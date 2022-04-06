@@ -63,6 +63,93 @@ public class TriangleInequalityTest {
     end = graph.getVertex("osm:node:42448554");
   }
 
+  @Test
+  public void testTriangleInequalityDefaultModes() {
+    checkTriangleInequality();
+  }
+
+  @Test
+  public void testTriangleInequalityWalkingOnly() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityDrivingOnly() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkTransit() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkBike() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityDefaultModesBasicSPT() {
+    checkTriangleInequality(null);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkingOnlyBasicSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityDrivingOnlyBasicSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkTransitBasicSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkBikeBasicSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityDefaultModesMultiSPT() {
+    checkTriangleInequality(null);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkingOnlyMultiSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityDrivingOnlyMultiSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkTransitMultiSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT);
+    checkTriangleInequality(modes);
+  }
+
+  @Test
+  public void testTriangleInequalityWalkBikeMultiSPT() {
+    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
+    checkTriangleInequality(modes);
+  }
+
   private GraphPath getPath(RoutingRequest proto, Edge startBackEdge, Vertex u, Vertex v) {
     RoutingRequest options = proto.clone();
 
@@ -160,92 +247,5 @@ public class TriangleInequalityTest {
     }
 
     assertFalse(violated);
-  }
-
-  @Test
-  public void testTriangleInequalityDefaultModes() {
-    checkTriangleInequality();
-  }
-
-  @Test
-  public void testTriangleInequalityWalkingOnly() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityDrivingOnly() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkTransit() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkBike() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityDefaultModesBasicSPT() {
-    checkTriangleInequality(null);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkingOnlyBasicSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityDrivingOnlyBasicSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkTransitBasicSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkBikeBasicSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityDefaultModesMultiSPT() {
-    checkTriangleInequality(null);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkingOnlyMultiSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityDrivingOnlyMultiSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkTransitMultiSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT);
-    checkTriangleInequality(modes);
-  }
-
-  @Test
-  public void testTriangleInequalityWalkBikeMultiSPT() {
-    TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE);
-    checkTriangleInequality(modes);
   }
 }

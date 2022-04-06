@@ -56,13 +56,13 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   }
 
   @Override
-  @NotNull
-  public RaptorTransferConstraint getTransferConstraint() {
-    return constraint;
+  public int getEarliestBoardTimeForConstrainedTransfer() {
+    return earliestBoardTime;
   }
 
   @Override
-  public int getEarliestBoardTimeForConstrainedTransfer() {
-    return earliestBoardTime;
+  @NotNull
+  public RaptorTransferConstraint getTransferConstraint() {
+    return constraint;
   }
 }

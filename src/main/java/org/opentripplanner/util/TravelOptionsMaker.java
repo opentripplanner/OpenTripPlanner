@@ -8,10 +8,10 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
- * Class which creates "Travel by" options list from supported transit modes and which extra modes are supported (bike sharing, bike &amp; ride, park &amp; ride)
- *
- * This list is then returned to the client which shows it in UI.
- * Created by mabu on 28.7.2015.
+ * Class which creates "Travel by" options list from supported transit modes and which extra modes
+ * are supported (bike sharing, bike &amp; ride, park &amp; ride)
+ * <p>
+ * This list is then returned to the client which shows it in UI. Created by mabu on 28.7.2015.
  */
 public final class TravelOptionsMaker {
 

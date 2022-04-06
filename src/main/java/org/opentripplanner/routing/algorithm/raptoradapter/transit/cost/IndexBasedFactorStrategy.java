@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import java.util.Arrays;
 
 /**
- * This class keep a facto for each index and the minimum factor for fast retrieval
- * during Raptor search.
+ * This class keep a facto for each index and the minimum factor for fast retrieval during Raptor
+ * search.
  */
 final class IndexBasedFactorStrategy implements FactorStrategy {
 

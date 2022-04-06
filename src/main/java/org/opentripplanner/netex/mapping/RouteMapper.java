@@ -150,8 +150,8 @@ class RouteMapper {
   }
 
   /**
-   * Find an agency by mapping the GroupOfLines/Network Authority. If no authority is found
-   * a dummy agency is created and returned.
+   * Find an agency by mapping the GroupOfLines/Network Authority. If no authority is found a dummy
+   * agency is created and returned.
    */
   private Agency findOrCreateAuthority(Line_VersionStructure line) {
     String groupRef = line.getRepresentedByGroupRef().getRef();

@@ -12,8 +12,8 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
  * When wanting to take a bike onto transit we want to improve the performance by limiting the
- * number of accesses to those stops which actually have trips where you can take the bike on.
- * Once we have reached enough of trips we skip all further edges.
+ * number of accesses to those stops which actually have trips where you can take the bike on. Once
+ * we have reached enough of trips we skip all further edges.
  */
 public class BikeToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
@@ -27,6 +27,14 @@ public class BikeToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
   public BikeToStopSkipEdgeStrategy(Function<Stop, Collection<Trip>> getTripsForStop) {
     this.getTripsForStop = getTripsForStop;
+  }
+
+  public static boolean bikeAccessForTrip(Trip trip) {
+    if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
+      return trip.getBikesAllowed() == BikeAccess.ALLOWED;
+    }
+
+    return trip.getRoute().getBikesAllowed() == BikeAccess.ALLOWED;
   }
 
   @Override
@@ -46,13 +54,5 @@ public class BikeToStopSkipEdgeStrategy implements SkipEdgeStrategy {
       }
     }
     return current.getWalkDistance() > distanceLimit;
-  }
-
-  public static boolean bikeAccessForTrip(Trip trip) {
-    if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
-      return trip.getBikesAllowed() == BikeAccess.ALLOWED;
-    }
-
-    return trip.getRoute().getBikesAllowed() == BikeAccess.ALLOWED;
   }
 }

@@ -25,24 +25,16 @@ import org.slf4j.LoggerFactory;
 public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
-
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  private WriteToGraphCallback saveResultOnGraph;
-
   /**
    * Update streamer
    */
   private final VehiclePositionSource vehiclePositionSource;
-  private VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
-
   private final String feedId;
-
-  @Override
-  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-    this.saveResultOnGraph = saveResultOnGraph;
-  }
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  private WriteToGraphCallback saveResultOnGraph;
+  private VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
 
   public PollingVehiclePositionUpdater(VehiclePositionsUpdaterParameters params) {
     super(params);
@@ -58,6 +50,11 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+    this.saveResultOnGraph = saveResultOnGraph;
+  }
+
+  @Override
   public void setup(Graph graph) {
     var index = graph.index;
     vehiclePositionPatternMatcher =
@@ -69,12 +66,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
       );
   }
 
-  private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, ServiceDate sd) {
-    return Optional
-      .ofNullable(graph.getTimetableSnapshot())
-      .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
-      .orElseGet(() -> graph.index.getPatternForTrip().get(trip));
-  }
+  @Override
+  public void teardown() {}
 
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
@@ -92,11 +85,15 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     }
   }
 
-  @Override
-  public void teardown() {}
-
   public String toString() {
     String s = (vehiclePositionSource == null) ? "NONE" : vehiclePositionSource.toString();
     return "Streaming vehicle position updater with update source = " + s;
+  }
+
+  private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, ServiceDate sd) {
+    return Optional
+      .ofNullable(graph.getTimetableSnapshot())
+      .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
+      .orElseGet(() -> graph.index.getPatternForTrip().get(trip));
   }
 }

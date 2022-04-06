@@ -1,6 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -120,11 +125,11 @@ public class PlainStreetEdgeTest {
   }
 
   /**
-   * Test the traversal of two edges with different traverse modes, with a focus on cycling.
-   * This test will fail unless the following three conditions are met:
-   * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
-   * 2. Turn costs are computed such that bike walking is taken into account correctly.
-   * 3. User-specified bike speeds are applied correctly during turn cost computation.
+   * Test the traversal of two edges with different traverse modes, with a focus on cycling. This
+   * test will fail unless the following three conditions are met: 1. Turn costs are computed based
+   * on the back edge's traverse mode during reverse traversal. 2. Turn costs are computed such that
+   * bike walking is taken into account correctly. 3. User-specified bike speeds are applied
+   * correctly during turn cost computation.
    */
   @Test
   public void testTraverseModeSwitchBike() {
@@ -155,11 +160,11 @@ public class PlainStreetEdgeTest {
   }
 
   /**
-   * Test the traversal of two edges with different traverse modes, with a focus on walking.
-   * This test will fail unless the following three conditions are met:
-   * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
-   * 2. Turn costs are computed such that bike walking is taken into account correctly.
-   * 3. Enabling bike mode on a routing request bases the bike walking speed on the walking speed.
+   * Test the traversal of two edges with different traverse modes, with a focus on walking. This
+   * test will fail unless the following three conditions are met: 1. Turn costs are computed based
+   * on the back edge's traverse mode during reverse traversal. 2. Turn costs are computed such that
+   * bike walking is taken into account correctly. 3. Enabling bike mode on a routing request bases
+   * the bike walking speed on the walking speed.
    */
   @Test
   public void testTraverseModeSwitchWalk() {
@@ -286,10 +291,6 @@ public class PlainStreetEdgeTest {
 
   /**
    * Create an edge. If twoWay, create two edges (back and forth).
-   *
-   * @param vA
-   * @param vB
-   * @param length
    */
   private StreetEdge edge(
     StreetVertex vA,

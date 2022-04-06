@@ -5,8 +5,8 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
- * Use this class to attach a debugHandler to a pareto set. The handler will
- * be notified about all changes in the set.
+ * Use this class to attach a debugHandler to a pareto set. The handler will be notified about all
+ * changes in the set.
  *
  * @param <T> The {@link ParetoSet} type.
  */

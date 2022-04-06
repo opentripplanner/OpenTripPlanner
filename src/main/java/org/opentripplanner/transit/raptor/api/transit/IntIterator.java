@@ -1,14 +1,12 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 /**
- * Iterator for fast iteration over int base type integers without
- * boxing and unboxing.
+ * Iterator for fast iteration over int base type integers without boxing and unboxing.
  */
 public interface IntIterator {
   /**
-   * Retrieve the next int in sequence. SHOULD only be called ONCE per iteration,
-   * the implementation can optimize the iterator implementation by incrementing the
-   * value in this method.
+   * Retrieve the next int in sequence. SHOULD only be called ONCE per iteration, the implementation
+   * can optimize the iterator implementation by incrementing the value in this method.
    */
   int next();
 

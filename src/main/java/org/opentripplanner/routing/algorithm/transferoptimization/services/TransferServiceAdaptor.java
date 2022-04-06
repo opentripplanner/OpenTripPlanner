@@ -11,10 +11,10 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStop
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * This a just an adaptor to look up transfers constraints. The adaptor hides the
- * {@link TransferService} specific API and functions as a bridge to the
- * {@code transferoptimization} model. The best solution would be to use the same
- * mechanism in Raptor and here, but that would require the main transit model to be refactored.
+ * This a just an adaptor to look up transfers constraints. The adaptor hides the {@link
+ * TransferService} specific API and functions as a bridge to the {@code transferoptimization}
+ * model. The best solution would be to use the same mechanism in Raptor and here, but that would
+ * require the main transit model to be refactored.
  * <p>
  * The adaptor makes it easy to test the {@link TransferGenerator} by mocking.
  *

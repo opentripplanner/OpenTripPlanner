@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * A collection of request tags. The intended use of tags are for cross-cutting
- * concerns like performance timing, debugging and logging. Currently, we only use tags for
- * performance timing; Hence only one getter method {@code #getTimingTags}.
+ * A collection of request tags. The intended use of tags are for cross-cutting concerns like
+ * performance timing, debugging and logging. Currently, we only use tags for performance timing;
+ * Hence only one getter method {@code #getTimingTags}.
  */
 public class Tags implements Serializable {
 

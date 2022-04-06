@@ -7,7 +7,8 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * This class define how to calculate the cost when cost is part of the multi-criteria pareto function.
+ * This class define how to calculate the cost when cost is part of the multi-criteria pareto
+ * function.
  */
 public class McCostParams {
 
@@ -21,8 +22,8 @@ public class McCostParams {
   private final double waitReluctanceFactor;
 
   /**
-   * Default constructor defines default values. These defaults are
-   * overridden by defaults in the {@link RoutingRequest}.
+   * Default constructor defines default values. These defaults are overridden by defaults in the
+   * {@link RoutingRequest}.
    */
   private McCostParams() {
     this.boardCost = 600;
@@ -47,13 +48,13 @@ public class McCostParams {
   }
 
   /**
-   * The normal transit reluctance is 1.0 - this is the baseline for all other costs. This
-   * parameter is used to set a specific reluctance (other than 1.0) to some trips. For example
-   * most people like TRAINS over other type of public transport, so it is possible to set the
-   * reluctance for RAIL to e.g. 0.9 to give it a small advantage. The OTP domain is responsible
-   * for the mapping between this arrays of reluctance values and the index in the {@link
-   * RaptorTripSchedule#transitReluctanceFactorIndex()}. Raptor is agnostic to the meaning of the index.
-   * But, it MUST match the the {@link RaptorTripSchedule#transitReluctanceFactorIndex()}.
+   * The normal transit reluctance is 1.0 - this is the baseline for all other costs. This parameter
+   * is used to set a specific reluctance (other than 1.0) to some trips. For example most people
+   * like TRAINS over other type of public transport, so it is possible to set the reluctance for
+   * RAIL to e.g. 0.9 to give it a small advantage. The OTP domain is responsible for the mapping
+   * between this arrays of reluctance values and the index in the {@link
+   * RaptorTripSchedule#transitReluctanceFactorIndex()}. Raptor is agnostic to the meaning of the
+   * index. But, it MUST match the the {@link RaptorTripSchedule#transitReluctanceFactorIndex()}.
    * <p>
    * If {@code null} is returned the default reluctance 1.0 is used.
    */
@@ -67,14 +68,8 @@ public class McCostParams {
   }
 
   @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(McCostParams.class)
-      .addNum("boardCost", boardCost, 0)
-      .addNum("transferCost", transferCost, 0)
-      .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
-      .addDoubles("transitReluctanceFactors", transitReluctanceFactors, 1.0)
-      .toString();
+  public int hashCode() {
+    return Objects.hash(boardCost, transferCost, waitReluctanceFactor);
   }
 
   @Override
@@ -94,7 +89,13 @@ public class McCostParams {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(boardCost, transferCost, waitReluctanceFactor);
+  public String toString() {
+    return ToStringBuilder
+      .of(McCostParams.class)
+      .addNum("boardCost", boardCost, 0)
+      .addNum("transferCost", transferCost, 0)
+      .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
+      .addDoubles("transitReluctanceFactors", transitReluctanceFactors, 1.0)
+      .toString();
   }
 }

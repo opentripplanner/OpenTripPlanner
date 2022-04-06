@@ -18,6 +18,11 @@ public class StopNotLinkedForTransfers implements DataImportIssue {
   }
 
   @Override
+  public String getMessage() {
+    return String.format(FMT, stop);
+  }
+
+  @Override
   public String getHTMLMessage() {
     return String.format(
       HTMLFMT,
@@ -26,11 +31,6 @@ public class StopNotLinkedForTransfers implements DataImportIssue {
       stop.getDefaultName(),
       stop.getStop().getId()
     );
-  }
-
-  @Override
-  public String getMessage() {
-    return String.format(FMT, stop);
   }
 
   @Override

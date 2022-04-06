@@ -13,8 +13,8 @@ public class BookingMethodMapper {
   private static final Logger LOG = LoggerFactory.getLogger(BookingMethodMapper.class);
 
   /**
-   * @param sourceRef The entity with the booking-method, used to include a reference to the
-   *                  entity in the log, in case of a problem with the mapping.
+   * @param sourceRef The entity with the booking-method, used to include a reference to the entity
+   *                  in the log, in case of a problem with the mapping.
    */
   public static BookingMethod map(
     String sourceRef,

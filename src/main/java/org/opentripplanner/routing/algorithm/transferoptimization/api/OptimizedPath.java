@@ -11,8 +11,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
- * An OptimizedPath decorates a path returned from Raptor with a transfer-priority-cost and
- * a wait-time-optimized-cost.
+ * An OptimizedPath decorates a path returned from Raptor with a transfer-priority-cost and a
+ * wait-time-optimized-cost.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -49,15 +49,10 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     this.breakTieCost = breakTieCost;
   }
 
-  @Override
-  public int transferPriorityCost() {
-    return transferPriorityCost;
-  }
-
   /**
-   * A utility function for calculating the priority cost for a transfer.
-   * If the {@code transfer exist}, the given supplier is used to get the constrained transfer
-   * (can be null) and the cost is calculated. If a transfer does not exist, zero cost is returned.
+   * A utility function for calculating the priority cost for a transfer. If the {@code transfer
+   * exist}, the given supplier is used to get the constrained transfer (can be null) and the cost
+   * is calculated. If a transfer does not exist, zero cost is returned.
    */
   public static int priorityCost(boolean transferExist, Supplier<RaptorConstrainedTransfer> txGet) {
     if (transferExist) {
@@ -67,6 +62,11 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     }
     // Return no zero cost if a transfer do not exist
     return TransferConstraint.ZERO_COST;
+  }
+
+  @Override
+  public int transferPriorityCost() {
+    return transferPriorityCost;
   }
 
   @Override
@@ -94,11 +94,6 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     return toString(null);
   }
 
-  private void appendSummary(PathStringBuilder buf) {
-    buf.costCentiSec(transferPriorityCost, TransferConstraint.ZERO_COST, "pri");
-    buf.costCentiSec(generalizedCostWaitTimeOptimized(), generalizedCost(), "wtc");
-  }
-
   private static int priorityCost(Path<?> path) {
     return path.legStream().mapToInt(OptimizedPath::priorityCost).sum();
   }
@@ -110,5 +105,10 @@ public class OptimizedPath<T extends RaptorTripSchedule>
       leg.isTransitLeg() && leg.nextTransitLeg() != null,
       () -> leg.asTransitLeg().getConstrainedTransferAfterLeg()
     );
+  }
+
+  private void appendSummary(PathStringBuilder buf) {
+    buf.costCentiSec(transferPriorityCost, TransferConstraint.ZERO_COST, "pri");
+    buf.costCentiSec(generalizedCostWaitTimeOptimized(), generalizedCost(), "wtc");
   }
 }

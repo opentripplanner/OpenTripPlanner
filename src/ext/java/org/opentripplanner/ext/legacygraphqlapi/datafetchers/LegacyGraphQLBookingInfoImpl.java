@@ -16,6 +16,11 @@ public class LegacyGraphQLBookingInfoImpl
   }
 
   @Override
+  public DataFetcher<String> dropOffMessage() {
+    return environment -> getSource(environment).getDropOffMessage();
+  }
+
+  @Override
   public DataFetcher<BookingTime> earliestBookingTime() {
     return environment -> getSource(environment).getEarliestBookingTime();
   }
@@ -23,11 +28,6 @@ public class LegacyGraphQLBookingInfoImpl
   @Override
   public DataFetcher<BookingTime> latestBookingTime() {
     return environment -> getSource(environment).getLatestBookingTime();
-  }
-
-  @Override
-  public DataFetcher<Long> minimumBookingNoticeSeconds() {
-    return environment -> getSource(environment).getMinimumBookingNotice().toSeconds();
   }
 
   @Override
@@ -41,13 +41,13 @@ public class LegacyGraphQLBookingInfoImpl
   }
 
   @Override
-  public DataFetcher<String> pickupMessage() {
-    return environment -> getSource(environment).getPickupMessage();
+  public DataFetcher<Long> minimumBookingNoticeSeconds() {
+    return environment -> getSource(environment).getMinimumBookingNotice().toSeconds();
   }
 
   @Override
-  public DataFetcher<String> dropOffMessage() {
-    return environment -> getSource(environment).getDropOffMessage();
+  public DataFetcher<String> pickupMessage() {
+    return environment -> getSource(environment).getPickupMessage();
   }
 
   private BookingInfo getSource(DataFetchingEnvironment environment) {

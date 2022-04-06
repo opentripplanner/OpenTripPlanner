@@ -8,8 +8,6 @@ public class SiriTransportModeMapper {
 
   /**
    * Maps first SIRI-VehicleMode to OTP-mode
-   * @param vehicleModes
-   * @return
    */
   static TransitMode mapTransitMainMode(List<VehicleModesEnumeration> vehicleModes) {
     if (vehicleModes != null && !vehicleModes.isEmpty()) {

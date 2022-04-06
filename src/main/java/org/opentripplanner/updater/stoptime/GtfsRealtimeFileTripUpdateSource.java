@@ -18,17 +18,15 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeFileTripUpdateSource.class);
 
   private final File file;
-
+  /**
+   * Default agency id that is used for the trip ids in the TripUpdates
+   */
+  private final String feedId;
   /**
    * True iff the last list with updates represent all updates that are active right now, i.e. all
    * previous updates should be disregarded
    */
   private boolean fullDataset = true;
-
-  /**
-   * Default agency id that is used for the trip ids in the TripUpdates
-   */
-  private final String feedId;
 
   public GtfsRealtimeFileTripUpdateSource(Parameters config) {
     this.feedId = getFeedId();
@@ -78,17 +76,18 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
     return fullDataset;
   }
 
-  public String toString() {
-    return "GtfsRealtimeFileTripUpdateSource(" + file + ")";
-  }
-
   @Override
   public String getFeedId() {
     return this.feedId;
   }
 
+  public String toString() {
+    return "GtfsRealtimeFileTripUpdateSource(" + file + ")";
+  }
+
   public interface Parameters {
     String getFeedId();
+
     String getFile();
   }
 }

@@ -20,13 +20,13 @@ public class TestTransferPoint implements TransferPoint {
     return applyToAllTrips;
   }
 
-  public int getStopPosition() {
-    return schedule.pattern().findStopPositionAfter(0, stop);
-  }
-
   @Override
   public int getSpecificityRanking() {
     return 2;
+  }
+
+  public int getStopPosition() {
+    return schedule.pattern().findStopPositionAfter(0, stop);
   }
 
   public boolean matches(TestTripSchedule schedule, int stop) {

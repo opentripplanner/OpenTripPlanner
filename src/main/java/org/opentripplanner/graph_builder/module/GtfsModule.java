@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Sets;
-import java.awt.*;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -50,24 +50,17 @@ import org.slf4j.LoggerFactory;
 public class GtfsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
-
-  private DataImportIssueStore issueStore;
-
   private final EntityHandler counter = new EntityCounter();
-
-  private FareServiceFactory fareServiceFactory;
-
   private final Set<String> agencyIdsSeen = Sets.newHashSet();
-
-  private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
-
   /**
    * @see BuildConfig#transitServiceStart
    * @see BuildConfig#transitServiceEnd
    */
   private final ServiceDateInterval transitPeriodLimit;
-
   private final List<GtfsBundle> gtfsBundles;
+  private DataImportIssueStore issueStore;
+  private FareServiceFactory fareServiceFactory;
+  private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
   public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
     this.gtfsBundles = bundles;
@@ -157,6 +150,13 @@ public class GtfsModule implements GraphBuilderModule {
   }
 
   /* Private Methods */
+
+  @Override
+  public void checkInputs() {
+    for (GtfsBundle bundle : gtfsBundles) {
+      bundle.checkInputs();
+    }
+  }
 
   /**
    * This method have side-effects, the {@code stopTimesByTrip} is updated.
@@ -292,14 +292,12 @@ public class GtfsModule implements GraphBuilderModule {
 
   /**
    * Generates routeText colors for routes with routeColor and without routeTextColor
-   *
+   * <p>
    * If route doesn't have color or already has routeColor and routeTextColor nothing is done.
-   *
-   * textColor can be black or white. White for dark colors and black for light colors of routeColor.
-   * If color is light or dark is calculated based on luminance formula:
-   * sqrt( 0.299*Red^2 + 0.587*Green^2 + 0.114*Blue^2 )
-   *
-   * @param route
+   * <p>
+   * textColor can be black or white. White for dark colors and black for light colors of
+   * routeColor. If color is light or dark is calculated based on luminance formula: sqrt(
+   * 0.299*Red^2 + 0.587*Green^2 + 0.114*Blue^2 )
    */
   private void generateRouteColor(Route route) {
     String routeColor = route.getColor();
@@ -345,13 +343,28 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     @Override
-    public <T> T getEntityForId(Class<T> type, Serializable id) {
-      return dao.getEntityForId(type, id);
+    public void saveEntity(Object entity) {
+      dao.saveEntity(entity);
     }
 
     @Override
-    public void saveEntity(Object entity) {
-      dao.saveEntity(entity);
+    public void updateEntity(Object entity) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void saveOrUpdateEntity(Object entity) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <K extends Serializable, T extends IdentityBean<K>> void removeEntity(T entity) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> void clearAllEntitiesForType(Class<T> type) {
+      throw new UnsupportedOperationException();
     }
 
     @Override
@@ -365,28 +378,13 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     @Override
-    public <T> void clearAllEntitiesForType(Class<T> type) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <K extends Serializable, T extends IdentityBean<K>> void removeEntity(T entity) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
     public <T> Collection<T> getAllEntitiesForType(Class<T> type) {
       return dao.getAllEntitiesForType(type);
     }
 
     @Override
-    public void saveOrUpdateEntity(Object entity) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void updateEntity(Object entity) {
-      throw new UnsupportedOperationException();
+    public <T> T getEntityForId(Class<T> type, Serializable id) {
+      return dao.getEntityForId(type, id);
     }
   }
 
@@ -413,13 +411,6 @@ public class GtfsModule implements GraphBuilderModule {
       value++;
       count.put(entityType, value);
       return value;
-    }
-  }
-
-  @Override
-  public void checkInputs() {
-    for (GtfsBundle bundle : gtfsBundles) {
-      bundle.checkInputs();
     }
   }
 }

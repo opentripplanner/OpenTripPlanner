@@ -27,8 +27,8 @@ public class TripPatternWithRaptorStopIndexes {
   private final TransferForPatternByStopPos constrainedTransfersForwardSearch = new TransferForPatternByStopPos();
 
   /**
-   * List of transfers FROM this pattern for each stop position in pattern used by Raptor during
-   * the REVERSE search.
+   * List of transfers FROM this pattern for each stop position in pattern used by Raptor during the
+   * REVERSE search.
    */
   private final TransferForPatternByStopPos constrainedTransfersReverseSearch = new TransferForPatternByStopPos();
 
@@ -147,10 +147,9 @@ public class TripPatternWithRaptorStopIndexes {
   }
 
   /**
-   * This method should be called AFTER all transfers are added, and before the pattern is used in
-   * a Raptor search. This is done to protect against modification when processing real-time
-   * updates
-   *
+   * This method should be called AFTER all transfers are added, and before the pattern is used in a
+   * Raptor search. This is done to protect against modification when processing real-time updates
+   * <p>
    * {@link TripPatternWithRaptorStopIndexes#sealedConstrainedTransfers}
    */
   public void sealConstrainedTransfers() {

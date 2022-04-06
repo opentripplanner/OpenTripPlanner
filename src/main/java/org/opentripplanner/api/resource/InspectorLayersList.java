@@ -6,7 +6,6 @@ import java.util.Map;
 import org.opentripplanner.inspector.TileRenderer;
 
 /**
- *
  * @author mabu
  */
 public class InspectorLayersList {

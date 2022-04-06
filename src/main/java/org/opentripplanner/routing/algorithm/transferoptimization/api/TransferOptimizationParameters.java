@@ -8,8 +8,8 @@ import org.opentripplanner.transit.raptor.api.path.Path;
  */
 public interface TransferOptimizationParameters {
   /**
-   * If enabled, all paths will be optimized with respect to the transfer point to minimise
-   * the {@link org.opentripplanner.model.transfer.TransferConstraint#cost(TransferConstraint)}.
+   * If enabled, all paths will be optimized with respect to the transfer point to minimise the
+   * {@link org.opentripplanner.model.transfer.TransferConstraint#cost(TransferConstraint)}.
    */
   boolean optimizeTransferPriority();
 
@@ -36,10 +36,10 @@ public interface TransferOptimizationParameters {
 
   /**
    * Use this to add an extra board- and alight-cost for (none) prioritized stops. A {@code
-   * stopBoardAlightCosts} is added to the generalized-cost during routing. But, this cost cannot
-   * be too high, because that would add extra cost to the transfer, and favor other alternative
-   * paths. But, when optimizing transfers, we do not have to take other paths into consideration
-   * and can "boost" the stop-priority-cost to allow transfers to take place at a preferred stop.
+   * stopBoardAlightCosts} is added to the generalized-cost during routing. But, this cost cannot be
+   * too high, because that would add extra cost to the transfer, and favor other alternative paths.
+   * But, when optimizing transfers, we do not have to take other paths into consideration and can
+   * "boost" the stop-priority-cost to allow transfers to take place at a preferred stop.
    * <p>
    * The cost added during routing is already added to the generalized-cost used as a base in the
    * optimized transfer calculation. By setting this parameter to 0, no extra cost is added, by

@@ -6,14 +6,14 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 /**
  * Round tracker to keep track of round index and when to stop exploring new rounds.
  * <p>
- * In round 0 the access paths with one leg are added. In round 1 the first transit and transfers
- * is added, ...
+ * In round 0 the access paths with one leg are added. In round 1 the first transit and transfers is
+ * added, ...
  */
 public class RoundTracker implements RoundProvider {
 
   /**
-   * The extra number of rounds/transfers we accept compared to the trip with
-   * the fewest number of transfers. This is used to abort the search.
+   * The extra number of rounds/transfers we accept compared to the trip with the fewest number of
+   * transfers. This is used to abort the search.
    */
   private final int numberOfAdditionalTransfers;
 
@@ -25,9 +25,8 @@ public class RoundTracker implements RoundProvider {
   /**
    * The round upper limit for when to abort the search.
    * <p/>
-   * This is default set to the maximum number of rounds limit, but as soon as
-   * the destination is reach the {@link #numberOfAdditionalTransfers} is used to
-   * update the limit.
+   * This is default set to the maximum number of rounds limit, but as soon as the destination is
+   * reach the {@link #numberOfAdditionalTransfers} is used to update the limit.
    * <p/>
    * The limit is inclusive, indicating the the last round to process.
    */
@@ -39,22 +38,6 @@ public class RoundTracker implements RoundProvider {
     this.numberOfAdditionalTransfers = numberOfAdditionalTransfers;
     lifeCycle.onSetupIteration(t -> setupIteration());
     lifeCycle.onRoundComplete(this::roundComplete);
-  }
-
-  /**
-   * Before each iteration, initialize the round to 0.
-   */
-  private void setupIteration() {
-    round = 0;
-  }
-
-  /**
-   * Set the round limit based on the 'numberOfAdditionalTransfers' parameter.
-   */
-  private void roundComplete(boolean destinationReached) {
-    if (destinationReached) {
-      recalculateMaxLimitBasedOnDestinationReachedInCurrentRound();
-    }
   }
 
   /** Is there more rounds to process (or is the upper limit reached). */
@@ -75,11 +58,27 @@ public class RoundTracker implements RoundProvider {
   }
 
   /**
-   * Return true if this round is the fist round, calculating the first transit path.
-   * Access is calculated in round zero (0).
+   * Return true if this round is the fist round, calculating the first transit path. Access is
+   * calculated in round zero (0).
    */
   public boolean isFirstRound() {
     return round == 1;
+  }
+
+  /**
+   * Before each iteration, initialize the round to 0.
+   */
+  private void setupIteration() {
+    round = 0;
+  }
+
+  /**
+   * Set the round limit based on the 'numberOfAdditionalTransfers' parameter.
+   */
+  private void roundComplete(boolean destinationReached) {
+    if (destinationReached) {
+      recalculateMaxLimitBasedOnDestinationReachedInCurrentRound();
+    }
   }
 
   /* private methods */

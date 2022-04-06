@@ -37,21 +37,21 @@ public class OTPConfiguration {
 
   private static final Logger LOG = LoggerFactory.getLogger(OTPConfiguration.class);
   /**
-   * The command line parameters provide the directory for loading config files, and
-   * in some cases may have parameters used to parse/override the file configs.
+   * The command line parameters provide the directory for loading config files, and in some cases
+   * may have parameters used to parse/override the file configs.
    */
   private final CommandLineParameters cli;
   private final OtpConfig otpConfig;
 
   /**
-   * The build-config in NOT final because it can be set from the embedded
-   * graph.obj build-config after the graph is loaded.
+   * The build-config in NOT final because it can be set from the embedded graph.obj build-config
+   * after the graph is loaded.
    */
   private BuildConfig buildConfig;
 
   /**
-   * The router-config in NOT final because it can be set from the embedded
-   * graph.obj router-config after the graph is loaded.
+   * The router-config in NOT final because it can be set from the embedded graph.obj router-config
+   * after the graph is loaded.
    */
   private RouterConfig routerConfig;
 
@@ -63,16 +63,16 @@ public class OTPConfiguration {
   }
 
   /**
-   * Create a new OTP configuration instance for a given directory. OTP can load
-   * multiple graphs with its own configuration.
+   * Create a new OTP configuration instance for a given directory. OTP can load multiple graphs
+   * with its own configuration.
    */
   public OTPConfiguration(CommandLineParameters cli) {
     this(cli, new ConfigLoader(cli.getBaseDirectory()));
   }
 
   /**
-   * Create a new config for test using the given JSON config. The config is used to initiate
-   * the OTP config, build config and the router config.
+   * Create a new config for test using the given JSON config. The config is used to initiate the
+   * OTP config, build config and the router config.
    */
   public static OTPConfiguration createForTest(String configJson) {
     return new OTPConfiguration(new CommandLineParameters(), ConfigLoader.fromString(configJson));
@@ -97,6 +97,7 @@ public class OTPConfiguration {
   /**
    * TODO OTP2 - Remove this, and inject config using interfaces into the necessary
    *           - components, decompiling them from the OTP application parameters.
+   *
    * @return the command line parameters
    */
   public CommandLineParameters getCli() {
@@ -121,6 +122,7 @@ public class OTPConfiguration {
    * Get the {@code router-config.json} as JsonNode.
    * <p>
    * Returns a {@link MissingNode} if base directory is {@code null} or the file does not exist.
+   *
    * @throws RuntimeException if the file contains syntax errors or cannot be parsed.
    */
   public RouterConfig routerConfig() {

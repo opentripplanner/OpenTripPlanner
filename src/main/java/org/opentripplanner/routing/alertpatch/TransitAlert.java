@@ -14,48 +14,35 @@ import org.opentripplanner.util.I18NString;
 public class TransitAlert implements Serializable {
 
   private static final long serialVersionUID = 8305126586053909836L;
-
+  private final Set<EntitySelector> entities = new HashSet<>();
+  private final Collection<StopCondition> stopConditions = new ArrayList<>();
   private String id;
-
   public I18NString alertHeaderText;
   public I18NString alertDescriptionText;
   public I18NString alertDetailText;
   public I18NString alertAdviceText;
-
   // TODO OTP2 we wanted to merge the GTFS single alertUrl and the SIRI multiple URLs.
   //      However, GTFS URLs are one-per-language in a single object, and SIRI URLs are N objects with no translation.
   public I18NString alertUrl;
-
   private List<AlertUrl> alertUrlList = new ArrayList<>();
-
   //null means unknown
   public String alertType;
-
   /**
    * The severity of the alert.
    */
   public AlertSeverity severity;
-
   /**
    * The cause of the disruption.
    */
   public AlertCause cause;
-
   /**
    * The effect of the disruption.
    */
   public AlertEffect effect;
-
   //null means unknown
   public Integer priority;
-
   private List<TimePeriod> timePeriods = new ArrayList<>();
-
   private String feedId;
-
-  private final Set<EntitySelector> entities = new HashSet<>();
-
-  private final Collection<StopCondition> stopConditions = new ArrayList<>();
 
   public String getId() {
     return id;
@@ -128,8 +115,8 @@ public class TransitAlert implements Serializable {
   }
 
   /**
-   * Finds the last validity endTime from all timePeriods for this alert.
-   * Returns <code>null</code> if the validity is open-ended
+   * Finds the last validity endTime from all timePeriods for this alert. Returns <code>null</code>
+   * if the validity is open-ended
    *
    * @return Last endDate for this Alert, <code>null</code> if open-ended
    */

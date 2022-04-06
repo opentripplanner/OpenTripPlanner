@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -62,52 +61,9 @@ public class CsvFileIO {
     }
   }
 
-  private List<TestCaseDefinition> readTestCaseDefinitionsFromFile() throws IOException {
-    List<TestCaseDefinition> testCases = new ArrayList<>();
-    CsvReader csvReader = new CsvReader(
-      testCasesFile.getAbsolutePath(),
-      CSV_DELIMITER,
-      CHARSET_UTF_8
-    );
-    csvReader.readHeaders();
-
-    while (csvReader.readRecord()) {
-      try {
-        if (isCommentOrEmpty(csvReader.getRawRecord())) {
-          continue;
-        }
-        var tc = new TestCaseDefinition(
-          csvReader.get("testCaseId"),
-          csvReader.get("description"),
-          parseTime(csvReader.get("departure")),
-          parseTime(csvReader.get("arrival")),
-          parseDuration(csvReader.get("window")),
-          new GenericLocation(
-            csvReader.get("origin"),
-            FeedScopedId.ofNullable(FEED_ID, csvReader.get("fromPlace")),
-            Double.parseDouble(csvReader.get("fromLat")),
-            Double.parseDouble(csvReader.get("fromLon"))
-          ),
-          new GenericLocation(
-            csvReader.get("destination"),
-            FeedScopedId.ofNullable(FEED_ID, csvReader.get("toPlace")),
-            Double.parseDouble(csvReader.get("toLat")),
-            Double.parseDouble(csvReader.get("toLon"))
-          ),
-          asSortedList(toArray(csvReader.get("tags"))),
-          new QualifiedModeSet(toArray(csvReader.get("modes"))).getRequestModes()
-        );
-        testCases.add(tc);
-      } catch (RuntimeException e) {
-        LOG.error("Parse error! Test-case: " + csvReader.getRawRecord());
-        throw e;
-      }
-    }
-    return testCases;
-  }
-
   /**
-   * Write all results to a CSV file. This file can be renamed and used as expected-result input file.
+   * Write all results to a CSV file. This file can be renamed and used as expected-result input
+   * file.
    */
   public void writeResultsToFile(List<TestCase> testCases) {
     if (!printResultsForFirstStrategyRun) {
@@ -162,58 +118,6 @@ public class CsvFileIO {
   }
 
   /* private methods */
-
-  private Multimap<String, Result> readExpectedResultsFromFile() throws IOException {
-    Multimap<String, Result> results = ArrayListMultimap.create();
-
-    if (!expectedResultsFile.exists()) {
-      return results;
-    }
-
-    CsvReader csvReader = new CsvReader(
-      expectedResultsFile.getAbsolutePath(),
-      CSV_DELIMITER,
-      CHARSET_UTF_8
-    );
-    csvReader.readHeaders();
-
-    while (csvReader.readRecord()) {
-      if (isCommentOrEmpty(csvReader.getRawRecord())) {
-        continue;
-      }
-      Result expRes = readExpectedResult(csvReader);
-      results.put(expRes.testCaseId, expRes);
-    }
-    return results;
-  }
-
-  private Result readExpectedResult(CsvReader csvReader) throws IOException {
-    try {
-      return new Result(
-        csvReader.get("tcId"),
-        Integer.parseInt(csvReader.get("nTransfers")),
-        parseTime(csvReader.get("duration")),
-        Integer.parseInt(csvReader.get("cost")),
-        Integer.parseInt(csvReader.get("walkDistance")),
-        parseTime(csvReader.get("startTime")),
-        parseTime(csvReader.get("endTime")),
-        str2Col(csvReader.get("agencies")),
-        str2Col(csvReader.get("modes"), TraverseMode::valueOf),
-        str2Col(csvReader.get("routes")),
-        str2Col(csvReader.get("stops")),
-        csvReader.get("details")
-      );
-    } catch (RuntimeException e) {
-      throw new java.lang.IllegalStateException(
-        e.getMessage() + ". Line: " + csvReader.getRawRecord(),
-        e
-      );
-    }
-  }
-
-  private boolean isCommentOrEmpty(String line) {
-    return line.startsWith("#") || line.matches("[\\s,;|]*");
-  }
 
   private static String time2str(Integer timeOrDuration) {
     return TimeUtils.timeToStrLong(timeOrDuration);
@@ -271,5 +175,101 @@ public class CsvFileIO {
   private static void write(PrintWriter out, Integer value) {
     out.print(value);
     out.print(CSV_DELIMITER);
+  }
+
+  private List<TestCaseDefinition> readTestCaseDefinitionsFromFile() throws IOException {
+    List<TestCaseDefinition> testCases = new ArrayList<>();
+    CsvReader csvReader = new CsvReader(
+      testCasesFile.getAbsolutePath(),
+      CSV_DELIMITER,
+      CHARSET_UTF_8
+    );
+    csvReader.readHeaders();
+
+    while (csvReader.readRecord()) {
+      try {
+        if (isCommentOrEmpty(csvReader.getRawRecord())) {
+          continue;
+        }
+        var tc = new TestCaseDefinition(
+          csvReader.get("testCaseId"),
+          csvReader.get("description"),
+          parseTime(csvReader.get("departure")),
+          parseTime(csvReader.get("arrival")),
+          parseDuration(csvReader.get("window")),
+          new GenericLocation(
+            csvReader.get("origin"),
+            FeedScopedId.ofNullable(FEED_ID, csvReader.get("fromPlace")),
+            Double.parseDouble(csvReader.get("fromLat")),
+            Double.parseDouble(csvReader.get("fromLon"))
+          ),
+          new GenericLocation(
+            csvReader.get("destination"),
+            FeedScopedId.ofNullable(FEED_ID, csvReader.get("toPlace")),
+            Double.parseDouble(csvReader.get("toLat")),
+            Double.parseDouble(csvReader.get("toLon"))
+          ),
+          asSortedList(toArray(csvReader.get("tags"))),
+          new QualifiedModeSet(toArray(csvReader.get("modes"))).getRequestModes()
+        );
+        testCases.add(tc);
+      } catch (RuntimeException e) {
+        LOG.error("Parse error! Test-case: " + csvReader.getRawRecord());
+        throw e;
+      }
+    }
+    return testCases;
+  }
+
+  private Multimap<String, Result> readExpectedResultsFromFile() throws IOException {
+    Multimap<String, Result> results = ArrayListMultimap.create();
+
+    if (!expectedResultsFile.exists()) {
+      return results;
+    }
+
+    CsvReader csvReader = new CsvReader(
+      expectedResultsFile.getAbsolutePath(),
+      CSV_DELIMITER,
+      CHARSET_UTF_8
+    );
+    csvReader.readHeaders();
+
+    while (csvReader.readRecord()) {
+      if (isCommentOrEmpty(csvReader.getRawRecord())) {
+        continue;
+      }
+      Result expRes = readExpectedResult(csvReader);
+      results.put(expRes.testCaseId, expRes);
+    }
+    return results;
+  }
+
+  private Result readExpectedResult(CsvReader csvReader) throws IOException {
+    try {
+      return new Result(
+        csvReader.get("tcId"),
+        Integer.parseInt(csvReader.get("nTransfers")),
+        parseTime(csvReader.get("duration")),
+        Integer.parseInt(csvReader.get("cost")),
+        Integer.parseInt(csvReader.get("walkDistance")),
+        parseTime(csvReader.get("startTime")),
+        parseTime(csvReader.get("endTime")),
+        str2Col(csvReader.get("agencies")),
+        str2Col(csvReader.get("modes"), TraverseMode::valueOf),
+        str2Col(csvReader.get("routes")),
+        str2Col(csvReader.get("stops")),
+        csvReader.get("details")
+      );
+    } catch (RuntimeException e) {
+      throw new java.lang.IllegalStateException(
+        e.getMessage() + ". Line: " + csvReader.getRawRecord(),
+        e
+      );
+    }
+  }
+
+  private boolean isCommentOrEmpty(String line) {
+    return line.startsWith("#") || line.matches("[\\s,;|]*");
   }
 }

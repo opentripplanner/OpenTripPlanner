@@ -20,14 +20,6 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
     this.coordinates = (ArrayList<Coordinate>) coordinates.clone();
   }
 
-  @Override
-  public Envelope expandEnvelope(Envelope env) {
-    for (Coordinate c : coordinates) {
-      env.expandToInclude(c);
-    }
-    return env;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public CoordinateArrayListSequence clone() {
@@ -43,8 +35,18 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
   }
 
   @Override
+  public int getDimension() {
+    return 2;
+  }
+
+  @Override
   public Coordinate getCoordinate(int i) {
     return coordinates.get(i);
+  }
+
+  @Override
+  public Coordinate getCoordinateCopy(int i) {
+    return new Coordinate(coordinates.get(i));
   }
 
   @Override
@@ -55,13 +57,13 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
   }
 
   @Override
-  public Coordinate getCoordinateCopy(int i) {
-    return new Coordinate(coordinates.get(i));
+  public double getX(int index) {
+    return coordinates.get(index).x;
   }
 
   @Override
-  public int getDimension() {
-    return 2;
+  public double getY(int index) {
+    return coordinates.get(index).y;
   }
 
   @Override
@@ -71,13 +73,8 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
   }
 
   @Override
-  public double getX(int index) {
-    return coordinates.get(index).x;
-  }
-
-  @Override
-  public double getY(int index) {
-    return coordinates.get(index).y;
+  public int size() {
+    return coordinates.size();
   }
 
   @Override
@@ -95,13 +92,29 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
   }
 
   @Override
-  public int size() {
-    return coordinates.size();
+  public Coordinate[] toCoordinateArray() {
+    return coordinates.toArray(new Coordinate[0]);
   }
 
   @Override
-  public Coordinate[] toCoordinateArray() {
-    return coordinates.toArray(new Coordinate[0]);
+  public Envelope expandEnvelope(Envelope env) {
+    for (Coordinate c : coordinates) {
+      env.expandToInclude(c);
+    }
+    return env;
+  }
+
+  @Override
+  public CoordinateSequence copy() {
+    CoordinateArrayListSequence clone;
+    try {
+      clone = (CoordinateArrayListSequence) super.clone();
+    } catch (CloneNotSupportedException e) {
+      /* never happens since super is Object */
+      throw new RuntimeException(e);
+    }
+    clone.coordinates = (ArrayList<Coordinate>) coordinates.clone();
+    return clone;
   }
 
   public void extend(Coordinate[] newCoordinates) {
@@ -122,18 +135,5 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
 
   public void clear() {
     coordinates = new ArrayList<>();
-  }
-
-  @Override
-  public CoordinateSequence copy() {
-    CoordinateArrayListSequence clone;
-    try {
-      clone = (CoordinateArrayListSequence) super.clone();
-    } catch (CloneNotSupportedException e) {
-      /* never happens since super is Object */
-      throw new RuntimeException(e);
-    }
-    clone.coordinates = (ArrayList<Coordinate>) coordinates.clone();
-    return clone;
   }
 }

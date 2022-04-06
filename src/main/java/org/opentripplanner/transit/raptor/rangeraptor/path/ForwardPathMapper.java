@@ -12,8 +12,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 /**
- * Build a path from a destination arrival - this maps between the domain of routing
- * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
+ * Build a path from a destination arrival - this maps between the domain of routing to the domain
+ * of result paths. All values not needed for routing is computed as part of this mapping.
  */
 public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
 
@@ -39,10 +39,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     this.stopNameResolver = stopNameResolver;
     this.tripSearch = forwardSearch(useApproximateTripTimesSearch);
     lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
-  }
-
-  private void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
-    this.iterationDepartureTime = iterationDepartureTime;
   }
 
   @Override
@@ -79,5 +75,9 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     return useApproximateTimeSearch
       ? TripTimesSearch::findTripForwardSearchApproximateTime
       : TripTimesSearch::findTripForwardSearch;
+  }
+
+  private void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
+    this.iterationDepartureTime = iterationDepartureTime;
   }
 }

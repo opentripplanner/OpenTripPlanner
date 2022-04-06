@@ -35,6 +35,9 @@ public class FrequencyMapperTest {
   private static final Trip TRIP = new Trip();
 
   private static final Frequency FREQUENCY = new Frequency();
+  private final FrequencyMapper subject = new FrequencyMapper(
+    new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)))
+  );
 
   static {
     TRIP.setId(AGENCY_AND_ID);
@@ -47,10 +50,6 @@ public class FrequencyMapperTest {
     FREQUENCY.setLabelOnly(LABEL_ONLY);
     FREQUENCY.setTrip(TRIP);
   }
-
-  private final FrequencyMapper subject = new FrequencyMapper(
-    new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)))
-  );
 
   @Test
   public void testMapCollection() throws Exception {

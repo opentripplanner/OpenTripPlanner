@@ -47,27 +47,22 @@ public class DebugTimingAggregator {
   private final Timer requestTotalTimer;
 
   private final Timer.Sample startedCalculating;
-
+  private final List<String> messages = new ArrayList<>();
   private Timer.Sample startedDirectStreetRouter;
   private long directStreetRouterTime;
-
   private Timer.Sample startedDirectFlexRouter;
   private long directFlexRouterTime;
-
   private Timer.Sample finishedPatternFiltering;
   private Timer.Sample finishedAccessEgress;
   private Timer.Sample finishedRaptorSearch;
-
   private Timer.Sample finishedRouters;
   private Timer.Sample finishedFiltering;
-
   private Timer.Sample startedAccessCalculating;
   private Timer.Sample startedEgressCalculating;
   private long accessTime;
   private long egressTime;
   private int numAccesses;
   private int numEgresses;
-
   private long precalculationTime;
   private Timer.Sample startedTransitRouterTime;
   private long tripPatternFilterTime;
@@ -78,11 +73,10 @@ public class DebugTimingAggregator {
   private long filteringTime;
   private long renderingTime;
   private long requestTotalTime;
-  private final List<String> messages = new ArrayList<>();
 
   /**
-   * Record the time when we first began calculating a path for this request. Note that timings will not
-   * include network and server request queue overhead, which is what we want.
+   * Record the time when we first began calculating a path for this request. Note that timings will
+   * not include network and server request queue overhead, which is what we want.
    */
   public DebugTimingAggregator(MeterRegistry registry, Collection<String> timingTags) {
     var tags = MicrometerUtils.mapTimingTags(timingTags);

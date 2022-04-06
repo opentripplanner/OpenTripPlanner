@@ -33,11 +33,8 @@ class Vector {
   }
 
   @Override
-  public String toString() {
-    if (v2 == NOT_SET) return name + "[" + v1 + "]";
-    if (v3 == NOT_SET) return name + "[" + v1 + ", " + v2 + "]";
-    if (v4 == NOT_SET) return name + "[" + v1 + ", " + v2 + ", " + v3 + "]";
-    return name + "[" + v1 + ", " + v2 + ", " + v3 + ", " + v4 + "]";
+  public int hashCode() {
+    return Objects.hash(name, v1, v2, v3, v4);
   }
 
   @Override
@@ -53,7 +50,16 @@ class Vector {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(name, v1, v2, v3, v4);
+  public String toString() {
+    if (v2 == NOT_SET) {
+      return "%s[%d]".formatted(name, v1);
+    }
+    if (v3 == NOT_SET) {
+      return "%s[%d, %d]".formatted(name, v1, v2);
+    }
+    if (v4 == NOT_SET) {
+      return "%s[%d, %d, %d]".formatted(name, v1, v2, v3);
+    }
+    return "%s[%d, %d, %d, %d]".formatted(name, v1, v2, v3, v4);
   }
 }

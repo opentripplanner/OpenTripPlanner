@@ -34,18 +34,10 @@ import org.xml.sax.SAXException;
  */
 public class XmlDataListDownloader<T> {
 
-  public interface XmlDataFactory<T> {
-    T build(Map<String, String> attributes);
-  }
-
   private static final Logger LOG = LoggerFactory.getLogger(XmlDataListDownloader.class);
-
   private String path;
-
   private XPathExpression xpathExpr;
-
   private XmlDataFactory<T> dataFactory;
-
   // if true, read attributes of elements, instead of the text of their child elements
   private boolean readAttributes = false;
 
@@ -97,6 +89,11 @@ public class XmlDataListDownloader<T> {
       LOG.warn("Error parsing XML feed from " + url + "(bad XML of some sort)", e);
       return null;
     }
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getName() + "(" + path + ")";
   }
 
   private List<T> parseXML(InputStream data)
@@ -152,8 +149,7 @@ public class XmlDataListDownloader<T> {
     return out;
   }
 
-  @Override
-  public String toString() {
-    return getClass().getName() + "(" + path + ")";
+  public interface XmlDataFactory<T> {
+    T build(Map<String, String> attributes);
   }
 }

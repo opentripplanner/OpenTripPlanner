@@ -29,7 +29,6 @@ public class TurnRestriction implements Serializable {
 
   /**
    * Return true if the turn restriction is in force at the time described by the long.
-   * @param time
    */
   public boolean active(long time) {
     if (this.time != null) {

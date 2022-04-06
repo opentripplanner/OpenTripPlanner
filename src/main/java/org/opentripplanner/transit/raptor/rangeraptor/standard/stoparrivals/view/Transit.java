@@ -24,6 +24,11 @@ final class Transit<T extends RaptorTripSchedule>
   }
 
   @Override
+  public ArrivalView<T> previous() {
+    return cursor.stop(round() - 1, boardStop(), this);
+  }
+
+  @Override
   public boolean arrivedByTransit() {
     return true;
   }
@@ -41,11 +46,6 @@ final class Transit<T extends RaptorTripSchedule>
   @Override
   public T trip() {
     return arrival.trip();
-  }
-
-  @Override
-  public ArrivalView<T> previous() {
-    return cursor.stop(round() - 1, boardStop(), this);
   }
 
   public int boardTime() {

@@ -18,12 +18,12 @@ public final class GraphBundle implements Serializable {
     this.path = path;
   }
 
-  public void setPath(File path) {
-    this.path = path;
-  }
-
   public File getPath() {
     return path;
+  }
+
+  public void setPath(File path) {
+    this.path = path;
   }
 
   public File getGraphPath() {

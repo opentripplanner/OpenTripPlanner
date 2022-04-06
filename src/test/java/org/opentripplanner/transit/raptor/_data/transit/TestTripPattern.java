@@ -13,10 +13,12 @@ public class TestTripPattern implements RaptorTripPattern {
   private final int[] stopIndexes;
 
   /**
+   * <pre>
    * 0 - 000 : No restriction
-   * 1 - 001 : No Boarding.
-   * 2 - 010 : No Alighting.
-   * 4 - 100 : No wheelchair.
+   * 1 - 001 : No Boarding
+   * 2 - 010 : No Alighting
+   * 4 - 100 : No wheelchair
+   * </pre>
    */
   private final int[] restrictions;
 
@@ -36,6 +38,7 @@ public class TestTripPattern implements RaptorTripPattern {
   }
 
   /**
+   * <pre>
    * Codes:
    *   B : Board
    *   A : Alight
@@ -43,6 +46,7 @@ public class TestTripPattern implements RaptorTripPattern {
    *   * : Board, Alight, Wheelchair
    *
    * Example:   B BA * AW
+   * </pre>
    */
   public void restrictions(String codes) {
     String[] split = codes.split(" ");

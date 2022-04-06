@@ -55,12 +55,12 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * The maximum number of itineraries returned. This will remove all itineraries at the
-   * end of the list AFTER the final sort of the itineraries.
+   * The maximum number of itineraries returned. This will remove all itineraries at the end of the
+   * list AFTER the final sort of the itineraries.
    * <p>
-   * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which
-   * end of the list is cropped.
-   *
+   * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which end of the
+   * list is cropped.
+   * <p>
    * Use {@code -1} to disable.
    */
   public ItineraryListFilterChainBuilder withMaxNumberOfItineraries(int value) {
@@ -69,12 +69,12 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Remove itineraries from the tail or head of the list in the final filtering. The
-   * {@link #maxNumberOfItineraries} is used together with this parameter to reduce the
-   * number of itineraries down to the requested size.
+   * Remove itineraries from the tail or head of the list in the final filtering. The {@link
+   * #maxNumberOfItineraries} is used together with this parameter to reduce the number of
+   * itineraries down to the requested size.
    * <p>
-   * The default is to crop the tail. But, we need to crop the head to be able to paginate
-   * in the opposite direction of the main sort-order of the original search.
+   * The default is to crop the tail. But, we need to crop the head to be able to paginate in the
+   * opposite direction of the main sort-order of the original search.
    */
   public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
     this.maxNumberOfItinerariesCrop = section;
@@ -94,14 +94,12 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * This function is used to compute a max-limit for generalized-cost. The limit
-   * is applied to itineraries with at least one transit leg. Street-only itineraries are not
-   * considered.
+   * This function is used to compute a max-limit for generalized-cost. The limit is applied to
+   * itineraries with at least one transit leg. Street-only itineraries are not considered.
    * <p>
-   * The smallest transit leg generalized-cost value is used as input to the function.
-   * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
-   * {@code 5000}, then all transit itineraries with a cost larger than
-   * {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   * The smallest transit leg generalized-cost value is used as input to the function. For example
+   * if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, then all
+   * transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
    */
   public ItineraryListFilterChainBuilder withTransitGeneralizedCostLimit(
     DoubleFunction<Double> value
@@ -111,17 +109,16 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * This is a a bit similar to {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, with
-   * a few important differences.
-   *
-   * This function is used to compute a max-limit for generalized-cost. The limit
-   * is applied to itineraries with no transit legs, however ALL itineraries (including those with
-   * transit legs) are considered when calculating the minimum cost.
+   * This is a a bit similar to {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, with a few
+   * important differences.
    * <p>
-   * The smallest generalized-cost value is used as input to the function.
-   * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
-   * {@code 5000}, then all non-transit itineraries with a cost larger than
-   * {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   * This function is used to compute a max-limit for generalized-cost. The limit is applied to
+   * itineraries with no transit legs, however ALL itineraries (including those with transit legs)
+   * are considered when calculating the minimum cost.
+   * <p>
+   * The smallest generalized-cost value is used as input to the function. For example if the
+   * function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, then all
+   * non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
    */
   public ItineraryListFilterChainBuilder withNonTransitGeneralizedCostLimit(
     DoubleFunction<Double> value
@@ -141,9 +138,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * This is used to filter out park and ride itineraries that contain only driving and a
-   * very long walking leg.
-   * The value describes the amount of driving vs. walking to allow the itinerary.
+   * This is used to filter out park and ride itineraries that contain only driving and a very long
+   * walking leg. The value describes the amount of driving vs. walking to allow the itinerary.
    */
   public ItineraryListFilterChainBuilder withParkAndRideDurationRatio(double value) {
     this.parkAndRideDurationRatio = value;
@@ -152,9 +148,8 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
-   * cases we get "silly" transit itineraries that is marginally better on travel-duration
-   * compared with a on-street-all-the-way itinerary. Use this method to turn this filter
-   * on/off.
+   * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
+   * with a on-street-all-the-way itinerary. Use this method to turn this filter on/off.
    * <p>
    * The filter remove all itineraries with a generalized-cost that is higher than the best
    * on-street-all-the-way itinerary.
@@ -170,8 +165,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * This will NOT delete itineraries, but tag them as deleted using the
-   * {@link Itinerary#systemNotices}.
+   * This will NOT delete itineraries, but tag them as deleted using the {@link
+   * Itinerary#systemNotices}.
    */
   public ItineraryListFilterChainBuilder withDebugEnabled(boolean value) {
     this.debug = value;
@@ -179,8 +174,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Max departure time. This is a absolute filter on the itinerary departure time from the
-   * origin. The filter is ignored if the value is {@code null}.
+   * Max departure time. This is a absolute filter on the itinerary departure time from the origin.
+   * The filter is ignored if the value is {@code null}.
    */
   public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(
     Instant latestDepartureTimeLimit
@@ -190,12 +185,11 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
-   * To get notified about this a subscriber can be added. The first itinerary removed by the
-   * {@code maxLimit} is returned. The 'maxLimit' check is the last thing happening in the
-   * filter-chain after the final sort. So, if another filter remove an itinerary, the itinerary
-   * is not considered with the respect to this the {@link #withMaxNumberOfItineraries(int)}
-   * limit.
+   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed. To
+   * get notified about this a subscriber can be added. The first itinerary removed by the {@code
+   * maxLimit} is returned. The 'maxLimit' check is the last thing happening in the filter-chain
+   * after the final sort. So, if another filter remove an itinerary, the itinerary is not
+   * considered with the respect to this the {@link #withMaxNumberOfItineraries(int)} limit.
    *
    * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
    *                                  Only the first element removed is passed to the subscriber.
@@ -208,9 +202,9 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by
-   * and remove-transit-with-higher-cost-than-best-on-street-only filter. This make sure that
-   * poor transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
+   * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by and
+   * remove-transit-with-higher-cost-than-best-on-street-only filter. This make sure that poor
+   * transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
    */
   public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
     this.removeWalkAllTheWayResults = enable;
@@ -302,9 +296,9 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * These filters will group the itineraries by the main-legs and reduce the number of
-   * itineraries in each group. The main legs is the legs that together constitute more than a
-   * given　percentage of the total travel distance.
+   * These filters will group the itineraries by the main-legs and reduce the number of itineraries
+   * in each group. The main legs is the legs that together constitute more than a given　percentage
+   * of the total travel distance.
    * <p>
    * Each group is filtered using generalized-cost, keeping only the itineraries with the lowest
    * cost. If there is a tie, the filter look at the number-of-transfers as a tie breaker.

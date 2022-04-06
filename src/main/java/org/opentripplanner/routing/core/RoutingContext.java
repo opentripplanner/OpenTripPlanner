@@ -1,24 +1,12 @@
 package org.opentripplanner.routing.core;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.response.InputField;
-import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions,
  * on a specific graph, using specified endpoint vertices.
- *
+ * <p>
  * In addition, while the RoutingRequest should only carry parameters _in_ to the routing operation,
  * the routing context should be used to carry information back out, such as debug figures or flags
  * that certain thresholds have been exceeded.
@@ -48,7 +36,10 @@ public class RoutingContext {
   /** Indicates that the search timed out or was otherwise aborted. */
   public boolean aborted;
 
-  /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
+  /**
+   * Indicates that a maximum slope constraint was specified but was removed during routing to
+   * produce a result.
+   */
   public boolean slopeRestrictionRemoved = false;
 
   /**

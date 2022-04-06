@@ -42,8 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This makes a Graph out of various inputs like GTFS and OSM.
- * It is modular: GraphBuilderModules are placed in a list and run in sequence.
+ * This makes a Graph out of various inputs like GTFS and OSM. It is modular: GraphBuilderModules
+ * are placed in a list and run in sequence.
  */
 public class GraphBuilder implements Runnable {
 
@@ -57,42 +57,9 @@ public class GraphBuilder implements Runnable {
     this.graph = baseGraph == null ? new Graph() : baseGraph;
   }
 
-  private void addModule(GraphBuilderModule loader) {
-    graphBuilderModules.add(loader);
-  }
-
-  public Graph getGraph() {
-    return graph;
-  }
-
-  public void run() {
-    // Record how long it takes to build the graph, purely for informational purposes.
-    long startTime = System.currentTimeMillis();
-
-    // Check all graph builder inputs, and fail fast to avoid waiting until the build process
-    // advances.
-    for (GraphBuilderModule builder : graphBuilderModules) {
-      builder.checkInputs();
-    }
-
-    DataImportIssueStore issueStore = new DataImportIssueStore(true);
-    HashMap<Class<?>, Object> extra = new HashMap<>();
-
-    for (GraphBuilderModule load : graphBuilderModules) {
-      load.buildGraph(graph, extra, issueStore);
-    }
-    issueStore.summarize();
-
-    long endTime = System.currentTimeMillis();
-    LOG.info(
-      String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0)
-    );
-    LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-  }
-
   /**
-   * Factory method to create and configure a GraphBuilder with all the appropriate modules to
-   * build a graph from the given data source and configuration directory.
+   * Factory method to create and configure a GraphBuilder with all the appropriate modules to build
+   * a graph from the given data source and configuration directory.
    */
   public static GraphBuilder create(
     BuildConfig config,
@@ -256,5 +223,38 @@ public class GraphBuilder implements Runnable {
     }
 
     return graphBuilder;
+  }
+
+  public Graph getGraph() {
+    return graph;
+  }
+
+  public void run() {
+    // Record how long it takes to build the graph, purely for informational purposes.
+    long startTime = System.currentTimeMillis();
+
+    // Check all graph builder inputs, and fail fast to avoid waiting until the build process
+    // advances.
+    for (GraphBuilderModule builder : graphBuilderModules) {
+      builder.checkInputs();
+    }
+
+    DataImportIssueStore issueStore = new DataImportIssueStore(true);
+    HashMap<Class<?>, Object> extra = new HashMap<>();
+
+    for (GraphBuilderModule load : graphBuilderModules) {
+      load.buildGraph(graph, extra, issueStore);
+    }
+    issueStore.summarize();
+
+    long endTime = System.currentTimeMillis();
+    LOG.info(
+      String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0)
+    );
+    LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+  }
+
+  private void addModule(GraphBuilderModule loader) {
+    graphBuilderModules.add(loader);
   }
 }

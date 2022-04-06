@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parser for the OpenStreetMap PBF format. Parses files in three passes:
- * First the relations, then the ways, then the nodes are also loaded.
+ * Parser for the OpenStreetMap PBF format. Parses files in three passes: First the relations, then
+ * the ways, then the nodes are also loaded.
  */
 public class BinaryOpenStreetMapProvider {
 
@@ -53,6 +53,29 @@ public class BinaryOpenStreetMapProvider {
     }
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects
+      .toStringHelper(this)
+      .add("source", source)
+      .add("cacheDataInMem", cacheDataInMem)
+      .add("cachedBytes", cachedBytes)
+      .toString();
+  }
+
+  public void checkInputs() {
+    if (!source.exists()) {
+      throw new RuntimeException("Can't read OSM path: " + source.path());
+    }
+  }
+
+  @SuppressWarnings("Convert2MethodRef")
+  private static InputStream track(OsmParserPhase phase, long size, InputStream inputStream) {
+    // Keep logging lambda, replacing it with a method-ref will cause the
+    // logging to report incorrect class and line number
+    return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, m -> LOG.info(m));
+  }
+
   private void parsePhase(BinaryOpenStreetMapParser parser, OsmParserPhase phase)
     throws IOException {
     parser.setPhase(phase);
@@ -80,28 +103,5 @@ public class BinaryOpenStreetMapProvider {
       return track(phase, cachedBytes.length, new ByteArrayInputStream(cachedBytes));
     }
     return track(phase, source.size(), source.asInputStream());
-  }
-
-  @SuppressWarnings("Convert2MethodRef")
-  private static InputStream track(OsmParserPhase phase, long size, InputStream inputStream) {
-    // Keep logging lambda, replacing it with a method-ref will cause the
-    // logging to report incorrect class and line number
-    return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, m -> LOG.info(m));
-  }
-
-  @Override
-  public String toString() {
-    return MoreObjects
-      .toStringHelper(this)
-      .add("source", source)
-      .add("cacheDataInMem", cacheDataInMem)
-      .add("cachedBytes", cachedBytes)
-      .toString();
-  }
-
-  public void checkInputs() {
-    if (!source.exists()) {
-      throw new RuntimeException("Can't read OSM path: " + source.path());
-    }
   }
 }

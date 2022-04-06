@@ -5,12 +5,11 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 /**
- * A vertex for a vehicle rental station.
- * It is connected to the streets by a StreetVehicleRentalLink.
- * To allow transitions on and off a bike, it has VehicleRentalEdge loop edges.
+ * A vertex for a vehicle rental station. It is connected to the streets by a
+ * StreetVehicleRentalLink. To allow transitions on and off a bike, it has VehicleRentalEdge loop
+ * edges.
  *
  * @author laurent
- *
  */
 public class VehicleRentalStationVertex extends Vertex {
 

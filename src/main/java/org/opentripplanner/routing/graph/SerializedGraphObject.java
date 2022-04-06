@@ -45,7 +45,10 @@ public class SerializedGraphObject implements Serializable {
 
   private final Collection<Edge> edges;
 
-  /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
+  /**
+   * The config JSON used to build this graph. Allows checking whether the configuration has
+   * changed.
+   */
   public final BuildConfig buildConfig;
 
   /** Embed a router configuration inside the graph, for starting up with a single file. */
@@ -89,9 +92,9 @@ public class SerializedGraphObject implements Serializable {
   }
 
   /**
-   * After deserialization, the vertices will all have null outgoing and incoming edge lists
-   * because those edge lists are marked transient, to prevent excessive recursion depth while
-   * serializing. This method will reconstruct all those edge lists after deserialization.
+   * After deserialization, the vertices will all have null outgoing and incoming edge lists because
+   * those edge lists are marked transient, to prevent excessive recursion depth while serializing.
+   * This method will reconstruct all those edge lists after deserialization.
    */
   public void reconstructEdgeLists() {
     for (Vertex v : graph.getVertices()) {
@@ -154,19 +157,6 @@ public class SerializedGraphObject implements Serializable {
     }
   }
 
-  private void save(OutputStream outputStream, String graphName, long size) {
-    LOG.info("Writing graph " + graphName + " ...");
-    outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
-    Kryo kryo = KryoBuilder.create();
-    Output output = new Output(outputStream);
-    output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());
-    kryo.writeClassAndObject(output, this);
-    output.close();
-    LOG.info("Graph written: {}", graphName);
-    // Summarize serialized classes and associated serializers to stdout:
-    // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
-  }
-
   @SuppressWarnings("Convert2MethodRef")
   private static OutputStream wrapOutputStreamWithProgressTracker(
     OutputStream outputStream,
@@ -198,5 +188,18 @@ public class SerializedGraphObject implements Serializable {
         );
       }
     }
+  }
+
+  private void save(OutputStream outputStream, String graphName, long size) {
+    LOG.info("Writing graph " + graphName + " ...");
+    outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
+    Kryo kryo = KryoBuilder.create();
+    Output output = new Output(outputStream);
+    output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());
+    kryo.writeClassAndObject(output, this);
+    output.close();
+    LOG.info("Graph written: {}", graphName);
+    // Summarize serialized classes and associated serializers to stdout:
+    // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
   }
 }

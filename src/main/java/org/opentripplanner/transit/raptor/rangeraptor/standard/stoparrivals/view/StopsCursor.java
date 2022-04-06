@@ -11,11 +11,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stop
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 /**
- * Used to create a view to the internal StdRangeRaptor model and to navigate
- * between stop arrivals. Since view objects are only used for path and debugging
- * operations, the view can create temporary objects for each StopArrival. These
- * view objects are temporary objects and when the algorithm progress they might
- * get invalid - so do not keep references to these objects bejond the scope of
+ * Used to create a view to the internal StdRangeRaptor model and to navigate between stop arrivals.
+ * Since view objects are only used for path and debugging operations, the view can create temporary
+ * objects for each StopArrival. These view objects are temporary objects and when the algorithm
+ * progress they might get invalid - so do not keep references to these objects bejond the scope of
  * of a the callers method.
  * <p/>
  * The design was originally done to support the FLyweight design pattern.
@@ -58,8 +57,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
 
   /**
    * Return a fictive Transfer stop arrival view. The arrival does not exist in the state, but is
-   * linked with the previous arrival witch is a "real" arrival present in the state. This
-   * enables path generation.
+   * linked with the previous arrival witch is a "real" arrival present in the state. This enables
+   * path generation.
    */
   public Transfer<T> fictiveTransfer(
     int round,
@@ -75,8 +74,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
 
   /**
    * Return a fictive Transit stop arrival view. The arrival does not exist in the state, but is
-   * linked with the previous arrival witch is a "real" arrival present in the state. This
-   * enables path generation.
+   * linked with the previous arrival witch is a "real" arrival present in the state. This enables
+   * path generation.
    */
   public Transit<T> fictiveTransit(
     int round,
@@ -92,8 +91,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Return the stop-arrival for the given round, stop and given access. There is no
-   * check that the access exist.
+   * Return the stop-arrival for the given round, stop and given access. There is no check that the
+   * access exist.
    */
   public ArrivalView<T> access(int round, int stop, RaptorTransfer access) {
     var arrival = arrivals.get(round, stop);
@@ -151,8 +150,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
   }
 
   /**
-   * A access stop arrival, time-shifted according to the first transit boarding/departure time
-   * and the possible restrictions in the access.
+   * A access stop arrival, time-shifted according to the first transit boarding/departure time and
+   * the possible restrictions in the access.
    * <p>
    * If given transit is {@code null}, then use the iteration departure time without any
    * time-shifted departure. This is used for logging and debugging, not for returned paths.

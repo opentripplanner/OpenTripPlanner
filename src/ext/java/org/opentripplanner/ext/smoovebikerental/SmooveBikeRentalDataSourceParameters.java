@@ -26,8 +26,8 @@ public class SmooveBikeRentalDataSourceParameters extends VehicleRentalDataSourc
   }
 
   /**
-   * Each updater can be assigned a unique network ID in the configuration to prevent
-   * returning bikes at stations for another network.
+   * Each updater can be assigned a unique network ID in the configuration to prevent returning
+   * bikes at stations for another network.
    * TODO shouldn't we give each updater a unique network ID by default?
    */
   @Nullable

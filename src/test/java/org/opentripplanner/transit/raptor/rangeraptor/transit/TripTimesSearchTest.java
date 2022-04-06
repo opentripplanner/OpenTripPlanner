@@ -229,6 +229,26 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     }
   }
 
+  private static Bus busFwd(
+    int accessStop,
+    int transitToStop,
+    int arrivalTime,
+    TestTripSchedule trip
+  ) {
+    Access access = new Access(accessStop, -9999, -9999, -9999);
+    return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
+  }
+
+  private static Bus busRev(
+    int accessStop,
+    int transitToStop,
+    int arrivalTime,
+    TestTripSchedule trip
+  ) {
+    Access access = new Access(accessStop, -9999, -9999, -9999);
+    return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
+  }
+
   private void assertForwardAppxTime(
     String approximateArrivalTime,
     int boardStop,
@@ -272,25 +292,5 @@ public class TripTimesSearchTest implements RaptorTestConstants {
 
   private Bus busRev(int accessToStop, int transitToStop, int arrivalTime) {
     return busRev(accessToStop, transitToStop, arrivalTime, schedule);
-  }
-
-  private static Bus busFwd(
-    int accessStop,
-    int transitToStop,
-    int arrivalTime,
-    TestTripSchedule trip
-  ) {
-    Access access = new Access(accessStop, -9999, -9999, -9999);
-    return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
-  }
-
-  private static Bus busRev(
-    int accessStop,
-    int transitToStop,
-    int arrivalTime,
-    TestTripSchedule trip
-  ) {
-    Access access = new Access(accessStop, -9999, -9999, -9999);
-    return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
   }
 }

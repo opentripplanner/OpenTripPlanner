@@ -1,12 +1,11 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 
 /**
- * A trivial heuristic that always returns 0, which is always admissible. For use in testing, troubleshooting, and
- * spatial analysis applications where there is no target.
+ * A trivial heuristic that always returns 0, which is always admissible. For use in testing,
+ * troubleshooting, and spatial analysis applications where there is no target.
  */
 public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic {
 

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.services;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,9 +14,9 @@ public class RealtimeVehiclePositionService {
    * For the given pattern set all realtime vehicle positions.
    * <p>
    * The list is expected to be exhaustive: all existing positions will be overridden.
-   *
-   * This means that if there are two updaters providing positions for the same pattern
-   * they overwrite each other.
+   * <p>
+   * This means that if there are two updaters providing positions for the same pattern they
+   * overwrite each other.
    */
   public void setVehiclePositions(TripPattern pattern, List<RealtimeVehiclePosition> updates) {
     positions.put(pattern, List.copyOf(updates));

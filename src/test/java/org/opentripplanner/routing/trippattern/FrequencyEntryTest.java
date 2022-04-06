@@ -42,16 +42,6 @@ public class FrequencyEntryTest {
     tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
   }
 
-  private static FrequencyEntry make(int startTime, int endTime, int headwaySecs, boolean exact) {
-    Frequency f = new Frequency();
-    f.setStartTime(startTime);
-    f.setEndTime(endTime);
-    f.setHeadwaySecs(headwaySecs);
-    f.setExactTimes(exact ? 1 : 0);
-
-    return new FrequencyEntry(f, tripTimes);
-  }
-
   @Test
   public void testExactFrequencyProperEnd() {
     FrequencyEntry fe = make(100000, 150000, 100, true);
@@ -101,5 +91,15 @@ public class FrequencyEntryTest {
     assertEquals(100400, fe.prevArrivalTime(4, 100500)); // 5th stop, after begin
     assertEquals(-1, fe.prevArrivalTime(7, 100600)); // 8th stop, before begin
     assertEquals(100700, fe.prevArrivalTime(7, 100800)); // 8th stop, after begin
+  }
+
+  private static FrequencyEntry make(int startTime, int endTime, int headwaySecs, boolean exact) {
+    Frequency f = new Frequency();
+    f.setStartTime(startTime);
+    f.setEndTime(endTime);
+    f.setHeadwaySecs(headwaySecs);
+    f.setExactTimes(exact ? 1 : 0);
+
+    return new FrequencyEntry(f, tripTimes);
   }
 }

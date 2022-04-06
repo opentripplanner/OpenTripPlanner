@@ -33,19 +33,17 @@ import org.opentripplanner.util.TestUtils;
  */
 public class SplitEdgeTurnRestrictionsTest {
 
-  // Deufringen
-  static GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
-  static GenericLocation steinhaldenWeg = new GenericLocation(48.67815, 8.87305);
-  static GenericLocation k1022 = new GenericLocation(48.67846, 8.87021);
-
-  // Böblingen
-  static GenericLocation paulGerhardtWegEast = new GenericLocation(48.68363, 9.00728);
-  static GenericLocation paulGerhardtWegWest = new GenericLocation(48.68297, 9.00520);
-  static GenericLocation parkStrasse = new GenericLocation(48.68358, 9.00826);
-  static GenericLocation herrenbergerStrasse = new GenericLocation(48.68497, 9.00909);
-  static GenericLocation steinbeissWeg = new GenericLocation(48.68172, 9.00599);
-
   static final Instant dateTime = TestUtils.dateInstant("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
+  // Deufringen
+  static final GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
+  static final GenericLocation steinhaldenWeg = new GenericLocation(48.67815, 8.87305);
+  static final GenericLocation k1022 = new GenericLocation(48.67846, 8.87021);
+  // Böblingen
+  static final GenericLocation paulGerhardtWegEast = new GenericLocation(48.68363, 9.00728);
+  static final GenericLocation paulGerhardtWegWest = new GenericLocation(48.68297, 9.00520);
+  static final GenericLocation parkStrasse = new GenericLocation(48.68358, 9.00826);
+  static final GenericLocation herrenbergerStrasse = new GenericLocation(48.68497, 9.00909);
+  static final GenericLocation steinbeissWeg = new GenericLocation(48.68172, 9.00599);
 
   @Test
   public void shouldTakeDeufringenTurnRestrictionsIntoAccount() throws IOException {

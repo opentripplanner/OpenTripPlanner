@@ -26,8 +26,8 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
   private static final Logger LOG = LoggerFactory.getLogger(StaticStreetNotesSource.class);
 
   /**
-   * Notes for street edges. No need to synchronize access to the map as they will not be
-   * concurrent write access (no notes for temporary edges, we use notes from parent).
+   * Notes for street edges. No need to synchronize access to the map as they will not be concurrent
+   * write access (no notes for temporary edges, we use notes from parent).
    */
   private final SetMultimap<Edge, MatcherAndStreetNote> notesForEdge = HashMultimap.<Edge, MatcherAndStreetNote>create();
 
@@ -39,18 +39,9 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
 
   StaticStreetNotesSource() {}
 
-  void addNote(Edge edge, StreetNote note, NoteMatcher matcher) {
-    if (LOG.isDebugEnabled()) LOG.debug(
-      "Adding note {} to {} with matcher {}",
-      note,
-      edge,
-      matcher
-    );
-    notesForEdge.put(edge, buildMatcherAndAlert(matcher, note));
-  }
-
   /**
    * Return the set of notes applicable for this state / backedge pair.
+   *
    * @return The set of notes or null if empty.
    */
   @Override
@@ -66,11 +57,19 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
     return maas;
   }
 
+  void addNote(Edge edge, StreetNote note, NoteMatcher matcher) {
+    if (LOG.isDebugEnabled()) LOG.debug(
+      "Adding note {} to {} with matcher {}",
+      note,
+      edge,
+      matcher
+    );
+    notesForEdge.put(edge, buildMatcherAndAlert(matcher, note));
+  }
+
   /**
    * Remove all notes attached to this edge. NOTE: this should only be called within a graph
    * building context (or unit testing).
-   *
-   * @param edge
    */
   void removeNotes(Edge edge) {
     if (LOG.isDebugEnabled()) LOG.debug("Removing notes for edge: {}", edge);
@@ -81,10 +80,6 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
    * Create a MatcherAndAlert, interning it if the note and matcher pair is already created. Note:
    * we use the default Object.equals() for matchers, as they are mostly already singleton
    * instances.
-   *
-   * @param noteMatcher
-   * @param note
-   * @return
    */
   private MatcherAndStreetNote buildMatcherAndAlert(NoteMatcher noteMatcher, StreetNote note) {
     T2<NoteMatcher, StreetNote> key = new T2<>(noteMatcher, note);

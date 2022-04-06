@@ -3,10 +3,15 @@ package org.opentripplanner.ext.interactivelauncher.views;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.BG_STATUS_BAR;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.FG_STATUS_BAR;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.function.Consumer;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 public class SearchDirectoryView {
 
@@ -47,6 +52,10 @@ public class SearchDirectoryView {
     return panel;
   }
 
+  Dimension minWidth(Dimension d, int minWidth) {
+    return new Dimension(Math.max(minWidth, d.width), d.height);
+  }
+
   private void onSelectSource() {
     JFileChooser chooser = new JFileChooser(new File(fileTxt.getText()));
     chooser.setBackground(ViewUtils.BACKGROUND);
@@ -64,9 +73,5 @@ public class SearchDirectoryView {
       fileTxt.setText(dir.getAbsolutePath());
       rootDirChangedListener.accept(dir.getAbsolutePath());
     }
-  }
-
-  Dimension minWidth(Dimension d, int minWidth) {
-    return new Dimension(Math.max(minWidth, d.width), d.height);
   }
 }

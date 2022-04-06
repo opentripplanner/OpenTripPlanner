@@ -5,9 +5,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
 /**
- * List of different pareto set comparators. Earlier we created these dynamically,
- * but that affect the performance, so it is better to have one function for each
- * use case.
+ * List of different pareto set comparators. Earlier we created these dynamically, but that affect
+ * the performance, so it is better to have one function for each use case.
  * <p/>
  * All comparators include the "standard" set of criteria:
  * <ul>

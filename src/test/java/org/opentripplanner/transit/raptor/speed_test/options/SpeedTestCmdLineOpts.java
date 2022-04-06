@@ -101,6 +101,12 @@ public class SpeedTestCmdLineOpts {
     return parseCSVList(TAGS);
   }
 
+  List<String> parseCSVList(String opt) {
+    return cmd.hasOption(opt)
+      ? Arrays.asList(cmd.getOptionValue(opt).split("\\s*,\\s*"))
+      : Collections.emptyList();
+  }
+
   private Options options() {
     Options options = new Options();
 
@@ -161,12 +167,6 @@ public class SpeedTestCmdLineOpts {
       "but not stop 1 for all trips starting with the given stop sequence."
     );
     return options;
-  }
-
-  List<String> parseCSVList(String opt) {
-    return cmd.hasOption(opt)
-      ? Arrays.asList(cmd.getOptionValue(opt).split("\\s*,\\s*"))
-      : Collections.emptyList();
   }
 
   private boolean printHelpOptSet() {

@@ -18,14 +18,13 @@ public enum StreetTraversalPermission {
 
   private static final StreetTraversalPermission[] lookup = new StreetTraversalPermission[StreetTraversalPermission.values()
     .length];
+  public final int code;
 
   static {
     for (StreetTraversalPermission s : StreetTraversalPermission.values()) {
       lookup[s.code] = s;
     }
   }
-
-  public final int code;
 
   StreetTraversalPermission(int code) {
     this.code = code;
@@ -41,9 +40,6 @@ public enum StreetTraversalPermission {
 
   /**
    * Returns intersection of allowed permissions between current permissions and given permissions
-   *
-   * @param perm
-   * @return
    */
   public StreetTraversalPermission intersection(StreetTraversalPermission perm) {
     return get(this.code & perm.code);

@@ -11,9 +11,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
@@ -195,13 +193,6 @@ class NetexTestDataSample {
     }
   }
 
-  private Via_VersionedChildStructure createViaDestinationDisplayRef(String destinationDisplayId) {
-    return new Via_VersionedChildStructure()
-      .withDestinationDisplayRef(
-        new DestinationDisplayRefStructure().withRef(destinationDisplayId)
-      );
-  }
-
   static DayTypeRefs_RelStructure createEveryDayRefs() {
     return new DayTypeRefs_RelStructure()
       .withDayTypeRef(Collections.singleton(createEveryDayRef()));
@@ -251,11 +242,11 @@ class NetexTestDataSample {
     return datedServiceJourneyBySjId;
   }
 
-  /* private static utility methods */
-
   private static TimetabledPassingTime createTimetablePassingTime(String id, int hh, int mm) {
     return new TimetabledPassingTime().withId(id).withDepartureTime(LocalTime.of(hh, mm));
   }
+
+  /* private static utility methods */
 
   private static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(
     String id
@@ -279,5 +270,12 @@ class NetexTestDataSample {
 
   private static JAXBElement<DayTypeRefStructure> createEveryDayRef() {
     return createJaxbElement(new DayTypeRefStructure().withRef(EVERYDAY.getId()));
+  }
+
+  private Via_VersionedChildStructure createViaDestinationDisplayRef(String destinationDisplayId) {
+    return new Via_VersionedChildStructure()
+      .withDestinationDisplayRef(
+        new DestinationDisplayRefStructure().withRef(destinationDisplayId)
+      );
   }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.inspector;
 
-import java.awt.*;
+import java.awt.Color;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
@@ -108,6 +108,11 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     return true;
   }
 
+  @Override
+  public String getName() {
+    return "Traversal permissions";
+  }
+
   private Color getColor(StreetTraversalPermission permissions) {
     /*
      * We use the trick that there are 3 main traversal modes (WALK, BIKE and CAR) and 3 color
@@ -140,10 +145,5 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       sb.append("none");
     }
     return sb.toString();
-  }
-
-  @Override
-  public String getName() {
-    return "Traversal permissions";
   }
 }

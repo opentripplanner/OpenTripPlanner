@@ -8,9 +8,9 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 
 /**
- * This utility help converting a Raptor path to a string which is used in several
- * unit tests for easy comparison. The Stop index(1..n) is translated to stop names(A..N)
- * using {@link RaptorTestConstants#stopIndexToName(int)}.
+ * This utility help converting a Raptor path to a string which is used in several unit tests for
+ * easy comparison. The Stop index(1..n) is translated to stop names(A..N) using {@link
+ * RaptorTestConstants#stopIndexToName(int)}.
  */
 public class PathUtils {
 

@@ -27,8 +27,8 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class TimetableSnapshotTest {
 
-  private static Map<FeedScopedId, TripPattern> patternIndex;
   private static final TimeZone timeZone = TimeZone.getTimeZone("GMT");
+  private static Map<FeedScopedId, TripPattern> patternIndex;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -56,19 +56,6 @@ public class TimetableSnapshotTest {
     Timetable a = new Timetable(orig, new ServiceDate().previous());
     Timetable b = new Timetable(orig, new ServiceDate());
     assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
-  }
-
-  private boolean updateResolver(
-    TimetableSnapshot resolver,
-    TripPattern pattern,
-    TripUpdate tripUpdate,
-    ServiceDate serviceDate
-  ) {
-    TripTimesPatch tripTimesPatch = pattern
-      .getScheduledTimetable()
-      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
-    return resolver.update(pattern, updatedTripTimes, serviceDate);
   }
 
   @Test
@@ -231,5 +218,18 @@ public class TimetableSnapshotTest {
 
     assertNull(resolver.commit());
     assertFalse(resolver.isDirty());
+  }
+
+  private boolean updateResolver(
+    TimetableSnapshot resolver,
+    TripPattern pattern,
+    TripUpdate tripUpdate,
+    ServiceDate serviceDate
+  ) {
+    TripTimesPatch tripTimesPatch = pattern
+      .getScheduledTimetable()
+      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
+    return resolver.update(pattern, updatedTripTimes, serviceDate);
   }
 }

@@ -51,14 +51,13 @@ public interface DateConstants {
   String DATE_TIME_FORMAT_NICE = "MM.dd.yyyy 'at' h:mm:a z";
   String PRETTY_DATE_FORMAT = "MMMM d, yyyy";
   String PRETTY_DT_FORMAT = PRETTY_DATE_FORMAT + " 'at' h:mm a z";
+  SimpleDateFormat PRETTY_DT = new SimpleDateFormat(PRETTY_DT_FORMAT);
   String DT_FORMAT = "M.d.yyyy h:mm a";
-
   SimpleDateFormat dateSDF = new SimpleDateFormat(DATE_FORMAT);
   SimpleDateFormat timeSDF = new SimpleDateFormat(TIME_FORMAT);
   SimpleDateFormat simpTimeSDF = new SimpleDateFormat(SIMPLE_TIME_FORMAT);
   SimpleDateFormat dateTimeSDF = new SimpleDateFormat(DATE_TIME_FORMAT);
   SimpleDateFormat PRETTY_DATE = new SimpleDateFormat(PRETTY_DATE_FORMAT);
-  SimpleDateFormat PRETTY_DT = new SimpleDateFormat(PRETTY_DT_FORMAT);
   SimpleDateFormat YEAR = new SimpleDateFormat("yyyy");
   SimpleDateFormat dowSDF = new SimpleDateFormat("E");
 

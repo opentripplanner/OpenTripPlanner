@@ -21,11 +21,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
- *
- * Raptor should return the optimal path with various access and egress paths. The
- * Standard and Standard Reverse optimizations should return the best time option,
- * while the Multi-criteria optimization should return a pareto optimal solutions
- * with/without timetable view enabled.
+ * <p>
+ * Raptor should return the optimal path with various access and egress paths. The Standard and
+ * Standard Reverse optimizations should return the best time option, while the Multi-criteria
+ * optimization should return a pareto optimal solutions with/without timetable view enabled.
  */
 public class B03_AccessEgressTest implements RaptorTestConstants {
 
@@ -114,9 +113,8 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
   }
 
   /**
-   * This test turn timetable "off", this is the same as {@code arriveBy=false}. There is no
-   * support for {@code arriveBy=true}, which would prioritize the latest arrival if cost is
-   * the same.
+   * This test turn timetable "off", this is the same as {@code arriveBy=false}. There is no support
+   * for {@code arriveBy=true}, which would prioritize the latest arrival if cost is the same.
    */
   @Test
   public void multiCriteriaWithoutTimetable() {

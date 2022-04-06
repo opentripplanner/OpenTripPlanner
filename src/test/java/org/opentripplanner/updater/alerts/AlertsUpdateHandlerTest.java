@@ -545,11 +545,6 @@ public class AlertsUpdateHandlerTest {
     private Multimap<EntitySelector, TransitAlert> alerts = HashMultimap.create();
 
     @Override
-    public Collection<TransitAlert> getAllAlerts() {
-      return new HashSet<>(alerts.values());
-    }
-
-    @Override
     public void setAlerts(Collection<TransitAlert> alerts) {
       Multimap<EntitySelector, TransitAlert> newAlerts = HashMultimap.create();
       for (TransitAlert alert : alerts) {
@@ -559,6 +554,11 @@ public class AlertsUpdateHandlerTest {
       }
 
       this.alerts = newAlerts;
+    }
+
+    @Override
+    public Collection<TransitAlert> getAllAlerts() {
+      return new HashSet<>(alerts.values());
     }
   }
 }

@@ -21,9 +21,9 @@ import org.opentripplanner.datastore.FileType;
 /**
  * This is a manual integration test to test the Google Cloud Storage integration. To set up the
  * test you need to provide a service credential file and a bucket name. For all test to pass there
- * also need to be a gtfs.zip file in your store. Edit the {@link #CREDENTIALS_FILE},
- * {@link #BUCKET_NAME} and {@link #GTFS_URI} to make the test run.
- *
+ * also need to be a gtfs.zip file in your store. Edit the {@link #CREDENTIALS_FILE}, {@link
+ * #BUCKET_NAME} and {@link #GTFS_URI} to make the test run.
+ * <p>
  * This test comed in handy, not only to verify the implementation, but also to verify that your
  * credentials have the proper rights. If the test run, then OTP should also run with the same
  * credentials.

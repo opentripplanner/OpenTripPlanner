@@ -13,8 +13,8 @@ public class TripPatternMapper {
 
   /**
    * Convert all old TripPatterns into new ones, keeping a Map between the two. Do this conversion
-   * up front (rather than lazily on demand) to ensure pattern IDs match the sequence of patterns
-   * in source data.
+   * up front (rather than lazily on demand) to ensure pattern IDs match the sequence of patterns in
+   * source data.
    */
   Map<TripPattern, TripPatternWithRaptorStopIndexes> mapOldTripPatternToRaptorTripPattern(
     StopIndexForRaptor stopIndex,

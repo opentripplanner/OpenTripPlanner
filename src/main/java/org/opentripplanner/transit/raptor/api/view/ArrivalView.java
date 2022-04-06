@@ -10,15 +10,15 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * The purpose of the stop-arrival-view is to provide a common interface for stop-arrivals for
  * different implementations. The view hide the internal Raptor specific models, like the standard
- * and multi-criteria implementation. The internal models can be optimized for speed and/or
- * memory consumption, while the view provide one interface for mapping back to the users domain.
+ * and multi-criteria implementation. The internal models can be optimized for speed and/or memory
+ * consumption, while the view provide one interface for mapping back to the users domain.
  * <p/>
  * The view is used by the debugging functionality and mapping to raptor paths (Raptor API).
  * <p/>
  * The view objects are only created to construct paths to be returned as part of debugging. This is
  * done for just a fraction of all stop arrivals, so there is no need to optimize performance nor
- * memory consumption fo view objects, but the view is designed with the Flyweight design pattern
- * in mind.
+ * memory consumption fo view objects, but the view is designed with the Flyweight design pattern in
+ * mind.
  * <p/>
  * NB! The scope of a view is only guaranteed to be valid for the duration of the method call - e.g.
  * debug callback.
@@ -44,17 +44,17 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   int stop();
 
   /**
-   * The Range Raptor ROUND this stop is reached. Note! the destination
-   * is reached in the same round as the associated egress stop arrival.
+   * The Range Raptor ROUND this stop is reached. Note! the destination is reached in the same round
+   * as the associated egress stop arrival.
    */
   int round();
 
   /**
-   * {@code true} if this arrival represents a simple access arrival without
-   * any embedded rides. FLEX access should not be added in round 0 (the first round).
+   * {@code true} if this arrival represents a simple access arrival without any embedded rides.
+   * FLEX access should not be added in round 0 (the first round).
    * <p>
-   * This method is used to add special functionality for the first transit leg and the
-   * next leg. For example adding transfer cost to all boardings except the fist one.
+   * This method is used to add special functionality for the first transit leg and the next leg.
+   * For example adding transfer cost to all boardings except the fist one.
    */
   default boolean isFirstRound() {
     return round() == 0;
@@ -78,8 +78,8 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   ArrivalView<T> previous();
 
   /**
-   * If it exists, return the most recent transit arrival visited. For a transit-stop-arrival
-   * this is itself, for a transfer-stop-arrival it is the previous stop-arrival.
+   * If it exists, return the most recent transit arrival visited. For a transit-stop-arrival this
+   * is itself, for a transfer-stop-arrival it is the previous stop-arrival.
    * <p>
    * For access- and egress-arrivals, including flex this method return {@code null}.
    * <p>

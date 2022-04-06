@@ -35,25 +35,18 @@ import org.opentripplanner.routing.vertextype.TemporaryVertex;
 public class RoutingContextDestroyTest {
 
   private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
-  private TemporaryVerticesContainer subject;
-
   // Given:
   // - a graph with 3 intersections/vertexes
   private final Graph g = new Graph();
-
   private final StreetVertex a = new IntersectionVertex(g, "A", 1.0, 1.0);
-
   private final StreetVertex b = new IntersectionVertex(g, "B", 0.0, 1.0);
-
   private final StreetVertex c = new IntersectionVertex(g, "C", 1.0, 0.0);
-
   private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
-
   // - And travel *origin* is 0,4 degrees on the road from B to A
   private final GenericLocation from = new GenericLocation(1.0, 0.4);
-
   // - and *destination* is slightly off 0.7 degrees on road from C to A
   private final GenericLocation to = new GenericLocation(0.701, 1.001);
+  private TemporaryVerticesContainer subject;
 
   // - and some roads
   @Before
@@ -90,6 +83,26 @@ public class RoutingContextDestroyTest {
         assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getToVertex());
       }
     }
+  }
+
+  private static <T extends Collection<String>> T findAllReachableVertexes(
+    Vertex vertex,
+    boolean forward,
+    T list
+  ) {
+    if (list.contains(vertex.getDefaultName())) {
+      return list;
+    }
+
+    list.add(vertex.getDefaultName());
+    if (forward) {
+      vertex.getOutgoing().forEach(it -> findAllReachableVertexes(it.getToVertex(), forward, list));
+    } else {
+      vertex
+        .getIncoming()
+        .forEach(it -> findAllReachableVertexes(it.getFromVertex(), forward, list));
+    }
+    return list;
   }
 
   private void originAndDestinationInsertedCorrect() {
@@ -134,26 +147,6 @@ public class RoutingContextDestroyTest {
     );
     double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
     new StreetEdge(v0, v1, geom, name, dist, StreetTraversalPermission.ALL, false);
-  }
-
-  private static <T extends Collection<String>> T findAllReachableVertexes(
-    Vertex vertex,
-    boolean forward,
-    T list
-  ) {
-    if (list.contains(vertex.getDefaultName())) {
-      return list;
-    }
-
-    list.add(vertex.getDefaultName());
-    if (forward) {
-      vertex.getOutgoing().forEach(it -> findAllReachableVertexes(it.getToVertex(), forward, list));
-    } else {
-      vertex
-        .getIncoming()
-        .forEach(it -> findAllReachableVertexes(it.getFromVertex(), forward, list));
-    }
-    return list;
   }
 
   private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {

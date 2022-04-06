@@ -3,8 +3,8 @@ package org.opentripplanner.transit.raptor.api.debug;
 import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
- * Debug events hold information about an internal event in the Raptor Algorithm. The element
- * may be a stop arrivals, a destination arrival or path.
+ * Debug events hold information about an internal event in the Raptor Algorithm. The element may be
+ * a stop arrivals, a destination arrival or path.
  *
  * @param <E> the element type.
  */
@@ -96,9 +96,9 @@ public class DebugEvent<E> {
   }
 
   /**
-   * An element might get rejected or dropped as part of an optimization. The reason should
-   * explain why an element is rejected.
-   * <P/>
+   * An element might get rejected or dropped as part of an optimization. The reason should explain
+   * why an element is rejected.
+   * <p/>
    * The reason is optional, especially if the {@link #rejectedDroppedByElement} is specified.
    *
    * @return If no reason exist an empty string is returned.
@@ -126,9 +126,9 @@ public class DebugEvent<E> {
     /** Element is rejected */
     REJECT("Reject"),
     /**
-     * Element is dropped from the algorithm state. Since Range Raptor works in rounds and iterations, an element
-     * dropped in a later round/iteration might still make it to the optimal solution. This only means that the
-     * element is no longer part of the state.
+     * Element is dropped from the algorithm state. Since Range Raptor works in rounds and
+     * iterations, an element dropped in a later round/iteration might still make it to the optimal
+     * solution. This only means that the element is no longer part of the state.
      */
     DROP("Drop");
 

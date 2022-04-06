@@ -31,43 +31,6 @@ public class BikeWalkingTest extends GraphRoutingTest {
   private StreetVertex A, B, C, D, E, F, Q;
   private StreetEdge AB, BC, CD, DE, EF;
 
-  @BeforeEach
-  protected void setUp() throws Exception {
-    // Generate a very simple graph
-    //
-    //   TS1 <-> A <-> B <-> C <-> D <-> E <-> F <-> E1 <-> S2
-
-    graph =
-      graphOf(
-        new Builder() {
-          @Override
-          public void build() {
-            S1 = stop("S1", 0, 45);
-            S2 = stop("S2", 0.005, 45);
-            E1 = entrance("E1", 0.004, 45);
-            A = intersection("A", 0.001, 45);
-            B = intersection("B", 0.002, 45);
-            C = intersection("C", 0.003, 45);
-            D = intersection("D", 0.004, 45);
-            E = intersection("E", 0.005, 45);
-            F = intersection("F", 0.006, 45);
-            Q = intersection("Q", 0.009, 45);
-
-            elevator(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, D, Q);
-
-            biLink(A, S1);
-            AB = street(A, B, 100, StreetTraversalPermission.PEDESTRIAN);
-            BC = street(B, C, 100, StreetTraversalPermission.PEDESTRIAN);
-            CD = street(C, D, 100, StreetTraversalPermission.ALL);
-            DE = street(D, E, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-            EF = street(E, F, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-            biLink(F, E1);
-            pathway(E1, S2, 60, 100);
-          }
-        }
-      );
-  }
-
   @Test
   public void testWalkOnly() {
     assertWalkPath(
@@ -330,6 +293,43 @@ public class BikeWalkingTest extends GraphRoutingTest {
         "null - 0 / 1.0 - null"
       )
     );
+  }
+
+  @BeforeEach
+  protected void setUp() throws Exception {
+    // Generate a very simple graph
+    //
+    //   TS1 <-> A <-> B <-> C <-> D <-> E <-> F <-> E1 <-> S2
+
+    graph =
+      graphOf(
+        new Builder() {
+          @Override
+          public void build() {
+            S1 = stop("S1", 0, 45);
+            S2 = stop("S2", 0.005, 45);
+            E1 = entrance("E1", 0.004, 45);
+            A = intersection("A", 0.001, 45);
+            B = intersection("B", 0.002, 45);
+            C = intersection("C", 0.003, 45);
+            D = intersection("D", 0.004, 45);
+            E = intersection("E", 0.005, 45);
+            F = intersection("F", 0.006, 45);
+            Q = intersection("Q", 0.009, 45);
+
+            elevator(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, D, Q);
+
+            biLink(A, S1);
+            AB = street(A, B, 100, StreetTraversalPermission.PEDESTRIAN);
+            BC = street(B, C, 100, StreetTraversalPermission.PEDESTRIAN);
+            CD = street(C, D, 100, StreetTraversalPermission.ALL);
+            DE = street(D, E, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+            EF = street(E, F, 100, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+            biLink(F, E1);
+            pathway(E1, S2, 60, 100);
+          }
+        }
+      );
   }
 
   private void assertBikePath(Vertex fromVertex, Vertex toVertex, String... descriptor) {

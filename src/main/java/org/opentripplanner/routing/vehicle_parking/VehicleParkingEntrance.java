@@ -16,15 +16,12 @@ public class VehicleParkingEntrance implements Serializable {
   private final double x, y;
 
   private final I18NString name;
-
-  // Used to explicitly specify the intersection to link to instead of using (x, y)
-  private transient StreetVertex vertex;
-
   // If this entrance should be linked to car accessible streets
   private final boolean carAccessible;
-
   // If this entrance should be linked to walk/bike accessible streets
   private final boolean walkAccessible;
+  // Used to explicitly specify the intersection to link to instead of using (x, y)
+  private transient StreetVertex vertex;
 
   VehicleParkingEntrance(
     VehicleParking vehicleParking,
@@ -82,20 +79,9 @@ public class VehicleParkingEntrance implements Serializable {
     return walkAccessible;
   }
 
-  void clearVertex() {
-    vertex = null;
-  }
-
-  public String toString() {
-    return ToStringBuilder
-      .of(VehicleParkingEntrance.class)
-      .addObj("entranceId", entranceId)
-      .addObj("name", name)
-      .addCoordinate("x", x)
-      .addCoordinate("y", y)
-      .addBool("carAccessible", carAccessible)
-      .addBool("walkAccessible", walkAccessible)
-      .toString();
+  @Override
+  public int hashCode() {
+    return Objects.hash(entranceId, x, y, name, carAccessible, walkAccessible);
   }
 
   @Override
@@ -117,9 +103,20 @@ public class VehicleParkingEntrance implements Serializable {
     );
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(entranceId, x, y, name, carAccessible, walkAccessible);
+  public String toString() {
+    return ToStringBuilder
+      .of(VehicleParkingEntrance.class)
+      .addObj("entranceId", entranceId)
+      .addObj("name", name)
+      .addCoordinate("x", x)
+      .addCoordinate("y", y)
+      .addBool("carAccessible", carAccessible)
+      .addBool("walkAccessible", walkAccessible)
+      .toString();
+  }
+
+  void clearVertex() {
+    vertex = null;
   }
 
   public static class VehicleParkingEntranceBuilder {

@@ -13,8 +13,7 @@ public class WheelChairMapper {
    * If input and containing objects are not null, get the LimitationStatusEnumeration and map to
    * internal {@link WheelChairBoarding} enumeration.
    *
-   * @param accessibilityAssessment NeTEx object wrapping information regarding
-   *                                WheelChairBoarding
+   * @param accessibilityAssessment NeTEx object wrapping information regarding WheelChairBoarding
    * @param defaultValue            If no {@link AccessibilityAssessment} is defined, default to
    *                                this value
    * @return Mapped enumerator, {@link WheelChairBoarding#NO_INFORMATION} if no value is found

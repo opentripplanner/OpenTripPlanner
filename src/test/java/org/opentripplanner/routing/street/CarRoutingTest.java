@@ -31,19 +31,19 @@ public class CarRoutingTest {
   private static Graph herrenbergGraph;
 
   @BeforeAll
-  static void setup() {
+  public static void setup() {
     herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
   }
 
   /**
-   * The OTP algorithm tries hard to never visit the same node twice. This is generally a good
-   * idea because it avoids useless loops in the traversal leading to way faster processing time.
+   * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea
+   * because it avoids useless loops in the traversal leading to way faster processing time.
    * <p>
    * However there is are certain rare pathological cases where through a series of turn
    * restrictions and roadworks you absolutely must visit a vertex twice if you want to produce a
-   * result. One example would be a route like this: https://tinyurl.com/ycqux93g (Note: At the
-   * time of writing this Hindenburgstr. (https://www.openstreetmap.org/way/415545869) is closed
-   * due to roadworks.)
+   * result. One example would be a route like this: https://tinyurl.com/ycqux93g (Note: At the time
+   * of writing this Hindenburgstr. (https://www.openstreetmap.org/way/415545869) is closed due to
+   * roadworks.)
    * <p>
    * This test checks that such a loop is possible.
    * <p>

@@ -38,26 +38,6 @@ public enum TraverseMode {
 
   private static final EnumSet<TraverseMode> STREET_MODES = EnumSet.of(WALK, BICYCLE, SCOOTER, CAR);
 
-  public boolean isTransit() {
-    return TRANSIT_MODES.contains(this);
-  }
-
-  public boolean isOnStreetNonTransit() {
-    return STREET_MODES.contains(this);
-  }
-
-  public boolean isDriving() {
-    return this == CAR;
-  }
-
-  public boolean isCycling() {
-    return this == BICYCLE;
-  }
-
-  public boolean isWalking() {
-    return this == WALK;
-  }
-
   public static TraverseMode fromTransitMode(TransitMode transitMode) {
     switch (transitMode) {
       case RAIL:
@@ -85,5 +65,25 @@ public enum TraverseMode {
       default:
         throw new IllegalArgumentException();
     }
+  }
+
+  public boolean isTransit() {
+    return TRANSIT_MODES.contains(this);
+  }
+
+  public boolean isOnStreetNonTransit() {
+    return STREET_MODES.contains(this);
+  }
+
+  public boolean isDriving() {
+    return this == CAR;
+  }
+
+  public boolean isCycling() {
+    return this == BICYCLE;
+  }
+
+  public boolean isWalking() {
+    return this == WALK;
   }
 }

@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Search for directories containing OTP configuration files. The search is
- * recursive and searches sub-directories 10 levels deep.
+ * Search for directories containing OTP configuration files. The search is recursive and searches
+ * sub-directories 10 levels deep.
  */
 class SearchForOtpConfig {
 

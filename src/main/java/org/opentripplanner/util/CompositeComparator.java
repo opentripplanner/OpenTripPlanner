@@ -3,8 +3,8 @@ package org.opentripplanner.util;
 import java.util.Comparator;
 
 /**
- * This class take a list of comparators and turn them into one,
- * iterating over the vector passes in at construction time.
+ * This class take a list of comparators and turn them into one, iterating over the vector passes in
+ * at construction time.
  * <p>
  * This class implement the composite design pattern.
  * <p>

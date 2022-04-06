@@ -14,14 +14,6 @@ abstract class AbstractGsDataSource implements DataSource {
     this.type = type;
   }
 
-  BlobId blobId() {
-    return blobId;
-  }
-
-  String bucketName() {
-    return blobId.getBucket();
-  }
-
   @Override
   public final String name() {
     return blobId.getName();
@@ -40,5 +32,13 @@ abstract class AbstractGsDataSource implements DataSource {
   @Override
   public final String toString() {
     return type + " " + path();
+  }
+
+  BlobId blobId() {
+    return blobId;
+  }
+
+  String bucketName() {
+    return blobId.getBucket();
   }
 }

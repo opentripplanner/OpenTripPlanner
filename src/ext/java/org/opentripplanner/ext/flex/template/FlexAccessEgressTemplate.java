@@ -36,7 +36,6 @@ public abstract class FlexAccessEgressTemplate {
   private final FlexParameters flexParams;
 
   /**
-   *
    * @param accessEgress  Path from origin to the point of boarding for this flex trip
    * @param trip          The FlexTrip used for this Template
    * @param fromStopIndex Stop sequence index where this FlexTrip is boarded
@@ -79,9 +78,50 @@ public abstract class FlexAccessEgressTemplate {
   }
 
   /**
+   * This method is very much the hot code path in the flex access/egress search so any optimization
+   * here will lead to noticeable speedups.
+   */
+  public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
+    if (transferStop instanceof Stop) {
+      TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
+      return Stream
+        .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
+        .filter(Objects::nonNull);
+    }
+    // transferStop is Location Area/Line
+    else {
+      return getTransfersFromTransferStop(graph)
+        .stream()
+        .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= flexParams.maxTransferMeters)
+        .filter(transfer -> getFinalStop(transfer) != null)
+        .map(transfer -> {
+          List<Edge> edges = getTransferEdges(transfer);
+          return getFlexAccessEgress(edges, getFlexVertex(edges.get(0)), getFinalStop(transfer));
+        })
+        .filter(Objects::nonNull);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects
+      .toStringHelper(this)
+      .add("accessEgress", accessEgress)
+      .add("trip", trip)
+      .add("fromStopIndex", fromStopIndex)
+      .add("toStopIndex", toStopIndex)
+      .add("transferStop", transferStop)
+      .add("secondsFromStartOfTime", secondsFromStartOfTime)
+      .add("serviceDate", serviceDate)
+      .add("calculator", calculator)
+      .add("flexParams", flexParams)
+      .toString();
+  }
+
+  /**
    * Get a list of edges used for transferring to and from the scheduled transit network. The edges
    * should be in the order of traversal of the state in the NearbyStop
-   * */
+   */
   protected abstract List<Edge> getTransferEdges(PathTransfer transfer);
 
   /**
@@ -109,31 +149,6 @@ public abstract class FlexAccessEgressTemplate {
    * Get the FlexTripEdge for the flex ride.
    */
   protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
-
-  /**
-   * This method is very much the hot code path in the flex access/egress search so any optimization
-   * here will lead to noticeable speedups.
-   */
-  public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
-    if (transferStop instanceof Stop) {
-      TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
-      return Stream
-        .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
-        .filter(Objects::nonNull);
-    }
-    // transferStop is Location Area/Line
-    else {
-      return getTransfersFromTransferStop(graph)
-        .stream()
-        .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= flexParams.maxTransferMeters)
-        .filter(transfer -> getFinalStop(transfer) != null)
-        .map(transfer -> {
-          List<Edge> edges = getTransferEdges(transfer);
-          return getFlexAccessEgress(edges, getFlexVertex(edges.get(0)), getFinalStop(transfer));
-        })
-        .filter(Objects::nonNull);
-    }
-  }
 
   protected FlexAccessEgress getFlexAccessEgress(
     List<Edge> transferEdges,
@@ -170,21 +185,5 @@ public abstract class FlexAccessEgressTemplate {
       state,
       transferEdges.isEmpty()
     );
-  }
-
-  @Override
-  public String toString() {
-    return MoreObjects
-      .toStringHelper(this)
-      .add("accessEgress", accessEgress)
-      .add("trip", trip)
-      .add("fromStopIndex", fromStopIndex)
-      .add("toStopIndex", toStopIndex)
-      .add("transferStop", transferStop)
-      .add("secondsFromStartOfTime", secondsFromStartOfTime)
-      .add("serviceDate", serviceDate)
-      .add("calculator", calculator)
-      .add("flexParams", flexParams)
-      .toString();
   }
 }

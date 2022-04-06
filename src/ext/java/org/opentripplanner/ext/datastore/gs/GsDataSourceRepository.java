@@ -28,13 +28,13 @@ public class GsDataSourceRepository implements DataSourceRepository {
   }
 
   @Override
-  public void open() {
-    this.storage = connectToStorage();
+  public String description() {
+    return "Google Cloud Storage";
   }
 
   @Override
-  public String description() {
-    return "Google Cloud Storage";
+  public void open() {
+    this.storage = connectToStorage();
   }
 
   @Override

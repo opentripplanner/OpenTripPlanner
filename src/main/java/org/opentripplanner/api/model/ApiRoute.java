@@ -23,8 +23,8 @@ public final class ApiRoute implements Serializable {
   public String brandingUrl;
 
   @Override
-  public String toString() {
-    return "<Route " + id + " " + shortName + ">";
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
   @Override
@@ -40,7 +40,7 @@ public final class ApiRoute implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(id);
+  public String toString() {
+    return "<Route " + id + " " + shortName + ">";
   }
 }

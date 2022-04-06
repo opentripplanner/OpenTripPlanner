@@ -74,9 +74,31 @@ public class TransferIndexGenerator {
   }
 
   /**
+   * Add information about a newly created pattern and timetables in the index, in order to be able
+   * to create constrained transfers for these patterns.
+   */
+  public void addRealtimeTrip(TripPatternWithRaptorStopIndexes pattern, List<Trip> trips) {
+    TripPattern tripPattern = pattern.getPattern();
+
+    patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
+
+    for (Trip trip : trips) {
+      patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern);
+    }
+
+    for (StopLocation stop : tripPattern.getStops()) {
+      patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
+      Station station = stop.getParentStation();
+      if (station != null) {
+        patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
+      }
+    }
+  }
+
+  /**
    * This sorts and seals the constrained transfers for all patterns in order to protect them from
    * modification, while they are used in the routing.
-   *
+   * <p>
    * {@link TripPatternWithRaptorStopIndexes#sealConstrainedTransfers()}
    */
   private void sealConstrainedTransfers() {
@@ -106,28 +128,6 @@ public class TransferIndexGenerator {
         if (station != null) {
           patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
         }
-      }
-    }
-  }
-
-  /**
-   * Add information about a newly created pattern and timetables in the index, in order to be
-   * able to create constrained transfers for these patterns.
-   */
-  public void addRealtimeTrip(TripPatternWithRaptorStopIndexes pattern, List<Trip> trips) {
-    TripPattern tripPattern = pattern.getPattern();
-
-    patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
-
-    for (Trip trip : trips) {
-      patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern);
-    }
-
-    for (StopLocation stop : tripPattern.getStops()) {
-      patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
-      Station station = stop.getParentStation();
-      if (station != null) {
-        patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
       }
     }
   }
@@ -265,6 +265,27 @@ public class TransferIndexGenerator {
       this.stopPosition = stopPosition;
     }
 
+    @Override
+    public int hashCode() {
+      return Objects.hash(pattern, trip, stopPosition);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (!(o instanceof TPoint)) {
+        return false;
+      }
+      final TPoint tPoint = (TPoint) o;
+      return (
+        stopPosition == tPoint.stopPosition &&
+        Objects.equals(pattern, tPoint.pattern) &&
+        Objects.equals(trip, tPoint.trip)
+      );
+    }
+
     boolean canBoard() {
       // We prevent boarding at the last stop, this might be enforced by the
       // canBoard method, but we do not trust it here.
@@ -292,27 +313,6 @@ public class TransferIndexGenerator {
         stopPosition,
         new TransferForPattern(to.sourcePoint, trip, rank, c)
       );
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (!(o instanceof TPoint)) {
-        return false;
-      }
-      final TPoint tPoint = (TPoint) o;
-      return (
-        stopPosition == tPoint.stopPosition &&
-        Objects.equals(pattern, tPoint.pattern) &&
-        Objects.equals(trip, tPoint.trip)
-      );
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(pattern, trip, stopPosition);
     }
   }
 }

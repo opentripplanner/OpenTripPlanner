@@ -19,8 +19,8 @@ public class SameEdgeAdjuster {
 
   /**
    * Utility class. If the from and to vertices are generated and lie along some of the same edges,
-   * we need to wire them up along those edges so that we don't get odd circuitous routes for
-   * really short trips.
+   * we need to wire them up along those edges so that we don't get odd circuitous routes for really
+   * short trips.
    */
   public static DisposableEdgeCollection adjust(Vertex from, Vertex to, Graph graph) {
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph, Scope.REQUEST);

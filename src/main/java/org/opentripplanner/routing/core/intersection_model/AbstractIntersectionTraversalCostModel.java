@@ -16,9 +16,21 @@ public abstract class AbstractIntersectionTraversalCostModel
   /** Factor by which absolute turn angles are divided to get turn costs for non-driving scenarios. */
   protected double nonDrivingTurnCostFactor = 1.0 / 20.0;
 
+  /* Concrete subclasses must implement this */
+  @Override
+  public abstract double computeTraversalCost(
+    IntersectionVertex v,
+    StreetEdge from,
+    StreetEdge to,
+    TraverseMode mode,
+    RoutingRequest options,
+    float fromSpeed,
+    float toSpeed
+  );
+
   /**
    * Computes the turn cost in seconds for non-driving traversal modes.
-   *
+   * <p>
    * TODO(flamholz): this should probably account for whether there is a traffic light?
    */
   protected double computeNonDrivingTraversalCost(StreetEdge from, StreetEdge to, float toSpeed) {
@@ -35,7 +47,7 @@ public abstract class AbstractIntersectionTraversalCostModel
 
   /**
    * Calculates the turn angle from the incoming/outgoing edges and routing request.
-   *
+   * <p>
    * Corrects for the side of the street they are driving on.
    */
   protected int calculateTurnAngle(StreetEdge from, StreetEdge to) {
@@ -50,16 +62,4 @@ public abstract class AbstractIntersectionTraversalCostModel
 
     return angleOutOfIntersection - angleIntoIntersection;
   }
-
-  /* Concrete subclasses must implement this */
-  @Override
-  public abstract double computeTraversalCost(
-    IntersectionVertex v,
-    StreetEdge from,
-    StreetEdge to,
-    TraverseMode mode,
-    RoutingRequest options,
-    float fromSpeed,
-    float toSpeed
-  );
 }

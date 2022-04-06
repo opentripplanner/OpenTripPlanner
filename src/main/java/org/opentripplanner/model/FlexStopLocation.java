@@ -52,8 +52,17 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     this.url = url;
   }
 
-  public void setName(I18NString name) {
-    this.name = name;
+  @Override
+  public String getFirstZoneAsString() {
+    return zoneId;
+  }
+
+  /**
+   * Returns the centroid of this location.
+   */
+  @Override
+  public WgsCoordinate getCoordinate() {
+    return new WgsCoordinate(centroid.getY(), centroid.getX());
   }
 
   /**
@@ -69,23 +78,6 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     this.centroid = geometry.getCentroid();
   }
 
-  /**
-   * Returns the centroid of this location.
-   */
-  @Override
-  public WgsCoordinate getCoordinate() {
-    return new WgsCoordinate(centroid.getY(), centroid.getX());
-  }
-
-  @Override
-  public String getFirstZoneAsString() {
-    return zoneId;
-  }
-
-  public void setZoneId(String zoneId) {
-    this.zoneId = zoneId;
-  }
-
   @Override
   public boolean isPartOfStation() {
     return false;
@@ -98,5 +90,13 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public void setName(I18NString name) {
+    this.name = name;
+  }
+
+  public void setZoneId(String zoneId) {
+    this.zoneId = zoneId;
   }
 }

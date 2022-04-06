@@ -85,29 +85,22 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
 
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
-
-  private DataImportIssueStore issueStore;
-
-  // Private members that are only read or written internally.
-
   private final HashMap<Vertex, Double> elevationData = new HashMap<>();
 
-  public boolean skipVisibility = false;
-
-  public boolean platformEntriesLinking = false;
-
-  // Members that can be set by clients.
-
-  /**
-   * WayPropertySet computes edge properties from OSM way data.
-   */
-  public WayPropertySet wayPropertySet = new WayPropertySet();
-
+  // Private members that are only read or written internally.
   /**
    * Providers of OSM data.
    */
   private final List<BinaryOpenStreetMapProvider> providers = new ArrayList<>();
+  private DataImportIssueStore issueStore;
+  public boolean skipVisibility = false;
 
+  // Members that can be set by clients.
+  public boolean platformEntriesLinking = false;
+  /**
+   * WayPropertySet computes edge properties from OSM way data.
+   */
+  public WayPropertySet wayPropertySet = new WayPropertySet();
   /**
    * Allows for arbitrary custom naming of edges.
    */
@@ -120,8 +113,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   /**
    * Whether we should create car P+R stations from OSM data. The default value is true. In normal
-   * operation it is set by the JSON graph build configuration, but it is also initialized to
-   * "true" here to provide the default behavior in tests.
+   * operation it is set by the JSON graph build configuration, but it is also initialized to "true"
+   * here to provide the default behavior in tests.
    */
   public boolean staticParkAndRide = true;
 
@@ -133,6 +126,20 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
   public int maxAreaNodes = 500;
+  /**
+   * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
+   */
+  public boolean banDiscouragedWalking = false;
+  public boolean banDiscouragedBiking = false;
+
+  /**
+   * Construct and set providers all at once.
+   */
+  public OpenStreetMapModule(List<BinaryOpenStreetMapProvider> providers) {
+    this.setProviders(providers);
+  }
+
+  public OpenStreetMapModule() {}
 
   public List<String> provides() {
     return Arrays.asList("streets", "turns");
@@ -167,21 +174,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     wayPropertySetSource = source;
   }
 
-  /**
-   * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
-   */
-  public boolean banDiscouragedWalking = false;
-  public boolean banDiscouragedBiking = false;
-
-  /**
-   * Construct and set providers all at once.
-   */
-  public OpenStreetMapModule(List<BinaryOpenStreetMapProvider> providers) {
-    this.setProviders(providers);
-  }
-
-  public OpenStreetMapModule() {}
-
   @Override
   public void buildGraph(
     Graph graph,
@@ -214,6 +206,22 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     graph.calculateEnvelope();
   }
 
+  @Override
+  public void checkInputs() {
+    for (BinaryOpenStreetMapProvider provider : providers) {
+      provider.checkInputs();
+    }
+  }
+
+  private Issue invalidDuration(OSMWithTags element, String v) {
+    return Issue.issue(
+      "InvalidDuration",
+      "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
+      element.getId(),
+      v
+    );
+  }
+
   protected class Handler {
 
     private static final String nodeLabelFormat = "osm:node:%d";
@@ -223,18 +231,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private final Graph graph;
 
     private final OSMDatabase osmdb;
-
+    // track OSM nodes which are decomposed into multiple graph vertices because they are
+    // elevators. later they will be iterated over to build ElevatorEdges between them.
+    private final HashMap<Long, HashMap<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
+    // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
+    private final Map<Long, OsmVertex> intersectionNodes = new HashMap<>();
     /**
      * The bike safety factor of the safest street
      */
     private float bestBikeSafety = 1.0f;
-
-    // track OSM nodes which are decomposed into multiple graph vertices because they are
-    // elevators. later they will be iterated over to build ElevatorEdges between them.
-    private final HashMap<Long, HashMap<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
-
-    // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
-    private final Map<Long, OsmVertex> intersectionNodes = new HashMap<>();
 
     public Handler(Graph graph, OSMDatabase osmdb) {
       this.graph = graph;
@@ -281,6 +286,148 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       applyBikeSafetyFactor(graph);
     } // END buildGraph()
+
+    // TODO Set this to private once WalkableAreaBuilder is gone
+    protected void applyWayProperties(
+      StreetEdge street,
+      StreetEdge backStreet,
+      WayProperties wayData,
+      OSMWithTags way
+    ) {
+      Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
+      boolean motorVehicleNoThrough = wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(
+        way
+      );
+      boolean bicycleNoThrough = wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(
+        way
+      );
+      boolean walkNoThrough = wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(way);
+
+      if (street != null) {
+        double safety = wayData.getSafetyFeatures().first;
+        street.setBicycleSafetyFactor((float) safety);
+        if (safety < bestBikeSafety) {
+          bestBikeSafety = (float) safety;
+        }
+        if (notes != null) {
+          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
+            street,
+            note.first,
+            note.second
+          );
+        }
+        street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
+        street.setBicycleNoThruTraffic(bicycleNoThrough);
+        street.setWalkNoThruTraffic(walkNoThrough);
+      }
+
+      if (backStreet != null) {
+        double safety = wayData.getSafetyFeatures().second;
+        if (safety < bestBikeSafety) {
+          bestBikeSafety = (float) safety;
+        }
+        backStreet.setBicycleSafetyFactor((float) safety);
+        if (notes != null) {
+          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
+            backStreet,
+            note.first,
+            note.second
+          );
+        }
+        backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
+        backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
+        backStreet.setWalkNoThruTraffic(walkNoThrough);
+      }
+    }
+
+    // TODO Set this to private once WalkableAreaBuilder is gone
+    protected I18NString getNameForWay(OSMWithTags way, String id) {
+      I18NString name = way.getAssumedName();
+
+      if (customNamer != null && name != null) {
+        name = new NonLocalizedString(customNamer.name(way, name.toString()));
+      }
+
+      if (name == null) {
+        name = new NonLocalizedString(id);
+      }
+      return name;
+    }
+
+    /**
+     * Make or get a shared vertex for flat intersections, or one vertex per level for multilevel
+     * nodes like elevators. When there is an elevator or other Z-dimension discontinuity, a single
+     * node can appear in several ways at different levels.
+     *
+     * @param node The node to fetch a label for.
+     * @param way  The way it is connected to (for fetching level information).
+     * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
+     * TransitStopStreetVertex.
+     */
+    // TODO Set this to private once WalkableAreaBuilder is gone
+    protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
+      // If the node should be decomposed to multiple levels,
+      // use the numeric level because it is unique, the human level may not be (although
+      // it will likely lead to some head-scratching if it is not).
+      OsmVertex iv = null;
+      if (node.isMultiLevel()) {
+        // make a separate node for every level
+        return recordLevel(node, way);
+      }
+      // single-level case
+      long nid = node.getId();
+      iv = intersectionNodes.get(nid);
+      if (iv == null) {
+        Coordinate coordinate = getCoordinate(node);
+        String label = getNodeLabel(node);
+        String highway = node.getTag("highway");
+        if ("motorway_junction".equals(highway)) {
+          String ref = node.getTag("ref");
+          if (ref != null) {
+            ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y, nid);
+            ev.setExitName(ref);
+            iv = ev;
+          }
+        }
+
+        /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
+        if (node.isStop()) {
+          String ref = node.getTag("ref");
+          String name = node.getTag("name");
+          if (ref != null) {
+            iv =
+              new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, nid, name, ref);
+          }
+        }
+
+        if (node.isBarrier()) {
+          BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
+          bv.setBarrierPermissions(
+            OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
+          );
+          iv = bv;
+        }
+
+        if (iv == null) {
+          iv =
+            new OsmVertex(
+              graph,
+              label,
+              coordinate.x,
+              coordinate.y,
+              node.getId(),
+              new NonLocalizedString(label)
+            );
+          if (node.hasTrafficLight()) {
+            iv.trafficLight = true;
+          }
+        }
+
+        intersectionNodes.put(nid, iv);
+      }
+
+      return iv;
+    }
 
     private OptionalInt parseCapacity(OSMWithTags element) {
       return parseCapacity(element, "capacity");
@@ -859,59 +1006,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       LOG.info(progress.completeMessage());
     }
 
-    // TODO Set this to private once WalkableAreaBuilder is gone
-    protected void applyWayProperties(
-      StreetEdge street,
-      StreetEdge backStreet,
-      WayProperties wayData,
-      OSMWithTags way
-    ) {
-      Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
-      boolean motorVehicleNoThrough = wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(
-        way
-      );
-      boolean bicycleNoThrough = wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(
-        way
-      );
-      boolean walkNoThrough = wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(way);
-
-      if (street != null) {
-        double safety = wayData.getSafetyFeatures().first;
-        street.setBicycleSafetyFactor((float) safety);
-        if (safety < bestBikeSafety) {
-          bestBikeSafety = (float) safety;
-        }
-        if (notes != null) {
-          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
-            street,
-            note.first,
-            note.second
-          );
-        }
-        street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
-        street.setBicycleNoThruTraffic(bicycleNoThrough);
-        street.setWalkNoThruTraffic(walkNoThrough);
-      }
-
-      if (backStreet != null) {
-        double safety = wayData.getSafetyFeatures().second;
-        if (safety < bestBikeSafety) {
-          bestBikeSafety = (float) safety;
-        }
-        backStreet.setBicycleSafetyFactor((float) safety);
-        if (notes != null) {
-          for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
-            backStreet,
-            note.first,
-            note.second
-          );
-        }
-        backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
-        backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
-        backStreet.setWalkNoThruTraffic(walkNoThrough);
-      }
-    }
-
     private void setWayName(OSMWithTags way) {
       if (!way.hasTag("name")) {
         I18NString creativeName = wayPropertySet.getCreativeNameForWay(way);
@@ -1269,9 +1363,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
 
     /**
-     * The safest bike lane should have a safety weight no lower than the time weight of a flat street. This method divides the safety lengths by
-     * the length ratio of the safest street, ensuring this property.
-     *
+     * The safest bike lane should have a safety weight no lower than the time weight of a flat
+     * street. This method divides the safety lengths by the length ratio of the safest street,
+     * ensuring this property.
+     * <p>
      * TODO Move this away, this is common to all street builders.
      */
     private void applyBikeSafetyFactor(Graph graph) {
@@ -1339,8 +1434,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
 
     /**
-     * Handle oneway streets, cycleways, and other per-mode and universal access controls. See http://wiki.openstreetmap.org/wiki/Bicycle for
-     * various scenarios, along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
+     * Handle oneway streets, cycleways, and other per-mode and universal access controls. See
+     * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios, along with
+     * http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
      */
     private P2<StreetEdge> getEdgesForStreet(
       OsmVertex startEndpoint,
@@ -1488,24 +1584,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       return street;
     }
 
-    // TODO Set this to private once WalkableAreaBuilder is gone
-    protected I18NString getNameForWay(OSMWithTags way, String id) {
-      I18NString name = way.getAssumedName();
-
-      if (customNamer != null && name != null) {
-        name = new NonLocalizedString(customNamer.name(way, name.toString()));
-      }
-
-      if (name == null) {
-        name = new NonLocalizedString(id);
-      }
-      return name;
-    }
-
     /**
-     * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node is active at level 5.
+     * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node
+     * is active at level 5.
      *
-     * @param way the way that has the level
+     * @param way  the way that has the level
      * @param node the node to record for
      * @author mattwigway
      */
@@ -1535,95 +1618,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         return vertex;
       }
       return vertices.get(level);
-    }
-
-    /**
-     * Make or get a shared vertex for flat intersections, or one vertex per level for multilevel nodes like elevators. When there is an elevator
-     * or other Z-dimension discontinuity, a single node can appear in several ways at different levels.
-     *
-     * @param node The node to fetch a label for.
-     * @param way  The way it is connected to (for fetching level information).
-     * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a TransitStopStreetVertex.
-     */
-    // TODO Set this to private once WalkableAreaBuilder is gone
-    protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
-      // If the node should be decomposed to multiple levels,
-      // use the numeric level because it is unique, the human level may not be (although
-      // it will likely lead to some head-scratching if it is not).
-      OsmVertex iv = null;
-      if (node.isMultiLevel()) {
-        // make a separate node for every level
-        return recordLevel(node, way);
-      }
-      // single-level case
-      long nid = node.getId();
-      iv = intersectionNodes.get(nid);
-      if (iv == null) {
-        Coordinate coordinate = getCoordinate(node);
-        String label = getNodeLabel(node);
-        String highway = node.getTag("highway");
-        if ("motorway_junction".equals(highway)) {
-          String ref = node.getTag("ref");
-          if (ref != null) {
-            ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y, nid);
-            ev.setExitName(ref);
-            iv = ev;
-          }
-        }
-
-        /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
-        if (node.isStop()) {
-          String ref = node.getTag("ref");
-          String name = node.getTag("name");
-          if (ref != null) {
-            iv =
-              new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, nid, name, ref);
-          }
-        }
-
-        if (node.isBarrier()) {
-          BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
-          bv.setBarrierPermissions(
-            OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
-          );
-          iv = bv;
-        }
-
-        if (iv == null) {
-          iv =
-            new OsmVertex(
-              graph,
-              label,
-              coordinate.x,
-              coordinate.y,
-              node.getId(),
-              new NonLocalizedString(label)
-            );
-          if (node.hasTrafficLight()) {
-            iv.trafficLight = true;
-          }
-        }
-
-        intersectionNodes.put(nid, iv);
-      }
-
-      return iv;
-    }
-  }
-
-  private Issue invalidDuration(OSMWithTags element, String v) {
-    return Issue.issue(
-      "InvalidDuration",
-      "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
-      element.getId(),
-      v
-    );
-  }
-
-  @Override
-  public void checkInputs() {
-    for (BinaryOpenStreetMapProvider provider : providers) {
-      provider.checkInputs();
     }
   }
 }

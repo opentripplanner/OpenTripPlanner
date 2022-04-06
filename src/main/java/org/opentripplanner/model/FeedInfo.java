@@ -40,6 +40,10 @@ public final class FeedInfo implements Serializable {
     this.version = version;
   }
 
+  public static FeedInfo dummyForTest(String id) {
+    return new FeedInfo(id, "publisher", "www.z.org", "en", null, null, null);
+  }
+
   public String getPublisherName() {
     return publisherName;
   }
@@ -69,8 +73,8 @@ public final class FeedInfo implements Serializable {
   }
 
   @Override
-  public String toString() {
-    return "<FeedInfo " + getId() + ">";
+  public int hashCode() {
+    return id.hashCode();
   }
 
   @Override
@@ -86,11 +90,7 @@ public final class FeedInfo implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return id.hashCode();
-  }
-
-  public static FeedInfo dummyForTest(String id) {
-    return new FeedInfo(id, "publisher", "www.z.org", "en", null, null, null);
+  public String toString() {
+    return "<FeedInfo " + getId() + ">";
   }
 }

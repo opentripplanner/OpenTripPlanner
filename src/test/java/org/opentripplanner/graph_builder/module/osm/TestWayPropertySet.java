@@ -99,10 +99,6 @@ public class TestWayPropertySet {
 
   /**
    * Test that two values are within epsilon of each other.
-   *
-   * @param val1
-   * @param val2
-   * @param epsilon
    */
   private boolean within(float val1, float val2, float epsilon) {
     return (Math.abs(val1 - val2) < epsilon);
@@ -110,9 +106,6 @@ public class TestWayPropertySet {
 
   /**
    * Convert kilometers per hour to meters per second
-   *
-   * @param kmh
-   * @return
    */
   private float kmhAsMs(float kmh) {
     return kmh * 1000 / 3600;

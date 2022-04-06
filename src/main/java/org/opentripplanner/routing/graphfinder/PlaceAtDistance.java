@@ -19,6 +19,11 @@ public class PlaceAtDistance {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(place, distance);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -28,11 +33,6 @@ public class PlaceAtDistance {
     }
     final PlaceAtDistance that = (PlaceAtDistance) o;
     return Double.compare(that.distance, distance) == 0 && Objects.equals(place, that.place);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(place, distance);
   }
 
   @Override

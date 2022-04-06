@@ -88,8 +88,20 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create and prepare heuristic search (both FORWARD and REVERSE) based on optimizations and
-   * input search parameters. This is done for Standard and Multi-criteria profiles only.
+   * Only exposed for testing purposes
+   */
+  @Nullable
+  public Heuristics getDestinationHeuristics() {
+    if (!originalRequest.useDestinationPruning()) {
+      return null;
+    }
+    LOG.debug("RangeRaptor - Destination pruning enabled.");
+    return revHeuristics.result();
+  }
+
+  /**
+   * Create and prepare heuristic search (both FORWARD and REVERSE) based on optimizations and input
+   * search parameters. This is done for Standard and Multi-criteria profiles only.
    */
   private void enableHeuristicSearchBasedOnOptimizationsAndSearchParameters() {
     // We delegate this to a static method to be able to write unit test on this logic
@@ -101,8 +113,8 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Run standard "singe-iteration" raptor search to calculate heuristics - this should be
-   * really fast to run compared with a (multi-criteria) range-raptor search.
+   * Run standard "singe-iteration" raptor search to calculate heuristics - this should be really
+   * fast to run compared with a (multi-criteria) range-raptor search.
    *
    * @throws DestinationNotReachedException if destination is not reached.
    */
@@ -267,17 +279,5 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
         )
         .calculate();
     }
-  }
-
-  /**
-   * Only exposed for testing purposes
-   */
-  @Nullable
-  public Heuristics getDestinationHeuristics() {
-    if (!originalRequest.useDestinationPruning()) {
-      return null;
-    }
-    LOG.debug("RangeRaptor - Destination pruning enabled.");
-    return revHeuristics.result();
   }
 }

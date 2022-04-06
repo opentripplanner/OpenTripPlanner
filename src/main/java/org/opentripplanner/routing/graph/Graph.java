@@ -95,7 +95,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
+ * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for
+ * each vertex, but those are in the vertex now.
  */
 public class Graph implements Serializable {
 
@@ -114,73 +115,53 @@ public class Graph implements Serializable {
 
   /**
    * Allows a notice element to be attached to an object in the OTP model by its id and then
-   * retrieved by the API when navigating from that object. The map key is entity id:
-   * {@link TransitEntity#getId()}. The notice is part of the static transit data.
+   * retrieved by the API when navigating from that object. The map key is entity id: {@link
+   * TransitEntity#getId()}. The notice is part of the static transit data.
    */
   private final Multimap<TransitEntity, Notice> noticesByElement = HashMultimap.create();
-
-  // transit feed validity information in seconds since epoch
-  private long transitServiceStarts = Long.MAX_VALUE;
-
-  private long transitServiceEnds = 0;
-
   private final Map<Class<?>, Serializable> services = new HashMap<>();
-
   private final TransferService transferService = new TransferService();
-
-  private GraphBundle bundle;
-
   /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
   private final Map<String, Vertex> vertices = new ConcurrentHashMap<>();
-
-  private transient CalendarService calendarService;
-
-  private transient StreetVertexIndex streetIndex;
-
-  public transient GraphIndex index;
-
   public final transient Deduplicator deduplicator = new Deduplicator();
-
   /**
-   * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code Set<Object>}.
-   * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.
+   * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code
+   * Set<Object>}. An empty Map is created before the Graph is built to allow registering IDs from
+   * multiple feeds.
    */
   private final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
-
-  private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
-
   private final Collection<Agency> agencies = new ArrayList<>();
-
   private final Collection<Operator> operators = new ArrayList<>();
-
   private final Collection<String> feedIds = new HashSet<>();
-
   private final Map<String, FeedInfo> feedInfoForId = new HashMap<>();
-
+  /** List of transit modes that are availible in GTFS data used in this graph **/
+  private final HashSet<TransitMode> transitModes = new HashSet<>();
+  public final Date buildTime = new Date();
+  /** Pre-generated transfers between all stops. */
+  public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
+  /** Data model for Raptor routing, with realtime updates applied (if any). */
+  private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
+  // transit feed validity information in seconds since epoch
+  private long transitServiceStarts = Long.MAX_VALUE;
+  private long transitServiceEnds = 0;
+  private GraphBundle bundle;
+  private transient CalendarService calendarService;
+  private transient StreetVertexIndex streetIndex;
+  public transient GraphIndex index;
+  private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
   private transient TimeZone timeZone = null;
-
   //Envelope of all OSM and transit vertices. Calculated during build time
   private WorldEnvelope envelope = null;
-
   //ConvexHull of all the graph vertices. Generated at Graph build time.
   private Geometry convexHull = null;
-
   /** The density center of the graph for determining the initial geographic extent in the client. */
   private Coordinate center = null;
-
   /* The preferences that were used for graph building. */
   public Preferences preferences = null;
-
-  /** List of transit modes that are availible in GTFS data used in this graph**/
-  private final HashSet<TransitMode> transitModes = new HashSet<>();
-
   // TODO OTP2: This is only enabled with static bike rental
   public boolean hasBikeSharing = false;
-
   public boolean hasParkRide = false;
-
   public boolean hasBikeRide = false;
-
   /**
    * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
    * graph updaters defined in the configuration.
@@ -188,96 +169,67 @@ public class Graph implements Serializable {
    * @see GraphUpdaterConfigurator
    */
   public transient GraphUpdaterManager updaterManager = null;
-
-  public final Date buildTime = new Date();
-
   /** True if OSM data was loaded into this Graph. */
   public boolean hasStreets = false;
-
   /** True if GTFS data was loaded into this Graph. */
   public boolean hasTransit = false;
-
   /** True if direct single-edge transfers were generated between transit stops in this Graph. */
   public boolean hasDirectTransfers = false;
-
   /**
    * True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0).
    */
   public boolean hasFrequencyService = false;
-
   /**
    * True if schedule-based services exist in this Graph (including GTFS frequencies with
    * exact_times = 1).
    */
   public boolean hasScheduledService = false;
-
   /**
-   * Have bike parks already been linked to the graph. As the linking happens twice if a base
-   * graph is used, we store information on whether bike park linking should be skipped.
+   * Have bike parks already been linked to the graph. As the linking happens twice if a base graph
+   * is used, we store information on whether bike park linking should be skipped.
    */
   public boolean hasLinkedBikeParks = false;
-
   /**
-   * The difference in meters between the WGS84 ellipsoid height and geoid height
-   * at the graph's center
+   * The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's
+   * center
    */
   public Double ellipsoidToGeoidDifference = 0.0;
-
   /**
    * Does this graph contain elevation data?
    */
   public boolean hasElevation = false;
-
   /**
    * If this graph contains elevation data, the minimum value.
    */
   public Double minElevation = null;
-
   /**
    * If this graph contains elevation data, the maximum value.
    */
   public Double maxElevation = null;
-
   /** Parent stops **/
   public Map<FeedScopedId, Station> stationById = new HashMap<>();
-
   /**
    * Optional level above parent stops (only supported in NeTEx)
    */
   public Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
-
   /**
    * Optional grouping that can contain both stations and multimodal stations (only supported in
    * NeTEx)
    */
   public Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
-
   /**
    * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
    * vertices/edges anymore.
    */
   public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
-
   public Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
-
-  /** Pre-generated transfers between all stops. */
-  public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
-
   public Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
-
   public Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
-
   public Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
-
   /** The distance between elevation samples used in CompactElevationProfile. */
   private double distanceBetweenElevationSamples;
-
   /** Data model for Raptor routing, with realtime updates applied (if any). */
   private transient TransitLayer transitLayer;
-
-  /** Data model for Raptor routing, with realtime updates applied (if any). */
-  private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
-
   public transient TransitLayerUpdater transitLayerUpdater;
 
   private transient TransitAlertService transitAlertService;
@@ -290,17 +242,17 @@ public class Graph implements Serializable {
     DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
 
   /**
-   * Hack. I've tried three different ways of generating unique labels.
-   * Previously we were just tolerating edge label collisions.
-   * For some reason we're repeatedly generating splits on the same edge objects, despite a
-   * comment that said it was guaranteed there would only ever be one split per edge. This is
-   * going to fail as soon as we load a base OSM graph and build transit on top of it.
+   * Hack. I've tried three different ways of generating unique labels. Previously we were just
+   * tolerating edge label collisions. For some reason we're repeatedly generating splits on the
+   * same edge objects, despite a comment that said it was guaranteed there would only ever be one
+   * split per edge. This is going to fail as soon as we load a base OSM graph and build transit on
+   * top of it.
    */
   public long nextSplitNumber = 0;
 
   /**
-   * DataOverlay Sandbox module parameter bindings configured in the build-config, and needed
-   * when creating the data overlay context when routing.
+   * DataOverlay Sandbox module parameter bindings configured in the build-config, and needed when
+   * creating the data overlay context when routing.
    */
   public DataOverlayParameterBindings dataOverlayParameterBindings;
 
@@ -344,7 +296,7 @@ public class Graph implements Serializable {
   /**
    * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph,
    * when they are constructed or deserialized.
-   *
+   * <p>
    * TODO OTP2 - This strategy is error prune, problematic when testing and causes a cyclic
    *           - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
    *           - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
@@ -363,6 +315,7 @@ public class Graph implements Serializable {
 
   /**
    * Removes an edge from the graph. This method is not thread-safe.
+   *
    * @param e The edge to be removed
    */
   public void removeEdge(Edge e) {
@@ -457,12 +410,12 @@ public class Graph implements Serializable {
     return realtimeTransitLayer.get();
   }
 
-  public boolean hasRealtimeTransitLayer() {
-    return realtimeTransitLayer != null;
-  }
-
   public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
     this.realtimeTransitLayer.publish(realtimeTransitLayer);
+  }
+
+  public boolean hasRealtimeTransitLayer() {
+    return realtimeTransitLayer != null;
   }
 
   public boolean containsVertex(Vertex v) {
@@ -573,7 +526,8 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Find the total number of edges in this Graph. There are assumed to be no Edges in an incoming edge list that are not in an outgoing edge list.
+   * Find the total number of edges in this Graph. There are assumed to be no Edges in an incoming
+   * edge list that are not in an outgoing edge list.
    *
    * @return number of outgoing edges in the graph
    */
@@ -583,11 +537,6 @@ public class Graph implements Serializable {
       ne += v.getDegreeOut();
     }
     return ne;
-  }
-
-  private void readObject(ObjectInputStream inputStream)
-    throws ClassNotFoundException, IOException {
-    inputStream.defaultReadObject();
   }
 
   /**
@@ -602,9 +551,9 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Perform indexing on vertices, edges, and timetables, and create transient data structures.
-   * This used to be done in readObject methods upon deserialization, but stand-alone mode now
-   * allows passing graphs from graphbuilder to server in memory, without a round trip through
+   * Perform indexing on vertices, edges, and timetables, and create transient data structures. This
+   * used to be done in readObject methods upon deserialization, but stand-alone mode now allows
+   * passing graphs from graphbuilder to server in memory, without a round trip through
    * serialization.
    */
   public void index() {
@@ -656,17 +605,15 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Get or create a serviceId for a given date. This method is used when a new trip is
-   * added from a realtime data update. It make sure the date is in the existing transit service
-   * period.
-   *
+   * Get or create a serviceId for a given date. This method is used when a new trip is added from a
+   * realtime data update. It make sure the date is in the existing transit service period.
+   * <p>
    * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
    *           - this when doing the issue #3030.
    *
    * @param serviceDate service date for the added service id
-   *
-   * @return service-id for date if it exist or is created. If the given service date is outside
-   * the service period {@code null} is returned.
+   * @return service-id for date if it exist or is created. If the given service date is outside the
+   * service period {@code null} is returned.
    */
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
@@ -735,10 +682,10 @@ public class Graph implements Serializable {
   /**
    * Returns the time zone for the first agency in this graph. This is used to interpret times in
    * API requests. The JVM default time zone cannot be used because we support multiple graphs on
-   * one server via the routerId. Ideally we would want to interpret times in the time zone of
-   * the geographic location where the origin/destination vertex or board/alight event is
-   * located. This may become necessary when we start making graphs with long distance train,
-   * boat, or air services.
+   * one server via the routerId. Ideally we would want to interpret times in the time zone of the
+   * geographic location where the origin/destination vertex or board/alight event is located. This
+   * may become necessary when we start making graphs with long distance train, boat, or air
+   * services.
    */
   public TimeZone getTimeZone() {
     if (timeZone == null) {
@@ -775,7 +722,7 @@ public class Graph implements Serializable {
 
   /**
    * Calculates envelope out of all OSM coordinates
-   *
+   * <p>
    * Transit stops are added to the envelope as they are added to the graph
    */
   public void calculateEnvelope() {
@@ -803,12 +750,12 @@ public class Graph implements Serializable {
 
   /**
    * Expands envelope to include given point
+   * <p>
+   * If envelope is empty it creates it (This can happen with a graph without OSM data) Used when
+   * adding stops to OSM envelope
    *
-   * If envelope is empty it creates it (This can happen with a graph without OSM data)
-   * Used when adding stops to OSM envelope
-   *
-   * @param  x  the value to lower the minimum x to or to raise the maximum x to
-   * @param  y  the value to lower the minimum y to or to raise the maximum y to
+   * @param x the value to lower the minimum x to or to raise the maximum x to
+   * @param y the value to lower the minimum y to or to raise the maximum y to
    */
   public void expandToInclude(double x, double y) {
     //Envelope can be empty if graph building is run without OSM data
@@ -823,13 +770,14 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Calculates Transit center from median of coordinates of all transitStops if graph
-   * has transit. If it doesn't it isn't calculated. (mean walue of min, max latitude and longitudes are used)
-   *
+   * Calculates Transit center from median of coordinates of all transitStops if graph has transit.
+   * If it doesn't it isn't calculated. (mean walue of min, max latitude and longitudes are used)
+   * <p>
    * Transit center is saved in center variable
-   *
-   * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
-   * in memory, this can become problematic in large installations. It works without a problem on New York State.
+   * <p>
+   * This speeds up calculation, but problem is that median needs to have all of
+   * latitudes/longitudes in memory, this can become problematic in large installations. It works
+   * without a problem on New York State.
    */
   public void calculateTransitCenter() {
     if (hasTransit) {
@@ -897,35 +845,7 @@ public class Graph implements Serializable {
     return vehiclePositionService;
   }
 
-  private Collection<StopLocation> getStopsForId(FeedScopedId id) {
-    // GroupOfStations
-    GroupOfStations groupOfStations = groupOfStationsById.get(id);
-    if (groupOfStations != null) {
-      return groupOfStations.getChildStops();
-    }
-
-    // Multimodal station
-    MultiModalStation multiModalStation = multiModalStationById.get(id);
-    if (multiModalStation != null) {
-      return multiModalStation.getChildStops();
-    }
-
-    // Station
-    Station station = stationById.get(id);
-    if (station != null) {
-      return station.getChildStops();
-    }
-    // Single stop
-    var stop = index.getStopForId(id);
-    if (stop != null) {
-      return Collections.singleton(stop);
-    }
-
-    return null;
-  }
-
   /**
-   *
    * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
    * @return The associated TransitStopVertex or all underlying TransitStopVertices
    */
@@ -1102,8 +1022,8 @@ public class Graph implements Serializable {
   }
 
   /**
-   *  Flex locations are generated by GTFS graph builder, but consumed only after the street graph
-   *  is built
+   * Flex locations are generated by GTFS graph builder, but consumed only after the street graph is
+   * built
    */
   public FlexStopLocation getLocationById(FeedScopedId id) {
     return locationsById.get(id);
@@ -1129,5 +1049,37 @@ public class Graph implements Serializable {
     );
 
     return stopLocations;
+  }
+
+  private void readObject(ObjectInputStream inputStream)
+    throws ClassNotFoundException, IOException {
+    inputStream.defaultReadObject();
+  }
+
+  private Collection<StopLocation> getStopsForId(FeedScopedId id) {
+    // GroupOfStations
+    GroupOfStations groupOfStations = groupOfStationsById.get(id);
+    if (groupOfStations != null) {
+      return groupOfStations.getChildStops();
+    }
+
+    // Multimodal station
+    MultiModalStation multiModalStation = multiModalStationById.get(id);
+    if (multiModalStation != null) {
+      return multiModalStation.getChildStops();
+    }
+
+    // Station
+    Station station = stationById.get(id);
+    if (station != null) {
+      return station.getChildStops();
+    }
+    // Single stop
+    var stop = index.getStopForId(id);
+    if (stop != null) {
+      return Collections.singleton(stop);
+    }
+
+    return null;
   }
 }

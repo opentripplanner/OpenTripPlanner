@@ -20,15 +20,14 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<StopArrival> from() {
-    return environment ->
-      new StopArrival(getSource(environment).getTripPlan().from, null, null, null, null);
+  public DataFetcher<DebugOutput> debugOutput() {
+    return environment -> getSource(environment).getDebugTimingAggregator().finishedRendering();
   }
 
   @Override
-  public DataFetcher<StopArrival> to() {
+  public DataFetcher<StopArrival> from() {
     return environment ->
-      new StopArrival(getSource(environment).getTripPlan().to, null, null, null, null);
+      new StopArrival(getSource(environment).getTripPlan().from, null, null, null, null);
   }
 
   @Override
@@ -59,17 +58,6 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Long> prevDateTime() {
-    return environment -> {
-      TripSearchMetadata metadata = getSource(environment).getMetadata();
-      if (metadata == null || metadata.prevDateTime == null) {
-        return null;
-      }
-      return metadata.prevDateTime.getEpochSecond() * 1000;
-    };
-  }
-
-  @Override
   public DataFetcher<Long> nextDateTime() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();
@@ -81,17 +69,28 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<String> previousPageCursor() {
+  public DataFetcher<String> nextPageCursor() {
     return environment -> {
-      final PageCursor pageCursor = getSource(environment).getPreviousPageCursor();
+      final PageCursor pageCursor = getSource(environment).getNextPageCursor();
       return pageCursor != null ? pageCursor.encode() : null;
     };
   }
 
   @Override
-  public DataFetcher<String> nextPageCursor() {
+  public DataFetcher<Long> prevDateTime() {
     return environment -> {
-      final PageCursor pageCursor = getSource(environment).getNextPageCursor();
+      TripSearchMetadata metadata = getSource(environment).getMetadata();
+      if (metadata == null || metadata.prevDateTime == null) {
+        return null;
+      }
+      return metadata.prevDateTime.getEpochSecond() * 1000;
+    };
+  }
+
+  @Override
+  public DataFetcher<String> previousPageCursor() {
+    return environment -> {
+      final PageCursor pageCursor = getSource(environment).getPreviousPageCursor();
       return pageCursor != null ? pageCursor.encode() : null;
     };
   }
@@ -108,8 +107,9 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<DebugOutput> debugOutput() {
-    return environment -> getSource(environment).getDebugTimingAggregator().finishedRendering();
+  public DataFetcher<StopArrival> to() {
+    return environment ->
+      new StopArrival(getSource(environment).getTripPlan().to, null, null, null, null);
   }
 
   private RoutingResponse getSource(DataFetchingEnvironment environment) {

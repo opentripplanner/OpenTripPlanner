@@ -21,7 +21,7 @@ class FrequencyMapper {
     return MapUtils.mapToList(allFrequencys, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   Frequency map(org.onebusaway.gtfs.model.Frequency orginal) {
     return orginal == null ? null : mappedFrequencys.computeIfAbsent(orginal, this::doMap);
   }

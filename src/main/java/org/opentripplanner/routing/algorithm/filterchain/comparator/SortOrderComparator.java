@@ -58,6 +58,11 @@ public class SortOrderComparator extends CompositeComparator<Itinerary> {
     GENERALIZED_COST_COMP
   );
 
+  @SafeVarargs
+  private SortOrderComparator(Comparator<Itinerary>... compareVector) {
+    super(compareVector);
+  }
+
   /** Return the default comparator for a depart-after search. */
   public static SortOrderComparator defaultComparatorDepartAfter() {
     return STREET_AND_ARRIVAL_TIME;
@@ -92,10 +97,5 @@ public class SortOrderComparator extends CompositeComparator<Itinerary> {
         return STREET_AND_DEPARTURE_TIME;
     }
     throw new IllegalArgumentException();
-  }
-
-  @SafeVarargs
-  private SortOrderComparator(Comparator<Itinerary>... compareVector) {
-    super(compareVector);
   }
 }

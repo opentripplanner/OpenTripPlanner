@@ -128,33 +128,21 @@ public final class Stop extends StationElement implements StopLocation {
     return "<Stop " + getId() + ">";
   }
 
-  public String getPlatformCode() {
-    return platformCode;
-  }
-
   public I18NString getUrl() {
     return url;
   }
 
-  public TimeZone getTimeZone() {
-    return timeZone;
+  public String getPlatformCode() {
+    return platformCode;
   }
 
   public TransitMode getVehicleType() {
     return vehicleType;
   }
 
-  public Collection<BoardingArea> getBoardingAreas() {
-    return boardingAreas != null ? boardingAreas : Collections.emptySet();
-  }
-
-  /**
-   * Get the transfer cost priority for Stop. This will fetch the value from the parent
-   * [if parent exist] or return the default value.
-   */
-  @NotNull
-  public StopTransferPriority getPriority() {
-    return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
+  @Override
+  public String getVehicleSubmode() {
+    return netexSubmode;
   }
 
   public Collection<FareZone> getFareZones() {
@@ -166,8 +154,20 @@ public final class Stop extends StationElement implements StopLocation {
     return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
   }
 
-  @Override
-  public String getVehicleSubmode() {
-    return netexSubmode;
+  public TimeZone getTimeZone() {
+    return timeZone;
+  }
+
+  /**
+   * Get the transfer cost priority for Stop. This will fetch the value from the parent [if parent
+   * exist] or return the default value.
+   */
+  @NotNull
+  public StopTransferPriority getPriority() {
+    return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
+  }
+
+  public Collection<BoardingArea> getBoardingAreas() {
+    return boardingAreas != null ? boardingAreas : Collections.emptySet();
   }
 }

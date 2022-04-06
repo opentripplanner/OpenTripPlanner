@@ -30,28 +30,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
   private final boolean wheelchairAccessible;
   private final FeedScopedId id;
 
-  /**
-   * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean)}
-   */
-  public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
-    return PathwayEdge.lowCost(fromV, toV, null, name, true);
-  }
-
-  /**
-   * Create a PathwayEdge that doesn't have a traversal time, distance or steps.
-   *
-   * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
-   */
-  public static PathwayEdge lowCost(
-    Vertex fromV,
-    Vertex toV,
-    FeedScopedId id,
-    I18NString name,
-    boolean wheelchairAccessible
-  ) {
-    return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible);
-  }
-
   public PathwayEdge(
     Vertex fromv,
     Vertex tov,
@@ -73,43 +51,30 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     this.distance = distance;
   }
 
+  /**
+   * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean)}
+   */
+  public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
+    return PathwayEdge.lowCost(fromV, toV, null, name, true);
+  }
+
+  /**
+   * Create a PathwayEdge that doesn't have a traversal time, distance or steps.
+   * <p>
+   * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
+   */
+  public static PathwayEdge lowCost(
+    Vertex fromV,
+    Vertex toV,
+    FeedScopedId id,
+    I18NString name,
+    boolean wheelchairAccessible
+  ) {
+    return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible);
+  }
+
   public String getDirection() {
     return null;
-  }
-
-  public double getDistanceMeters() {
-    return this.distance;
-  }
-
-  @Override
-  public double getEffectiveWalkDistance() {
-    if (traversalTime > 0) {
-      return 0;
-    } else {
-      return distance;
-    }
-  }
-
-  @Override
-  public int getDistanceIndependentTime() {
-    return traversalTime;
-  }
-
-  public LineString getGeometry() {
-    Coordinate[] coordinates = new Coordinate[] {
-      getFromVertex().getCoordinate(),
-      getToVertex().getCoordinate(),
-    };
-    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
-  }
-
-  @Override
-  public I18NString getName() {
-    return name;
-  }
-
-  public FeedScopedId getId() {
-    return id;
   }
 
   public State traverse(State s0) {
@@ -155,5 +120,40 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     }
 
     return s1.makeState();
+  }
+
+  @Override
+  public I18NString getName() {
+    return name;
+  }
+
+  public LineString getGeometry() {
+    Coordinate[] coordinates = new Coordinate[] {
+      getFromVertex().getCoordinate(),
+      getToVertex().getCoordinate(),
+    };
+    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+  }
+
+  public double getDistanceMeters() {
+    return this.distance;
+  }
+
+  @Override
+  public double getEffectiveWalkDistance() {
+    if (traversalTime > 0) {
+      return 0;
+    } else {
+      return distance;
+    }
+  }
+
+  @Override
+  public int getDistanceIndependentTime() {
+    return traversalTime;
+  }
+
+  public FeedScopedId getId() {
+    return id;
   }
 }

@@ -10,13 +10,13 @@ public class LegacyGraphQLStopOnRouteImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLStopOnRoute {
 
   @Override
-  public DataFetcher<Object> stop() {
-    return environment -> getSource(environment).getStop();
+  public DataFetcher<Route> route() {
+    return environment -> getSource(environment).getRoute();
   }
 
   @Override
-  public DataFetcher<Route> route() {
-    return environment -> getSource(environment).getRoute();
+  public DataFetcher<Object> stop() {
+    return environment -> getSource(environment).getStop();
   }
 
   private LegacyGraphQLStopOnRouteModel getSource(DataFetchingEnvironment environment) {

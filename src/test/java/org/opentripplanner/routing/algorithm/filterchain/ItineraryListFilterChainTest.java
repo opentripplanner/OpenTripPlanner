@@ -21,8 +21,8 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 /**
- * This class test the whole filter chain with a few test cases. Each filter should be tested
- * with a unit test. This is just a some test on top of the other filter unit-tests.
+ * This class test the whole filter chain with a few test cases. Each filter should be tested with a
+ * unit test. This is just a some test on top of the other filter unit-tests.
  */
 public class ItineraryListFilterChainTest implements PlanTestConstants {
 
@@ -64,38 +64,6 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertEquals(toStr(List.of(i1)), toStr(chain.filter(List.of(i1, i2, i3))));
   }
 
-  @Nested
-  class MaxItinerariesBuilderTest {
-
-    @BeforeEach
-    public void setUpItineraries() {
-      i1 = newItinerary(A).bus(21, T11_05, T11_10, E).build();
-      i2 = newItinerary(A).bus(31, T11_07, T11_12, E).build();
-      i3 = newItinerary(A).bus(41, T11_09, T11_14, E).build();
-    }
-
-    @Test
-    public void testPostProcessorWithMaxItinerariesFilterSetToTwo() {
-      // Given a default postProcessor with 'numOfItineraries=2'
-      ItineraryListFilterChain chain = createBuilder(false, false, 2).build();
-      assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3)));
-    }
-
-    @Test
-    public void testPostProcessorWithMaxItinerariesFilterSetToOneDepartAt() {
-      // Given a default postProcessor with 'numOfItineraries=1'
-      ItineraryListFilterChain chain = createBuilder(false, false, 1).build();
-      assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
-    }
-
-    @Test
-    public void testPostProcessorWithMaxItinerariesFilterSetToOneArriveBy() {
-      // Given a postProcessor with 'numOfItineraries=1' and 'arriveBy=true'
-      ItineraryListFilterChain chain = createBuilder(true, false, 1).build();
-      assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3)));
-    }
-  }
-
   @Test
   public void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
@@ -110,41 +78,6 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertFalse(i3.systemNotices.isEmpty());
     assertEquals("transit-vs-street-filter", i2.systemNotices.get(0).tag);
     assertEquals("latest-departure-time-limit", i3.systemNotices.get(0).tag);
-  }
-
-  @Nested
-  class RemoveTransitWithHigherCostThanBestOnStreetOnlyTest {
-
-    Itinerary walk;
-    Itinerary bus;
-    ItineraryListFilterChainBuilder builder = createBuilder(true, false, 20);
-
-    @BeforeEach
-    public void setUpItineraries() {
-      // given
-      // Walk for 12 minute
-      walk = newItinerary(A, T11_06).walk(D12m, E).build();
-      // Not optimal, takes longer than walking
-      bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
-    }
-
-    @Test
-    public void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
-      // Disable filter and allow none optimal bus itinerary pass through
-      ItineraryListFilterChain chain = builder
-        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(false)
-        .build();
-      assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
-    }
-
-    @Test
-    public void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
-      // Enable filter and remove bus itinerary
-      ItineraryListFilterChain chain = builder
-        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
-        .build();
-      assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
-    }
   }
 
   @Test
@@ -218,8 +151,6 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     );
   }
 
-  /* private methods */
-
   private ItineraryListFilterChainBuilder createBuilder(
     boolean arriveBy,
     boolean debug,
@@ -230,5 +161,72 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       .withMaxNumberOfItineraries(numOfItineraries)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withDebugEnabled(debug);
+  }
+
+  @Nested
+  class MaxItinerariesBuilderTest {
+
+    @BeforeEach
+    public void setUpItineraries() {
+      i1 = newItinerary(A).bus(21, T11_05, T11_10, E).build();
+      i2 = newItinerary(A).bus(31, T11_07, T11_12, E).build();
+      i3 = newItinerary(A).bus(41, T11_09, T11_14, E).build();
+    }
+
+    @Test
+    public void testPostProcessorWithMaxItinerariesFilterSetToTwo() {
+      // Given a default postProcessor with 'numOfItineraries=2'
+      ItineraryListFilterChain chain = createBuilder(false, false, 2).build();
+      assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3)));
+    }
+
+    @Test
+    public void testPostProcessorWithMaxItinerariesFilterSetToOneDepartAt() {
+      // Given a default postProcessor with 'numOfItineraries=1'
+      ItineraryListFilterChain chain = createBuilder(false, false, 1).build();
+      assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
+    }
+
+    @Test
+    public void testPostProcessorWithMaxItinerariesFilterSetToOneArriveBy() {
+      // Given a postProcessor with 'numOfItineraries=1' and 'arriveBy=true'
+      ItineraryListFilterChain chain = createBuilder(true, false, 1).build();
+      assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3)));
+    }
+  }
+
+  @Nested
+  class RemoveTransitWithHigherCostThanBestOnStreetOnlyTest {
+
+    Itinerary walk;
+    Itinerary bus;
+    ItineraryListFilterChainBuilder builder = createBuilder(true, false, 20);
+
+    @BeforeEach
+    public void setUpItineraries() {
+      // given
+      // Walk for 12 minute
+      walk = newItinerary(A, T11_06).walk(D12m, E).build();
+      // Not optimal, takes longer than walking
+      bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
+    }
+
+    @Test
+    public void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
+      // Disable filter and allow none optimal bus itinerary pass through
+      ItineraryListFilterChain chain = builder
+        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(false)
+        .build();
+      assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
+    }
+
+    @Test
+    public void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
+      // Enable filter and remove bus itinerary
+      ItineraryListFilterChain chain = builder
+        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
+        .build();
+      assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
+    }
   }
 }

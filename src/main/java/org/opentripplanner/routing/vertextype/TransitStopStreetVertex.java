@@ -5,9 +5,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
- * A vertex for an OSM node that represents a transit stop and has a ref=(stop_code) tag.
- * OTP will treat this as an authoritative statement on where the transit stop is located within the street network,
- * and the GTFS stop vertex will be linked to exactly this location.
+ * A vertex for an OSM node that represents a transit stop and has a ref=(stop_code) tag. OTP will
+ * treat this as an authoritative statement on where the transit stop is located within the street
+ * network, and the GTFS stop vertex will be linked to exactly this location.
  */
 public class TransitStopStreetVertex extends OsmVertex {
 

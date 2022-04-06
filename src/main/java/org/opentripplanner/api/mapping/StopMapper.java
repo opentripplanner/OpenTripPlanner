@@ -86,8 +86,8 @@ public class StopMapper {
   }
 
   /**
-   * Get the parent station id (without feed-scope) for the given station element,
-   * this method should only be used to fetch old ids for beeing backward compatible.
+   * Get the parent station id (without feed-scope) for the given station element, this method
+   * should only be used to fetch old ids for beeing backward compatible.
    */
   private static String mapToParentStationOldId(StopLocation stop) {
     return stop.isPartOfStation() ? stop.getParentStation().getId().getId() : null;

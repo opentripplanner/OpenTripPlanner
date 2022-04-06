@@ -8,13 +8,12 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 
 /**
- * This class generate TransferPoints adapted to Raptor. The internal model
- * {@link org.opentripplanner.model.transfer.TransferPoint} can not be used by Raptor as is, so
- * we transform them into {@link TransferPointMatcher}. For example to speed ut the search in
- * Raptor we avoid fetching Stops from memory and instead uses a {@code stopIndex}. This index is
- * not necessarily fixed, but generated for the
- * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer}, so we need to
- * generate
+ * This class generate TransferPoints adapted to Raptor. The internal model {@link
+ * org.opentripplanner.model.transfer.TransferPoint} can not be used by Raptor as is, so we
+ * transform them into {@link TransferPointMatcher}. For example to speed ut the search in Raptor we
+ * avoid fetching Stops from memory and instead uses a {@code stopIndex}. This index is not
+ * necessarily fixed, but generated for the {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer},
+ * so we need to generate
  */
 
 final class TransferPointForPatternFactory {

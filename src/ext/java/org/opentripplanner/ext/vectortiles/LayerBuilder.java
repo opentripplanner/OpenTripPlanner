@@ -25,6 +25,12 @@ public abstract class LayerBuilder<T> {
     this.layerBuilder = MvtLayerBuild.newLayerBuilder(layerName, MvtLayerParams.DEFAULT);
   }
 
+  /**
+   * Get a list of geometries in this layer inside the query envelope. The geometries should include
+   * an object of type T as their userData.
+   */
+  protected abstract List<Geometry> getGeometries(Envelope query);
+
   VectorTile.Tile.Layer build(Envelope envelope, LayerParameters params) {
     Envelope query = new Envelope(envelope);
     query.expandBy(
@@ -51,10 +57,4 @@ public abstract class LayerBuilder<T> {
     MvtLayerBuild.writeProps(layerBuilder, layerProps);
     return layerBuilder.build();
   }
-
-  /**
-   * Get a list of geometries in this layer inside the query envelope. The geometries should include
-   * an object of type T as their userData.
-   */
-  protected abstract List<Geometry> getGeometries(Envelope query);
 }

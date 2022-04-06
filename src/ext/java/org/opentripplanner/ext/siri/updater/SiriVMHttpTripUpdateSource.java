@@ -16,26 +16,21 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
   private static final Logger LOG = LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
 
   private static final long RETRY_INTERVAL_MILLIS = 5000;
-
+  /**
+   * Feed id that is used to match trip ids in the TripUpdates
+   */
+  private final String feedId;
+  private final String url;
+  private final String originalRequestorRef;
   /**
    * True iff the last list with updates represent all updates that are active right now, i.e. all
    * previous updates should be disregarded
    */
   private boolean fullDataset = true;
-
-  /**
-   * Feed id that is used to match trip ids in the TripUpdates
-   */
-  private final String feedId;
-
-  private final String url;
-
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
-
   private String requestorRef;
   private int timeout;
   private int retryCount = 0;
-  private final String originalRequestorRef;
 
   public SiriVMHttpTripUpdateSource(Parameters parameters) {
     this.url = parameters.getUrl();
@@ -120,19 +115,22 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     return fullDataset;
   }
 
-  public String toString() {
-    return "SiriVMHttpTripUpdateSource(" + url + ")";
-  }
-
   @Override
   public String getFeedId() {
     return this.feedId;
   }
 
+  public String toString() {
+    return "SiriVMHttpTripUpdateSource(" + url + ")";
+  }
+
   interface Parameters {
     String getUrl();
+
     String getRequestorRef();
+
     String getFeedId();
+
     int getTimeoutSec();
   }
 }

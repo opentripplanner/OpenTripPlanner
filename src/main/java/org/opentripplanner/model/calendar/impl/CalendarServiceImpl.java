@@ -11,11 +11,10 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
- * An implementation of {@link CalendarService}. Requires a pre-computed
- * {@link CalendarServiceData} bundle for efficient operation.
+ * An implementation of {@link CalendarService}. Requires a pre-computed {@link CalendarServiceData}
+ * bundle for efficient operation.
  *
  * @author bdferris
- *
  */
 public class CalendarServiceImpl implements CalendarService {
 
@@ -51,9 +50,9 @@ public class CalendarServiceImpl implements CalendarService {
   }
 
   /**
-   * Get or create a serviceId for a given date. This method is used when a new trip is
-   * added from during realtime data updates.
-   *
+   * Get or create a serviceId for a given date. This method is used when a new trip is added from
+   * during realtime data updates.
+   * <p>
    * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
    *           - this when doing the issue #3030.
    *

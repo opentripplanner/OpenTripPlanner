@@ -23,11 +23,10 @@ import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor.service.RequestAlias;
 
 /**
- * This class is responsible for creating a new search and holding
- * application scoped Raptor state.
+ * This class is responsible for creating a new search and holding application scoped Raptor state.
  * <p/>
- * This class should have APPLICATION scope. It manage a threadPool,
- * and hold a reference to the application tuning parameters.
+ * This class should have APPLICATION scope. It manage a threadPool, and hold a reference to the
+ * application tuning parameters.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

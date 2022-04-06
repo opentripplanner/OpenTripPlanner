@@ -43,7 +43,7 @@ public class RoutingResponseMapperTest {
     .build();
 
   @Test
-  void mapIntoPageCursorFactoryNoTransitSearchParams() {
+  public void mapIntoPageCursorFactoryNoTransitSearchParams() {
     var factory = RoutingResponseMapper.mapIntoPageCursorFactory(
       SortOrder.STREET_AND_ARRIVAL_TIME,
       TRANSIT_TIME_ZERO,

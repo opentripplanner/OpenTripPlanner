@@ -52,6 +52,20 @@ public class StopTimesMapperTest {
   private static final Trip TRIP = new Trip();
 
   private static final StopTime STOP_TIME = new StopTime();
+  private final StopMapper stopMapper = new StopMapper(new TranslationHelper());
+  private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
+  private final LocationMapper locationMapper = new LocationMapper();
+  private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
+    stopMapper,
+    locationMapper
+  );
+  private final StopTimeMapper subject = new StopTimeMapper(
+    stopMapper,
+    locationMapper,
+    locationGroupMapper,
+    new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))),
+    bookingRuleMapper
+  );
 
   static {
     TRIP.setId(AGENCY_AND_ID);
@@ -72,22 +86,6 @@ public class StopTimesMapperTest {
     STOP_TIME.setTimepoint(TIMEPOINT);
     STOP_TIME.setTrip(TRIP);
   }
-
-  private final StopMapper stopMapper = new StopMapper(new TranslationHelper());
-  private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
-  private final LocationMapper locationMapper = new LocationMapper();
-  private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
-    stopMapper,
-    locationMapper
-  );
-
-  private final StopTimeMapper subject = new StopTimeMapper(
-    stopMapper,
-    locationMapper,
-    locationGroupMapper,
-    new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))),
-    bookingRuleMapper
-  );
 
   @Test
   public void testMapCollection() {

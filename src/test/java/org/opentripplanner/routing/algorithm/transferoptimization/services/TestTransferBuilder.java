@@ -10,8 +10,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * This builder is used to create a {@link ConstrainedTransfer} for use in unit-tests. It build a valid
- * instance with dummy trip reference.
+ * This builder is used to create a {@link ConstrainedTransfer} for use in unit-tests. It build a
+ * valid instance with dummy trip reference.
  */
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransferBuilder<T extends RaptorTripSchedule> {

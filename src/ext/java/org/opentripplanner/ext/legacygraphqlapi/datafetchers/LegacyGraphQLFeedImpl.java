@@ -18,11 +18,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFeed {
 
   @Override
-  public DataFetcher<String> feedId() {
-    return this::getSource;
-  }
-
-  @Override
   public DataFetcher<Iterable<Agency>> agencies() {
     return environment -> getAgencies(environment);
   }
@@ -62,6 +57,11 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
       }
       return null;
     };
+  }
+
+  @Override
+  public DataFetcher<String> feedId() {
+    return this::getSource;
   }
 
   private List<Agency> getAgencies(DataFetchingEnvironment environment) {

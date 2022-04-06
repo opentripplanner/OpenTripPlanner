@@ -7,7 +7,7 @@ public class TransitModeMapper {
   /**
    * Return an OTP TransitMode matching a routeType. If no good match is found, it returns null.
    *
-   * @param routeType  Route type to be mapped into a mode
+   * @param routeType Route type to be mapped into a mode
    */
   public static TransitMode mapMode(int routeType) {
     // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.

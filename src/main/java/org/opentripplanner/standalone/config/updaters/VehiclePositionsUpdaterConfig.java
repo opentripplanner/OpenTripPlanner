@@ -15,14 +15,6 @@ public class VehiclePositionsUpdaterConfig {
     CONFIG_MAPPING.put("gtfs-http", DataSourceType.GTFS_RT_VEHICLE_POSITIONS);
   }
 
-  private static DataSourceType mapStringToSourceType(String typeKey) {
-    DataSourceType type = CONFIG_MAPPING.get(typeKey);
-    if (type == null) {
-      throw new OtpAppException("The updater source type is unknown: " + typeKey);
-    }
-    return type;
-  }
-
   public static VehiclePositionsUpdaterParameters create(String updaterRef, NodeAdapter c) {
     var sourceType = mapStringToSourceType(c.asText("sourceType"));
     var feedId = c.asText("feedId");
@@ -35,5 +27,13 @@ public class VehiclePositionsUpdaterConfig {
       default:
         throw new OtpAppException("The updater source type is unhandled: " + sourceType);
     }
+  }
+
+  private static DataSourceType mapStringToSourceType(String typeKey) {
+    DataSourceType type = CONFIG_MAPPING.get(typeKey);
+    if (type == null) {
+      throw new OtpAppException("The updater source type is unknown: " + typeKey);
+    }
+    return type;
   }
 }

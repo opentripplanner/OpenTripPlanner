@@ -129,13 +129,6 @@ public class NoticeAssignmentMapperTest {
     assertEquals(NOTICE_ID, notice2b.getId().getId());
   }
 
-  private StopTime createStopTime(int stopSequence, Trip trip) {
-    StopTime stopTime1 = new StopTime();
-    stopTime1.setStopSequence(stopSequence);
-    stopTime1.setTrip(trip);
-    return stopTime1;
-  }
-
   private static TimetabledPassingTime createTimetabledPassingTime(String id, String stopPointId) {
     return new TimetabledPassingTime()
       .withId(id)
@@ -144,5 +137,12 @@ public class NoticeAssignmentMapperTest {
           new PointInJourneyPatternRefStructure().withRef(stopPointId)
         )
       );
+  }
+
+  private StopTime createStopTime(int stopSequence, Trip trip) {
+    StopTime stopTime1 = new StopTime();
+    stopTime1.setStopSequence(stopSequence);
+    stopTime1.setTrip(trip);
+    return stopTime1;
   }
 }

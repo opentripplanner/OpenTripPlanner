@@ -24,7 +24,7 @@ public class LocationMapper {
     return MapUtils.mapToList(allLocations, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   FlexStopLocation map(org.onebusaway.gtfs.model.Location orginal) {
     return orginal == null ? null : mappedLocations.computeIfAbsent(orginal, this::doMap);
   }

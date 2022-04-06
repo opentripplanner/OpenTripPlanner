@@ -25,12 +25,6 @@ public class NodeAdapterTest {
 
   public static final Duration D3h = Duration.ofHours(3);
 
-  private enum AnEnum {
-    A,
-    B,
-    C,
-  }
-
   @Test
   public void testAsRawNode() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
@@ -353,5 +347,11 @@ public class NodeAdapterTest {
     assertFalse(subject.path("bar").isNonEmptyArray());
     assertFalse(subject.path("foobar").isNonEmptyArray());
     assertFalse(subject.path("missing").isNonEmptyArray());
+  }
+
+  private enum AnEnum {
+    A,
+    B,
+    C,
   }
 }

@@ -329,6 +329,44 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     testThatThereIsNoTransferAtStopB(TestTransitData.TX_LONG_MIN_TIME);
   }
 
+  @Test
+  void findDependedTransfersForThreeRoutes() {
+    TestRoute l1 = route("L1", STOP_A, STOP_B, STOP_C).withTimetable(schedule("10:02 10:10 10:20"));
+    TestRoute l2 = route("L2", STOP_B, STOP_D, STOP_E).withTimetable(schedule("10:12 10:22 10:32"));
+    TestRoute l3 = route("L3", STOP_F, STOP_E, STOP_G).withTimetable(schedule("10:24 10:34 10:45"));
+
+    data
+      .withRoutes(l1, l2, l3)
+      .withTransfer(STOP_C, walk(STOP_D, D30s))
+      .withTransfer(STOP_D, walk(STOP_F, D20s));
+
+    // The only possible place to transfer between A and D is stop C (no extra transfers):
+    var path = pathBuilder
+      .access(ACCESS_START, ACCESS_DURATION, STOP_A)
+      .bus(l1.getTripSchedule(0), STOP_B)
+      .bus(l2.getTripSchedule(0), STOP_E)
+      .walk(D20s, STOP_F)
+      .bus(l3.getTripSchedule(0), STOP_G)
+      .egress(D1m);
+
+    var transitLegs = path.transitLegs().collect(Collectors.toList());
+
+    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+
+    var result = subject.findAllPossibleTransfers(transitLegs);
+
+    assertEquals(
+      "[[" +
+      "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L2]}, " +
+      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:22 BUS L2], transfer: On-Street 30s ~ 4}" +
+      "], [" +
+      "TripToTripTransfer{from: [4 10:22 BUS L2], to: [6 10:24 BUS L3], transfer: On-Street 20s ~ 6}, " +
+      "TripToTripTransfer{from: [5 10:32 BUS L2], to: [5 10:34 BUS L3]}" +
+      "]]",
+      result.toString()
+    );
+  }
+
   private void testThatThereIsNoTransferAtStopB(TransferConstraint transfer) {
     // given 3 possible expected transfers
     var expBxB = "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}";
@@ -369,44 +407,6 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     // The same stop transfer is no longer an option
     assertEquals("[[" + expBxB + ", " + expExE + "]]", result.toString());
-  }
-
-  @Test
-  void findDependedTransfersForThreeRoutes() {
-    TestRoute l1 = route("L1", STOP_A, STOP_B, STOP_C).withTimetable(schedule("10:02 10:10 10:20"));
-    TestRoute l2 = route("L2", STOP_B, STOP_D, STOP_E).withTimetable(schedule("10:12 10:22 10:32"));
-    TestRoute l3 = route("L3", STOP_F, STOP_E, STOP_G).withTimetable(schedule("10:24 10:34 10:45"));
-
-    data
-      .withRoutes(l1, l2, l3)
-      .withTransfer(STOP_C, walk(STOP_D, D30s))
-      .withTransfer(STOP_D, walk(STOP_F, D20s));
-
-    // The only possible place to transfer between A and D is stop C (no extra transfers):
-    var path = pathBuilder
-      .access(ACCESS_START, ACCESS_DURATION, STOP_A)
-      .bus(l1.getTripSchedule(0), STOP_B)
-      .bus(l2.getTripSchedule(0), STOP_E)
-      .walk(D20s, STOP_F)
-      .bus(l3.getTripSchedule(0), STOP_G)
-      .egress(D1m);
-
-    var transitLegs = path.transitLegs().collect(Collectors.toList());
-
-    var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
-
-    var result = subject.findAllPossibleTransfers(transitLegs);
-
-    assertEquals(
-      "[[" +
-      "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L2]}, " +
-      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:22 BUS L2], transfer: On-Street 30s ~ 4}" +
-      "], [" +
-      "TripToTripTransfer{from: [4 10:22 BUS L2], to: [6 10:24 BUS L3], transfer: On-Street 20s ~ 6}, " +
-      "TripToTripTransfer{from: [5 10:32 BUS L2], to: [5 10:34 BUS L3]}" +
-      "]]",
-      result.toString()
-    );
   }
 
   private List<TransitPathLeg<TestTripSchedule>> transitLegsTwoRoutes(

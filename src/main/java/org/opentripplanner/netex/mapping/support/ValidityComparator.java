@@ -8,16 +8,15 @@ import org.rutebanken.netex.model.ValidBetween;
 /**
  * This comparator is used for choosing the StopPlace with the most relevant validity period when
  * there are multiple versions of the same StopPlace. This way of sorting is specific to how
- * versioning is handled in the <a href="https://github.com/entur/tiamat">Entur stop place register</a>.
- * StopPlaces are chosen according to the current import date, even though the user can search for
- * trips in the past or future when other StopPlaces might be valid. This is a simplification
- * chosen both to avoid problems with older data sets and because OTP does not support validity
- * information on stops.
- *
- * Stop places are compared according to the following criteria in order:
- * 1. Valid now (or no validity information)
- * 2. Future valid period with earliest start date
- * 3. Past valid period with latest end date
+ * versioning is handled in the <a href="https://github.com/entur/tiamat">Entur stop place
+ * register</a>. StopPlaces are chosen according to the current import date, even though the user
+ * can search for trips in the past or future when other StopPlaces might be valid. This is a
+ * simplification chosen both to avoid problems with older data sets and because OTP does not
+ * support validity information on stops.
+ * <p>
+ * Stop places are compared according to the following criteria in order: 1. Valid now (or no
+ * validity information) 2. Future valid period with earliest start date 3. Past valid period with
+ * latest end date
  */
 class ValidityComparator implements Comparator<Collection<ValidBetween>> {
 

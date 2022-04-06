@@ -33,12 +33,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants {
 
-  private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
-
   /** The expected result is tha same for all tests */
   private static final String EXPECTED_RESULT =
     "Walk 30s ~ B ~ " +
@@ -46,6 +40,11 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
     "BUS R2 0:04:41 0:05:01 ~ D ~ " +
     "Walk 20s " +
     "[0:01:11 0:05:31 4m20s 1tx]";
+  private final TestTransitData data = new TestTransitData();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
 
   @BeforeEach
   public void setup() {

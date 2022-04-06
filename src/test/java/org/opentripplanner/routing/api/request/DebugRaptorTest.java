@@ -1,15 +1,11 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DebugRaptorTest {
-
-  private DebugRaptor subject() {
-    return new DebugRaptor();
-  }
 
   @Test
   void withStops() {
@@ -41,5 +37,9 @@ class DebugRaptorTest {
     assertEquals("DebugRaptor{stops: 12}", subject().withStops("12").toString());
     assertEquals("DebugRaptor{path: 13, 22*}", subject().withPath("13 22*").toString());
     assertEquals("DebugRaptor{path: 17, 2*, 32}", subject().withPath("17 2* 32*").toString());
+  }
+
+  private DebugRaptor subject() {
+    return new DebugRaptor();
   }
 }

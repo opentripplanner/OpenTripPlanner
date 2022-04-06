@@ -1,6 +1,9 @@
 package org.opentripplanner.datastore.file;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.opentripplanner.datastore.FileType.GRAPH;
 
 import java.io.File;

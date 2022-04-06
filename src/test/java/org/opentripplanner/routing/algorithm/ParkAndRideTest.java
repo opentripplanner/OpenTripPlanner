@@ -141,37 +141,6 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     );
   }
 
-  private void assertPath(
-    Vertex fromVertex,
-    Vertex toVertex,
-    StreetMode streetMode,
-    boolean requireWheelChairAccessible,
-    List<String> departAtDescriptor,
-    List<String> arriveByDescriptor
-  ) {
-    var departAt = runStreetSearchAndCreateDescriptor(
-      fromVertex,
-      toVertex,
-      streetMode,
-      requireWheelChairAccessible,
-      Set.of(),
-      Set.of(),
-      false
-    );
-    var arriveBy = runStreetSearchAndCreateDescriptor(
-      fromVertex,
-      toVertex,
-      streetMode,
-      requireWheelChairAccessible,
-      Set.of(),
-      Set.of(),
-      true
-    );
-
-    assertEquals(departAtDescriptor, departAt, "departAt path");
-    assertEquals(arriveByDescriptor, arriveBy, "arriveBy path");
-  }
-
   protected List<String> runStreetSearchAndCreateDescriptor(
     Vertex fromVertex,
     Vertex toVertex,
@@ -216,5 +185,36 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
         )
       )
       .collect(Collectors.toList());
+  }
+
+  private void assertPath(
+    Vertex fromVertex,
+    Vertex toVertex,
+    StreetMode streetMode,
+    boolean requireWheelChairAccessible,
+    List<String> departAtDescriptor,
+    List<String> arriveByDescriptor
+  ) {
+    var departAt = runStreetSearchAndCreateDescriptor(
+      fromVertex,
+      toVertex,
+      streetMode,
+      requireWheelChairAccessible,
+      Set.of(),
+      Set.of(),
+      false
+    );
+    var arriveBy = runStreetSearchAndCreateDescriptor(
+      fromVertex,
+      toVertex,
+      streetMode,
+      requireWheelChairAccessible,
+      Set.of(),
+      Set.of(),
+      true
+    );
+
+    assertEquals(departAtDescriptor, departAt, "departAt path");
+    assertEquals(arriveByDescriptor, arriveBy, "arriveBy path");
   }
 }

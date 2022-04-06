@@ -21,18 +21,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for creating the top level services like {@link OTPConfiguration}
- * and {@link OTPServer}. The purpose of this class is to wire the
- * application, creating the necessary Services and modules and putting them together.
- * It is NOT responsible for starting or running the application. The whole idea of this
- * class is to separate application construction from running it.
+ * This class is responsible for creating the top level services like {@link OTPConfiguration} and
+ * {@link OTPServer}. The purpose of this class is to wire the application, creating the necessary
+ * Services and modules and putting them together. It is NOT responsible for starting or running the
+ * application. The whole idea of this class is to separate application construction from running
+ * it.
  *
  * <p> The top level construction class(this class) may delegate to other construction classes
  * to inject configuration and services into sub-modules.
  *
  * <p> THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
- * should be really fast, since the only IO operations are reading config files and logging.
- * Loading transit or map data should NOT happen during this phase.
+ * should be really fast, since the only IO operations are reading config files and logging. Loading
+ * transit or map data should NOT happen during this phase.
  */
 public class OTPAppConstruction {
 
@@ -63,8 +63,8 @@ public class OTPAppConstruction {
   }
 
   /**
-   * Create a new Grizzly server - call this method once, the new instance is created
-   * every time this method is called.
+   * Create a new Grizzly server - call this method once, the new instance is created every time
+   * this method is called.
    */
   public GrizzlyServer createGrizzlyServer(Router router) {
     return new GrizzlyServer(config.getCli(), createApplication(router));
@@ -77,6 +77,7 @@ public class OTPAppConstruction {
 
   /**
    * Create the default graph builder.
+   *
    * @param baseGraph the base graph to add more data on to of.
    */
   public GraphBuilder createGraphBuilder(Graph baseGraph) {
@@ -93,8 +94,8 @@ public class OTPAppConstruction {
   /**
    * The output data source to use for saving the serialized graph.
    * <p>
-   * This method will return {@code null} if the graph should NOT be saved. The
-   * business logic to make that decision is in the {@link GraphBuilderDataSources}.
+   * This method will return {@code null} if the graph should NOT be saved. The business logic to
+   * make that decision is in the {@link GraphBuilderDataSources}.
    */
   @Nullable
   public DataSource graphOutputDataSource() {
@@ -111,8 +112,8 @@ public class OTPAppConstruction {
   }
 
   /**
-   * Create the top-level objects that represent the OTP server. There is one server and it
-   * is created lazy at the first invocation of this method.
+   * Create the top-level objects that represent the OTP server. There is one server and it is
+   * created lazy at the first invocation of this method.
    * <p>
    * The method is {@code public} to allow test access.
    */

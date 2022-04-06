@@ -18,10 +18,6 @@ public class RoutingValidationException extends RuntimeException {
     this.routingErrors = routingErrors;
   }
 
-  public List<RoutingError> getRoutingErrors() {
-    return routingErrors;
-  }
-
   public static void unwrapAndRethrowCompletionException(CompletionException e) {
     if (e.getCause() instanceof RoutingValidationException) {
       throw (RoutingValidationException) e.getCause();
@@ -29,5 +25,9 @@ public class RoutingValidationException extends RuntimeException {
       throw (RuntimeException) e.getCause();
     }
     throw e;
+  }
+
+  public List<RoutingError> getRoutingErrors() {
+    return routingErrors;
   }
 }

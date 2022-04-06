@@ -14,8 +14,6 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
 
-  public NoThruTrafficEdgeRenderer() {}
-
   private static final Color[] colors = {
     new Color(200, 200, 200), // no limitations = light gray
     new Color(200, 200, 0), // no walk thru traffic = yellow
@@ -26,6 +24,8 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
     new Color(200, 0, 200), // no car & bike thru = purple
     new Color(200, 0, 0), // no for all = red
   };
+
+  public NoThruTrafficEdgeRenderer() {}
 
   @Override
   public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {

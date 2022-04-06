@@ -1,9 +1,7 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import io.micrometer.core.instrument.Tag;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -14,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * All input parameters to RangeRaptor that is specific to a routing request.
- * See {@link RaptorTransitDataProvider} for transit data.
+ * All input parameters to RangeRaptor that is specific to a routing request. See {@link
+ * RaptorTransitDataProvider} for transit data.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -30,10 +28,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   private final DebugRequest debug;
   private final RaptorSlackProvider slackProvider;
   private final Set<String> timingTags;
-
-  static <T extends RaptorTripSchedule> RaptorRequest<T> defaults() {
-    return new RaptorRequest<>();
-  }
 
   private RaptorRequest() {
     searchParams = SearchParams.defaults();
@@ -69,9 +63,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   }
 
   /**
-   * A dynamic search is a search which uses heuristics to resolve search parameters
-   * as earliest-departure-time, latest-arrival-time and search-window. This is an aggregated
-   * value:
+   * A dynamic search is a search which uses heuristics to resolve search parameters as
+   * earliest-departure-time, latest-arrival-time and search-window. This is an aggregated value:
    * <ul>
    *     <li>A multi-criteria search is a dynamic search.</li>
    *     <li>A standard range-raptor search with more than one iteration.</li>
@@ -143,16 +136,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   }
 
   @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(RaptorRequest.class)
-      .addEnum("profile", profile)
-      .addBoolIfTrue("reverse", searchDirection.isInReverse())
-      .addCol("optimizations", optimizations)
-      .addObj("debug", debug, DebugRequest.defaults())
-      .addObj("searchParams", searchParams)
-      .addCol("timingTags", timingTags)
-      .toString();
+  public int hashCode() {
+    return Objects.hash(searchParams, profile, debug);
   }
 
   @Override
@@ -172,8 +157,20 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(searchParams, profile, debug);
+  public String toString() {
+    return ToStringBuilder
+      .of(RaptorRequest.class)
+      .addEnum("profile", profile)
+      .addBoolIfTrue("reverse", searchDirection.isInReverse())
+      .addCol("optimizations", optimizations)
+      .addObj("debug", debug, DebugRequest.defaults())
+      .addObj("searchParams", searchParams)
+      .addCol("timingTags", timingTags)
+      .toString();
+  }
+
+  static <T extends RaptorTripSchedule> RaptorRequest<T> defaults() {
+    return new RaptorRequest<>();
   }
 
   static void assertProperty(boolean predicate, String message) {

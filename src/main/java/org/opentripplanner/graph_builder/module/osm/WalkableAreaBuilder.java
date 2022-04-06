@@ -64,11 +64,10 @@ import org.slf4j.LoggerFactory;
  * Anyway, since we're not going to run an O(N^3) algorithm at runtime just to give people who don't
  * understand Snell's Law weird paths that they can complain about, this should be just fine.
  * </p>
- *
+ * <p>
  * TODO this approach could be replaced by building a walkable grid of edges for an area, so the
  * number of edges for an area wouldn't be determined by the nodes. The current approach can lead
  * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
- *
  */
 public class WalkableAreaBuilder {
 
@@ -124,8 +123,8 @@ public class WalkableAreaBuilder {
   }
 
   /**
-   * For all areas just use outermost rings as edges so that areas can be routable without visibility calculations
-   * @param group
+   * For all areas just use outermost rings as edges so that areas can be routable without
+   * visibility calculations
    */
   public void buildWithoutVisibility(AreaGroup group) {
     Set<Edge> edges = new HashSet<>();
@@ -347,19 +346,9 @@ public class WalkableAreaBuilder {
     pruneAreaEdges(startingVertices, edges, ringEdges);
   }
 
-  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy {
-    @Override
-    public boolean shouldSkipEdge(State current, Edge edge) {
-      return !edges.contains(edge);
-    }
-  }
-
   /**
-   * Do an all-pairs shortest path search from a list of vertices over a specified set of edges,
-   * and retain only those edges which are actually used in some shortest path.
-   *
-   * @param startingVertices
-   * @param edges
+   * Do an all-pairs shortest path search from a list of vertices over a specified set of edges, and
+   * retain only those edges which are actually used in some shortest path.
    */
   private void pruneAreaEdges(
     Collection<Vertex> startingVertices,
@@ -672,5 +661,12 @@ public class WalkableAreaBuilder {
       return isEndpoint;
     }
     return false;
+  }
+
+  record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy {
+    @Override
+    public boolean shouldSkipEdge(State current, Edge edge) {
+      return !edges.contains(edge);
+    }
   }
 }

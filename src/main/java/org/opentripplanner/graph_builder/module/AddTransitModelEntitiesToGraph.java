@@ -59,6 +59,24 @@ public class AddTransitModelEntitiesToGraph {
 
   private final int subwayAccessTime;
 
+  private AddTransitModelEntitiesToGraph(GtfsContext context) {
+    this(context.getFeedId(), context.getTransitService(), 0);
+  }
+
+  /**
+   * @param subwayAccessTime a positive integer for the extra time to access a subway platform, if
+   *                         negative the default value of zero is used.
+   */
+  private AddTransitModelEntitiesToGraph(
+    GtfsFeedId feedId,
+    OtpTransitService transitModel,
+    int subwayAccessTime
+  ) {
+    this.feedId = feedId;
+    this.transitService = transitModel;
+    this.subwayAccessTime = Math.max(subwayAccessTime, 0);
+  }
+
   public static void addToGraph(GtfsContext context, Graph graph) {
     new AddTransitModelEntitiesToGraph(context).applyToGraph(graph);
   }
@@ -70,24 +88,6 @@ public class AddTransitModelEntitiesToGraph {
     Graph graph
   ) {
     new AddTransitModelEntitiesToGraph(feedId, transitModel, subwayAccessTime).applyToGraph(graph);
-  }
-
-  private AddTransitModelEntitiesToGraph(GtfsContext context) {
-    this(context.getFeedId(), context.getTransitService(), 0);
-  }
-
-  /**
-   * @param subwayAccessTime a positive integer for the extra time to access a subway platform, if negative the
-   *                         default value of zero is used.
-   */
-  private AddTransitModelEntitiesToGraph(
-    GtfsFeedId feedId,
-    OtpTransitService transitModel,
-    int subwayAccessTime
-  ) {
-    this.feedId = feedId;
-    this.transitService = transitModel;
-    this.subwayAccessTime = Math.max(subwayAccessTime, 0);
   }
 
   private void applyToGraph(Graph graph) {
@@ -260,9 +260,9 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   /**
-   * Create elevator edges from pathways. As pathway based elevators are not vertices, but edges
-   * in the pathway model, we have to model each possible movement as an onboard-offboard pair,
-   * instead of having only one set of vertices per level and edges between them.
+   * Create elevator edges from pathways. As pathway based elevators are not vertices, but edges in
+   * the pathway model, we have to model each possible movement as an onboard-offboard pair, instead
+   * of having only one set of vertices per level and edges between them.
    */
   private void createElevatorEdgesAndAddThemToGraph(
     Graph graph,

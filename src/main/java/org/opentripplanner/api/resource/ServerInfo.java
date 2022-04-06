@@ -17,17 +17,11 @@ public class ServerInfo {
 
   private static final ApiServerInfo SERVER_INFO = createServerInfo();
 
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  public ApiServerInfo getServerInfo() {
-    return SERVER_INFO;
-  }
-
   /**
    * Determine the OTP version and CPU type of the running server. This information should not
-   * change while the server is up, so it can safely be cached at startup. The project info
-   * is not available before the graph is loaded, so for this to work this class should not be
-   * loaded BEFORE that.
+   * change while the server is up, so it can safely be cached at startup. The project info is not
+   * available before the graph is loaded, so for this to work this class should not be loaded
+   * BEFORE that.
    */
   public static ApiServerInfo createServerInfo() {
     String cpuName = "unknown";
@@ -46,5 +40,11 @@ public class ServerInfo {
     } catch (Exception ignore) {}
 
     return new ApiServerInfo(cpuName, nCores, OtpProjectInfo.projectInfo());
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public ApiServerInfo getServerInfo() {
+    return SERVER_INFO;
   }
 }

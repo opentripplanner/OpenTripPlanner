@@ -11,8 +11,8 @@ import org.opentripplanner.routing.algorithm.filterchain.ListSection;
  * Flag all itineraries after the provided limit. This flags the itineraries at the end of the list
  * for removal, so the list should be sorted on the desired key before this filter is applied.
  * <p>
- * The filter can also report the first itinerary in the list it will flag. The subscriber
- * is optional.
+ * The filter can also report the first itinerary in the list it will flag. The subscriber is
+ * optional.
  */
 public class MaxLimitFilter implements ItineraryDeletionFlagger {
 

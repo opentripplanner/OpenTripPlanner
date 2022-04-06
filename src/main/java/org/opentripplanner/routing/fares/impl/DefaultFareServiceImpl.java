@@ -64,13 +64,12 @@ class FareAndId {
 }
 
 /**
- * This fare service module handles the cases that GTFS handles within a single feed.
- * It cannot necessarily handle multi-feed graphs, because a rule-less fare attribute
- * might be applied to rides on routes in another feed, for example.
- * For more interesting fare structures like New York's MTA, or cities with multiple
- * feeds and inter-feed transfer rules, you get to implement your own FareService.
- * See this thread on gtfs-changes explaining the proper interpretation of fares.txt:
- * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
+ * This fare service module handles the cases that GTFS handles within a single feed. It cannot
+ * necessarily handle multi-feed graphs, because a rule-less fare attribute might be applied to
+ * rides on routes in another feed, for example. For more interesting fare structures like New
+ * York's MTA, or cities with multiple feeds and inter-feed transfer rules, you get to implement
+ * your own FareService. See this thread on gtfs-changes explaining the proper interpretation of
+ * fares.txt: http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
 public class DefaultFareServiceImpl implements FareService {
 
@@ -123,50 +122,6 @@ public class DefaultFareServiceImpl implements FareService {
     return new Money(new WrappedCurrency(currency), cents);
   }
 
-  private FareSearch performSearch(
-    FareType fareType,
-    List<Ride> rides,
-    Collection<FareRuleSet> fareRules
-  ) {
-    FareSearch r = new FareSearch(rides.size());
-
-    // Dynamic algorithm to calculate fare cost.
-    // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
-    // rides are already edges, so when comparing "via" routes, i -> k is connected
-    // to k+1 -> j.
-    for (int i = 0; i < rides.size(); i++) {
-      // each diagonal
-      for (int j = 0; j < rides.size() - i; j++) {
-        FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules);
-        float cost = best.fare;
-        if (cost < 0) {
-          LOG.error("negative cost for a ride sequence");
-          cost = Float.POSITIVE_INFINITY;
-        }
-        if (cost < Float.POSITIVE_INFINITY) {
-          r.endOfComponent[j] = j + i;
-          r.next[j][j + i] = j + i;
-        }
-        r.resultTable[j][j + i] = cost;
-        r.fareIds[j][j + i] = best.fareId;
-        for (int k = 0; k < i; k++) {
-          float via = addFares(
-            rides.subList(j, j + k + 1),
-            rides.subList(j + k + 1, j + i + 1),
-            r.resultTable[j][j + k],
-            r.resultTable[j + k + 1][j + i]
-          );
-          if (r.resultTable[j][j + i] > via) {
-            r.resultTable[j][j + i] = via;
-            r.endOfComponent[j] = j + i;
-            r.next[j][j + i] = r.next[j][j + k];
-          }
-        }
-      }
-    }
-    return r;
-  }
-
   protected float addFares(List<Ride> ride0, List<Ride> ride1, float cost0, float cost1) {
     return cost0 + cost1;
   }
@@ -183,21 +138,18 @@ public class DefaultFareServiceImpl implements FareService {
   /**
    * Builds the Fare object for the given currency, fareType and fareRules.
    * <p>
-   * Besides calculating the lowest fare, we also break down the fare and which routes
-   * correspond to which components. Note that even if we cannot get a lowest fare
-   * (if some rides don't have fare rules), there will still be a breakdown for those
-   * parts which have fares.
+   * Besides calculating the lowest fare, we also break down the fare and which routes correspond to
+   * which components. Note that even if we cannot get a lowest fare (if some rides don't have fare
+   * rules), there will still be a breakdown for those parts which have fares.
    * <p>
-   * As an example, given the rides A-B and B-C. Where A-B and B-C have fares of 10
-   * each, 2 fare detail objects are added, one with fare 10 for A-B and one with fare 10
-   * for B-C.
+   * As an example, given the rides A-B and B-C. Where A-B and B-C have fares of 10 each, 2 fare
+   * detail objects are added, one with fare 10 for A-B and one with fare 10 for B-C.
    * <p>
-   * If we add the rule for A-C with a fare of 15, we will get 1 fare detail object
-   * with fare 15, which lists both A-B and B-C as routes involved.
+   * If we add the rule for A-C with a fare of 15, we will get 1 fare detail object with fare 15,
+   * which lists both A-B and B-C as routes involved.
    * <p>
-   * If our only rule were A-B with a fare of 10, we would have no lowest fare, but
-   * we will still have one fare detail with fare 10 for the route A-B. B-C will not
-   * just not be listed at all.
+   * If our only rule were A-B with a fare of 10, we would have no lowest fare, but we will still
+   * have one fare detail with fare 10 for the route A-B. B-C will not just not be listed at all.
    */
   protected boolean populateFare(
     Fare fare,
@@ -245,6 +197,50 @@ public class DefaultFareServiceImpl implements FareService {
     Collection<FareRuleSet> fareRules
   ) {
     return getBestFareAndId(fareType, rides, fareRules).fare;
+  }
+
+  private FareSearch performSearch(
+    FareType fareType,
+    List<Ride> rides,
+    Collection<FareRuleSet> fareRules
+  ) {
+    FareSearch r = new FareSearch(rides.size());
+
+    // Dynamic algorithm to calculate fare cost.
+    // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
+    // rides are already edges, so when comparing "via" routes, i -> k is connected
+    // to k+1 -> j.
+    for (int i = 0; i < rides.size(); i++) {
+      // each diagonal
+      for (int j = 0; j < rides.size() - i; j++) {
+        FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules);
+        float cost = best.fare;
+        if (cost < 0) {
+          LOG.error("negative cost for a ride sequence");
+          cost = Float.POSITIVE_INFINITY;
+        }
+        if (cost < Float.POSITIVE_INFINITY) {
+          r.endOfComponent[j] = j + i;
+          r.next[j][j + i] = j + i;
+        }
+        r.resultTable[j][j + i] = cost;
+        r.fareIds[j][j + i] = best.fareId;
+        for (int k = 0; k < i; k++) {
+          float via = addFares(
+            rides.subList(j, j + k + 1),
+            rides.subList(j + k + 1, j + i + 1),
+            r.resultTable[j][j + k],
+            r.resultTable[j + k + 1][j + i]
+          );
+          if (r.resultTable[j][j + i] > via) {
+            r.resultTable[j][j + i] = via;
+            r.endOfComponent[j] = j + i;
+            r.next[j][j + i] = r.next[j][j + k];
+          }
+        }
+      }
+    }
+    return r;
   }
 
   private FareAndId getBestFareAndId(

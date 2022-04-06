@@ -17,20 +17,6 @@ public class TransferGeneratorDummy {
 
   private static final int D0s = 0;
 
-  @SafeVarargs
-  static TransferGenerator<TestTripSchedule> dummyTransferGenerator(
-    final List<TripToTripTransfer<TestTripSchedule>>... transfers
-  ) {
-    return new TransferGenerator<>(null, null, null) {
-      @Override
-      public List<List<TripToTripTransfer<TestTripSchedule>>> findAllPossibleTransfers(
-        List<TransitPathLeg<TestTripSchedule>> transitLegs
-      ) {
-        return Arrays.asList(transfers);
-      }
-    };
-  }
-
   /** Transfer from trip & stop, walk, to stop & trip */
   public static TripToTripTransfer<TestTripSchedule> tx(
     TestTripSchedule fromTrip,
@@ -64,6 +50,20 @@ public class TransferGeneratorDummy {
     int walkDuration
   ) {
     return createTripToTripTransfer(builder, walkDuration);
+  }
+
+  @SafeVarargs
+  static TransferGenerator<TestTripSchedule> dummyTransferGenerator(
+    final List<TripToTripTransfer<TestTripSchedule>>... transfers
+  ) {
+    return new TransferGenerator<>(null, null, null) {
+      @Override
+      public List<List<TripToTripTransfer<TestTripSchedule>>> findAllPossibleTransfers(
+        List<TransitPathLeg<TestTripSchedule>> transitLegs
+      ) {
+        return Arrays.asList(transfers);
+      }
+    };
   }
 
   /* private methods */

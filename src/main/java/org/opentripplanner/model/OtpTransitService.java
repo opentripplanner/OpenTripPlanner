@@ -11,12 +11,13 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
  */
 public interface OtpTransitService {
   /**
-   * @return  a list of all Agencies.
+   * @return a list of all Agencies.
    */
   Collection<Agency> getAllAgencies();
 
   /**
-   * @return a list of all Operators, the list may be empty if there are no Operators in the imported data.
+   * @return a list of all Operators, the list may be empty if there are no Operators in the
+   * imported data.
    */
   Collection<Operator> getAllOperators();
 
@@ -64,8 +65,8 @@ public interface OtpTransitService {
   Collection<FlexLocationGroup> getAllLocationGroups();
 
   /**
-   * @return the list of {@link StopTime} objects associated with the trip,
-   * sorted by {@link StopTime#getStopSequence()}
+   * @return the list of {@link StopTime} objects associated with the trip, sorted by {@link
+   * StopTime#getStopSequence()}
    */
   List<StopTime> getStopTimesForTrip(Trip trip);
 

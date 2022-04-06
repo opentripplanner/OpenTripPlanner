@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +16,10 @@ import org.slf4j.LoggerFactory;
 public class JsonDataListDownloader<T> {
 
   private static final Logger log = LoggerFactory.getLogger(JsonDataListDownloader.class);
-
-  private String url;
   private final String jsonParsePath;
   private final Map<String, String> headers;
   private final Function<JsonNode, T> elementParser;
+  private String url;
 
   public JsonDataListDownloader(
     String url,
@@ -58,6 +55,16 @@ public class JsonDataListDownloader<T> {
     return null;
   }
 
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
+  private static String convertStreamToString(java.io.InputStream is) {
+    try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
+      return scanner.hasNext() ? scanner.next() : "";
+    }
+  }
+
   private List<T> parseJSON(InputStream dataStream) throws IllegalArgumentException, IOException {
     ArrayList<T> out = new ArrayList<>();
 
@@ -88,15 +95,5 @@ public class JsonDataListDownloader<T> {
       }
     }
     return out;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  private static String convertStreamToString(java.io.InputStream is) {
-    try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
-      return scanner.hasNext() ? scanner.next() : "";
-    }
   }
 }

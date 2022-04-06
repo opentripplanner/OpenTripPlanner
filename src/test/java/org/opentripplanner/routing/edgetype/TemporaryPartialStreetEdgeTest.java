@@ -262,10 +262,6 @@ public class TemporaryPartialStreetEdgeTest {
 
   /**
    * Create an edge. If twoWay, create two edges (back and forth).
-   *
-   * @param vA
-   * @param vB
-   * @param length
    */
   private StreetEdge edge(
     StreetVertex vA,

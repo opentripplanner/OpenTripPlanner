@@ -22,7 +22,7 @@ import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 /**
  * A TraverseVisitor used in finding various types of places while walking the street graph.
- *
+ * <p>
  * TODO Add car and bike parks
  */
 public class PlaceFinderTraverseVisitor implements TraverseVisitor {
@@ -43,14 +43,20 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final double radiusMeters;
 
   /**
-   *
-   * @param routingService A RoutingService used in finding information about the various places.
-   * @param filterByModes A list of TransitModes for which to find Stops and PatternAtStops. Use null to disable the filtering.
-   * @param filterByPlaceTypes A list of PlaceTypes to search for. Use null to disable the filtering, and search for all types.
-   * @param filterByStops A list of Stop ids for which to find Stops and PatternAtStops. Use null to disable the filtering.
-   * @param filterByRoutes A list of Route ids used for filtering Stops. Only the stops which are served by the route are returned. Use null to disable the filtering.
-   * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering.  Use null to disable the filtering.
-   * @param maxResults Maximum number of results to return.
+   * @param routingService             A RoutingService used in finding information about the
+   *                                   various places.
+   * @param filterByModes              A list of TransitModes for which to find Stops and
+   *                                   PatternAtStops. Use null to disable the filtering.
+   * @param filterByPlaceTypes         A list of PlaceTypes to search for. Use null to disable the
+   *                                   filtering, and search for all types.
+   * @param filterByStops              A list of Stop ids for which to find Stops and
+   *                                   PatternAtStops. Use null to disable the filtering.
+   * @param filterByRoutes             A list of Route ids used for filtering Stops. Only the stops
+   *                                   which are served by the route are returned. Use null to
+   *                                   disable the filtering.
+   * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering.  Use
+   *                                   null to disable the filtering.
+   * @param maxResults                 Maximum number of results to return.
    */
   public PlaceFinderTraverseVisitor(
     RoutingService routingService,
@@ -77,6 +83,52 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     this.radiusMeters = radiusMeters;
   }
 
+  @Override
+  public void visitEdge(Edge edge) {}
+
+  @Override
+  public void visitVertex(State state) {
+    Vertex vertex = state.getVertex();
+    double distance = state.getWalkDistance();
+    if (vertex instanceof TransitStopVertex) {
+      Stop stop = ((TransitStopVertex) vertex).getStop();
+      handleStop(stop, distance);
+      handlePatternsAtStop(stop, distance);
+    } else if (vertex instanceof VehicleRentalStationVertex) {
+      handleBikeRentalStation(((VehicleRentalStationVertex) vertex).getStation(), distance);
+    }
+  }
+
+  @Override
+  public void visitEnqueue() {}
+
+  /**
+   * @return A SkipEdgeStrategy to be used with this TraverseVisitor. It skips edges when either the
+   * maximum number of places or the furthest distance has been reached. However, when the maximum
+   * number of places has been reached, it continues searching along other paths until the distance
+   * of the place that is furthest away. This is to account for the fact that the a star does not
+   * traverse edges ordered by distance.
+   */
+  public SkipEdgeStrategy getSkipEdgeStrategy() {
+    return (current, edge) -> {
+      double furthestDistance = radiusMeters;
+
+      if (
+        PlaceFinderTraverseVisitor.this.placesFound.size() >=
+        PlaceFinderTraverseVisitor.this.maxResults
+      ) {
+        furthestDistance = 0;
+        for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
+          if (pad.distance > furthestDistance) {
+            furthestDistance = pad.distance;
+          }
+        }
+      }
+
+      return current.getWalkDistance() > furthestDistance;
+    };
+  }
+
   private static <T> Set<T> toSet(List<T> list) {
     if (list == null) {
       return null;
@@ -90,25 +142,6 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
       .stream()
       .map(TripPattern::getMode)
       .anyMatch(modes::contains);
-  }
-
-  @Override
-  public void visitEdge(Edge edge) {}
-
-  @Override
-  public void visitEnqueue() {}
-
-  @Override
-  public void visitVertex(State state) {
-    Vertex vertex = state.getVertex();
-    double distance = state.getWalkDistance();
-    if (vertex instanceof TransitStopVertex) {
-      Stop stop = ((TransitStopVertex) vertex).getStop();
-      handleStop(stop, distance);
-      handlePatternsAtStop(stop, distance);
-    } else if (vertex instanceof VehicleRentalStationVertex) {
-      handleBikeRentalStation(((VehicleRentalStationVertex) vertex).getStation(), distance);
-    }
   }
 
   private void handleStop(Stop stop, double distance) {
@@ -164,32 +197,5 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
     seenBicycleRentalStations.add(station.getId());
     placesFound.add(new PlaceAtDistance(station, distance));
-  }
-
-  /**
-   * @return A SkipEdgeStrategy to be used with this TraverseVisitor. It skips edges when either
-   *          the maximum number of places or the furthest distance has been reached. However,
-   *          when the maximum number of places has been reached, it continues searching along
-   *          other paths until the distance of the place that is furthest away. This is to account
-   *          for the fact that the a star does not traverse edges ordered by distance.
-   */
-  public SkipEdgeStrategy getSkipEdgeStrategy() {
-    return (current, edge) -> {
-      double furthestDistance = radiusMeters;
-
-      if (
-        PlaceFinderTraverseVisitor.this.placesFound.size() >=
-        PlaceFinderTraverseVisitor.this.maxResults
-      ) {
-        furthestDistance = 0;
-        for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
-          if (pad.distance > furthestDistance) {
-            furthestDistance = pad.distance;
-          }
-        }
-      }
-
-      return current.getWalkDistance() > furthestDistance;
-    };
   }
 }

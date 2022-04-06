@@ -51,10 +51,6 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     2.0
   );
 
-  static TestPathBuilder pathBuilder() {
-    return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
-  }
-
   static {
     TRANS_WAIT_TIME_CALC.setMinSafeTransferTime(D5m);
   }
@@ -91,9 +87,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   }
 
   /**
-   * This test emulates the normal case were there is only one option to transfer between two
-   * trips and we should find the exact same option. The path should exactly match the original
-   * path after the path is reconstructed.
+   * This test emulates the normal case were there is only one option to transfer between two trips
+   * and we should find the exact same option. The path should exactly match the original path after
+   * the path is reconstructed.
    */
   @Test
   public void testTripWithOneTransfer() {
@@ -137,11 +133,13 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   }
 
   /**
+   * <pre>
    * DEPARTURE TIMES
    * Stop        A      B      C      D      E      F      G
    * Trip 1    10:02  10:10         10:20
    * Trip 2           10:12  10:15  10:22         10:35
    * Trip 3                                10:24  10:37  10:49
+   * </pre>
    */
   @Test
   public void testPathWithThreeTripsAndMultiplePlacesToTransfer() {
@@ -213,11 +211,12 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   }
 
   /**
+   * <pre>
    * DEPARTURE TIMES
    * Stop        A      B      C      D
    * Trip 1    10:02  10:10  10:15
    * Trip 2           10:13  10:17  10:30
-   *
+   * </pre>
    * Case: Transfer at stop B is returned, but transfer at stop C i guaranteed
    * Expect: Transfer at C and transfer info attached
    */
@@ -267,6 +266,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       "ConstrainedTransfer{from: <Trip BUS T1:10:02, stopPos 2>, to: <Trip BUS T2:10:13, stopPos 1>, constraint: {guaranteed}}",
       it.accessLeg().nextLeg().asTransitLeg().getConstrainedTransferAfterLeg().toString()
     );
+  }
+
+  static TestPathBuilder pathBuilder() {
+    return new TestPathBuilder(ALIGHT_SLACK, COST_CALCULATOR);
   }
 
   /* private methods */

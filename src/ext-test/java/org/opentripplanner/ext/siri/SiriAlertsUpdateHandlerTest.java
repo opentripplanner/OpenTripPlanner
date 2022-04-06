@@ -145,107 +145,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     }
   }
 
-  private PtSituationElement createPtSituationElement(
-    String situationNumber,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime,
-    AffectsScopeStructure affects
-  ) {
-    PtSituationElement element = new PtSituationElement();
-    element.setCreationTime(ZonedDateTime.now());
-    element.setProgress(WorkflowStatusEnumeration.OPEN);
-    if (startTime != null | endTime != null) {
-      HalfOpenTimestampOutputRangeStructure period = new HalfOpenTimestampOutputRangeStructure();
-
-      if (startTime != null) {
-        period.setStartTime(startTime);
-      }
-
-      if (endTime != null) {
-        period.setEndTime(endTime);
-      }
-      element.getValidityPeriods().add(period);
-    }
-
-    SituationNumber sn = new SituationNumber();
-    sn.setValue(situationNumber);
-    element.setSituationNumber(sn);
-
-    element.setAffects(affects);
-
-    element.getDescriptions().add(createDefaultedTextStructure("description"));
-    element.getSummaries().add(createDefaultedTextStructure("summary"));
-
-    return element;
-  }
-
-  private AffectsScopeStructure createAffectsStop(
-    List<RoutePointTypeEnumeration> stopConditions,
-    String... stopIds
-  ) {
-    AffectsScopeStructure affects = new AffectsScopeStructure();
-
-    AffectsScopeStructure.StopPoints stopPoints = new AffectsScopeStructure.StopPoints();
-
-    for (String stopId : stopIds) {
-      StopPointRef stopPointRef = new StopPointRef();
-      stopPointRef.setValue(stopId);
-      AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
-      affectedStopPoint.setStopPointRef(stopPointRef);
-      if (stopConditions != null) {
-        affectedStopPoint.getStopConditions().addAll(stopConditions);
-      }
-      stopPoints.getAffectedStopPoints().add(affectedStopPoint);
-    }
-
-    affects.setStopPoints(stopPoints);
-
-    return affects;
-  }
-
-  private DefaultedTextStructure createDefaultedTextStructure(String value) {
-    DefaultedTextStructure textStructure = new DefaultedTextStructure();
-    textStructure.setValue(value);
-    return textStructure;
-  }
-
-  private ServiceDelivery createServiceDelivery(PtSituationElement situationElement) {
-    return createServiceDelivery(List.of(situationElement));
-  }
-
-  private boolean containsOnlyEntitiesOfClass(TransitAlert transitAlert, Class<?> cls) {
-    long totalEntityCount = transitAlert.getEntities().size();
-    long clsEntityCount = transitAlert.getEntities().stream().filter(cls::isInstance).count();
-    return clsEntityCount > 0 && clsEntityCount == totalEntityCount;
-  }
-
-  private boolean matchesEntity(TransitAlert transitAlert, FeedScopedId feedScopedEntityId) {
-    boolean foundMatch = false;
-    for (EntitySelector entity : transitAlert.getEntities()) {
-      if (!foundMatch) {
-        if (entity instanceof EntitySelector.Stop) {
-          foundMatch = ((EntitySelector.Stop) entity).stopId.equals(feedScopedEntityId);
-        } else if (entity instanceof EntitySelector.Trip) {
-          foundMatch = ((EntitySelector.Trip) entity).tripId.equals(feedScopedEntityId);
-        } else if (entity instanceof EntitySelector.Route) {
-          foundMatch = ((EntitySelector.Route) entity).routeId.equals(feedScopedEntityId);
-        }
-      }
-    }
-    return foundMatch;
-  }
-
-  private ServiceDelivery createServiceDelivery(List<PtSituationElement> situationElement) {
-    ServiceDelivery delivery = new ServiceDelivery();
-    SituationExchangeDeliveryStructure sxDeliveries = new SituationExchangeDeliveryStructure();
-    SituationExchangeDeliveryStructure.Situations situations = new SituationExchangeDeliveryStructure.Situations();
-    situations.getPtSituationElements().addAll(situationElement);
-    sxDeliveries.setSituations(situations);
-    delivery.getSituationExchangeDeliveries().add(sxDeliveries);
-
-    return delivery;
-  }
-
   @Test
   public void testSiriSxUpdateForStopMultipleValidityPeriods() {
     init();
@@ -303,58 +202,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertValidity("period 1", transitAlert, startTimePeriod_1, endTimePeriod_1);
 
     assertValidity("period 2", transitAlert, startTimePeriod_2, endTimePeriod_2);
-  }
-
-  private void assertValidity(
-    String label,
-    TransitAlert transitAlert,
-    ZonedDateTime startTimePeriod_1,
-    ZonedDateTime endTimePeriod_1
-  ) {
-    // TimePeriod ends BEFORE first validityPeriod starts
-    assertFalse(
-      transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() - 200,
-        startTimePeriod_1.toEpochSecond() - 100
-      ),
-      "TimePeriod ends BEFORE first validityPeriod starts: " + label
-    );
-
-    // TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends
-    assertTrue(
-      transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() - 1000,
-        endTimePeriod_1.toEpochSecond() - 100
-      ),
-      "TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends: " + label
-    );
-
-    // TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends
-    assertTrue(
-      transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() + 100,
-        endTimePeriod_1.toEpochSecond() - 100
-      ),
-      "TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends: " + label
-    );
-
-    // TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends
-    assertTrue(
-      transitAlert.displayDuring(
-        startTimePeriod_1.toEpochSecond() + 100,
-        endTimePeriod_1.toEpochSecond() + 100
-      ),
-      "TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends: " + label
-    );
-
-    // TimePeriod starts AFTER first validityPeriod ends
-    assertFalse(
-      transitAlert.displayDuring(
-        endTimePeriod_1.toEpochSecond() + 100,
-        endTimePeriod_1.toEpochSecond() + 200
-      ),
-      "TimePeriod starts AFTER first validityPeriod ends: " + label
-    );
   }
 
   @Test
@@ -533,48 +380,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(effectiveEndDate, endTime);
   }
 
-  private AffectsScopeStructure createAffectsFramedVehicleJourney(
-    String datedVehicleJourney,
-    String dataFrameValue,
-    String... stopIds
-  ) {
-    AffectsScopeStructure affects = new AffectsScopeStructure();
-    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
-    AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
-    FramedVehicleJourneyRefStructure framedVehicleJourneyRef = new FramedVehicleJourneyRefStructure();
-    framedVehicleJourneyRef.setDatedVehicleJourneyRef(datedVehicleJourney);
-    if (dataFrameValue != null) {
-      DataFrameRefStructure dataFrameRef = new DataFrameRefStructure();
-      dataFrameRef.setValue(dataFrameValue);
-      framedVehicleJourneyRef.setDataFrameRef(dataFrameRef);
-    }
-    affectedVehicleJourney.setFramedVehicleJourneyRef(framedVehicleJourneyRef);
-
-    if (stopIds != null) {
-      AffectedRouteStructure affectedRoute = new AffectedRouteStructure();
-      AffectedRouteStructure.StopPoints stopPoints = createAffectedStopPoints(stopIds);
-      affectedRoute.setStopPoints(stopPoints);
-      affectedVehicleJourney.getRoutes().add(affectedRoute);
-    }
-
-    vehicleJourneys.getAffectedVehicleJourneies().add(affectedVehicleJourney);
-    affects.setVehicleJourneys(vehicleJourneys);
-
-    return affects;
-  }
-
-  private AffectedRouteStructure.StopPoints createAffectedStopPoints(String... stopIds) {
-    AffectedRouteStructure.StopPoints stopPoints = new AffectedRouteStructure.StopPoints();
-    for (String stopId : stopIds) {
-      AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
-      StopPointRef stopPointRef = new StopPointRef();
-      stopPointRef.setValue(stopId);
-      affectedStopPoint.setStopPointRef(stopPointRef);
-      stopPoints.getAffectedStopPointsAndLinkProjectionToNextStopPoints().add(affectedStopPoint);
-    }
-    return stopPoints;
-  }
-
   @Test
   public void testSiriSxUpdateForTripByVehicleJourney() {
     init();
@@ -610,33 +415,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Trip.class));
     assertTrue(matchesEntity(transitAlert, tripId));
-  }
-
-  private AffectsScopeStructure createAffectsVehicleJourney(
-    String vehicleJourneyRef,
-    ZonedDateTime originAimedDepartureTime,
-    String... stopIds
-  ) {
-    AffectsScopeStructure affects = new AffectsScopeStructure();
-    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
-    AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
-
-    VehicleJourneyRef vehicleJourney = new VehicleJourneyRef();
-    vehicleJourney.setValue(vehicleJourneyRef);
-    affectedVehicleJourney.getVehicleJourneyReves().add(vehicleJourney);
-    affectedVehicleJourney.setOriginAimedDepartureTime(originAimedDepartureTime);
-
-    if (stopIds != null) {
-      AffectedRouteStructure affectedRoute = new AffectedRouteStructure();
-      AffectedRouteStructure.StopPoints stopPoints = createAffectedStopPoints(stopIds);
-      affectedRoute.setStopPoints(stopPoints);
-      affectedVehicleJourney.getRoutes().add(affectedRoute);
-    }
-
-    vehicleJourneys.getAffectedVehicleJourneies().add(affectedVehicleJourney);
-    affects.setVehicleJourneys(vehicleJourneys);
-
-    return affects;
   }
 
   @Test
@@ -688,40 +466,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, stopId1, tripId, serviceDate));
   }
 
-  private boolean matchesEntity(
-    TransitAlert transitAlert,
-    FeedScopedId stopId,
-    FeedScopedId routeOrTripId
-  ) {
-    return matchesEntity(transitAlert, stopId, routeOrTripId, null);
-  }
-
-  private boolean matchesEntity(
-    TransitAlert transitAlert,
-    FeedScopedId stopId,
-    FeedScopedId routeOrTripId,
-    ServiceDate serviceDate
-  ) {
-    boolean foundMatch = false;
-    for (EntitySelector entity : transitAlert.getEntities()) {
-      if (!foundMatch) {
-        if (entity instanceof EntitySelector.StopAndRoute) {
-          foundMatch =
-            ((EntitySelector.StopAndRoute) entity).stopAndRoute.equals(
-                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
-              );
-        }
-        if (entity instanceof EntitySelector.StopAndTrip) {
-          foundMatch =
-            ((EntitySelector.StopAndTrip) entity).stopAndTrip.equals(
-                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
-              );
-        }
-      }
-    }
-    return foundMatch;
-  }
-
   @Test
   public void testSiriSxUpdateForLine() {
     init();
@@ -767,34 +511,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(startTime, effectiveStartDate);
     assertEquals(endTime, effectiveEndDate);
-  }
-
-  private AffectsScopeStructure createAffectsLine(String line, String... stopIds) {
-    AffectsScopeStructure affects = new AffectsScopeStructure();
-
-    AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
-    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork = new AffectsScopeStructure.Networks.AffectedNetwork();
-    AffectedLineStructure affectedLine = new AffectedLineStructure();
-    LineRef lineRef = new LineRef();
-    lineRef.setValue(line);
-    affectedLine.setLineRef(lineRef);
-    affectedNetwork.getAffectedLines().add(affectedLine);
-
-    if (stopIds != null) {
-      AffectedLineStructure.Routes routes = new AffectedLineStructure.Routes();
-      AffectedRouteStructure affectedRoute = new AffectedRouteStructure();
-
-      AffectedRouteStructure.StopPoints stopPoints = createAffectedStopPoints(stopIds);
-
-      affectedRoute.setStopPoints(stopPoints);
-      routes.getAffectedRoutes().add(affectedRoute);
-      affectedLine.setRoutes(routes);
-    }
-
-    networks.getAffectedNetworks().add(affectedNetwork);
-    affects.setNetworks(networks);
-
-    return affects;
   }
 
   @Test
@@ -932,45 +648,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
   }
 
-  private void assertLineAndStopAlerts(
-    String situationNumber,
-    String routeId,
-    String stopId0,
-    String stopId1
-  ) {
-    /*
-     * Line and stop-alerts should result in several TransitAlertes. One for each routeId/stop combination
-     */
-
-    final FeedScopedId feedRouteId = new FeedScopedId(FEED_ID, routeId);
-    final FeedScopedId feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
-    Collection<TransitAlert> tripPatches = transitAlertService.getStopAndRouteAlerts(
-      feedStop_0_id,
-      feedRouteId
-    );
-
-    assertNotNull(tripPatches);
-    assertEquals(1, tripPatches.size());
-    TransitAlert transitAlert = tripPatches.iterator().next();
-
-    assertEquals(situationNumber, transitAlert.getId());
-
-    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndRoute.class));
-    assertTrue(matchesEntity(transitAlert, feedStop_0_id, feedRouteId));
-
-    final FeedScopedId feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
-    tripPatches = transitAlertService.getStopAndRouteAlerts(feedStop_1_id, feedRouteId);
-
-    assertNotNull(tripPatches);
-    assertEquals(1, tripPatches.size());
-    transitAlert = tripPatches.iterator().next();
-
-    assertEquals(situationNumber, transitAlert.getId());
-
-    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndRoute.class));
-    assertTrue(matchesEntity(transitAlert, feedStop_1_id, feedRouteId));
-  }
-
   @Test
   public void testSiriSxUpdateForLineAndExternallyDefinedStopPoint() {
     init();
@@ -1048,6 +725,380 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertNull(transitAlert.getEffectiveEndDate());
   }
 
+  @Test
+  public void testSiriSxUpdateForLineAndExternallyDefinedStopPlace() {
+    init();
+    final String routeId = "route0";
+
+    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+
+    final String situationNumber = "TST:SituationNumber:1234";
+    final String stopId0 = "stop0";
+    final String stopId1 = "stop1";
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      createAffectsLineWithExternallyDefinedStopPlaces(routeId, stopId0, stopId1)
+    );
+
+    final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
+    alertsUpdateHandler.update(serviceDelivery);
+
+    assertFalse(transitAlertService.getAllAlerts().isEmpty());
+    assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
+  }
+
+  @Test
+  public void testSiriSxUpdateForUnknownEntity() {
+    init();
+    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+
+    final String situationNumber = "TST:SituationNumber:1234";
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      null
+    );
+
+    final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
+    alertsUpdateHandler.update(serviceDelivery);
+
+    Collection<TransitAlert> alerts = transitAlertService.getAllAlerts();
+    assertEquals(1, alerts.size());
+    TransitAlert transitAlert = alerts.iterator().next();
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Unknown.class));
+  }
+
+  @Override
+  public String getFeedName() {
+    return "gtfs/interlining";
+  }
+
+  private PtSituationElement createPtSituationElement(
+    String situationNumber,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
+    AffectsScopeStructure affects
+  ) {
+    PtSituationElement element = new PtSituationElement();
+    element.setCreationTime(ZonedDateTime.now());
+    element.setProgress(WorkflowStatusEnumeration.OPEN);
+    if (startTime != null | endTime != null) {
+      HalfOpenTimestampOutputRangeStructure period = new HalfOpenTimestampOutputRangeStructure();
+
+      if (startTime != null) {
+        period.setStartTime(startTime);
+      }
+
+      if (endTime != null) {
+        period.setEndTime(endTime);
+      }
+      element.getValidityPeriods().add(period);
+    }
+
+    SituationNumber sn = new SituationNumber();
+    sn.setValue(situationNumber);
+    element.setSituationNumber(sn);
+
+    element.setAffects(affects);
+
+    element.getDescriptions().add(createDefaultedTextStructure("description"));
+    element.getSummaries().add(createDefaultedTextStructure("summary"));
+
+    return element;
+  }
+
+  private AffectsScopeStructure createAffectsStop(
+    List<RoutePointTypeEnumeration> stopConditions,
+    String... stopIds
+  ) {
+    AffectsScopeStructure affects = new AffectsScopeStructure();
+
+    AffectsScopeStructure.StopPoints stopPoints = new AffectsScopeStructure.StopPoints();
+
+    for (String stopId : stopIds) {
+      StopPointRef stopPointRef = new StopPointRef();
+      stopPointRef.setValue(stopId);
+      AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
+      affectedStopPoint.setStopPointRef(stopPointRef);
+      if (stopConditions != null) {
+        affectedStopPoint.getStopConditions().addAll(stopConditions);
+      }
+      stopPoints.getAffectedStopPoints().add(affectedStopPoint);
+    }
+
+    affects.setStopPoints(stopPoints);
+
+    return affects;
+  }
+
+  private DefaultedTextStructure createDefaultedTextStructure(String value) {
+    DefaultedTextStructure textStructure = new DefaultedTextStructure();
+    textStructure.setValue(value);
+    return textStructure;
+  }
+
+  private ServiceDelivery createServiceDelivery(PtSituationElement situationElement) {
+    return createServiceDelivery(List.of(situationElement));
+  }
+
+  private boolean containsOnlyEntitiesOfClass(TransitAlert transitAlert, Class<?> cls) {
+    long totalEntityCount = transitAlert.getEntities().size();
+    long clsEntityCount = transitAlert.getEntities().stream().filter(cls::isInstance).count();
+    return clsEntityCount > 0 && clsEntityCount == totalEntityCount;
+  }
+
+  private boolean matchesEntity(TransitAlert transitAlert, FeedScopedId feedScopedEntityId) {
+    boolean foundMatch = false;
+    for (EntitySelector entity : transitAlert.getEntities()) {
+      if (!foundMatch) {
+        if (entity instanceof EntitySelector.Stop) {
+          foundMatch = ((EntitySelector.Stop) entity).stopId.equals(feedScopedEntityId);
+        } else if (entity instanceof EntitySelector.Trip) {
+          foundMatch = ((EntitySelector.Trip) entity).tripId.equals(feedScopedEntityId);
+        } else if (entity instanceof EntitySelector.Route) {
+          foundMatch = ((EntitySelector.Route) entity).routeId.equals(feedScopedEntityId);
+        }
+      }
+    }
+    return foundMatch;
+  }
+
+  private ServiceDelivery createServiceDelivery(List<PtSituationElement> situationElement) {
+    ServiceDelivery delivery = new ServiceDelivery();
+    SituationExchangeDeliveryStructure sxDeliveries = new SituationExchangeDeliveryStructure();
+    SituationExchangeDeliveryStructure.Situations situations = new SituationExchangeDeliveryStructure.Situations();
+    situations.getPtSituationElements().addAll(situationElement);
+    sxDeliveries.setSituations(situations);
+    delivery.getSituationExchangeDeliveries().add(sxDeliveries);
+
+    return delivery;
+  }
+
+  private void assertValidity(
+    String label,
+    TransitAlert transitAlert,
+    ZonedDateTime startTimePeriod_1,
+    ZonedDateTime endTimePeriod_1
+  ) {
+    // TimePeriod ends BEFORE first validityPeriod starts
+    assertFalse(
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() - 200,
+        startTimePeriod_1.toEpochSecond() - 100
+      ),
+      "TimePeriod ends BEFORE first validityPeriod starts: " + label
+    );
+
+    // TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends
+    assertTrue(
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() - 1000,
+        endTimePeriod_1.toEpochSecond() - 100
+      ),
+      "TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends: " + label
+    );
+
+    // TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends
+    assertTrue(
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() + 100,
+        endTimePeriod_1.toEpochSecond() - 100
+      ),
+      "TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends: " + label
+    );
+
+    // TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends
+    assertTrue(
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() + 100,
+        endTimePeriod_1.toEpochSecond() + 100
+      ),
+      "TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends: " + label
+    );
+
+    // TimePeriod starts AFTER first validityPeriod ends
+    assertFalse(
+      transitAlert.displayDuring(
+        endTimePeriod_1.toEpochSecond() + 100,
+        endTimePeriod_1.toEpochSecond() + 200
+      ),
+      "TimePeriod starts AFTER first validityPeriod ends: " + label
+    );
+  }
+
+  private AffectsScopeStructure createAffectsFramedVehicleJourney(
+    String datedVehicleJourney,
+    String dataFrameValue,
+    String... stopIds
+  ) {
+    AffectsScopeStructure affects = new AffectsScopeStructure();
+    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
+    AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
+    FramedVehicleJourneyRefStructure framedVehicleJourneyRef = new FramedVehicleJourneyRefStructure();
+    framedVehicleJourneyRef.setDatedVehicleJourneyRef(datedVehicleJourney);
+    if (dataFrameValue != null) {
+      DataFrameRefStructure dataFrameRef = new DataFrameRefStructure();
+      dataFrameRef.setValue(dataFrameValue);
+      framedVehicleJourneyRef.setDataFrameRef(dataFrameRef);
+    }
+    affectedVehicleJourney.setFramedVehicleJourneyRef(framedVehicleJourneyRef);
+
+    if (stopIds != null) {
+      AffectedRouteStructure affectedRoute = new AffectedRouteStructure();
+      AffectedRouteStructure.StopPoints stopPoints = createAffectedStopPoints(stopIds);
+      affectedRoute.setStopPoints(stopPoints);
+      affectedVehicleJourney.getRoutes().add(affectedRoute);
+    }
+
+    vehicleJourneys.getAffectedVehicleJourneies().add(affectedVehicleJourney);
+    affects.setVehicleJourneys(vehicleJourneys);
+
+    return affects;
+  }
+
+  private AffectedRouteStructure.StopPoints createAffectedStopPoints(String... stopIds) {
+    AffectedRouteStructure.StopPoints stopPoints = new AffectedRouteStructure.StopPoints();
+    for (String stopId : stopIds) {
+      AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
+      StopPointRef stopPointRef = new StopPointRef();
+      stopPointRef.setValue(stopId);
+      affectedStopPoint.setStopPointRef(stopPointRef);
+      stopPoints.getAffectedStopPointsAndLinkProjectionToNextStopPoints().add(affectedStopPoint);
+    }
+    return stopPoints;
+  }
+
+  private AffectsScopeStructure createAffectsVehicleJourney(
+    String vehicleJourneyRef,
+    ZonedDateTime originAimedDepartureTime,
+    String... stopIds
+  ) {
+    AffectsScopeStructure affects = new AffectsScopeStructure();
+    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
+    AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
+
+    VehicleJourneyRef vehicleJourney = new VehicleJourneyRef();
+    vehicleJourney.setValue(vehicleJourneyRef);
+    affectedVehicleJourney.getVehicleJourneyReves().add(vehicleJourney);
+    affectedVehicleJourney.setOriginAimedDepartureTime(originAimedDepartureTime);
+
+    if (stopIds != null) {
+      AffectedRouteStructure affectedRoute = new AffectedRouteStructure();
+      AffectedRouteStructure.StopPoints stopPoints = createAffectedStopPoints(stopIds);
+      affectedRoute.setStopPoints(stopPoints);
+      affectedVehicleJourney.getRoutes().add(affectedRoute);
+    }
+
+    vehicleJourneys.getAffectedVehicleJourneies().add(affectedVehicleJourney);
+    affects.setVehicleJourneys(vehicleJourneys);
+
+    return affects;
+  }
+
+  private boolean matchesEntity(
+    TransitAlert transitAlert,
+    FeedScopedId stopId,
+    FeedScopedId routeOrTripId
+  ) {
+    return matchesEntity(transitAlert, stopId, routeOrTripId, null);
+  }
+
+  private boolean matchesEntity(
+    TransitAlert transitAlert,
+    FeedScopedId stopId,
+    FeedScopedId routeOrTripId,
+    ServiceDate serviceDate
+  ) {
+    boolean foundMatch = false;
+    for (EntitySelector entity : transitAlert.getEntities()) {
+      if (!foundMatch) {
+        if (entity instanceof EntitySelector.StopAndRoute) {
+          foundMatch =
+            ((EntitySelector.StopAndRoute) entity).stopAndRoute.equals(
+                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
+              );
+        }
+        if (entity instanceof EntitySelector.StopAndTrip) {
+          foundMatch =
+            ((EntitySelector.StopAndTrip) entity).stopAndTrip.equals(
+                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
+              );
+        }
+      }
+    }
+    return foundMatch;
+  }
+
+  private AffectsScopeStructure createAffectsLine(String line, String... stopIds) {
+    AffectsScopeStructure affects = new AffectsScopeStructure();
+
+    AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
+    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork = new AffectsScopeStructure.Networks.AffectedNetwork();
+    AffectedLineStructure affectedLine = new AffectedLineStructure();
+    LineRef lineRef = new LineRef();
+    lineRef.setValue(line);
+    affectedLine.setLineRef(lineRef);
+    affectedNetwork.getAffectedLines().add(affectedLine);
+
+    if (stopIds != null) {
+      AffectedLineStructure.Routes routes = new AffectedLineStructure.Routes();
+      AffectedRouteStructure affectedRoute = new AffectedRouteStructure();
+
+      AffectedRouteStructure.StopPoints stopPoints = createAffectedStopPoints(stopIds);
+
+      affectedRoute.setStopPoints(stopPoints);
+      routes.getAffectedRoutes().add(affectedRoute);
+      affectedLine.setRoutes(routes);
+    }
+
+    networks.getAffectedNetworks().add(affectedNetwork);
+    affects.setNetworks(networks);
+
+    return affects;
+  }
+
+  private void assertLineAndStopAlerts(
+    String situationNumber,
+    String routeId,
+    String stopId0,
+    String stopId1
+  ) {
+    /*
+     * Line and stop-alerts should result in several TransitAlertes. One for each routeId/stop combination
+     */
+
+    final FeedScopedId feedRouteId = new FeedScopedId(FEED_ID, routeId);
+    final FeedScopedId feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
+    Collection<TransitAlert> tripPatches = transitAlertService.getStopAndRouteAlerts(
+      feedStop_0_id,
+      feedRouteId
+    );
+
+    assertNotNull(tripPatches);
+    assertEquals(1, tripPatches.size());
+    TransitAlert transitAlert = tripPatches.iterator().next();
+
+    assertEquals(situationNumber, transitAlert.getId());
+
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndRoute.class));
+    assertTrue(matchesEntity(transitAlert, feedStop_0_id, feedRouteId));
+
+    final FeedScopedId feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
+    tripPatches = transitAlertService.getStopAndRouteAlerts(feedStop_1_id, feedRouteId);
+
+    assertNotNull(tripPatches);
+    assertEquals(1, tripPatches.size());
+    transitAlert = tripPatches.iterator().next();
+
+    assertEquals(situationNumber, transitAlert.getId());
+
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndRoute.class));
+    assertTrue(matchesEntity(transitAlert, feedStop_1_id, feedRouteId));
+  }
+
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPoints(
     String line,
     String... stopIds
@@ -1117,52 +1168,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, feedStopId));
   }
 
-  @Test
-  public void testSiriSxUpdateForLineAndExternallyDefinedStopPlace() {
-    init();
-    final String routeId = "route0";
-
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
-
-    final String situationNumber = "TST:SituationNumber:1234";
-    final String stopId0 = "stop0";
-    final String stopId1 = "stop1";
-    PtSituationElement ptSituation = createPtSituationElement(
-      situationNumber,
-      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-      createAffectsLineWithExternallyDefinedStopPlaces(routeId, stopId0, stopId1)
-    );
-
-    final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery);
-
-    assertFalse(transitAlertService.getAllAlerts().isEmpty());
-    assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
-  }
-
-  @Test
-  public void testSiriSxUpdateForUnknownEntity() {
-    init();
-    assertTrue(transitAlertService.getAllAlerts().isEmpty());
-
-    final String situationNumber = "TST:SituationNumber:1234";
-    PtSituationElement ptSituation = createPtSituationElement(
-      situationNumber,
-      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-      null
-    );
-
-    final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
-    alertsUpdateHandler.update(serviceDelivery);
-
-    Collection<TransitAlert> alerts = transitAlertService.getAllAlerts();
-    assertEquals(1, alerts.size());
-    TransitAlert transitAlert = alerts.iterator().next();
-    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Unknown.class));
-  }
-
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPlaces(
     String line,
     String... stopIds
@@ -1192,10 +1197,5 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     }
 
     return affects;
-  }
-
-  @Override
-  public String getFeedName() {
-    return "gtfs/interlining";
   }
 }

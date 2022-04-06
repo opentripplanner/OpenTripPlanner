@@ -8,8 +8,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
 
 /**
- * The egress stop arrival state is responsible for sending arrival notifications.
- * This is used to update the destination arrivals.
+ * The egress stop arrival state is responsible for sending arrival notifications. This is used to
+ * update the destination arrivals.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -42,6 +42,14 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   }
 
   @Override
+  public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
+    super.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
+    for (RaptorTransfer egressPath : egressPaths) {
+      callback.newDestinationArrival(round, arrivalTime, true, egressPath);
+    }
+  }
+
+  @Override
   public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
     super.transferToStop(fromStop, arrivalTime, transferPath);
     for (RaptorTransfer egressPath : egressPaths) {
@@ -53,14 +61,6 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
           egressPath
         );
       }
-    }
-  }
-
-  @Override
-  public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
-    super.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
-    for (RaptorTransfer egressPath : egressPaths) {
-      callback.newDestinationArrival(round, arrivalTime, true, egressPath);
     }
   }
 

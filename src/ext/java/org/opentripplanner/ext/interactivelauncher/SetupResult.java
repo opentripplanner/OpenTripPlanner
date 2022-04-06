@@ -26,6 +26,24 @@ public class SetupResult {
     this.serveGraph = serveGraph;
   }
 
+  @Override
+  public String toString() {
+    return (
+      "SetupResult{" +
+      "configDataDir=" +
+      configDataDir.getAbsolutePath() +
+      (buildStreet ? ", buildStreet" : "") +
+      (buildTransit ? ", buildTransit" : "") +
+      (saveGraph ? ", saveGraph" : "") +
+      (serveGraph ? ", serveGraph" : "") +
+      '}'
+    );
+  }
+
+  public String toCliString() {
+    return String.join(" ", asOtpArgs());
+  }
+
   File configDataDir() {
     return configDataDir;
   }
@@ -54,20 +72,6 @@ public class SetupResult {
     return serveGraph;
   }
 
-  @Override
-  public String toString() {
-    return (
-      "SetupResult{" +
-      "configDataDir=" +
-      configDataDir.getAbsolutePath() +
-      (buildStreet ? ", buildStreet" : "") +
-      (buildTransit ? ", buildTransit" : "") +
-      (saveGraph ? ", saveGraph" : "") +
-      (serveGraph ? ", serveGraph" : "") +
-      '}'
-    );
-  }
-
   String[] asOtpArgs() {
     List<String> args = new ArrayList<>();
 
@@ -91,9 +95,5 @@ public class SetupResult {
     args.add(configDataDir.getAbsolutePath());
 
     return args.toArray(new String[0]);
-  }
-
-  public String toCliString() {
-    return String.join(" ", asOtpArgs());
   }
 }

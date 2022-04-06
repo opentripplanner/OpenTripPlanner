@@ -6,7 +6,6 @@ import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TransferStopArrival<T extends RaptorTripSchedule>
@@ -30,6 +29,11 @@ public final class TransferStopArrival<T extends RaptorTripSchedule>
   }
 
   @Override
+  public TransitArrival<T> mostRecentTransitArrival() {
+    return previous().mostRecentTransitArrival();
+  }
+
+  @Override
   public boolean arrivedByTransfer() {
     return true;
   }
@@ -37,10 +41,5 @@ public final class TransferStopArrival<T extends RaptorTripSchedule>
   @Override
   public TransferPathView transferPath() {
     return () -> transfer;
-  }
-
-  @Override
-  public TransitArrival<T> mostRecentTransitArrival() {
-    return previous().mostRecentTransitArrival();
   }
 }

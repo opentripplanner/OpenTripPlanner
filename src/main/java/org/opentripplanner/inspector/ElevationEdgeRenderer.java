@@ -48,6 +48,11 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
   }
 
   @Override
+  public String getName() {
+    return "Elevation";
+  }
+
+  @Override
   public boolean hasEdgeSegments(Edge edge) {
     return true;
   }
@@ -98,10 +103,5 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
       )
       .findAny()
       .orElse(null);
-  }
-
-  @Override
-  public String getName() {
-    return "Elevation";
   }
 }

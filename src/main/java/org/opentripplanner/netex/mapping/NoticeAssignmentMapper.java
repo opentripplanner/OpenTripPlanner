@@ -22,9 +22,9 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
  * Maps NeTEx NoticeAssignment, which is the connection between a Notice and the object it refers
- * to. In the case of a notice referring to a StopPointInJourneyPattern, which has no OTP equivalent,
- * it will be assigned to its corresponding TimeTabledPassingTimes for each ServiceJourney in the
- * same JourneyPattern.
+ * to. In the case of a notice referring to a StopPointInJourneyPattern, which has no OTP
+ * equivalent, it will be assigned to its corresponding TimeTabledPassingTimes for each
+ * ServiceJourney in the same JourneyPattern.
  */
 class NoticeAssignmentMapper {
 

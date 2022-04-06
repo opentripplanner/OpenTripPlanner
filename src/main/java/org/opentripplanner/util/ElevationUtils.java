@@ -30,14 +30,10 @@ public class ElevationUtils {
 
   /**
    * Computes the difference between the ellipsoid and geoid at a specified lat/lon using Geotools
-   * EarthGravitationalModel. For unknown reasons, this method can produce incorrect results if called at the same
-   * time from multiple threads, so the method has been made synchronized.
+   * EarthGravitationalModel. For unknown reasons, this method can produce incorrect results if
+   * called at the same time from multiple threads, so the method has been made synchronized.
    *
-   * @param lat
-   * @param lon
    * @return difference in meters
-   * @throws FactoryException
-   * @throws TransformException
    */
   public static synchronized double computeEllipsoidToGeoidDifference(double lat, double lon)
     throws TransformException {

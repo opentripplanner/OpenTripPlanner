@@ -15,8 +15,8 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 
 /**
- * This decorator help unzip the content of any underling data source(the delegate).
- * This make it easier to provide a store implementation - since this code can be reused.
+ * This decorator help unzip the content of any underling data source(the delegate). This make it
+ * easier to provide a store implementation - since this code can be reused.
  * <p/>
  * See the Google Cloud Store implementation for an example on hwo to use it.
  */
@@ -25,9 +25,9 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   private final DataSource delegate;
 
   /**
-   * This store load the zip file into memory; hence we should load the content only once,
-   * even at the risk that the source is changed since last tile a resource is accessed.
-   * To achieve this we use a boolean flag to indicate if the content is loaded or not.
+   * This store load the zip file into memory; hence we should load the content only once, even at
+   * the risk that the source is changed since last tile a resource is accessed. To achieve this we
+   * use a boolean flag to indicate if the content is loaded or not.
    */
   private boolean contentLoaded = false;
 
@@ -37,9 +37,9 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   private List<DataSource> content = new ArrayList<>();
 
   /**
-   * Create a Zip Stream data source decorator around another data source. The given delegate
-   * is responsible for retrieving meta-data and providing an input stream to fetch the
-   * zipped content.
+   * Create a Zip Stream data source decorator around another data source. The given delegate is
+   * responsible for retrieving meta-data and providing an input stream to fetch the zipped
+   * content.
    */
   public ZipStreamDataSourceDecorator(DataSource delegate) {
     this.delegate = delegate;
@@ -76,25 +76,8 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   }
 
   @Override
-  public String detailedInfo() {
-    return delegate.detailedInfo();
-  }
-
-  @Override
   public boolean isWritable() {
     return false;
-  }
-
-  @Override
-  public Collection<DataSource> content() {
-    loadContent();
-    return content;
-  }
-
-  @Override
-  public DataSource entry(String name) {
-    loadContent();
-    return content.stream().filter(it -> name.equals(it.name())).findFirst().orElse(null);
   }
 
   @Override
@@ -109,6 +92,23 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
     throw new UnsupportedOperationException(
       "This datasource type " + type() + " do not support WRITING. Can not write to: " + path()
     );
+  }
+
+  @Override
+  public String detailedInfo() {
+    return delegate.detailedInfo();
+  }
+
+  @Override
+  public Collection<DataSource> content() {
+    loadContent();
+    return content;
+  }
+
+  @Override
+  public DataSource entry(String name) {
+    loadContent();
+    return content.stream().filter(it -> name.equals(it.name())).findFirst().orElse(null);
   }
 
   @Override

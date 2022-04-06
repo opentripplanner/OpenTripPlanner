@@ -33,10 +33,6 @@ public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
     this.blockReadinessUntilInitialized = blockReadinessUntilInitialized;
   }
 
-  String getFeedId() {
-    return feedId;
-  }
-
   public String getUrl() {
     return url;
   }
@@ -65,5 +61,9 @@ public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
 
   public boolean blockReadinessUntilInitialized() {
     return blockReadinessUntilInitialized;
+  }
+
+  String getFeedId() {
+    return feedId;
   }
 }

@@ -23,8 +23,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
- * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and
- * stops.
+ * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and stops.
  */
 public class FlexibleTransitLeg implements Leg {
 
@@ -96,10 +95,6 @@ public class FlexibleTransitLeg implements Leg {
   @Override
   public boolean isTransitLeg() {
     return true;
-  }
-
-  public void addAlert(TransitAlert alert) {
-    transitAlerts.add(alert);
   }
 
   @Override
@@ -220,6 +215,10 @@ public class FlexibleTransitLeg implements Leg {
   @Override
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  public void addAlert(TransitAlert alert) {
+    transitAlerts.add(alert);
   }
 
   /**

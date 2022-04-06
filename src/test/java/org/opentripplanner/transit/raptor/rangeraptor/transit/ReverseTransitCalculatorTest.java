@@ -23,16 +23,6 @@ public class ReverseTransitCalculatorTest {
   private int earliestAcceptableDepartureTime = hm2time(16, 0);
   private int iterationStep = 60;
 
-  private TransitCalculator<TestTripSchedule> create() {
-    return new ReverseTransitCalculator<>(
-      TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
-      latestArrivalTime,
-      searchWindowSizeInSeconds,
-      earliestAcceptableDepartureTime,
-      iterationStep
-    );
-  }
-
   @Test
   public void exceedsTimeLimit() {
     earliestAcceptableDepartureTime = 1200;
@@ -101,6 +91,16 @@ public class ReverseTransitCalculatorTest {
 
     // No transfer form stop A expected
     assertFalse(subject.getTransfers(transitData, STOP_A).hasNext());
+  }
+
+  private TransitCalculator<TestTripSchedule> create() {
+    return new ReverseTransitCalculator<>(
+      TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
+      latestArrivalTime,
+      searchWindowSizeInSeconds,
+      earliestAcceptableDepartureTime,
+      iterationStep
+    );
   }
 
   private void assertIntIterator(IntIterator it, int... values) {

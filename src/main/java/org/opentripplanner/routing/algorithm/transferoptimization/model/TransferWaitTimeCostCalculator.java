@@ -168,15 +168,15 @@ public class TransferWaitTimeCostCalculator {
   }
 
   /**
-   * The optimized transfer normally do not need to account for transfer constraints, but we want
-   * a guaranteed or stay-seated transfer to "win" over a normal transfer - independent of what
-   * the wait-times of the facilitated transfer are. We also need to account for the case where we
-   * have to choose between facilitated transfers.
+   * The optimized transfer normally do not need to account for transfer constraints, but we want a
+   * guaranteed or stay-seated transfer to "win" over a normal transfer - independent of what the
+   * wait-times of the facilitated transfer are. We also need to account for the case where we have
+   * to choose between facilitated transfers.
    * <p>
    * Here is an example with to possible paths: {@code A-B-D-E-H-J} and {@code A-C-F-G-I-J}, the
-   * {@code \} is a normal transfer and the {@code \\} is a guaranteed transfer. The path
-   * {@code A-B-D-G-I-J} is also possible, but can be dropped early, because it does not contain
-   * any guaranteed transfers.
+   * {@code \} is a normal transfer and the {@code \\} is a guaranteed transfer. The path {@code
+   * A-B-D-G-I-J} is also possible, but can be dropped early, because it does not contain any
+   * guaranteed transfers.
    * <pre>
    *  A --- B ---------- C
    *         \           \\

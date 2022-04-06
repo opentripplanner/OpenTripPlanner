@@ -50,9 +50,9 @@ public class TestTransfer implements RaptorTransfer {
 
   /**
    * Creates a walk transfer with time restrictions. opening and closing may be specified as seconds
-   * since the start of "RAPTOR time" to limit the time periods that the access is traversable, which
-   * is repeatead every 24 hours. This allows the access to only be traversable between for example
-   * 08:00 and 16:00 every day.
+   * since the start of "RAPTOR time" to limit the time periods that the access is traversable,
+   * which is repeatead every 24 hours. This allows the access to only be traversable between for
+   * example 08:00 and 16:00 every day.
    */
   public static TestTransfer walk(int stop, int durationInSeconds, int opening, int closing) {
     return new Builder(stop, durationInSeconds).withOpeningHours(opening, closing).build();
@@ -107,11 +107,6 @@ public class TestTransfer implements RaptorTransfer {
     return new Builder(stop, durationInSeconds).withNRides(nRides).withCost(cost).build();
   }
 
-  /** Set opening and closing hours and return a new object. */
-  public TestTransfer openingHours(int opening, int closing) {
-    return new Builder(this).withOpeningHours(opening, closing).build();
-  }
-
   public static Collection<RaptorTransfer> transfers(int... stopTimes) {
     List<RaptorTransfer> legs = new ArrayList<>();
     for (int i = 0; i < stopTimes.length; i += 2) {
@@ -128,6 +123,11 @@ public class TestTransfer implements RaptorTransfer {
     return toRaptorCost(durationInSeconds * reluctance);
   }
 
+  /** Set opening and closing hours and return a new object. */
+  public TestTransfer openingHours(int opening, int closing) {
+    return new Builder(this).withOpeningHours(opening, closing).build();
+  }
+
   @Override
   public int stop() {
     return stop;
@@ -141,16 +141,6 @@ public class TestTransfer implements RaptorTransfer {
   @Override
   public int durationInSeconds() {
     return durationInSeconds;
-  }
-
-  @Override
-  public int numberOfRides() {
-    return numberOfRides;
-  }
-
-  @Override
-  public boolean stopReachedOnBoard() {
-    return stopReachedOnBoard;
   }
 
   @Override
@@ -206,6 +196,16 @@ public class TestTransfer implements RaptorTransfer {
   }
 
   @Override
+  public int numberOfRides() {
+    return numberOfRides;
+  }
+
+  @Override
+  public boolean stopReachedOnBoard() {
+    return stopReachedOnBoard;
+  }
+
+  @Override
   public String toString() {
     return asString();
   }
@@ -216,8 +216,8 @@ public class TestTransfer implements RaptorTransfer {
   }
 
   /**
-   * Do not use the builder, use the static factory methods. Only use the builder if you
-   * need to override the {@link TestTransfer class}.
+   * Do not use the builder, use the static factory methods. Only use the builder if you need to
+   * override the {@link TestTransfer class}.
    */
   protected static class Builder {
 

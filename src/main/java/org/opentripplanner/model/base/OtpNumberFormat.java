@@ -16,6 +16,19 @@ public class OtpNumberFormat {
   private DecimalFormat decimalFormat;
   private DecimalFormat coordinateFormat;
 
+  /** Used to format integer cost types like generalized-cost used by Raptor. */
+  public static String formatCost(int cost) {
+    if (Math.abs(cost) >= 1_000_000 || cost % 100 == 0) {
+      return "$" + cost / 100;
+    }
+    return String.format(Locale.ROOT, "$%.2f", cost / 100.0);
+  }
+
+  /** Used to format integer cost types with a given unit. */
+  public static String formatCost(int cost, String unit) {
+    return formatCost(cost) + unit;
+  }
+
   String formatCoordinate(Number value) {
     if (coordinateFormat == null) {
       coordinateFormat = new DecimalFormat("#0.0####", DECIMAL_SYMBOLS);
@@ -45,18 +58,5 @@ public class OtpNumberFormat {
       decimalFormat = new DecimalFormat("#,##0.0##", DECIMAL_SYMBOLS);
     }
     return decimalFormat.format(value);
-  }
-
-  /** Used to format integer cost types like generalized-cost used by Raptor. */
-  public static String formatCost(int cost) {
-    if (Math.abs(cost) >= 1_000_000 || cost % 100 == 0) {
-      return "$" + cost / 100;
-    }
-    return String.format(Locale.ROOT, "$%.2f", cost / 100.0);
-  }
-
-  /** Used to format integer cost types with a given unit. */
-  public static String formatCost(int cost, String unit) {
-    return formatCost(cost) + unit;
   }
 }

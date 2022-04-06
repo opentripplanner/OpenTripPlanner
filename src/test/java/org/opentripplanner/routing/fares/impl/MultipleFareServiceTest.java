@@ -14,24 +14,9 @@ import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 
 /**
- *
  * @author laurent
  */
 public class MultipleFareServiceTest {
-
-  private static class SimpleFareService implements FareService {
-
-    private final Fare fare;
-
-    private SimpleFareService(Fare fare) {
-      this.fare = fare;
-    }
-
-    @Override
-    public Fare getCost(Itinerary itin) {
-      return fare;
-    }
-  }
 
   @Test
   public void testAddingMultipleFareService() {
@@ -90,5 +75,19 @@ public class MultipleFareServiceTest {
     fare = mfs.getCost(null);
     assertEquals(240, fare.getFare(FareType.regular).getCents());
     assertEquals(300, fare.getFare(FareType.student).getCents());
+  }
+
+  private static class SimpleFareService implements FareService {
+
+    private final Fare fare;
+
+    private SimpleFareService(Fare fare) {
+      this.fare = fare;
+    }
+
+    @Override
+    public Fare getCost(Itinerary itin) {
+      return fare;
+    }
   }
 }

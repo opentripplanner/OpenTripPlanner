@@ -9,9 +9,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 
 /**
- * Generic abstract implementation of the {@link DebugHandler} interface. The main purpose
- * is provide a common logic for the adapters between the Range Raptor domain and the
- * outside client - the event listeners and the request API.
+ * Generic abstract implementation of the {@link DebugHandler} interface. The main purpose is
+ * provide a common logic for the adapters between the Range Raptor domain and the outside client -
+ * the event listeners and the request API.
  *
  * @param <T> The element type for the debug event
  */

@@ -8,15 +8,6 @@ import junit.framework.TestCase;
 
 public class TestXmlDataListDownloader extends TestCase {
 
-  private static class DataTest {
-
-    private String name;
-
-    private double lat;
-
-    private double lon;
-  }
-
   public void testKML() {
     XmlDataListDownloader<DataTest> xmlDataListDownloader = new XmlDataListDownloader<>();
     xmlDataListDownloader.setPath("//document/data/element");
@@ -48,5 +39,14 @@ public class TestXmlDataListDownloader extends TestCase {
     assertEquals("C", c.name);
     assertEquals(45.2, c.lat);
     assertEquals(1.1, c.lon);
+  }
+
+  private static class DataTest {
+
+    private String name;
+
+    private double lat;
+
+    private double lon;
   }
 }

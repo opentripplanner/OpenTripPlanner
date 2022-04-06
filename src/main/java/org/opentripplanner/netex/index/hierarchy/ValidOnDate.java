@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 import org.rutebanken.netex.model.EntityInVersionStructure;
 
 /**
- * Wrapper class to simplify getting the correct version of a Netex versioned
- * entity.
+ * Wrapper class to simplify getting the correct version of a Netex versioned entity.
  */
 class ValidOnDate<T extends EntityInVersionStructure> {
 
@@ -16,8 +15,8 @@ class ValidOnDate<T extends EntityInVersionStructure> {
   private final LocalDateTime time;
 
   /**
-   * Wrap the given {@code entity} and find the first point in time the
-   * entity is valid after the given {@code timeLimit}.
+   * Wrap the given {@code entity} and find the first point in time the entity is valid after the
+   * given {@code timeLimit}.
    */
   ValidOnDate(T entity, LocalDateTime timeLimit) {
     this.entity = entity;
@@ -33,8 +32,8 @@ class ValidOnDate<T extends EntityInVersionStructure> {
   }
 
   /**
-   * Return true if this is a better version of the entity based on the time limit passed in
-   * on the constructor and, in case of a tie the version number is used.
+   * Return true if this is a better version of the entity based on the time limit passed in on the
+   * constructor and, in case of a tie the version number is used.
    */
   boolean bestVersion(ValidOnDate<T> other) {
     if (time.isBefore(other.time)) {

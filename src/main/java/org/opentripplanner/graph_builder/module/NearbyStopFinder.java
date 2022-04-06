@@ -42,7 +42,8 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
 
 /**
- * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.
+ * These library functions are used by the streetless and streetful stop linkers, and in profile
+ * transfer generation.
  * TODO OTP2 Fold these into org.opentripplanner.routing.graphfinder.StreetGraphFinder
  *           These are not library functions, this is instantiated as an object. Define lifecycle of the object (reuse?).
  *           Because AStar instances should only be used once, NearbyStopFinder should only be used once.
@@ -59,8 +60,9 @@ public class NearbyStopFinder {
   private DirectGraphFinder directGraphFinder;
 
   /**
-   * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
-   * network or straight line distance based on the presence of OSM street data in the graph.
+   * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search
+   * via the street network or straight line distance based on the presence of OSM street data in
+   * the graph.
    */
   public NearbyStopFinder(Graph graph, Duration durationLimit) {
     this(graph, durationLimit, graph.hasStreets);
@@ -68,7 +70,9 @@ public class NearbyStopFinder {
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
-   * @param useStreets if true, search via the street network instead of using straight-line distance.
+   *
+   * @param useStreets if true, search via the street network instead of using straight-line
+   *                   distance.
    */
   public NearbyStopFinder(Graph graph, Duration durationLimit, boolean useStreets) {
     this.graph = graph;
@@ -84,10 +88,10 @@ public class NearbyStopFinder {
   }
 
   /**
-   * Find all unique nearby stops that are the closest stop on some trip pattern or flex trip.
-   * Note that the result will include the origin vertex if it is an instance of StopVertex.
-   * This is intentional: we don't want to return the next stop down the line for trip patterns that pass through the
-   * origin vertex.
+   * Find all unique nearby stops that are the closest stop on some trip pattern or flex trip. Note
+   * that the result will include the origin vertex if it is an instance of StopVertex. This is
+   * intentional: we don't want to return the next stop down the line for trip patterns that pass
+   * through the origin vertex.
    */
   public Set<NearbyStop> findNearbyStopsConsideringPatterns(
     Vertex vertex,
@@ -129,9 +133,9 @@ public class NearbyStopFinder {
   }
 
   /**
-   * Return all stops within a certain radius of the given vertex, using network distance along streets.
-   * Use the correct method depending on whether the graph has street data or not.
-   * If the origin vertex is a StopVertex, the result will include it; this characteristic is essential for
+   * Return all stops within a certain radius of the given vertex, using network distance along
+   * streets. Use the correct method depending on whether the graph has street data or not. If the
+   * origin vertex is a StopVertex, the result will include it; this characteristic is essential for
    * associating the correct stop with each trip pattern in the vicinity.
    */
   public List<NearbyStop> findNearbyStops(
@@ -150,12 +154,12 @@ public class NearbyStopFinder {
   }
 
   /**
-   * Return all stops within a certain radius of the given vertex, using network distance along streets.
-   * If the origin vertex is a StopVertex, the result will include it.
+   * Return all stops within a certain radius of the given vertex, using network distance along
+   * streets. If the origin vertex is a StopVertex, the result will include it.
    *
-   * @param originVertices the origin point of the street search
-   * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
-   *                         originVertex as the destination
+   * @param originVertices   the origin point of the street search
+   * @param reverseDirection if true the paths returned instead originate at the nearby stops and
+   *                         have the originVertex as the destination
    */
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,

@@ -43,6 +43,7 @@ public class EntranceMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
+  private final EntranceMapper subject = new EntranceMapper(new TranslationHelper());
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
@@ -59,8 +60,6 @@ public class EntranceMapperTest {
     STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
     STOP.setZoneId(ZONE_ID);
   }
-
-  private final EntranceMapper subject = new EntranceMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() throws Exception {

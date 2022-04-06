@@ -22,21 +22,17 @@ import org.slf4j.LoggerFactory;
 class FlexStopLocationMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexStopLocationMapper.class);
-
-  private final FeedScopedIdFactory idFactory;
-
-  private final HashGridSpatialIndex<Stop> stopsSpatialIndex;
-
   /**
    * Key-value pair used until proper NeTEx support is added
    */
   private static final String FLEXIBLE_STOP_AREA_TYPE_KEY = "FlexibleStopAreaType";
-
   /**
    * Key-value pair used until proper NeTEx support is added
    */
   private static final String UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE =
     "UnrestrictedPublicTransportAreas";
+  private final FeedScopedIdFactory idFactory;
+  private final HashGridSpatialIndex<Stop> stopsSpatialIndex;
 
   FlexStopLocationMapper(FeedScopedIdFactory idFactory, Collection<Stop> stops) {
     this.idFactory = idFactory;

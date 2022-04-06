@@ -117,6 +117,10 @@ public class ParetoSetWithMarkerTest {
     assertEquals("[6, 4], [5, 5], [4, 6]", toString(subject.elementsAfterMarker()));
   }
 
+  private static Vector v(int u, int v) {
+    return new Vector(u, v);
+  }
+
   private String toString(ParetoSetWithMarker<Vector> set) {
     if (set.isEmpty()) {
       return "{}";
@@ -146,10 +150,6 @@ public class ParetoSetWithMarkerTest {
       .map(Objects::toString)
       .reduce((a, b) -> a + ", " + b)
       .orElse("{}");
-  }
-
-  private static Vector v(int u, int v) {
-    return new Vector(u, v);
   }
 
   private static class Vector {

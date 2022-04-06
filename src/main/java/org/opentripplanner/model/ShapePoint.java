@@ -43,9 +43,8 @@ public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
   }
 
   /**
-   * @return the distance traveled along the shape path. If no distance was
-   *         specified, the value is undefined. Check first with
-   *         {@link #isDistTraveledSet()}
+   * @return the distance traveled along the shape path. If no distance was specified, the value is
+   * undefined. Check first with {@link #isDistTraveledSet()}
    */
   public double getDistTraveled() {
     return distTraveled;
@@ -76,6 +75,11 @@ public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(shapeId, sequence);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -85,11 +89,6 @@ public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
     }
     ShapePoint that = (ShapePoint) o;
     return sequence == that.sequence && Objects.equals(shapeId, that.shapeId);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(shapeId, sequence);
   }
 
   @Override

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * GTFS-RT alerts updater
- *
+ * <p>
  * Usage example:
  *
  * <pre>
@@ -31,29 +31,15 @@ import org.slf4j.LoggerFactory;
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
-
-  private WriteToGraphCallback saveResultOnGraph;
-
-  private Long lastTimestamp = Long.MIN_VALUE;
-
   private final String url;
-
   private final String feedId;
-
-  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
-
   private final long earlyStart;
-
-  private AlertsUpdateHandler updateHandler = null;
-
   private final boolean fuzzyTripMatching;
-
+  private WriteToGraphCallback saveResultOnGraph;
+  private Long lastTimestamp = Long.MIN_VALUE;
+  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private AlertsUpdateHandler updateHandler = null;
   private TransitAlertService transitAlertService;
-
-  @Override
-  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-    this.saveResultOnGraph = saveResultOnGraph;
-  }
 
   public GtfsRealtimeAlertsUpdater(GtfsRealtimeAlertsUpdaterParameters config) {
     super(config);
@@ -70,6 +56,11 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+    this.saveResultOnGraph = saveResultOnGraph;
+  }
+
+  @Override
   public void setup(Graph graph) {
     TransitAlertService transitAlertService = new TransitAlertServiceImpl(graph);
     if (fuzzyTripMatching) {
@@ -83,6 +74,17 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     updateHandler.setFeedId(feedId);
     updateHandler.setTransitAlertService(transitAlertService);
     updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
+  }
+
+  @Override
+  public void teardown() {}
+
+  public TransitAlertService getTransitAlertService() {
+    return transitAlertService;
+  }
+
+  public String toString() {
+    return "GtfsRealtimeUpdater(" + url + ")";
   }
 
   @Override
@@ -114,16 +116,5 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     } catch (Exception e) {
       LOG.error("Error reading gtfs-realtime feed from " + url, e);
     }
-  }
-
-  @Override
-  public void teardown() {}
-
-  public TransitAlertService getTransitAlertService() {
-    return transitAlertService;
-  }
-
-  public String toString() {
-    return "GtfsRealtimeUpdater(" + url + ")";
   }
 }

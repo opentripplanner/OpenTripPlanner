@@ -81,6 +81,11 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
   public SiriVMHttpTripUpdateSource.Parameters sourceParameters() {
     return new SiriVMHttpTripUpdateSource.Parameters() {
       @Override
+      public String getUrl() {
+        return url;
+      }
+
+      @Override
       public String getRequestorRef() {
         return requestorRef;
       }
@@ -93,11 +98,6 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
       @Override
       public int getTimeoutSec() {
         return timeoutSec;
-      }
-
-      @Override
-      public String getUrl() {
-        return url;
       }
     };
   }

@@ -10,6 +10,10 @@ import org.opentripplanner.routing.graph.Vertex;
 
 public class GraphUtils {
 
+  public static Geometry makeConvexHull(Graph graph) {
+    return new ConvexHull(geometryCollectionFromVertices(graph)).getConvexHull();
+  }
+
   private static GeometryCollection geometryCollectionFromVertices(Graph graph) {
     GeometryFactory gf = GeometryUtils.getGeometryFactory();
     Collection<Vertex> vertices = graph.getVertices();
@@ -20,9 +24,5 @@ public class GraphUtils {
     }
 
     return new GeometryCollection(points, gf);
-  }
-
-  public static Geometry makeConvexHull(Graph graph) {
-    return new ConvexHull(geometryCollectionFromVertices(graph)).getConvexHull();
   }
 }

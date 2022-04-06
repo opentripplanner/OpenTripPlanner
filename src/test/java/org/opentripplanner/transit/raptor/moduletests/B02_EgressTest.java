@@ -21,7 +21,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
- *
+ * <p>
  * Raptor should return the optimal path with various egress paths. All Raptor
  * optimizations(McRaptor, Standard and Reverse Standard) should be tested.
  */

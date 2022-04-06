@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
- * <P/>
+ * <p/>
  * This class is immutable and thread safe.
  */
 public final class DefaultCostCalculator implements CostCalculator {

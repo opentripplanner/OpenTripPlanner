@@ -14,8 +14,7 @@ public class NetexObjectDecorator {
   private NetexObjectDecorator() {}
 
   /**
-   * Handle given {@code element} if not {@code null}. This method reduce
-   * the code from:
+   * Handle given {@code element} if not {@code null}. This method reduce the code from:
    * <pre>
    * if(entity.getProperty() != null) {
    *     SubType x = entity.getProperty();
@@ -38,13 +37,13 @@ public class NetexObjectDecorator {
   public static void foo() {}
 
   /**
-   * Use this method to log unmapped entities. The entity mys be part of the supported profile,
-   * or not supported at all.
+   * Use this method to log unmapped entities. The entity mys be part of the supported profile, or
+   * not supported at all.
    * <p>
    * Consider implementing the mapper.
    *
-   * @param log the logger to use, passing the logger in as an argument make sure the log event
-   *            get the right scope - this class is just a utility class, or the messenger.
+   * @param log the logger to use, passing the logger in as an argument make sure the log event get
+   *            the right scope - this class is just a utility class, or the messenger.
    * @param ref the unexpected reference to an unmapped object.
    */
   public static void logUnmappedEntityRef(Logger log, @NotNull VersionOfObjectRefStructure ref) {

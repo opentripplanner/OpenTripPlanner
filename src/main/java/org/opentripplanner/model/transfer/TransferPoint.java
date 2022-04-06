@@ -44,13 +44,39 @@ import org.opentripplanner.model.Trip;
  *     trip-transfer-point, since the stop could change to another platform(common for railway
  *     stations). To account for this the RT-update would need to patch the trip-transfer-point.
  *     We simplify the RT-updates by converting the stop to a stop-position-in-pattern.
- *     <p>
+ * <p>
  *     This is the most specific point type.
  *   </li>
  * </ol>
  * <p>
  */
 public interface TransferPoint {
+  /**
+   * Utility method witch can be used in APIs to get the trip, if it exists, from a transfer point.
+   */
+  @Nullable
+  static Trip getTrip(TransferPoint point) {
+    return point.isTripTransferPoint() ? point.asTripTransferPoint().getTrip() : null;
+  }
+
+  /**
+   * Utility method witch can be used in APIs to get the route, if it exists, from a transfer
+   * point.
+   */
+  @Nullable
+  static Route getRoute(TransferPoint point) {
+    if (point.isTripTransferPoint()) {
+      return point.asTripTransferPoint().getTrip().getRoute();
+    }
+    if (point.isRouteStopTransferPoint()) {
+      return point.asRouteStopTransferPoint().getRoute();
+    }
+    if (point.isRouteStationTransferPoint()) {
+      return point.asRouteStationTransferPoint().getRoute();
+    }
+    return null;
+  }
+
   /** Return {@code true} if this transfer point apply to all trips in pattern */
   boolean appliesToAllTrips();
 
@@ -104,30 +130,5 @@ public interface TransferPoint {
 
   default StationTransferPoint asStationTransferPoint() {
     return (StationTransferPoint) this;
-  }
-
-  /**
-   * Utility method witch can be used in APIs to get the trip, if it exists, from a transfer point.
-   */
-  @Nullable
-  static Trip getTrip(TransferPoint point) {
-    return point.isTripTransferPoint() ? point.asTripTransferPoint().getTrip() : null;
-  }
-
-  /**
-   * Utility method witch can be used in APIs to get the route, if it exists, from a transfer point.
-   */
-  @Nullable
-  static Route getRoute(TransferPoint point) {
-    if (point.isTripTransferPoint()) {
-      return point.asTripTransferPoint().getTrip().getRoute();
-    }
-    if (point.isRouteStopTransferPoint()) {
-      return point.asRouteStopTransferPoint().getRoute();
-    }
-    if (point.isRouteStationTransferPoint()) {
-      return point.asRouteStationTransferPoint().getRoute();
-    }
-    return null;
   }
 }

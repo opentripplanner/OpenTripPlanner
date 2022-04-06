@@ -14,11 +14,11 @@ public enum TimeUnit {
     this.chronoUnit = chronoUnit;
   }
 
-  private ChronoUnit asChronoUnit() {
-    return chronoUnit;
-  }
-
   public int between(Temporal temporal1Inclusive, Temporal temporal2Exclusive) {
     return (int) asChronoUnit().between(temporal1Inclusive, temporal2Exclusive);
+  }
+
+  private ChronoUnit asChronoUnit() {
+    return chronoUnit;
   }
 }

@@ -24,10 +24,10 @@ public class TransferService implements Serializable {
   private final List<ConstrainedTransfer> transfersList;
 
   /**
-   * A map of map may seem a bit odd, but the first map have the FROM-transfer-point
-   * as its key, while the second map have the TO-transfer-point as its key. This allows us to
-   * support all combination of (Trip, Route, Stop and Station) in total 16 possible combination
-   * of keys to the ConstrainedTransfer.
+   * A map of map may seem a bit odd, but the first map have the FROM-transfer-point as its key,
+   * while the second map have the TO-transfer-point as its key. This allows us to support all
+   * combination of (Trip, Route, Stop and Station) in total 16 possible combination of keys to the
+   * ConstrainedTransfer.
    */
   private final TransferPointMap<TransferPointMap<ConstrainedTransfer>> transfersMap;
 

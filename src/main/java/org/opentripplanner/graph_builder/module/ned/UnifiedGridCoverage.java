@@ -20,11 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Stitches together multiple elevation maps into a single elevation map,
- * hackily.  This is horrible, but the geotools way of doing things is
- * too slow.
- * @author novalis
+ * Stitches together multiple elevation maps into a single elevation map, hackily.  This is
+ * horrible, but the geotools way of doing things is too slow.
  *
+ * @author novalis
  */
 public class UnifiedGridCoverage extends AbstractCoverage {
 
@@ -33,19 +32,21 @@ public class UnifiedGridCoverage extends AbstractCoverage {
   private static final Logger log = LoggerFactory.getLogger(UnifiedGridCoverage.class);
 
   /**
-   * A spatial index of the intersection of all regions and datums. For smaller-scale deployments, this spatial index
-   * might perform more slowly than manually iterating over each region and datum. However, in larger regions, this
-   * can result in 20+% more calculations being done during the same time compared to the brute-force method. In
-   * smaller-scale deployments since the overall time is not as long, we leave this in here for the benefit of larger
-   * regions where this will result in much better performance.
+   * A spatial index of the intersection of all regions and datums. For smaller-scale deployments,
+   * this spatial index might perform more slowly than manually iterating over each region and
+   * datum. However, in larger regions, this can result in 20+% more calculations being done during
+   * the same time compared to the brute-force method. In smaller-scale deployments since the
+   * overall time is not as long, we leave this in here for the benefit of larger regions where this
+   * will result in much better performance.
    */
   private final SpatialIndex datumRegionIndex;
   private final ArrayList<Coverage> regions;
 
   /**
-   * It would be nice if we could construct this unified coverage with zero sub-coverages and add all sub-coverages
-   * in the same way. However, the superclass constructor (AbstractCoverage) needs a coverage to copy properties from.
-   * So the first sub-coverage needs to be passed in at construction time.
+   * It would be nice if we could construct this unified coverage with zero sub-coverages and add
+   * all sub-coverages in the same way. However, the superclass constructor (AbstractCoverage) needs
+   * a coverage to copy properties from. So the first sub-coverage needs to be passed in at
+   * construction time.
    */
   protected UnifiedGridCoverage(List<GridCoverage2D> regionCoverages, List<VerticalDatum> datums) {
     super("unified", regionCoverages.get(0));
@@ -85,6 +86,16 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     return null;
   }
 
+  @Override
+  public int getNumSampleDimensions() {
+    return regions.get(0).getNumSampleDimensions();
+  }
+
+  @Override
+  public SampleDimension getSampleDimension(int index) throws IndexOutOfBoundsException {
+    return regions.get(0).getSampleDimension(index);
+  }
+
   /**
    * Calculate the elevation at a given point
    */
@@ -102,16 +113,6 @@ public class UnifiedGridCoverage extends AbstractCoverage {
       return result;
     }
     throw new PointOutsideCoverageException("Point not found: " + point);
-  }
-
-  @Override
-  public int getNumSampleDimensions() {
-    return regions.get(0).getNumSampleDimensions();
-  }
-
-  @Override
-  public SampleDimension getSampleDimension(int index) throws IndexOutOfBoundsException {
-    return regions.get(0).getSampleDimension(index);
   }
 
   public static class DatumRegion {

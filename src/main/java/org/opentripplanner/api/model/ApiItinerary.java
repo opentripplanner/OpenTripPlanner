@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
 
 /**
@@ -50,18 +49,18 @@ public class ApiItinerary {
   public boolean walkLimitExceeded = false;
 
   /**
-   * If a generalized cost is used in the routing algorithm, this should be the total
-   * cost computed by the algorithm. This is relevant for anyone who want to debug an search
-   * and tuning the system. The unit should be equivalent to the cost of "one second of transit".
+   * If a generalized cost is used in the routing algorithm, this should be the total cost computed
+   * by the algorithm. This is relevant for anyone who want to debug an search and tuning the
+   * system. The unit should be equivalent to the cost of "one second of transit".
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
   public int generalizedCost = -1;
 
   /**
-   * How much elevation is lost, in total, over the course of the trip, in meters. As an example,
-   * a trip that went from the top of Mount Everest straight down to sea level, then back up K2,
-   * then back down again would have an elevationLost of Everest + K2.
+   * How much elevation is lost, in total, over the course of the trip, in meters. As an example, a
+   * trip that went from the top of Mount Everest straight down to sea level, then back up K2, then
+   * back down again would have an elevationLost of Everest + K2.
    */
   public Double elevationLost = 0.0;
   /**
@@ -82,8 +81,8 @@ public class ApiItinerary {
 
   /**
    * A list of Legs. Each Leg is either a walking (cycling, car) portion of the trip, or a transit
-   * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the
-   * 6, then walks to their destination, has four legs.
+   * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6,
+   * then walks to their destination, has four legs.
    */
   public List<ApiLeg> legs = new ArrayList<>();
 
@@ -91,10 +90,10 @@ public class ApiItinerary {
    * A itinerary can be tagged with a system notice. System notices should only be added to a
    * response if explicit asked for in the request.
    * <p>
-   * For example when tuning or manually testing the itinerary-filter-chain it you can enable
-   * the {@link ItineraryFilterParameters#debug} and instead of removing itineraries from the
-   * result the itineraries would be tagged by the filters instead. This enable investigating,
-   * why an expected itinerary is missing from the result set.
+   * For example when tuning or manually testing the itinerary-filter-chain it you can enable the
+   * {@link ItineraryFilterParameters#debug} and instead of removing itineraries from the result the
+   * itineraries would be tagged by the filters instead. This enable investigating, why an expected
+   * itinerary is missing from the result set.
    */
   public List<ApiSystemNotice> systemNotices = null;
 

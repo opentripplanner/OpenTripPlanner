@@ -24,10 +24,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Created by demory on 2017-03-14.
- *
+ * <p>
  * Leaving OTPFeature.FloatingBike turned off both prevents floating bike updaters added to
  * router-config.json from being used, but more importantly, floating bikes added by a
- * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be used.
+ * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
+ * used.
  */
 class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
 
@@ -49,11 +50,6 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
     language = parameters.language();
     httpHeaders = parameters.getHttpHeaders();
     allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
-  }
-
-  @Override
-  public void setup() {
-    loader = new GbfsFeedLoader(url, httpHeaders, language);
   }
 
   @Override
@@ -142,6 +138,11 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
     }
 
     return stations;
+  }
+
+  @Override
+  public void setup() {
+    loader = new GbfsFeedLoader(url, httpHeaders, language);
   }
 
   @Override

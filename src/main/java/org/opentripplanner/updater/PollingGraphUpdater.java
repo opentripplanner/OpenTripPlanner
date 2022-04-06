@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This abstract class implements logic that is shared between all polling updaters.
- * Usage example ('polling' name is an example and 'polling-updater' should be the type of a
- * concrete class derived from this abstract class):
+ * This abstract class implements logic that is shared between all polling updaters. Usage example
+ * ('polling' name is an example and 'polling-updater' should be the type of a concrete class
+ * derived from this abstract class):
  *
  * <pre>
  * polling.type = polling-updater
@@ -18,14 +18,7 @@ import org.slf4j.LoggerFactory;
 public abstract class PollingGraphUpdater implements GraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingGraphUpdater.class);
-
-  /**
-   * Mirrors GraphUpdater.run method. Only difference is that runPolling will be run multiple
-   * times with pauses in between. The length of the pause is defined in the preference
-   * frequencySec.
-   */
-  protected abstract void runPolling() throws Exception;
-
+  private final String configRef;
   /** How long to wait after polling to poll again. */
   protected Integer pollingPeriodSeconds;
 
@@ -33,13 +26,12 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   protected boolean blockReadinessUntilInitialized;
 
   /**
-   * True when a full batch of realtime data has been fetched and applied to the graph.
-   * There was previously a second boolean field that controlled whether this affected "readiness". If we are waiting
-   * for any realtime data to be applied, we should wait for all of it to be applied, so I removed that.
+   * True when a full batch of realtime data has been fetched and applied to the graph. There was
+   * previously a second boolean field that controlled whether this affected "readiness". If we are
+   * waiting for any realtime data to be applied, we should wait for all of it to be applied, so I
+   * removed that.
    */
   protected boolean primed;
-
-  private final String configRef;
 
   /** Shared configuration code for all polling graph updaters. */
   public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
@@ -80,8 +72,9 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   }
 
   /**
-   * Allow clients to wait for all realtime data to be loaded before submitting any travel plan requests.
-   * This does not block use of the OTP server. The client must voluntarily hit an endpoint and wait for readiness.
+   * Allow clients to wait for all realtime data to be loaded before submitting any travel plan
+   * requests. This does not block use of the OTP server. The client must voluntarily hit an
+   * endpoint and wait for readiness.
    * TODO OTP2 This is really a bit backward. We should just run() the updaters once before scheduling them to poll,
    *           and not bring the router online until they have finished.
    */
@@ -92,4 +85,10 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   public String getConfigRef() {
     return configRef;
   }
+
+  /**
+   * Mirrors GraphUpdater.run method. Only difference is that runPolling will be run multiple times
+   * with pauses in between. The length of the pause is defined in the preference frequencySec.
+   */
+  protected abstract void runPolling() throws Exception;
 }

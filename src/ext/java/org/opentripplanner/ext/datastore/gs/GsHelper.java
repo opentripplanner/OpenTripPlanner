@@ -11,9 +11,6 @@ import java.util.regex.Pattern;
  */
 class GsHelper {
 
-  /** This is a utility class with static methods only; hence this constructor is private */
-  private GsHelper() {}
-
   /**
    * GCS URL pattern for the Scheme Specific Part, without the 'gs:' prefix Not all rules are
    * validated here, but the following is:
@@ -31,6 +28,9 @@ class GsHelper {
   private static final Pattern GS_URL_PATTERN = Pattern.compile(
     "//([\\p{Lower}\\d_.-]{3,222})/([^\\p{Cntrl}]+)?"
   );
+
+  /** This is a utility class with static methods only; hence this constructor is private */
+  private GsHelper() {}
 
   static BlobId toBlobId(URI uri) {
     Matcher m = GS_URL_PATTERN.matcher(uri.getSchemeSpecificPart());

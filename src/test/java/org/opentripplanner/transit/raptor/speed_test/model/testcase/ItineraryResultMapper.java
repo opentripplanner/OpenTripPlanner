@@ -18,11 +18,11 @@ import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * Map an Itinerary to a result instance. We do this to normalize the Itinerary
- * for the purpose of testing, and serialization of the results.
+ * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of
+ * testing, and serialization of the results.
  * <p/>
- * This way we do not need to change the Itinerary class to fit our needs and
- * we avoid the 'feature envy' anti pattern.
+ * This way we do not need to change the Itinerary class to fit our needs and we avoid the 'feature
+ * envy' anti pattern.
  */
 class ItineraryResultMapper {
 
@@ -71,6 +71,28 @@ class ItineraryResultMapper {
     this.testCaseId = testCaseId;
   }
 
+  public static String details(Itinerary itin) {
+    PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
+
+    for (Leg leg : itin.legs) {
+      Optional
+        .ofNullable(leg.getFrom().stop)
+        .map(ItineraryResultMapper::formatStop)
+        .map(id -> buf.sep().stop(id).sep());
+
+      if (leg.isWalkingLeg()) {
+        buf.walk((int) leg.getDuration());
+      } else if (leg.isTransitLeg()) {
+        buf.transit(
+          leg.getMode().name() + " " + leg.getRoute().getShortName(),
+          TimeUtils.localTime(leg.getStartTime()).toSecondOfDay(),
+          TimeUtils.localTime(leg.getEndTime()).toSecondOfDay()
+        );
+      }
+    }
+    return buf.toString();
+  }
+
   static Collection<Result> map(
     final String testCaseId,
     Collection<org.opentripplanner.model.plan.Itinerary> itineraries,
@@ -78,6 +100,14 @@ class ItineraryResultMapper {
   ) {
     var mapper = new ItineraryResultMapper(skipCost, testCaseId);
     return itineraries.stream().map(mapper::map).collect(Collectors.toList());
+  }
+
+  private static String formatStop(StopLocation s) {
+    return s.getName() + "(" + s.getId().getId() + ")";
+  }
+
+  private static String agencyShortName(Agency agency) {
+    return AGENCY_NAMES_SHORT.getOrDefault(agency.getName(), agency.getName());
   }
 
   private Result map(Itinerary itinerary) {
@@ -115,35 +145,5 @@ class ItineraryResultMapper {
       stops,
       details(itinerary)
     );
-  }
-
-  public static String details(Itinerary itin) {
-    PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
-
-    for (Leg leg : itin.legs) {
-      Optional
-        .ofNullable(leg.getFrom().stop)
-        .map(ItineraryResultMapper::formatStop)
-        .map(id -> buf.sep().stop(id).sep());
-
-      if (leg.isWalkingLeg()) {
-        buf.walk((int) leg.getDuration());
-      } else if (leg.isTransitLeg()) {
-        buf.transit(
-          leg.getMode().name() + " " + leg.getRoute().getShortName(),
-          TimeUtils.localTime(leg.getStartTime()).toSecondOfDay(),
-          TimeUtils.localTime(leg.getEndTime()).toSecondOfDay()
-        );
-      }
-    }
-    return buf.toString();
-  }
-
-  private static String formatStop(StopLocation s) {
-    return s.getName() + "(" + s.getId().getId() + ")";
-  }
-
-  private static String agencyShortName(Agency agency) {
-    return AGENCY_NAMES_SHORT.getOrDefault(agency.getName(), agency.getName());
   }
 }

@@ -31,8 +31,8 @@ public class GenericDataFile {
   private Map<String, Array> netcdfDataForVariable;
 
   /**
-   * Reads and parses the .nc file according to configuration into map of variable names and
-   * arrays of their values from the .nc file
+   * Reads and parses the .nc file according to configuration into map of variable names and arrays
+   * of their values from the .nc file
    *
    * @param file              input .nc data grid file
    * @param dataOverlayConfig settings which describe the file variables selection
@@ -96,10 +96,6 @@ public class GenericDataFile {
     }
   }
 
-  String getDataSource() {
-    return dataSource;
-  }
-
   public Map<String, Array> getNetcdfDataForVariable() {
     return netcdfDataForVariable;
   }
@@ -126,6 +122,10 @@ public class GenericDataFile {
 
   public OffsetDateTime getOriginDate() {
     return originDate;
+  }
+
+  String getDataSource() {
+    return dataSource;
   }
 
   /**

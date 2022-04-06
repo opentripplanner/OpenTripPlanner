@@ -50,8 +50,7 @@ public class TripPatternType {
           .name("aimedStartTime")
           .description("The aimed date and time the trip starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(// startTime is already adjusted for realtime - need to subtract delay to get aimed time
-          env ->
+          .dataFetcher(env -> // startTime is already adjusted for realtime - need to subtract delay to get aimed time
             itinerary(env).startTime().getTime().getTime() - 1000L * itinerary(env).departureDelay()
           )
           .build()
@@ -71,8 +70,7 @@ public class TripPatternType {
           .name("aimedEndTime")
           .description("The aimed date and time the trip ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(// endTime is already adjusted for realtime - need to subtract delay to get aimed time
-          env ->
+          .dataFetcher(env -> // endTime is already adjusted for realtime - need to subtract delay to get aimed time
             itinerary(env).endTime().getTime().getTime() - 1000L * itinerary(env).arrivalDelay()
           )
           .build()

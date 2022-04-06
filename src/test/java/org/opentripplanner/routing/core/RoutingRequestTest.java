@@ -20,10 +20,6 @@ public class RoutingRequestTest {
   private static final FeedScopedId OTHER_ID = new FeedScopedId("F", "X");
   public static final String TIMEZONE = "Europe/Paris";
 
-  private GenericLocation randomLocation() {
-    return new GenericLocation(Math.random(), Math.random());
-  }
-
   @Test
   public void testRequest() {
     RoutingRequest request = new RoutingRequest();
@@ -100,6 +96,10 @@ public class RoutingRequestTest {
     }
   }
 
+  private GenericLocation randomLocation() {
+    return new GenericLocation(Math.random(), Math.random());
+  }
+
   private static class RoutePenaltyTC {
 
     final boolean prefAgency;
@@ -115,23 +115,6 @@ public class RoutingRequestTest {
       this.unPrefAgency = "x".equalsIgnoreCase(cells[2]);
       this.unPrefRoute = "x".equalsIgnoreCase(cells[3]);
       this.expectedCost = Integer.parseInt(cells[4]);
-    }
-
-    RoutingRequest createRoutingRequest() {
-      RoutingRequest request = new RoutingRequest();
-      if (prefAgency) {
-        request.setPreferredAgencies(List.of(OTHER_ID));
-      }
-      if (prefRoute) {
-        request.setPreferredRoutes(List.of(OTHER_ID));
-      }
-      if (unPrefAgency) {
-        request.setUnpreferredAgencies(List.of(AGENCY_ID));
-      }
-      if (unPrefRoute) {
-        request.setUnpreferredRoutes(List.of(ROUTE_ID));
-      }
-      return request;
     }
 
     @Override
@@ -151,6 +134,23 @@ public class RoutingRequestTest {
       }
 
       return "RoutePenaltyTC {" + sb.substring(sb.length() == 0 ? 0 : 2) + "}";
+    }
+
+    RoutingRequest createRoutingRequest() {
+      RoutingRequest request = new RoutingRequest();
+      if (prefAgency) {
+        request.setPreferredAgencies(List.of(OTHER_ID));
+      }
+      if (prefRoute) {
+        request.setPreferredRoutes(List.of(OTHER_ID));
+      }
+      if (unPrefAgency) {
+        request.setUnpreferredAgencies(List.of(AGENCY_ID));
+      }
+      if (unPrefRoute) {
+        request.setUnpreferredRoutes(List.of(ROUTE_ID));
+      }
+      return request;
     }
   }
 }

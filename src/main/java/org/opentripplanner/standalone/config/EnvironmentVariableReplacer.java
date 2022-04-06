@@ -10,11 +10,10 @@ import java.util.regex.Pattern;
 import org.opentripplanner.util.OtpAppException;
 
 /**
- * Replaces environment variable placeholders specified on the format ${variable} in a text
- * with the current system environment variable values.
+ * Replaces environment variable placeholders specified on the format ${variable} in a text with the
+ * current system environment variable values.
  * <p>
- * The following OTP Project info is also available in addition to system environment
- * variables:
+ * The following OTP Project info is also available in addition to system environment variables:
  *
  * <ul>
  *   <li>{@code maven.version} - Full Maven version string, including the SNAPSHOT qualifier if present.</li>
@@ -31,9 +30,9 @@ import org.opentripplanner.util.OtpAppException;
 class EnvironmentVariableReplacer {
 
   /**
-   * A pattern matching a placeholder like '${VAR_NAME}'. The placeholder must start with
-   * '${' and end with '}'. The environment variable name must consist of only alphanumerical
-   * characters(a-z, A-Z, 0-9), dot `.` and underscore '_'.
+   * A pattern matching a placeholder like '${VAR_NAME}'. The placeholder must start with '${' and
+   * end with '}'. The environment variable name must consist of only alphanumerical characters(a-z,
+   * A-Z, 0-9), dot `.` and underscore '_'.
    */
   private static final Pattern PATTERN = Pattern.compile("\\$\\{([.\\w]+)}");
 
@@ -55,11 +54,11 @@ class EnvironmentVariableReplacer {
   );
 
   /**
-   * Search for {@link #PATTERN}s and replace each placeholder with the value of the
-   * corresponding environment variable.
+   * Search for {@link #PATTERN}s and replace each placeholder with the value of the corresponding
+   * environment variable.
    *
-   * @param source is used only to generate human friendly error message in case the text
-   *               contain a placeholder whitch can not be found.
+   * @param source is used only to generate human friendly error message in case the text contain a
+   *               placeholder whitch can not be found.
    * @throws IllegalArgumentException if a placeholder exist in the {@code text}, but the
    *                                  environment variable do not exist.
    */

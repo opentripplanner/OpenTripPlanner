@@ -10,7 +10,6 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -77,6 +76,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     );
   }
 
+  public static BikeAccess bikeAccessForTrip(Trip trip) {
+    if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
+      return trip.getBikesAllowed();
+    }
+
+    return trip.getRoute().getBikesAllowed();
+  }
+
   @Override
   public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
     return routeIsNotBanned(tripPatternForDate);
@@ -114,13 +121,5 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
     FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().getRoute().getId();
     return !bannedRoutes.contains(routeId);
-  }
-
-  public static BikeAccess bikeAccessForTrip(Trip trip) {
-    if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
-      return trip.getBikesAllowed();
-    }
-
-    return trip.getRoute().getBikesAllowed();
   }
 }

@@ -41,26 +41,26 @@ public class StopArrivalStateParetoSetTest {
     5,
     BASE_COST
   );
+  private final StopArrivalParetoSet<RaptorTripSchedule> subject = new StopArrivalParetoSet<>(null);
   private static final AbstractStopArrival<RaptorTripSchedule> TRANSIT_L1 = newTransitStopState(
     ROUND_1,
     998,
     10,
     BASE_COST
   );
-  private static final AbstractStopArrival<RaptorTripSchedule> TRANSIT_L2 = newTransitStopState(
-    ROUND_2,
-    997,
-    20,
-    BASE_COST
-  );
-
-  private final StopArrivalParetoSet<RaptorTripSchedule> subject = new StopArrivalParetoSet<>(null);
 
   @Test
   public void addOneElementToSet() {
     subject.add(newAccessStopState(STOP_1, 10, ANY));
     assertStopsInSet(STOP_1);
   }
+
+  private static final AbstractStopArrival<RaptorTripSchedule> TRANSIT_L2 = newTransitStopState(
+    ROUND_2,
+    997,
+    20,
+    BASE_COST
+  );
 
   @Test
   public void testTimeDominance() {
@@ -110,9 +110,9 @@ public class StopArrivalStateParetoSetTest {
   }
 
   /**
-   * During the same round transfers should not dominate transits, but this is handled
-   * by the worker state (2-phase transfer calculation), not by the pareto-set. Using
-   * the pareto-set for this would cause unnecessary exploration in the following round.
+   * During the same round transfers should not dominate transits, but this is handled by the worker
+   * state (2-phase transfer calculation), not by the pareto-set. Using the pareto-set for this
+   * would cause unnecessary exploration in the following round.
    */
   @Test
   public void testTransitAndTransferDoesNotAffectDominance() {
@@ -120,11 +120,6 @@ public class StopArrivalStateParetoSetTest {
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));
     assertStopsInSet(STOP_1, STOP_4);
-  }
-
-  private void assertStopsInSet(int... expStopIndexes) {
-    int[] result = subject.stream().mapToInt(AbstractStopArrival::stop).sorted().toArray();
-    assertEquals(Arrays.toString(expStopIndexes), Arrays.toString(result), "Stop indexes");
   }
 
   private static AccessStopArrival<RaptorTripSchedule> newAccessStopState(
@@ -166,5 +161,10 @@ public class StopArrivalStateParetoSetTest {
       default:
         throw new IllegalArgumentException();
     }
+  }
+
+  private void assertStopsInSet(int... expStopIndexes) {
+    int[] result = subject.stream().mapToInt(AbstractStopArrival::stop).sorted().toArray();
+    assertEquals(Arrays.toString(expStopIndexes), Arrays.toString(result), "Stop indexes");
   }
 }

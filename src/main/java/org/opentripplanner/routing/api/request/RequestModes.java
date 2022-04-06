@@ -9,6 +9,14 @@ import org.opentripplanner.model.modes.AllowedTransitMode;
 
 public class RequestModes {
 
+  public static RequestModes defaultRequestModes = new RequestModes(
+    StreetMode.WALK,
+    StreetMode.WALK,
+    StreetMode.WALK,
+    StreetMode.WALK,
+    new HashSet<>(AllowedTransitMode.getAllTransitModes())
+  );
+
   @Nonnull
   public StreetMode accessMode;
 
@@ -23,14 +31,6 @@ public class RequestModes {
 
   @Nonnull
   public Set<AllowedTransitMode> transitModes;
-
-  public static RequestModes defaultRequestModes = new RequestModes(
-    StreetMode.WALK,
-    StreetMode.WALK,
-    StreetMode.WALK,
-    StreetMode.WALK,
-    new HashSet<>(AllowedTransitMode.getAllTransitModes())
-  );
 
   public RequestModes(
     StreetMode accessMode,

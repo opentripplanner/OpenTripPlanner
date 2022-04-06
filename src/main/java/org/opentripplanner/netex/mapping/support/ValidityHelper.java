@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import org.rutebanken.netex.model.ValidBetween;
 
 /**
- * This helper class provides methods for checking if a period is valid now, in the past, or in the future according
- * to the current date.
+ * This helper class provides methods for checking if a period is valid now, in the past, or in the
+ * future according to the current date.
  */
 class ValidityHelper {
 

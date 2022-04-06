@@ -132,43 +132,6 @@ public class GraphIndex {
     LOG.info("GraphIndex init complete.");
   }
 
-  private void initalizeServiceCodesForDate(Graph graph) {
-    CalendarService calendarService = graph.getCalendarService();
-
-    if (calendarService == null) {
-      return;
-    }
-
-    // CalendarService has one main implementation (CalendarServiceImpl) which contains a
-    // CalendarServiceData which can easily supply all of the dates. But it's impossible to
-    // actually see those dates without modifying the interfaces and inheritance. So we have
-    // to work around this abstraction and reconstruct the CalendarData.
-    // Note the "multiCalendarServiceImpl" which has docs saying it expects one single
-    // CalendarData. It seems to merge the calendar services from multiple GTFS feeds, but
-    // its only documentation says it's a hack.
-    // TODO OTP2 - This cleanup is added to the 'Final cleanup OTP2' issue #2757
-
-    // Reconstruct set of all dates where service is defined, keeping track of which services
-    // run on which days.
-    Multimap<ServiceDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
-
-    for (FeedScopedId serviceId : calendarService.getServiceIds()) {
-      Set<ServiceDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(
-        serviceId
-      );
-      for (ServiceDate serviceDate : serviceDatesForService) {
-        serviceIdsForServiceDate.put(serviceDate, serviceId);
-      }
-    }
-    for (ServiceDate serviceDate : serviceIdsForServiceDate.keySet()) {
-      TIntSet serviceCodesRunning = new TIntHashSet();
-      for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
-        serviceCodesRunning.add(graph.getServiceCodes().get(serviceId));
-      }
-      serviceCodesRunningForDate.put(serviceDate, serviceCodesRunning);
-    }
-  }
-
   public Agency getAgencyForId(FeedScopedId id) {
     return agencyForId.get(id);
   }
@@ -211,9 +174,8 @@ public class GraphIndex {
 
   /**
    * Returns all the patterns for a specific stop. If timetableSnapshot is included, new patterns
-   * added by realtime updates are added to the collection. A set is used here because trip
-   * patterns that were updated by realtime data is both part of the GraphIndex and the
-   * TimetableSnapshot.
+   * added by realtime updates are added to the collection. A set is used here because trip patterns
+   * that were updated by realtime data is both part of the GraphIndex and the TimetableSnapshot.
    */
   public Collection<TripPattern> getPatternsForStop(
     StopLocation stop,
@@ -289,5 +251,42 @@ public class GraphIndex {
 
   public FlexIndex getFlexIndex() {
     return flexIndex;
+  }
+
+  private void initalizeServiceCodesForDate(Graph graph) {
+    CalendarService calendarService = graph.getCalendarService();
+
+    if (calendarService == null) {
+      return;
+    }
+
+    // CalendarService has one main implementation (CalendarServiceImpl) which contains a
+    // CalendarServiceData which can easily supply all of the dates. But it's impossible to
+    // actually see those dates without modifying the interfaces and inheritance. So we have
+    // to work around this abstraction and reconstruct the CalendarData.
+    // Note the "multiCalendarServiceImpl" which has docs saying it expects one single
+    // CalendarData. It seems to merge the calendar services from multiple GTFS feeds, but
+    // its only documentation says it's a hack.
+    // TODO OTP2 - This cleanup is added to the 'Final cleanup OTP2' issue #2757
+
+    // Reconstruct set of all dates where service is defined, keeping track of which services
+    // run on which days.
+    Multimap<ServiceDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
+
+    for (FeedScopedId serviceId : calendarService.getServiceIds()) {
+      Set<ServiceDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(
+        serviceId
+      );
+      for (ServiceDate serviceDate : serviceDatesForService) {
+        serviceIdsForServiceDate.put(serviceDate, serviceId);
+      }
+    }
+    for (ServiceDate serviceDate : serviceIdsForServiceDate.keySet()) {
+      TIntSet serviceCodesRunning = new TIntHashSet();
+      for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
+        serviceCodesRunning.add(graph.getServiceCodes().get(serviceId));
+      }
+      serviceCodesRunningForDate.put(serviceDate, serviceCodesRunning);
+    }
   }
 }

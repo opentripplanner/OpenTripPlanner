@@ -62,8 +62,34 @@ public abstract class GraphRoutingTest {
   public static final String TEST_FEED_ID = "testFeed";
   public static final String TEST_VEHICLE_RENTAL_NETWORK = "test network";
 
+  public static String graphPathToString(GraphPath graphPath) {
+    return graphPath.states
+      .stream()
+      .flatMap(s ->
+        Stream.of(
+          s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
+          s.getVertex().getDefaultName()
+        )
+      )
+      .filter(Objects::nonNull)
+      .collect(Collectors.joining(" - "));
+  }
+
   protected Graph graphOf(Builder builder) {
     return builder.graph();
+  }
+
+  protected GraphPath routeParkAndRide(
+    Graph graph,
+    StreetVertex from,
+    StreetVertex to,
+    TraverseModeSet traverseModeSet
+  ) {
+    RoutingRequest request = new RoutingRequest(traverseModeSet);
+    RoutingContext rctx = new RoutingContext(request, graph, from, to);
+    request.parkAndRide = true;
+
+    return AStarBuilder.oneToOne().setContext(rctx).getShortestPathTree().getPath(to);
   }
 
   public abstract static class Builder {
@@ -434,31 +460,5 @@ public abstract class GraphRoutingTest {
       st.setStop(s1.getStop());
       return st;
     }
-  }
-
-  public static String graphPathToString(GraphPath graphPath) {
-    return graphPath.states
-      .stream()
-      .flatMap(s ->
-        Stream.of(
-          s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
-          s.getVertex().getDefaultName()
-        )
-      )
-      .filter(Objects::nonNull)
-      .collect(Collectors.joining(" - "));
-  }
-
-  protected GraphPath routeParkAndRide(
-    Graph graph,
-    StreetVertex from,
-    StreetVertex to,
-    TraverseModeSet traverseModeSet
-  ) {
-    RoutingRequest request = new RoutingRequest(traverseModeSet);
-    RoutingContext rctx = new RoutingContext(request, graph, from, to);
-    request.parkAndRide = true;
-
-    return AStarBuilder.oneToOne().setContext(rctx).getShortestPathTree().getPath(to);
   }
 }

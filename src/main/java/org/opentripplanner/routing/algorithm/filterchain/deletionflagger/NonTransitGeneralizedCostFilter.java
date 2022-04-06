@@ -8,12 +8,13 @@ import org.opentripplanner.model.plan.Itinerary;
 
 /**
  * This filter is similar to {@link TransitGeneralizedCostFilter}. There are some important
- * differences, however. It will only remove non-transit results, but ALL results can be used as
- * a basis for computing the cost limit.
- *
+ * differences, however. It will only remove non-transit results, but ALL results can be used as a
+ * basis for computing the cost limit.
+ * <p>
  * This is needed so that we do not for example get walk legs that last several hours, when transit
  * can take you to the destination much quicker.
  * <p>
+ *
  * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#nonTransitGeneralizedCostLimit
  */
 public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger {

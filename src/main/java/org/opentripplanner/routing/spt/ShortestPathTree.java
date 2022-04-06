@@ -18,17 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class keeps track which graph vertices have been visited and their associated states,
- * so that decisions can be made about whether new states should be enqueued for later exploration.
- * It also allows states to be retrieved for a given target vertex.
- *
- * We no longer have different implementations of ShortestPathTree because the label-setting (multi-state) approach
- * used in public transit routing, turn restrictions, bike rental, etc. is a generalization of the basic Dijkstra
- * (single-state) approach. It is much more straightforward to use the more general SPT implementation in all cases.
- *
- * Note that turn restrictions make all searches multi-state; however turn restrictions do not apply when walking.
- * The turn restriction handling is done in the base dominance function implementation, and applies to all subclasses.
- * It essentially splits each vertex into N vertices depending on the incoming edge being taken.
+ * This class keeps track which graph vertices have been visited and their associated states, so
+ * that decisions can be made about whether new states should be enqueued for later exploration. It
+ * also allows states to be retrieved for a given target vertex.
+ * <p>
+ * We no longer have different implementations of ShortestPathTree because the label-setting
+ * (multi-state) approach used in public transit routing, turn restrictions, bike rental, etc. is a
+ * generalization of the basic Dijkstra (single-state) approach. It is much more straightforward to
+ * use the more general SPT implementation in all cases.
+ * <p>
+ * Note that turn restrictions make all searches multi-state; however turn restrictions do not apply
+ * when walking. The turn restriction handling is done in the base dominance function
+ * implementation, and applies to all subclasses. It essentially splits each vertex into N vertices
+ * depending on the incoming edge being taken.
  */
 public class ShortestPathTree {
 
@@ -112,14 +114,14 @@ public class ShortestPathTree {
   }
 
   /**
-   * The add method checks a new State to see if it is non-dominated and thus worth visiting
-   * later. If so, the method returns 'true' indicating that the state is deemed useful and should
-   * be enqueued for later exploration. The method will also perform implementation-specific
-   * actions that track dominant or optimal states.
+   * The add method checks a new State to see if it is non-dominated and thus worth visiting later.
+   * If so, the method returns 'true' indicating that the state is deemed useful and should be
+   * enqueued for later exploration. The method will also perform implementation-specific actions
+   * that track dominant or optimal states.
    *
    * @param newState the State to add to the SPT, if it is deemed non-dominated
-   * @return a boolean value indicating whether the state was added to the tree and should
-   *          therefore be enqueued
+   * @return a boolean value indicating whether the state was added to the tree and should therefore
+   * be enqueued
    */
   public boolean add(State newState) {
     Vertex vertex = newState.getVertex();
@@ -193,22 +195,23 @@ public class ShortestPathTree {
   }
 
   /**
-   * The visit method should be called upon extracting a State from a priority queue. It
-   * checks whether the State is still worth visiting (i.e. whether it has been dominated since it
-   * was enqueued) and informs the ShortestPathTree that this State's outgoing edges have been
-   * relaxed. A state may remain in the priority queue after being dominated, and such sub-optimal
-   * states must be caught as they come out of the queue to avoid unnecessary branching.
-   *
-   * So this function checks that a state coming out of the queue is still in the Pareto-optimal set for this vertex,
-   * which indicates that it has not been ruled out as a state on an optimal path. Many shortest
-   * path algorithms will decrease the key of a vertex in the priority queue when it is updated, but we store states
-   * in the queue rather than vertices, and states do not get updated or change their weight.
+   * The visit method should be called upon extracting a State from a priority queue. It checks
+   * whether the State is still worth visiting (i.e. whether it has been dominated since it was
+   * enqueued) and informs the ShortestPathTree that this State's outgoing edges have been relaxed.
+   * A state may remain in the priority queue after being dominated, and such sub-optimal states
+   * must be caught as they come out of the queue to avoid unnecessary branching.
+   * <p>
+   * So this function checks that a state coming out of the queue is still in the Pareto-optimal set
+   * for this vertex, which indicates that it has not been ruled out as a state on an optimal path.
+   * Many shortest path algorithms will decrease the key of a vertex in the priority queue when it
+   * is updated, but we store states in the queue rather than vertices, and states do not get
+   * updated or change their weight.
    * TODO consider just removing states from the priority queue.
-   *
+   * <p>
    * When the Fibonacci heap was replaced with a binary heap, the decrease-key operation was
    * removed for the same reason: both improve theoretical run time complexity, at the cost of
    * high constant factors and more complex code.
-   *
+   * <p>
    * So there can be dominated (useless) states in the queue. When they come out we want to
    * ignore them rather than spend time branching out from them.
    *

@@ -19,10 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is the root parser for a Netex XML Document. The parser ONLY read the document and
- * populate the index with entities. The parser is only responsible for populating the
- * index, not for validating the document, nor linking of entities or mapping the OTP
- * internal data structures.
+ * This is the root parser for a Netex XML Document. The parser ONLY read the document and populate
+ * the index with entities. The parser is only responsible for populating the index, not for
+ * validating the document, nor linking of entities or mapping the OTP internal data structures.
  */
 public class NetexDocumentParser {
 
@@ -35,8 +34,8 @@ public class NetexDocumentParser {
   }
 
   /**
-   * This static method create a new parser and parse the document. The result is added
-   * to given index for further processing.
+   * This static method create a new parser and parse the document. The result is added to given
+   * index for further processing.
    */
   public static void parseAndPopulateIndex(
     NetexEntityIndex index,

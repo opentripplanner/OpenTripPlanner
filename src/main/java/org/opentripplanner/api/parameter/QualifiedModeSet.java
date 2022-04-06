@@ -12,14 +12,15 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 /**
- * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift to "long distance
- * mode" routing means that it will make more sense to specify access, egress, and transit modes in separate parameters.
- * So now this only contains one mode set rather than a sequence of them.
- *
- * This class and QualifiedMode are clearly somewhat inefficient and allow nonsensical combinations like
- * renting and parking a subway. They are not intended for use in routing. Rather, they simply parse the
- * language of mode specifications that may be given in the mode query parameter. They are then converted
- * into more efficient and useful representation in the routing request.
+ * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift
+ * to "long distance mode" routing means that it will make more sense to specify access, egress, and
+ * transit modes in separate parameters. So now this only contains one mode set rather than a
+ * sequence of them.
+ * <p>
+ * This class and QualifiedMode are clearly somewhat inefficient and allow nonsensical combinations
+ * like renting and parking a subway. They are not intended for use in routing. Rather, they simply
+ * parse the language of mode specifications that may be given in the mode query parameter. They are
+ * then converted into more efficient and useful representation in the routing request.
  */
 public class QualifiedModeSet implements Serializable {
 

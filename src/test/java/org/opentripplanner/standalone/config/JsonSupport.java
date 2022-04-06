@@ -9,7 +9,7 @@ public class JsonSupport {
 
   /**
    * Convert text to a JsonNode.
-   *
+   * <p>
    * Comments and unquoted fields are allowed as well as using ' instead of ".
    */
   public static JsonNode jsonNodeForTest(String jsonText) {

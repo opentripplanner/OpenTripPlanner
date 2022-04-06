@@ -29,9 +29,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 
 /**
- * The responsibility of this class is to wire different standard range raptor
- * worker configurations together based on the context passed into the class.
- * There is a factory (create) method for each legal configuration.
+ * The responsibility of this class is to wire different standard range raptor worker configurations
+ * together based on the context passed into the class. There is a factory (create) method for each
+ * legal configuration.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -51,9 +51,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a heuristic search using the provided callback to create the worker.
-   * The callback is necessary because the heuristics MUST be created before the
-   * worker, if not the heuristic can not be added to the worker lifecycle and fails.
+   * Create a heuristic search using the provided callback to create the worker. The callback is
+   * necessary because the heuristics MUST be created before the worker, if not the heuristic can
+   * not be added to the worker lifecycle and fails.
    */
   public HeuristicSearch<T> createHeuristicSearch(
     BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker
@@ -137,8 +137,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a Standard Range Raptor state for the given context. If debugging is enabled,
-   * the stop arrival state is wrapped.
+   * Create a Standard Range Raptor state for the given context. If debugging is enabled, the stop
+   * arrival state is wrapped.
    */
   private StopArrivalsState<T> stdStopArrivalsState() {
     StdStopArrivalsState<T> state = new StdStopArrivalsState<>(

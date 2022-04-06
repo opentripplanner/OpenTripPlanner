@@ -10,7 +10,13 @@ import javax.xml.stream.XMLStreamException;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.*;
+import uk.org.siri.siri20.EstimatedTimetableRequestStructure;
+import uk.org.siri.siri20.MessageQualifierStructure;
+import uk.org.siri.siri20.RequestorRef;
+import uk.org.siri.siri20.ServiceRequest;
+import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri20.SituationExchangeRequestStructure;
+import uk.org.siri.siri20.VehicleMonitoringRequestStructure;
 
 public class SiriHelper {
 
@@ -24,13 +30,6 @@ public class SiriHelper {
     } catch (DatatypeConfigurationException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private static Siri createSiriObject() {
-    Siri request = new Siri();
-    request.setVersion("2.0");
-
-    return request;
   }
 
   public static Siri unmarshal(InputStream is) throws JAXBException, XMLStreamException {
@@ -56,6 +55,13 @@ public class SiriHelper {
     throws JAXBException {
     Siri request = createETServiceRequest(requestorRef, previewIntervalMillis);
     return SiriXml.toXml(request);
+  }
+
+  private static Siri createSiriObject() {
+    Siri request = new Siri();
+    request.setVersion("2.0");
+
+    return request;
   }
 
   private static Siri createSXServiceRequest(String requestorRefValue) {

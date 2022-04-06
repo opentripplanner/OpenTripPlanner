@@ -23,12 +23,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
  * The algorithm used herein is described in
  * <p>
  * Conway, Matthew Wigginton, Andrew Byrd, and Marco van der Linden. “Evidence-Based Transit and
- * Land Use Sketch Planning
- * Using Interactive Accessibility Methods on Combined Schedule and Headway-Based Networks.”
- * Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
+ * Land Use Sketch Planning Using Interactive Accessibility Methods on Combined Schedule and
+ * Headway-Based Networks.” Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
  * <p>
- * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
- * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+ * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,” January
+ * 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
  * <p>
  * This version do support the following features:
  * <ul>
@@ -53,20 +52,19 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
   private final RoutingStrategy<T> transitWorker;
 
   /**
-   * The RangeRaptor state - we delegate keeping track of state to the state object,
-   * this allow the worker implementation to focus on the algorithm, while
-   * the state keep track of the result.
+   * The RangeRaptor state - we delegate keeping track of state to the state object, this allow the
+   * worker implementation to focus on the algorithm, while the state keep track of the result.
    * <p/>
-   * This also allow us to try out different strategies for storing the result in memory.
-   * For a long time we had a state which stored all data as int arrays in addition to the
-   * current object-oriented approach. There were no performance differences(=> GC is not
-   * the bottle neck), so we dropped the integer array implementation.
+   * This also allow us to try out different strategies for storing the result in memory. For a long
+   * time we had a state which stored all data as int arrays in addition to the current
+   * object-oriented approach. There were no performance differences(=> GC is not the bottle neck),
+   * so we dropped the integer array implementation.
    */
   private final WorkerState<T> state;
 
   /**
-   * The round tracker keep track for the current Raptor round, and abort the search if the
-   * round max limit is reached.
+   * The round tracker keep track for the current Raptor round, and abort the search if the round
+   * max limit is reached.
    */
   private final RoundTracker roundTracker;
 
@@ -121,12 +119,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
   }
 
   /**
-   * For each iteration (minute), calculate the minimum travel time to each transit stop in seconds.
+   * For each iteration (minute), calculate the minimum travel time to each transit stop in
+   * seconds.
    * <p/>
    * Run the scheduled search, round 0 is the street search
    * <p/>
-   * We are using the Range-RAPTOR extension described in Delling, Daniel, Thomas Pajor, and Renato Werneck.
-   * “Round-Based Public Transit Routing,” January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+   * We are using the Range-RAPTOR extension described in Delling, Daniel, Thomas Pajor, and Renato
+   * Werneck. “Round-Based Public Transit Routing,” January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
    *
    * @return a unique set of paths
    */
@@ -278,8 +277,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
   }
 
   /**
-   * @return {@code true} if a constrained transfer exist to prevent the normal
-   * trip search from execution.
+   * @return {@code true} if a constrained transfer exist to prevent the normal trip search from
+   * execution.
    */
   private boolean boardWithConstrainedTransfer(
     RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
@@ -389,8 +388,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
   }
 
   /**
-   * Set the departure time in the scheduled search to the given departure time,
-   * and prepare for the scheduled search at the next-earlier minute.
+   * Set the departure time in the scheduled search to the given departure time, and prepare for the
+   * scheduled search at the next-earlier minute.
    */
   private void addAccessPaths(Collection<RaptorTransfer> accessPaths) {
     if (accessPaths == null) {

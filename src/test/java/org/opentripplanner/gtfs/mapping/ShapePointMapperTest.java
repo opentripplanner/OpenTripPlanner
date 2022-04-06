@@ -27,6 +27,7 @@ public class ShapePointMapperTest {
   private static final int SEQUENCE = 3;
 
   private static final ShapePoint SHAPE_POINT = new ShapePoint();
+  private final ShapePointMapper subject = new ShapePointMapper();
 
   static {
     SHAPE_POINT.setId(ID);
@@ -36,8 +37,6 @@ public class ShapePointMapperTest {
     SHAPE_POINT.setSequence(SEQUENCE);
     SHAPE_POINT.setShapeId(AGENCY_AND_ID);
   }
-
-  private final ShapePointMapper subject = new ShapePointMapper();
 
   @Test
   public void testMapCollection() throws Exception {

@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A Vertical datum specified as a grid of offsets from NAD83
- * http://vdatum.noaa.gov/dev/gtx_info.html
+ * A Vertical datum specified as a grid of offsets from NAD83 http://vdatum.noaa.gov/dev/gtx_info.html
  *
  * @author novalis
- *
  */
 public class VerticalDatum {
 
@@ -36,6 +34,32 @@ public class VerticalDatum {
     this.deltaLongitude = width;
     this.deltaLatitude = height;
     this.datum = datum;
+  }
+
+  public static VerticalDatum fromGTX(InputStream inputStream) throws IOException {
+    DataInputStream stream = new DataInputStream(new BufferedInputStream(inputStream));
+    double lowerLeftLatitude = stream.readDouble();
+    double lowerLeftLongitude = stream.readDouble();
+    if (lowerLeftLongitude > 180) {
+      lowerLeftLongitude -= 360; //convert to standard coordinates
+    }
+    double deltaLatitude = stream.readDouble();
+    double deltaLongitude = stream.readDouble();
+    int nRows = stream.readInt();
+    int nColumns = stream.readInt();
+    float[][] data = new float[nRows][nColumns];
+    for (int y = 0; y < nRows; ++y) {
+      for (int x = 0; x < nColumns; ++x) {
+        data[y][x] = stream.readFloat();
+      }
+    }
+    return new VerticalDatum(
+      lowerLeftLongitude,
+      lowerLeftLatitude,
+      deltaLatitude * nColumns,
+      deltaLongitude * nRows,
+      data
+    );
   }
 
   double interpolatedHeight(double longitude, double latitude) {
@@ -110,31 +134,5 @@ public class VerticalDatum {
       return false;
     }
     return true;
-  }
-
-  public static VerticalDatum fromGTX(InputStream inputStream) throws IOException {
-    DataInputStream stream = new DataInputStream(new BufferedInputStream(inputStream));
-    double lowerLeftLatitude = stream.readDouble();
-    double lowerLeftLongitude = stream.readDouble();
-    if (lowerLeftLongitude > 180) {
-      lowerLeftLongitude -= 360; //convert to standard coordinates
-    }
-    double deltaLatitude = stream.readDouble();
-    double deltaLongitude = stream.readDouble();
-    int nRows = stream.readInt();
-    int nColumns = stream.readInt();
-    float[][] data = new float[nRows][nColumns];
-    for (int y = 0; y < nRows; ++y) {
-      for (int x = 0; x < nColumns; ++x) {
-        data[y][x] = stream.readFloat();
-      }
-    }
-    return new VerticalDatum(
-      lowerLeftLongitude,
-      lowerLeftLatitude,
-      deltaLatitude * nColumns,
-      deltaLongitude * nRows,
-      data
-    );
   }
 }

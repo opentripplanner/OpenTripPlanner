@@ -6,11 +6,10 @@ import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 
 /**
- * Note that I decided to call this class ServiceCalendar instead of Calendar,
- * so as to avoid confusion with java.util.Calendar
+ * Note that I decided to call this class ServiceCalendar instead of Calendar, so as to avoid
+ * confusion with java.util.Calendar
  *
  * @author bdferris
- *
  */
 public final class ServiceCalendar implements Serializable {
 
@@ -125,6 +124,21 @@ public final class ServiceCalendar implements Serializable {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(
+      serviceId,
+      monday,
+      tuesday,
+      wednesday,
+      thursday,
+      friday,
+      saturday,
+      sunday,
+      period
+    );
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -143,21 +157,6 @@ public final class ServiceCalendar implements Serializable {
       sunday == that.sunday &&
       Objects.equals(serviceId, that.serviceId) &&
       Objects.equals(period, that.period)
-    );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(
-      serviceId,
-      monday,
-      tuesday,
-      wednesday,
-      thursday,
-      friday,
-      saturday,
-      sunday,
-      period
     );
   }
 

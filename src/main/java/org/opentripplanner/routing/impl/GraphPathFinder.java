@@ -16,26 +16,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
- * the graph until the requested number of them have been found.
- * It is used in point-to-point (i.e. not one-to-many / analyst) routing.
- *
+ * This class contains the logic for repeatedly building shortest path trees and accumulating paths
+ * through the graph until the requested number of them have been found. It is used in
+ * point-to-point (i.e. not one-to-many / analyst) routing.
+ * <p>
  * Its exact behavior will depend on whether the routing request allows transit.
- *
- * When using transit it will incorporate techniques from what we called "long distance" mode,
- * which is designed to provide reasonable response times when routing over large graphs (e.g.
- * the entire Netherlands or New York State). In this case it only uses the street network at the
- * first and last legs of the trip, and all other transfers between transit vehicles will occur
- * via PathTransfer edges which are pre-computed by the graph builder.
- *
- * More information is available on the OTP wiki at:
- * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs
- *
- * One instance of this class should be constructed per search (i.e. per RoutingRequest: it is request-scoped).
- * Its behavior is undefined if it is reused for more than one search.
- *
- * It is very close to being an abstract library class with only static functions. However it turns out to be convenient
- * and harmless to have the OTPServer object etc. in fields, to avoid passing context around in function parameters.
+ * <p>
+ * When using transit it will incorporate techniques from what we called "long distance" mode, which
+ * is designed to provide reasonable response times when routing over large graphs (e.g. the entire
+ * Netherlands or New York State). In this case it only uses the street network at the first and
+ * last legs of the trip, and all other transfers between transit vehicles will occur via
+ * PathTransfer edges which are pre-computed by the graph builder.
+ * <p>
+ * More information is available on the OTP wiki at: https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs
+ * <p>
+ * One instance of this class should be constructed per search (i.e. per RoutingRequest: it is
+ * request-scoped). Its behavior is undefined if it is reused for more than one search.
+ * <p>
+ * It is very close to being an abstract library class with only static functions. However it turns
+ * out to be convenient and harmless to have the OTPServer object etc. in fields, to avoid passing
+ * context around in function parameters.
  */
 public class GraphPathFinder {
 
@@ -48,8 +48,8 @@ public class GraphPathFinder {
   }
 
   /**
-   * This no longer does "trip banning" to find multiple itineraries.
-   * It just searches once trying to find a non-transit path.
+   * This no longer does "trip banning" to find multiple itineraries. It just searches once trying
+   * to find a non-transit path.
    */
   public List<GraphPath> getPaths(RoutingContext routingContext) {
     if (routingContext == null) {
@@ -88,7 +88,7 @@ public class GraphPathFinder {
   }
 
   /**
-   *  Try to find N paths through the Graph
+   * Try to find N paths through the Graph
    */
   public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
     RoutingRequest request = routingContext.opt;

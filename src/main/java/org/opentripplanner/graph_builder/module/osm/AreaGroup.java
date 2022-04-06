@@ -132,6 +132,10 @@ class AreaGroup {
     return out;
   }
 
+  public OSMWithTags getSomeOSMObject() {
+    return areas.iterator().next().parent;
+  }
+
   private Ring toRing(Polygon polygon, HashMap<Coordinate, OSMNode> nodeMap) {
     List<OSMNode> shell = new ArrayList<>();
     for (Coordinate coord : polygon.getExteriorRing().getCoordinates()) {
@@ -157,9 +161,5 @@ class AreaGroup {
     }
 
     return ring;
-  }
-
-  public OSMWithTags getSomeOSMObject() {
-    return areas.iterator().next().parent;
   }
 }

@@ -29,8 +29,8 @@ public class RaptorOptions implements Serializable {
   private SearchDirection searchDirection = SearchDirection.FORWARD;
 
   /**
-   * If set this is used to set the latest-arrival-time in Raptor for arriveBy=false,
-   * and to set the earliest-departure-time in Raptor for arriveBy=true.
+   * If set this is used to set the latest-arrival-time in Raptor for arriveBy=false, and to set the
+   * earliest-departure-time in Raptor for arriveBy=true.
    */
   private Instant timeLimit = null;
 

@@ -34,6 +34,7 @@ import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
  */
 public class BikeRentalTest extends GraphRoutingTest {
 
+  private final String NON_NETWORK = "non network";
   private Graph graph;
   private TransitStopVertex S1;
   private TemporaryStreetLocation T1, T2;
@@ -41,8 +42,6 @@ public class BikeRentalTest extends GraphRoutingTest {
   private StreetVertex A, B, C, D;
   private VehicleRentalStationVertex B1, B2;
   private StreetEdge SE1, SE2, SE3;
-
-  private final String NON_NETWORK = "non network";
 
   @BeforeEach
   public void setUp() {

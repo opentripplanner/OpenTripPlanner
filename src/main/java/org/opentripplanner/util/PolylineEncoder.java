@@ -56,10 +56,6 @@ public class PolylineEncoder {
 
   /**
    * If level less than 0, then {@link EncodedPolylineBean#getLevels()} will be null.
-   *
-   * @param points
-   * @param level
-   * @return
    */
   public static EncodedPolylineBean createEncodings(Iterable<Coordinate> points, int level) {
     StringBuilder encodedPoints = new StringBuilder();
@@ -113,14 +109,6 @@ public class PolylineEncoder {
     }
 
     return points;
-  }
-
-  /*****************************************************************************
-   * Private Methods
-   ****************************************************************************/
-
-  private static int floor1e5(double coordinate) {
-    return (int) Math.floor(coordinate * 1e5);
   }
 
   public static String encodeSignedNumber(int num) {
@@ -180,6 +168,10 @@ public class PolylineEncoder {
     } while (v >= 0x20);
 
     return new int[] { num, index };
+  }
+
+  private static int floor1e5(double coordinate) {
+    return (int) Math.floor(coordinate * 1e5);
   }
 
   private static class PointAdapterList extends AbstractList<Coordinate> {

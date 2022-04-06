@@ -15,8 +15,8 @@ public final class WgsCoordinate implements Serializable {
     "Use the 'sameLocation(..)' method to compare coordinates. See JavaDoc on 'equals(..)'";
 
   /**
-   * A epsilon of 1E-7 gives a precision for coordinates at equator at 1.1 cm,
-   * which is good enough for compering most coordinates in OTP.
+   * A epsilon of 1E-7 gives a precision for coordinates at equator at 1.1 cm, which is good enough
+   * for compering most coordinates in OTP.
    */
   private static final double EPSILON = 1E-7;
 
@@ -29,8 +29,8 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
-   * Unlike the constructor this factory method retuns {@code null} if both {@code lat} and
-   * {@code lon} is {@code null}.
+   * Unlike the constructor this factory method retuns {@code null} if both {@code lat} and {@code
+   * lon} is {@code null}.
    */
   public static WgsCoordinate creatOptionalCoordinate(Double latitude, Double longitude) {
     if (latitude == null && longitude == null) {
@@ -60,8 +60,8 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
-   * Compare to coordinates and return {@code true} if they are close together - have the
-   * same location. The comparison uses an EPSILON of 1E-7 for each axis, for both latitude and
+   * Compare to coordinates and return {@code true} if they are close together - have the same
+   * location. The comparison uses an EPSILON of 1E-7 for each axis, for both latitude and
    * longitude.
    */
   public boolean sameLocation(WgsCoordinate other) {
@@ -69,27 +69,6 @@ public final class WgsCoordinate implements Serializable {
       return true;
     }
     return isCloseTo(latitude, other.latitude) && isCloseTo(longitude, other.longitude);
-  }
-
-  /**
-   * Not supported, throws UnsupportedOperationException. When we compare to coordinates we want
-   * see if they are within a given distance, roughly within a square centimeter. This is not
-   * <em>transitive</em>, hence violating the equals/hasCode guideline. Consider 3 point along
-   * one of the axis:
-   * <pre>
-   *  | 8mm | 8mm |
-   *  x --- y --- z
-   * </pre>
-   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is
-   * {@code true}, but {@code x.sameLocation(z)} is {@code false}.
-   * <p>
-   * Use the {@link #sameLocation(WgsCoordinate)} method instead of equals, and never put this
-   * class in a Set or use it as a key in a Map.
-   * @throws UnsupportedOperationException if called.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    throw new UnsupportedOperationException(WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS);
   }
 
   /**
@@ -101,8 +80,30 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
-   * Return a string on the form: {@code "(60.12345, 11.12345)"}. Up to 5 digits are used
-   * after the period(.), even if the coordinate is specified with a higher precision.
+   * Not supported, throws UnsupportedOperationException. When we compare to coordinates we want see
+   * if they are within a given distance, roughly within a square centimeter. This is not
+   * <em>transitive</em>, hence violating the equals/hasCode guideline. Consider 3 point along
+   * one of the axis:
+   * <pre>
+   *  | 8mm | 8mm |
+   *  x --- y --- z
+   * </pre>
+   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is {@code true},
+   * but {@code x.sameLocation(z)} is {@code false}.
+   * <p>
+   * Use the {@link #sameLocation(WgsCoordinate)} method instead of equals, and never put this class
+   * in a Set or use it as a key in a Map.
+   *
+   * @throws UnsupportedOperationException if called.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    throw new UnsupportedOperationException(WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS);
+  }
+
+  /**
+   * Return a string on the form: {@code "(60.12345, 11.12345)"}. Up to 5 digits are used after the
+   * period(.), even if the coordinate is specified with a higher precision.
    */
   @Override
   public String toString() {

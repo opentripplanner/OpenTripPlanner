@@ -10,9 +10,8 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 class CsvReportBuilder {
 
-  private final String sep;
   public static final char NEW_LINE = '\n';
-
+  private final String sep;
   private final StringBuilder buf = new StringBuilder();
 
   CsvReportBuilder() {
@@ -21,6 +20,11 @@ class CsvReportBuilder {
 
   CsvReportBuilder(String separator) {
     sep = separator;
+  }
+
+  @Override
+  public String toString() {
+    return buf.toString();
   }
 
   void addEnum(Enum<?> enumValue) {
@@ -74,10 +78,5 @@ class CsvReportBuilder {
 
   void newLine() {
     buf.append(NEW_LINE);
-  }
-
-  @Override
-  public String toString() {
-    return buf.toString();
   }
 }

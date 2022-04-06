@@ -8,16 +8,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * This {@link java.util.Collection} store all pareto-optimal elements. The
- * {@link #add(Object)} method returns {@code true} if and only if the element
- * was added successfully. When an element is added other elements which are no
- * longer pareto-optimal are dropped.
+ * This {@link java.util.Collection} store all pareto-optimal elements. The {@link #add(Object)}
+ * method returns {@code true} if and only if the element was added successfully. When an element is
+ * added other elements which are no longer pareto-optimal are dropped.
  * <p/>
- * Like the {@link java.util.ArrayList} the elements are stored internally in
- * an array for performance reasons, and the order is guaranteed to be the same
- * as the order the elements are added. New elements are added at the end, while
- * dominated elements are removed. Elements in between are shifted towards the
- * beginning of the list:
+ * Like the {@link java.util.ArrayList} the elements are stored internally in an array for
+ * performance reasons, and the order is guaranteed to be the same as the order the elements are
+ * added. New elements are added at the end, while dominated elements are removed. Elements in
+ * between are shifted towards the beginning of the list:
  * <p/>
  * {@code  [[1,7], [3,5], [5,3]] + [2,4] => [[1,7], [5,3], [2,4]]   -- less than dominates}
  * <p/>
@@ -38,7 +36,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
   /**
    * Create a new ParetoSet with a comparator and a drop event listener.
    *
-   * @param comparator The comparator to use with this set
+   * @param comparator    The comparator to use with this set
    * @param eventListener At most one listener can be registered to listen for drop events.
    */
   public ParetoSet(
@@ -60,38 +58,20 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     return elements[index];
   }
 
-  @Override
-  public int size() {
-    return size;
-  }
-
   /**
    * Return an iterator over the contained collection.
    * <p>
-   * This is NOT thread-safe and the behavior is undefined if the collection is modified during
-   * the iteration.
+   * This is NOT thread-safe and the behavior is undefined if the collection is modified during the
+   * iteration.
    */
   @Override
   public final Iterator<T> iterator() {
     return tailIterator(0);
   }
 
-  /**
-   * Return an iterable instance. This is made to be as FAST AS POSSIBLE, sacrificing
-   * thread-safety and modifiable protection.
-   * <p>
-   * The iterator created by this iterable is NOT thread-safe.
-   * <p>
-   * Do not modify the collection between the iterator is created, until the iterator complete.
-   * <p>
-   * It is safe to create as many iterators as you like. The iterator created will reflect the
-   * current set of elements in this set at the time of creation.
-   *
-   * @param startIndexInclusive the first element to include in the iterator, unlike the elements
-   *                            in  this set the index is cashed until an iterator is created.
-   */
-  final Iterable<T> tail(final int startIndexInclusive) {
-    return () -> tailIterator(startIndexInclusive);
+  @Override
+  public int size() {
+    return size;
   }
 
   @Override
@@ -134,9 +114,24 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     return false;
   }
 
+  @Override
+  public boolean remove(Object o) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void clear() {
+    size = 0;
+  }
+
+  @Override
+  public String toString() {
+    return toString(Objects::toString);
+  }
+
   /**
-   * Test if an element qualify - the element is NOT added. Use the {@link #add(T)}
-   * method directly if the purpose is to add the new element to the collection.
+   * Test if an element qualify - the element is NOT added. Use the {@link #add(T)} method directly
+   * if the purpose is to add the new element to the collection.
    * <p/>
    * Both methods are optimized for performance; hence the add method does not use this method.
    */
@@ -171,27 +166,17 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     return mutualDominanceExist;
   }
 
-  @Override
-  public boolean remove(Object o) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clear() {
-    size = 0;
-  }
-
   /**
-   * This is used for logging and tuning purposes - by looking at the statistics we can decide
-   * a good value for the initial size.
+   * This is used for logging and tuning purposes - by looking at the statistics we can decide a
+   * good value for the initial size.
    */
   public final int internalArrayLength() {
     return elements.length;
   }
 
   /**
-   * A special toSting method which allows the caller to provide a to-string-mapper for the
-   * elements in the set.
+   * A special toSting method which allows the caller to provide a to-string-mapper for the elements
+   * in the set.
    */
   public String toString(Function<? super T, String> toStringMapper) {
     return (
@@ -201,23 +186,36 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     );
   }
 
-  @Override
-  public String toString() {
-    return toString(Objects::toString);
-  }
-
   /**
-   * Notify subclasses about reindexing. This method is empty,
-   * and only exist for subclasses to override it.
+   * Notify subclasses about reindexing. This method is empty, and only exist for subclasses to
+   * override it.
    */
   protected void notifyElementMoved(int fromIndex, int toIndex) {
     // Noop
   }
 
   /**
-   * This tail iterator is made to be FAST, it is NOT thread-safe and it the
-   * underlying collection is changed the returned values of the iterator also
-   * changes. Do not update on this collection while using this iterator.
+   * Return an iterable instance. This is made to be as FAST AS POSSIBLE, sacrificing thread-safety
+   * and modifiable protection.
+   * <p>
+   * The iterator created by this iterable is NOT thread-safe.
+   * <p>
+   * Do not modify the collection between the iterator is created, until the iterator complete.
+   * <p>
+   * It is safe to create as many iterators as you like. The iterator created will reflect the
+   * current set of elements in this set at the time of creation.
+   *
+   * @param startIndexInclusive the first element to include in the iterator, unlike the elements in
+   *                            this set the index is cashed until an iterator is created.
+   */
+  final Iterable<T> tail(final int startIndexInclusive) {
+    return () -> tailIterator(startIndexInclusive);
+  }
+
+  /**
+   * This tail iterator is made to be FAST, it is NOT thread-safe and it the underlying collection
+   * is changed the returned values of the iterator also changes. Do not update on this collection
+   * while using this iterator.
    */
   private Iterator<T> tailIterator(final int startInclusive) {
     return new Iterator<>() {
@@ -236,8 +234,8 @@ public class ParetoSet<T> extends AbstractCollection<T> {
   }
 
   /**
-   * Remove all elements dominated by the {@code newValue} starting from
-   * {@code index + 1}. The element at {@code index} is dropped.
+   * Remove all elements dominated by the {@code newValue} starting from {@code index + 1}. The
+   * element at {@code index} is dropped.
    */
   private void removeDominatedElementsFromRestOfSetAndAddNewElement(
     final T newValue,

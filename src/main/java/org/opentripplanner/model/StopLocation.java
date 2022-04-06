@@ -82,10 +82,9 @@ public interface StopLocation {
 
   /**
    * The geometry of the stop.
-   *
-   * For fixed-schedule stops this will return the same data as
-   * getCoordinate().
-   *
+   * <p>
+   * For fixed-schedule stops this will return the same data as getCoordinate().
+   * <p>
    * For flex stops this will return the geometries of the stop or group of stops.
    */
   Geometry getGeometry();

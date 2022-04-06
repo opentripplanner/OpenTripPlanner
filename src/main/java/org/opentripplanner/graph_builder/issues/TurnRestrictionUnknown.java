@@ -18,12 +18,12 @@ public class TurnRestrictionUnknown implements DataImportIssue {
   }
 
   @Override
-  public String getHTMLMessage() {
-    return String.format(FMT, tagval, relationId, relationId);
+  public String getMessage() {
+    return String.format(FMT, tagval, relationId);
   }
 
   @Override
-  public String getMessage() {
-    return String.format(FMT, tagval, relationId);
+  public String getHTMLMessage() {
+    return String.format(FMT, tagval, relationId, relationId);
   }
 }

@@ -13,13 +13,7 @@ import uk.org.siri.siri20.Siri;
 public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETHttpTripUpdateSource.class);
-
-  /**
-   * True iff the last list with updates represent all updates that are active right now, i.e. all
-   * previous updates should be disregarded
-   */
-  private boolean fullDataset = true;
-
+  private static final Map<String, String> requestHeaders = new HashMap<>();
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
@@ -30,12 +24,13 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private final String requestorRef;
 
   private final int timeout;
-
-  private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
-
   private final int previewIntervalMillis;
-
-  private static final Map<String, String> requestHeaders = new HashMap<>();
+  /**
+   * True iff the last list with updates represent all updates that are active right now, i.e. all
+   * previous updates should be disregarded
+   */
+  private boolean fullDataset = true;
+  private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
   public SiriETHttpTripUpdateSource(Parameters parameters) {
     this.feedId = parameters.getFeedId();
@@ -105,20 +100,24 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     return fullDataset;
   }
 
-  public String toString() {
-    return "SiriETHttpTripUpdateSource(" + url + ")";
-  }
-
   @Override
   public String getFeedId() {
     return this.feedId;
   }
 
+  public String toString() {
+    return "SiriETHttpTripUpdateSource(" + url + ")";
+  }
+
   public interface Parameters {
     String getUrl();
+
     String getRequestorRef();
+
     String getFeedId();
+
     int getTimeoutSec();
+
     int getPreviewIntervalMinutes();
   }
 }

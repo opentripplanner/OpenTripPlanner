@@ -15,6 +15,10 @@ class MinCostFilterChainTest {
   private final A v02 = new A("C", 0, 2);
   private final A w01 = new A("A'", 0, 1);
 
+  static Set<A> setOf(A... as) {
+    return Set.of(as);
+  }
+
   @Test
   void filterEmptySet() {
     // filter empty set
@@ -50,10 +54,6 @@ class MinCostFilterChainTest {
     return new MinCostFilterChain<A>(List.of(it -> it.x, it -> it.y)).filter(setOf(as));
   }
 
-  static Set<A> setOf(A... as) {
-    return Set.of(as);
-  }
-
   static class A {
 
     /** Name is included in eq/hc to be able to add the "same" [x,y] vector to a set. */
@@ -68,6 +68,11 @@ class MinCostFilterChainTest {
     }
 
     @Override
+    public int hashCode() {
+      return Objects.hash(x, y, name);
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -77,11 +82,6 @@ class MinCostFilterChainTest {
       }
       final A a = (A) o;
       return name.equals(a.name) && x == a.x && y == a.y;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(x, y, name);
     }
 
     @Override

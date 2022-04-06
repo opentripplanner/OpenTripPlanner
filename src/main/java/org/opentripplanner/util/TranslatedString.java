@@ -13,15 +13,16 @@ import java.util.Objects;
 
 /**
  * This is for translated strings for which translations are read from OSM or GTFS alerts.
- *
+ * <p>
  * This can be translated street names, GTFS alerts and notes.
+ *
  * @author Hannes Junnila
  */
 public class TranslatedString implements I18NString, Serializable {
 
   /**
-   * Store all translations, so we don't get memory overhead for identical strings
-   * As this is static, it isn't serialized when saving the graph.
+   * Store all translations, so we don't get memory overhead for identical strings As this is
+   * static, it isn't serialized when saving the graph.
    */
   private static final HashMap<Map<String, String>, I18NString> intern = new HashMap<>();
 
@@ -35,19 +36,6 @@ public class TranslatedString implements I18NString, Serializable {
         this.translations.put(i.getKey().toLowerCase(), i.getValue());
       }
     }
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    return (
-      (other instanceof TranslatedString) &&
-      this.translations.equals(((TranslatedString) other).translations)
-    );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(translations);
   }
 
   public static I18NString getI18NString(String untranslated, String... translations) {
@@ -65,10 +53,11 @@ public class TranslatedString implements I18NString, Serializable {
   }
 
   /**
-   * Gets an interned I18NString.
-   * If the translations only have a single value, return a NonTranslatedString, otherwise a TranslatedString
+   * Gets an interned I18NString. If the translations only have a single value, return a
+   * NonTranslatedString, otherwise a TranslatedString
    *
-   * @param translations A Map of languages and translations, a null language is the default translation
+   * @param translations A Map of languages and translations, a null language is the default
+   *                     translation
    */
   public static I18NString getI18NString(Map<String, String> translations) {
     if (intern.containsKey(translations)) {
@@ -86,6 +75,29 @@ public class TranslatedString implements I18NString, Serializable {
     }
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(translations);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    return (
+      (other instanceof TranslatedString) &&
+      this.translations.equals(((TranslatedString) other).translations)
+    );
+  }
+
+  /**
+   * @return The default translation
+   */
+  @Override
+  public String toString() {
+    return translations.containsKey(null)
+      ? translations.get(null)
+      : translations.values().iterator().next();
+  }
+
   /**
    * @return The available languages
    */
@@ -98,16 +110,6 @@ public class TranslatedString implements I18NString, Serializable {
    */
   public List<Entry<String, String>> getTranslations() {
     return new ArrayList<>(translations.entrySet());
-  }
-
-  /**
-   * @return The default translation
-   */
-  @Override
-  public String toString() {
-    return translations.containsKey(null)
-      ? translations.get(null)
-      : translations.values().iterator().next();
   }
 
   /**

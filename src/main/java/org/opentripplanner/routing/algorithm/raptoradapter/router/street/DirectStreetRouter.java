@@ -69,9 +69,9 @@ public class DirectStreetRouter {
   }
 
   /**
-   * Calculates the maximum distance in meters based on the maxDirectStreetDurationSeconds and
-   * the fastest mode available. This assumes that it is not possible to exceed the speed defined
-   * in the RoutingRequest.
+   * Calculates the maximum distance in meters based on the maxDirectStreetDurationSeconds and the
+   * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
+   * RoutingRequest.
    */
   private static double calculateDistanceMaxLimit(RoutingRequest request) {
     double distanceLimit;

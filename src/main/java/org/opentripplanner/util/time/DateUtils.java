@@ -11,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- *
- * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g)
- * October 20, 2009
+ * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g) October 20, 2009
  */
 public class DateUtils implements DateConstants {
 
@@ -25,7 +22,6 @@ public class DateUtils implements DateConstants {
   /**
    * Returns a Date object based on input date and time parameters Defaults to today / now (when
    * date / time are null)
-   *
    */
   public static Date toDate(String date, String time, TimeZone tz) {
     //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
@@ -72,60 +68,6 @@ public class DateUtils implements DateConstants {
       }
     }
     LOG.debug("resulting date is {}", retVal);
-    return retVal;
-  }
-
-  private static int[] parseTime(String time) {
-    int[] retVal = null;
-
-    boolean amPm = false;
-    int addHours = 0;
-    int hour = 0, min = 0, sec = 0;
-    try {
-      String[] hms = time.toUpperCase().split(":");
-
-      // if we don't have a colon sep string, assume string is int and represents seconds past
-      // midnight
-      if (hms.length < 2) {
-        int secondsPastMidnight = getIntegerFromString(time);
-        retVal =
-          new int[] {
-            secondsPastMidnight / 3600,
-            (secondsPastMidnight % 3600) / 60,
-            secondsPastMidnight % 60,
-          };
-      }
-
-      if (hms[1].endsWith("PM") || hms[1].endsWith("AM")) {
-        amPm = true;
-
-        if (hms[1].contains("PM")) addHours = 12;
-
-        int suffex = hms[1].lastIndexOf(' ');
-        if (suffex < 1) {
-          suffex = hms[1].lastIndexOf("AM");
-          if (suffex < 1) {
-            suffex = hms[1].lastIndexOf("PM");
-          }
-        }
-        hms[1] = hms[1].substring(0, suffex);
-      }
-
-      int h = Integer.parseInt(trim(hms[0]));
-      if (amPm && h == 12) h = 0;
-      hour = h + addHours;
-
-      min = Integer.parseInt(trim(hms[1]));
-      if (hms.length > 2) {
-        sec = Integer.parseInt(trim(hms[2]));
-      }
-
-      retVal = new int[] { hour, min, sec };
-    } catch (Exception ignore) {
-      LOG.info("Time '{}' didn't parse", time);
-      retVal = null;
-    }
-
     return retVal;
   }
 
@@ -258,5 +200,59 @@ public class DateUtils implements DateConstants {
     } else {
       return System.currentTimeMillis() + timeout.toMillis();
     }
+  }
+
+  private static int[] parseTime(String time) {
+    int[] retVal = null;
+
+    boolean amPm = false;
+    int addHours = 0;
+    int hour = 0, min = 0, sec = 0;
+    try {
+      String[] hms = time.toUpperCase().split(":");
+
+      // if we don't have a colon sep string, assume string is int and represents seconds past
+      // midnight
+      if (hms.length < 2) {
+        int secondsPastMidnight = getIntegerFromString(time);
+        retVal =
+          new int[] {
+            secondsPastMidnight / 3600,
+            (secondsPastMidnight % 3600) / 60,
+            secondsPastMidnight % 60,
+          };
+      }
+
+      if (hms[1].endsWith("PM") || hms[1].endsWith("AM")) {
+        amPm = true;
+
+        if (hms[1].contains("PM")) addHours = 12;
+
+        int suffex = hms[1].lastIndexOf(' ');
+        if (suffex < 1) {
+          suffex = hms[1].lastIndexOf("AM");
+          if (suffex < 1) {
+            suffex = hms[1].lastIndexOf("PM");
+          }
+        }
+        hms[1] = hms[1].substring(0, suffex);
+      }
+
+      int h = Integer.parseInt(trim(hms[0]));
+      if (amPm && h == 12) h = 0;
+      hour = h + addHours;
+
+      min = Integer.parseInt(trim(hms[1]));
+      if (hms.length > 2) {
+        sec = Integer.parseInt(trim(hms[2]));
+      }
+
+      retVal = new int[] { hour, min, sec };
+    } catch (Exception ignore) {
+      LOG.info("Time '{}' didn't parse", time);
+      retVal = null;
+    }
+
+    return retVal;
   }
 }

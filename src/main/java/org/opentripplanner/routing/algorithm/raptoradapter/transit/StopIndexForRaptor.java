@@ -10,21 +10,21 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
- * This index is temporary to help creating a fixed list of stops (by index), a reverse map
- * of indexes by stop, and to create a list of stop indexes for each trip pattern. It
- * make sure the <code>stops</code> and <code>indexByStop</code> have the same order.
+ * This index is temporary to help creating a fixed list of stops (by index), a reverse map of
+ * indexes by stop, and to create a list of stop indexes for each trip pattern. It make sure the
+ * <code>stops</code> and <code>indexByStop</code> have the same order.
  * <p>
- * Raptor uses an integer index to reference stops. This is not the stop id, but just a
- * sequence number - an index. Hence we don´t care about the order - as long as the order does
- * not change. Raptor reference stops as integers for performance reasons, it never accesses
- * stops, it does not need to. The returned itineraries from Raptor contain stop indexes, not
- * references to stops, so OTP must maintain the stop index.
+ * Raptor uses an integer index to reference stops. This is not the stop id, but just a sequence
+ * number - an index. Hence we don´t care about the order - as long as the order does not change.
+ * Raptor reference stops as integers for performance reasons, it never accesses stops, it does not
+ * need to. The returned itineraries from Raptor contain stop indexes, not references to stops, so
+ * OTP must maintain the stop index.
  * <p>
  * The index also holds a pre-calculated board/alight cost for each stop used by Raptor during
  * routing.
  * <p>
- * The scope of instances of this class is limited to the mapping process, the final state is
- * stored in the {@link TransitLayer}.
+ * The scope of instances of this class is limited to the mapping process, the final state is stored
+ * in the {@link TransitLayer}.
  */
 public final class StopIndexForRaptor {
 
@@ -78,15 +78,6 @@ public final class StopIndexForRaptor {
   }
 
   /**
-   * Create map between stop and index used by Raptor to stop objects in original graph
-   */
-  private void initializeIndexByStop() {
-    for (int i = 0; i < stopsByIndex.size(); ++i) {
-      indexByStop.put(stopsByIndex.get(i), i);
-    }
-  }
-
-  /**
    * Create static board/alight cost for Raptor to include for each stop.
    */
   private static int[] createStopBoardAlightCosts(
@@ -104,5 +95,14 @@ public final class StopIndexForRaptor {
       stopVisitCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
     }
     return stopVisitCosts;
+  }
+
+  /**
+   * Create map between stop and index used by Raptor to stop objects in original graph
+   */
+  private void initializeIndexByStop() {
+    for (int i = 0; i < stopsByIndex.size(); ++i) {
+      indexByStop.put(stopsByIndex.get(i), i);
+    }
   }
 }

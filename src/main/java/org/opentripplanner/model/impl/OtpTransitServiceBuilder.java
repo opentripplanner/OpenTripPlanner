@@ -53,8 +53,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
- * {@link #build()} method is read only, and this class provide a mutable collections to construct
- * a {@link OtpTransitService} instance.
+ * {@link #build()} method is read only, and this class provide a mutable collections to construct a
+ * {@link OtpTransitService} instance.
  */
 public class OtpTransitServiceBuilder {
 
@@ -163,8 +163,8 @@ public class OtpTransitServiceBuilder {
   }
 
   /**
-   * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable). Entities
-   * that might have Notices are Routes, Trips, Stops and StopTimes.
+   * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable).
+   * Entities that might have Notices are Routes, Trips, Stops and StopTimes.
    */
   public Multimap<TransitEntity, Notice> getNoticeAssignments() {
     return noticeAssignments;
@@ -254,20 +254,6 @@ public class OtpTransitServiceBuilder {
     return tripOnServiceDates;
   }
 
-  /**
-   * Find all serviceIds in both CalendarServices and CalendarServiceDates.
-   */
-  Set<FeedScopedId> findAllServiceIds() {
-    Set<FeedScopedId> serviceIds = new HashSet<>();
-    for (ServiceCalendar calendar : getCalendars()) {
-      serviceIds.add(calendar.getServiceId());
-    }
-    for (ServiceCalendarDate date : getCalendarDates()) {
-      serviceIds.add(date.getServiceId());
-    }
-    return serviceIds;
-  }
-
   public CalendarServiceData buildCalendarServiceData() {
     return CalendarServiceDataFactoryImpl.createCalendarServiceData(
       getAgenciesById().values(),
@@ -281,9 +267,9 @@ public class OtpTransitServiceBuilder {
   }
 
   /**
-   * Limit the transit service to a time period removing calendar dates and services
-   * outside the period. If a service is start before and/or ends after the period
-   * then the service is modified to match the period.
+   * Limit the transit service to a time period removing calendar dates and services outside the
+   * period. If a service is start before and/or ends after the period then the service is modified
+   * to match the period.
    */
   public void limitServiceDays(ServiceDateInterval periodLimit, DataImportIssueStore issues) {
     if (periodLimit.isUnbounded()) {
@@ -326,14 +312,34 @@ public class OtpTransitServiceBuilder {
     LOG.info("Limiting transit service days to time period complete.");
   }
 
+  /**
+   * Find all serviceIds in both CalendarServices and CalendarServiceDates.
+   */
+  Set<FeedScopedId> findAllServiceIds() {
+    Set<FeedScopedId> serviceIds = new HashSet<>();
+    for (ServiceCalendar calendar : getCalendars()) {
+      serviceIds.add(calendar.getServiceId());
+    }
+    for (ServiceCalendarDate date : getCalendarDates()) {
+      serviceIds.add(date.getServiceId());
+    }
+    return serviceIds;
+  }
+
+  private static void logRemove(String type, int orgSize, int newSize, String reason) {
+    if (orgSize == newSize) {
+      return;
+    }
+    LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
+  }
+
   private int numberOfTrips() {
     return tripsById.size() + flexTripsById.size();
   }
 
   /**
-   * Check all relations and remove entities which reference none existing entries. This
-   * may happen as a result of inconsistent data or by deliberate removal of elements in the
-   * builder.
+   * Check all relations and remove entities which reference none existing entries. This may happen
+   * as a result of inconsistent data or by deliberate removal of elements in the builder.
    */
   private void removeEntitiesWithInvalidReferences(DataImportIssueStore issues) {
     removeTripsWithNoneExistingServiceIds();
@@ -428,8 +434,8 @@ public class OtpTransitServiceBuilder {
   }
 
   /**
-   * Return {@code true} if the the point is a trip-transfer-point and the trip reference
-   * is missing.
+   * Return {@code true} if the the point is a trip-transfer-point and the trip reference is
+   * missing.
    */
   private boolean transferPointTripReferenceDoesNotExist(TransferPoint point) {
     if (!point.isTripTransferPoint()) {
@@ -437,12 +443,5 @@ public class OtpTransitServiceBuilder {
     }
     var trip = point.asTripTransferPoint().getTrip();
     return !tripsById.containsKey(trip.getId());
-  }
-
-  private static void logRemove(String type, int orgSize, int newSize, String reason) {
-    if (orgSize == newSize) {
-      return;
-    }
-    LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
   }
 }

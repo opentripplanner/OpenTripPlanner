@@ -2,13 +2,9 @@ package org.opentripplanner.netex.mapping.calendar;
 
 import static org.opentripplanner.netex.mapping.support.ServiceAlterationFilter.isRunning;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;

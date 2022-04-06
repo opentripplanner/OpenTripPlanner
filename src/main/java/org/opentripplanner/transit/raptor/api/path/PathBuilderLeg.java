@@ -14,7 +14,8 @@ import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
- * This is the leg implementation for the {@link PathBuilder}. It Private inner class which help cashing and calculating values before constructing a path.
+ * This is the leg implementation for the {@link PathBuilder}. It Private inner class which help
+ * cashing and calculating values before constructing a path.
  */
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
@@ -30,9 +31,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private PathBuilderLeg<T> next = null;
 
   /**
-   * Copy-constructor - do a deep copy with the exception of immutable types.
-   * Always start with the desired head. The constructor will recursively copy the entire
-   * path (all legs until {@code next} do not exist).
+   * Copy-constructor - do a deep copy with the exception of immutable types. Always start with the
+   * desired head. The constructor will recursively copy the entire path (all legs until {@code
+   * next} do not exist).
    */
   private PathBuilderLeg(PathBuilderLeg<T> other) {
     // Immutable fields
@@ -59,47 +60,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   /* factory methods */
 
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(RaptorTransfer access) {
-    return new PathBuilderLeg<>(new MyAccessLeg(access));
-  }
-
-  /**
-   * Create a transfer leg. The given {@code toStop} is the stop you arrive on when
-   * traveling in the direction from origin to destination. In a forward search the
-   * given {@code transfer.stop()} and the {@code toStop} is the same, but in a reverse
-   * search, the {@code transfer.stop()} is the fromStop; hence the {@code toStop} must be
-   * passed in.
-   */
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> transferLeg(
-    RaptorTransfer transfer,
-    int toStop
-  ) {
-    return new PathBuilderLeg<>(new MyTransferLeg(transfer, toStop));
-  }
-
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> transitLeg(
-    T trip,
-    BoardAndAlightTime boardAndAlightTime
-  ) {
-    return transitLeg(trip, boardAndAlightTime, null);
-  }
-
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> transitLeg(
-    T trip,
-    BoardAndAlightTime boardAndAlightTime,
-    @Nullable RaptorConstrainedTransfer txConstrainedAfterLeg
-  ) {
-    return new PathBuilderLeg<>(
-      new MyTransitLeg<>(trip, boardAndAlightTime, txConstrainedAfterLeg)
-    );
-  }
-
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(RaptorTransfer egress) {
-    return new PathBuilderLeg<>(new MyEgressLeg(egress));
-  }
-
-  /* accessors */
-
   public int fromTime() {
     return fromTime;
   }
@@ -120,13 +80,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return leg.toStop();
   }
 
+  /* accessors */
+
   public int toStopPos() {
     return asTransitLeg().toStopPos();
-  }
-
-  private void setTime(int fromTime, int toTime) {
-    this.fromTime = fromTime;
-    this.toTime = toTime;
   }
 
   public int durationInSec() {
@@ -147,10 +104,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   public boolean isAccess() {
     return leg.isAccess();
-  }
-
-  private boolean isAccessWithoutRides() {
-    return isAccess() && hasNoRides();
   }
 
   /** This leg is a transit leg or access/transfer/egress leg with rides (FLEX) */
@@ -175,71 +128,17 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return leg.isEgress();
   }
 
-  private MyAccessLeg asAccessLeg() {
-    return (MyAccessLeg) leg;
-  }
-
-  private MyTransferLeg asTransferLeg() {
-    return (MyTransferLeg) leg;
-  }
-
-  private MyTransitLeg<T> asTransitLeg() {
-    //noinspection unchecked
-    return (MyTransitLeg<T>) leg;
-  }
-
-  private MyEgressLeg asEgressLeg() {
-    return (MyEgressLeg) leg;
-  }
-
   public T trip() {
     return asTransitLeg().trip;
-  }
-
-  PathBuilderLeg<T> prev() {
-    return prev;
-  }
-
-  void setPrev(PathBuilderLeg<T> prev) {
-    this.prev = prev;
   }
 
   public PathBuilderLeg<T> next() {
     return next;
   }
 
-  void setNext(PathBuilderLeg<T> next) {
-    this.next = next;
-  }
-
-  @Nullable
-  PathBuilderLeg<T> prevTransitLeg() {
-    var it = prev();
-    if (it == null) {
-      return null;
-    }
-    if (it.isTransfer()) {
-      it = it.prev();
-    }
-    if (it == null) {
-      return null;
-    }
-    // Check transfer, it can be a FLEX access
-    return it.isTransit() ? it : null;
-  }
-
   @Nullable
   public PathBuilderLeg<T> nextTransitLeg() {
     return next(PathBuilderLeg::isTransit);
-  }
-
-  @Nullable
-  PathBuilderLeg<T> next(Predicate<PathBuilderLeg<T>> test) {
-    var it = next();
-    while (it != null && !test.test(it)) {
-      it = it.next();
-    }
-    return it;
   }
 
   @Override
@@ -251,21 +150,15 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     leg.addToString(builder);
   }
 
-  /* Build helper methods, package local */
-
-  PathBuilderLeg<T> mutate() {
-    return new PathBuilderLeg<>(this);
-  }
-
   /**
-   * Access, transfers and egress legs must be time-shifted towards the appropriate
-   * transit leg. The access is moved to arrive just in time to board the next transit, and
-   * transfers and egress are moved in time to start when the previous transit arrive, maximising
-   * the wait time after the transfer. Slacks are respected.
+   * Access, transfers and egress legs must be time-shifted towards the appropriate transit leg. The
+   * access is moved to arrive just in time to board the next transit, and transfers and egress are
+   * moved in time to start when the previous transit arrive, maximising the wait time after the
+   * transfer. Slacks are respected.
    * <p>
    * This method operate on the current leg for access legs and the NEXT leg for transfer and
-   * egress. So, if the NEXT leg is a transit or egress leg it is time-shifted. This make it safe
-   * to call this method on any leg - just make sure the legs are linked first.
+   * egress. So, if the NEXT leg is a transit or egress leg it is time-shifted. This make it safe to
+   * call this method on any leg - just make sure the legs are linked first.
    */
   public void timeShiftThisAndNextLeg(RaptorSlackProvider slackProvider) {
     if (isAccess()) {
@@ -320,7 +213,104 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     this.fromTime = boardAndAlightTime.boardTime();
   }
 
-  /* Factory methods, create new path */
+  /**
+   * The wait-time between this TRANSIT leg and the next transit leg including any slack. If there
+   * is a transfer leg between the two transit legs, the transfer time is excluded from the wait
+   * time.
+   * <p>
+   * {@code -1} is returned:
+   * <ul>
+   *     <li>if this leg is not a transit leg</li>
+   *     <li>no transit leg exist after this leg</li>
+   * <ul>
+   */
+  public int waitTimeBeforeNextTransitIncludingSlack() {
+    if (next.hasRides()) {
+      return waitTimeBeforeNextLegIncludingSlack();
+    }
+
+    // Add wait-time before and after transfer(the next leg)
+    return waitTimeBeforeNextLegIncludingSlack() + next.waitTimeBeforeNextLegIncludingSlack();
+  }
+
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(RaptorTransfer access) {
+    return new PathBuilderLeg<>(new MyAccessLeg(access));
+  }
+
+  /**
+   * Create a transfer leg. The given {@code toStop} is the stop you arrive on when traveling in the
+   * direction from origin to destination. In a forward search the given {@code transfer.stop()} and
+   * the {@code toStop} is the same, but in a reverse search, the {@code transfer.stop()} is the
+   * fromStop; hence the {@code toStop} must be passed in.
+   */
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> transferLeg(
+    RaptorTransfer transfer,
+    int toStop
+  ) {
+    return new PathBuilderLeg<>(new MyTransferLeg(transfer, toStop));
+  }
+
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> transitLeg(
+    T trip,
+    BoardAndAlightTime boardAndAlightTime
+  ) {
+    return transitLeg(trip, boardAndAlightTime, null);
+  }
+
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> transitLeg(
+    T trip,
+    BoardAndAlightTime boardAndAlightTime,
+    @Nullable RaptorConstrainedTransfer txConstrainedAfterLeg
+  ) {
+    return new PathBuilderLeg<>(
+      new MyTransitLeg<>(trip, boardAndAlightTime, txConstrainedAfterLeg)
+    );
+  }
+
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(RaptorTransfer egress) {
+    return new PathBuilderLeg<>(new MyEgressLeg(egress));
+  }
+
+  PathBuilderLeg<T> prev() {
+    return prev;
+  }
+
+  void setPrev(PathBuilderLeg<T> prev) {
+    this.prev = prev;
+  }
+
+  void setNext(PathBuilderLeg<T> next) {
+    this.next = next;
+  }
+
+  @Nullable
+  PathBuilderLeg<T> prevTransitLeg() {
+    var it = prev();
+    if (it == null) {
+      return null;
+    }
+    if (it.isTransfer()) {
+      it = it.prev();
+    }
+    if (it == null) {
+      return null;
+    }
+    // Check transfer, it can be a FLEX access
+    return it.isTransit() ? it : null;
+  }
+
+  @Nullable
+  PathBuilderLeg<T> next(Predicate<PathBuilderLeg<T>> test) {
+    var it = next();
+    while (it != null && !test.test(it)) {
+      it = it.next();
+    }
+    return it;
+  }
+
+  PathBuilderLeg<T> mutate() {
+    return new PathBuilderLeg<>(this);
+  }
 
   AccessPathLeg<T> createAccessPathLeg(
     CostCalculator costCalculator,
@@ -330,6 +320,40 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     var accessPath = asAccessLeg().streetPath;
     int cost = cost(costCalculator, accessPath);
     return new AccessPathLeg<>(accessPath, fromTime, toTime, cost, nextLeg);
+  }
+
+  /* Build helper methods, package local */
+
+  private static int cost(CostCalculator costCalculator, RaptorTransfer streetPath) {
+    return costCalculator != null ? streetPath.generalizedCost() : ZERO_COST;
+  }
+
+  private void setTime(int fromTime, int toTime) {
+    this.fromTime = fromTime;
+    this.toTime = toTime;
+  }
+
+  private boolean isAccessWithoutRides() {
+    return isAccess() && hasNoRides();
+  }
+
+  private MyAccessLeg asAccessLeg() {
+    return (MyAccessLeg) leg;
+  }
+
+  /* Factory methods, create new path */
+
+  private MyTransferLeg asTransferLeg() {
+    return (MyTransferLeg) leg;
+  }
+
+  private MyTransitLeg<T> asTransitLeg() {
+    //noinspection unchecked
+    return (MyTransitLeg<T>) leg;
+  }
+
+  private MyEgressLeg asEgressLeg() {
+    return (MyEgressLeg) leg;
   }
 
   private PathLeg<T> createPathLeg(
@@ -361,6 +385,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return new TransferPathLeg<>(fromStop(), fromTime, toTime, cost, streetPath, nextLeg);
   }
 
+  /* private methods */
+
   private TransitPathLeg<T> createTransitPathLeg(
     CostCalculator costCalculator,
     RaptorSlackProvider slackProvider
@@ -385,8 +411,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return new EgressPathLeg<>(asEgressLeg().streetPath, fromTime, toTime, cost);
   }
 
-  /* private methods */
-
   /**
    * Find the stop arrival time for this leg, this include alight-slack for transit legs.
    */
@@ -395,26 +419,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       return toTime;
     }
     return toTime + slackProvider.alightSlack(asTransitLeg().trip.pattern());
-  }
-
-  /**
-   * The wait-time between this TRANSIT leg and the next transit leg including any slack.
-   * If there is a transfer leg between the two transit legs, the transfer time is excluded from
-   * the wait time.
-   * <p>
-   * {@code -1} is returned:
-   * <ul>
-   *     <li>if this leg is not a transit leg</li>
-   *     <li>no transit leg exist after this leg</li>
-   * <ul>
-   */
-  public int waitTimeBeforeNextTransitIncludingSlack() {
-    if (next.hasRides()) {
-      return waitTimeBeforeNextLegIncludingSlack();
-    }
-
-    // Add wait-time before and after transfer(the next leg)
-    return waitTimeBeforeNextLegIncludingSlack() + next.waitTimeBeforeNextLegIncludingSlack();
   }
 
   private int waitTimeAfterPrevStopArrival(RaptorSlackProvider slackProvider) {
@@ -549,10 +553,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return waitCost + egressCost;
   }
 
-  private static int cost(CostCalculator costCalculator, RaptorTransfer streetPath) {
-    return costCalculator != null ? streetPath.generalizedCost() : ZERO_COST;
-  }
-
   /* PRIVATE INTERFACES */
 
   /** This is the common interface for all immutable leg structures. */
@@ -574,6 +574,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
 
     int toStop();
+
     PathStringBuilder addToString(PathStringBuilder builder);
   }
 
@@ -647,10 +648,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     final BoardAndAlightTime boardAndAlightTime;
 
     /**
-     * Transfer constraints are attached to the transit leg BEFORE the transit, this
-     * simplifies the code a bit. We do not always have transfers (same stop) between
-     * to transits, so it is can not be attached to the transfer. Also, attaching it to the
-     * transit leg BEFORE make the transit leg after more reusable when mutating the builder.
+     * Transfer constraints are attached to the transit leg BEFORE the transit, this simplifies the
+     * code a bit. We do not always have transfers (same stop) between to transits, so it is can not
+     * be attached to the transfer. Also, attaching it to the transit leg BEFORE make the transit
+     * leg after more reusable when mutating the builder.
      */
     @Nullable
     private final RaptorConstrainedTransfer constrainedTransferAfterLeg;
@@ -670,6 +671,20 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       return true;
     }
 
+    @Override
+    public int toStop() {
+      return trip.pattern().stopIndex(boardAndAlightTime.alightStopPos());
+    }
+
+    @Override
+    public PathStringBuilder addToString(PathStringBuilder builder) {
+      return builder
+        .transit(trip.pattern().debugInfo(), fromTime(), toTime())
+        .sep()
+        .stop(toStop())
+        .sep();
+    }
+
     public int fromStop() {
       return trip.pattern().stopIndex(boardAndAlightTime.boardStopPos());
     }
@@ -680,11 +695,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     public int fromTime() {
       return boardAndAlightTime.boardTime();
-    }
-
-    @Override
-    public int toStop() {
-      return trip.pattern().stopIndex(boardAndAlightTime.alightStopPos());
     }
 
     public int toStopPos() {
@@ -698,15 +708,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     @Override
     public final String toString() {
       return addToString(new PathStringBuilder(null)).toString();
-    }
-
-    @Override
-    public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder
-        .transit(trip.pattern().debugInfo(), fromTime(), toTime())
-        .sep()
-        .stop(toStop())
-        .sep();
     }
   }
 

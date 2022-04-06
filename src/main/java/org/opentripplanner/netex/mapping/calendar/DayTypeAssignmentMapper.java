@@ -30,13 +30,12 @@ import org.rutebanken.netex.model.PropertyOfDay;
  * <b>DESIGN</b>
  * <p>
  * To simplify the logic in this class and avoid passing input parameters down the call chain this
- * class perform the mapping by first creating an instance with READ-ONLY input members. The
- * result i added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a
- * final step, the to collections are merged (dates-datesToRemove) and then mapped to
- * {@link ServiceDate}s.
+ * class perform the mapping by first creating an instance with READ-ONLY input members. The result
+ * i added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final step,
+ * the to collections are merged (dates-datesToRemove) and then mapped to {@link ServiceDate}s.
  * <p>
- * This class is THREAD-SAFE. A static mapping method is the single point of entry and a
- * private constructor ensure the instance is used in one thread only.
+ * This class is THREAD-SAFE. A static mapping method is the single point of entry and a private
+ * constructor ensure the instance is used in one thread only.
  */
 public class DayTypeAssignmentMapper {
 
@@ -64,8 +63,8 @@ public class DayTypeAssignmentMapper {
   }
 
   /**
-   * Map all given {@code dayTypeAssignments} into a map of {@link ServiceDate} by
-   * {@code dayTypeId}s.
+   * Map all given {@code dayTypeAssignments} into a map of {@link ServiceDate} by {@code
+   * dayTypeId}s.
    */
   public static Map<String, Set<ServiceDate>> mapDayTypes(
     ReadOnlyHierarchicalMapById<DayType> dayTypes,
@@ -95,6 +94,26 @@ public class DayTypeAssignmentMapper {
 
   /* private methods */
 
+  private static boolean isDayTypeAvailableForAssigment(DayTypeAssignment dta) {
+    if (dta.isIsAvailable() == null) {
+      return true;
+    }
+    return dta.isIsAvailable();
+  }
+
+  private static Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
+    Set<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
+
+    if (dayType.getProperties() != null) {
+      List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
+
+      for (PropertyOfDay p : propertyOfDays) {
+        result.addAll(DayOfWeekMapper.mapDayOfWeeks(p.getDaysOfWeek()));
+      }
+    }
+    return result;
+  }
+
   private void map(DayTypeAssignment dayTypeAssignment) {
     // Add or remove single days
     if (dayTypeAssignment.getDate() != null) {
@@ -110,12 +129,13 @@ public class DayTypeAssignmentMapper {
   }
 
   /**
-   * When mapping two lists of dates are created internally in this class, these are
-   * merged as a final step in the mapping process.
+   * When mapping two lists of dates are created internally in this class, these are merged as a
+   * final step in the mapping process.
    * <p>
-   * Do not call this method before you want to retrieve the result. Calling this method more
-   * than once, may have unexpected effects.
+   * Do not call this method before you want to retrieve the result. Calling this method more than
+   * once, may have unexpected effects.
    * <p>
+   *
    * @return the list of service dates for all dayTypes mapped.
    */
   private Set<ServiceDate> mergeAndMapDates() {
@@ -155,25 +175,5 @@ public class DayTypeAssignmentMapper {
     } else {
       datesToRemove.add(date.toLocalDate());
     }
-  }
-
-  private static boolean isDayTypeAvailableForAssigment(DayTypeAssignment dta) {
-    if (dta.isIsAvailable() == null) {
-      return true;
-    }
-    return dta.isIsAvailable();
-  }
-
-  private static Set<DayOfWeek> daysOfWeekForDayType(DayType dayType) {
-    Set<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
-
-    if (dayType.getProperties() != null) {
-      List<PropertyOfDay> propertyOfDays = dayType.getProperties().getPropertyOfDay();
-
-      for (PropertyOfDay p : propertyOfDays) {
-        result.addAll(DayOfWeekMapper.mapDayOfWeeks(p.getDaysOfWeek()));
-      }
-    }
-    return result;
   }
 }

@@ -35,6 +35,40 @@ public class Transfer {
     this.edges = null;
   }
 
+  public static RoutingRequest prepareTransferRoutingRequest(RoutingRequest request) {
+    RoutingRequest rr = request.getStreetSearchRequest(request.modes.transferMode);
+
+    rr.arriveBy = false;
+    rr.setDateTime(Instant.ofEpochSecond(0));
+    rr.from = null;
+    rr.to = null;
+
+    // Some of the values are rounded to ease caching in RaptorRequestTransferCache
+    rr.bikeTriangleSafetyFactor = roundTo(request.bikeTriangleSafetyFactor, 1);
+    rr.bikeTriangleSlopeFactor = roundTo(request.bikeTriangleSlopeFactor, 1);
+    rr.bikeTriangleTimeFactor = 1.0 - rr.bikeTriangleSafetyFactor - rr.bikeTriangleSlopeFactor;
+    rr.bikeSwitchCost = roundTo100(request.bikeSwitchCost);
+    rr.bikeSwitchTime = roundTo100(request.bikeSwitchTime);
+
+    rr.wheelchairAccessible = request.wheelchairAccessible;
+    rr.maxWheelchairSlope = request.maxWheelchairSlope;
+
+    rr.walkSpeed = roundToHalf(request.walkSpeed);
+    rr.bikeSpeed = roundToHalf(request.bikeSpeed);
+
+    rr.walkReluctance = roundTo(request.walkReluctance, 1);
+    rr.stairsReluctance = roundTo(request.stairsReluctance, 1);
+    rr.stairsTimeFactor = roundTo(request.stairsTimeFactor, 1);
+    rr.turnReluctance = roundTo(request.turnReluctance, 1);
+
+    rr.elevatorBoardCost = roundTo100(request.elevatorBoardCost);
+    rr.elevatorBoardTime = roundTo100(request.elevatorBoardTime);
+    rr.elevatorHopCost = roundTo100(request.elevatorHopCost);
+    rr.elevatorHopTime = roundTo100(request.elevatorHopTime);
+
+    return rr;
+  }
+
   public List<Coordinate> getCoordinates() {
     List<Coordinate> coordinates = new ArrayList<>();
     if (edges == null) {
@@ -91,44 +125,6 @@ public class Transfer {
         RaptorCostConverter.toRaptorCost(s.getWeight())
       )
     );
-  }
-
-  public static RoutingRequest prepareTransferRoutingRequest(RoutingRequest request) {
-    RoutingRequest transferRoutingRequest = request.getStreetSearchRequest(
-      request.modes.transferMode
-    );
-    transferRoutingRequest.arriveBy = false;
-    transferRoutingRequest.setDateTime(Instant.ofEpochSecond(0));
-    transferRoutingRequest.from = null;
-    transferRoutingRequest.to = null;
-
-    // Some of the values are rounded to ease caching in RaptorRequestTransferCache
-    transferRoutingRequest.bikeTriangleSafetyFactor = roundTo(request.bikeTriangleSafetyFactor, 1);
-    transferRoutingRequest.bikeTriangleSlopeFactor = roundTo(request.bikeTriangleSlopeFactor, 1);
-    transferRoutingRequest.bikeTriangleTimeFactor =
-      1.0 -
-      transferRoutingRequest.bikeTriangleSafetyFactor -
-      transferRoutingRequest.bikeTriangleSlopeFactor;
-    transferRoutingRequest.bikeSwitchCost = roundTo100(request.bikeSwitchCost);
-    transferRoutingRequest.bikeSwitchTime = roundTo100(request.bikeSwitchTime);
-
-    transferRoutingRequest.wheelchairAccessible = request.wheelchairAccessible;
-    transferRoutingRequest.maxWheelchairSlope = request.maxWheelchairSlope;
-
-    transferRoutingRequest.walkSpeed = roundToHalf(request.walkSpeed);
-    transferRoutingRequest.bikeSpeed = roundToHalf(request.bikeSpeed);
-
-    transferRoutingRequest.walkReluctance = roundTo(request.walkReluctance, 1);
-    transferRoutingRequest.stairsReluctance = roundTo(request.stairsReluctance, 1);
-    transferRoutingRequest.stairsTimeFactor = roundTo(request.stairsTimeFactor, 1);
-    transferRoutingRequest.turnReluctance = roundTo(request.turnReluctance, 1);
-
-    transferRoutingRequest.elevatorBoardCost = roundTo100(request.elevatorBoardCost);
-    transferRoutingRequest.elevatorBoardTime = roundTo100(request.elevatorBoardTime);
-    transferRoutingRequest.elevatorHopCost = roundTo100(request.elevatorHopCost);
-    transferRoutingRequest.elevatorHopTime = roundTo100(request.elevatorHopTime);
-
-    return transferRoutingRequest;
   }
 
   private static double roundToHalf(double input) {

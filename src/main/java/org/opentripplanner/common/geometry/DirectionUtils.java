@@ -27,8 +27,9 @@ public class DirectionUtils {
   }
 
   /**
-   * Computes the angle of the last segment of a LineString or MultiLineString in radians clockwise from North
-   * in the range (-PI, PI).
+   * Computes the angle of the last segment of a LineString or MultiLineString in radians clockwise
+   * from North in the range (-PI, PI).
+   *
    * @param geometry a LineString or a MultiLineString
    */
   public static synchronized double getLastAngle(Geometry geometry) {
@@ -53,8 +54,9 @@ public class DirectionUtils {
   }
 
   /**
-   * Computes the angle of the first segment of a LineString or MultiLineString in radians clockwise from North
-   * in the range (-PI, PI).
+   * Computes the angle of the first segment of a LineString or MultiLineString in radians clockwise
+   * from North in the range (-PI, PI).
+   *
    * @param geometry a LineString or a MultiLineString
    */
   public static synchronized double getFirstAngle(Geometry geometry) {

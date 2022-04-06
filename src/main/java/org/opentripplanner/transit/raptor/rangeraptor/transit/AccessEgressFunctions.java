@@ -14,9 +14,9 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
 /**
- * This class contains functions used by the {@link AccessPaths} and {@link EgressPaths}
- * classes. The functions are all static utility functions, and are placed in this class to be
- * shared between the two classes.
+ * This class contains functions used by the {@link AccessPaths} and {@link EgressPaths} classes.
+ * The functions are all static utility functions, and are placed in this class to be shared between
+ * the two classes.
  * <p>
  * The class also contains the ParetoSet comparator to filter Standard Raptor(not multi-criteria)
  * access and egress.
@@ -25,8 +25,8 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 public final class AccessEgressFunctions {
 
   /**
-   * Filter standard(not multi-criteria) Raptor access and egress paths.
-   * A path is pareto optimal for a given stop if
+   * Filter standard(not multi-criteria) Raptor access and egress paths. A path is pareto optimal
+   * for a given stop if
    * <ol>
    *     <li>
    *         time duration is lower
@@ -54,8 +54,8 @@ public final class AccessEgressFunctions {
   private AccessEgressFunctions() {}
 
   /**
-   * This method helps with calculating the egress departure time. It will add
-   * transit slack (egress leaves on-board) and then time-shift the egress.
+   * This method helps with calculating the egress departure time. It will add transit slack (egress
+   * leaves on-board) and then time-shift the egress.
    */
   public static int calculateEgressDepartureTime(
     int arrivalTime,
@@ -101,9 +101,8 @@ public final class AccessEgressFunctions {
   }
 
   /**
-   * Filter the given input keeping all elements satisfying the given include predicate.
-   * If the {@code keepOne} flag is set only one raptor transfer is kept for each
-   * group of numOfRides.
+   * Filter the given input keeping all elements satisfying the given include predicate. If the
+   * {@code keepOne} flag is set only one raptor transfer is kept for each group of numOfRides.
    */
   static TIntObjectMap<List<RaptorTransfer>> groupByRound(
     Collection<RaptorTransfer> input,

@@ -53,8 +53,8 @@ public class HierarchicalElementTest {
   }
 
   /**
-   * When a child do not have a value it should provide the parent value instead.
-   * Hence parent and child should return the same value.
+   * When a child do not have a value it should provide the parent value instead. Hence parent and
+   * child should return the same value.
    */
   @Test
   public void emptyChildReturnsParentValue() {

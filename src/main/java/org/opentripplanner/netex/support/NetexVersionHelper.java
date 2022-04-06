@@ -22,24 +22,24 @@ public class NetexVersionHelper {
   private NetexVersionHelper() {}
 
   /**
-   * According to the <b>Norwegian Netex profile</b> the version number must be a
-   * positive increasing integer. A bigger value indicate a later version.
+   * According to the <b>Norwegian Netex profile</b> the version number must be a positive
+   * increasing integer. A bigger value indicate a later version.
    */
   public static int versionOf(EntityInVersionStructure e) {
     return Integer.parseInt(e.getVersion());
   }
 
   /**
-   * Return the latest (maximum) version number for the given {@code list} of elements.
-   * If no elements exist in the collection {@code -1} is returned.
+   * Return the latest (maximum) version number for the given {@code list} of elements. If no
+   * elements exist in the collection {@code -1} is returned.
    */
   public static int latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
     return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(-1);
   }
 
   /**
-   * Return the element with the latest (maximum) version for a given {@code list} of elements.
-   * If no elements exist in the collection {@code null} is returned.
+   * Return the element with the latest (maximum) version for a given {@code list} of elements. If
+   * no elements exist in the collection {@code null} is returned.
    */
   public static <T extends EntityInVersionStructure> T latestVersionedElementIn(
     Collection<T> list
@@ -55,9 +55,9 @@ public class NetexVersionHelper {
   }
 
   /**
-   * Find the first valid datetime in the given {@code periods} after or equals to the given
-   * {@code timestamp}. For example, this method can be used to find the fist point in time where
-   * the given periods are defined after current time - {@code timestamp=now()}.
+   * Find the first valid datetime in the given {@code periods} after or equals to the given {@code
+   * timestamp}. For example, this method can be used to find the fist point in time where the given
+   * periods are defined after current time - {@code timestamp=now()}.
    */
   public static LocalDateTime firstValidDateTime(
     List<ValidBetween> periods,

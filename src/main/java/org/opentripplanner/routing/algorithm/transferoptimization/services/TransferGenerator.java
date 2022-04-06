@@ -78,7 +78,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     return result;
   }
 
-  /* private methods */
+  private static <T> T last(List<T> list) {
+    return list.get(list.size() - 1);
+  }
 
   private List<TripToTripTransfer<T>> findTransfers(
     T fromTrip,
@@ -238,9 +240,5 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       latestArrivalStopPos = nextLatestArrivalStopPos;
       result.set(i, filteredTransfers);
     }
-  }
-
-  private static <T> T last(List<T> list) {
-    return list.get(list.size() - 1);
   }
 }

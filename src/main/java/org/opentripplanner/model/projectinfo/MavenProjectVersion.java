@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * This class encapsulate a simplified version of  Mave version number. It has logic to parse
- * any version string that follow the Maven standard.
+ * This class encapsulate a simplified version of  Mave version number. It has logic to parse any
+ * version string that follow the Maven standard.
  */
 public class MavenProjectVersion implements Serializable {
 
@@ -22,9 +22,9 @@ public class MavenProjectVersion implements Serializable {
 
   /**
    * The qualifier, snapshot or build number part of the version. This is what is after the first
-   * '-'. Maven distinguish between qualifier, snapshots or build-number to be able to sort
-   * versions in the correct order, but we do not need to 'sort', hence the simplification
-   * treating all 3 of these as a 'qualifier'.
+   * '-'. Maven distinguish between qualifier, snapshots or build-number to be able to sort versions
+   * in the correct order, but we do not need to 'sort', hence the simplification treating all 3 of
+   * these as a 'qualifier'.
    */
   public final String qualifier;
 
@@ -34,6 +34,24 @@ public class MavenProjectVersion implements Serializable {
     this.minor = minor;
     this.patch = patch;
     this.qualifier = qualifier;
+  }
+
+  /** @return "major.minor.patch". The SNAPSHOT `qualifier` is removed. */
+  public String unqualifiedVersion() {
+    return String.format("%d.%d.%d", major, minor, patch);
+  }
+
+  /**
+   * Compare version and check if they are the same. Note the version might be two different
+   * SNAPSHOTs of the same version - here considered equals.
+   */
+  public boolean sameVersion(MavenProjectVersion other) {
+    return version.equals(other.version);
+  }
+
+  @Override
+  public String toString() {
+    return version;
   }
 
   static MavenProjectVersion parse(String version) {
@@ -66,24 +84,6 @@ public class MavenProjectVersion implements Serializable {
     }
 
     return new MavenProjectVersion(version, major, minor, patch, qualifier);
-  }
-
-  /** @return "major.minor.patch". The SNAPSHOT `qualifier` is removed. */
-  public String unqualifiedVersion() {
-    return String.format("%d.%d.%d", major, minor, patch);
-  }
-
-  /**
-   * Compare version and check if they are the same. Note the version might be two different
-   * SNAPSHOTs of the same version - here considered equals.
-   */
-  public boolean sameVersion(MavenProjectVersion other) {
-    return version.equals(other.version);
-  }
-
-  @Override
-  public String toString() {
-    return version;
   }
 
   private static String[] splitInotNumFields(String v) {

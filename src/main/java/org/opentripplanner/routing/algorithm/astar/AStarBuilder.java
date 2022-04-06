@@ -75,6 +75,14 @@ public class AStarBuilder {
     return this;
   }
 
+  public ShortestPathTree getShortestPathTree() {
+    return build().getShortestPathTree();
+  }
+
+  public List<GraphPath> getPathsToTarget() {
+    return build().getPathsToTarget();
+  }
+
   private AStar build() {
     return new AStar(
       heuristic,
@@ -85,13 +93,5 @@ public class AStarBuilder {
       timeout,
       originBackEdge
     );
-  }
-
-  public ShortestPathTree getShortestPathTree() {
-    return build().getShortestPathTree();
-  }
-
-  public List<GraphPath> getPathsToTarget() {
-    return build().getPathsToTarget();
   }
 }

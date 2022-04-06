@@ -1,6 +1,11 @@
 package org.opentripplanner.visualizer;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -22,7 +27,28 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -51,7 +77,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Exit on window close.
- *
  */
 class ExitListener extends WindowAdapter {
 
@@ -81,7 +106,8 @@ class DisplayVertex {
 }
 
 /**
- * This is a ListModel that holds Edges. It gets its edges from a PatternBoard/PatternAlight, hence the iterable.
+ * This is a ListModel that holds Edges. It gets its edges from a PatternBoard/PatternAlight, hence
+ * the iterable.
  */
 class EdgeListModel extends AbstractListModel<Edge> {
 
@@ -130,189 +156,18 @@ class VertexList extends AbstractListModel<DisplayVertex> {
 /**
  * A simple visualizer for graphs. It shows (using ShowGraph) a map of the graph, intersections and
  * TransitStops only, and allows a user to select stops, examine incoming and outgoing edges, and
- * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say)
- * a bunch of weird buttons designed to debug specific cases.
+ * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) a
+ * bunch of weird buttons designed to debug specific cases.
  */
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
-  private final class ComparePathStatesClickListener implements ListSelectionListener {
-
-    private final JList<String> outputList;
-
-    ComparePathStatesClickListener(JList<String> outputList) {
-      this.outputList = outputList;
-    }
-
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-      @SuppressWarnings("unchecked")
-      JList<State> theList = (JList<State>) e.getSource();
-      State st = (State) theList.getSelectedValue();
-      if (st == null) {
-        return;
-      }
-
-      DefaultListModel<String> stateListModel = new DefaultListModel<>();
-      stateListModel.addElement("weight:" + st.getWeight());
-      stateListModel.addElement("weightdelta:" + st.getWeightDelta());
-      stateListModel.addElement("rentingVehicle:" + st.isRentingVehicle());
-      stateListModel.addElement("vehicleParked:" + st.isVehicleParked());
-      stateListModel.addElement("walkDistance:" + st.getWalkDistance());
-      stateListModel.addElement("elapsedTime:" + st.getElapsedTimeSeconds());
-      outputList.setModel(stateListModel);
-
-      lastStateClicked = st;
-    }
-  }
-
-  private final class OnPopupMenuClickListener implements ActionListener {
-
-    private final class DiffListCellRenderer extends DefaultListCellRenderer {
-
-      private final int diverge;
-      private final int converge;
-
-      private DiffListCellRenderer(int diverge, int converge) {
-        this.diverge = diverge;
-        this.converge = converge;
-      }
-
-      @Override
-      public Component getListCellRendererComponent(
-        JList<?> list,
-        Object value,
-        int index,
-        boolean isSelected,
-        boolean cellHasFocus
-      ) {
-        Component c = super.getListCellRendererComponent(
-          list,
-          value,
-          index,
-          isSelected,
-          cellHasFocus
-        );
-        if (isSelected) {
-          return c;
-        }
-
-        if (index <= diverge) {
-          c.setBackground(new Color(196, 201, 255));
-        }
-        if (index >= converge) {
-          c.setBackground(new Color(255, 196, 196));
-        }
-
-        return c;
-      }
-    }
-
-    private int[] diffPaths() {
-      if (firstComparePath == null || secondComparePath == null) {
-        return new int[] { -2, -2 };
-      }
-
-      int l1 = firstComparePath.states.size();
-      int l2 = secondComparePath.states.size();
-      int minlen = l1 < l2 ? l1 : l2;
-
-      int divergence = -1;
-      int convergence = -1;
-
-      // find divergence
-      for (int i = 0; i < minlen; i++) {
-        Vertex v1 = firstComparePath.states.get(i).getVertex();
-        Vertex v2 = secondComparePath.states.get(i).getVertex();
-        if (!v1.equals(v2)) {
-          divergence = i - 1;
-          break;
-        }
-      }
-
-      // find convergence
-      for (int i = 0; i < minlen; i++) {
-        Vertex v1 = firstComparePath.states.get(l1 - i - 1).getVertex();
-        Vertex v2 = secondComparePath.states.get(l2 - i - 1).getVertex();
-        if (!v1.equals(v2)) {
-          convergence = i - 1;
-          break;
-        }
-      }
-
-      return new int[] { divergence, convergence };
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
-      if (pp == null) {
-        return;
-      }
-      GraphPath path = pp.gp;
-
-      firstComparePath = secondComparePath;
-      secondComparePath = path;
-
-      if (firstComparePath != null) {
-        DefaultListModel<State> pathModel = new DefaultListModel<>();
-        for (State st : firstComparePath.states) {
-          pathModel.addElement(st);
-        }
-        firstComparePathStates.setModel(pathModel);
-      }
-      if (secondComparePath != null) {
-        DefaultListModel<State> pathModel = new DefaultListModel<>();
-        for (State st : secondComparePath.states) {
-          pathModel.addElement(st);
-        }
-        secondComparePathStates.setModel(pathModel);
-      }
-
-      int[] diff = diffPaths();
-      final int diverge = diff[0];
-      final int converge = diff[1];
-      if (diff[0] >= 0) {
-        firstComparePathStates.setCellRenderer(
-          new DiffListCellRenderer(diverge, firstComparePath.states.size() - converge - 1)
-        );
-        secondComparePathStates.setCellRenderer(
-          new DiffListCellRenderer(diverge, secondComparePath.states.size() - converge - 1)
-        );
-      }
-    }
-  }
-
-  static class PathPrinter {
-
-    GraphPath gp;
-
-    PathPrinter(GraphPath gp) {
-      this.gp = gp;
-    }
-
-    public String toString() {
-      SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
-      String startTime = shortDateFormat.format(new Date(gp.getStartTime() * 1000));
-      String endTime = shortDateFormat.format(new Date(gp.getEndTime() * 1000));
-      return (
-        "Path (" +
-        startTime +
-        "-" +
-        endTime +
-        ") weight:" +
-        gp.getWeight() +
-        " dur:" +
-        (gp.getDuration() / 60.0) +
-        " walk:" +
-        gp.getWalkDistance()
-      );
-    }
-  }
-
   private static final long serialVersionUID = 1L;
-
   private static final Logger LOG = LoggerFactory.getLogger(GraphVisualizer.class);
-
+  private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+  /* The router we are visualizing. */
+  private final Router router;
+  /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
+  private final Graph graph;
   private JPanel leftPanel;
 
   /* The Processing applet that actually displays the graph. */
@@ -346,99 +201,49 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   private JCheckBox carCheckBox;
 
   private JTextField searchDate;
-
-  private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-
   private JTextField boardingPenaltyField;
-
   private DefaultListModel<DataImportIssue> issueMatchesModel;
-
   private JList<DataImportIssue> issueMatches;
-
   private DefaultListModel<String> metadataModel;
-
   private HashSet<Vertex> closed;
-
   private Vertex tracingVertex;
-
   private HashSet<Vertex> open;
-
   private HashSet<Vertex> seen;
-
   private JList<String> metadataList;
-
-  /* The router we are visualizing. */
-  private final Router router;
-
-  /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
-  private final Graph graph;
-
   private JRadioButton opQuick;
-
   private JRadioButton opSafe;
-
   private JRadioButton opFlat;
-
   private JRadioButton opGreenways;
-
   private ButtonGroup optimizeTypeGrp;
-
   private JTextField maxWalkField;
-
   private JTextField walkSpeed;
-
   private JTextField bikeSpeed;
-
   private JTextField heuristicWeight;
-
   private JCheckBox softWalkLimiting;
-
   private JTextField softWalkPenalty;
-
   private JTextField softWalkOverageRate;
-
   private JCheckBox arriveByCheckBox;
-
   private JLabel searchTimeElapsedLabel;
-
   private JCheckBox dontUseGraphicalCallbackCheckBox;
-
   private JTextField nPaths;
-
   private JList<PathPrinter> pathsList;
-
   private JList<State> pathStates;
-
   private JCheckBox showTransitCheckbox;
-
   private JCheckBox showStreetsCheckbox;
-
   private JCheckBox showMultistateVerticesCheckbox;
-
   private JCheckBox showHighlightedCheckbox;
-
   private JCheckBox showSPTCheckbox;
-
   private ShortestPathTree spt;
-
   private JTextField sptFlattening;
-
   private JTextField sptThickness;
-
   private JPopupMenu popup;
-
   private GraphPath firstComparePath;
   private GraphPath secondComparePath;
-
   private JList<State> firstComparePathStates;
   private JList<State> secondComparePathStates;
-
   private JList<String> secondStateData;
-
   private JList<String> firstStateData;
-
   protected State lastStateClicked = null;
-
   private JCheckBox longDistanceModeCheckbox;
 
   public GraphVisualizer(Router router) {
@@ -492,6 +297,236 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         }
       }
     );
+  }
+
+  public void verticesSelected(final List<Vertex> selected) {
+    // sort vertices by name
+    Collections.sort(
+      selected,
+      new Comparator<>() {
+        @Override
+        public int compare(Vertex arg0, Vertex arg1) {
+          return arg0.getLabel().compareTo(arg1.getLabel());
+        }
+      }
+    );
+    ListModel<DisplayVertex> data = new VertexList(selected);
+    nearbyVertices.setModel(data);
+
+    // pick out an intersection vertex and find the path
+    // if the spt is already available
+    Vertex target = null;
+    for (Vertex vv : selected) {
+      if (vv instanceof IntersectionVertex) {
+        target = vv;
+        break;
+      }
+    }
+    if (target != null && spt != null) {
+      List<GraphPath> paths = spt.getPaths(target);
+      showPathsInPanel(paths);
+    }
+  }
+
+  public Graph getGraph() {
+    return graph;
+  }
+
+  protected JComponent makeTextPanel(String text) {
+    JPanel panel = new JPanel(false);
+    JLabel filler = new JLabel(text);
+    filler.setHorizontalAlignment(JLabel.CENTER);
+    panel.setLayout(new GridLayout(1, 1));
+    panel.add(filler);
+    return panel;
+  }
+
+  protected void trace() {
+    DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
+    if (selected == null) {
+      return;
+    }
+    Vertex v = selected.vertex;
+
+    if (tracingVertex != v) {
+      tracingVertex = v;
+      closed = new HashSet<>();
+      open = new HashSet<>();
+      open.add(v);
+      seen = new HashSet<>();
+    }
+    HashSet<Vertex> newOpen = new HashSet<>();
+    for (Vertex v2 : open) {
+      closed.add(v2);
+      for (Edge e : v2.getOutgoing()) {
+        Vertex target = e.getToVertex();
+        if (closed.contains(target)) {
+          continue;
+        }
+        newOpen.add(target);
+      }
+    }
+    seen.addAll(newOpen);
+    open = newOpen;
+    showGraph.setHighlightedVertices(seen);
+  }
+
+  protected void traceOld() {
+    HashSet<Vertex> seenVertices = new HashSet<>();
+    DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
+    if (selected == null) {
+      System.out.println("no vertex selected");
+      return;
+    }
+    Vertex v = selected.vertex;
+    System.out.println("initial vertex: " + v);
+    Queue<Vertex> toExplore = new LinkedList<>();
+    toExplore.add(v);
+    seenVertices.add(v);
+    while (!toExplore.isEmpty()) {
+      Vertex src = toExplore.poll();
+      for (Edge e : src.getOutgoing()) {
+        Vertex tov = e.getToVertex();
+        if (!seenVertices.contains(tov)) {
+          seenVertices.add(tov);
+          toExplore.add(tov);
+        }
+      }
+    }
+    showGraph.setHighlightedVertices(seenVertices);
+  }
+
+  protected void checkGraph() {
+    HashSet<Vertex> seenVertices = new HashSet<>();
+    Collection<Vertex> allVertices = getGraph().getVertices();
+    Vertex v = allVertices.iterator().next();
+    System.out.println("initial vertex: " + v);
+    Queue<Vertex> toExplore = new LinkedList<>();
+    toExplore.add(v);
+    seenVertices.add(v);
+    while (!toExplore.isEmpty()) {
+      Vertex src = toExplore.poll();
+      for (Edge e : src.getOutgoing()) {
+        Vertex tov = e.getToVertex();
+        if (!seenVertices.contains(tov)) {
+          seenVertices.add(tov);
+          toExplore.add(tov);
+        }
+      }
+    }
+
+    System.out.println(
+      "After investigation, visited " + seenVertices.size() + " of " + allVertices.size()
+    );
+
+    /* now, let's find an unvisited vertex */
+    for (Vertex u : allVertices) {
+      if (!seenVertices.contains(u)) {
+        System.out.println("unvisited vertex" + u);
+        break;
+      }
+    }
+  }
+
+  protected void route(String from, String to) {
+    Date when;
+    // Year + 1900
+    try {
+      when = dateFormat.parse(searchDate.getText());
+    } catch (ParseException e) {
+      searchDate.setText("Format: " + dateFormat.toPattern());
+      return;
+    }
+    TraverseModeSet modeSet = new TraverseModeSet();
+    modeSet.setWalk(walkCheckBox.isSelected());
+    modeSet.setBicycle(bikeCheckBox.isSelected());
+    modeSet.setFerry(ferryCheckBox.isSelected());
+    modeSet.setRail(trainCheckBox.isSelected());
+    modeSet.setTram(trainCheckBox.isSelected());
+    modeSet.setSubway(trainCheckBox.isSelected());
+    modeSet.setFunicular(trainCheckBox.isSelected());
+    modeSet.setGondola(trainCheckBox.isSelected());
+    modeSet.setBus(busCheckBox.isSelected());
+    modeSet.setCableCar(busCheckBox.isSelected());
+    modeSet.setCar(carCheckBox.isSelected());
+    // must set generic transit mode last, and only when it is checked
+    // otherwise 'false' will clear trainish and busish
+    if (transitCheckBox.isSelected()) modeSet.setTransit(true);
+    RoutingRequest options = new RoutingRequest(modeSet);
+    options.setArriveBy(arriveByCheckBox.isSelected());
+    options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+    // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
+    options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
+    // there should be a ui element for walk distance and optimize type
+    options.setBicycleOptimizeType(getSelectedOptimizeType());
+    options.setDateTime(when.toInstant());
+    options.setFromString(from);
+    options.setToString(to);
+    options.walkSpeed = Float.parseFloat(walkSpeed.getText());
+    options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
+    options.numItineraries = 1;
+    System.out.println("--------");
+    System.out.println("Path from " + from + " to " + to + " at " + when);
+    System.out.println("\tModes: " + modeSet);
+    System.out.println("\tOptions: " + options);
+
+    options.numItineraries = (Integer.parseInt(this.nPaths.getText()));
+
+    // apply callback if the options call for it
+    // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
+    // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
+    // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
+    GraphPathFinder finder = new GraphPathFinder(router);
+
+    long t0 = System.currentTimeMillis();
+    // TODO: check options properly intialized (AMB)
+    try (var temporaryVertices = new TemporaryVerticesContainer(graph, options)) {
+      var routingContext = new RoutingContext(options, graph, temporaryVertices);
+      List<GraphPath> paths = finder.graphPathFinderEntryPoint(routingContext);
+      long dt = System.currentTimeMillis() - t0;
+      searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
+
+      // grab the spt from the visitor
+      // TODO somehow yank the SPT out of the depths of the call stack... but there multiple SPTs here.
+      // This is why we should probably just use AStar directly.
+      /*
+            spt = vis.spt;
+            showGraph.setSPT(spt);
+            System.out.println( "got spt:"+spt );
+            */
+
+      if (paths == null) {
+        System.out.println("no path");
+        showGraph.highlightGraphPath(null);
+        return;
+      }
+
+      // now's a convenient time to set graphical SPT weights
+      showGraph.simpleSPT.setWeights();
+
+      showPathsInPanel(paths);
+
+      // now's a good time to set showGraph's SPT drawing weights
+      showGraph.setSPTFlattening(Float.parseFloat(sptFlattening.getText()));
+      showGraph.setSPTThickness(Float.parseFloat(sptThickness.getText()));
+      showGraph.redraw();
+    }
+  }
+
+  BicycleOptimizeType getSelectedOptimizeType() {
+    if (opQuick.isSelected()) {
+      return BicycleOptimizeType.QUICK;
+    }
+    if (opSafe.isSelected()) {
+      return BicycleOptimizeType.SAFE;
+    }
+    if (opFlat.isSelected()) {
+      return BicycleOptimizeType.FLAT;
+    }
+    if (opGreenways.isSelected()) {
+      return BicycleOptimizeType.GREENWAYS;
+    }
+    return BicycleOptimizeType.QUICK;
   }
 
   private Container makeDiffTab() {
@@ -755,31 +790,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     pane.add(optimizeTypePane);
 
     return pane;
-  }
-
-  BicycleOptimizeType getSelectedOptimizeType() {
-    if (opQuick.isSelected()) {
-      return BicycleOptimizeType.QUICK;
-    }
-    if (opSafe.isSelected()) {
-      return BicycleOptimizeType.SAFE;
-    }
-    if (opFlat.isSelected()) {
-      return BicycleOptimizeType.FLAT;
-    }
-    if (opGreenways.isSelected()) {
-      return BicycleOptimizeType.GREENWAYS;
-    }
-    return BicycleOptimizeType.QUICK;
-  }
-
-  protected JComponent makeTextPanel(String text) {
-    JPanel panel = new JPanel(false);
-    JLabel filler = new JLabel(text);
-    filler.setHorizontalAlignment(JLabel.CENTER);
-    panel.setLayout(new GridLayout(1, 1));
-    panel.add(filler);
-    return panel;
   }
 
   private void initRightPanel(Container pane) {
@@ -1324,178 +1334,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     routingPanel.add(dontUseGraphicalCallbackCheckBox);
   }
 
-  protected void trace() {
-    DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
-    if (selected == null) {
-      return;
-    }
-    Vertex v = selected.vertex;
-
-    if (tracingVertex != v) {
-      tracingVertex = v;
-      closed = new HashSet<>();
-      open = new HashSet<>();
-      open.add(v);
-      seen = new HashSet<>();
-    }
-    HashSet<Vertex> newOpen = new HashSet<>();
-    for (Vertex v2 : open) {
-      closed.add(v2);
-      for (Edge e : v2.getOutgoing()) {
-        Vertex target = e.getToVertex();
-        if (closed.contains(target)) {
-          continue;
-        }
-        newOpen.add(target);
-      }
-    }
-    seen.addAll(newOpen);
-    open = newOpen;
-    showGraph.setHighlightedVertices(seen);
-  }
-
-  protected void traceOld() {
-    HashSet<Vertex> seenVertices = new HashSet<>();
-    DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
-    if (selected == null) {
-      System.out.println("no vertex selected");
-      return;
-    }
-    Vertex v = selected.vertex;
-    System.out.println("initial vertex: " + v);
-    Queue<Vertex> toExplore = new LinkedList<>();
-    toExplore.add(v);
-    seenVertices.add(v);
-    while (!toExplore.isEmpty()) {
-      Vertex src = toExplore.poll();
-      for (Edge e : src.getOutgoing()) {
-        Vertex tov = e.getToVertex();
-        if (!seenVertices.contains(tov)) {
-          seenVertices.add(tov);
-          toExplore.add(tov);
-        }
-      }
-    }
-    showGraph.setHighlightedVertices(seenVertices);
-  }
-
-  protected void checkGraph() {
-    HashSet<Vertex> seenVertices = new HashSet<>();
-    Collection<Vertex> allVertices = getGraph().getVertices();
-    Vertex v = allVertices.iterator().next();
-    System.out.println("initial vertex: " + v);
-    Queue<Vertex> toExplore = new LinkedList<>();
-    toExplore.add(v);
-    seenVertices.add(v);
-    while (!toExplore.isEmpty()) {
-      Vertex src = toExplore.poll();
-      for (Edge e : src.getOutgoing()) {
-        Vertex tov = e.getToVertex();
-        if (!seenVertices.contains(tov)) {
-          seenVertices.add(tov);
-          toExplore.add(tov);
-        }
-      }
-    }
-
-    System.out.println(
-      "After investigation, visited " + seenVertices.size() + " of " + allVertices.size()
-    );
-
-    /* now, let's find an unvisited vertex */
-    for (Vertex u : allVertices) {
-      if (!seenVertices.contains(u)) {
-        System.out.println("unvisited vertex" + u);
-        break;
-      }
-    }
-  }
-
-  protected void route(String from, String to) {
-    Date when;
-    // Year + 1900
-    try {
-      when = dateFormat.parse(searchDate.getText());
-    } catch (ParseException e) {
-      searchDate.setText("Format: " + dateFormat.toPattern());
-      return;
-    }
-    TraverseModeSet modeSet = new TraverseModeSet();
-    modeSet.setWalk(walkCheckBox.isSelected());
-    modeSet.setBicycle(bikeCheckBox.isSelected());
-    modeSet.setFerry(ferryCheckBox.isSelected());
-    modeSet.setRail(trainCheckBox.isSelected());
-    modeSet.setTram(trainCheckBox.isSelected());
-    modeSet.setSubway(trainCheckBox.isSelected());
-    modeSet.setFunicular(trainCheckBox.isSelected());
-    modeSet.setGondola(trainCheckBox.isSelected());
-    modeSet.setBus(busCheckBox.isSelected());
-    modeSet.setCableCar(busCheckBox.isSelected());
-    modeSet.setCar(carCheckBox.isSelected());
-    // must set generic transit mode last, and only when it is checked
-    // otherwise 'false' will clear trainish and busish
-    if (transitCheckBox.isSelected()) modeSet.setTransit(true);
-    RoutingRequest options = new RoutingRequest(modeSet);
-    options.setArriveBy(arriveByCheckBox.isSelected());
-    options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
-    // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-    options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
-    // there should be a ui element for walk distance and optimize type
-    options.setBicycleOptimizeType(getSelectedOptimizeType());
-    options.setDateTime(when.toInstant());
-    options.setFromString(from);
-    options.setToString(to);
-    options.walkSpeed = Float.parseFloat(walkSpeed.getText());
-    options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
-    options.numItineraries = 1;
-    System.out.println("--------");
-    System.out.println("Path from " + from + " to " + to + " at " + when);
-    System.out.println("\tModes: " + modeSet);
-    System.out.println("\tOptions: " + options);
-
-    options.numItineraries = (Integer.parseInt(this.nPaths.getText()));
-
-    // apply callback if the options call for it
-    // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
-    // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
-    // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
-    GraphPathFinder finder = new GraphPathFinder(router);
-
-    long t0 = System.currentTimeMillis();
-    // TODO: check options properly intialized (AMB)
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, options)) {
-      var routingContext = new RoutingContext(options, graph, temporaryVertices);
-      List<GraphPath> paths = finder.graphPathFinderEntryPoint(routingContext);
-      long dt = System.currentTimeMillis() - t0;
-      searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
-
-      // grab the spt from the visitor
-      // TODO somehow yank the SPT out of the depths of the call stack... but there multiple SPTs here.
-      // This is why we should probably just use AStar directly.
-      /*
-            spt = vis.spt;
-            showGraph.setSPT(spt);
-            System.out.println( "got spt:"+spt );
-            */
-
-      if (paths == null) {
-        System.out.println("no path");
-        showGraph.highlightGraphPath(null);
-        return;
-      }
-
-      // now's a convenient time to set graphical SPT weights
-      showGraph.simpleSPT.setWeights();
-
-      showPathsInPanel(paths);
-
-      // now's a good time to set showGraph's SPT drawing weights
-      showGraph.setSPTFlattening(Float.parseFloat(sptFlattening.getText()));
-      showGraph.setSPTThickness(Float.parseFloat(sptThickness.getText()));
-      showGraph.redraw();
-    }
-  }
-
   private void showPathsInPanel(List<GraphPath> paths) {
     // show paths in a list panel
     DefaultListModel<PathPrinter> data = new DefaultListModel<>();
@@ -1505,36 +1343,177 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     pathsList.setModel(data);
   }
 
-  public void verticesSelected(final List<Vertex> selected) {
-    // sort vertices by name
-    Collections.sort(
-      selected,
-      new Comparator<>() {
-        @Override
-        public int compare(Vertex arg0, Vertex arg1) {
-          return arg0.getLabel().compareTo(arg1.getLabel());
-        }
-      }
-    );
-    ListModel<DisplayVertex> data = new VertexList(selected);
-    nearbyVertices.setModel(data);
+  static class PathPrinter {
 
-    // pick out an intersection vertex and find the path
-    // if the spt is already available
-    Vertex target = null;
-    for (Vertex vv : selected) {
-      if (vv instanceof IntersectionVertex) {
-        target = vv;
-        break;
-      }
+    GraphPath gp;
+
+    PathPrinter(GraphPath gp) {
+      this.gp = gp;
     }
-    if (target != null && spt != null) {
-      List<GraphPath> paths = spt.getPaths(target);
-      showPathsInPanel(paths);
+
+    public String toString() {
+      SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
+      String startTime = shortDateFormat.format(new Date(gp.getStartTime() * 1000));
+      String endTime = shortDateFormat.format(new Date(gp.getEndTime() * 1000));
+      return (
+        "Path (" +
+        startTime +
+        "-" +
+        endTime +
+        ") weight:" +
+        gp.getWeight() +
+        " dur:" +
+        (gp.getDuration() / 60.0) +
+        " walk:" +
+        gp.getWalkDistance()
+      );
     }
   }
 
-  public Graph getGraph() {
-    return graph;
+  private final class ComparePathStatesClickListener implements ListSelectionListener {
+
+    private final JList<String> outputList;
+
+    ComparePathStatesClickListener(JList<String> outputList) {
+      this.outputList = outputList;
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+      @SuppressWarnings("unchecked")
+      JList<State> theList = (JList<State>) e.getSource();
+      State st = (State) theList.getSelectedValue();
+      if (st == null) {
+        return;
+      }
+
+      DefaultListModel<String> stateListModel = new DefaultListModel<>();
+      stateListModel.addElement("weight:" + st.getWeight());
+      stateListModel.addElement("weightdelta:" + st.getWeightDelta());
+      stateListModel.addElement("rentingVehicle:" + st.isRentingVehicle());
+      stateListModel.addElement("vehicleParked:" + st.isVehicleParked());
+      stateListModel.addElement("walkDistance:" + st.getWalkDistance());
+      stateListModel.addElement("elapsedTime:" + st.getElapsedTimeSeconds());
+      outputList.setModel(stateListModel);
+
+      lastStateClicked = st;
+    }
+  }
+
+  private final class OnPopupMenuClickListener implements ActionListener {
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
+      if (pp == null) {
+        return;
+      }
+      GraphPath path = pp.gp;
+
+      firstComparePath = secondComparePath;
+      secondComparePath = path;
+
+      if (firstComparePath != null) {
+        DefaultListModel<State> pathModel = new DefaultListModel<>();
+        for (State st : firstComparePath.states) {
+          pathModel.addElement(st);
+        }
+        firstComparePathStates.setModel(pathModel);
+      }
+      if (secondComparePath != null) {
+        DefaultListModel<State> pathModel = new DefaultListModel<>();
+        for (State st : secondComparePath.states) {
+          pathModel.addElement(st);
+        }
+        secondComparePathStates.setModel(pathModel);
+      }
+
+      int[] diff = diffPaths();
+      final int diverge = diff[0];
+      final int converge = diff[1];
+      if (diff[0] >= 0) {
+        firstComparePathStates.setCellRenderer(
+          new DiffListCellRenderer(diverge, firstComparePath.states.size() - converge - 1)
+        );
+        secondComparePathStates.setCellRenderer(
+          new DiffListCellRenderer(diverge, secondComparePath.states.size() - converge - 1)
+        );
+      }
+    }
+
+    private int[] diffPaths() {
+      if (firstComparePath == null || secondComparePath == null) {
+        return new int[] { -2, -2 };
+      }
+
+      int l1 = firstComparePath.states.size();
+      int l2 = secondComparePath.states.size();
+      int minlen = l1 < l2 ? l1 : l2;
+
+      int divergence = -1;
+      int convergence = -1;
+
+      // find divergence
+      for (int i = 0; i < minlen; i++) {
+        Vertex v1 = firstComparePath.states.get(i).getVertex();
+        Vertex v2 = secondComparePath.states.get(i).getVertex();
+        if (!v1.equals(v2)) {
+          divergence = i - 1;
+          break;
+        }
+      }
+
+      // find convergence
+      for (int i = 0; i < minlen; i++) {
+        Vertex v1 = firstComparePath.states.get(l1 - i - 1).getVertex();
+        Vertex v2 = secondComparePath.states.get(l2 - i - 1).getVertex();
+        if (!v1.equals(v2)) {
+          convergence = i - 1;
+          break;
+        }
+      }
+
+      return new int[] { divergence, convergence };
+    }
+
+    private final class DiffListCellRenderer extends DefaultListCellRenderer {
+
+      private final int diverge;
+      private final int converge;
+
+      private DiffListCellRenderer(int diverge, int converge) {
+        this.diverge = diverge;
+        this.converge = converge;
+      }
+
+      @Override
+      public Component getListCellRendererComponent(
+        JList<?> list,
+        Object value,
+        int index,
+        boolean isSelected,
+        boolean cellHasFocus
+      ) {
+        Component c = super.getListCellRendererComponent(
+          list,
+          value,
+          index,
+          isSelected,
+          cellHasFocus
+        );
+        if (isSelected) {
+          return c;
+        }
+
+        if (index <= diverge) {
+          c.setBackground(new Color(196, 201, 255));
+        }
+        if (index >= converge) {
+          c.setBackground(new Color(255, 196, 196));
+        }
+
+        return c;
+      }
+    }
   }
 }

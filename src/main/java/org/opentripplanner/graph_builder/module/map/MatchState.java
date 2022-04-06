@@ -51,27 +51,6 @@ public abstract class MatchState {
     return accumulatedError + currentError;
   }
 
-  protected boolean carsCanTraverse(Edge edge) {
-    // should be done with a method on edge (canTraverse already exists on turnEdge)
-    State s0 = new State(edge.getFromVertex(), traverseOptions, null);
-    State s1 = edge.traverse(s0);
-    return s1 != null;
-  }
-
-  protected List<Edge> getOutgoingMatchableEdges(Vertex vertex) {
-    List<Edge> edges = new ArrayList<>();
-    for (Edge e : vertex.getOutgoing()) {
-      if (!(e instanceof StreetEdge)) {
-        continue;
-      }
-      if (e.getGeometry() == null) {
-        continue;
-      }
-      edges.add(e);
-    }
-    return edges;
-  }
-
   public double getDistanceAlongRoute() {
     return distanceAlongRoute;
   }
@@ -112,5 +91,26 @@ public abstract class MatchState {
 
   protected static double distance(Coordinate from, Coordinate to) {
     return SphericalDistanceLibrary.fastDistance(from, to);
+  }
+
+  protected boolean carsCanTraverse(Edge edge) {
+    // should be done with a method on edge (canTraverse already exists on turnEdge)
+    State s0 = new State(edge.getFromVertex(), traverseOptions, null);
+    State s1 = edge.traverse(s0);
+    return s1 != null;
+  }
+
+  protected List<Edge> getOutgoingMatchableEdges(Vertex vertex) {
+    List<Edge> edges = new ArrayList<>();
+    for (Edge e : vertex.getOutgoing()) {
+      if (!(e instanceof StreetEdge)) {
+        continue;
+      }
+      if (e.getGeometry() == null) {
+        continue;
+      }
+      edges.add(e);
+    }
+    return edges;
   }
 }

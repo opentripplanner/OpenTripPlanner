@@ -96,8 +96,8 @@ public class TemporaryVertexDisposeTest {
   }
 
   /**
-   * Verify a complex temporary path is disposed. The temporary graph is connected to the
-   * main graph in both directions (in/out) from many places (temp. vertexes).
+   * Verify a complex temporary path is disposed. The temporary graph is connected to the main graph
+   * in both directions (in/out) from many places (temp. vertexes).
    * <p>
    * The temporary part of the graph do NOT contain any loops.
    */
@@ -203,14 +203,19 @@ public class TemporaryVertexDisposeTest {
 
   /* private methods */
 
+  // Factory method to create an edge
+  private static void edge(Vertex a, Vertex b) {
+    new E(a, b);
+  }
+
+  /* private test helper classes */
+
   private void assertOriginalGraphIsIntact() {
     assertEquals("[]", a.getIncoming().toString());
     assertEquals("[A->B]", a.getOutgoing().toString());
     assertEquals("[A->B]", b.getIncoming().toString());
     assertEquals("[]", b.getOutgoing().toString());
   }
-
-  /* private test helper classes */
 
   private static class V extends Vertex {
 
@@ -234,11 +239,6 @@ public class TemporaryVertexDisposeTest {
     public boolean isEndVertex() {
       throw new IllegalStateException("The `isEndVertex` is not used by dispose logic.");
     }
-  }
-
-  // Factory method to create an edge
-  private static void edge(Vertex a, Vertex b) {
-    new E(a, b);
   }
 
   private static class E extends FreeEdge {

@@ -18,26 +18,19 @@ import org.apache.commons.math3.util.FastMath;
 
 /**
  * Stroke that paint a text.
- *
+ * <p>
  * Slightly adapted to OTP from original source.
  *
- * @see <a
- *      href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
- *
+ * @see <a href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
  */
 public class TextStroke implements Stroke {
 
-  private final String text;
-
-  private final Font font;
-
-  private boolean stretchToFit = false;
-
-  private boolean repeat = false;
-
-  private final AffineTransform t = new AffineTransform();
-
   private static final float FLATNESS = 1;
+  private final String text;
+  private final Font font;
+  private final AffineTransform t = new AffineTransform();
+  private boolean stretchToFit = false;
+  private boolean repeat = false;
 
   public TextStroke(String text, Font font) {
     this(text, font, true, false);

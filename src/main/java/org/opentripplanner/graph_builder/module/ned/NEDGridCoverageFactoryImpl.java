@@ -25,14 +25,18 @@ import org.slf4j.LoggerFactory;
 public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(NEDGridCoverageFactoryImpl.class);
-
+  private static final String[] DATUM_FILENAMES = {
+    "g2012a00.gtx",
+    "g2012g00.gtx",
+    "g2012h00.gtx",
+    "g2012p00.gtx",
+    "g2012s00.gtx",
+    "g2012u00.gtx",
+  };
   private final File cacheDirectory;
-
   public final NEDTileSource tileSource;
-
-  private List<VerticalDatum> datums;
-
   private final List<GridCoverage2D> regionCoverages = new ArrayList<>();
+  private List<VerticalDatum> datums;
 
   public NEDGridCoverageFactoryImpl(File cacheDirectory) {
     this.cacheDirectory = cacheDirectory;
@@ -44,14 +48,72 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     this.tileSource = tileSource;
   }
 
-  private static final String[] DATUM_FILENAMES = {
-    "g2012a00.gtx",
-    "g2012g00.gtx",
-    "g2012h00.gtx",
-    "g2012p00.gtx",
-    "g2012s00.gtx",
-    "g2012u00.gtx",
-  };
+  /**
+   * Creates a new thread-specific UnifiedGridCoverage instance with new Interpolator2D instances
+   * that wrap the underlying shared elevation tile data. During a refactor in the year 2020, the
+   * code at one point was written such that a new UnifiedGridCoverage instance was created with
+   * unique tile data for each thread to use. However, benchmarking showed that this caused longer
+   * run times which is likely due to too much memory competing for a slot in the processor cache.
+   */
+  public Coverage getGridCoverage() {
+    // If the tile data hasn't been loaded into memory yet, do that now.
+    if (regionCoverages.size() == 0) {
+      loadVerticalDatum();
+      // Make one grid coverage for each NED tile, adding them to a list of coverage instances that can then be
+      // wrapped with thread-specific interpolators.
+      for (File path : tileSource.getNEDTiles()) {
+        GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+        regionCoverages.add(factory.getUninterpolatedGridCoverage());
+      }
+    }
+
+    // Create a new UnifiedGridCoverage using the shared region coverages.
+    return new UnifiedGridCoverage(regionCoverages, datums);
+  }
+
+  @Override
+  public void checkInputs() {
+    /* Attempt to create cache directory if it doesn't exist. */
+    if (!cacheDirectory.exists()) {
+      LOG.info("Cache directory {} does not exist, creating it.", cacheDirectory);
+      if (!cacheDirectory.mkdirs()) {
+        throw new RuntimeException("Failed to create cache directory for NED at " + cacheDirectory);
+      }
+    }
+    if (!cacheDirectory.canRead() || !cacheDirectory.canWrite()) {
+      throw new RuntimeException(
+        String.format("Can't write and write NED cache at '%s'. Check permissions.", cacheDirectory)
+      );
+    }
+    boolean missingDatum = false;
+    for (String filename : DATUM_FILENAMES) {
+      File datumFile = new File(cacheDirectory, filename);
+      if (!datumFile.canRead()) {
+        missingDatum = true;
+      }
+    }
+    if (missingDatum) {
+      /* Attempt to fetch the datum files from the web. */
+      LOG.warn(
+        "OTP needs additional files (a vertical datum) to convert between NED elevations and OSM's WGS84 elevations."
+      );
+      try {
+        fetchDatum();
+      } catch (Exception ex) {
+        LOG.error("Exception while fetching datum files from the web.");
+        throw new RuntimeException(ex);
+      }
+    }
+  }
+
+  /**
+   * Verify that the needed elevation data exists in the cache and if it does not exist, try to
+   * download it. The graph is used to determine the extent of the NED.
+   */
+  @Override
+  public void fetchData(Graph graph) {
+    tileSource.fetchData(graph, cacheDirectory);
+  }
 
   /*
    * Summarizing from http://www.nauticalcharts.noaa.gov/csdl/learn_datum.html:
@@ -109,30 +171,8 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
   }
 
   /**
-   * Creates a new thread-specific UnifiedGridCoverage instance with new Interpolator2D instances that wrap the
-   * underlying shared elevation tile data. During a refactor in the year 2020, the code at one point was written such
-   * that a new UnifiedGridCoverage instance was created with unique tile data for each thread to use. However,
-   * benchmarking showed that this caused longer run times which is likely due to too much memory competing for a slot
-   * in the processor cache.
-   */
-  public Coverage getGridCoverage() {
-    // If the tile data hasn't been loaded into memory yet, do that now.
-    if (regionCoverages.size() == 0) {
-      loadVerticalDatum();
-      // Make one grid coverage for each NED tile, adding them to a list of coverage instances that can then be
-      // wrapped with thread-specific interpolators.
-      for (File path : tileSource.getNEDTiles()) {
-        GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
-        regionCoverages.add(factory.getUninterpolatedGridCoverage());
-      }
-    }
-
-    // Create a new UnifiedGridCoverage using the shared region coverages.
-    return new UnifiedGridCoverage(regionCoverages, datums);
-  }
-
-  /**
-   * Grab the rather voluminous vertical datum files from the OTP web server and save them in the NED cache directory.
+   * Grab the rather voluminous vertical datum files from the OTP web server and save them in the
+   * NED cache directory.
    */
   private void fetchDatum() throws Exception {
     LOG.info("Attempting to fetch datum files from OTP project web server...");
@@ -154,49 +194,5 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     }
     zis.close();
     LOG.info("Done.");
-  }
-
-  @Override
-  public void checkInputs() {
-    /* Attempt to create cache directory if it doesn't exist. */
-    if (!cacheDirectory.exists()) {
-      LOG.info("Cache directory {} does not exist, creating it.", cacheDirectory);
-      if (!cacheDirectory.mkdirs()) {
-        throw new RuntimeException("Failed to create cache directory for NED at " + cacheDirectory);
-      }
-    }
-    if (!cacheDirectory.canRead() || !cacheDirectory.canWrite()) {
-      throw new RuntimeException(
-        String.format("Can't write and write NED cache at '%s'. Check permissions.", cacheDirectory)
-      );
-    }
-    boolean missingDatum = false;
-    for (String filename : DATUM_FILENAMES) {
-      File datumFile = new File(cacheDirectory, filename);
-      if (!datumFile.canRead()) {
-        missingDatum = true;
-      }
-    }
-    if (missingDatum) {
-      /* Attempt to fetch the datum files from the web. */
-      LOG.warn(
-        "OTP needs additional files (a vertical datum) to convert between NED elevations and OSM's WGS84 elevations."
-      );
-      try {
-        fetchDatum();
-      } catch (Exception ex) {
-        LOG.error("Exception while fetching datum files from the web.");
-        throw new RuntimeException(ex);
-      }
-    }
-  }
-
-  /**
-   * Verify that the needed elevation data exists in the cache and if it does not exist, try to download it. The graph
-   * is used to determine the extent of the NED.
-   */
-  @Override
-  public void fetchData(Graph graph) {
-    tileSource.fetchData(graph, cacheDirectory);
   }
 }

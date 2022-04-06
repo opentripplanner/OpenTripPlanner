@@ -3,8 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 /**
  * Used to calculate times in a forward trip search.
  * <p>
- * This class is stateless, but need to be instantiatable to be injected as a
- * strategy.
+ * This class is stateless, but need to be instantiatable to be injected as a strategy.
  */
 public class ForwardTimeCalculator implements TimeCalculator {
 

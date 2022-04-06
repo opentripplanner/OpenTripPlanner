@@ -16,6 +16,11 @@ public class LegacyGraphQLplaceAtDistanceImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLPlaceAtDistance {
 
   @Override
+  public DataFetcher<Integer> distance() {
+    return environment -> (int) getSource(environment).distance;
+  }
+
+  @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment -> {
       PlaceAtDistance placeAtDistance = getSource(environment);
@@ -60,11 +65,6 @@ public class LegacyGraphQLplaceAtDistanceImpl
   @Override
   public DataFetcher<Object> place() {
     return environment -> getSource(environment).place;
-  }
-
-  @Override
-  public DataFetcher<Integer> distance() {
-    return environment -> (int) getSource(environment).distance;
   }
 
   private PlaceAtDistance getSource(DataFetchingEnvironment environment) {

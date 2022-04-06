@@ -4,8 +4,8 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 /**
- * The responsibility of this class is to publish workerlifecycle events on behalf
- * of the Range Raptor Worker.RangeRaptor Worker delegate this to this class.
+ * The responsibility of this class is to publish workerlifecycle events on behalf of the Range
+ * Raptor Worker.RangeRaptor Worker delegate this to this class.
  */
 public class LifeCycleEventPublisher {
 

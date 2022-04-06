@@ -6,30 +6,6 @@ import org.junit.jupiter.api.Test;
 
 public class ValueObjectToStringBuilderTest {
 
-  private enum AEnum {
-    A,
-  }
-
-  private static class Foo {
-
-    int a;
-    String b;
-
-    public Foo(int a, String b) {
-      this.a = a;
-      this.b = b;
-    }
-
-    @Override
-    public String toString() {
-      return ValueObjectToStringBuilder.of().addNum(a, " meters").addStr(b).toString();
-    }
-  }
-
-  private ValueObjectToStringBuilder subject() {
-    return ValueObjectToStringBuilder.of();
-  }
-
   @Test
   public void addNum() {
     assertEquals("30,000.0", subject().addNum(30_000d).toString());
@@ -141,5 +117,29 @@ public class ValueObjectToStringBuilderTest {
     assertEquals("", subject().skipNull().addCost(null, "pip").toString());
     assertEquals("$-0.01pip", subject().addCost(-1, "pip").toString());
     assertEquals("$1pip", subject().addCost(100, "pip").toString());
+  }
+
+  private ValueObjectToStringBuilder subject() {
+    return ValueObjectToStringBuilder.of();
+  }
+
+  private enum AEnum {
+    A,
+  }
+
+  private static class Foo {
+
+    int a;
+    String b;
+
+    public Foo(int a, String b) {
+      this.a = a;
+      this.b = b;
+    }
+
+    @Override
+    public String toString() {
+      return ValueObjectToStringBuilder.of().addNum(a, " meters").addStr(b).toString();
+    }
   }
 }

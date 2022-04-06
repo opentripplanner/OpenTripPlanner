@@ -14,6 +14,11 @@ public class RoutingError {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(code, inputField);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -23,11 +28,6 @@ public class RoutingError {
     }
     RoutingError that = (RoutingError) o;
     return code == that.code && inputField == that.inputField;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(code, inputField);
   }
 
   @Override

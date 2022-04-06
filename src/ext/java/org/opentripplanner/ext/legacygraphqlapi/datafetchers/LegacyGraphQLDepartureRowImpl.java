@@ -21,11 +21,6 @@ public class LegacyGraphQLDepartureRowImpl
   }
 
   @Override
-  public DataFetcher<Object> stop() {
-    return environment -> getSource(environment).stop;
-  }
-
-  @Override
   public DataFetcher<Double> lat() {
     return environment -> getSource(environment).stop.getLat();
   }
@@ -38,6 +33,11 @@ public class LegacyGraphQLDepartureRowImpl
   @Override
   public DataFetcher<TripPattern> pattern() {
     return environment -> getSource(environment).pattern;
+  }
+
+  @Override
+  public DataFetcher<Object> stop() {
+    return environment -> getSource(environment).stop;
   }
 
   @Override

@@ -17,8 +17,8 @@ import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * A calculator that will take you back in time not forward, this is the
- * basic logic to implement a reveres search.
+ * A calculator that will take you back in time not forward, this is the basic logic to implement a
+ * reveres search.
  */
 final class ReverseTransitCalculator<T extends RaptorTripSchedule>
   extends ReverseTimeCalculator
@@ -105,10 +105,29 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule>
   }
 
   @Override
+  public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+    if (timeTable.useCustomizedTripSearch()) {
+      return timeTable.createCustomizedTripSearch(SearchDirection.REVERSE);
+    }
+
+    return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, timeTable);
+  }
+
+  @Override
+  public RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable) {
+    return new TripScheduleExactMatchSearch<>(createTripSearch(timeTable), this, -iterationStep);
+  }
+
+  @Override
   public RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(
     RaptorRoute<T> route
   ) {
     return route.transferConstraintsReverseSearch();
+  }
+
+  @Override
+  public boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+    return pattern.alightingPossibleAt(stopPos);
   }
 
   @Override
@@ -122,24 +141,5 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule>
     int fromStop
   ) {
     return transitDataProvider.getTransfersToStop(fromStop);
-  }
-
-  @Override
-  public boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos) {
-    return pattern.alightingPossibleAt(stopPos);
-  }
-
-  @Override
-  public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
-    if (timeTable.useCustomizedTripSearch()) {
-      return timeTable.createCustomizedTripSearch(SearchDirection.REVERSE);
-    }
-
-    return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, timeTable);
-  }
-
-  @Override
-  public RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable) {
-    return new TripScheduleExactMatchSearch<>(createTripSearch(timeTable), this, -iterationStep);
   }
 }

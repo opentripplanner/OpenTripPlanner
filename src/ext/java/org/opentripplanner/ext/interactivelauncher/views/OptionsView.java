@@ -7,7 +7,9 @@ import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSec
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import org.opentripplanner.ext.interactivelauncher.Model;
 
 class OptionsView {
@@ -58,6 +60,10 @@ class OptionsView {
     onBuildGraphChkChanged();
   }
 
+  void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
+    box.addActionListener(l -> modelUpdate.accept(box.isSelected() && box.isEnabled()));
+  }
+
   private void addDebugCheckBoxes(Model model) {
     addSectionSpace(panel);
     addComp(new JLabel("Debug logging"), panel);
@@ -77,10 +83,6 @@ class OptionsView {
     bind(saveGraphChk, model::setSaveGraph);
     bind(startOptServerChk, model::setServeGraph);
     bind(startOptVisualizerChk, model::setVisualizer);
-  }
-
-  void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
-    box.addActionListener(l -> modelUpdate.accept(box.isSelected() && box.isEnabled()));
   }
 
   private boolean buildStreet() {

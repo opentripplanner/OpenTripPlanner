@@ -48,18 +48,15 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetVertexIndex {
 
+  private static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndex.class);
   private final Graph graph;
-
   private final VertexLinker vertexLinker;
-
   /**
    * Contains only instances of {@link StreetEdge}
    */
   private final SpatialIndex edgeTree;
   private final SpatialIndex transitStopTree;
   private final SpatialIndex verticesTree;
-
-  private static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndex.class);
 
   /**
    * Should only be called by the graph.
@@ -73,62 +70,63 @@ public class StreetVertexIndex {
     postSetup();
   }
 
-  private static void createHalfLocationForTest(
-    TemporaryStreetLocation base,
+  /**
+   * Creates a TemporaryStreetLocation on the given street (set of PlainStreetEdges). How far along
+   * is controlled by the location parameter, which represents a distance along the edge between 0
+   * (the from vertex) and 1 (the to vertex).
+   *
+   * @param edges A collection of nearby edges, which represent one street.
+   * @return the new TemporaryStreetLocation
+   */
+  public static TemporaryStreetLocation createTemporaryStreetLocationForTest(
+    String label,
     I18NString name,
+    Iterable<StreetEdge> edges,
     Coordinate nearestPoint,
-    StreetEdge street,
     boolean endVertex,
     DisposableEdgeCollection tempEdges
   ) {
-    StreetVertex tov = (StreetVertex) street.getToVertex();
-    StreetVertex fromv = (StreetVertex) street.getFromVertex();
-    LineString geometry = street.getGeometry();
+    boolean wheelchairAccessible = false;
 
-    P2<LineString> geometries = getGeometry(street, nearestPoint);
+    TemporaryStreetLocation location = new TemporaryStreetLocation(
+      label,
+      nearestPoint,
+      name,
+      endVertex
+    );
 
-    double totalGeomLength = geometry.getLength();
-    double lengthRatioIn = geometries.first.getLength() / totalGeomLength;
+    for (StreetEdge street : edges) {
+      Vertex fromv = street.getFromVertex();
+      Vertex tov = street.getToVertex();
+      wheelchairAccessible |= street.isWheelchairAccessible();
 
-    double lengthIn = street.getDistanceMeters() * lengthRatioIn;
-    double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
+      /* forward edges and vertices */
+      Vertex edgeLocation;
+      if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
+        // no need to link to area edges caught on-end
+        edgeLocation = fromv;
 
-    if (endVertex) {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
-        street,
-        fromv,
-        base,
-        geometries.first,
-        name,
-        lengthIn
-      );
+        if (endVertex) {
+          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
+        } else {
+          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
+        }
+      } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
+        // no need to link to area edges caught on-end
+        edgeLocation = tov;
 
-      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
-      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
-      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
-      temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
-      tempEdges.addEdge(temporaryPartialStreetEdge);
-    } else {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
-        street,
-        base,
-        tov,
-        geometries.second,
-        name,
-        lengthOut
-      );
-
-      temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
-      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
-      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
-      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
-      tempEdges.addEdge(temporaryPartialStreetEdge);
+        if (endVertex) {
+          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
+        } else {
+          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
+        }
+      } else {
+        // creates links from street head -> location -> street tail.
+        createHalfLocationForTest(location, name, nearestPoint, street, endVertex, tempEdges);
+      }
     }
-  }
-
-  private static P2<LineString> getGeometry(StreetEdge e, Coordinate nearestPoint) {
-    LineString geometry = e.getGeometry();
-    return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
+    location.setWheelchairAccessible(wheelchairAccessible);
+    return location;
   }
 
   public VertexLinker getVertexLinker() {
@@ -225,6 +223,108 @@ public class StreetVertexIndex {
     }
 
     return null;
+  }
+
+  @Override
+  public String toString() {
+    return (
+      getClass().getName() +
+      " -- edgeTree: " +
+      edgeTree.toString() +
+      " -- verticesTree: " +
+      verticesTree.toString()
+    );
+  }
+
+  /**
+   * Finds the appropriate vertex for this location.
+   *
+   * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
+   */
+  public Vertex getVertexForLocationForTest(
+    GenericLocation location,
+    RoutingRequest options,
+    boolean endVertex,
+    Set<DisposableEdgeCollection> tempEdges
+  ) {
+    // Check if coordinate is provided and connect it to graph
+    Coordinate coordinate = location.getCoordinate();
+    if (coordinate != null) {
+      //return getClosestVertex(loc, options, endVertex);
+      return createVertexFromLocation(location, options, endVertex, tempEdges);
+    }
+
+    return null;
+  }
+
+  private static void createHalfLocationForTest(
+    TemporaryStreetLocation base,
+    I18NString name,
+    Coordinate nearestPoint,
+    StreetEdge street,
+    boolean endVertex,
+    DisposableEdgeCollection tempEdges
+  ) {
+    StreetVertex tov = (StreetVertex) street.getToVertex();
+    StreetVertex fromv = (StreetVertex) street.getFromVertex();
+    LineString geometry = street.getGeometry();
+
+    P2<LineString> geometries = getGeometry(street, nearestPoint);
+
+    double totalGeomLength = geometry.getLength();
+    double lengthRatioIn = geometries.first.getLength() / totalGeomLength;
+
+    double lengthIn = street.getDistanceMeters() * lengthRatioIn;
+    double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
+
+    if (endVertex) {
+      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
+        street,
+        fromv,
+        base,
+        geometries.first,
+        name,
+        lengthIn
+      );
+
+      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
+      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
+      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
+      temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
+      tempEdges.addEdge(temporaryPartialStreetEdge);
+    } else {
+      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
+        street,
+        base,
+        tov,
+        geometries.second,
+        name,
+        lengthOut
+      );
+
+      temporaryPartialStreetEdge.setStreetClass(street.getStreetClass());
+      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
+      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
+      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
+      tempEdges.addEdge(temporaryPartialStreetEdge);
+    }
+  }
+
+  private static P2<LineString> getGeometry(StreetEdge e, Coordinate nearestPoint) {
+    LineString geometry = e.getGeometry();
+    return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
+  }
+
+  private static LineString edgeGeometryOrStraightLine(Edge e) {
+    LineString geometry = e.getGeometry();
+    if (geometry == null) {
+      Coordinate[] coordinates = new Coordinate[] {
+        e.getFromVertex().getCoordinate(),
+        e.getToVertex().getCoordinate(),
+      };
+      geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    }
+    return geometry;
   }
 
   private Vertex createVertexFromLocation(
@@ -334,108 +434,5 @@ public class StreetVertexIndex {
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
-  }
-
-  @Override
-  public String toString() {
-    return (
-      getClass().getName() +
-      " -- edgeTree: " +
-      edgeTree.toString() +
-      " -- verticesTree: " +
-      verticesTree.toString()
-    );
-  }
-
-  /**
-   * Finds the appropriate vertex for this location.
-   *
-   * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
-   */
-  public Vertex getVertexForLocationForTest(
-    GenericLocation location,
-    RoutingRequest options,
-    boolean endVertex,
-    Set<DisposableEdgeCollection> tempEdges
-  ) {
-    // Check if coordinate is provided and connect it to graph
-    Coordinate coordinate = location.getCoordinate();
-    if (coordinate != null) {
-      //return getClosestVertex(loc, options, endVertex);
-      return createVertexFromLocation(location, options, endVertex, tempEdges);
-    }
-
-    return null;
-  }
-
-  /**
-   * Creates a TemporaryStreetLocation on the given street (set of PlainStreetEdges). How far along
-   * is controlled by the location parameter, which represents a distance along the edge between 0
-   * (the from vertex) and 1 (the to vertex).
-   *
-   * @param edges A collection of nearby edges, which represent one street.
-   * @return the new TemporaryStreetLocation
-   */
-  public static TemporaryStreetLocation createTemporaryStreetLocationForTest(
-    String label,
-    I18NString name,
-    Iterable<StreetEdge> edges,
-    Coordinate nearestPoint,
-    boolean endVertex,
-    DisposableEdgeCollection tempEdges
-  ) {
-    boolean wheelchairAccessible = false;
-
-    TemporaryStreetLocation location = new TemporaryStreetLocation(
-      label,
-      nearestPoint,
-      name,
-      endVertex
-    );
-
-    for (StreetEdge street : edges) {
-      Vertex fromv = street.getFromVertex();
-      Vertex tov = street.getToVertex();
-      wheelchairAccessible |= street.isWheelchairAccessible();
-
-      /* forward edges and vertices */
-      Vertex edgeLocation;
-      if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-        edgeLocation = fromv;
-
-        if (endVertex) {
-          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
-        } else {
-          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
-        }
-      } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-        edgeLocation = tov;
-
-        if (endVertex) {
-          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
-        } else {
-          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
-        }
-      } else {
-        // creates links from street head -> location -> street tail.
-        createHalfLocationForTest(location, name, nearestPoint, street, endVertex, tempEdges);
-      }
-    }
-    location.setWheelchairAccessible(wheelchairAccessible);
-    return location;
-  }
-
-  private static LineString edgeGeometryOrStraightLine(Edge e) {
-    LineString geometry = e.getGeometry();
-    if (geometry == null) {
-      Coordinate[] coordinates = new Coordinate[] {
-        e.getFromVertex().getCoordinate(),
-        e.getToVertex().getCoordinate(),
-      };
-      geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
-    }
-    return geometry;
   }
 }

@@ -27,8 +27,8 @@ import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 public class StatesToWalkStepsMapper {
 
   /**
-   * Tolerance for how many meters can be between two consecutive turns will be merged into a
-   * singe walk step. See {@link StatesToWalkStepsMapper#removeZag(WalkStep, WalkStep)}
+   * Tolerance for how many meters can be between two consecutive turns will be merged into a singe
+   * walk step. See {@link StatesToWalkStepsMapper#removeZag(WalkStep, WalkStep)}
    */
   private static final double MAX_ZAG_DISTANCE = 30;
 
@@ -54,11 +54,11 @@ public class StatesToWalkStepsMapper {
   private String roundaboutPreviousStreet = null;
 
   /**
-     * Converts a list of street edges to a list of turn-by-turn directions.
-     *
-     * @param previousStep the last walking step of a non-transit leg that immediately precedes this
-       one or null, if first leg
-     */
+   * Converts a list of street edges to a list of turn-by-turn directions.
+   *
+   * @param previousStep the last walking step of a non-transit leg that immediately precedes this
+   *                     one or null, if first leg
+   */
   public StatesToWalkStepsMapper(
     List<State> states,
     WalkStep previousStep,
@@ -69,6 +69,17 @@ public class StatesToWalkStepsMapper {
     this.previous = previousStep;
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
+  }
+
+  public static String getNormalizedName(String streetName) {
+    if (streetName == null) {
+      return null; //Avoid null reference exceptions with pathways which don't have names
+    }
+    int idx = streetName.indexOf('(');
+    if (idx > 0) {
+      return streetName.substring(0, idx - 1);
+    }
+    return streetName;
   }
 
   public List<WalkStep> generateWalkSteps() {
@@ -93,6 +104,61 @@ public class StatesToWalkStepsMapper {
     }
 
     return steps;
+  }
+
+  /**
+   * Have we done a U-Turn with the previous two states
+   */
+  private static boolean isUTurn(WalkStep twoBack, WalkStep lastStep) {
+    RelativeDirection d1 = lastStep.relativeDirection;
+    RelativeDirection d2 = twoBack.relativeDirection;
+    return (
+      (
+        (d1 == RelativeDirection.RIGHT || d1 == RelativeDirection.HARD_RIGHT) &&
+        (d2 == RelativeDirection.RIGHT || d2 == RelativeDirection.HARD_RIGHT)
+      ) ||
+      (
+        (d1 == RelativeDirection.LEFT || d1 == RelativeDirection.HARD_LEFT) &&
+        (d2 == RelativeDirection.LEFT || d2 == RelativeDirection.HARD_LEFT)
+      )
+    );
+  }
+
+  private static double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
+    double angleDiff = thisAngle - lastAngle;
+    if (angleDiff < 0) {
+      angleDiff += Math.PI * 2;
+    }
+    double ccwAngleDiff = Math.PI * 2 - angleDiff;
+    if (ccwAngleDiff < angleDiff) {
+      angleDiff = ccwAngleDiff;
+    }
+    return angleDiff;
+  }
+
+  private static boolean isLink(Edge edge) {
+    return (
+      edge instanceof StreetEdge &&
+      (((StreetEdge) edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK
+    );
+  }
+
+  private static List<P2<Double>> encodeElevationProfile(
+    Edge edge,
+    double distanceOffset,
+    double heightOffset
+  ) {
+    if (!(edge instanceof StreetEdge elevEdge)) {
+      return new ArrayList<>();
+    }
+    if (elevEdge.getElevationProfile() == null) {
+      return new ArrayList<>();
+    }
+    ArrayList<P2<Double>> out = new ArrayList<>();
+    for (Coordinate coordinate : elevEdge.getElevationProfile().toCoordinateArray()) {
+      out.add(new P2<>(coordinate.x + distanceOffset, coordinate.y + heightOffset));
+    }
+    return out;
   }
 
   private void processState(State backState, State forwardState) {
@@ -246,13 +312,14 @@ public class StatesToWalkStepsMapper {
 
   /**
    * Merge two consecutive turns will be into a singe walk step.
-   * <p>
+   * <pre>
    *      | a
    *      |
    *  ____/
    * / ^ this is a zag between walk steps a and b. If it is less than 30 meters, a and b will be
    * |   in the same walk step.
    * | b
+   * </pre>
    */
   private void removeZag(WalkStep threeBack, WalkStep twoBack) {
     current = threeBack;
@@ -267,24 +334,6 @@ public class StatesToWalkStepsMapper {
         }
       }
     }
-  }
-
-  /**
-   * Have we done a U-Turn with the previous two states
-   */
-  private static boolean isUTurn(WalkStep twoBack, WalkStep lastStep) {
-    RelativeDirection d1 = lastStep.relativeDirection;
-    RelativeDirection d2 = twoBack.relativeDirection;
-    return (
-      (
-        (d1 == RelativeDirection.RIGHT || d1 == RelativeDirection.HARD_RIGHT) &&
-        (d2 == RelativeDirection.RIGHT || d2 == RelativeDirection.HARD_RIGHT)
-      ) ||
-      (
-        (d1 == RelativeDirection.LEFT || d1 == RelativeDirection.HARD_LEFT) &&
-        (d2 == RelativeDirection.LEFT || d2 == RelativeDirection.HARD_LEFT)
-      )
-    );
   }
 
   private void processUTurn(WalkStep lastStep, WalkStep twoBack) {
@@ -433,53 +482,5 @@ public class StatesToWalkStepsMapper {
       step.area = true;
     }
     return step;
-  }
-
-  public static String getNormalizedName(String streetName) {
-    if (streetName == null) {
-      return null; //Avoid null reference exceptions with pathways which don't have names
-    }
-    int idx = streetName.indexOf('(');
-    if (idx > 0) {
-      return streetName.substring(0, idx - 1);
-    }
-    return streetName;
-  }
-
-  private static double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
-    double angleDiff = thisAngle - lastAngle;
-    if (angleDiff < 0) {
-      angleDiff += Math.PI * 2;
-    }
-    double ccwAngleDiff = Math.PI * 2 - angleDiff;
-    if (ccwAngleDiff < angleDiff) {
-      angleDiff = ccwAngleDiff;
-    }
-    return angleDiff;
-  }
-
-  private static boolean isLink(Edge edge) {
-    return (
-      edge instanceof StreetEdge &&
-      (((StreetEdge) edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK
-    );
-  }
-
-  private static List<P2<Double>> encodeElevationProfile(
-    Edge edge,
-    double distanceOffset,
-    double heightOffset
-  ) {
-    if (!(edge instanceof StreetEdge elevEdge)) {
-      return new ArrayList<>();
-    }
-    if (elevEdge.getElevationProfile() == null) {
-      return new ArrayList<>();
-    }
-    ArrayList<P2<Double>> out = new ArrayList<>();
-    for (Coordinate coordinate : elevEdge.getElevationProfile().toCoordinateArray()) {
-      out.add(new P2<>(coordinate.x + distanceOffset, coordinate.y + heightOffset));
-    }
-    return out;
   }
 }

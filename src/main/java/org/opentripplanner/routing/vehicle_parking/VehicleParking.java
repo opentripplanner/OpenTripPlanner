@@ -14,7 +14,7 @@ import org.opentripplanner.util.I18NString;
 
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
- *
+ * <p>
  * All fields are immutable except for the availability, capacity which may be updated by updaters.
  * If any other properties change a new VehicleParking instance should be created.
  */
@@ -57,7 +57,8 @@ public class VehicleParking implements Serializable {
   private final I18NString note;
 
   /**
-   * The state of this vehicle parking. Only ones in an OPERATIONAL state may be used for Park and Ride.
+   * The state of this vehicle parking. Only ones in an OPERATIONAL state may be used for Park and
+   * Ride.
    */
   private final VehicleParkingState state;
 
@@ -80,16 +81,14 @@ public class VehicleParking implements Serializable {
    * The capacity (maximum available spaces) of this vehicle parking.
    */
   private final VehicleParkingSpaces capacity;
-
-  /**
-   * The currently available spaces at this vehicle parking.
-   */
-  private VehicleParkingSpaces availability;
-
   /**
    * The entrances to enter and exit this vehicle parking.
    */
   private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
+  /**
+   * The currently available spaces at this vehicle parking.
+   */
+  private VehicleParkingSpaces availability;
 
   VehicleParking(
     FeedScopedId id,
@@ -121,6 +120,10 @@ public class VehicleParking implements Serializable {
     this.wheelchairAccessibleCarPlaces = wheelchairAccessibleCarPlaces;
     this.capacity = capacity;
     this.availability = availability;
+  }
+
+  public static VehicleParkingBuilder builder() {
+    return new VehicleParkingBuilder();
   }
 
   public FeedScopedId getId() {
@@ -247,16 +250,24 @@ public class VehicleParking implements Serializable {
     this.availability = vehicleParkingSpaces;
   }
 
-  private void addEntrance(VehicleParkingEntranceCreator creator) {
-    var entrance = creator
-      .updateValues(VehicleParkingEntrance.builder().vehicleParking(this))
-      .build();
-
-    entrances.add(entrance);
-  }
-
-  public String toString() {
-    return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      id,
+      name,
+      x,
+      y,
+      detailsUrl,
+      imageUrl,
+      tags,
+      note,
+      state,
+      bicyclePlaces,
+      carPlaces,
+      wheelchairAccessibleCarPlaces,
+      capacity,
+      entrances
+    );
   }
 
   @Override
@@ -286,28 +297,16 @@ public class VehicleParking implements Serializable {
     );
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(
-      id,
-      name,
-      x,
-      y,
-      detailsUrl,
-      imageUrl,
-      tags,
-      note,
-      state,
-      bicyclePlaces,
-      carPlaces,
-      wheelchairAccessibleCarPlaces,
-      capacity,
-      entrances
-    );
+  public String toString() {
+    return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
   }
 
-  public static VehicleParkingBuilder builder() {
-    return new VehicleParkingBuilder();
+  private void addEntrance(VehicleParkingEntranceCreator creator) {
+    var entrance = creator
+      .updateValues(VehicleParkingEntrance.builder().vehicleParking(this))
+      .build();
+
+    entrances.add(entrance);
   }
 
   @FunctionalInterface
@@ -320,8 +319,8 @@ public class VehicleParking implements Serializable {
   @SuppressWarnings("unused")
   public static class VehicleParkingBuilder {
 
-    private Set<String> tags = Set.of();
     private final List<VehicleParkingEntranceCreator> entranceCreators = new ArrayList<>();
+    private Set<String> tags = Set.of();
     private FeedScopedId id;
     private I18NString name;
     private double x;

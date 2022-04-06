@@ -1,7 +1,12 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import static org.junit.Assert.*;
-import static org.opentripplanner.graph_builder.module.FakeGraph.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.graph_builder.module.FakeGraph.addExtraStops;
+import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopGrid;
+import static org.opentripplanner.graph_builder.module.FakeGraph.buildGraphNoTransit;
+import static org.opentripplanner.graph_builder.module.FakeGraph.link;
 
 import com.google.common.collect.Iterables;
 import java.net.URISyntaxException;
@@ -28,9 +33,9 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 public class LinkingTest {
 
   /**
-   * Ensure that splitting edges yields edges that are identical in length for forward and back edges.
-   * StreetEdges have lengths expressed internally in mm, and we want to be sure that not only do they
-   * sum to the same values but also that they
+   * Ensure that splitting edges yields edges that are identical in length for forward and back
+   * edges. StreetEdges have lengths expressed internally in mm, and we want to be sure that not
+   * only do they sum to the same values but also that they
    */
   @Test
   public void testSplitting() {
@@ -95,10 +100,9 @@ public class LinkingTest {
   }
 
   /**
-   * Test that all the stops are linked identically
-   * to the street network on two builds of similar graphs
-   * with additional stops in one.
-   *
+   * Test that all the stops are linked identically to the street network on two builds of similar
+   * graphs with additional stops in one.
+   * <p>
    * We do this by building the graphs and then comparing the stop tree caches.
    */
   @Test

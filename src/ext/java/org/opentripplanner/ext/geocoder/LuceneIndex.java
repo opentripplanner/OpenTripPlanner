@@ -126,6 +126,80 @@ public class LuceneIndex implements Serializable {
     }
   }
 
+  public static synchronized LuceneIndex forServer(Router router) {
+    var graph = router.graph;
+    var existingIndex = graph.getService(LuceneIndex.class);
+    if (existingIndex != null) {
+      return existingIndex;
+    }
+
+    var newIndex = new LuceneIndex(graph);
+    graph.putService(LuceneIndex.class, newIndex);
+    return newIndex;
+  }
+
+  public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
+    return matchingDocuments(StopLocation.class, query, autocomplete)
+      .map(document -> graph.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
+  }
+
+  public Stream<StopCollection> queryStopCollections(String query, boolean autocomplete) {
+    return matchingDocuments(StopCollection.class, query, autocomplete)
+      .map(document -> graph.getStopCollectionById(FeedScopedId.parseId(document.get(ID))));
+  }
+
+  public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {
+    return matchingDocuments(StreetVertex.class, query, autocomplete)
+      .map(document -> (StreetVertex) graph.getVertex(document.get(ID)));
+  }
+
+  static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
+    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+    Codec filterCodec = new Lucene91Codec() {
+      final PostingsFormat postingsFormat = new Completion90PostingsFormat();
+
+      @Override
+      public PostingsFormat getPostingsFormatForField(String field) {
+        if (suggestFields.contains(field)) {
+          return postingsFormat;
+        }
+        return super.getPostingsFormatForField(field);
+      }
+    };
+    iwc.setCodec(filterCodec);
+    return iwc;
+  }
+
+  private static void addToIndex(
+    IndexWriter writer,
+    Class<?> type,
+    String id,
+    I18NString name,
+    @Nullable String code,
+    double latitude,
+    double longitude
+  ) {
+    String typeName = type.getSimpleName();
+
+    Document document = new Document();
+    document.add(new StoredField(ID, id));
+    document.add(new TextField(TYPE, typeName, Store.YES));
+    document.add(new TextField(NAME, Objects.toString(name), Store.YES));
+    document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
+    document.add(new LatLonPoint(COORDINATE, latitude, longitude));
+
+    if (code != null) {
+      document.add(new TextField(CODE, code, Store.YES));
+      document.add(new ContextSuggestField(SUGGEST, code, 1, typeName));
+    }
+
+    try {
+      writer.addDocument(document);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
   private Stream<Document> matchingDocuments(
     Class<?> type,
     String searchTerms,
@@ -185,79 +259,5 @@ public class LuceneIndex implements Serializable {
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
-  }
-
-  public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
-    return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> graph.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
-  }
-
-  public Stream<StopCollection> queryStopCollections(String query, boolean autocomplete) {
-    return matchingDocuments(StopCollection.class, query, autocomplete)
-      .map(document -> graph.getStopCollectionById(FeedScopedId.parseId(document.get(ID))));
-  }
-
-  public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {
-    return matchingDocuments(StreetVertex.class, query, autocomplete)
-      .map(document -> (StreetVertex) graph.getVertex(document.get(ID)));
-  }
-
-  public static synchronized LuceneIndex forServer(Router router) {
-    var graph = router.graph;
-    var existingIndex = graph.getService(LuceneIndex.class);
-    if (existingIndex != null) {
-      return existingIndex;
-    }
-
-    var newIndex = new LuceneIndex(graph);
-    graph.putService(LuceneIndex.class, newIndex);
-    return newIndex;
-  }
-
-  private static void addToIndex(
-    IndexWriter writer,
-    Class<?> type,
-    String id,
-    I18NString name,
-    @Nullable String code,
-    double latitude,
-    double longitude
-  ) {
-    String typeName = type.getSimpleName();
-
-    Document document = new Document();
-    document.add(new StoredField(ID, id));
-    document.add(new TextField(TYPE, typeName, Store.YES));
-    document.add(new TextField(NAME, Objects.toString(name), Store.YES));
-    document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
-    document.add(new LatLonPoint(COORDINATE, latitude, longitude));
-
-    if (code != null) {
-      document.add(new TextField(CODE, code, Store.YES));
-      document.add(new ContextSuggestField(SUGGEST, code, 1, typeName));
-    }
-
-    try {
-      writer.addDocument(document);
-    } catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
-    IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-    Codec filterCodec = new Lucene91Codec() {
-      final PostingsFormat postingsFormat = new Completion90PostingsFormat();
-
-      @Override
-      public PostingsFormat getPostingsFormatForField(String field) {
-        if (suggestFields.contains(field)) {
-          return postingsFormat;
-        }
-        return super.getPostingsFormatForField(field);
-      }
-    };
-    iwc.setCodec(filterCodec);
-    return iwc;
   }
 }

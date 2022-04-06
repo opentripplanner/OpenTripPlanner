@@ -25,21 +25,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is the primary entry point for the trip planning web service.
- * All parameters are passed in the query string. These parameters are defined as fields in the abstract
- * RoutingResource superclass, which also has methods for building routing requests from query
- * parameters. This allows multiple web services to have the same set of query parameters.
- * In order for inheritance to work, the REST resources are request-scoped (constructed at each request)
- * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
+ * This is the primary entry point for the trip planning web service. All parameters are passed in
+ * the query string. These parameters are defined as fields in the abstract RoutingResource
+ * superclass, which also has methods for building routing requests from query parameters. This
+ * allows multiple web services to have the same set of query parameters. In order for inheritance
+ * to work, the REST resources are request-scoped (constructed at each request) rather than
+ * singleton-scoped (a single instance existing for the lifetime of the OTP server).
  */
-@Path("routers/{ignoreRouterId}/plan") // final element needed here rather than on method to distinguish from routers API
+@Path("routers/{ignoreRouterId}/plan")
+// final element needed here rather than on method to distinguish from routers API
 public class PlannerResource extends RoutingResource {
 
   private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
 
   /**
-   * @deprecated The support for multiple routers are removed from OTP2.
-   * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+   * @deprecated The support for multiple routers are removed from OTP2. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/2760
    */
   @Deprecated
   @PathParam("ignoreRouterId")

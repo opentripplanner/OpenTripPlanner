@@ -43,15 +43,13 @@ public class TimetableHelper {
    * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
    * must not be modified directly because they may be shared with the underlying
    * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
-   * protective copying of this Timetable. It is not done in this update method to avoid
-   * repeatedly cloning the same Timetable when several updates are applied to it at once. We
-   * assume here that all trips in a timetable are from the same feed, which should always be the
-   * case.
+   * protective copying of this Timetable. It is not done in this update method to avoid repeatedly
+   * cloning the same Timetable when several updates are applied to it at once. We assume here that
+   * all trips in a timetable are from the same feed, which should always be the case.
    *
-   * @param journey  SIRI-ET EstimatedVehicleJourney
+   * @param journey SIRI-ET EstimatedVehicleJourney
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something
-   * went wrong
+   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static TripTimes createUpdatedTripTimes(
     final Graph graph,
@@ -396,13 +394,12 @@ public class TimetableHelper {
   }
 
   /**
-   * Apply the SIRI ET to the appropriate TripTimes from this Timetable.
-   * Calculate new stoppattern based on single stop cancellations
+   * Apply the SIRI ET to the appropriate TripTimes from this Timetable. Calculate new stoppattern
+   * based on single stop cancellations
    *
-   * @param journey    SIRI-ET EstimatedVehicleJourney
+   * @param journey SIRI-ET EstimatedVehicleJourney
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something
-   * went wrong
+   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static List<StopLocation> createModifiedStops(
     Timetable timetable,
@@ -508,13 +505,12 @@ public class TimetableHelper {
   }
 
   /**
-   * Apply the SIRI ET to the appropriate TripTimes from this Timetable.
-   * Calculate new stoppattern based on single stop cancellations
+   * Apply the SIRI ET to the appropriate TripTimes from this Timetable. Calculate new stoppattern
+   * based on single stop cancellations
    *
-   * @param journey    SIRI-ET EstimatedVehicleJourney
+   * @param journey SIRI-ET EstimatedVehicleJourney
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something
-   * went wrong
+   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static List<StopTime> createModifiedStopTimes(
     Timetable timetable,
@@ -708,15 +704,13 @@ public class TimetableHelper {
    * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
    * must not be modified directly because they may be shared with the underlying
    * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
-   * protective copying of this Timetable. It is not done in this update method to avoid
-   * repeatedly cloning the same Timetable when several updates are applied to it at once. We
-   * assume here that all trips in a timetable are from the same feed, which should always be the
-   * case.
+   * protective copying of this Timetable. It is not done in this update method to avoid repeatedly
+   * cloning the same Timetable when several updates are applied to it at once. We assume here that
+   * all trips in a timetable are from the same feed, which should always be the case.
    *
    * @param activity SIRI-VM VehicleActivity
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something
-   * went wrong
+   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static TripTimes createUpdatedTripTimes(
     Timetable timetable,

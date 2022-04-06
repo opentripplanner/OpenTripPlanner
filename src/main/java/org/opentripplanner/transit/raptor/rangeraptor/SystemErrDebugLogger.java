@@ -26,8 +26,8 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This
- * is used by the REST API, SpeedTest and in module tests.
+ * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This is
+ * used by the REST API, SpeedTest and in module tests.
  * <p>
  * See the Raptor design doc for a general description of the logging functionality.
  */
@@ -37,12 +37,6 @@ public class SystemErrDebugLogger implements DebugLogger {
 
   private final boolean enableDebugLogging;
   private final NumberFormat numFormat = NumberFormat.getInstance(Locale.FRANCE);
-
-  private boolean forwardSearch = true;
-  private int lastIterationTime = NOT_SET;
-  private int lastRound = NOT_SET;
-  private boolean printPathHeader = true;
-
   private final TableFormatter arrivalTableFormatter = new TableFormatter(
     List.of(Center, Center, Right, Right, Right, Right, Left, Left),
     List.of("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "COST", "TRIP", "DETAILS"),
@@ -55,7 +49,6 @@ public class SystemErrDebugLogger implements DebugLogger {
     24,
     0
   );
-
   private final TableFormatter pathTableFormatter = new TableFormatter(
     List.of(Center, Center, Right, Right, Right, Right, Right, Right, Left),
     List.of(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "COST", "DETAILS"),
@@ -69,14 +62,18 @@ public class SystemErrDebugLogger implements DebugLogger {
     6,
     0
   );
+  private boolean forwardSearch = true;
+  private int lastIterationTime = NOT_SET;
+  private int lastRound = NOT_SET;
+  private boolean printPathHeader = true;
 
   public SystemErrDebugLogger(boolean enableDebugLogging) {
     this.enableDebugLogging = enableDebugLogging;
   }
 
   /**
-   * This should be passed into the {@link DebugRequestBuilder#stopArrivalListener(Consumer)}
-   * using a lambda to enable debugging stop arrivals.
+   * This should be passed into the {@link DebugRequestBuilder#stopArrivalListener(Consumer)} using
+   * a lambda to enable debugging stop arrivals.
    */
   public void stopArrivalLister(DebugEvent<ArrivalView<?>> e) {
     printIterationHeader(e.iterationStartTime());
@@ -155,6 +152,35 @@ public class SystemErrDebugLogger implements DebugLogger {
 
   /* private methods */
 
+  private static String details(String action, String optReason, @Nullable String element) {
+    StringBuilder buf = new StringBuilder();
+    buf.append(action).append(": ").append(element);
+    if (isNotBlank(optReason)) {
+      buf.append("  # ").append(optReason);
+    }
+    return buf.toString();
+  }
+
+  /**
+   * The absolute time duration in seconds of a trip.
+   */
+  private static int legDuration(ArrivalView<?> a) {
+    if (a.arrivedByAccess()) {
+      return a.accessPath().access().durationInSeconds();
+    }
+    if (a.arrivedByTransfer()) {
+      return a.transferPath().durationInSeconds();
+    }
+    if (a.arrivedAtDestination()) {
+      return a.egressPath().egress().durationInSeconds();
+    }
+    throw new IllegalStateException("Unsupported type: " + a.getClass());
+  }
+
+  private static boolean isNotBlank(String text) {
+    return text != null && !text.isBlank();
+  }
+
   private void printIterationHeader(int iterationTime) {
     if (iterationTime == lastIterationTime) {
       return;
@@ -197,15 +223,6 @@ public class SystemErrDebugLogger implements DebugLogger {
     );
   }
 
-  private static String details(String action, String optReason, @Nullable String element) {
-    StringBuilder buf = new StringBuilder();
-    buf.append(action).append(": ").append(element);
-    if (isNotBlank(optReason)) {
-      buf.append("  # ").append(optReason);
-    }
-    return buf.toString();
-  }
-
   private String path(ArrivalView<?> a) {
     return path(a, new PathStringBuilder(null))
       .space()
@@ -246,22 +263,6 @@ public class SystemErrDebugLogger implements DebugLogger {
     return buf.sep().stop(a.stop());
   }
 
-  /**
-   * The absolute time duration in seconds of a trip.
-   */
-  private static int legDuration(ArrivalView<?> a) {
-    if (a.arrivedByAccess()) {
-      return a.accessPath().access().durationInSeconds();
-    }
-    if (a.arrivedByTransfer()) {
-      return a.transferPath().durationInSeconds();
-    }
-    if (a.arrivedAtDestination()) {
-      return a.egressPath().egress().durationInSeconds();
-    }
-    throw new IllegalStateException("Unsupported type: " + a.getClass());
-  }
-
   private void printRoundHeader(int round) {
     if (round == lastRound) {
       return;
@@ -287,9 +288,5 @@ public class SystemErrDebugLogger implements DebugLogger {
       return "Egress";
     }
     throw new IllegalStateException("Unknown mode for: " + this);
-  }
-
-  private static boolean isNotBlank(String text) {
-    return text != null && !text.isBlank();
   }
 }

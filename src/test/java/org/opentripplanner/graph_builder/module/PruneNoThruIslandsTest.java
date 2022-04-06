@@ -20,11 +20,6 @@ public class PruneNoThruIslandsTest {
 
   private static Graph graph;
 
-  @BeforeAll
-  static void setup() {
-    graph = buildOsmGraph(ConstantsForTests.ISLAND_PRUNE_OSM);
-  }
-
   @Test
   public void bicycleNoThruIslandsBecomeNoThru() {
     Assertions.assertTrue(
@@ -61,6 +56,11 @@ public class PruneNoThruIslandsTest {
         .collect(Collectors.toSet())
         .contains("159830257")
     );
+  }
+
+  @BeforeAll
+  static void setup() {
+    graph = buildOsmGraph(ConstantsForTests.ISLAND_PRUNE_OSM);
   }
 
   private static Graph buildOsmGraph(String osmPath) {

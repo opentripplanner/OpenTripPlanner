@@ -11,37 +11,6 @@ public class LegacyGraphQLVehicleRentalStationImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLVehicleRentalStation {
 
   @Override
-  public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("VehicleRentalStation", getSource(environment).getId().toString());
-  }
-
-  @Override
-  public DataFetcher<String> stationId() {
-    return environment -> getSource(environment).getId().toString();
-  }
-
-  @Override
-  public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName().toString(environment.getLocale());
-  }
-
-  @Override
-  public DataFetcher<Integer> vehiclesAvailable() {
-    return environment -> getSource(environment).getVehiclesAvailable();
-  }
-
-  @Override
-  public DataFetcher<Integer> spacesAvailable() {
-    return environment -> getSource(environment).getSpacesAvailable();
-  }
-
-  @Override
-  public DataFetcher<Boolean> realtime() {
-    return environment -> getSource(environment).isRealTimeData();
-  }
-
-  @Override
   public DataFetcher<Boolean> allowDropoff() {
     return environment -> getSource(environment).isAllowDropoff();
   }
@@ -49,6 +18,11 @@ public class LegacyGraphQLVehicleRentalStationImpl
   @Override
   public DataFetcher<Boolean> allowDropoffNow() {
     return environment -> getSource(environment).allowDropoffNow();
+  }
+
+  @Override
+  public DataFetcher<Boolean> allowOverloading() {
+    return environment -> getSource(environment).isAllowOverloading();
   }
 
   @Override
@@ -62,13 +36,14 @@ public class LegacyGraphQLVehicleRentalStationImpl
   }
 
   @Override
-  public DataFetcher<String> network() {
-    return environment -> getSource(environment).getNetwork();
+  public DataFetcher<Integer> capacity() {
+    return environment -> getSource(environment).getCapacity();
   }
 
   @Override
-  public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).getLongitude();
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment ->
+      new Relay.ResolvedGlobalId("VehicleRentalStation", getSource(environment).getId().toString());
   }
 
   @Override
@@ -77,13 +52,18 @@ public class LegacyGraphQLVehicleRentalStationImpl
   }
 
   @Override
-  public DataFetcher<Boolean> allowOverloading() {
-    return environment -> getSource(environment).isAllowOverloading();
+  public DataFetcher<Double> lon() {
+    return environment -> getSource(environment).getLongitude();
   }
 
   @Override
-  public DataFetcher<Integer> capacity() {
-    return environment -> getSource(environment).getCapacity();
+  public DataFetcher<String> name() {
+    return environment -> getSource(environment).getName().toString(environment.getLocale());
+  }
+
+  @Override
+  public DataFetcher<String> network() {
+    return environment -> getSource(environment).getNetwork();
   }
 
   @Override
@@ -93,8 +73,28 @@ public class LegacyGraphQLVehicleRentalStationImpl
   }
 
   @Override
+  public DataFetcher<Boolean> realtime() {
+    return environment -> getSource(environment).isRealTimeData();
+  }
+
+  @Override
   public DataFetcher<VehicleRentalStationUris> rentalUris() {
     return environment -> getSource(environment).getRentalUris();
+  }
+
+  @Override
+  public DataFetcher<Integer> spacesAvailable() {
+    return environment -> getSource(environment).getSpacesAvailable();
+  }
+
+  @Override
+  public DataFetcher<String> stationId() {
+    return environment -> getSource(environment).getId().toString();
+  }
+
+  @Override
+  public DataFetcher<Integer> vehiclesAvailable() {
+    return environment -> getSource(environment).getVehiclesAvailable();
   }
 
   private VehicleRentalPlace getSource(DataFetchingEnvironment environment) {

@@ -9,8 +9,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * This is a Request builder to help construct valid requests. Se the
- * request classes for documentation on each parameter.
+ * This is a Request builder to help construct valid requests. Se the request classes for
+ * documentation on each parameter.
  * <p/>
  * <ul>
  *     <li>{@link RaptorRequest}
@@ -23,18 +23,15 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
   // Search
   private final SearchParamsBuilder<T> searchParams;
-  private SearchDirection searchDirection;
-  private RaptorSlackProvider slackProvider;
-
-  // Algorithm
-  private RaptorProfile profile;
   private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
-
   // Timer
   private final Set<String> timingTags;
-
   // Debug
   private final DebugRequestBuilder debug;
+  private SearchDirection searchDirection;
+  private RaptorSlackProvider slackProvider;
+  // Algorithm
+  private RaptorProfile profile;
 
   public RaptorRequestBuilder() {
     this(RaptorRequest.defaults());

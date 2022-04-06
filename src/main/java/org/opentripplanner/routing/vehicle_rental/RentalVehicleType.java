@@ -8,7 +8,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 
 /**
- * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS Specification</a>
+ * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
+ * Specification</a>
  */
 public class RentalVehicleType implements Serializable, Comparable<RentalVehicleType> {
 
@@ -52,6 +53,11 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
   }
 
   @Override
+  public int hashCode() {
+    return id.hashCode();
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) {
       return false;
@@ -60,11 +66,6 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
     RentalVehicleType that = (RentalVehicleType) o;
 
     return id.equals(that.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return id.hashCode();
   }
 
   @Override

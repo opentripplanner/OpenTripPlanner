@@ -16,16 +16,18 @@ public class LocalizedStringFormat implements I18NString, Serializable {
   }
 
   @Override
-  public String toString() {
-    return this.toString(null);
-  }
-
-  @Override
   public String toString(Locale locale) {
     return String.format(
       format,
       Arrays.stream(values).map(i -> i.toString(locale)).toArray(Object[]::new)
     );
+  }
+
+  @Override
+  public int hashCode() {
+    int result = Objects.hash(format);
+    result = 31 * result + Arrays.hashCode(values);
+    return result;
   }
 
   @Override
@@ -41,9 +43,7 @@ public class LocalizedStringFormat implements I18NString, Serializable {
   }
 
   @Override
-  public int hashCode() {
-    int result = Objects.hash(format);
-    result = 31 * result + Arrays.hashCode(values);
-    return result;
+  public String toString() {
+    return this.toString(null);
   }
 }

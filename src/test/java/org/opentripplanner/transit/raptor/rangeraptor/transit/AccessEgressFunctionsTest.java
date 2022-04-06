@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;

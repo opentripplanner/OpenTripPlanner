@@ -15,8 +15,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
- * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge splitting, such as start/endpoint snapping and
- * adding new edges during transit linking.
+ * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge
+ * splitting, such as start/endpoint snapping and adding new edges during transit linking.
  *
  * @author novalis
  */
@@ -38,7 +38,8 @@ public class AreaEdgeList implements Serializable {
   }
 
   /**
-   * Safely add a vertex to this area. This creates edges to all other vertices unless those edges would cross one of the original edges.
+   * Safely add a vertex to this area. This creates edges to all other vertices unless those edges
+   * would cross one of the original edges.
    */
   public void addVertex(IntersectionVertex newVertex) {
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
@@ -81,6 +82,14 @@ public class AreaEdgeList implements Serializable {
     }
 
     visibilityVertices.add(newVertex);
+  }
+
+  public void addArea(NamedArea namedArea) {
+    areas.add(namedArea);
+  }
+
+  public List<NamedArea> getAreas() {
+    return areas;
   }
 
   private void createSegments(
@@ -131,13 +140,5 @@ public class AreaEdgeList implements Serializable {
       );
       backward.setStreetClass(area.getStreetClass());
     }
-  }
-
-  public void addArea(NamedArea namedArea) {
-    areas.add(namedArea);
-  }
-
-  public List<NamedArea> getAreas() {
-    return areas;
   }
 }

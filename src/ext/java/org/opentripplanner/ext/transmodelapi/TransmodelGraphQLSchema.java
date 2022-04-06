@@ -125,6 +125,63 @@ public class TransmodelGraphQLSchema {
     return new TransmodelGraphQLSchema(defaultRequest, qglUtil).create();
   }
 
+  public GraphQLObjectType createPlanType(
+    GraphQLOutputType bookingArrangementType,
+    GraphQLOutputType interchangeType,
+    GraphQLOutputType linkGeometryType,
+    GraphQLOutputType systemNoticeType,
+    GraphQLOutputType authorityType,
+    GraphQLOutputType operatorType,
+    GraphQLOutputType bikeRentalStationType,
+    GraphQLOutputType rentalVehicleType,
+    GraphQLOutputType quayType,
+    GraphQLOutputType estimatedCallType,
+    GraphQLOutputType lineType,
+    GraphQLOutputType serviceJourneyType,
+    GraphQLOutputType ptSituationElementType,
+    GraphQLOutputType datedServiceJourneyType
+  ) {
+    GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
+    GraphQLObjectType placeType = PlanPlaceType.create(
+      bikeRentalStationType,
+      rentalVehicleType,
+      quayType
+    );
+    GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
+    GraphQLObjectType legType = LegType.create(
+      bookingArrangementType,
+      interchangeType,
+      linkGeometryType,
+      authorityType,
+      operatorType,
+      quayType,
+      estimatedCallType,
+      lineType,
+      serviceJourneyType,
+      datedServiceJourneyType,
+      ptSituationElementType,
+      placeType,
+      pathGuidanceType,
+      gqlUtil
+    );
+    GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
+    GraphQLObjectType routingErrorType = RoutingErrorType.create();
+
+    return TripType.create(placeType, tripPatternType, tripMetadataType, routingErrorType, gqlUtil);
+  }
+
+  //    private BookingArrangement getBookingArrangementForTripTimeShort(TripTimeShort tripTimeShort) {
+  //        Trip trip = index.tripForId.get(tripTimeShort.tripId);
+  //        if (trip == null) {
+  //            return null;
+  //        }
+  //        TripPattern tripPattern = index.patternForTrip.get(trip);
+  //        if (tripPattern == null || tripPattern.stopPattern == null) {
+  //            return null;
+  //        }
+  //        return tripPattern.stopPattern.bookingArrangements[tripTimeShort.stopIndex];
+  //    }
+
   @SuppressWarnings("unchecked")
   private GraphQLSchema create() {
     /*
@@ -1439,63 +1496,6 @@ public class TransmodelGraphQLSchema {
     dictionary.add(Relay.pageInfoType);
 
     return GraphQLSchema.newSchema().query(queryType).build(dictionary);
-  }
-
-  //    private BookingArrangement getBookingArrangementForTripTimeShort(TripTimeShort tripTimeShort) {
-  //        Trip trip = index.tripForId.get(tripTimeShort.tripId);
-  //        if (trip == null) {
-  //            return null;
-  //        }
-  //        TripPattern tripPattern = index.patternForTrip.get(trip);
-  //        if (tripPattern == null || tripPattern.stopPattern == null) {
-  //            return null;
-  //        }
-  //        return tripPattern.stopPattern.bookingArrangements[tripTimeShort.stopIndex];
-  //    }
-
-  public GraphQLObjectType createPlanType(
-    GraphQLOutputType bookingArrangementType,
-    GraphQLOutputType interchangeType,
-    GraphQLOutputType linkGeometryType,
-    GraphQLOutputType systemNoticeType,
-    GraphQLOutputType authorityType,
-    GraphQLOutputType operatorType,
-    GraphQLOutputType bikeRentalStationType,
-    GraphQLOutputType rentalVehicleType,
-    GraphQLOutputType quayType,
-    GraphQLOutputType estimatedCallType,
-    GraphQLOutputType lineType,
-    GraphQLOutputType serviceJourneyType,
-    GraphQLOutputType ptSituationElementType,
-    GraphQLOutputType datedServiceJourneyType
-  ) {
-    GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
-    GraphQLObjectType placeType = PlanPlaceType.create(
-      bikeRentalStationType,
-      rentalVehicleType,
-      quayType
-    );
-    GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
-    GraphQLObjectType legType = LegType.create(
-      bookingArrangementType,
-      interchangeType,
-      linkGeometryType,
-      authorityType,
-      operatorType,
-      quayType,
-      estimatedCallType,
-      lineType,
-      serviceJourneyType,
-      datedServiceJourneyType,
-      ptSituationElementType,
-      placeType,
-      pathGuidanceType,
-      gqlUtil
-    );
-    GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
-    GraphQLObjectType routingErrorType = RoutingErrorType.create();
-
-    return TripType.create(placeType, tripPatternType, tripMetadataType, routingErrorType, gqlUtil);
   }
 
   private List<FeedScopedId> toIdList(List<String> ids) {

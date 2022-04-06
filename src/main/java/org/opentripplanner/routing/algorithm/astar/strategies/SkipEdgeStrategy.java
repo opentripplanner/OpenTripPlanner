@@ -10,12 +10,11 @@ import org.opentripplanner.routing.graph.Edge;
  * the current path, but continues searching along other paths until they also are terminated.
  *
  * @author bdferris
- *
  */
 public interface SkipEdgeStrategy {
   /**
    * @param current the current vertex
-   * @param edge the current edge to potentially be skipped
+   * @param edge    the current edge to potentially be skipped
    * @return true if the given edge should not be considered for traversal
    */
   boolean shouldSkipEdge(State current, Edge edge);

@@ -11,8 +11,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 
 /**
- * The responsibility of this class is to wrap a {@link StopArrivalsState} and notify the
- * {@link org.opentripplanner.transit.raptor.rangeraptor.standard.debug.StateDebugger} about all stop arrival events.
+ * The responsibility of this class is to wrap a {@link StopArrivalsState} and notify the {@link
+ * org.opentripplanner.transit.raptor.rangeraptor.standard.debug.StateDebugger} about all stop
+ * arrival events.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

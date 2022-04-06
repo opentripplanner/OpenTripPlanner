@@ -1,7 +1,10 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JComponent;
 
 final class ViewUtils {
 

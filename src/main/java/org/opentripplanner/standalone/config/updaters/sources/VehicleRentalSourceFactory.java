@@ -18,14 +18,13 @@ import org.opentripplanner.util.OtpAppException;
 public class VehicleRentalSourceFactory {
 
   private static final Map<String, DataSourceType> CONFIG_MAPPING = new HashMap<>();
+  private final DataSourceType type;
+  private final NodeAdapter c;
 
   static {
     CONFIG_MAPPING.put("gbfs", GBFS);
     CONFIG_MAPPING.put("smoove", DataSourceType.SMOOVE);
   }
-
-  private final DataSourceType type;
-  private final NodeAdapter c;
 
   public VehicleRentalSourceFactory(DataSourceType type, NodeAdapter c) {
     this.type = type;

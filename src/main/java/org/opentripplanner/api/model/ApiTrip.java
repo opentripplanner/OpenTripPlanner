@@ -18,9 +18,9 @@ public class ApiTrip implements Serializable {
   public String shapeId;
 
   /**
-   * 0: No accessibility information for the trip.
-   * 1: Vehicle being used on this particular trip can accommodate at least one rider in a wheelchair.
-   * 2: No riders in wheelchairs can be accommodated on this trip.
+   * 0: No accessibility information for the trip. 1: Vehicle being used on this particular trip can
+   * accommodate at least one rider in a wheelchair. 2: No riders in wheelchairs can be accommodated
+   * on this trip.
    */
   public int wheelchairAccessible = 0;
   /**
@@ -32,8 +32,8 @@ public class ApiTrip implements Serializable {
   public String fareId;
 
   @Override
-  public String toString() {
-    return "<Trip " + id + ">";
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
   @Override
@@ -49,7 +49,7 @@ public class ApiTrip implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(id);
+  public String toString() {
+    return "<Trip " + id + ">";
   }
 }

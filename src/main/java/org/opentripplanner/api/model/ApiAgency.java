@@ -23,8 +23,9 @@ public class ApiAgency implements Serializable {
 
   public String brandingUrl;
 
-  public String toString() {
-    return "<Agency " + this.id + ">";
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
   @Override
@@ -39,8 +40,7 @@ public class ApiAgency implements Serializable {
     return Objects.equals(id, apiAgency.id);
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
+  public String toString() {
+    return "<Agency " + this.id + ">";
   }
 }

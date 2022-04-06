@@ -18,15 +18,10 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 
 public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
 
-  enum MapperType {
-    Digitransit,
-  }
-
   static Map<MapperType, Function<Graph, PropertyMapper<VehicleRentalPlace>>> mappers = Map.of(
     MapperType.Digitransit,
     g -> DigitransitVehicleRentalPropertyMapper.create()
   );
-
   private final Graph graph;
 
   public VehicleRentalLayerBuilder(
@@ -59,5 +54,9 @@ public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> 
         return point;
       })
       .collect(Collectors.toList());
+  }
+
+  enum MapperType {
+    Digitransit,
   }
 }

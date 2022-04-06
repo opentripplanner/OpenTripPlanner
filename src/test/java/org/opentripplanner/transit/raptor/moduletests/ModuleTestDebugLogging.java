@@ -24,7 +24,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
  *   ->by   |  Access |   0 |     2 | 00:08:30 |    12 000 |      | ->by element: Walk 30s ~ 2 (cost: 12000)
  *  Accept  |  Access |   0 |     2 | 00:08:30 |    12 000 |      | Accepted element: Walk 30s ~ 2 (cost: 12000)
  * </pre>
- *
+ * <p>
  * Enable debugging by setting the DEBUG to true.
  */
 public final class ModuleTestDebugLogging {

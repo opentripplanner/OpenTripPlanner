@@ -171,9 +171,8 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
   }
 
   /**
-   * If there is a large number of trips not in service, the binary search may return
-   * a best guess index which is above the correct trip index. This test make sure
-   * such trips are found.
+   * If there is a large number of trips not in service, the binary search may return a best guess
+   * index which is above the correct trip index. This test make sure such trips are found.
    */
   @Test
   public void assertTripIsFoundEvenIfItIsBeforeTheBinarySearchUpperAndLowerBound() {
@@ -197,6 +196,12 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     searchForTrip(TIME_A2, STOP_POS_1).assertTripFound().withIndex(indexA).withAlightTime(TIME_A2);
   }
 
+  private static void addNTimes(List<TestTripSchedule> trips, TestTripSchedule tripS, int n) {
+    for (int i = 0; i < n; i++) {
+      trips.add(tripS);
+    }
+  }
+
   private void withTrips(TestTripSchedule... schedules) {
     useRoute(TestRoute.route(pattern).withTimetable(schedules));
   }
@@ -209,12 +214,6 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     this.route = route;
     this.subject =
       new TripScheduleAlightSearch<>(TRIPS_BINARY_SEARCH_THRESHOLD, this.route.timetable());
-  }
-
-  private static void addNTimes(List<TestTripSchedule> trips, TestTripSchedule tripS, int n) {
-    for (int i = 0; i < n; i++) {
-      trips.add(tripS);
-    }
   }
 
   private TripAssert searchForTrip(int arrivalTime, int stopPosition) {

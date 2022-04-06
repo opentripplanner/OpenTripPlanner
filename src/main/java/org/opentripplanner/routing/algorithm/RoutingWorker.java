@@ -51,18 +51,18 @@ public class RoutingWorker {
   private final RoutingRequest request;
   private final Router router;
   /**
-   * The transit service time-zero normalized for the current search. All transit times are
-   * relative to a "time-zero". This enables us to use an integer(small memory footprint). The
-   * times are number for seconds past the {@code transitSearchTimeZero}. In the internal model
-   * all times are stored relative to the {@link org.opentripplanner.model.calendar.ServiceDate},
-   * but to be able to compare trip times for different service days we normalize all times by
-   * calculating an offset. Now all times for the selected trip patterns become relative to the
-   * {@code transitSearchTimeZero}.
+   * The transit service time-zero normalized for the current search. All transit times are relative
+   * to a "time-zero". This enables us to use an integer(small memory footprint). The times are
+   * number for seconds past the {@code transitSearchTimeZero}. In the internal model all times are
+   * stored relative to the {@link org.opentripplanner.model.calendar.ServiceDate}, but to be able
+   * to compare trip times for different service days we normalize all times by calculating an
+   * offset. Now all times for the selected trip patterns become relative to the {@code
+   * transitSearchTimeZero}.
    */
   private final ZonedDateTime transitSearchTimeZero;
+  private final AdditionalSearchDays additionalSearchDays;
   private SearchParams raptorSearchParamsUsed = null;
   private Itinerary firstRemovedItinerary = null;
-  private final AdditionalSearchDays additionalSearchDays;
 
   public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
     request.applyPageCursor();
@@ -157,11 +157,30 @@ public class RoutingWorker {
     );
   }
 
+  private static AdditionalSearchDays createAdditionalSearchDays(
+    RaptorTuningParameters raptorTuningParameters,
+    ZoneId zoneId,
+    RoutingRequest request
+  ) {
+    var searchDateTime = ZonedDateTime.ofInstant(request.getDateTime(), zoneId);
+    var maxWindow = Duration.ofMinutes(
+      raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
+    );
+
+    return new AdditionalSearchDays(
+      request.arriveBy,
+      searchDateTime,
+      request.searchWindow,
+      maxWindow,
+      request.maxJourneyDuration
+    );
+  }
+
   /**
-   * Filter itineraries away that depart after the latest-departure-time for depart after
-   * search. These itineraries are a result of time-shifting the access leg and is needed for
-   * the raptor to prune the results. These itineraries are often not ideal, but if they
-   * pareto optimal for the "next" window, they will appear when a "next" search is performed.
+   * Filter itineraries away that depart after the latest-departure-time for depart after search.
+   * These itineraries are a result of time-shifting the access leg and is needed for the raptor to
+   * prune the results. These itineraries are often not ideal, but if they pareto optimal for the
+   * "next" window, they will appear when a "next" search is performed.
    */
   private Instant filterOnLatestDepartureTime() {
     if (
@@ -227,25 +246,6 @@ public class RoutingWorker {
     } finally {
       debugTimingAggregator.finishedTransitRouter();
     }
-  }
-
-  private static AdditionalSearchDays createAdditionalSearchDays(
-    RaptorTuningParameters raptorTuningParameters,
-    ZoneId zoneId,
-    RoutingRequest request
-  ) {
-    var searchDateTime = ZonedDateTime.ofInstant(request.getDateTime(), zoneId);
-    var maxWindow = Duration.ofMinutes(
-      raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
-    );
-
-    return new AdditionalSearchDays(
-      request.arriveBy,
-      searchDateTime,
-      request.searchWindow,
-      maxWindow,
-      request.maxJourneyDuration
-    );
   }
 
   private Duration calculateSearchWindowNextSearch(List<Itinerary> itineraries) {

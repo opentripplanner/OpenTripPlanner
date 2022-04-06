@@ -9,8 +9,8 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 class HeuristicToRunResolver {
 
   /**
-   * Create and prepare heuristic search (both FORWARD and REVERSE) based on optimizations and
-   * input search parameters. This is done for Standard and Multi-criteria profiles only.
+   * Create and prepare heuristic search (both FORWARD and REVERSE) based on optimizations and input
+   * search parameters. This is done for Standard and Multi-criteria profiles only.
    */
   static void resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters(
     RaptorRequest<?> req,

@@ -35,6 +35,10 @@ public class DataImportIssueStore {
     add(Issue.issue(type, message, arguments));
   }
 
+  public List<DataImportIssue> getIssues() {
+    return this.issues;
+  }
+
   void summarize() {
     Map<String, Long> issueCounts = issues
       .stream()
@@ -53,9 +57,5 @@ public class DataImportIssueStore {
       .forEach(issueType ->
         ISSUE_LOG.info(String.format(FMT, issueType, issueCounts.get(issueType)))
       );
-  }
-
-  public List<DataImportIssue> getIssues() {
-    return this.issues;
   }
 }

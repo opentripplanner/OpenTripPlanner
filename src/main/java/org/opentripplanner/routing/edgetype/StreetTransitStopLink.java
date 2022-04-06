@@ -4,9 +4,8 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
- * This represents the connection between a street vertex and a transit vertex
- * where going from the street to the vehicle is immediate -- such as at a
- * curbside bus stop.
+ * This represents the connection between a street vertex and a transit vertex where going from the
+ * street to the vehicle is immediate -- such as at a curbside bus stop.
  */
 public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 

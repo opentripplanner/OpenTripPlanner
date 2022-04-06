@@ -12,7 +12,6 @@ import org.opentripplanner.util.I18NString;
  * edge-based graph.
  *
  * @author novalis
- *
  */
 public class FreeEdge extends Edge {
 
@@ -20,6 +19,10 @@ public class FreeEdge extends Edge {
 
   public FreeEdge(Vertex from, Vertex to) {
     super(from, to);
+  }
+
+  public String toString() {
+    return "FreeEdge(" + fromv + " -> " + tov + ")";
   }
 
   @Override
@@ -31,8 +34,8 @@ public class FreeEdge extends Edge {
   }
 
   @Override
-  public double getDistanceMeters() {
-    return 0;
+  public I18NString getName() {
+    return null;
   }
 
   @Override
@@ -41,11 +44,7 @@ public class FreeEdge extends Edge {
   }
 
   @Override
-  public I18NString getName() {
-    return null;
-  }
-
-  public String toString() {
-    return "FreeEdge(" + fromv + " -> " + tov + ")";
+  public double getDistanceMeters() {
+    return 0;
   }
 }

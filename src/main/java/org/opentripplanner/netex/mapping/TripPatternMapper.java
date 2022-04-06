@@ -10,7 +10,16 @@ import java.util.Objects;
 import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
+import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripOnServiceDate;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
@@ -28,12 +37,12 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 
 /**
- * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern contain the same
- * sequence of stops. This means that they can all use the same StopPattern. Each ServiceJourney contains
- * TimeTabledPassingTimes that are mapped to StopTimes.
+ * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern
+ * contain the same sequence of stops. This means that they can all use the same StopPattern. Each
+ * ServiceJourney contains TimeTabledPassingTimes that are mapped to StopTimes.
  * <p>
- * Headsigns in NeTEx are only specified once and then valid for each subsequent TimeTabledPassingTime until a new
- * headsign is specified. This is accounted for in the mapper.
+ * Headsigns in NeTEx are only specified once and then valid for each subsequent
+ * TimeTabledPassingTime until a new headsign is specified. This is accounted for in the mapper.
  * <p>
  * THIS CLASS IS NOT THREADSAFE! This mapper store its intermediate results as part of its state.
  */
@@ -220,6 +229,14 @@ class TripPatternMapper {
     return result;
   }
 
+  private static String getHeadsign(List<StopTime> stopTimes) {
+    if (stopTimes != null && stopTimes.size() > 0) {
+      return stopTimes.stream().findFirst().get().getStopHeadsign();
+    } else {
+      return "";
+    }
+  }
+
   private void mapDatedServiceJourney(ServiceJourney serviceJourney, Trip trip) {
     if (datedServiceJourneysBySJId.containsKey(serviceJourney.getId())) {
       for (DatedServiceJourney datedServiceJourney : datedServiceJourneysBySJId.get(
@@ -286,14 +303,6 @@ class TripPatternMapper {
         TripTimes tripTimes = new TripTimes(trip, result.tripStopTimes.get(trip), deduplicator);
         tripPattern.add(tripTimes);
       }
-    }
-  }
-
-  private static String getHeadsign(List<StopTime> stopTimes) {
-    if (stopTimes != null && stopTimes.size() > 0) {
-      return stopTimes.stream().findFirst().get().getStopHeadsign();
-    } else {
-      return "";
     }
   }
 }

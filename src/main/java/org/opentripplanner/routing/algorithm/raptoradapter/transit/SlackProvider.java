@@ -21,8 +21,7 @@ public final class SlackProvider implements RaptorSlackProvider {
   private final int[] boardSlack;
 
   /**
-   * Keep a list of alight-slack values for each mode.
-   * Kept in an array for performance
+   * Keep a list of alight-slack values for each mode. Kept in an array for performance
    */
   private final int[] alightSlack;
 
@@ -44,6 +43,11 @@ public final class SlackProvider implements RaptorSlackProvider {
   }
 
   @Override
+  public int transferSlack() {
+    return transferSlack;
+  }
+
+  @Override
   public int boardSlack(RaptorTripPattern pattern) {
     return boardSlack[index(pattern)];
   }
@@ -51,11 +55,6 @@ public final class SlackProvider implements RaptorSlackProvider {
   @Override
   public int alightSlack(RaptorTripPattern pattern) {
     return alightSlack[index(pattern)];
-  }
-
-  @Override
-  public int transferSlack() {
-    return transferSlack;
   }
 
   /* private methods */

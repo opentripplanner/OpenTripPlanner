@@ -9,19 +9,24 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 public class LegacyGraphQLCarParkImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLCarPark {
 
   @Override
+  public DataFetcher<String> carParkId() {
+    return environment -> getSource(environment).getId().getId();
+  }
+
+  @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment ->
       new Relay.ResolvedGlobalId("CarPark", getSource(environment).getId().toString());
   }
 
   @Override
-  public DataFetcher<String> carParkId() {
-    return environment -> getSource(environment).getId().getId();
+  public DataFetcher<Double> lat() {
+    return environment -> getSource(environment).getY();
   }
 
   @Override
-  public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName().toString();
+  public DataFetcher<Double> lon() {
+    return environment -> getSource(environment).getX();
   }
 
   @Override
@@ -36,6 +41,22 @@ public class LegacyGraphQLCarParkImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
+  public DataFetcher<String> name() {
+    return environment -> getSource(environment).getName().toString();
+  }
+
+  // TODO
+  @Override
+  public DataFetcher<Iterable<Object>> openingHours() {
+    return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<Boolean> realtime() {
+    return environment -> getSource(environment).hasRealTimeData();
+  }
+
+  @Override
   public DataFetcher<Integer> spacesAvailable() {
     return environment -> {
       var availability = getSource(environment).getAvailability();
@@ -47,29 +68,8 @@ public class LegacyGraphQLCarParkImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
-  public DataFetcher<Boolean> realtime() {
-    return environment -> getSource(environment).hasRealTimeData();
-  }
-
-  @Override
-  public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).getX();
-  }
-
-  @Override
-  public DataFetcher<Double> lat() {
-    return environment -> getSource(environment).getY();
-  }
-
-  @Override
   public DataFetcher<Iterable<String>> tags() {
     return environment -> getSource(environment).getTags();
-  }
-
-  // TODO
-  @Override
-  public DataFetcher<Iterable<Object>> openingHours() {
-    return environment -> null;
   }
 
   private VehicleParking getSource(DataFetchingEnvironment environment) {

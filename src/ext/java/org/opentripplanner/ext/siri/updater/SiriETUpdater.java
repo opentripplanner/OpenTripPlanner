@@ -14,7 +14,7 @@ import uk.org.siri.siri20.Siri;
 
 /**
  * Update OTP stop time tables from some (realtime) source
- *
+ * <p>
  * Usage example ('rt' name is an example) in file 'Graph.properties':
  *
  * <pre>
@@ -24,45 +24,37 @@ import uk.org.siri.siri20.Siri;
  * rt.url = http://host.tld/path
  * rt.feedId = TA
  * </pre>
- *
  */
 public class SiriETUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETUpdater.class);
-
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  protected WriteToGraphCallback saveResultOnGraph;
-
   /**
    * Update streamer
    */
   private final EstimatedTimetableSource updateSource;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer logFrequency;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer maxSnapshotFrequency;
-
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private final Boolean purgeExpiredData;
-
   /**
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
-
   /**
-   * The place where we'll record the incoming realtime timetables to make them available to the router in a thread
-   * safe way.
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  protected WriteToGraphCallback saveResultOnGraph;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer logFrequency;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer maxSnapshotFrequency;
+  /**
+   * The place where we'll record the incoming realtime timetables to make them available to the
+   * router in a thread safe way.
    */
   private SiriTimetableSnapshotSource snapshotSource;
 
@@ -118,6 +110,9 @@ public class SiriETUpdater extends PollingGraphUpdater {
     }
   }
 
+  @Override
+  public void teardown() {}
+
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
    * applies those updates to the graph.
@@ -144,9 +139,6 @@ public class SiriETUpdater extends PollingGraphUpdater {
       }
     } while (moreData);
   }
-
-  @Override
-  public void teardown() {}
 
   public String toString() {
     String s = (updateSource == null) ? "NONE" : updateSource.toString();

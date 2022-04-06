@@ -8,13 +8,12 @@ import org.opentripplanner.datastore.OtpDataStoreConfig;
 import org.opentripplanner.standalone.config.StorageConfig;
 
 /**
- * This class is a thin wrapper around the OTP configuration to provide a
- * mapping into the storage domain {@link org.opentripplanner.datastore}.
- * Every parameter the data-store needs is passed into it using this adapter.
+ * This class is a thin wrapper around the OTP configuration to provide a mapping into the storage
+ * domain {@link org.opentripplanner.datastore}. Every parameter the data-store needs is passed into
+ * it using this adapter.
  * <p/>
- * It allows decoupling the application configuration from the data storage
- * implementation, and at the same time show the mapping from the app config
- * into the data storage in ONE place.
+ * It allows decoupling the application configuration from the data storage implementation, and at
+ * the same time show the mapping from the app config into the data storage in ONE place.
  */
 class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
 

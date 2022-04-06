@@ -20,34 +20,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This Performs most of the work for the MapBuilder graph builder module.
- * It determines which sequence of graph edges a GTFS shape probably corresponds to.
- * Note that GTFS shapes are not in any way constrained to OSM edges or even roads.
+ * This Performs most of the work for the MapBuilder graph builder module. It determines which
+ * sequence of graph edges a GTFS shape probably corresponds to. Note that GTFS shapes are not in
+ * any way constrained to OSM edges or even roads.
  */
 public class StreetMatcher {
 
   private static final Logger log = LoggerFactory.getLogger(StreetMatcher.class);
   private static final double DISTANCE_THRESHOLD = 0.0002;
-
-  Graph graph;
-
   private final STRtree index;
-
-  STRtree createIndex() {
-    STRtree edgeIndex = new STRtree();
-    for (Vertex v : graph.getVertices()) {
-      for (Edge e : v.getOutgoing()) {
-        if (e instanceof StreetEdge) {
-          Envelope envelope;
-          Geometry geometry = e.getGeometry();
-          envelope = geometry.getEnvelopeInternal();
-          edgeIndex.insert(envelope, e);
-        }
-      }
-    }
-    log.debug("Created index");
-    return edgeIndex;
-  }
+  Graph graph;
 
   public StreetMatcher(Graph graph) {
     this.graph = graph;
@@ -135,6 +117,22 @@ public class StreetMatcher {
       }
     }
     return null;
+  }
+
+  STRtree createIndex() {
+    STRtree edgeIndex = new STRtree();
+    for (Vertex v : graph.getVertices()) {
+      for (Edge e : v.getOutgoing()) {
+        if (e instanceof StreetEdge) {
+          Envelope envelope;
+          Geometry geometry = e.getGeometry();
+          envelope = geometry.getEnvelopeInternal();
+          edgeIndex.insert(envelope, e);
+        }
+      }
+    }
+    log.debug("Created index");
+    return edgeIndex;
   }
 
   private Geometry removeDuplicatePoints(Geometry routeGeometry) {

@@ -5,9 +5,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 
 /**
- * This class calculates borders of envelopes that can be also on 180th meridian
- * The same way as it was previously calculated in GraphMetadata constructor
- *
+ * This class calculates borders of envelopes that can be also on 180th meridian The same way as it
+ * was previously calculated in GraphMetadata constructor
  */
 public class WorldEnvelope implements Serializable {
 
@@ -49,9 +48,37 @@ public class WorldEnvelope implements Serializable {
     }
   }
 
+  public double getLowerLeftLongitude() {
+    calculateCoordinates();
+    return lowerLeftLongitude;
+  }
+
+  public double getLowerLeftLatitude() {
+    calculateCoordinates();
+    return lowerLeftLatitude;
+  }
+
+  public double getUpperRightLongitude() {
+    calculateCoordinates();
+    return upperRightLongitude;
+  }
+
+  public double getUpperRightLatitude() {
+    calculateCoordinates();
+    return upperRightLatitude;
+  }
+
+  public boolean contains(Coordinate c) {
+    if (c.x < 0) {
+      return leftEnv.contains(c);
+    } else {
+      return rightEnv.contains(c);
+    }
+  }
+
   /**
    * Calculates lower/upper right/left latitude and longitude of all the coordintes
-   *
+   * <p>
    * This takes into account that envelope can extends over 180th meridian
    */
   private void calculateCoordinates() {
@@ -89,33 +116,5 @@ public class WorldEnvelope implements Serializable {
       this.lowerLeftLatitude = Math.min(rightEnv.getMinY(), leftEnv.getMinY());
     }
     coordinatesCalculated = true;
-  }
-
-  public double getLowerLeftLongitude() {
-    calculateCoordinates();
-    return lowerLeftLongitude;
-  }
-
-  public double getLowerLeftLatitude() {
-    calculateCoordinates();
-    return lowerLeftLatitude;
-  }
-
-  public double getUpperRightLongitude() {
-    calculateCoordinates();
-    return upperRightLongitude;
-  }
-
-  public double getUpperRightLatitude() {
-    calculateCoordinates();
-    return upperRightLatitude;
-  }
-
-  public boolean contains(Coordinate c) {
-    if (c.x < 0) {
-      return leftEnv.contains(c);
-    } else {
-      return rightEnv.contains(c);
-    }
   }
 }

@@ -13,6 +13,10 @@ public class DataFetcherDecorator {
     this.environment = e;
   }
 
+  public static <T> boolean hasArgument(Map<String, T> m, String name) {
+    return m.containsKey(name) && m.get(name) != null;
+  }
+
   public <T> void argument(String name, Consumer<T> consumer) {
     call(environment, name, consumer);
   }
@@ -56,9 +60,5 @@ public class DataFetcherDecorator {
         call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
       }
     }
-  }
-
-  public static <T> boolean hasArgument(Map<String, T> m, String name) {
-    return m.containsKey(name) && m.get(name) != null;
   }
 }

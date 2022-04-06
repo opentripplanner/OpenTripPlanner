@@ -1,14 +1,18 @@
 package org.opentripplanner.transit.raptor.api.debug;
 
 /**
- * The use of the API should provide a debug logger which map to what ever logging api
- * the caller use.
+ * The use of the API should provide a debug logger which map to what ever logging api the caller
+ * use.
  */
 @FunctionalInterface
 public interface DebugLogger {
+  static DebugLogger noop() {
+    return (topic, message) -> {};
+  }
+
   /**
-   * Check if debugging is enabled before doing heavy work like calculating statistics
-   * before logging it.
+   * Check if debugging is enabled before doing heavy work like calculating statistics before
+   * logging it.
    * <p/>
    * PLEASE IMPLEMENT THIS AND RETURN TRUE TO ENABLE DEBUGGING.
    */
@@ -17,8 +21,8 @@ public interface DebugLogger {
   }
 
   /**
-   * Prepare the debug logger for searching direction FORWARD or REVERSE. This method is optional
-   * to implement, the default do nothing.
+   * Prepare the debug logger for searching direction FORWARD or REVERSE. This method is optional to
+   * implement, the default do nothing.
    * <p>
    * The method is called once before each search begin.
    */
@@ -38,9 +42,5 @@ public interface DebugLogger {
     if (isEnabled()) {
       debug(topic, String.format(format, args));
     }
-  }
-
-  static DebugLogger noop() {
-    return (topic, message) -> {};
   }
 }

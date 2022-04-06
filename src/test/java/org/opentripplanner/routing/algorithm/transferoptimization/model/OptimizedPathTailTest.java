@@ -26,6 +26,11 @@ class OptimizedPathTailTest implements RaptorTestConstants {
   @SuppressWarnings("ConstantConditions")
   private final TransitPathLeg<TestTripSchedule> t3 = t2.nextTransitLeg();
 
+  @SuppressWarnings("ConstantConditions")
+  private final TripToTripTransfer<TestTripSchedule> tx23 = TransferGeneratorDummy.tx(
+    txConstrained(t2.trip(), STOP_D, t3.trip(), STOP_D).staySeated()
+  );
+
   private final TripToTripTransfer<TestTripSchedule> tx12 = TransferGeneratorDummy.tx(
     t1.trip(),
     STOP_B,
@@ -33,12 +38,6 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     STOP_C,
     t2.trip()
   );
-
-  @SuppressWarnings("ConstantConditions")
-  private final TripToTripTransfer<TestTripSchedule> tx23 = TransferGeneratorDummy.tx(
-    txConstrained(t2.trip(), STOP_D, t3.trip(), STOP_D).staySeated()
-  );
-
   private final TransferWaitTimeCostCalculator waitTimeCalc = new TransferWaitTimeCostCalculator(
     1.0,
     5.0
@@ -46,9 +45,9 @@ class OptimizedPathTailTest implements RaptorTestConstants {
 
   /**
    * Give stop B and D an extra stop-priority-cost.
-   *
-   *  Stop B is visited once and stop D twice. This will add the following extra cost to the path:
-   *  <pre>
+   * <p>
+   * Stop B is visited once and stop D twice. This will add the following extra cost to the path:
+   * <pre>
    *  - extraStopBoardAlightCostsFactor = 2.0
    *  - Cost stop B = 30s ($30.00)
    *  - Cost stop D = 10s ($10.00)

@@ -15,8 +15,8 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 public class GroupByFilterTest implements PlanTestConstants {
 
   /**
-   * This test group by exact trip ids and test that the reduce function
-   * works properly. It does not merge any groups.
+   * This test group by exact trip ids and test that the reduce function works properly. It does not
+   * merge any groups.
    */
   @Test
   public void aSimpleTestGroupByMatchingTripIdsNoMerge() {
@@ -54,8 +54,8 @@ public class GroupByFilterTest implements PlanTestConstants {
   }
 
   /**
-   * This test group by trips where the trip ids share the same prefix. The purpose is to test
-   * the merging of groups.
+   * This test group by trips where the trip ids share the same prefix. The purpose is to test the
+   * merging of groups.
    */
   @Test
   public void testMerging() {
@@ -87,8 +87,7 @@ public class GroupByFilterTest implements PlanTestConstants {
   }
 
   /**
-   * Create a filter that group by the first leg trip-id, and uses the default sort for each
-   * group.
+   * Create a filter that group by the first leg trip-id, and uses the default sort for each group.
    */
   private GroupByFilter<AGroupId> createFilter(int maxNumberOfItinerariesPrGroup) {
     return new GroupByFilter<>(

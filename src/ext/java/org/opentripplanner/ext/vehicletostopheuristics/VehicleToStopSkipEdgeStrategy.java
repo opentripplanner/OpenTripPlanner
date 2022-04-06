@@ -35,11 +35,6 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  */
 public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
-  private final Function<Stop, Set<Route>> getRoutesForStop;
-
-  private double sumOfScores;
-  private final int maxScore;
-
   public static final Set<StreetMode> applicableModes = Set.of(
     BIKE_TO_PARK,
     BIKE_RENTAL,
@@ -48,6 +43,9 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
     CAR_RENTAL,
     SCOOTER_RENTAL
   );
+  private final Function<Stop, Set<Route>> getRoutesForStop;
+  private final int maxScore;
+  private double sumOfScores;
 
   public VehicleToStopSkipEdgeStrategy(Function<Stop, Set<Route>> getRoutesForStop) {
     this.maxScore = 300;

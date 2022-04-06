@@ -22,7 +22,7 @@ import org.opentripplanner.transit.raptor.service.RangeRaptorDynamicSearch;
 
 /**
  * Feature under test
- *
+ * <p>
  * Raptor should return a proper array for heuristic values, i.e, time and transfers
  */
 public class G01_HeuristicTest implements RaptorTestConstants {
@@ -44,6 +44,7 @@ public class G01_HeuristicTest implements RaptorTestConstants {
   private final RaptorConfig<TestTripSchedule> config = RaptorConfig.defaultConfigForTest();
 
   /**
+   * <pre>
    * Stops: 0..4
    *
    * Stop on route (stop indexes):
@@ -62,6 +63,7 @@ public class G01_HeuristicTest implements RaptorTestConstants {
    *
    * Transfers:
    *   2 -> 3 30s
+   * </pre>
    */
   @BeforeEach
   public void setup() {

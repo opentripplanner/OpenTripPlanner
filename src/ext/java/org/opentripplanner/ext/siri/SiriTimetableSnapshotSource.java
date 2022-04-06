@@ -10,7 +10,6 @@ import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import com.google.common.base.Preconditions;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -71,61 +69,48 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
   private static boolean keepLogging = true;
-
-  public int logFrequency = 2000;
-
-  /**
-   * If a timetable snapshot is requested less than this number of milliseconds after the previous
-   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
-   * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
-   */
-  public int maxSnapshotFrequency = 1000; // msec
-
-  /**
-   * The last committed snapshot that was handed off to a routing thread. This snapshot may be
-   * given to more than one routing thread if the maximum snapshot frequency is exceeded.
-   */
-  private volatile TimetableSnapshot snapshot = null;
-
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
    * might modify this buffer will correctly acquire the lock.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
-
   /**
    * Lock to indicate that buffer is in use
    */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
-
   /**
    * Use a id generator to generate TripPattern ids for new TripPatterns created by RealTime
    * updates.
    */
   private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
-
   /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
+   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
+   * messages.
    */
   private final SiriTripPatternCache tripPatternCache = new SiriTripPatternCache(
     tripPatternIdGenerator
   );
-
+  private final TimeZone timeZone;
+  private final RoutingService routingService;
+  private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
+  private final TransitLayerUpdater transitLayerUpdater;
+  public int logFrequency = 2000;
+  /**
+   * If a timetable snapshot is requested less than this number of milliseconds after the previous
+   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
+   * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
+   */
+  public int maxSnapshotFrequency = 1000; // msec
+  /**
+   * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
+   * to more than one routing thread if the maximum snapshot frequency is exceeded.
+   */
+  private volatile TimetableSnapshot snapshot = null;
   /** Should expired realtime data be purged from the graph. */
   public boolean purgeExpiredData = true;
-
   protected ServiceDate lastPurgeDate = null;
-
   protected long lastSnapshotTime = -1;
-
-  private final TimeZone timeZone;
-
-  private final RoutingService routingService;
-
-  private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
-
-  private final TransitLayerUpdater transitLayerUpdater;
 
   public SiriTimetableSnapshotSource(final Graph graph) {
     timeZone = graph.getTimeZone();
@@ -136,9 +121,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /**
    * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-   *         timetable objects it references are guaranteed to never change, so the requesting
-   *         thread is provided a consistent view of all TripTimes. The routing thread need only
-   *         release its reference to the snapshot to release resources.
+   * timetable objects it references are guaranteed to never change, so the requesting thread is
+   * provided a consistent view of all TripTimes. The routing thread need only release its reference
+   * to the snapshot to release resources.
    */
   public TimetableSnapshot getTimetableSnapshot() {
     TimetableSnapshot snapshotToReturn;
@@ -160,30 +145,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return snapshotToReturn;
   }
 
-  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
-    final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
-      if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer.toString());
-        snapshot = buffer.commit(transitLayerUpdater, force);
-      } else {
-        LOG.debug("Buffer was unchanged, keeping old snapshot.");
-      }
-      lastSnapshotTime = System.currentTimeMillis();
-    } else {
-      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
-    }
-    return snapshot;
-  }
-
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   *
-   * @param graph graph to update (needed for adding/changing stop patterns)
+   * @param graph       graph to update (needed for adding/changing stop patterns)
    * @param fullDataset true iff the list with updates represent all updates that are active right
-   *        now, i.e. all previous updates should be disregarded
-   * @param updates SIRI VehicleMonitoringDeliveries that should be applied atomically
+   *                    now, i.e. all previous updates should be disregarded
+   * @param updates     SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyVehicleMonitoring(
     final Graph graph,
@@ -259,10 +227,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   *  @param graph graph to update (needed for adding/changing stop patterns)
+   * @param graph       graph to update (needed for adding/changing stop patterns)
    * @param fullDataset true iff the list with updates represent all updates that are active right
-   *        now, i.e. all previous updates should be disregarded
-   * @param updates SIRI VehicleMonitoringDeliveries that should be applied atomically
+   *                    now, i.e. all previous updates should be disregarded
+   * @param updates     SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyEstimatedTimetable(
     final Graph graph,
@@ -353,6 +321,22 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       // Always release lock
       bufferLock.unlock();
     }
+  }
+
+  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
+    final long now = System.currentTimeMillis();
+    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+      if (force || buffer.isDirty()) {
+        LOG.debug("Committing {}", buffer.toString());
+        snapshot = buffer.commit(transitLayerUpdater, force);
+      } else {
+        LOG.debug("Buffer was unchanged, keeping old snapshot.");
+      }
+      lastSnapshotTime = System.currentTimeMillis();
+    } else {
+      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
+    }
+    return snapshot;
   }
 
   private boolean handleModifiedTrip(
@@ -467,9 +451,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /**
    * Get the latest timetable for TripPattern for a given service date.
-   *
+   * <p>
    * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
-   *
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, ServiceDate serviceDate) {
     TimetableSnapshot timetableSnapshot = getTimetableSnapshot();
@@ -791,7 +774,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /**
    * Resolves submode based on added trips's mode and replacedRoute's mode
-   * @param transitMode Mode of the added trip
+   *
+   * @param transitMode   Mode of the added trip
    * @param replacedRoute Route that is being replaced
    * @return String-representation of submode
    */
@@ -1145,7 +1129,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Cancel scheduled trip in buffer given trip id (without agency id) on service date
    *
-   * @param tripId trip id without agency id
+   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
@@ -1173,11 +1157,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Removes previous trip-update from buffer if there is an update with given trip
-   * id (without agency id) on service date
+   * Removes previous trip-update from buffer if there is an update with given trip id (without
+   * agency id) on service date
    *
-   * @param feedId feed id the trip id belongs to
-   * @param tripId trip id without agency id
+   * @param feedId      feed id the trip id belongs to
+   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if a previously added trip was removed
    */
@@ -1565,7 +1549,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Retrieve route given a route id without an agency
    *
-   * @param feedId feed id for the route id
+   * @param feedId  feed id for the route id
    * @param routeId route id without the agency
    * @return route or null if route can't be found in graph index
    */

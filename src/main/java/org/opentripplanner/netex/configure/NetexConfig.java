@@ -13,14 +13,13 @@ import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.standalone.config.BuildConfig;
 
 /**
- * Responsible for dependency injection and creating main NeTEx module
- * objects. This decouple the main classes in the netex module, and serve
- * as a single entry-point to create a {@link NetexModule} which simplify
- * the code({@link org.opentripplanner.graph_builder.GraphBuilder}) using it.
+ * Responsible for dependency injection and creating main NeTEx module objects. This decouple the
+ * main classes in the netex module, and serve as a single entry-point to create a {@link
+ * NetexModule} which simplify the code({@link org.opentripplanner.graph_builder.GraphBuilder})
+ * using it.
  * <p>
- * This class inject the build configuration. This way none of the other
- * classes in the `org.opentripplanner.netex` have dependencies to the
- * {@link BuildConfig}.
+ * This class inject the build configuration. This way none of the other classes in the
+ * `org.opentripplanner.netex` have dependencies to the {@link BuildConfig}.
  * <p>
  * The naming convention used is close to the defacto standard used by Spring.
  */

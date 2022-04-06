@@ -25,7 +25,7 @@ public class TestUnconnectedAreas {
    * The P+R.osm.gz file contains 2 park and ride, one a single way area and the other a
    * multipolygon with a hole. Both are not linked to any street, apart from three roads that
    * crosses the P+R with w/o common nodes.
-   *
+   * <p>
    * This test just make sure we correctly link those P+R with the street network by creating
    * virtual nodes at the place where the street intersects the P+R areas. See ticket #1562.
    */
@@ -64,9 +64,10 @@ public class TestUnconnectedAreas {
   }
 
   /**
-   * This test ensures that if a Park and Ride has a node that is exactly atop a node on a way, the graph
-   * builder will not loop forever trying to split it. The hackett-pr.osm.gz file contains a park-and-ride lot in
-   * Hackettstown, NJ, which demonstrates this behavior. See discussion in ticket 1605.
+   * This test ensures that if a Park and Ride has a node that is exactly atop a node on a way, the
+   * graph builder will not loop forever trying to split it. The hackett-pr.osm.gz file contains a
+   * park-and-ride lot in Hackettstown, NJ, which demonstrates this behavior. See discussion in
+   * ticket 1605.
    */
   @Test
   public void testCoincidentNodeUnconnectedParkAndRide() {
@@ -79,7 +80,8 @@ public class TestUnconnectedAreas {
   }
 
   /**
-   * Test the situation where a road passes over a node of a park and ride but does not have a node there.
+   * Test the situation where a road passes over a node of a park and ride but does not have a node
+   * there.
    */
   @Test
   public void testRoadPassingOverNode() {
@@ -88,8 +90,8 @@ public class TestUnconnectedAreas {
   }
 
   /**
-   * Test the situation where a park and ride passes over the node of a road but does not have a node there.
-   * Additionally, the node of the road is duplicated to test this corner case.
+   * Test the situation where a park and ride passes over the node of a road but does not have a
+   * node there. Additionally, the node of the road is duplicated to test this corner case.
    */
   @Test
   public void testAreaPassingOverNode() {
@@ -102,8 +104,8 @@ public class TestUnconnectedAreas {
   }
 
   /**
-   * Test the situation where a road passes over a node of a park and ride but does not have a node there.
-   * Additionally, the node of the ring is duplicated to test this corner case.
+   * Test the situation where a road passes over a node of a park and ride but does not have a node
+   * there. Additionally, the node of the ring is duplicated to test this corner case.
    */
   @Test
   public void testRoadPassingOverDuplicatedNode() throws URISyntaxException {
@@ -122,8 +124,8 @@ public class TestUnconnectedAreas {
   }
 
   /**
-   * Test the situation where a road passes over an edge of the park and ride. Both ends of the
-   * way are connected to the park and ride.
+   * Test the situation where a road passes over an edge of the park and ride. Both ends of the way
+   * are connected to the park and ride.
    */
   @Test
   public void testRoadPassingOverParkRide() {
@@ -164,7 +166,8 @@ public class TestUnconnectedAreas {
   }
 
   /**
-   * We've written several OSM files that exhibit different situations but should show the same results. Test with this code.
+   * We've written several OSM files that exhibit different situations but should show the same
+   * results. Test with this code.
    */
   private List<String> testGeometricGraphWithClasspathFile(
     String fileName,

@@ -39,6 +39,7 @@ public class ServiceCalendarMapperTest {
   private static final ServiceDate END_DATE = new ServiceDate(2018, 1, 2);
 
   private static final ServiceCalendar CALENDAR = new ServiceCalendar();
+  private final ServiceCalendarMapper subject = new ServiceCalendarMapper();
 
   static {
     CALENDAR.setId(ID);
@@ -53,8 +54,6 @@ public class ServiceCalendarMapperTest {
     CALENDAR.setStartDate(START_DATE);
     CALENDAR.setEndDate(END_DATE);
   }
-
-  private final ServiceCalendarMapper subject = new ServiceCalendarMapper();
 
   @Test
   public void testMapCollection() {

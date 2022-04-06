@@ -61,11 +61,6 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     Locale.setDefault(DEFAULT_LOCALE);
   }
 
-  @Override
-  protected Graph getGraph() {
-    return ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
-  }
-
   @DisplayName("Direct WALK")
   @Test
   public void directWalk() {
@@ -147,5 +142,10 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.to = p1;
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
+  }
+
+  @Override
+  protected Graph getGraph() {
+    return ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
   }
 }

@@ -17,6 +17,11 @@ public class VehicleParkingUnlinked implements DataImportIssue {
   }
 
   @Override
+  public String getMessage() {
+    return String.format(FMT, vehicleParkingEntranceVertex);
+  }
+
+  @Override
   public String getHTMLMessage() {
     return String.format(
       HTMLFMT,
@@ -24,10 +29,5 @@ public class VehicleParkingUnlinked implements DataImportIssue {
       vehicleParkingEntranceVertex.getLon(),
       vehicleParkingEntranceVertex
     );
-  }
-
-  @Override
-  public String getMessage() {
-    return String.format(FMT, vehicleParkingEntranceVertex);
   }
 }

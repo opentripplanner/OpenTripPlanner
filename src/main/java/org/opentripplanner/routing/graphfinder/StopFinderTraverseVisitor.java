@@ -10,25 +10,22 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 // TODO Seems like this should be merged with the PlaceFinderTraverseVisitor
+
 /**
  * A TraverseVisitor used in finding stops while walking the street graph.
  */
 public class StopFinderTraverseVisitor implements TraverseVisitor {
 
   private final double radiusMeters;
+  /** A list of closest stops found while walking the graph */
+  public final List<NearbyStop> stopsFound = new ArrayList<>();
 
   public StopFinderTraverseVisitor(double radiusMeters) {
     this.radiusMeters = radiusMeters;
   }
 
-  /** A list of closest stops found while walking the graph */
-  public final List<NearbyStop> stopsFound = new ArrayList<>();
-
   @Override
   public void visitEdge(Edge edge) {}
-
-  @Override
-  public void visitEnqueue() {}
 
   // Accumulate stops into ret as the search runs.
   @Override
@@ -39,9 +36,12 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
+  @Override
+  public void visitEnqueue() {}
+
   /**
    * @return A SkipEdgeStrategy that will stop exploring edges after the distance radius has been
-   *          reached.
+   * reached.
    */
   public SkipEdgeStrategy getSkipEdgeStrategy() {
     return (current, edge) -> current.getWalkDistance() > radiusMeters;

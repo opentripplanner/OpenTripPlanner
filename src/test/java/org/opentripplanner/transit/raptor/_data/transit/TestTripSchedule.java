@@ -8,7 +8,7 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
  * <p>
- * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }.
+ * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
 public class TestTripSchedule implements RaptorTripSchedule {
 
@@ -28,6 +28,18 @@ public class TestTripSchedule implements RaptorTripSchedule {
     this.arrivalTimes = arrivalTimes;
     this.departureTimes = departureTimes;
     this.transitReluctanceIndex = transitReluctanceIndex;
+  }
+
+  public static TestTripSchedule.Builder schedule() {
+    return new TestTripSchedule.Builder();
+  }
+
+  public static TestTripSchedule.Builder schedule(TestTripPattern pattern) {
+    return schedule().pattern(pattern);
+  }
+
+  public static TestTripSchedule.Builder schedule(String times) {
+    return new TestTripSchedule.Builder().times(times);
   }
 
   @Override
@@ -51,13 +63,13 @@ public class TestTripSchedule implements RaptorTripSchedule {
     return pattern;
   }
 
-  public int size() {
-    return arrivalTimes.length;
-  }
-
   @Override
   public int transitReluctanceFactorIndex() {
     return transitReluctanceIndex;
+  }
+
+  public int size() {
+    return arrivalTimes.length;
   }
 
   @Override
@@ -73,18 +85,6 @@ public class TestTripSchedule implements RaptorTripSchedule {
       .addServiceTimeSchedule("arrivals", arrivalTimes)
       .addServiceTimeSchedule("departures", departureTimes)
       .toString();
-  }
-
-  public static TestTripSchedule.Builder schedule() {
-    return new TestTripSchedule.Builder();
-  }
-
-  public static TestTripSchedule.Builder schedule(TestTripPattern pattern) {
-    return schedule().pattern(pattern);
-  }
-
-  public static TestTripSchedule.Builder schedule(String times) {
-    return new TestTripSchedule.Builder().times(times);
   }
 
   @SuppressWarnings("UnusedReturnValue")
@@ -117,7 +117,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return this;
     }
 
-    /** @param arrivalTimes arrival times per stop. Example: "0:10, 0:20, 0:45 ..*/
+    /** @param arrivalTimes arrival times per stop. Example: "0:10, 0:20, 0:45 .. */
     public TestTripSchedule.Builder arrivals(String arrivalTimes) {
       return this.arrivals(TimeUtils.times(arrivalTimes));
     }
@@ -140,12 +140,10 @@ public class TestTripSchedule implements RaptorTripSchedule {
     }
 
     /**
-     * The time between arrival and departure for each stop in the pattern.
-     * If not both arrival and departure times are set, this parameter is used
-     * to calculate the unset values.
+     * The time between arrival and departure for each stop in the pattern. If not both arrival and
+     * departure times are set, this parameter is used to calculate the unset values.
      * <p>
-     * Unit: seconds.
-     * The default is 10 seconds.
+     * Unit: seconds. The default is 10 seconds.
      */
     public TestTripSchedule.Builder arrDepOffset(int arrivalDepartureOffset) {
       this.arrivalDepartureOffset = arrivalDepartureOffset;

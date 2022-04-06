@@ -30,19 +30,12 @@ public class StreetLeg implements Leg {
   private final Place to;
 
   private final LineString legGeometry;
-
-  private List<P2<Double>> legElevation;
-
-  private Double elevationLost = null;
-
-  private Double elevationGained = null;
-
   private final List<WalkStep> walkSteps;
-
   private final Set<StreetNote> streetNotes = new HashSet<>();
-
   private final int generalizedCost;
-
+  private List<P2<Double>> legElevation;
+  private Double elevationLost = null;
+  private Double elevationGained = null;
   private FeedScopedId pathwayId;
 
   private Boolean walkingBike;
@@ -95,14 +88,6 @@ public class StreetLeg implements Leg {
   @Override
   public boolean isOnStreetNonTransit() {
     return true;
-  }
-
-  public void addStretNote(StreetNote streetNote) {
-    streetNotes.add(streetNote);
-  }
-
-  public void setVehicleRentalNetwork(String network) {
-    vehicleRentalNetwork = network;
   }
 
   @Override
@@ -197,9 +182,17 @@ public class StreetLeg implements Leg {
     return vehicleRentalNetwork;
   }
 
+  public void setVehicleRentalNetwork(String network) {
+    vehicleRentalNetwork = network;
+  }
+
   @Override
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  public void addStretNote(StreetNote streetNote) {
+    streetNotes.add(streetNote);
   }
 
   /**

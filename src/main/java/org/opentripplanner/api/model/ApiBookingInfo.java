@@ -42,9 +42,9 @@ public class ApiBookingInfo implements Serializable {
   public final Integer maximumBookingNoticeSeconds;
 
   /**
-   * Message to riders utilizing service at a stop_time when booking on-demand pickup and drop
-   * off. Meant to provide minimal information to be transmitted within a user interface about the
-   * action a rider must take in order to utilize the service.
+   * Message to riders utilizing service at a stop_time when booking on-demand pickup and drop off.
+   * Meant to provide minimal information to be transmitted within a user interface about the action
+   * a rider must take in order to utilize the service.
    */
   public final String message;
 

@@ -16,7 +16,7 @@ import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
 /**
  * Update OTP stop time tables from some (realtime) source
- *
+ * <p>
  * Usage example:
  *
  * <pre>
@@ -26,52 +26,42 @@ import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
  * rt.url = http://host.tld/path
  * rt.feedId = TA
  * </pre>
- *
  */
 public class SiriVMUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriVMUpdater.class);
-
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  protected WriteToGraphCallback saveResultOnGraph;
-
   /**
    * Update streamer
    */
   private final VehicleMonitoringSource updateSource;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer logFrequency;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer maxSnapshotFrequency;
-
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private final Boolean purgeExpiredData;
-
   /**
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
-
+  private final boolean fuzzyTripMatching;
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  protected WriteToGraphCallback saveResultOnGraph;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer logFrequency;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer maxSnapshotFrequency;
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
   private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
-
-  private final boolean fuzzyTripMatching;
-
   /**
-   * The place where we'll record the incoming realtime timetables to make them available to the router in a thread
-   * safe way.
+   * The place where we'll record the incoming realtime timetables to make them available to the
+   * router in a thread safe way.
    */
   private SiriTimetableSnapshotSource snapshotSource;
 
@@ -134,6 +124,9 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     }
   }
 
+  @Override
+  public void teardown() {}
+
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
    * applies those updates to the graph.
@@ -161,9 +154,6 @@ public class SiriVMUpdater extends PollingGraphUpdater {
       }
     } while (moreData);
   }
-
-  @Override
-  public void teardown() {}
 
   public String toString() {
     String s = (updateSource == null) ? "NONE" : updateSource.toString();

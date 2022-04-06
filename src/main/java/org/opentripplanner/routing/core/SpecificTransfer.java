@@ -9,8 +9,9 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.TransferService;
 
 /**
- * SpecificTransfer class used by Transfer. Represents a specific transfer between two stops.
- * See the links described at TransferTable for more details about the specifications.
+ * SpecificTransfer class used by Transfer. Represents a specific transfer between two stops. See
+ * the links described at TransferTable for more details about the specifications.
+ *
  * @see TransferService
  */
 public class SpecificTransfer implements Serializable {
@@ -48,8 +49,8 @@ public class SpecificTransfer implements Serializable {
   private final FeedScopedId toTripId;
 
   /**
-   * Value indicating the minimum transfer time in seconds. May contain special (negative) values which meaning
-   * can be found in the Transfer.*_TRANSFER constants.
+   * Value indicating the minimum transfer time in seconds. May contain special (negative) values
+   * which meaning can be found in the Transfer.*_TRANSFER constants.
    */
   final int transferTime;
 
@@ -111,6 +112,17 @@ public class SpecificTransfer implements Serializable {
     return specificity;
   }
 
+  /**
+   * Returns whether this specific transfer is applicable to a transfer between two trips.
+   *
+   * @param fromTrip is the arriving trip
+   * @param toTrip   is the departing trip
+   * @return true if this specific transfer is applicable to a transfer between two trips.
+   */
+  public boolean matches(Trip fromTrip, Trip toTrip) {
+    return matchesFrom(fromTrip) && matchesTo(toTrip);
+  }
+
   private int getFromSpecificity() {
     int specificity = 0;
     if (fromTripId != null) {
@@ -129,18 +141,6 @@ public class SpecificTransfer implements Serializable {
       specificity = 1;
     }
     return specificity;
-  }
-
-  /**
-   * Returns whether this specific transfer is applicable to a transfer between
-   * two trips.
-   * @param fromTrip is the arriving trip
-   * @param toTrip is the departing trip
-   * @return true if this specific transfer is applicable to a transfer between
-   *   two trips.
-   */
-  public boolean matches(Trip fromTrip, Trip toTrip) {
-    return matchesFrom(fromTrip) && matchesTo(toTrip);
   }
 
   private boolean matchesFrom(Trip trip) {

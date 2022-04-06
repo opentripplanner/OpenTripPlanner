@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory;
 public abstract class GenericJsonDataSource<T> implements DataSource<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(GenericJsonDataSource.class);
-
-  private String url;
   private final JsonDataListDownloader<T> jsonDataListDownloader;
-
+  private String url;
   protected List<T> updates = List.of();
 
   public GenericJsonDataSource(String url, String jsonParsePath, Map<String, String> headers) {
@@ -25,8 +23,6 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
   public GenericJsonDataSource(String url, String jsonParsePath) {
     this(url, jsonParsePath, null);
   }
-
-  protected abstract T parseElement(JsonNode jsonNode);
 
   @Override
   public boolean update() {
@@ -50,4 +46,6 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
     this.url = url;
     this.jsonDataListDownloader.setUrl(url);
   }
+
+  protected abstract T parseElement(JsonNode jsonNode);
 }

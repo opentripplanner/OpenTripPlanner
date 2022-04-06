@@ -9,7 +9,6 @@ import org.opentripplanner.routing.graph.Graph;
  * representing National Elevation Dataset (NED) raster data.
  *
  * @author demory
- *
  */
 
 public interface ElevationGridCoverageFactory {
@@ -18,6 +17,9 @@ public interface ElevationGridCoverageFactory {
 
   void checkInputs();
 
-  /** Sets the graph of the factory and initiates the fetching of data that is not present in the cache */
+  /**
+   * Sets the graph of the factory and initiates the fetching of data that is not present in the
+   * cache
+   */
   void fetchData(Graph graph);
 }

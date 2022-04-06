@@ -41,20 +41,6 @@ public class UnscheduledTrip extends FlexTrip {
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
-  public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> noExplicitTimes = Predicate.not(st ->
-      st.isArrivalTimeSet() || st.isDepartureTimeSet()
-    );
-    Predicate<StopTime> notContinuousStop = stopTime ->
-      stopTime.getFlexContinuousDropOff() == NONE.getGtfsCode() &&
-      stopTime.getFlexContinuousPickup() == NONE.getGtfsCode();
-    return (
-      N_STOPS.contains(stopTimes.size()) &&
-      stopTimes.stream().allMatch(noExplicitTimes) &&
-      stopTimes.stream().allMatch(notContinuousStop)
-    );
-  }
-
   public UnscheduledTrip(Trip trip, List<StopTime> stopTimes) {
     super(trip);
     if (!isUnscheduledTrip(stopTimes)) {
@@ -71,6 +57,20 @@ public class UnscheduledTrip extends FlexTrip {
       this.dropOffBookingInfos[i] = stopTimes.get(0).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(0).getPickupBookingInfo();
     }
+  }
+
+  public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
+    Predicate<StopTime> noExplicitTimes = Predicate.not(st ->
+      st.isArrivalTimeSet() || st.isDepartureTimeSet()
+    );
+    Predicate<StopTime> notContinuousStop = stopTime ->
+      stopTime.getFlexContinuousDropOff() == NONE.getGtfsCode() &&
+      stopTime.getFlexContinuousPickup() == NONE.getGtfsCode();
+    return (
+      N_STOPS.contains(stopTimes.size()) &&
+      stopTimes.stream().allMatch(noExplicitTimes) &&
+      stopTimes.stream().allMatch(notContinuousStop)
+    );
   }
 
   @Override

@@ -39,27 +39,10 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
   }
 
   /**
-   * Add an entity and use its Id as key to index it.
-   */
-  public void add(V entity) {
-    super.add(entity.getId(), entity);
-  }
-
-  /** Add all given entities to local map */
-  public void addAll(Collection<V> entities) {
-    for (V it : entities) {
-      add(it);
-    }
-  }
-
-  public Collection<String> localKeys() {
-    return super.localKeys();
-  }
-
-  /**
    * Use the {@link #add(EntityInVersionStructure)} method!
-   * @throws IllegalArgumentException This method throws an exception to prevent adding
-   *                                  elements with a key different than the element id.
+   *
+   * @throws IllegalArgumentException This method throws an exception to prevent adding elements
+   *                                  with a key different than the element id.
    */
   @Override
   public void add(String key, V value) {
@@ -71,6 +54,24 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
   // method - which throws an exception.
   public void addAll(Multimap<String, V> other) {
     throw new IllegalArgumentException("Use the add method with just one argument instead.");
+  }
+
+  public Collection<String> localKeys() {
+    return super.localKeys();
+  }
+
+  /**
+   * Add an entity and use its Id as key to index it.
+   */
+  public void add(V entity) {
+    super.add(entity.getId(), entity);
+  }
+
+  /** Add all given entities to local map */
+  public void addAll(Collection<V> entities) {
+    for (V it : entities) {
+      add(it);
+    }
   }
 
   @Override

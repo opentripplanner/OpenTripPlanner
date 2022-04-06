@@ -11,11 +11,6 @@ public class LegacyGraphQLdebugOutputImpl
   private static final long nanosToMillis = 1000000;
 
   @Override
-  public DataFetcher<Long> totalTime() {
-    return environment -> getSource(environment).totalTime / nanosToMillis;
-  }
-
-  @Override
   public DataFetcher<Long> pathCalculationTime() {
     return environment -> getSource(environment).transitRouterTime / nanosToMillis;
   }
@@ -33,6 +28,11 @@ public class LegacyGraphQLdebugOutputImpl
   @Override
   public DataFetcher<Boolean> timedOut() {
     return environment -> false;
+  }
+
+  @Override
+  public DataFetcher<Long> totalTime() {
+    return environment -> getSource(environment).totalTime / nanosToMillis;
   }
 
   private DebugOutput getSource(DataFetchingEnvironment environment) {

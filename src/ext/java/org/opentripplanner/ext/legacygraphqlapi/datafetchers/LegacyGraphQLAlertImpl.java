@@ -36,8 +36,42 @@ import org.opentripplanner.util.TranslatedString;
 public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
 
   @Override
-  public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment -> new Relay.ResolvedGlobalId("Alert", getSource(environment).getId());
+  public DataFetcher<Agency> agency() {
+    return environment ->
+      getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
+        .findAny()
+        .map(EntitySelector.Agency.class::cast)
+        .map(entitySelector ->
+          getRoutingService(environment).getAgencyForId(entitySelector.agencyId)
+        )
+        .orElse(null);
+  }
+
+  @Override
+  public DataFetcher<String> alertCause() {
+    return environment -> getLegacyGraphQLCause(getSource(environment).cause);
+  }
+
+  @Override
+  public DataFetcher<String> alertDescriptionText() {
+    return environment ->
+      getSource(environment).alertDescriptionText.toString(environment.getLocale());
+  }
+
+  @Override
+  public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
+    return environment -> {
+      var text = getSource(environment).alertDescriptionText;
+      return getTranslations(text);
+    };
+  }
+
+  @Override
+  public DataFetcher<String> alertEffect() {
+    return environment -> getLegacyGraphQLEffect(getSource(environment).effect);
   }
 
   @Override
@@ -56,73 +90,6 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<String> feed() {
-    return environment -> getSource(environment).getFeedId();
-  }
-
-  @Override
-  public DataFetcher<Agency> agency() {
-    return environment ->
-      getSource(environment)
-        .getEntities()
-        .stream()
-        .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
-        .findAny()
-        .map(EntitySelector.Agency.class::cast)
-        .map(entitySelector ->
-          getRoutingService(environment).getAgencyForId(entitySelector.agencyId)
-        )
-        .orElse(null);
-  }
-
-  @Override
-  public DataFetcher<Route> route() {
-    return environment ->
-      getSource(environment)
-        .getEntities()
-        .stream()
-        .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
-        .findAny()
-        .map(EntitySelector.Route.class::cast)
-        .map(entitySelector -> getRoutingService(environment).getRouteForId(entitySelector.routeId))
-        .orElse(null);
-  }
-
-  @Override
-  public DataFetcher<Trip> trip() {
-    return environment ->
-      getSource(environment)
-        .getEntities()
-        .stream()
-        .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
-        .findAny()
-        .map(EntitySelector.Trip.class::cast)
-        .map(entitySelector ->
-          getRoutingService(environment).getTripForId().get(entitySelector.tripId)
-        )
-        .orElse(null);
-  }
-
-  @Override
-  public DataFetcher<Object> stop() {
-    return environment ->
-      getSource(environment)
-        .getEntities()
-        .stream()
-        .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
-        .findAny()
-        .map(EntitySelector.Stop.class::cast)
-        .map(entitySelector -> getRoutingService(environment).getStopForId(entitySelector.stopId))
-        .orElse(null);
-  }
-
-  // This is deprecated
-  @Override
-  public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment -> Collections.emptyList();
-  }
-
-  @Override
   public DataFetcher<String> alertHeaderText() {
     return environment -> getSource(environment).alertHeaderText.toString(environment.getLocale());
   }
@@ -136,17 +103,8 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<String> alertDescriptionText() {
-    return environment ->
-      getSource(environment).alertDescriptionText.toString(environment.getLocale());
-  }
-
-  @Override
-  public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
-    return environment -> {
-      var text = getSource(environment).alertDescriptionText;
-      return getTranslations(text);
-    };
+  public DataFetcher<String> alertSeverityLevel() {
+    return environment -> getLegacyGraphQLSeverity(getSource(environment).severity);
   }
 
   @Override
@@ -166,18 +124,14 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<String> alertEffect() {
-    return environment -> getLegacyGraphQLEffect(getSource(environment).effect);
-  }
-
-  @Override
-  public DataFetcher<String> alertCause() {
-    return environment -> getLegacyGraphQLCause(getSource(environment).cause);
-  }
-
-  @Override
-  public DataFetcher<String> alertSeverityLevel() {
-    return environment -> getLegacyGraphQLSeverity(getSource(environment).severity);
+  public DataFetcher<Long> effectiveEndDate() {
+    return environment -> {
+      Date effectiveEndDate = getSource(environment).getEffectiveEndDate();
+      if (effectiveEndDate == null) {
+        return null;
+      }
+      return effectiveEndDate.getTime() / 1000;
+    };
   }
 
   @Override
@@ -188,17 +142,6 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         return null;
       }
       return effectiveStartDate.getTime() / 1000;
-    };
-  }
-
-  @Override
-  public DataFetcher<Long> effectiveEndDate() {
-    return environment -> {
-      Date effectiveEndDate = getSource(environment).getEffectiveEndDate();
-      if (effectiveEndDate == null) {
-        return null;
-      }
-      return effectiveEndDate.getTime() / 1000;
     };
   }
 
@@ -323,6 +266,63 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .flatMap(list -> list.stream())
         .map(Object.class::cast)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public DataFetcher<String> feed() {
+    return environment -> getSource(environment).getFeedId();
+  }
+
+  @Override
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment -> new Relay.ResolvedGlobalId("Alert", getSource(environment).getId());
+  }
+
+  // This is deprecated
+  @Override
+  public DataFetcher<Iterable<TripPattern>> patterns() {
+    return environment -> Collections.emptyList();
+  }
+
+  @Override
+  public DataFetcher<Route> route() {
+    return environment ->
+      getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
+        .findAny()
+        .map(EntitySelector.Route.class::cast)
+        .map(entitySelector -> getRoutingService(environment).getRouteForId(entitySelector.routeId))
+        .orElse(null);
+  }
+
+  @Override
+  public DataFetcher<Object> stop() {
+    return environment ->
+      getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
+        .findAny()
+        .map(EntitySelector.Stop.class::cast)
+        .map(entitySelector -> getRoutingService(environment).getStopForId(entitySelector.stopId))
+        .orElse(null);
+  }
+
+  @Override
+  public DataFetcher<Trip> trip() {
+    return environment ->
+      getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
+        .findAny()
+        .map(EntitySelector.Trip.class::cast)
+        .map(entitySelector ->
+          getRoutingService(environment).getTripForId().get(entitySelector.tripId)
+        )
+        .orElse(null);
   }
 
   private Object getAlertEntityOrUnknown(Object entity, String id, String type) {

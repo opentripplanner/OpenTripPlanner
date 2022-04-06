@@ -187,6 +187,7 @@ public class TurnRestrictionTest {
 
   /**
    * Create an edge. If twoWay, create two edges (back and forth).
+   *
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {

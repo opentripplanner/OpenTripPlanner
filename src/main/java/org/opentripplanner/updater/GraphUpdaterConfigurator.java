@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Sets up and starts all the graph updaters.
- *
+ * <p>
  * Updaters are instantiated based on the updater parameters contained in UpdaterConfig. Updaters
  * are then setup by providing the graph as a parameter. Finally, the updaters are added to the
  * GraphUpdaterManager.

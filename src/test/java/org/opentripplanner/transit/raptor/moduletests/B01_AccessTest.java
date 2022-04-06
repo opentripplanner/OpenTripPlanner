@@ -23,7 +23,7 @@ import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * FEATURE UNDER TEST
- *
+ * <p>
  * Raptor should return the optimal path with various access paths. All Raptor
  * optimizations(McRaptor, Standard and Reverse Standard) should be tested.
  */

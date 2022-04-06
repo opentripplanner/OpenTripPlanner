@@ -28,7 +28,7 @@ class RouteMapper {
     return MapUtils.mapToList(agencies, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   Route map(org.onebusaway.gtfs.model.Route orginal) {
     return orginal == null ? null : mappedRoutes.computeIfAbsent(orginal, this::doMap);
   }

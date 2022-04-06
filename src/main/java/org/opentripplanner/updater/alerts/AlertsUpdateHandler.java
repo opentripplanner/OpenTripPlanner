@@ -24,15 +24,13 @@ import org.opentripplanner.util.TranslatedString;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
- * @author novalis
  *
+ * @author novalis
  */
 public class AlertsUpdateHandler {
 
-  private String feedId;
-
   private static final int MISSING_INT_FIELD_VALUE = -1;
-
+  private String feedId;
   private TransitAlertService transitAlertService;
 
   /** How long before the posted start of an event it should be displayed to users */
@@ -52,6 +50,22 @@ public class AlertsUpdateHandler {
       alerts.add(mapAlert(id, alert));
     }
     transitAlertService.setAlerts(alerts);
+  }
+
+  public void setFeedId(String feedId) {
+    if (feedId != null) this.feedId = feedId.intern();
+  }
+
+  public void setTransitAlertService(TransitAlertService transitAlertService) {
+    this.transitAlertService = transitAlertService;
+  }
+
+  public void setEarlyStart(long earlyStart) {
+    this.earlyStart = earlyStart;
+  }
+
+  public void setFuzzyTripMatcher(GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
+    this.fuzzyTripMatcher = fuzzyTripMatcher;
   }
 
   private TransitAlert mapAlert(String id, GtfsRealtime.Alert alert) {
@@ -166,7 +180,8 @@ public class AlertsUpdateHandler {
   /**
    * Convert a GTFS-RT Protobuf TranslatedString to a OTP TranslatedString or NonLocalizedString.
    *
-   * @return An OTP TranslatedString containing the same information as the input GTFS-RT Protobuf TranslatedString.
+   * @return An OTP TranslatedString containing the same information as the input GTFS-RT Protobuf
+   * TranslatedString.
    */
   private I18NString deBuffer(GtfsRealtime.TranslatedString input) {
     Map<String, String> translations = new HashMap<>();
@@ -176,21 +191,5 @@ public class AlertsUpdateHandler {
       translations.put(language, string);
     }
     return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
-  }
-
-  public void setFeedId(String feedId) {
-    if (feedId != null) this.feedId = feedId.intern();
-  }
-
-  public void setTransitAlertService(TransitAlertService transitAlertService) {
-    this.transitAlertService = transitAlertService;
-  }
-
-  public void setEarlyStart(long earlyStart) {
-    this.earlyStart = earlyStart;
-  }
-
-  public void setFuzzyTripMatcher(GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
-    this.fuzzyTripMatcher = fuzzyTripMatcher;
   }
 }

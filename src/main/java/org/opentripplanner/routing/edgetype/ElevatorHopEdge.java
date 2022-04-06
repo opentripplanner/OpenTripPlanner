@@ -11,8 +11,8 @@ import org.opentripplanner.util.I18NString;
 
 /**
  * A relatively low cost edge for travelling one level in an elevator.
- * @author mattwigway
  *
+ * @author mattwigway
  */
 public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
@@ -40,6 +40,14 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
   public ElevatorHopEdge(Vertex from, Vertex to, StreetTraversalPermission permission) {
     super(from, to);
     this.permission = permission;
+  }
+
+  public StreetTraversalPermission getPermission() {
+    return permission;
+  }
+
+  public String toString() {
+    return "ElevatorHopEdge(" + fromv + " -> " + tov + ")";
   }
 
   @Override
@@ -75,8 +83,8 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
   }
 
   @Override
-  public double getDistanceMeters() {
-    return 0;
+  public I18NString getName() {
+    return null;
   }
 
   @Override
@@ -85,15 +93,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
   }
 
   @Override
-  public I18NString getName() {
-    return null;
-  }
-
-  public StreetTraversalPermission getPermission() {
-    return permission;
-  }
-
-  public String toString() {
-    return "ElevatorHopEdge(" + fromv + " -> " + tov + ")";
+  public double getDistanceMeters() {
+    return 0;
   }
 }

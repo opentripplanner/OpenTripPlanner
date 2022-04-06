@@ -1,7 +1,6 @@
 package org.opentripplanner.util.model;
 
 import junit.framework.TestCase;
-import org.opentripplanner.util.model.EncodedPolylineBean;
 
 public class TestEncodedPolylineBean extends TestCase {
 

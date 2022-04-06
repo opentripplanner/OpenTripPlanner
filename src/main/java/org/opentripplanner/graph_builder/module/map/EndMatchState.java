@@ -4,8 +4,8 @@ import java.util.List;
 
 /**
  * The end of a route's geometry, meaning that the search can quit
- * @author novalis
  *
+ * @author novalis
  */
 public class EndMatchState extends MatchState {
 

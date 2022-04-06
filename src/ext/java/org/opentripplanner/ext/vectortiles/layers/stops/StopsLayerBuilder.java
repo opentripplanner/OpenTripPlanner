@@ -16,15 +16,10 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class StopsLayerBuilder extends LayerBuilder<TransitStopVertex> {
 
-  enum MapperType {
-    Digitransit,
-  }
-
   static Map<MapperType, Function<Graph, PropertyMapper<TransitStopVertex>>> mappers = Map.of(
     MapperType.Digitransit,
     DigitransitStopPropertyMapper::create
   );
-
   private final Graph graph;
 
   public StopsLayerBuilder(Graph graph, VectorTilesResource.LayerParameters layerParameters) {
@@ -50,5 +45,9 @@ public class StopsLayerBuilder extends LayerBuilder<TransitStopVertex> {
         return point;
       })
       .collect(Collectors.toList());
+  }
+
+  enum MapperType {
+    Digitransit,
   }
 }

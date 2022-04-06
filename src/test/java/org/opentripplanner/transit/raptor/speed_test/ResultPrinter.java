@@ -10,13 +10,12 @@ import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.util.TableFormatter;
-import org.opentripplanner.util.time.DurationUtils;
 
 /**
- * Printing stuff clutters up the code, so it is convenient to put printing and formatting output into
- * a separate class - this makes the SpeedTest more readable.
+ * Printing stuff clutters up the code, so it is convenient to put printing and formatting output
+ * into a separate class - this makes the SpeedTest more readable.
  *
-
+ *
  * <pre>
  *       METHOD CALLS DURATION |
  *                             |  Min   Max  Avg     Count   Total
@@ -30,6 +29,17 @@ class ResultPrinter {
   private static final String RESULT_TABLE_TITLE = "METHOD CALLS DURATION";
 
   private ResultPrinter() {}
+
+  public static String headerLine(String label) {
+    // Make a header width is 100
+    int prefixLen = (100 - label.length() - 4);
+    var buf = new StringBuilder(100);
+    buf.append("- ".repeat(prefixLen / 2));
+    if (label.length() % 2 == 1) {
+      buf.append(' ');
+    }
+    return buf.append("[ ").append(label).append(" ]").toString();
+  }
 
   static void printResultOk(TestCase testCase, boolean printItineraries) {
     printResult("SUCCESS", testCase, printItineraries, "");
@@ -108,17 +118,6 @@ class ResultPrinter {
         printProfileResultLine(p.name(), v, labelMaxLen);
       }
     }
-  }
-
-  public static String headerLine(String label) {
-    // Make a header width is 100
-    int prefixLen = (100 - label.length() - 4);
-    var buf = new StringBuilder(100);
-    buf.append("- ".repeat(prefixLen / 2));
-    if (label.length() % 2 == 1) {
-      buf.append(' ');
-    }
-    return buf.append("[ ").append(label).append(" ]").toString();
   }
 
   private static void printResult(

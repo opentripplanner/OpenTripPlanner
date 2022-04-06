@@ -39,6 +39,19 @@ public class ParkAndRideResource {
     this.otpServer = otpServer;
   }
 
+  /** Envelopes are in latitude, longitude format */
+  public static Envelope getEnvelope(String lowerLeft, String upperRight) {
+    String[] lowerLeftParts = lowerLeft.split(",");
+    String[] upperRightParts = upperRight.split(",");
+
+    return new Envelope(
+      Double.parseDouble(lowerLeftParts[1]),
+      Double.parseDouble(upperRightParts[1]),
+      Double.parseDouble(lowerLeftParts[0]),
+      Double.parseDouble(upperRightParts[0])
+    );
+  }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public Response getParkAndRide(
@@ -80,19 +93,6 @@ public class ParkAndRideResource {
     }
 
     return Response.status(Status.OK).entity(prs).build();
-  }
-
-  /** Envelopes are in latitude, longitude format */
-  public static Envelope getEnvelope(String lowerLeft, String upperRight) {
-    String[] lowerLeftParts = lowerLeft.split(",");
-    String[] upperRightParts = upperRight.split(",");
-
-    return new Envelope(
-      Double.parseDouble(lowerLeftParts[1]),
-      Double.parseDouble(upperRightParts[1]),
-      Double.parseDouble(lowerLeftParts[0]),
-      Double.parseDouble(upperRightParts[0])
-    );
   }
 
   public static class ParkAndRideInfo {

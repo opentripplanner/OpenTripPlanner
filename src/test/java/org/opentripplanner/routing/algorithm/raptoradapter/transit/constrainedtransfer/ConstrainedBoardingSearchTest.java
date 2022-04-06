@@ -64,8 +64,8 @@ public class ConstrainedBoardingSearchTest {
   public static final StationTransferPoint STATION_B_TX_POINT = new StationTransferPoint(STATION_B);
 
   /**
-   * 2 minutes alight slack is used in this test, no slack provider is involved - but
-   * the test pass in times to the search with slack added.
+   * 2 minutes alight slack is used in this test, no slack provider is involved - but the test pass
+   * in times to the search with slack added.
    */
   private static final int ALIGHT_SLACK = 120;
 
@@ -107,7 +107,6 @@ public class ConstrainedBoardingSearchTest {
    *     </li>
    * </ul>
    * The
-   *
    */
   @BeforeEach
   void setup() {
@@ -334,22 +333,6 @@ public class ConstrainedBoardingSearchTest {
     OTPFeature.enableFeatures(Map.of(OTPFeature.MinimumTransferTimeIsDefinitive, false));
   }
 
-  /**
-   * The most specific transfer passed in should be a guaranteed transfer
-   * at stop B
-   */
-  private void findGuaranteedTransferWithZeroConnectionTime(
-    List<ConstrainedTransfer> constrainedTransfers
-  ) {
-    testTransferSearch(
-      STOP_B,
-      constrainedTransfers,
-      TRIP_1_INDEX,
-      TRIP_2_INDEX,
-      GUARANTEED_CONSTRAINT
-    );
-  }
-
   void testTransferSearch(
     Stop transferStop,
     List<ConstrainedTransfer> constraints,
@@ -412,6 +395,21 @@ public class ConstrainedBoardingSearchTest {
     );
 
     assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);
+  }
+
+  /**
+   * The most specific transfer passed in should be a guaranteed transfer at stop B
+   */
+  private void findGuaranteedTransferWithZeroConnectionTime(
+    List<ConstrainedTransfer> constrainedTransfers
+  ) {
+    testTransferSearch(
+      STOP_B,
+      constrainedTransfers,
+      TRIP_1_INDEX,
+      TRIP_2_INDEX,
+      GUARANTEED_CONSTRAINT
+    );
   }
 
   private void assertBoarding(

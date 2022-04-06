@@ -28,18 +28,17 @@ import org.slf4j.LoggerFactory;
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links various
  * objects in the graph to the street network. It should be run after both the transit network and
  * street network are loaded. It links four things: transit stops, transit entrances, bike rental
- * stations, and bike parks. Therefore it should be run even when there's no GTFS data present
- * to make bike rental services and bike parks usable.
+ * stations, and bike parks. Therefore it should be run even when there's no GTFS data present to
+ * make bike rental services and bike parks usable.
  */
 public class StreetLinkerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
+  private Boolean addExtraEdgesToAreas = true;
 
   public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
   }
-
-  private Boolean addExtraEdgesToAreas = true;
 
   public List<String> provides() {
     return Arrays.asList("street to transit", "linking");
@@ -67,6 +66,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     // Calculates convex hull of a graph which is shown in routerInfo API point
     graph.calculateConvexHull();
+  }
+
+  @Override
+  public void checkInputs() {
+    //no inputs
   }
 
   public void linkTransitStops(Graph graph) {
@@ -109,6 +113,41 @@ public class StreetLinkerModule implements GraphBuilderModule {
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
+  }
+
+  private static void linkVehicleParkingWithLinker(
+    Graph graph,
+    VehicleParkingEntranceVertex vehicleParkingVertex
+  ) {
+    if (vehicleParkingVertex.isWalkAccessible()) {
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          vehicleParkingVertex,
+          new TraverseModeSet(TraverseMode.WALK),
+          LinkingDirection.BOTH_WAYS,
+          (vertex, streetVertex) ->
+            List.of(
+              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
+              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+            )
+        );
+    }
+
+    if (vehicleParkingVertex.isCarAccessible()) {
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          vehicleParkingVertex,
+          new TraverseModeSet(TraverseMode.CAR),
+          LinkingDirection.BOTH_WAYS,
+          (vertex, streetVertex) ->
+            List.of(
+              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
+              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+            )
+        );
+    }
   }
 
   private void linkTransitEntrances(Graph graph) {
@@ -175,41 +214,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     );
   }
 
-  private static void linkVehicleParkingWithLinker(
-    Graph graph,
-    VehicleParkingEntranceVertex vehicleParkingVertex
-  ) {
-    if (vehicleParkingVertex.isWalkAccessible()) {
-      graph
-        .getLinker()
-        .linkVertexPermanently(
-          vehicleParkingVertex,
-          new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) ->
-            List.of(
-              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
-              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
-            )
-        );
-    }
-
-    if (vehicleParkingVertex.isCarAccessible()) {
-      graph
-        .getLinker()
-        .linkVertexPermanently(
-          vehicleParkingVertex,
-          new TraverseModeSet(TraverseMode.CAR),
-          LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) ->
-            List.of(
-              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
-              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
-            )
-        );
-    }
-  }
-
   private void removeVehicleParkingEntranceVertexFromGraph(
     VehicleParkingEntranceVertex vehicleParkingEntranceVertex,
     Graph graph
@@ -244,10 +248,5 @@ public class StreetLinkerModule implements GraphBuilderModule {
     } else {
       vehicleParking.getEntrances().remove(entrance);
     }
-  }
-
-  @Override
-  public void checkInputs() {
-    //no inputs
   }
 }

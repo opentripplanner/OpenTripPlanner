@@ -7,8 +7,11 @@ import static java.awt.GridBagConstraints.NORTH;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.BACKGROUND;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.debugLayout;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import javax.swing.JFrame;
 import org.opentripplanner.ext.interactivelauncher.Model;
 
 public class MainView extends JFrame {

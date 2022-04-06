@@ -30,16 +30,18 @@ import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZoneRef;
 
 /**
- * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains
- * GroupsOfStopPlaces and these are also mapped to parent stops, because searching from a StopPlace and searching from
- * a GroupOfStopPlaces both corresponding to searching from all of its underlying quays. Model changes in OTP are
- * required if we want to preserve the original NeTEx hierarchy.
+ * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx
+ * also contains GroupsOfStopPlaces and these are also mapped to parent stops, because searching
+ * from a StopPlace and searching from a GroupOfStopPlaces both corresponding to searching from all
+ * of its underlying quays. Model changes in OTP are required if we want to preserve the original
+ * NeTEx hierarchy.
  * <p>
- * A NeTEx StopPlace can contain both a version and a validity period. Since none of these are present in the OTP model
- * we have to choose which version should be mapped based on both of these parameters.
+ * A NeTEx StopPlace can contain both a version and a validity period. Since none of these are
+ * present in the OTP model we have to choose which version should be mapped based on both of these
+ * parameters.
  * <p>
- * To ensure compatibility with older data sets, we also have to keep quays that are only present in older versions
- * of the StopPlace.
+ * To ensure compatibility with older data sets, we also have to keep quays that are only present in
+ * older versions of the StopPlace.
  */
 class StopAndStationMapper {
 
@@ -93,6 +95,10 @@ class StopAndStationMapper {
         addNewStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);
       }
     }
+  }
+
+  private static StopPlace first(List<StopPlace> stops) {
+    return stops.get(0);
   }
 
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
@@ -179,11 +185,9 @@ class StopAndStationMapper {
   }
 
   /**
-   * Return the list of quays for the given {@code stopPlace} or an empty list if
-   * no quays exist.
+   * Return the list of quays for the given {@code stopPlace} or an empty list if no quays exist.
    * <p>
-   * We do not support quay references, all quays must be included as part of the
-   * given stopPlace.
+   * We do not support quay references, all quays must be included as part of the given stopPlace.
    */
   private List<Quay> listOfQuays(StopPlace stopPlace) {
     Quays_RelStructure quays = stopPlace.getQuays();
@@ -212,17 +216,12 @@ class StopAndStationMapper {
     return result;
   }
 
-  private static StopPlace first(List<StopPlace> stops) {
-    return stops.get(0);
-  }
-
   /**
    * Get WheelChairBoarding from Quay and parent Station.
    *
    * @param quay      NeTEx quay could contain information about accessability
    * @param stopPlace Parent StopPlace for given Quay
-   * @return not null value with default NO_INFORMATION if nothing defined in quay or
-   * parentStation.
+   * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */
   private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
     var defaultWheelChairBoarding = WheelChairBoarding.NO_INFORMATION;

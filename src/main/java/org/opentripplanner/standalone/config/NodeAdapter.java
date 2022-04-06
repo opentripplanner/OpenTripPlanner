@@ -33,14 +33,13 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 
 /**
- * This class wrap a {@link JsonNode} and decorate it with type-safe parsing
- * of types used in OTP like enums, date, time, URIs and so on. By wrapping
- * the JsonNode we get consistent parsing rules and the possibility to log unused
- * parameters when the end of parsing a file. Also the configuration POJOs become
- * cleaner because they do not have any parsing logic in them any more.
+ * This class wrap a {@link JsonNode} and decorate it with type-safe parsing of types used in OTP
+ * like enums, date, time, URIs and so on. By wrapping the JsonNode we get consistent parsing rules
+ * and the possibility to log unused parameters when the end of parsing a file. Also the
+ * configuration POJOs become cleaner because they do not have any parsing logic in them any more.
  * <p>
- * This class have 100% test coverage - keep it that way, for the individual configuration
- * POJOs a smoke test is good enough.
+ * This class have 100% test coverage - keep it that way, for the individual configuration POJOs a
+ * smoke test is good enough.
  */
 public class NodeAdapter {
 
@@ -53,20 +52,20 @@ public class NodeAdapter {
   private final String source;
 
   /**
-   * This class wrap a {@link JsonNode} which might be a child of another node. We
-   * keep the path string for logging and debugging purposes
+   * This class wrap a {@link JsonNode} which might be a child of another node. We keep the path
+   * string for logging and debugging purposes
    */
   private final String contextPath;
 
   /**
-   * This parameter is used internally in this class to be able to produce a
-   * list of parameters which is NOT requested.
+   * This parameter is used internally in this class to be able to produce a list of parameters
+   * which is NOT requested.
    */
   private final List<String> parameterNames = new ArrayList<>();
 
   /**
-   * The collection of children is used to be able to produce a list of unused parameters
-   * for all children.
+   * The collection of children is used to be able to produce a list of unused parameters for all
+   * children.
    */
   private final List<NodeAdapter> children = new ArrayList<>();
 
@@ -106,10 +105,6 @@ public class NodeAdapter {
     return source;
   }
 
-  JsonNode asRawNode(String paramName) {
-    return param(paramName);
-  }
-
   public boolean isEmpty() {
     return json.isMissingNode();
   }
@@ -135,6 +130,7 @@ public class NodeAdapter {
 
   /**
    * Get a required parameter as a boolean value.
+   *
    * @throws OtpAppException if parameter is missing.
    */
   public boolean asBoolean(String paramName) {
@@ -195,6 +191,7 @@ public class NodeAdapter {
 
   /**
    * Get a required parameter as a text String value.
+   *
    * @throws OtpAppException if parameter is missing.
    */
   public String asText(String paramName) {
@@ -214,31 +211,8 @@ public class NodeAdapter {
     return asEnum(paramName, value, (Class<T>) defaultValue.getClass());
   }
 
-  private <T extends Enum<T>> T asEnum(String paramName, String value, Class<T> ofType) {
-    var upperCaseValue = value.toUpperCase();
-    return Stream
-      .of(ofType.getEnumConstants())
-      .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
-      .findFirst()
-      .orElseThrow(() -> {
-        List<T> legalValues = List.of(ofType.getEnumConstants());
-        throw new OtpAppException(
-          "The parameter '" +
-          fullPath(paramName) +
-          "': '" +
-          value +
-          "' is not in legal. Expected one of " +
-          legalValues +
-          ". Source: " +
-          source +
-          "."
-        );
-      });
-  }
-
   /**
-   * Get a map of enum values listed in the config like this:
-   * (This example have Boolean values)
+   * Get a map of enum values listed in the config like this: (This example have Boolean values)
    * <pre>
    * key : {
    *   A : true,  // turned on
@@ -248,10 +222,10 @@ public class NodeAdapter {
    * }
    * </pre>
    *
-   * @param <E> The enum type
-   * @param <T> The map value type.
-   * @param mapper The function to use to map a node in the JSON tree into a value of type T.
-   *               The second argument to the function is the enum NAME(String).
+   * @param <E>    The enum type
+   * @param <T>    The map value type.
+   * @param mapper The function to use to map a node in the JSON tree into a value of type T. The
+   *               second argument to the function is the enum NAME(String).
    * @return a map of listed enum values as keys with value, or an empty map if not set.
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(
@@ -263,10 +237,10 @@ public class NodeAdapter {
   }
 
   /**
-   * Get a map of enum values listed in the config like the
-   * {@link #asEnumMap(String, Class, BiFunction)}, but verify that all enum keys
-   * are listed. This can be used for settings where there is appropriate no default
-   * value. Note! This method return {@code null} if the given parameter is not present.
+   * Get a map of enum values listed in the config like the {@link #asEnumMap(String, Class,
+   * BiFunction)}, but verify that all enum keys are listed. This can be used for settings where
+   * there is appropriate no default value. Note! This method return {@code null} if the given
+   * parameter is not present.
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMapAllKeysRequired(
     String paramName,
@@ -446,8 +420,8 @@ public class NodeAdapter {
   }
 
   /**
-   * Log unused parameters for the entire configuration file/noe tree. Call this method for
-   * thew root adapter for each config file read.
+   * Log unused parameters for the entire configuration file/noe tree. Call this method for thew
+   * root adapter for each config file read.
    */
   public void logAllUnusedParameters(Logger log) {
     for (String p : unusedParams()) {
@@ -455,9 +429,54 @@ public class NodeAdapter {
     }
   }
 
+  public <T> Map<String, T> asMap(String paramName, BiFunction<NodeAdapter, String, T> mapper) {
+    NodeAdapter node = path(paramName);
+
+    if (node.isEmpty()) {
+      return Map.of();
+    }
+
+    Map<String, T> result = new HashMap<>();
+
+    Iterator<String> names = node.json.fieldNames();
+    while (names.hasNext()) {
+      String key = names.next();
+      result.put(key, mapper.apply(node, key));
+    }
+    return result;
+  }
+
+  JsonNode asRawNode(String paramName) {
+    return param(paramName);
+  }
+
+  private <T extends Enum<T>> T asEnum(String paramName, String value, Class<T> ofType) {
+    var upperCaseValue = value.toUpperCase();
+    return Stream
+      .of(ofType.getEnumConstants())
+      .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
+      .findFirst()
+      .orElseThrow(() -> {
+        List<T> legalValues = List.of(ofType.getEnumConstants());
+        throw new OtpAppException(
+          "The parameter '" +
+          fullPath(paramName) +
+          "': '" +
+          value +
+          "' is not in legal. Expected one of " +
+          legalValues +
+          ". Source: " +
+          source +
+          "."
+        );
+      });
+  }
+
+  /* private methods */
+
   /**
-   * This method list all unused parameters(full path), also nested ones.
-   * It uses recursion to get child nodes.
+   * This method list all unused parameters(full path), also nested ones. It uses recursion to get
+   * child nodes.
    */
   private List<String> unusedParams() {
     List<String> unusedParams = new ArrayList<>();
@@ -477,8 +496,6 @@ public class NodeAdapter {
     unusedParams.sort(String::compareTo);
     return unusedParams;
   }
-
-  /* private methods */
 
   private JsonNode param(String paramName) {
     parameterNames.add(paramName);
@@ -567,23 +584,6 @@ public class NodeAdapter {
       } else if (requireAllValues) {
         throw requiredFieldMissingException(concatPath(paramName, v.name()));
       }
-    }
-    return result;
-  }
-
-  public <T> Map<String, T> asMap(String paramName, BiFunction<NodeAdapter, String, T> mapper) {
-    NodeAdapter node = path(paramName);
-
-    if (node.isEmpty()) {
-      return Map.of();
-    }
-
-    Map<String, T> result = new HashMap<>();
-
-    Iterator<String> names = node.json.fieldNames();
-    while (names.hasNext()) {
-      String key = names.next();
-      result.put(key, mapper.apply(node, key));
     }
     return result;
   }

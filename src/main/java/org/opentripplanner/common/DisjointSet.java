@@ -68,6 +68,10 @@ public class DisjointSet<T> {
     return new ArrayList<>(out.valueCollection());
   }
 
+  public int size(int component) {
+    return -sets.get(component);
+  }
+
   private int compact(int i) {
     int key = sets.get(i);
     if (key < 0) {
@@ -76,9 +80,5 @@ public class DisjointSet<T> {
     int j = compact(key);
     sets.set(i, j);
     return j;
-  }
-
-  public int size(int component) {
-    return -sets.get(component);
   }
 }

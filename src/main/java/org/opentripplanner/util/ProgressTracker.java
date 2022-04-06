@@ -13,24 +13,20 @@ import org.opentripplanner.util.time.DurationUtils;
 /**
  * The progress tracker notify the caller based a time interval.
  * <p>
- * To avoid the caller from being notified to often the tracker  uses a 'timer'. The
- * 'timer' prevent notification unless a minimum amount of time is passed since last time the
- * caller was notified. The quiet period is set to 5 seconds.
+ * To avoid the caller from being notified to often the tracker  uses a 'timer'. The 'timer' prevent
+ * notification unless a minimum amount of time is passed since last time the caller was notified.
+ * The quiet period is set to 5 seconds.
  * <p>
- * There is also a 'minBlockSize' which prevent the tracker of calling the
- * {@link System#currentTimeMillis()} for each step, instead the timer is checked once for each
- * block of steps. This make the progress step up in regular, nice to read, chunks too.
+ * There is also a 'minBlockSize' which prevent the tracker of calling the {@link
+ * System#currentTimeMillis()} for each step, instead the timer is checked once for each block of
+ * steps. This make the progress step up in regular, nice to read, chunks too.
  * <p>
- * THIS CLASS IS THREAD SAFE
- * The progress tracker is created to be thread-safe.
- *
- *
+ * THIS CLASS IS THREAD SAFE The progress tracker is created to be thread-safe.
  */
 public class ProgressTracker {
 
   /**
-   * Set the quiet period for the progress tracker, this value is used by all
-   * production code.
+   * Set the quiet period for the progress tracker, this value is used by all production code.
    */
   public static final int QUIET_PERIOD_MILLISECONDS = 5000;
 
@@ -50,8 +46,8 @@ public class ProgressTracker {
   private final boolean logFormatAsBytes;
 
   /**
-   * The minimum number of steps between each time check. This make sure
-   * the {@link System#currentTimeMillis()} is not called for every step.
+   * The minimum number of steps between each time check. This make sure the {@link
+   * System#currentTimeMillis()} is not called for every step.
    */
   private final int minBlockSize;
 
@@ -68,71 +64,6 @@ public class ProgressTracker {
 
   /** The time for the last notification */
   private Instant lastNotification;
-
-  /**
-   * Track progress for the given action.
-   * @param actionName the action name to include in the notification strings.
-   * @param minBlockSize the minimum number of steps between each time check. A reasonably value
-   *                     is to use the number of steps which would take approximately 1 second.
-   *                     Set this lower if the time variation for each step is big.
-   * @param size The expected number the step method is called. If negative
-   *             the size is considered unknown.
-   */
-  public static ProgressTracker track(String actionName, int minBlockSize, long size) {
-    return new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, false);
-  }
-
-  /**
-   * Create an InputStream that decorate another InputStream with progress logging.
-   *
-   * @param actionName the action name to include in the notification strings.
-   * @param minBlockSize the minimum number of steps between each time check. A reasonably value
-   *                     is to use the number of steps which would take approximately 1 second.
-   *                     Set this lower if the time variation for each step is big.
-   * @param size The expected number the step method is called. If negative
-   *             the size is considered unknown.
-   * @param inputStream the "real" input stream to delegate all operations to.
-   * @param progressNotification the progress notification handler/subscriber.
-   */
-  public static InputStream track(
-    String actionName,
-    int minBlockSize,
-    long size,
-    InputStream inputStream,
-    Consumer<String> progressNotification
-  ) {
-    return new ProgressTrackerInputStream(
-      new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, true),
-      inputStream,
-      progressNotification
-    );
-  }
-
-  /**
-   * Create an OutputStream that decorate another OutputStream with progress logging.
-   *
-   * @param actionName the action name to include in the notification strings.
-   * @param minBlockSize the minimum number of steps between each time check. A reasonably value
-   *                     is to use the number of steps which would take approximately 1 second.
-   *                     Set this lower if the time variation for each step is big.
-   * @param size The expected number the step method is called. If negative
-   *             the size is considered unknown.
-   * @param outputStream the "real" input stream to delegate all operations to.
-   * @param progressNotification the progress notification handler/subscriber.
-   */
-  public static OutputStream track(
-    String actionName,
-    int minBlockSize,
-    long size,
-    OutputStream outputStream,
-    Consumer<String> progressNotification
-  ) {
-    return new ProgressTrackerOutputStream(
-      new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, true),
-      outputStream,
-      progressNotification
-    );
-  }
 
   /** Package local to allow unit testing. */
   ProgressTracker(
@@ -153,6 +84,74 @@ public class ProgressTracker {
     this.lastNotification = startTime;
   }
 
+  /**
+   * Track progress for the given action.
+   *
+   * @param actionName   the action name to include in the notification strings.
+   * @param minBlockSize the minimum number of steps between each time check. A reasonably value is
+   *                     to use the number of steps which would take approximately 1 second. Set
+   *                     this lower if the time variation for each step is big.
+   * @param size         The expected number the step method is called. If negative the size is
+   *                     considered unknown.
+   */
+  public static ProgressTracker track(String actionName, int minBlockSize, long size) {
+    return new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, false);
+  }
+
+  /**
+   * Create an InputStream that decorate another InputStream with progress logging.
+   *
+   * @param actionName           the action name to include in the notification strings.
+   * @param minBlockSize         the minimum number of steps between each time check. A reasonably
+   *                             value is to use the number of steps which would take approximately
+   *                             1 second. Set this lower if the time variation for each step is
+   *                             big.
+   * @param size                 The expected number the step method is called. If negative the size
+   *                             is considered unknown.
+   * @param inputStream          the "real" input stream to delegate all operations to.
+   * @param progressNotification the progress notification handler/subscriber.
+   */
+  public static InputStream track(
+    String actionName,
+    int minBlockSize,
+    long size,
+    InputStream inputStream,
+    Consumer<String> progressNotification
+  ) {
+    return new ProgressTrackerInputStream(
+      new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, true),
+      inputStream,
+      progressNotification
+    );
+  }
+
+  /**
+   * Create an OutputStream that decorate another OutputStream with progress logging.
+   *
+   * @param actionName           the action name to include in the notification strings.
+   * @param minBlockSize         the minimum number of steps between each time check. A reasonably
+   *                             value is to use the number of steps which would take approximately
+   *                             1 second. Set this lower if the time variation for each step is
+   *                             big.
+   * @param size                 The expected number the step method is called. If negative the size
+   *                             is considered unknown.
+   * @param outputStream         the "real" input stream to delegate all operations to.
+   * @param progressNotification the progress notification handler/subscriber.
+   */
+  public static OutputStream track(
+    String actionName,
+    int minBlockSize,
+    long size,
+    OutputStream outputStream,
+    Consumer<String> progressNotification
+  ) {
+    return new ProgressTrackerOutputStream(
+      new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, true),
+      outputStream,
+      progressNotification
+    );
+  }
+
   public String startMessage() {
     return actionName + " progress tracking started.";
   }
@@ -166,13 +165,12 @@ public class ProgressTracker {
   }
 
   /**
-   * This method is used to report more than one step. Let say you can not call the
-   * progress tracker for each step, but want the logging of the steps performed to
-   * reflect the actual number of elements processed. Then this method gives you
-   * the flexibility to "jump" a number of given {@code deltaSteps} for each
-   * invocation.
+   * This method is used to report more than one step. Let say you can not call the progress tracker
+   * for each step, but want the logging of the steps performed to reflect the actual number of
+   * elements processed. Then this method gives you the flexibility to "jump" a number of given
+   * {@code deltaSteps} for each invocation.
    *
-   * @param deltaSteps number of steps performed for this invocation.
+   * @param deltaSteps           number of steps performed for this invocation.
    * @param progressNotification the notification callback
    */
   public void steps(int deltaSteps, Consumer<String> progressNotification) {
@@ -193,6 +191,20 @@ public class ProgressTracker {
     }
 
     notifyIfQuietPeriodIsOver(counter, progressNotification);
+  }
+
+  public String completeMessage() {
+    long ii = stepCounter.get();
+    Duration totalTime = Duration.between(startTime, Instant.now());
+    // Add 1 millisecond to prevent / by zero.
+    String stepsPerSecond = toStr(Math.round(1000d * ii / (totalTime.toMillis() + 1)));
+    return String.format(
+      "%s progress tracking complete. %s done in %s (%s per second). ",
+      actionName,
+      toStr(ii),
+      DurationUtils.durationToStr(totalTime),
+      stepsPerSecond
+    );
   }
 
   private void notifyIfQuietPeriodIsOver(final long counter, final Consumer<String> notification) {
@@ -224,20 +236,6 @@ public class ProgressTracker {
     } else {
       notification.accept(String.format("%s progress: %s done", actionName, toStr(counter)));
     }
-  }
-
-  public String completeMessage() {
-    long ii = stepCounter.get();
-    Duration totalTime = Duration.between(startTime, Instant.now());
-    // Add 1 millisecond to prevent / by zero.
-    String stepsPerSecond = toStr(Math.round(1000d * ii / (totalTime.toMillis() + 1)));
-    return String.format(
-      "%s progress tracking complete. %s done in %s (%s per second). ",
-      actionName,
-      toStr(ii),
-      DurationUtils.durationToStr(totalTime),
-      stepsPerSecond
-    );
   }
 
   private String toStr(long value) {

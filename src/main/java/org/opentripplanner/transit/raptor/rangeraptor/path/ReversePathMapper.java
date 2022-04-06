@@ -48,10 +48,6 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
   }
 
-  private void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
-    this.iterationDepartureTime = iterationDepartureTime;
-  }
-
   @Override
   public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
     var pathBuilder = PathBuilder.tailPathBuilder(
@@ -85,5 +81,9 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     return useApproximateTimeSearch
       ? TripTimesSearch::findTripReverseSearchApproximateTime
       : TripTimesSearch::findTripReverseSearch;
+  }
+
+  private void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
+    this.iterationDepartureTime = iterationDepartureTime;
   }
 }

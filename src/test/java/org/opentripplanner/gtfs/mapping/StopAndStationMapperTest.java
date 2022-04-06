@@ -47,6 +47,7 @@ public class StopAndStationMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
+  private final StopMapper subject = new StopMapper(new TranslationHelper());
 
   static {
     STOP.setId(AGENCY_AND_ID);
@@ -64,8 +65,6 @@ public class StopAndStationMapperTest {
     STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
     STOP.setZoneId(ZONE_ID);
   }
-
-  private final StopMapper subject = new StopMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() {

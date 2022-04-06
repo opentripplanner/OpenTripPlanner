@@ -11,10 +11,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 /**
- * This class serve as a wrapper for all stop arrival pareto set, one set for each stop.
- * It also keep track of stops visited since "last mark".
+ * This class serve as a wrapper for all stop arrival pareto set, one set for each stop. It also
+ * keep track of stops visited since "last mark".
  * <p>
- *
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -26,7 +25,8 @@ public final class StopArrivals<T extends RaptorTripSchedule> {
   private final DebugStopArrivalsStatistics debugStats;
 
   /**
-   * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
+   * Set the time at a transit index iff it is optimal. This sets both the best time and the
+   * transfer time
    */
   public StopArrivals(
     int nStops,
@@ -89,8 +89,8 @@ public final class StopArrivals<T extends RaptorTripSchedule> {
   }
 
   /**
-   * This method creates a ParetoSet for the given egress stop. When arrivals are added to the
-   * stop, the "glue" make sure new destination arrivals is added to the destination arrivals.
+   * This method creates a ParetoSet for the given egress stop. When arrivals are added to the stop,
+   * the "glue" make sure new destination arrivals is added to the destination arrivals.
    */
   private void glueTogetherEgressStopWithDestinationArrivals(
     EgressPaths egressPaths,

@@ -37,8 +37,7 @@ import org.opentripplanner.datastore.configure.DataStoreFactory;
  * into cloud storage after building it. Depending on the source this might also offer enhanced
  * performance.
  * <p>
- * Use the {@link DataStoreFactory} to obtain a
- * new instance of this class.
+ * Use the {@link DataStoreFactory} to obtain a new instance of this class.
  */
 public class OtpDataStore {
 
@@ -58,8 +57,7 @@ public class OtpDataStore {
   private CompositeDataSource buildReportDir;
 
   /**
-   * Use the {@link DataStoreFactory} to
-   * create a new instance of this class.
+   * Use the {@link DataStoreFactory} to create a new instance of this class.
    */
   public OtpDataStore(OtpDataStoreConfig config, List<DataSourceRepository> repositories) {
     this.config = config;
@@ -68,6 +66,21 @@ public class OtpDataStore {
       );
     this.allRepositories = repositories;
     this.localRepository = getLocalDataSourceRepo(repositories);
+  }
+
+  /**
+   * Static method used to get direct access to graph file without creating the {@link OtpDataStore}
+   * - this is used by other application and tests that want to load the graph from a directory on
+   * the local file system.
+   * <p>
+   * Never use this method in the OTP application to access the graph, use the data-store.
+   *
+   * @param path the location where the graph file must exist.
+   * @return The graph file - the graph is not loaded, you can use the {@link
+   * org.opentripplanner.routing.graph.SerializedGraphObject#load(File)} to load the graph.
+   */
+  public static File graphFile(File path) {
+    return new File(path, GRAPH_FILENAME);
   }
 
   public void open() {
@@ -90,22 +103,6 @@ public class OtpDataStore {
   }
 
   /**
-   * Static method used to get direct access to graph file without creating the
-   * {@link OtpDataStore} - this is used by other application and tests that want to load the
-   * graph from a directory on the local file system.
-   *
-   * Never use this method in the OTP application to access the graph, use the data-store.
-   *
-   * @param path the location where the graph file must exist.
-   *
-   * @return The graph file - the graph is not loaded, you can use the
-   * {@link org.opentripplanner.routing.graph.SerializedGraphObject#load(File)} to load the graph.
-   */
-  public static File graphFile(File path) {
-    return new File(path, GRAPH_FILENAME);
-  }
-
-  /**
    * @return a description(path) for each datasource used/enabled.
    */
   public List<String> getRepositoryDescriptions() {
@@ -113,13 +110,13 @@ public class OtpDataStore {
   }
 
   /**
-   * List all existing data sources by file type. An empty list is returned if there is no files
-   * of the given type.
+   * List all existing data sources by file type. An empty list is returned if there is no files of
+   * the given type.
    * <p>
    * This method should not be called after this data store is closed. The behavior is undefined.
    *
-   * @return The collection may contain elements of type {@link DataSource} or
-   * {@link CompositeDataSource}.
+   * @return The collection may contain elements of type {@link DataSource} or {@link
+   * CompositeDataSource}.
    */
   @NotNull
   public Collection<DataSource> listExistingSourcesFor(FileType type) {

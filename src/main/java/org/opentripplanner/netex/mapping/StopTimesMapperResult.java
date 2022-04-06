@@ -12,17 +12,15 @@ import org.opentripplanner.model.StopTime;
 class StopTimesMapperResult {
 
   /**
-   *  A ordered list of scheduled stop point ids for all timetable stop points in the
-   *  order of the time-table-passing-times.
-   */
-  List<String> scheduledStopPointIds;
-
-  /**
    * stopTimes by the timetabled-passing-time id
    */
   final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
-
   final List<StopTime> stopTimes = new ArrayList<>();
+  /**
+   * A ordered list of scheduled stop point ids for all timetable stop points in the order of the
+   * time-table-passing-times.
+   */
+  List<String> scheduledStopPointIds;
 
   void addStopTime(String timetabledPassingTimeId, StopTime stopTime) {
     stopTimeByNetexId.put(timetabledPassingTimeId, stopTime);

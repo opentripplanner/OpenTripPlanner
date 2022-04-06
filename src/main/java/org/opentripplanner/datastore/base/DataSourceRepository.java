@@ -18,8 +18,8 @@ import org.opentripplanner.datastore.FileType;
  * graph back into cloud storage after building it. Depending on the source this might also offer
  * enhanced performance.
  * <p>
- * The {@link org.opentripplanner.datastore.OtpDataStore} will manage all repositories
- * so there is no need to use the repository directly.
+ * The {@link org.opentripplanner.datastore.OtpDataStore} will manage all repositories so there is
+ * no need to use the repository directly.
  */
 public interface DataSourceRepository {
   /**

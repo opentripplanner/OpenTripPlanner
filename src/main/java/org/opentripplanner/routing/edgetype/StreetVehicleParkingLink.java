@@ -32,16 +32,8 @@ public class StreetVehicleParkingLink extends Edge {
     return null;
   }
 
-  public double getDistanceMeters() {
-    return 0;
-  }
-
-  public LineString getGeometry() {
-    return null;
-  }
-
-  public I18NString getName() {
-    return vehicleParkingEntranceVertex.getName();
+  public String toString() {
+    return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
   }
 
   public State traverse(State s0) {
@@ -74,6 +66,18 @@ public class StreetVehicleParkingLink extends Edge {
     return s1.makeState();
   }
 
+  public I18NString getName() {
+    return vehicleParkingEntranceVertex.getName();
+  }
+
+  public LineString getGeometry() {
+    return null;
+  }
+
+  public double getDistanceMeters() {
+    return 0;
+  }
+
   private boolean hasBannedTags(RoutingRequest options, VehicleParking vehicleParking) {
     if (options.bannedVehicleParkingTags.isEmpty()) {
       return false;
@@ -88,9 +92,5 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     return !vehicleParking.getTags().containsAll(options.requiredVehicleParkingTags);
-  }
-
-  public String toString() {
-    return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
   }
 }

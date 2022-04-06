@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  *         stops, then the event is NOT listed. Note! there are events for dropping an accepted
  *         path. If an none matching path dominate a matching path, then both paths are logged
  *         as part of the event.
- *         <p>
+ * <p>
  *         You may also specify the first stop in the path to start logging events for. For example
  *         given the path {@code [1010, 1183, 3211, 492]}, then you may know, that you can get to
  *         stop 2 without any problems. So, to avoid getting spammed by logging events at the first
@@ -91,6 +91,15 @@ public class DebugRaptor implements Serializable {
     return debugPathFromStopIndex;
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(DebugRaptor.class)
+      .addObj("stops", toString(stops, FIRST_STOP_INDEX))
+      .addObj("path", toString(path, debugPathFromStopIndex))
+      .toString();
+  }
+
   private static List<Integer> split(String stops) {
     try {
       if (stops == null) {
@@ -114,15 +123,6 @@ public class DebugRaptor implements Serializable {
     var m = FIRST_STOP_PATTERN.matcher(text);
     Integer stop = m.find() ? Integer.parseInt(m.group(1)) : null;
     return stop == null ? FIRST_STOP_INDEX : stops.indexOf(stop);
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(DebugRaptor.class)
-      .addObj("stops", toString(stops, FIRST_STOP_INDEX))
-      .addObj("path", toString(path, debugPathFromStopIndex))
-      .toString();
   }
 
   private static String toString(List<Integer> stops, int fromStopIndex) {

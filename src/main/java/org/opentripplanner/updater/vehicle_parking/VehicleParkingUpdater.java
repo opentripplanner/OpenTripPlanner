@@ -30,23 +30,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Graph updater that dynamically sets availability information on vehicle parking lots.
- * This updater fetches data from a single {@link DataSource<VehicleParking>}.
+ * Graph updater that dynamically sets availability information on vehicle parking lots. This
+ * updater fetches data from a single {@link DataSource<VehicleParking>}.
  */
 public class VehicleParkingUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleParkingUpdater.class);
-
-  private WriteToGraphCallback saveResultOnGraph;
-
   private final Map<VehicleParking, List<VehicleParkingEntranceVertex>> verticesByPark = new HashMap<>();
-
   private final Map<VehicleParking, List<DisposableEdgeCollection>> tempEdgesByPark = new HashMap<>();
-
   private final DataSource<VehicleParking> source;
-
   private final List<VehicleParking> oldVehicleParkings = new ArrayList<>();
-
+  private WriteToGraphCallback saveResultOnGraph;
   private VertexLinker linker;
 
   private VehicleParkingService vehicleParkingService;
@@ -79,6 +73,9 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public void teardown() {}
+
+  @Override
   protected void runPolling() throws Exception {
     LOG.debug("Updating vehicle parkings from " + source);
     if (!source.update()) {
@@ -93,9 +90,6 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     );
     saveResultOnGraph.execute(graphWriterRunnable);
   }
-
-  @Override
-  public void teardown() {}
 
   private class VehicleParkingGraphWriterRunnable implements GraphWriterRunnable {
 

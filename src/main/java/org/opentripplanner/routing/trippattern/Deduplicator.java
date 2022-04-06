@@ -13,8 +13,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
- * Does the same thing as String.intern, but for several different types.
- * Java's String.intern uses perm gen space and is broken anyway.
+ * Does the same thing as String.intern, but for several different types. Java's String.intern uses
+ * perm gen space and is broken anyway.
  */
 public class Deduplicator implements Serializable {
 
@@ -95,7 +95,10 @@ public class Deduplicator implements Serializable {
     return canonical.array;
   }
 
-  /** Used to deduplicate list of via places for stop destinationDisplay. Stops may have the same via arrays.*/
+  /**
+   * Used to deduplicate list of via places for stop destinationDisplay. Stops may have the same via
+   * arrays.
+   */
   @Nullable
   public String[][] deduplicateString2DArray(String[][] original) {
     if (original == null) {
@@ -209,6 +212,11 @@ public class Deduplicator implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+      return Arrays.hashCode(array);
+    }
+
+    @Override
     public boolean equals(Object other) {
       if (!(other instanceof IntArray)) {
         return false;
@@ -216,11 +224,6 @@ public class Deduplicator implements Serializable {
 
       IntArray that = (IntArray) other;
       return Arrays.equals(array, that.array);
-    }
-
-    @Override
-    public int hashCode() {
-      return Arrays.hashCode(array);
     }
   }
 
@@ -242,17 +245,17 @@ public class Deduplicator implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+      return Arrays.hashCode(array);
+    }
+
+    @Override
     public boolean equals(Object other) {
       if (!(other instanceof StringArray)) {
         return false;
       }
       StringArray that = (StringArray) other;
       return Arrays.equals(array, that.array);
-    }
-
-    @Override
-    public int hashCode() {
-      return Arrays.hashCode(array);
     }
   }
 
@@ -274,17 +277,17 @@ public class Deduplicator implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+      return Arrays.deepHashCode(array);
+    }
+
+    @Override
     public boolean equals(Object other) {
       if (!(other instanceof String2DArray)) {
         return false;
       }
       String2DArray that = (String2DArray) other;
       return Arrays.deepEquals(array, that.array);
-    }
-
-    @Override
-    public int hashCode() {
-      return Arrays.deepHashCode(array);
     }
   }
 }

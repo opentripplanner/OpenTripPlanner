@@ -28,6 +28,10 @@ public class DataOverlayContext {
     }
   }
 
+  public Iterable<? extends Parameter> getParameters() {
+    return parameters;
+  }
+
   private void addParameter(
     ParameterName paramName,
     DataOverlayParameterBindings parameterBindings,
@@ -53,10 +57,6 @@ public class DataOverlayContext {
     }
 
     this.parameters.add(new Parameter(binding.get(), threshold, penalty));
-  }
-
-  public Iterable<? extends Parameter> getParameters() {
-    return parameters;
   }
 
   private boolean isParameterValueInvalid(Double value, ParameterName name, ParameterType type) {

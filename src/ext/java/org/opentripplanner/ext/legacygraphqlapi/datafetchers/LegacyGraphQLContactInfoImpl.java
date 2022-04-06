@@ -9,13 +9,18 @@ public class LegacyGraphQLContactInfoImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLContactInfo {
 
   @Override
-  public DataFetcher<String> contactPerson() {
-    return environment -> getSource(environment).getContactPerson();
+  public DataFetcher<String> additionalDetails() {
+    return environment -> getSource(environment).getAdditionalDetails();
   }
 
   @Override
-  public DataFetcher<String> phoneNumber() {
-    return environment -> getSource(environment).getPhoneNumber();
+  public DataFetcher<String> bookingUrl() {
+    return environment -> getSource(environment).getBookingUrl();
+  }
+
+  @Override
+  public DataFetcher<String> contactPerson() {
+    return environment -> getSource(environment).getContactPerson();
   }
 
   @Override
@@ -34,13 +39,8 @@ public class LegacyGraphQLContactInfoImpl
   }
 
   @Override
-  public DataFetcher<String> bookingUrl() {
-    return environment -> getSource(environment).getBookingUrl();
-  }
-
-  @Override
-  public DataFetcher<String> additionalDetails() {
-    return environment -> getSource(environment).getAdditionalDetails();
+  public DataFetcher<String> phoneNumber() {
+    return environment -> getSource(environment).getPhoneNumber();
   }
 
   private ContactInfo getSource(DataFetchingEnvironment environment) {

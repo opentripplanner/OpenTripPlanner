@@ -29,28 +29,28 @@ public final class Pathway extends TransitEntity {
     super(id);
   }
 
-  public void setPathwayMode(int pathwayMode) {
-    this.pathwayMode = pathwayMode;
-  }
-
   public int getPathwayMode() {
     return pathwayMode;
   }
 
-  public void setFromStop(StationElement fromStop) {
-    this.fromStop = fromStop;
+  public void setPathwayMode(int pathwayMode) {
+    this.pathwayMode = pathwayMode;
   }
 
   public StationElement getFromStop() {
     return fromStop;
   }
 
-  public void setToStop(StationElement toStop) {
-    this.toStop = toStop;
+  public void setFromStop(StationElement fromStop) {
+    this.fromStop = fromStop;
   }
 
   public StationElement getToStop() {
     return toStop;
+  }
+
+  public void setToStop(StationElement toStop) {
+    this.toStop = toStop;
   }
 
   public String getName() {
@@ -69,12 +69,12 @@ public final class Pathway extends TransitEntity {
     this.reversedName = reversedName;
   }
 
-  public void setTraversalTime(int traversalTime) {
-    this.traversalTime = traversalTime;
-  }
-
   public int getTraversalTime() {
     return traversalTime;
+  }
+
+  public void setTraversalTime(int traversalTime) {
+    this.traversalTime = traversalTime;
   }
 
   public double getLength() {

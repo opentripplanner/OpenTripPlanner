@@ -37,14 +37,14 @@ class GenericEdgeUpdater {
   private final TimeUnit timeFormat;
 
   private final Map<String, Array> genericVariablesData;
-  private int edgesUpdated;
   private final long dataStartTime;
+  private int edgesUpdated;
 
   /**
    * Calculates the generic data start time and sets the earlier parsed map of generic data file
    *
-   * @param dataFile          map of generic grid data from .nc file
-   * @param streetEdges       collection of all street edges to be updated
+   * @param dataFile    map of generic grid data from .nc file
+   * @param streetEdges collection of all street edges to be updated
    */
   GenericEdgeUpdater(
     GenericDataFile dataFile,
@@ -65,6 +65,13 @@ class GenericEdgeUpdater {
       dataFile.getDataSource(),
       this.dataStartTime
     );
+  }
+
+  /**
+   * Updates generic data to street edges
+   */
+  public void updateEdges() {
+    streetEdges.forEach(this::updateEdge);
   }
 
   /**
@@ -92,13 +99,6 @@ class GenericEdgeUpdater {
 
       return originInstant.plusSeconds(addSeconds).toEpochMilli();
     }
-  }
-
-  /**
-   * Updates generic data to street edges
-   */
-  public void updateEdges() {
-    streetEdges.forEach(this::updateEdge);
   }
 
   /**

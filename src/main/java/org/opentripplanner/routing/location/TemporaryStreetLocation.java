@@ -21,12 +21,12 @@ public final class TemporaryStreetLocation extends StreetLocation implements Tem
   }
 
   @Override
-  public void addIncoming(Edge edge) {
+  public void addOutgoing(Edge edge) {
     if (edge instanceof TemporaryEdge) {
       if (endVertex) {
-        super.addIncoming(edge);
+        throw new UnsupportedOperationException("Can't add outgoing edge to end vertex");
       } else {
-        throw new UnsupportedOperationException("Can't add incoming edge to start vertex");
+        super.addOutgoing(edge);
       }
     } else {
       throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
@@ -34,12 +34,12 @@ public final class TemporaryStreetLocation extends StreetLocation implements Tem
   }
 
   @Override
-  public void addOutgoing(Edge edge) {
+  public void addIncoming(Edge edge) {
     if (edge instanceof TemporaryEdge) {
       if (endVertex) {
-        throw new UnsupportedOperationException("Can't add outgoing edge to end vertex");
+        super.addIncoming(edge);
       } else {
-        super.addOutgoing(edge);
+        throw new UnsupportedOperationException("Can't add incoming edge to start vertex");
       }
     } else {
       throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");

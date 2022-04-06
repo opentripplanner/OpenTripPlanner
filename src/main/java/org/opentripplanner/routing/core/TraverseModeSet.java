@@ -7,11 +7,12 @@ import java.util.List;
 
 /**
  * A set of traverse modes -- typically, one non-transit mode (walking, biking, car) and zero or
- * more transit modes (bus, tram, etc).  This class allows efficiently adding or removing modes
- * from a set.
+ * more transit modes (bus, tram, etc).  This class allows efficiently adding or removing modes from
+ * a set.
+ *
  * @author novalis
- *
- *
+ * <p>
+ * <p>
  * TODO OTP2 - Replace this with the use of a EnumSet
  */
 public class TraverseModeSet implements Cloneable, Serializable {
@@ -69,6 +70,10 @@ public class TraverseModeSet implements Cloneable, Serializable {
     }
   }
 
+  public TraverseModeSet(Collection<TraverseMode> modeList) {
+    this(modeList.toArray(new TraverseMode[0]));
+  }
+
   /**
    * Returns a mode set containing all modes.
    */
@@ -76,31 +81,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
     TraverseModeSet modes = new TraverseModeSet();
     modes.modes = MODE_ALL;
     return modes;
-  }
-
-  private int getMaskForMode(TraverseMode mode) {
-    return switch (mode) {
-      case BICYCLE -> MODE_BICYCLE;
-      case WALK -> MODE_WALK;
-      case CAR -> MODE_CAR;
-      case BUS -> MODE_BUS;
-      case TRAM -> MODE_TRAM;
-      case CABLE_CAR -> MODE_CABLE_CAR;
-      case GONDOLA -> MODE_GONDOLA;
-      case FERRY -> MODE_FERRY;
-      case FUNICULAR -> MODE_FUNICULAR;
-      case SUBWAY -> MODE_SUBWAY;
-      case RAIL -> MODE_RAIL;
-      case TROLLEYBUS -> MODE_TROLLEYBUS;
-      case MONORAIL -> MODE_MONORAIL;
-      case AIRPLANE -> MODE_AIRPLANE;
-      case TRANSIT -> MODE_TRANSIT;
-      default -> 0;
-    };
-  }
-
-  public TraverseModeSet(Collection<TraverseMode> modeList) {
-    this(modeList.toArray(new TraverseMode[0]));
   }
 
   public void setMode(TraverseMode mode, boolean value) {
@@ -116,40 +96,120 @@ public class TraverseModeSet implements Cloneable, Serializable {
     return (modes & MODE_BICYCLE) != 0;
   }
 
+  public void setBicycle(boolean bicycle) {
+    if (bicycle) {
+      modes |= MODE_BICYCLE;
+    } else {
+      modes &= ~MODE_BICYCLE;
+    }
+  }
+
   public boolean getWalk() {
     return (modes & MODE_WALK) != 0;
+  }
+
+  public void setWalk(boolean walk) {
+    if (walk) {
+      modes |= MODE_WALK;
+    } else {
+      modes &= ~MODE_WALK;
+    }
   }
 
   public boolean getCar() {
     return (modes & MODE_CAR) != 0;
   }
 
+  public void setCar(boolean car) {
+    if (car) {
+      modes |= MODE_CAR;
+    } else {
+      modes &= ~MODE_CAR;
+    }
+  }
+
   public boolean getTram() {
     return (modes & MODE_TRAM) != 0;
+  }
+
+  public void setTram(boolean tram) {
+    if (tram) {
+      modes |= MODE_TRAM;
+    } else {
+      modes &= ~MODE_TRAM;
+    }
   }
 
   public boolean getBus() {
     return (modes & MODE_BUS) != 0;
   }
 
+  public void setBus(boolean bus) {
+    if (bus) {
+      modes |= MODE_BUS;
+    } else {
+      modes &= ~MODE_BUS;
+    }
+  }
+
   public boolean getGondola() {
     return (modes & MODE_GONDOLA) != 0;
+  }
+
+  public void setGondola(boolean gondola) {
+    if (gondola) {
+      modes |= MODE_GONDOLA;
+    } else {
+      modes &= ~MODE_GONDOLA;
+    }
   }
 
   public boolean getFerry() {
     return (modes & MODE_FERRY) != 0;
   }
 
+  public void setFerry(boolean ferry) {
+    if (ferry) {
+      modes |= MODE_FERRY;
+    } else {
+      modes &= ~MODE_FERRY;
+    }
+  }
+
   public boolean getCableCar() {
     return (modes & MODE_CABLE_CAR) != 0;
+  }
+
+  public void setCableCar(boolean cableCar) {
+    if (cableCar) {
+      modes |= MODE_CABLE_CAR;
+    } else {
+      modes &= ~MODE_CABLE_CAR;
+    }
   }
 
   public boolean getFunicular() {
     return (modes & MODE_FUNICULAR) != 0;
   }
 
+  public void setFunicular(boolean funicular) {
+    if (funicular) {
+      modes |= MODE_FUNICULAR;
+    } else {
+      modes &= ~MODE_FUNICULAR;
+    }
+  }
+
   public boolean getRail() {
     return (modes & MODE_RAIL) != 0;
+  }
+
+  public void setRail(boolean rail) {
+    if (rail) {
+      modes |= MODE_RAIL;
+    } else {
+      modes &= ~MODE_RAIL;
+    }
   }
 
   public boolean getTrolleyBus() {
@@ -164,82 +224,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
     return (modes & MODE_SUBWAY) != 0;
   }
 
-  public boolean getAirplane() {
-    return (modes & MODE_AIRPLANE) != 0;
-  }
-
-  public void setBicycle(boolean bicycle) {
-    if (bicycle) {
-      modes |= MODE_BICYCLE;
-    } else {
-      modes &= ~MODE_BICYCLE;
-    }
-  }
-
-  public void setWalk(boolean walk) {
-    if (walk) {
-      modes |= MODE_WALK;
-    } else {
-      modes &= ~MODE_WALK;
-    }
-  }
-
-  public void setCar(boolean car) {
-    if (car) {
-      modes |= MODE_CAR;
-    } else {
-      modes &= ~MODE_CAR;
-    }
-  }
-
-  public void setTram(boolean tram) {
-    if (tram) {
-      modes |= MODE_TRAM;
-    } else {
-      modes &= ~MODE_TRAM;
-    }
-  }
-
-  public void setBus(boolean bus) {
-    if (bus) {
-      modes |= MODE_BUS;
-    } else {
-      modes &= ~MODE_BUS;
-    }
-  }
-
-  public void setFerry(boolean ferry) {
-    if (ferry) {
-      modes |= MODE_FERRY;
-    } else {
-      modes &= ~MODE_FERRY;
-    }
-  }
-
-  public void setCableCar(boolean cableCar) {
-    if (cableCar) {
-      modes |= MODE_CABLE_CAR;
-    } else {
-      modes &= ~MODE_CABLE_CAR;
-    }
-  }
-
-  public void setGondola(boolean gondola) {
-    if (gondola) {
-      modes |= MODE_GONDOLA;
-    } else {
-      modes &= ~MODE_GONDOLA;
-    }
-  }
-
-  public void setFunicular(boolean funicular) {
-    if (funicular) {
-      modes |= MODE_FUNICULAR;
-    } else {
-      modes &= ~MODE_FUNICULAR;
-    }
-  }
-
   public void setSubway(boolean subway) {
     if (subway) {
       modes |= MODE_SUBWAY;
@@ -248,12 +232,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
     }
   }
 
-  public void setRail(boolean rail) {
-    if (rail) {
-      modes |= MODE_RAIL;
-    } else {
-      modes &= ~MODE_RAIL;
-    }
+  public boolean getAirplane() {
+    return (modes & MODE_AIRPLANE) != 0;
   }
 
   public void setAirplane(boolean airplane) {
@@ -323,20 +303,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
     return (modes & modeMask) != 0;
   }
 
-  public String toString() {
-    StringBuilder out = new StringBuilder();
-    for (TraverseMode mode : TraverseMode.values()) {
-      int mask = getMaskForMode(mode);
-      if (mask != 0 && (modes & mask) == mask) {
-        if (out.length() != 0) {
-          out.append(", ");
-        }
-        out.append(mode);
-      }
-    }
-    return "TraverseMode (" + out + ")";
-  }
-
   /** get this traverse mode as a string that can be fed back into the constructor */
   public String getAsStr() {
     String retVal = null;
@@ -349,16 +315,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
       retVal += m;
     }
     return retVal;
-  }
-
-  @Override
-  public TraverseModeSet clone() {
-    try {
-      return (TraverseModeSet) super.clone();
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
   }
 
   /**
@@ -377,5 +333,50 @@ public class TraverseModeSet implements Cloneable, Serializable {
       return modes == ((TraverseModeSet) other).modes;
     }
     return false;
+  }
+
+  @Override
+  public TraverseModeSet clone() {
+    try {
+      return (TraverseModeSet) super.clone();
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
+  public String toString() {
+    StringBuilder out = new StringBuilder();
+    for (TraverseMode mode : TraverseMode.values()) {
+      int mask = getMaskForMode(mode);
+      if (mask != 0 && (modes & mask) == mask) {
+        if (out.length() != 0) {
+          out.append(", ");
+        }
+        out.append(mode);
+      }
+    }
+    return "TraverseMode (" + out + ")";
+  }
+
+  private int getMaskForMode(TraverseMode mode) {
+    return switch (mode) {
+      case BICYCLE -> MODE_BICYCLE;
+      case WALK -> MODE_WALK;
+      case CAR -> MODE_CAR;
+      case BUS -> MODE_BUS;
+      case TRAM -> MODE_TRAM;
+      case CABLE_CAR -> MODE_CABLE_CAR;
+      case GONDOLA -> MODE_GONDOLA;
+      case FERRY -> MODE_FERRY;
+      case FUNICULAR -> MODE_FUNICULAR;
+      case SUBWAY -> MODE_SUBWAY;
+      case RAIL -> MODE_RAIL;
+      case TROLLEYBUS -> MODE_TROLLEYBUS;
+      case MONORAIL -> MODE_MONORAIL;
+      case AIRPLANE -> MODE_AIRPLANE;
+      case TRANSIT -> MODE_TRANSIT;
+      default -> 0;
+    };
   }
 }

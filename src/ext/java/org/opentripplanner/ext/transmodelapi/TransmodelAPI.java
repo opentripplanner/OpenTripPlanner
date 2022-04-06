@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{ignoreRouterId}/transmodel/index") // It would be nice to get rid of the final /index.
+@Path("/routers/{ignoreRouterId}/transmodel/index")
+// It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class TransmodelAPI {
 
@@ -65,9 +66,9 @@ public class TransmodelAPI {
   }
 
   /**
-   * This method should be called BEFORE the Web-Container is started and load new
-   * instances of this class. This is a hack, and it would be better if the configuration
-   * was done more explicit and enforced, not relaying on a "static" setup method to be called.
+   * This method should be called BEFORE the Web-Container is started and load new instances of this
+   * class. This is a hack, and it would be better if the configuration was done more explicit and
+   * enforced, not relaying on a "static" setup method to be called.
    */
   public static void setUp(
     TransmodelAPIParameters config,

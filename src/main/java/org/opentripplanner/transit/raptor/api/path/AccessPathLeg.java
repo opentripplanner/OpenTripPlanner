@@ -6,8 +6,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * Represent an access leg in a path. The access leg is the first leg from origin to the
- * first transit leg. The next leg must be a transit leg - no other legs are allowed.
+ * Represent an access leg in a path. The access leg is the first leg from origin to the first
+ * transit leg. The next leg must be a transit leg - no other legs are allowed.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -38,17 +38,17 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     return fromTime;
   }
 
+  @Override
+  public int toTime() {
+    return toTime;
+  }
+
   /**
    * The stop index where the leg end, also called arrival stop index.
    */
   @Override
   public int toStop() {
     return access.stop();
-  }
-
-  @Override
-  public int toTime() {
-    return toTime;
   }
 
   @Override
@@ -61,18 +61,18 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     return true;
   }
 
-  public RaptorTransfer access() {
-    return access;
-  }
-
   @Override
   public PathLeg<T> nextLeg() {
     return next;
   }
 
+  public RaptorTransfer access() {
+    return access;
+  }
+
   @Override
-  public String toString() {
-    return "Access " + asString(toStop());
+  public int hashCode() {
+    return Objects.hash(fromTime, toStop(), toTime, next);
   }
 
   @Override
@@ -93,7 +93,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(fromTime, toStop(), toTime, next);
+  public String toString() {
+    return "Access " + asString(toStop());
   }
 }

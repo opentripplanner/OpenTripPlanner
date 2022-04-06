@@ -22,14 +22,14 @@ public class GtfsBundle {
   private CsvInputSource csvInputSource;
 
   /**
-   * Create direct transfers between the constituent stops of each parent station.
-   * This is different from "linking stops to parent stations" below.
+   * Create direct transfers between the constituent stops of each parent station. This is different
+   * from "linking stops to parent stations" below.
    */
   public boolean parentStationTransfers = false;
 
   /**
-   * Connect parent station vertices to their constituent stops to allow beginning and
-   * ending paths (itineraries) at them.
+   * Connect parent station vertices to their constituent stops to allow beginning and ending paths
+   * (itineraries) at them.
    */
   public boolean linkStopsToParentStations = false;
 

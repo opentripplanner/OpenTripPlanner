@@ -49,6 +49,10 @@ public class RouteMapperTest {
   private static final Agency AGENCY = new Agency();
 
   private static final Route ROUTE = new Route();
+  private final RouteMapper subject = new RouteMapper(
+    new AgencyMapper(FEED_ID),
+    new DataImportIssueStore(false)
+  );
 
   static {
     AGENCY.setId("A");
@@ -66,11 +70,6 @@ public class RouteMapperTest {
     ROUTE.setSortOrder(SORT_ORDER);
     ROUTE.setBrandingUrl(BRANDING_URL);
   }
-
-  private final RouteMapper subject = new RouteMapper(
-    new AgencyMapper(FEED_ID),
-    new DataImportIssueStore(false)
-  );
 
   @Test
   public void testMapCollection() throws Exception {

@@ -18,10 +18,10 @@ import org.opentripplanner.util.time.TimeUtils;
  * The responsibility of this class is to listen for egress stop arrivals and forward these as
  * Destination arrivals to the {@link DestinationArrivalPaths}.
  * <p/>
- * Range Raptor requires paths to be collected at the end of each iteration. Following
- * iterations may overwrite the existing state; Hence invalidate trips explored in previous
- * iterations. Because adding new destination arrivals to the set of paths is expensive,
- * this class optimize this by only adding new destination arrivals at the end of each round.
+ * Range Raptor requires paths to be collected at the end of each iteration. Following iterations
+ * may overwrite the existing state; Hence invalidate trips explored in previous iterations. Because
+ * adding new destination arrivals to the set of paths is expensive, this class optimize this by
+ * only adding new destination arrivals at the end of each round.
  * <p/>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -69,6 +69,11 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
     }
   }
 
+  @Override
+  public boolean arrivedAtDestinationCurrentRound() {
+    return newElementSet();
+  }
+
   private boolean newElementSet() {
     return bestArrival != null;
   }
@@ -84,11 +89,6 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
       logDebugRejectEvents();
       bestArrival = null;
     }
-  }
-
-  @Override
-  public boolean arrivedAtDestinationCurrentRound() {
-    return newElementSet();
   }
 
   private void addNewElementToPath() {
@@ -134,10 +134,6 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
       this.egressPath = egressPath;
     }
 
-    <T extends RaptorTripSchedule> ArrivalView<T> toArrivalState(StopsCursor<T> cursor) {
-      return cursor.stop(round, egressPath.stop(), stopReachedOnBoard);
-    }
-
     @Override
     public String toString() {
       return ToStringBuilder
@@ -146,6 +142,10 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
         .addBool("stopReachedOnBoard", stopReachedOnBoard)
         .addObj("egressPath", egressPath)
         .toString();
+    }
+
+    <T extends RaptorTripSchedule> ArrivalView<T> toArrivalState(StopsCursor<T> cursor) {
+      return cursor.stop(round, egressPath.stop(), stopReachedOnBoard);
     }
   }
 }

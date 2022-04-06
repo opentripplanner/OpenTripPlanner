@@ -22,18 +22,8 @@ import org.opentripplanner.routing.RoutingService;
 public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLLeg {
 
   @Override
-  public DataFetcher<Long> startTime() {
-    return environment -> getSource(environment).getStartTime().getTime().getTime();
-  }
-
-  @Override
-  public DataFetcher<Long> endTime() {
-    return environment -> getSource(environment).getEndTime().getTime().getTime();
-  }
-
-  @Override
-  public DataFetcher<Integer> departureDelay() {
-    return environment -> getSource(environment).getDepartureDelay();
+  public DataFetcher<Agency> agency() {
+    return environment -> getSource(environment).getAgency();
   }
 
   @Override
@@ -42,39 +32,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<String> mode() {
-    return environment -> getSource(environment).getMode().name();
-  }
-
-  @Override
-  public DataFetcher<Double> duration() {
-    return environment -> (double) getSource(environment).getDuration();
-  }
-
-  @Override
-  public DataFetcher<Integer> generalizedCost() {
-    return environment -> getSource(environment).getGeneralizedCost();
-  }
-
-  @Override
-  public DataFetcher<Geometry> legGeometry() {
-    return environment -> getSource(environment).getLegGeometry();
-  }
-
-  @Override
-  public DataFetcher<Agency> agency() {
-    return environment -> getSource(environment).getAgency();
-  }
-
-  @Override
-  public DataFetcher<Boolean> realTime() {
-    return environment -> getSource(environment).getRealTime();
-  }
-
-  // TODO
-  @Override
-  public DataFetcher<String> realtimeState() {
-    return environment -> null;
+  public DataFetcher<Integer> departureDelay() {
+    return environment -> getSource(environment).getDepartureDelay();
   }
 
   @Override
@@ -83,18 +42,28 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<Boolean> transitLeg() {
-    return environment -> getSource(environment).isTransitLeg();
+  public DataFetcher<BookingInfo> dropOffBookingInfo() {
+    return environment -> getSource(environment).getDropOffBookingInfo();
   }
 
   @Override
-  public DataFetcher<Boolean> walkingBike() {
-    return environment -> getSource(environment).getWalkingBike();
+  public DataFetcher<String> dropoffType() {
+    return environment -> {
+      if (getSource(environment).getAlightRule() == null) {
+        return PickDrop.SCHEDULED.name();
+      }
+      return getSource(environment).getAlightRule().name();
+    };
   }
 
   @Override
-  public DataFetcher<Boolean> rentedBike() {
-    return environment -> getSource(environment).getRentedVehicle();
+  public DataFetcher<Double> duration() {
+    return environment -> (double) getSource(environment).getDuration();
+  }
+
+  @Override
+  public DataFetcher<Long> endTime() {
+    return environment -> getSource(environment).getEndTime().getTime().getTime();
   }
 
   @Override
@@ -112,32 +81,24 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<StopArrival> to() {
-    return environment -> {
-      Leg source = getSource(environment);
-      return new StopArrival(
-        source.getTo(),
-        source.getEndTime(),
-        source.getEndTime(),
-        source.getAlightStopPosInPattern(),
-        source.getAlightGtfsStopSequence()
-      );
-    };
+  public DataFetcher<Integer> generalizedCost() {
+    return environment -> getSource(environment).getGeneralizedCost();
   }
 
   @Override
-  public DataFetcher<Route> route() {
-    return environment -> getSource(environment).getRoute();
+  public DataFetcher<Boolean> interlineWithPreviousLeg() {
+    return environment -> getSource(environment).isInterlinedWithPreviousLeg();
+  }
+
+  // TODO
+  @Override
+  public DataFetcher<Boolean> intermediatePlace() {
+    return environment -> false;
   }
 
   @Override
-  public DataFetcher<Trip> trip() {
-    return environment -> getSource(environment).getTrip();
-  }
-
-  @Override
-  public DataFetcher<String> serviceDate() {
-    return environment -> ServiceDateMapper.mapToApi(getSource(environment).getServiceDate());
+  public DataFetcher<Iterable<StopArrival>> intermediatePlaces() {
+    return environment -> getSource(environment).getIntermediateStops();
   }
 
   @Override
@@ -156,19 +117,18 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<Iterable<StopArrival>> intermediatePlaces() {
-    return environment -> getSource(environment).getIntermediateStops();
-  }
-
-  // TODO
-  @Override
-  public DataFetcher<Boolean> intermediatePlace() {
-    return environment -> false;
+  public DataFetcher<Geometry> legGeometry() {
+    return environment -> getSource(environment).getLegGeometry();
   }
 
   @Override
-  public DataFetcher<Iterable<WalkStep>> steps() {
-    return environment -> getSource(environment).getWalkSteps();
+  public DataFetcher<String> mode() {
+    return environment -> getSource(environment).getMode().name();
+  }
+
+  @Override
+  public DataFetcher<BookingInfo> pickupBookingInfo() {
+    return environment -> getSource(environment).getPickupBookingInfo();
   }
 
   @Override
@@ -182,28 +142,68 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<String> dropoffType() {
+  public DataFetcher<Boolean> realTime() {
+    return environment -> getSource(environment).getRealTime();
+  }
+
+  // TODO
+  @Override
+  public DataFetcher<String> realtimeState() {
+    return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<Boolean> rentedBike() {
+    return environment -> getSource(environment).getRentedVehicle();
+  }
+
+  @Override
+  public DataFetcher<Route> route() {
+    return environment -> getSource(environment).getRoute();
+  }
+
+  @Override
+  public DataFetcher<String> serviceDate() {
+    return environment -> ServiceDateMapper.mapToApi(getSource(environment).getServiceDate());
+  }
+
+  @Override
+  public DataFetcher<Long> startTime() {
+    return environment -> getSource(environment).getStartTime().getTime().getTime();
+  }
+
+  @Override
+  public DataFetcher<Iterable<WalkStep>> steps() {
+    return environment -> getSource(environment).getWalkSteps();
+  }
+
+  @Override
+  public DataFetcher<StopArrival> to() {
     return environment -> {
-      if (getSource(environment).getAlightRule() == null) {
-        return PickDrop.SCHEDULED.name();
-      }
-      return getSource(environment).getAlightRule().name();
+      Leg source = getSource(environment);
+      return new StopArrival(
+        source.getTo(),
+        source.getEndTime(),
+        source.getEndTime(),
+        source.getAlightStopPosInPattern(),
+        source.getAlightGtfsStopSequence()
+      );
     };
   }
 
   @Override
-  public DataFetcher<Boolean> interlineWithPreviousLeg() {
-    return environment -> getSource(environment).isInterlinedWithPreviousLeg();
+  public DataFetcher<Boolean> transitLeg() {
+    return environment -> getSource(environment).isTransitLeg();
   }
 
   @Override
-  public DataFetcher<BookingInfo> dropOffBookingInfo() {
-    return environment -> getSource(environment).getDropOffBookingInfo();
+  public DataFetcher<Trip> trip() {
+    return environment -> getSource(environment).getTrip();
   }
 
   @Override
-  public DataFetcher<BookingInfo> pickupBookingInfo() {
-    return environment -> getSource(environment).getPickupBookingInfo();
+  public DataFetcher<Boolean> walkingBike() {
+    return environment -> getSource(environment).getWalkingBike();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

@@ -14,7 +14,7 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 /**
  * A reference to a pattern at a specific stop.
- *
+ * <p>
  * TODO Is this the right package for this?
  */
 public class PatternAtStop {
@@ -27,19 +27,6 @@ public class PatternAtStop {
     this.id = toId(stop, pattern);
     this.stop = stop;
     this.pattern = pattern;
-  }
-
-  /**
-   * Converts the ids of the pattern and stop to an opaque id, which can be supplied to the users
-   * to be used for refetching the combination.
-   */
-  private static String toId(StopLocation stop, TripPattern pattern) {
-    Base64.Encoder encoder = Base64.getEncoder();
-    return (
-      encoder.encodeToString(stop.getId().toString().getBytes(StandardCharsets.UTF_8)) +
-      ";" +
-      encoder.encodeToString(pattern.getId().toString().getBytes(StandardCharsets.UTF_8))
-    );
   }
 
   /**
@@ -66,12 +53,13 @@ public class PatternAtStop {
   /**
    * Returns a list of stop times for the specific pattern at the stop.
    *
-   * @param routingService     An instance of the RoutingService to be used for the timetable search
+   * @param routingService     An instance of the RoutingService to be used for the timetable
+   *                           search
    * @param startTime          Start time for the search. Seconds from UNIX epoch
    * @param timeRange          Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch
    * @param arrivalDeparture   Filter by arrivals, departures, or both
-   * @return                   A list of stop times
+   * @return A list of stop times
    */
   public List<TripTimeOnDate> getStoptimes(
     RoutingService routingService,
@@ -91,6 +79,11 @@ public class PatternAtStop {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(id, stop, pattern);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -107,11 +100,6 @@ public class PatternAtStop {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(id, stop, pattern);
-  }
-
-  @Override
   public String toString() {
     return ToStringBuilder
       .of(getClass())
@@ -119,5 +107,18 @@ public class PatternAtStop {
       .addObj("stop", stop)
       .addObj("pattern", pattern)
       .toString();
+  }
+
+  /**
+   * Converts the ids of the pattern and stop to an opaque id, which can be supplied to the users to
+   * be used for refetching the combination.
+   */
+  private static String toId(StopLocation stop, TripPattern pattern) {
+    Base64.Encoder encoder = Base64.getEncoder();
+    return (
+      encoder.encodeToString(stop.getId().toString().getBytes(StandardCharsets.UTF_8)) +
+      ";" +
+      encoder.encodeToString(pattern.getId().toString().getBytes(StandardCharsets.UTF_8))
+    );
   }
 }

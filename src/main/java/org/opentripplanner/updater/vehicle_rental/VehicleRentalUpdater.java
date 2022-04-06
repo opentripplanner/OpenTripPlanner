@@ -31,20 +31,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Dynamic vehicle-rental station updater which updates the Graph with vehicle rental stations from one VehicleRentalDataSource.
+ * Dynamic vehicle-rental station updater which updates the Graph with vehicle rental stations from
+ * one VehicleRentalDataSource.
  */
 public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
-
-  private WriteToGraphCallback saveResultOnGraph;
-
-  Map<FeedScopedId, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
-
-  Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
-
   private final DataSource<VehicleRentalPlace> source;
-
+  private WriteToGraphCallback saveResultOnGraph;
+  Map<FeedScopedId, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
+  Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private VertexLinker linker;
 
   private VehicleRentalStationService service;
@@ -85,6 +81,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public void teardown() {}
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(VehicleRentalUpdater.class).addObj("source", source).toString();
+  }
+
+  @Override
   protected void runPolling() {
     LOG.debug("Updating vehicle rental stations from " + source);
     if (!source.update()) {
@@ -99,9 +103,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     );
     saveResultOnGraph.execute(graphWriterRunnable);
   }
-
-  @Override
-  public void teardown() {}
 
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {
 
@@ -167,10 +168,5 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         tempEdgesByStation.remove(station);
       }
     }
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder.of(VehicleRentalUpdater.class).addObj("source", source).toString();
   }
 }

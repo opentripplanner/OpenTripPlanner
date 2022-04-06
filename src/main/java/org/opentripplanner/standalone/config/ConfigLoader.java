@@ -61,25 +61,25 @@ public class ConfigLoader {
   }
 
   /**
-   * Create a config loader that load config from the given input json document.
-   * Use it with {@link #loadBuildConfig()} or one of the other load methods to
-   * return a configuration for the given input json string.
+   * Create a config loader that load config from the given input json document. Use it with {@link
+   * #loadBuildConfig()} or one of the other load methods to return a configuration for the given
+   * input json string.
    */
   public static ConfigLoader fromString(String json) {
     return new ConfigLoader(null, json);
   }
 
   /**
-   * Generic method to parse the given json and return a JsonNode tree. The {@code source} is
-   * used to generate a proper error message in case the string is not a proper JSON document.
+   * Generic method to parse the given json and return a JsonNode tree. The {@code source} is used
+   * to generate a proper error message in case the string is not a proper JSON document.
    */
   public static JsonNode nodeFromString(String json, String source) {
     return new ConfigLoader(null, null).stringToJsonNode(json, source);
   }
 
   /**
-   * Check if a file is a config file using the configuration file name.
-   * This method returns {@code true} if the file match {@code (otp|build|router)-config.json}.
+   * Check if a file is a config file using the configuration file name. This method returns {@code
+   * true} if the file match {@code (otp|build|router)-config.json}.
    */
   public static boolean isConfigFile(String filename) {
     return (
@@ -87,48 +87,6 @@ public class ConfigLoader {
       BUILD_CONFIG_FILENAME.equals(filename) ||
       ROUTER_CONFIG_FILENAME.equals(filename)
     );
-  }
-
-  /**
-   * Load the graph build configuration file as a JsonNode three. An empty node is
-   * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
-   * <p>
-   * This method also log all loaded parameters to the console.
-   * <p>
-   * @see #loadJsonFile for more details.
-   */
-  public OtpConfig loadOtpConfig() {
-    return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME, true);
-  }
-
-  /**
-   * Load the graph build configuration file as a JsonNode three. An empty node is
-   * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
-   * <p>
-   * This method also log all loaded parameters to the console.
-   * <p>
-   * @see #loadJsonFile for more details.
-   */
-  public BuildConfig loadBuildConfig() {
-    JsonNode node = loadJsonByFilename(BUILD_CONFIG_FILENAME);
-    if (node.isMissingNode()) {
-      return BuildConfig.DEFAULT;
-    }
-    return new BuildConfig(node, BUILD_CONFIG_FILENAME, true);
-  }
-
-  /**
-   * Load the router configuration file as a JsonNode three. An empty node is
-   * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
-   * <p>
-   * @see #loadJsonFile for more details.
-   */
-  public RouterConfig loadRouterConfig() {
-    JsonNode node = loadJsonByFilename(ROUTER_CONFIG_FILENAME);
-    if (node.isMissingNode()) {
-      return RouterConfig.DEFAULT;
-    }
-    return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
   }
 
   /**
@@ -146,8 +104,53 @@ public class ConfigLoader {
   }
 
   /**
-   * Load the router configuration file as a JsonNode three. An empty node is
-   * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
+   * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
+   * given {@code configDir}  is {@code null} or config file is NOT found.
+   * <p>
+   * This method also log all loaded parameters to the console.
+   * <p>
+   *
+   * @see #loadJsonFile for more details.
+   */
+  public OtpConfig loadOtpConfig() {
+    return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME, true);
+  }
+
+  /**
+   * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
+   * given {@code configDir}  is {@code null} or config file is NOT found.
+   * <p>
+   * This method also log all loaded parameters to the console.
+   * <p>
+   *
+   * @see #loadJsonFile for more details.
+   */
+  public BuildConfig loadBuildConfig() {
+    JsonNode node = loadJsonByFilename(BUILD_CONFIG_FILENAME);
+    if (node.isMissingNode()) {
+      return BuildConfig.DEFAULT;
+    }
+    return new BuildConfig(node, BUILD_CONFIG_FILENAME, true);
+  }
+
+  /**
+   * Load the router configuration file as a JsonNode three. An empty node is returned if the given
+   * {@code configDir}  is {@code null} or config file is NOT found.
+   * <p>
+   *
+   * @see #loadJsonFile for more details.
+   */
+  public RouterConfig loadRouterConfig() {
+    JsonNode node = loadJsonByFilename(ROUTER_CONFIG_FILENAME);
+    if (node.isMissingNode()) {
+      return RouterConfig.DEFAULT;
+    }
+    return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
+  }
+
+  /**
+   * Load the router configuration file as a JsonNode three. An empty node is returned if the given
+   * {@code configDir}  is {@code null} or config file is NOT found.
    * <p>
    * This is public to allow loading configuration files from tests like the SpeedTest.
    *
@@ -170,14 +173,45 @@ public class ConfigLoader {
   }
 
   /**
-   * Open and parse the JSON file at the given path into a Jackson JSON tree. Comments and
-   * unquoted keys are allowed. Returns an empty node if the file does not exist. Throws an
-   * exception if the file contains syntax errors or cannot be parsed for some other reason.
+   * Convert the JsonNode to a pretty-printed string with secrets hidden, operating on a protective
+   * copy of the node to avoid losing information.
+   */
+  private static String toRedactedString(JsonNode node) {
+    JsonNode redactedNode = node.deepCopy();
+    redactSecretsRecursive(redactedNode);
+    return redactedNode.toPrettyString();
+  }
+
+  /** Note that this method destructively modifies the node and its children in place. */
+  private static void redactSecretsRecursive(JsonNode node) {
+    if (node.isObject()) {
+      node
+        .fields()
+        .forEachRemaining(entry -> {
+          if (entry.getValue().isObject()) {
+            redactSecretsRecursive(entry.getValue());
+          } else if (REDACT_KEYS.contains(entry.getKey())) {
+            entry.setValue(new TextNode("********"));
+          }
+        });
+    }
+  }
+
+  private static void logConfigVersion(String configVersion, String filename) {
+    if (configVersion != null) {
+      LOG.info("{} config-version is {}.", filename, configVersion);
+    }
+  }
+
+  /**
+   * Open and parse the JSON file at the given path into a Jackson JSON tree. Comments and unquoted
+   * keys are allowed. Returns an empty node if the file does not exist. Throws an exception if the
+   * file contains syntax errors or cannot be parsed for some other reason.
    * <p>
-   * We do not require any JSON config files to be present because that would get in the way of
-   * the simplest rapid deployment workflow. Therefore we return an empty JSON node when the file
-   * is missing, causing us to fall back on all the default values as if there was a JSON file
-   * present with no fields defined.
+   * We do not require any JSON config files to be present because that would get in the way of the
+   * simplest rapid deployment workflow. Therefore we return an empty JSON node when the file is
+   * missing, causing us to fall back on all the default values as if there was a JSON file present
+   * with no fields defined.
    */
   private JsonNode loadJsonFile(File file) {
     try {
@@ -224,37 +258,6 @@ public class ConfigLoader {
     }
     if (!configDir.isDirectory()) {
       throw new IllegalArgumentException(configDir + " is not a readable configuration directory.");
-    }
-  }
-
-  /**
-   * Convert the JsonNode to a pretty-printed string with secrets hidden,
-   * operating on a protective copy of the node to avoid losing information.
-   */
-  private static String toRedactedString(JsonNode node) {
-    JsonNode redactedNode = node.deepCopy();
-    redactSecretsRecursive(redactedNode);
-    return redactedNode.toPrettyString();
-  }
-
-  /** Note that this method destructively modifies the node and its children in place. */
-  private static void redactSecretsRecursive(JsonNode node) {
-    if (node.isObject()) {
-      node
-        .fields()
-        .forEachRemaining(entry -> {
-          if (entry.getValue().isObject()) {
-            redactSecretsRecursive(entry.getValue());
-          } else if (REDACT_KEYS.contains(entry.getKey())) {
-            entry.setValue(new TextNode("********"));
-          }
-        });
-    }
-  }
-
-  private static void logConfigVersion(String configVersion, String filename) {
-    if (configVersion != null) {
-      LOG.info("{} config-version is {}.", filename, configVersion);
     }
   }
 }

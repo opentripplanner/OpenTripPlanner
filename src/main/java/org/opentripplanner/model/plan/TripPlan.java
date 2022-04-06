@@ -10,7 +10,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
  */
 public class TripPlan {
 
-  /**  The time and date of travel */
+  /** The time and date of travel */
   public final Date date;
 
   /** The origin */

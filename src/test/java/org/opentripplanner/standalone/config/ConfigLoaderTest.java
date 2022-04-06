@@ -94,8 +94,8 @@ public class ConfigLoaderTest {
    * Test replacing environment variables in JSON config. The {@link ConfigLoader} should replace
    * placeholders like '${ENV_NAME}' when converting a JSON string to a node tree.
    * <p>
-   * This test pick a random system environment variable and insert it into the JSON string to
-   * be able to test the replace functionality. This is necessary to avoid changing the system
+   * This test pick a random system environment variable and insert it into the JSON string to be
+   * able to test the replace functionality. This is necessary to avoid changing the system
    * environment variables and to apply this test on the {@link ConfigLoader} level.
    */
   @Test

@@ -22,21 +22,20 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * GraphUpdaterManager updaterManager = graph.getUpdaterManager();
  * </pre>
- *
+ * <p>
  * Each updater will run in its own thread. When changes to the graph have to be made by these
  * updaters, this should be done via the execute method of this manager to prevent race conditions
  * between graph write operations.
- *
  */
 public class GraphUpdaterManager implements WriteToGraphCallback {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
 
   /**
-   * OTP's multi-version concurrency control model for graph updating allows simultaneous reads,
-   * but never simultaneous writes. We ensure this policy is respected by having a single writer
-   * thread, which sequentially executes all graph updater tasks. Each task is a runnable that is
-   * scheduled with the ExecutorService to run at regular intervals.
+   * OTP's multi-version concurrency control model for graph updating allows simultaneous reads, but
+   * never simultaneous writes. We ensure this policy is respected by having a single writer thread,
+   * which sequentially executes all graph updater tasks. Each task is a runnable that is scheduled
+   * with the ExecutorService to run at regular intervals.
    * FIXME: In reality we're not using scheduleAtFixedInterval.
    *        We're scheduling for immediate execution from separate threads that sleep in a loop.
    *        We should perhaps switch to having polling GraphUpdaters call scheduleAtFixedInterval.
@@ -44,8 +43,8 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
   private final ScheduledExecutorService scheduler;
 
   /**
-   * A pool of threads on which the updaters will run.
-   * This creates a pool that will auto-scale up to any size (maximum pool size is MAX_INT).
+   * A pool of threads on which the updaters will run. This creates a pool that will auto-scale up
+   * to any size (maximum pool size is MAX_INT).
    * FIXME The polling updaters occupy an entire thread, sleeping in between polling operations.
    */
   private final ExecutorService updaterPool;
@@ -62,6 +61,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
 
   /**
    * Constructor.
+   *
    * @param graph is the Graph that will be updated.
    */
   public GraphUpdaterManager(Graph graph, List<GraphUpdater> updaters) {
@@ -78,8 +78,8 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
   }
 
   /**
-   * This should be called only once at startup to kick off every updater in its own thread, and only after all
-   * the updaters have had their setup methods called.
+   * This should be called only once at startup to kick off every updater in its own thread, and
+   * only after all the updaters have had their setup methods called.
    */
   public void startUpdaters() {
     for (GraphUpdater updater : updaterList) {
@@ -146,6 +146,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
 
   /**
    * Return the number of updaters started, but not ready.
+   *
    * @see GraphUpdater#isPrimed()
    */
   public List<String> listUnprimedUpdaters() {
@@ -157,8 +158,8 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
   }
 
   /**
-   * Just an example of fetching status information from the graph updater manager to expose it in a web service.
-   * More useful stuff should be added later.
+   * Just an example of fetching status information from the graph updater manager to expose it in a
+   * web service. More useful stuff should be added later.
    */
   public Map<Integer, String> getUpdaterDescriptions() {
     Map<Integer, String> ret = Maps.newTreeMap();
@@ -170,8 +171,8 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
   }
 
   /**
-   * Just an example of fetching status information from the graph updater manager to expose it in a web service.
-   * More useful stuff should be added later.
+   * Just an example of fetching status information from the graph updater manager to expose it in a
+   * web service. More useful stuff should be added later.
    */
   public GraphUpdater getUpdater(int id) {
     if (id >= updaterList.size()) {
@@ -196,9 +197,9 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
    * This method start a task during startup and log a message when all updaters are initialized.
    * When all updaters are ready, then OTP is ready for processing routing requests.
    * <p>
-   * It starts its own thread using busy-wait(anti-pattern). The ideal would be to add a
-   * callback from each updater to notify the manager about 'isPrimed'. But, this is simple, the
-   * thread is mostly idle, and it is short-lived, so the busy-wait is a compromise.
+   * It starts its own thread using busy-wait(anti-pattern). The ideal would be to add a callback
+   * from each updater to notify the manager about 'isPrimed'. But, this is simple, the thread is
+   * mostly idle, and it is short-lived, so the busy-wait is a compromise.
    */
   private void reportReadinessForUpdaters() {
     Executors

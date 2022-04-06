@@ -18,8 +18,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 
 /**
- * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
- * refers to days in order.
+ * A collection of all the TripSchedules active on a range of consecutive days. The outer list of
+ * tripSchedulesByDay refers to days in order.
  */
 public class TripPatternForDates
   implements RaptorRoute<TripSchedule>, RaptorTimeTable<TripSchedule>, RaptorTripPattern {
@@ -42,8 +42,8 @@ public class TripPatternForDates
   private final int[] arrivalTimes;
 
   /**
-   * The arrival times in a nStops * numberOfTripSchedules sized array. The order is the same as
-   * in arrivalTimes.
+   * The arrival times in a nStops * numberOfTripSchedules sized array. The order is the same as in
+   * arrivalTimes.
    */
   private final int[] departureTimes;
 
@@ -100,8 +100,8 @@ public class TripPatternForDates
   }
 
   /**
-   * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes,
-   *             but is realy an implementation detail that should not leak outside the class.
+   * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes, but is
+   * realy an implementation detail that should not leak outside the class.
    */
   @Deprecated
   public int tripPatternForDateOffsets(int index) {
@@ -176,16 +176,6 @@ public class TripPatternForDates
     return (int index) -> departureTimes[base + index];
   }
 
-  public IntUnaryOperator getArrivalTimesForTrip(int index) {
-    return (int stopPositionInPattern) ->
-      arrivalTimes[stopPositionInPattern * numberOfTripSchedules + index];
-  }
-
-  public IntUnaryOperator getDepartureTimesForTrip(int index) {
-    return (int stopPositionInPattern) ->
-      departureTimes[stopPositionInPattern * numberOfTripSchedules + index];
-  }
-
   @Override
   public int numberOfTripSchedules() {
     return numberOfTripSchedules;
@@ -203,6 +193,16 @@ public class TripPatternForDates
     return direction.isForward()
       ? new TripFrequencyBoardSearch<>(this)
       : new TripFrequencyAlightSearch<>(this);
+  }
+
+  public IntUnaryOperator getArrivalTimesForTrip(int index) {
+    return (int stopPositionInPattern) ->
+      arrivalTimes[stopPositionInPattern * numberOfTripSchedules + index];
+  }
+
+  public IntUnaryOperator getDepartureTimesForTrip(int index) {
+    return (int stopPositionInPattern) ->
+      departureTimes[stopPositionInPattern * numberOfTripSchedules + index];
   }
 
   @Override

@@ -78,13 +78,13 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   }
 
   @Override
-  public DataSource findSource(String filename, FileType type) {
-    return new FileDataSource(new File(baseDir, filename), type);
+  public CompositeDataSource findCompositeSource(URI uri, FileType type) {
+    return createCompositeSource(openFile(uri, type), type);
   }
 
   @Override
-  public CompositeDataSource findCompositeSource(URI uri, FileType type) {
-    return createCompositeSource(openFile(uri, type), type);
+  public DataSource findSource(String filename, FileType type) {
+    return new FileDataSource(new File(baseDir, filename), type);
   }
 
   @Override
@@ -125,8 +125,20 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
   /* private methods */
 
-  private boolean isCompositeDataSource(File file) {
-    return file.isDirectory() || file.getName().endsWith(".zip");
+  public File openFile(URI uri, FileType type) {
+    try {
+      return uri.isAbsolute() ? new File(uri) : new File(baseDir, uri.getPath());
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException(
+        "The file URI is invalid for file type " +
+        type +
+        ". " +
+        "URI: '" +
+        uri +
+        "', details: " +
+        e.getMessage()
+      );
+    }
   }
 
   private static CompositeDataSource createCompositeSource(File file, FileType type) {
@@ -150,20 +162,15 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     );
   }
 
-  public File openFile(URI uri, FileType type) {
-    try {
-      return uri.isAbsolute() ? new File(uri) : new File(baseDir, uri.getPath());
-    } catch (IllegalArgumentException e) {
-      throw new OtpAppException(
-        "The file URI is invalid for file type " +
-        type +
-        ". " +
-        "URI: '" +
-        uri +
-        "', details: " +
-        e.getMessage()
-      );
-    }
+  private static boolean isTransitFile(File file, Pattern pattern) {
+    return (
+      pattern.matcher(file.getName()).find() &&
+      (file.isDirectory() || file.getName().endsWith(".zip"))
+    );
+  }
+
+  private boolean isCompositeDataSource(File file) {
+    return file.isDirectory() || file.getName().endsWith(".zip");
   }
 
   private FileType resolveFileType(File file) {
@@ -191,12 +198,5 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
       return CONFIG;
     }
     return UNKNOWN;
-  }
-
-  private static boolean isTransitFile(File file, Pattern pattern) {
-    return (
-      pattern.matcher(file.getName()).find() &&
-      (file.isDirectory() || file.getName().endsWith(".zip"))
-    );
   }
 }

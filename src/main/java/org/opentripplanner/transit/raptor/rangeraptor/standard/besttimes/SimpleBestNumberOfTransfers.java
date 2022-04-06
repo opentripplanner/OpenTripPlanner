@@ -5,8 +5,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTrans
 import org.opentripplanner.transit.raptor.util.IntUtils;
 
 /**
- * The responsibility for this class is to keep track of the best (minimun)
- * number of transfers for all stops reached.
+ * The responsibility for this class is to keep track of the best (minimun) number of transfers for
+ * all stops reached.
  */
 public class SimpleBestNumberOfTransfers implements BestNumberOfTransfers {
 
@@ -18,6 +18,11 @@ public class SimpleBestNumberOfTransfers implements BestNumberOfTransfers {
     this.roundProvider = roundProvider;
   }
 
+  @Override
+  public int calculateMinNumberOfTransfers(int stop) {
+    return bestNumOfTransfers[stop];
+  }
+
   /**
    * Call this method to notify that the given stop is reached in the current round of Raptor.
    */
@@ -26,10 +31,5 @@ public class SimpleBestNumberOfTransfers implements BestNumberOfTransfers {
     if (numOfTransfers < bestNumOfTransfers[stop]) {
       bestNumOfTransfers[stop] = numOfTransfers;
     }
-  }
-
-  @Override
-  public int calculateMinNumberOfTransfers(int stop) {
-    return bestNumOfTransfers[stop];
   }
 }

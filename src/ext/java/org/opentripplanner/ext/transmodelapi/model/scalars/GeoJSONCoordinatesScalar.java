@@ -27,11 +27,6 @@ public class GeoJSONCoordinatesScalar {
 
   private static final String DOCUMENTATION =
     "List of coordinates like: [[60.89, 11.12], [62.56, 12.10]]";
-
-  public static GraphQLScalarType getGraphQGeoJSONCoordinatesScalar() {
-    return INSTANCE;
-  }
-
   private static final GraphQLScalarType INSTANCE = GraphQLScalarType
     .newScalar()
     .name("Coordinates")
@@ -96,4 +91,8 @@ public class GeoJSONCoordinatesScalar {
       }
     )
     .build();
+
+  public static GraphQLScalarType getGraphQGeoJSONCoordinatesScalar() {
+    return INSTANCE;
+  }
 }

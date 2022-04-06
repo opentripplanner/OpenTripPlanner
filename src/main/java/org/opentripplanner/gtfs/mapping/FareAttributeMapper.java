@@ -17,7 +17,7 @@ class FareAttributeMapper {
     return MapUtils.mapToList(allStops, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   FareAttribute map(org.onebusaway.gtfs.model.FareAttribute orginal) {
     return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
   }

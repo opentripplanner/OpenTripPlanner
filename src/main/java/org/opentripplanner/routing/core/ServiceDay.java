@@ -11,11 +11,10 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
- * Represents a day of transit services.
- * Intended for quickly checking whether a service is running during path searches.
+ * Represents a day of transit services. Intended for quickly checking whether a service is running
+ * during path searches.
  *
  * @author andrewbyrd
- *
  */
 public class ServiceDay implements Serializable {
 
@@ -35,22 +34,6 @@ public class ServiceDay implements Serializable {
     this.serviceDate = serviceDate;
 
     init(serviceCodes, cs, timeZone);
-  }
-
-  private void init(
-    Map<FeedScopedId, Integer> serviceCodes,
-    CalendarService cs,
-    TimeZone timeZone
-  ) {
-    Date d = serviceDate.getAsDate(timeZone);
-    this.midnight = d.getTime() / 1000;
-    serviceIdsRunning = new BitSet(cs.getServiceIds().size());
-
-    for (FeedScopedId serviceId : cs.getServiceIdsOnDate(serviceDate)) {
-      int n = serviceCodes.get(serviceId);
-      if (n < 0) continue;
-      serviceIdsRunning.set(n);
-    }
   }
 
   /** Does the given serviceId run on this ServiceDay? */
@@ -94,8 +77,9 @@ public class ServiceDay implements Serializable {
     return this.midnight + secondsSinceMidnight;
   }
 
-  public String toString() {
-    return Long.toString(this.midnight) + Arrays.asList(serviceIdsRunning);
+  @Override
+  public int hashCode() {
+    return (int) midnight;
   }
 
   public boolean equals(Object o) {
@@ -106,8 +90,23 @@ public class ServiceDay implements Serializable {
     return other.midnight == midnight;
   }
 
-  @Override
-  public int hashCode() {
-    return (int) midnight;
+  public String toString() {
+    return Long.toString(this.midnight) + Arrays.asList(serviceIdsRunning);
+  }
+
+  private void init(
+    Map<FeedScopedId, Integer> serviceCodes,
+    CalendarService cs,
+    TimeZone timeZone
+  ) {
+    Date d = serviceDate.getAsDate(timeZone);
+    this.midnight = d.getTime() / 1000;
+    serviceIdsRunning = new BitSet(cs.getServiceIds().size());
+
+    for (FeedScopedId serviceId : cs.getServiceIdsOnDate(serviceDate)) {
+      int n = serviceCodes.get(serviceId);
+      if (n < 0) continue;
+      serviceIdsRunning.set(n);
+    }
   }
 }

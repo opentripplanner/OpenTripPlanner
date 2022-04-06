@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 /**
- * This {@link FactorStrategy} keep a single value and use it every time
- * the factor is needed. The {@link #minFactor()} return the same value.
+ * This {@link FactorStrategy} keep a single value and use it every time the factor is needed. The
+ * {@link #minFactor()} return the same value.
  * <p>
  * The class and methods are {@code final} to help the JIT compiler optimize the use of this class.
  */

@@ -17,15 +17,10 @@ import org.opentripplanner.routing.graph.Graph;
 
 public class StationsLayerBuilder extends LayerBuilder<Station> {
 
-  enum MapperType {
-    Digitransit,
-  }
-
   static Map<MapperType, Function<Graph, PropertyMapper<Station>>> mappers = Map.of(
     MapperType.Digitransit,
     DigitransitStationPropertyMapper::create
   );
-
   private final Graph graph;
 
   public StationsLayerBuilder(Graph graph, VectorTilesResource.LayerParameters layerParameters) {
@@ -47,5 +42,9 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
         return point;
       })
       .collect(Collectors.toList());
+  }
+
+  enum MapperType {
+    Digitransit,
   }
 }

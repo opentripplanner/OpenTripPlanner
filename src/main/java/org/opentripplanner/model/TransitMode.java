@@ -25,11 +25,11 @@ public enum TransitMode {
     EnumSet.of(AIRPLANE)
   );
 
-  public boolean onStreet() {
-    return ON_STREET_MODES.contains(this);
-  }
-
   public static Set<TransitMode> transitModesExceptAirplane() {
     return NO_AIRPLANE_MODES;
+  }
+
+  public boolean onStreet() {
+    return ON_STREET_MODES.contains(this);
   }
 }

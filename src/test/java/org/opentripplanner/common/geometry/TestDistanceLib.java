@@ -55,22 +55,6 @@ public class TestDistanceLib extends TestCase {
     runOneTestPointToLineStringFastDistance(785, 786, 45.05, -0.01, 45, -0.1, 45, 0, 45.1, 0);
   }
 
-  private void runOneTestPointToLineStringFastDistance(
-    double dMin,
-    double dMax,
-    double lat,
-    double lon,
-    double... latlon
-  ) {
-    double dist = SphericalDistanceLibrary.fastDistance(
-      makeCoordinate(lat, lon),
-      makeLineString(latlon)
-    );
-    System.out.println("dist=" + dist + ", interval=[" + dMin + "," + dMax + "]");
-    assertTrue(dist >= dMin);
-    assertTrue(dist <= dMax);
-  }
-
   public void testLineStringFastLenght() {
     // Note: the meridian length of 1 degree of latitude on the sphere is around 111.2 km
     // a ~= 111.2 km
@@ -85,6 +69,22 @@ public class TestDistanceLib extends TestCase {
     assertTrue(Math.abs(b - a * Math.cos(Math.toRadians(45))) < 1.0);
     assertTrue(Math.abs(c - Math.sqrt(a * a + b * b)) < 10.0);
     assertTrue(Math.abs(d - (a + b)) < 10.0);
+  }
+
+  private void runOneTestPointToLineStringFastDistance(
+    double dMin,
+    double dMax,
+    double lat,
+    double lon,
+    double... latlon
+  ) {
+    double dist = SphericalDistanceLibrary.fastDistance(
+      makeCoordinate(lat, lon),
+      makeLineString(latlon)
+    );
+    System.out.println("dist=" + dist + ", interval=[" + dMin + "," + dMax + "]");
+    assertTrue(dist >= dMin);
+    assertTrue(dist <= dMax);
   }
 
   private double runOneTestLineStringFastLength(double dMin, double dMax, double... latlon) {

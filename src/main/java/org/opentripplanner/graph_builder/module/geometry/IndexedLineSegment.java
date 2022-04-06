@@ -8,16 +8,33 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 class IndexedLineSegment {
 
   private static final double RADIUS = SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
+  private final double lineLength;
   int index;
   Coordinate start;
   Coordinate end;
-  private final double lineLength;
 
   public IndexedLineSegment(int index, Coordinate start, Coordinate end) {
     this.index = index;
     this.start = start;
     this.end = end;
     this.lineLength = SphericalDistanceLibrary.fastDistance(start, end);
+  }
+
+  public double fraction(Coordinate coord) {
+    double cte = crossTrackError(coord);
+    double distanceToStart = SphericalDistanceLibrary.fastDistance(coord, start);
+    double distanceToEnd = SphericalDistanceLibrary.fastDistance(coord, end);
+
+    if (cte < distanceToStart && cte < distanceToEnd) {
+      double atd = alongTrackDistance(coord, cte);
+      return atd / lineLength;
+    } else {
+      if (distanceToStart < distanceToEnd) {
+        return 0;
+      } else {
+        return 1;
+      }
+    }
   }
 
   // in radians
@@ -83,23 +100,6 @@ class IndexedLineSegment {
       ) *
       RADIUS
     );
-  }
-
-  public double fraction(Coordinate coord) {
-    double cte = crossTrackError(coord);
-    double distanceToStart = SphericalDistanceLibrary.fastDistance(coord, start);
-    double distanceToEnd = SphericalDistanceLibrary.fastDistance(coord, end);
-
-    if (cte < distanceToStart && cte < distanceToEnd) {
-      double atd = alongTrackDistance(coord, cte);
-      return atd / lineLength;
-    } else {
-      if (distanceToStart < distanceToEnd) {
-        return 0;
-      } else {
-        return 1;
-      }
-    }
   }
 
   private double alongTrackDistance(Coordinate coord, double crossTrackError) {

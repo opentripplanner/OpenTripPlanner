@@ -128,22 +128,6 @@ public class RoutingRequestTransitDataProviderFilterTest {
     assertTrue(validateModesOnTripTimes(Set.of(new AllowedTransitMode(BUS, LOCAL_BUS)), tripTimes));
   }
 
-  private boolean validateModesOnTripTimes(
-    Set<AllowedTransitMode> allowedModes,
-    TripTimes tripTimes
-  ) {
-    var filter = new RoutingRequestTransitDataProviderFilter(
-      false,
-      false,
-      false,
-      allowedModes,
-      Set.of(),
-      Set.of()
-    );
-
-    return filter.tripTimesPredicate(tripTimes);
-  }
-
   @Test
   public void notFilteringExpectedTripTimesTest() {
     TripTimes tripTimes = createTestTripTimes(
@@ -395,6 +379,22 @@ public class RoutingRequestTransitDataProviderFilterTest {
     assertFalse(filter.tripTimesPredicate(failingTripTimes3));
     assertFalse(filter.tripTimesPredicate(failingTripTimes4));
     assertFalse(filter.tripTimesPredicate(failingTripTimes5));
+  }
+
+  private boolean validateModesOnTripTimes(
+    Set<AllowedTransitMode> allowedModes,
+    TripTimes tripTimes
+  ) {
+    var filter = new RoutingRequestTransitDataProviderFilter(
+      false,
+      false,
+      false,
+      allowedModes,
+      Set.of(),
+      Set.of()
+    );
+
+    return filter.tripTimesPredicate(tripTimes);
   }
 
   private TripPatternForDate createTestTripPatternForDate() {

@@ -48,32 +48,25 @@ import org.slf4j.LoggerFactory;
 public class VertexLinker {
 
   private static final Logger LOG = LoggerFactory.getLogger(VertexLinker.class);
-
-  /**
-   * Spatial index of StreetEdges in the graph.
-   */
-  private final StreetSpatialIndex streetSpatialIndex = new StreetSpatialIndex();
-
-  private final Graph graph;
-
   /**
    * if there are two ways and the distances to them differ by less than this value, we link to both
    * of them
    */
   private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
-
   private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
-
   private static final int MAX_SEARCH_RADIUS_METERS = 1000;
-
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
-
+  /**
+   * Spatial index of StreetEdges in the graph.
+   */
+  private final StreetSpatialIndex streetSpatialIndex = new StreetSpatialIndex();
+  private final Graph graph;
   // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
   private Boolean addExtraEdgesToAreas = false;
 
   /**
-   * Construct a new VertexLinker.
-   * NOTE: Only one VertexLinker should be active on a graph at any given time.
+   * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
+   * given time.
    */
   public VertexLinker(Graph graph) {
     for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class)) {
@@ -120,21 +113,73 @@ public class VertexLinker {
     removeEdgeFromIndex(edge, Scope.PERMANENT);
   }
 
+  // TODO Temporary code until we refactor WalkableAreaBuilder (#3152)
+  public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
+    this.addExtraEdgesToAreas = addExtraEdgesToAreas;
+  }
+
+  /**
+   * While in destructive splitting mode (during graph construction rather than handling routing
+   * requests), we remove edges that have been split and may then re-split the resulting segments
+   * recursively, so parts of them are also removed. Newly created edge fragments are added to the
+   * spatial index; the edges that were split are removed (disconnected) from the graph but were
+   * previously not removed from the spatial index, so for all subsequent splitting operations we
+   * had to check whether any edge coming out of the spatial index had been "soft deleted".
+   * <p>
+   * I believe this was compensating for the fact that STRTrees are optimized at construction and
+   * read-only. That restriction no longer applies since we've been using our own hash grid spatial
+   * index instead of the STRTree. So rather than filtering out soft deleted edges, this is now an
+   * assertion that the system behaves as intended, and will log an error if the spatial index is
+   * returning edges that have been disconnected from the graph.
+   */
+  private static boolean edgeReachableFromGraph(Edge edge) {
+    boolean edgeReachableFromGraph = edge.getToVertex().getIncoming().contains(edge);
+    if (!edgeReachableFromGraph) {
+      LOG.error(
+        "Edge returned from spatial index is no longer reachable from graph. That is not expected."
+      );
+    }
+    return edgeReachableFromGraph;
+  }
+
+  /** projected distance from stop to edge, in latitude degrees */
+  private static double distance(Vertex tstop, StreetEdge edge, double xscale) {
+    // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
+    // for the actual distance calculations.
+    LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
+    return transformed.distance(
+      GEOMETRY_FACTORY.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat()))
+    );
+  }
+
+  /** project this linestring to an equirectangular projection */
+  private static LineString equirectangularProject(LineString geometry, double xScale) {
+    Coordinate[] coords = new Coordinate[geometry.getNumPoints()];
+
+    for (int i = 0; i < coords.length; i++) {
+      Coordinate c = geometry.getCoordinateN(i);
+      c = (Coordinate) c.clone();
+      c.x *= xScale;
+      coords[i] = c;
+    }
+
+    return GEOMETRY_FACTORY.createLineString(coords);
+  }
+
   /**
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
-   *
-   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be
-   * a significant fraction of response time. Hannes Junnila has reported >70% speedups in searches
-   * by making the search radius smaller. Therefore we use an expanding-envelope search, which is
-   * more efficient in dense areas.
+   * <p>
+   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be a
+   * significant fraction of response time. Hannes Junnila has reported >70% speedups in searches by
+   * making the search radius smaller. Therefore we use an expanding-envelope search, which is more
+   * efficient in dense areas.
    *
    * @param vertex        Vertex to be linked into the street graph
    * @param traverseModes Only street edges allowing one of these modes will be linked
    * @param direction     The direction of the new edges to be created
    * @param scope         The scope of the split
    * @param edgeFunction  How the provided vertex should be linked into the street graph
-   *
    * @return A DisposableEdgeCollection with edges created by this method. It is the caller's
    * responsibility to call the dispose method on this object when the edges are no longer needed.
    */
@@ -233,8 +278,8 @@ public class VertexLinker {
 
   /**
    * We need to get the closest edges per mode to be sure that we are linking to edges traversable
-   * by all the specified modes. We use a set here to avoid duplicates in the case that edges
-   * are traversable by more than one of the modes specified.
+   * by all the specified modes. We use a set here to avoid duplicates in the case that edges are
+   * traversable by more than one of the modes specified.
    */
   private Set<DistanceTo<StreetEdge>> getClosestEdgesPerMode(
     TraverseModeSet traverseModeSet,
@@ -284,30 +329,6 @@ public class VertexLinker {
       );
     }
     return closesEdges;
-  }
-
-  /**
-   * While in destructive splitting mode (during graph construction rather than handling routing
-   * requests), we remove edges that have been split and may then re-split the resulting segments
-   * recursively, so parts of them are also removed. Newly created edge fragments are added to the
-   * spatial index; the edges that were split are removed (disconnected) from the graph but were
-   * previously not removed from the spatial index, so for all subsequent splitting operations we
-   * had to check whether any edge coming out of the spatial index had been "soft deleted".
-   * <p>
-   * I believe this was compensating for the fact that STRTrees are optimized at construction and
-   * read-only. That restriction no longer applies since we've been using our own hash grid spatial
-   * index instead of the STRTree. So rather than filtering out soft deleted edges, this is now an
-   * assertion that the system behaves as intended, and will log an error if the spatial index is
-   * returning edges that have been disconnected from the graph.
-   */
-  private static boolean edgeReachableFromGraph(Edge edge) {
-    boolean edgeReachableFromGraph = edge.getToVertex().getIncoming().contains(edge);
-    if (!edgeReachableFromGraph) {
-      LOG.error(
-        "Edge returned from spatial index is no longer reachable from graph. That is not expected."
-      );
-    }
-    return edgeReachableFromGraph;
   }
 
   /** Split the edge if necessary return the closest vertex */
@@ -367,38 +388,14 @@ public class VertexLinker {
     }
   }
 
-  /** projected distance from stop to edge, in latitude degrees */
-  private static double distance(Vertex tstop, StreetEdge edge, double xscale) {
-    // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
-    // for the actual distance calculations.
-    LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
-    return transformed.distance(
-      GEOMETRY_FACTORY.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat()))
-    );
-  }
-
-  /** project this linestring to an equirectangular projection */
-  private static LineString equirectangularProject(LineString geometry, double xScale) {
-    Coordinate[] coords = new Coordinate[geometry.getNumPoints()];
-
-    for (int i = 0; i < coords.length; i++) {
-      Coordinate c = geometry.getCoordinateN(i);
-      c = (Coordinate) c.clone();
-      c.x *= xScale;
-      coords[i] = c;
-    }
-
-    return GEOMETRY_FACTORY.createLineString(coords);
-  }
-
   /**
    * Split the street edge at the given fraction
    *
-   * @param originalEdge   to be split
-   * @param ll             fraction at which to split the edge
-   * @param scope          the scope of the split
-   * @param direction      what direction to link the edges
-   * @param tempEdges      collection of temporary edges
+   * @param originalEdge to be split
+   * @param ll           fraction at which to split the edge
+   * @param scope        the scope of the split
+   * @param direction    what direction to link the edges
+   * @param tempEdges    collection of temporary edges
    * @return Splitter vertex with added new edges
    */
   private SplitterVertex split(
@@ -459,11 +456,6 @@ public class VertexLinker {
     return v;
   }
 
-  // TODO Temporary code until we refactor WalkableAreaBuilder (#3152)
-  public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
-    this.addExtraEdgesToAreas = addExtraEdgesToAreas;
-  }
-
   private static class DistanceTo<T> {
 
     T item;
@@ -477,6 +469,11 @@ public class VertexLinker {
     }
 
     @Override
+    public int hashCode() {
+      return Objects.hash(item);
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -486,11 +483,6 @@ public class VertexLinker {
       }
       DistanceTo<?> that = (DistanceTo<?>) o;
       return Objects.equals(item, that.item);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(item);
     }
   }
 }

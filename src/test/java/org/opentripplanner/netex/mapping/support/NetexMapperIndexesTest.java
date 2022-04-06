@@ -5,13 +5,11 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createDatedServiceJ
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.EntityStructure;

@@ -10,7 +10,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * This class is responsible for creating a pretty table that can be printed to a terminal window. Like this:
+ * This class is responsible for creating a pretty table that can be printed to a terminal window.
+ * Like this:
  * <pre>
  * Description  | Duration | Walk | Start time |  End  | Modes
  * Case one     |    34:13 | 1532 |      08:07 | 08:41 |  BUS
@@ -19,31 +20,14 @@ import java.util.stream.Collectors;
  */
 public class TableFormatter {
 
-  public enum Align {
-    Left(TableFormatter::padLeft),
-    Center(TableFormatter::padCenter),
-    Right(TableFormatter::padRight);
-
-    private final BiFunction<String, Integer, String> padFunction;
-
-    Align(BiFunction<String, Integer, String> padFunction) {
-      this.padFunction = padFunction;
-    }
-
-    String pad(String value, int width) {
-      return padFunction.apply(value, width);
-    }
-  }
-
   private final List<Align> aligns = new ArrayList<>();
   private final List<String> headers = new ArrayList<>();
   private final List<Integer> widths = new ArrayList<>();
   private final List<List<String>> rows = new ArrayList<>();
 
   /**
-   * Use this constructor to create a table with headers and the use the
-   * {@link #addRow(Object...)} to add rows to the table. The column
-   * widths will be calculated based on the data in the table.
+   * Use this constructor to create a table with headers and the use the {@link #addRow(Object...)}
+   * to add rows to the table. The column widths will be calculated based on the data in the table.
    */
   public TableFormatter(Collection<Align> aligns, Collection<String> headers) {
     if (aligns.size() != headers.size()) {
@@ -55,9 +39,9 @@ public class TableFormatter {
   }
 
   /**
-   * Use this constructor to create a table with headers and fixed width columns.
-   * This is usful if you want to print header and row during computation and can not hold
-   * the entire table in memory until all values are added.
+   * Use this constructor to create a table with headers and fixed width columns. This is usful if
+   * you want to print header and row during computation and can not hold the entire table in memory
+   * until all values are added.
    * <p>
    * Use the {@code print} methods to return each line.
    */
@@ -74,10 +58,11 @@ public class TableFormatter {
   }
 
   /**
-   * This static method take a table as input and format each row in equally wide columns. It is
-   * a simpler alternative to the {@link TableFormatter} class.
+   * This static method take a table as input and format each row in equally wide columns. It is a
+   * simpler alternative to the {@link TableFormatter} class.
    * <p>
-   * It formats each row with identical width using the maximum width of all elements in that column:
+   * It formats each row with identical width using the maximum width of all elements in that
+   * column:
    * <pre>
    * Input:
    * [
@@ -90,7 +75,8 @@ public class TableFormatter {
    *   "100 | 2 |   102"
    * ]
    * </pre>
-   * All columns are left or right justified, depending on the given {@code leftJustify} input variable.
+   * All columns are left or right justified, depending on the given {@code leftJustify} input
+   * variable.
    */
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   public static List<String> formatTableAsTextLines(
@@ -145,7 +131,45 @@ public class TableFormatter {
     return buf.toString();
   }
 
+  private static List<String> toStrings(Collection<?> row) {
+    return row.stream().map(it -> it == null ? "" : it.toString()).collect(Collectors.toList());
+  }
+
   /* private methods */
+
+  private static List<String> toStrings(Object... row) {
+    return Arrays
+      .stream(row)
+      .map(it -> it == null ? "" : it.toString())
+      .collect(Collectors.toList());
+  }
+
+  private static String padLeft(String value, int width) {
+    return pad(value, width, b -> false);
+  }
+
+  private static String padRight(String value, int width) {
+    return pad(value, width, b -> true);
+  }
+
+  private static String padCenter(String value, int width) {
+    return pad(value, width, b -> !b);
+  }
+
+  private static String pad(String value, int width, Function<Boolean, Boolean> toRight) {
+    boolean toggle = toRight.apply(false);
+    StringBuilder buf = new StringBuilder(value);
+    while (buf.length() < width) {
+      if (toggle) {
+        buf.insert(0, ' ');
+      } else {
+        buf.append(' ');
+      }
+      toggle = toRight.apply(toggle);
+    }
+    value = buf.toString();
+    return value;
+  }
 
   private void addRow(Collection<?> row) {
     assertRowIsLessThanOrSameSizeAsHeader(row);
@@ -194,17 +218,6 @@ public class TableFormatter {
     }
   }
 
-  private static List<String> toStrings(Collection<?> row) {
-    return row.stream().map(it -> it == null ? "" : it.toString()).collect(Collectors.toList());
-  }
-
-  private static List<String> toStrings(Object... row) {
-    return Arrays
-      .stream(row)
-      .map(it -> it == null ? "" : it.toString())
-      .collect(Collectors.toList());
-  }
-
   private void assertRowIsLessThanOrSameSizeAsHeader(Collection<?> row) {
     if (row.size() > headers.size()) {
       throw new IllegalArgumentException(
@@ -217,30 +230,19 @@ public class TableFormatter {
     }
   }
 
-  private static String padLeft(String value, int width) {
-    return pad(value, width, b -> false);
-  }
+  public enum Align {
+    Left(TableFormatter::padLeft),
+    Center(TableFormatter::padCenter),
+    Right(TableFormatter::padRight);
 
-  private static String padRight(String value, int width) {
-    return pad(value, width, b -> true);
-  }
+    private final BiFunction<String, Integer, String> padFunction;
 
-  private static String padCenter(String value, int width) {
-    return pad(value, width, b -> !b);
-  }
-
-  private static String pad(String value, int width, Function<Boolean, Boolean> toRight) {
-    boolean toggle = toRight.apply(false);
-    StringBuilder buf = new StringBuilder(value);
-    while (buf.length() < width) {
-      if (toggle) {
-        buf.insert(0, ' ');
-      } else {
-        buf.append(' ');
-      }
-      toggle = toRight.apply(toggle);
+    Align(BiFunction<String, Integer, String> padFunction) {
+      this.padFunction = padFunction;
     }
-    value = buf.toString();
-    return value;
+
+    String pad(String value, int width) {
+      return padFunction.apply(value, width);
+    }
   }
 }

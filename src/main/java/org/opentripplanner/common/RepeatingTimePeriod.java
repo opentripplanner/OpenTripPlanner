@@ -5,25 +5,22 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 /**
- * Represents a repeating time period, used for opening hours etc.
- * For instance: Monday - Friday 8AM to 8PM, Satuday 10AM to 5PM, Sunday closed.
- * For now it is week-based so doesn't handle every possible case, but since it is encapsulated
- * that could conceivably be changed.
+ * Represents a repeating time period, used for opening hours etc. For instance: Monday - Friday 8AM
+ * to 8PM, Satuday 10AM to 5PM, Sunday closed. For now it is week-based so doesn't handle every
+ * possible case, but since it is encapsulated that could conceivably be changed.
  *
  * @author mattwigway
- *
  */
 public class RepeatingTimePeriod implements Serializable {
 
   private static final long serialVersionUID = -5977328371879835782L;
-
-  private RepeatingTimePeriod() {
-    this.timeZone = null;
-  }
-
   /**
-   * This stores the time periods this is active/open, stored as seconds from noon
-   * (positive or negative) on the given day.
+   * The timezone this is represented in.
+   */
+  private final TimeZone timeZone;
+  /**
+   * This stores the time periods this is active/open, stored as seconds from noon (positive or
+   * negative) on the given day.
    */
   private int[][] monday;
   private int[][] tuesday;
@@ -33,18 +30,12 @@ public class RepeatingTimePeriod implements Serializable {
   private int[][] saturday;
   private int[][] sunday;
 
-  /**
-   * The timezone this is represented in.
-   */
-  private final TimeZone timeZone;
+  private RepeatingTimePeriod() {
+    this.timeZone = null;
+  }
 
   /**
    * Parse the time specification from an OSM turn restriction
-   * @param day_on
-   * @param day_off
-   * @param hour_on
-   * @param hour_off
-   * @return
    */
   public static RepeatingTimePeriod parseFromOsmTurnRestriction(
     String day_on,
@@ -114,24 +105,6 @@ public class RepeatingTimePeriod implements Serializable {
     return ret;
   }
 
-  /**
-   * Return seconds before or after noon for the given hour.
-   * @param hour
-   */
-  private static int parseHour(String hour) {
-    String[] parsed = hour.split(":");
-    int ret = Integer.parseInt(parsed[0]) * 3600;
-
-    if (parsed.length >= 2) {
-      ret += Integer.parseInt(parsed[1]) * 60;
-    }
-
-    // subtract 12 hours to make it noon-relative. This implicitly handles DST.
-    ret -= 12 * 3600;
-
-    return ret;
-  }
-
   public boolean active(long time) {
     // TODO: Timezone/locale
     Calendar cal;
@@ -193,5 +166,22 @@ public class RepeatingTimePeriod implements Serializable {
     }
 
     return false;
+  }
+
+  /**
+   * Return seconds before or after noon for the given hour.
+   */
+  private static int parseHour(String hour) {
+    String[] parsed = hour.split(":");
+    int ret = Integer.parseInt(parsed[0]) * 3600;
+
+    if (parsed.length >= 2) {
+      ret += Integer.parseInt(parsed[1]) * 60;
+    }
+
+    // subtract 12 hours to make it noon-relative. This implicitly handles DST.
+    ret -= 12 * 3600;
+
+    return ret;
   }
 }

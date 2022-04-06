@@ -61,6 +61,13 @@ public class CalendarServiceBuilderTest {
     assertEquals(4, list.size());
   }
 
+  @Test
+  public void createServiceId() {
+    CalendarServiceBuilder subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
+    assertEquals(new FeedScopedId(FEED_ID, "S000001"), subject.createServiceId());
+    assertEquals(new FeedScopedId(FEED_ID, "S000002"), subject.createServiceId());
+  }
+
   private void assertServiceDateExistInList(
     Collection<ServiceCalendarDate> list,
     FeedScopedId serviceId,
@@ -82,12 +89,5 @@ public class CalendarServiceBuilderTest {
       "list=" +
       list
     );
-  }
-
-  @Test
-  public void createServiceId() {
-    CalendarServiceBuilder subject = new CalendarServiceBuilder(new FeedScopedIdFactory(FEED_ID));
-    assertEquals(new FeedScopedId(FEED_ID, "S000001"), subject.createServiceId());
-    assertEquals(new FeedScopedId(FEED_ID, "S000002"), subject.createServiceId());
   }
 }

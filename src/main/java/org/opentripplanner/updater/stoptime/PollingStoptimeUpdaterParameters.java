@@ -52,6 +52,10 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
     return configRef;
   }
 
+  public DataSourceType getSourceType() {
+    return sourceType;
+  }
+
   String getFeedId() {
     return feedId;
   }
@@ -70,10 +74,6 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
 
   boolean fuzzyTripMatching() {
     return fuzzyTripMatching;
-  }
-
-  public DataSourceType getSourceType() {
-    return sourceType;
   }
 
   GtfsRealtimeFileTripUpdateSource.Parameters fileSourceParameters() {

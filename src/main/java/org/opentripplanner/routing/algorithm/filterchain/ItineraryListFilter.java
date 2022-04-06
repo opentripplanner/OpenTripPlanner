@@ -12,8 +12,8 @@ import org.opentripplanner.model.plan.Itinerary;
  * in the same filter. Instead, create two filters and insert them after each other in the filter
  * chain.
  * <p>
- * This allows decoration of each filter and make it easier to reuse logic. Like the
- * {@link org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter} is reused in
+ * This allows decoration of each filter and make it easier to reuse logic. Like the {@link
+ * org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter} is reused in
  * several places.
  */
 public interface ItineraryListFilter {
@@ -21,8 +21,8 @@ public interface ItineraryListFilter {
    * Process the given itineraries returning the result.
    * <p>
    * This function should not change the List instance passed in, but may change the elements. It
-   * must return a List with all the elements passed in (and possibly new elements). Note! that
-   * the list passed into the filter might be immutable.
+   * must return a List with all the elements passed in (and possibly new elements). Note! that the
+   * list passed into the filter might be immutable.
    * <p>
    * This can be achieved using streams. Example:
    * <pre>

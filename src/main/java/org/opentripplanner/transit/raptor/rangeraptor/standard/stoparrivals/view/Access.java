@@ -24,6 +24,11 @@ final class Access<T extends RaptorTripSchedule>
   }
 
   @Override
+  public ArrivalView<T> previous() {
+    throw new UnsupportedOperationException("Access path arrival is the first path.");
+  }
+
+  @Override
   public boolean arrivedByAccess() {
     return true;
   }
@@ -36,10 +41,5 @@ final class Access<T extends RaptorTripSchedule>
   @Override
   public RaptorTransfer access() {
     return access;
-  }
-
-  @Override
-  public ArrivalView<T> previous() {
-    throw new UnsupportedOperationException("Access path arrival is the first path.");
   }
 }

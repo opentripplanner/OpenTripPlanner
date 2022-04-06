@@ -115,6 +115,14 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     assertEquals(result.size(), 1);
   }
 
+  private static <T> String firstRide(Collection<T> c) {
+    return c
+      .stream()
+      .map(Object::toString)
+      .map(it -> it.substring(0, it.indexOf(" ~")))
+      .collect(Collectors.joining(" "));
+  }
+
   private TransitPathLeg<TestTripSchedule> transitLeg(int egressStop) {
     TestTransfer walk = walk(egressStop, EGRESS_END - EGRESS_START);
     var egress = new EgressPathLeg<TestTripSchedule>(
@@ -127,13 +135,5 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     var times = BoardAndAlightTime.create(TRIP, STOP_A, T10_00, egressStop, toTime);
     int cost = 100 * (T10_40 - T10_00);
     return new TransitPathLeg<>(TRIP, times, null, cost, egress);
-  }
-
-  private static <T> String firstRide(Collection<T> c) {
-    return c
-      .stream()
-      .map(Object::toString)
-      .map(it -> it.substring(0, it.indexOf(" ~")))
-      .collect(Collectors.joining(" "));
   }
 }

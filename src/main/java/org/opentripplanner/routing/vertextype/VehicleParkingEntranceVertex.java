@@ -7,7 +7,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 
 /**
  * A vertex for a vehicle parking entrance.
- *
+ * <p>
  * Connected to streets by {@link org.opentripplanner.routing.edgetype.StreetVehicleParkingLink}.
  * Transition for parking the bike is handled by {@link org.opentripplanner.routing.edgetype.VehicleParkingEdge}.
  */

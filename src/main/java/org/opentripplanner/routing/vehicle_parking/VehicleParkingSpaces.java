@@ -33,6 +33,10 @@ public class VehicleParkingSpaces implements Serializable {
     this.wheelchairAccessibleCarSpaces = wheelchairAccessibleCarSpaces;
   }
 
+  public static VehicleParkingSpacesBuilder builder() {
+    return new VehicleParkingSpacesBuilder();
+  }
+
   public Integer getBicycleSpaces() {
     return bicycleSpaces;
   }
@@ -43,6 +47,11 @@ public class VehicleParkingSpaces implements Serializable {
 
   public Integer getWheelchairAccessibleCarSpaces() {
     return wheelchairAccessibleCarSpaces;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(bicycleSpaces, carSpaces, wheelchairAccessibleCarSpaces);
   }
 
   @Override
@@ -59,15 +68,6 @@ public class VehicleParkingSpaces implements Serializable {
       Objects.equals(carSpaces, that.carSpaces) &&
       Objects.equals(wheelchairAccessibleCarSpaces, that.wheelchairAccessibleCarSpaces)
     );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(bicycleSpaces, carSpaces, wheelchairAccessibleCarSpaces);
-  }
-
-  public static VehicleParkingSpacesBuilder builder() {
-    return new VehicleParkingSpacesBuilder();
   }
 
   public static class VehicleParkingSpacesBuilder {

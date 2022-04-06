@@ -10,15 +10,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 /**
- * The purpose of this class is to optimize the search for a trip schedule for
- * a given pattern and stop. Normally the search scan from the upper bound index
- * and down, it can do so because the trips are ordered after the FIRST stop
- * boarding times. We also assume that trips do not pass each other; Hence
- * trips IN SERVICE on a given day will be in order for all other stops too.
+ * The purpose of this class is to optimize the search for a trip schedule for a given pattern and
+ * stop. Normally the search scan from the upper bound index and down, it can do so because the
+ * trips are ordered after the FIRST stop boarding times. We also assume that trips do not pass each
+ * other; Hence trips IN SERVICE on a given day will be in order for all other stops too.
  * <p/>
- * The search use a binary search if the number of trip schedules is above a
- * given threshold. A linear search is slow when the number of schedules is very
- * large, let say more than 300 trip schedules.
+ * The search use a binary search if the number of trip schedules is above a given threshold. A
+ * linear search is slow when the number of schedules is very large, let say more than 300 trip
+ * schedules.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -47,23 +46,23 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   /* TripScheduleBoardOrAlightEvent implementation using fly-weight pattern */
 
   @Override
-  public T getTrip() {
-    return candidateTrip;
-  }
-
-  @Override
   public int getTripIndex() {
     return candidateTripIndex;
   }
 
   @Override
-  public int getTime() {
-    return candidateTrip.departure(stopPositionInPattern);
+  public T getTrip() {
+    return candidateTrip;
   }
 
   @Override
   public int getStopPositionInPattern() {
     return stopPositionInPattern;
+  }
+
+  @Override
+  public int getTime() {
+    return candidateTrip.departure(stopPositionInPattern);
   }
 
   @Override
@@ -74,14 +73,14 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   /* TripScheduleSearch implementation */
 
   /**
-   * Find the first trip leaving from the given stop AFTER the the 'earliestTime', but
-   * before the given trip ({@code tripIndexUpperBound}).
+   * Find the first trip leaving from the given stop AFTER the the 'earliestTime', but before the
+   * given trip ({@code tripIndexUpperBound}).
    *
-   * @param earliestTime     The time of arrival at the given stop for the previous trip.
+   * @param earliestTime          The time of arrival at the given stop for the previous trip.
    * @param stopPositionInPattern The stop to board
    * @param tripIndexUpperBound   Upper bound for trip index to search for. Exclusive - search start
-   *                              at {@code tripIndexUpperBound - 1}.
-   *                              Use {@code -1} (negative value) for an unbounded search.
+   *                              at {@code tripIndexUpperBound - 1}. Use {@code -1} (negative
+   *                              value) for an unbounded search.
    */
   @Override
   public RaptorTripScheduleBoardOrAlightEvent<T> search(
@@ -143,9 +142,9 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   }
 
   /**
-   * This method search for the first scheduled trip boarding, after or equals to the
-   * given {@code earliestBoardTime}. Only trips with a trip index smaller than the given
-   * {@code tripIndexUpperBound} is considered.
+   * This method search for the first scheduled trip boarding, after or equals to the given {@code
+   * earliestBoardTime}. Only trips with a trip index smaller than the given {@code
+   * tripIndexUpperBound} is considered.
    * <p/>
    * The search searches backwards until index 0 is reached (inclusive).
    *
@@ -173,8 +172,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   }
 
   /**
-   * This method search for the first scheduled trip boarding, after or equals to
-   * the given {@code earliestBoardTime}.
+   * This method search for the first scheduled trip boarding, after or equals to the given {@code
+   * earliestBoardTime}.
    *
    * @param tripIndexLowerBound The trip index lower bound, where search start (inclusive).
    */
@@ -195,8 +194,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
   /**
    * Do a binary search to find the approximate upper bound index for where to start the search.
    * <p/>
-   * This is just a guess and we return when the trip with a best valid departure is in the range
-   * of the next {@link #nTripsBinarySearchThreshold}.
+   * This is just a guess and we return when the trip with a best valid departure is in the range of
+   * the next {@link #nTripsBinarySearchThreshold}.
    *
    * @return a better upper bound index (exclusive)
    */

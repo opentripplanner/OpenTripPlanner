@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
@@ -27,14 +26,6 @@ public class RaptorTransferIndex {
 
     this.reversedTransfers =
       reversedTransfers.stream().map(List::copyOf).collect(Collectors.toList());
-  }
-
-  public List<List<RaptorTransfer>> getForwardTransfers() {
-    return forwardTransfers;
-  }
-
-  public List<List<RaptorTransfer>> getReversedTransfers() {
-    return reversedTransfers;
   }
 
   public static RaptorTransferIndex create(
@@ -75,5 +66,13 @@ public class RaptorTransferIndex {
     }
 
     return new RaptorTransferIndex(forwardTransfers, reversedTransfers);
+  }
+
+  public List<List<RaptorTransfer>> getForwardTransfers() {
+    return forwardTransfers;
+  }
+
+  public List<List<RaptorTransfer>> getReversedTransfers() {
+    return reversedTransfers;
   }
 }

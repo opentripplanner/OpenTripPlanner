@@ -23,11 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * We perform initial date calculations in the timezone of the host jvm, which
- * may be different than the timezone of an agency with the specified service
- * id. To my knowledge, the calculation should work the same, which is to say I
- * can't immediately think of any cases where the service dates would be
- * computed incorrectly.
+ * We perform initial date calculations in the timezone of the host jvm, which may be different than
+ * the timezone of an agency with the specified service id. To my knowledge, the calculation should
+ * work the same, which is to say I can't immediately think of any cases where the service dates
+ * would be computed incorrectly.
  *
  * @author bdferris
  */
@@ -40,15 +39,6 @@ public class CalendarServiceDataFactoryImpl {
   private final Map<FeedScopedId, List<ServiceCalendar>> calendarsByServiceId;
   private final Set<FeedScopedId> serviceIds;
 
-  public static CalendarServiceData createCalendarServiceData(
-    Collection<Agency> agencies,
-    Collection<ServiceCalendarDate> calendarDates,
-    Collection<ServiceCalendar> serviceCalendars
-  ) {
-    return new CalendarServiceDataFactoryImpl(agencies, calendarDates, serviceCalendars)
-      .createData();
-  }
-
   private CalendarServiceDataFactoryImpl(
     Collection<Agency> agencies,
     Collection<ServiceCalendarDate> calendarDates,
@@ -60,6 +50,29 @@ public class CalendarServiceDataFactoryImpl {
     this.calendarsByServiceId =
       serviceCalendars.stream().collect(groupingBy(ServiceCalendar::getServiceId));
     this.serviceIds = merge(calendarDatesByServiceId.keySet(), calendarsByServiceId.keySet());
+  }
+
+  public static CalendarServiceData createCalendarServiceData(
+    Collection<Agency> agencies,
+    Collection<ServiceCalendarDate> calendarDates,
+    Collection<ServiceCalendar> serviceCalendars
+  ) {
+    return new CalendarServiceDataFactoryImpl(agencies, calendarDates, serviceCalendars)
+      .createData();
+  }
+
+  /** package local to be unit testable */
+  static <T> Set<T> merge(Collection<T> set1, Collection<T> set2) {
+    Set<T> newSet = new HashSet<>();
+    newSet.addAll(set1);
+    newSet.addAll(set2);
+    return newSet;
+  }
+
+  private static Date getServiceDateAsNoon(ServiceDate serviceDate, TimeZone timeZone) {
+    Calendar c = serviceDate.getAsCalendar(timeZone);
+    c.add(Calendar.HOUR_OF_DAY, 12);
+    return c.getTime();
   }
 
   private CalendarServiceData createData() {
@@ -214,19 +227,5 @@ public class CalendarServiceDataFactoryImpl {
 
   private void addServiceDate(Set<ServiceDate> activeDates, ServiceDate serviceDate) {
     activeDates.add(serviceDate);
-  }
-
-  private static Date getServiceDateAsNoon(ServiceDate serviceDate, TimeZone timeZone) {
-    Calendar c = serviceDate.getAsCalendar(timeZone);
-    c.add(Calendar.HOUR_OF_DAY, 12);
-    return c.getTime();
-  }
-
-  /** package local to be unit testable */
-  static <T> Set<T> merge(Collection<T> set1, Collection<T> set2) {
-    Set<T> newSet = new HashSet<>();
-    newSet.addAll(set1);
-    newSet.addAll(set2);
-    return newSet;
   }
 }

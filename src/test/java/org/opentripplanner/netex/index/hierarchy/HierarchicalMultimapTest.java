@@ -32,13 +32,11 @@ public class HierarchicalMultimapTest {
   private static final String PRESIDENT = "president";
   private static final String GOVERNOR = "governor";
   private static final String ACTOR = "actor";
-
-  private final HierarchicalMultimap<String, E> country = new HierarchicalMultimap<>();
-  private final HierarchicalMultimap<String, E> state = new HierarchicalMultimap<>(country);
-
   private static final List<E> PRESIDENTS = Collections.singletonList(REAGAN);
   private static final List<E> ACTORS_COUNTRY = Collections.singletonList(EASTWOOD);
   private static final List<E> ACTORS_STATE = Collections.singletonList(SCHWARZENEGGER);
+  private final HierarchicalMultimap<String, E> country = new HierarchicalMultimap<>();
+  private final HierarchicalMultimap<String, E> state = new HierarchicalMultimap<>(country);
 
   @Before
   public void setup() {

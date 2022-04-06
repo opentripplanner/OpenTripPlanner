@@ -43,6 +43,126 @@ public class State implements Cloneable {
 
   /* CONSTRUCTORS */
 
+  public State(RoutingContext rctx) {
+    this(
+      rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
+      rctx.opt.getDateTime().getEpochSecond(),
+      rctx.opt,
+      rctx
+    );
+  }
+
+  /**
+   * Create an initial state, forcing vertex to the specified value. Useful for reusing a
+   * RoutingContext in TransitIndex, tests, etc.
+   */
+  public State(Vertex vertex, RoutingRequest opt, RoutingContext routingContext) {
+    // Since you explicitly specify, the vertex, we don't set the backEdge.
+    this(vertex, opt.getDateTime().getEpochSecond(), opt, routingContext);
+  }
+
+  /**
+   * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for
+   * reusing a RoutingContext in TransitIndex, tests, etc.
+   */
+  public State(
+    Vertex vertex,
+    long timeSeconds,
+    RoutingRequest options,
+    RoutingContext routingContext
+  ) {
+    this(vertex, timeSeconds, timeSeconds, options, routingContext, false, false, false);
+  }
+
+  /**
+   * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for
+   * reusing a RoutingContext in TransitIndex, tests, etc.
+   */
+  public State(
+    Vertex vertex,
+    long timeSeconds,
+    RoutingRequest options,
+    RoutingContext routingContext,
+    boolean carPickupStateInCar,
+    boolean bikeRentalFloatingState,
+    boolean keptRentedVehicleAtDestination
+  ) {
+    this(
+      vertex,
+      timeSeconds,
+      timeSeconds,
+      options,
+      routingContext,
+      carPickupStateInCar,
+      bikeRentalFloatingState,
+      keptRentedVehicleAtDestination
+    );
+  }
+
+  /**
+   * Create an initial state, forcing vertex, back edge, time and start time to the specified
+   * values. Useful for starting a multiple initial state search, for example when propagating
+   * profile results to the street network in RoundBasedProfileRouter.
+   */
+  public State(
+    Vertex vertex,
+    long timeSeconds,
+    long startTime,
+    RoutingRequest options,
+    RoutingContext routingContext,
+    boolean carPickupStateInCar,
+    boolean vehicleRentalFloatingState,
+    boolean keptRentedVehicleAtDestination
+  ) {
+    this.weight = 0;
+    this.vertex = vertex;
+    this.backState = null;
+    this.stateData = new StateData(options);
+    this.stateData.rctx = routingContext;
+    this.stateData.startTime = startTime;
+    if (options.vehicleRental) {
+      if (options.arriveBy) {
+        if (keptRentedVehicleAtDestination) {
+          this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
+          this.stateData.currentMode = TraverseMode.BICYCLE;
+          this.stateData.mayKeepRentedVehicleAtDestination = true;
+        } else if (vehicleRentalFloatingState) {
+          this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
+          this.stateData.currentMode = TraverseMode.BICYCLE;
+        } else {
+          this.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
+          this.stateData.currentMode = TraverseMode.WALK;
+        }
+      } else {
+        this.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
+      }
+    }
+    if (options.carPickup) {
+      /* For carPickup two initial states are created in getStates(request):
+                 1. WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
+                 2. CAR / IN_CAR where pickup happens directly at the bus stop */
+      if (carPickupStateInCar) {
+        this.stateData.carPickupState = CarPickupState.IN_CAR;
+        this.stateData.currentMode = TraverseMode.CAR;
+      } else {
+        this.stateData.carPickupState =
+          options.arriveBy ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
+        this.stateData.currentMode = TraverseMode.WALK;
+      }
+    }
+    /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
+           with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
+    if (options.parkAndRide) {
+      this.stateData.vehicleParked = options.arriveBy;
+      this.stateData.currentMode =
+        this.stateData.vehicleParked
+          ? TraverseMode.WALK
+          : options.streetSubRequestModes.getBicycle() ? TraverseMode.BICYCLE : TraverseMode.CAR;
+    }
+    this.walkDistance = 0;
+    this.time = timeSeconds * 1000;
+  }
+
   /**
    * Create an initial state representing the beginning of a search for the given routing context.
    * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
@@ -105,163 +225,12 @@ public class State implements Cloneable {
     return states;
   }
 
-  public State(RoutingContext rctx) {
-    this(
-      rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
-      rctx.opt.getDateTime().getEpochSecond(),
-      rctx.opt,
-      rctx
-    );
-  }
-
   /**
-   * Create an initial state, forcing vertex to the specified value. Useful for reusing a
-   * RoutingContext in TransitIndex, tests, etc.
-   */
-  public State(Vertex vertex, RoutingRequest opt, RoutingContext routingContext) {
-    // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.getDateTime().getEpochSecond(), opt, routingContext);
-  }
-
-  /**
-   * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing
-   * a RoutingContext in TransitIndex, tests, etc.
-   */
-  public State(
-    Vertex vertex,
-    long timeSeconds,
-    RoutingRequest options,
-    RoutingContext routingContext
-  ) {
-    this(vertex, timeSeconds, timeSeconds, options, routingContext, false, false, false);
-  }
-
-  /**
-   * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing
-   * a RoutingContext in TransitIndex, tests, etc.
-   */
-  public State(
-    Vertex vertex,
-    long timeSeconds,
-    RoutingRequest options,
-    RoutingContext routingContext,
-    boolean carPickupStateInCar,
-    boolean bikeRentalFloatingState,
-    boolean keptRentedVehicleAtDestination
-  ) {
-    this(
-      vertex,
-      timeSeconds,
-      timeSeconds,
-      options,
-      routingContext,
-      carPickupStateInCar,
-      bikeRentalFloatingState,
-      keptRentedVehicleAtDestination
-    );
-  }
-
-  /**
-   * Create an initial state, forcing vertex, back edge, time and start time to the specified values. Useful for starting
-   * a multiple initial state search, for example when propagating profile results to the street network in RoundBasedProfileRouter.
-   */
-  public State(
-    Vertex vertex,
-    long timeSeconds,
-    long startTime,
-    RoutingRequest options,
-    RoutingContext routingContext,
-    boolean carPickupStateInCar,
-    boolean vehicleRentalFloatingState,
-    boolean keptRentedVehicleAtDestination
-  ) {
-    this.weight = 0;
-    this.vertex = vertex;
-    this.backState = null;
-    this.stateData = new StateData(options);
-    this.stateData.rctx = routingContext;
-    this.stateData.startTime = startTime;
-    if (options.vehicleRental) {
-      if (options.arriveBy) {
-        if (keptRentedVehicleAtDestination) {
-          this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
-          this.stateData.currentMode = TraverseMode.BICYCLE;
-          this.stateData.mayKeepRentedVehicleAtDestination = true;
-        } else if (vehicleRentalFloatingState) {
-          this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
-          this.stateData.currentMode = TraverseMode.BICYCLE;
-        } else {
-          this.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
-          this.stateData.currentMode = TraverseMode.WALK;
-        }
-      } else {
-        this.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
-      }
-    }
-    if (options.carPickup) {
-      /* For carPickup two initial states are created in getStates(request):
-                 1. WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
-                 2. CAR / IN_CAR where pickup happens directly at the bus stop */
-      if (carPickupStateInCar) {
-        this.stateData.carPickupState = CarPickupState.IN_CAR;
-        this.stateData.currentMode = TraverseMode.CAR;
-      } else {
-        this.stateData.carPickupState =
-          options.arriveBy ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
-        this.stateData.currentMode = TraverseMode.WALK;
-      }
-    }
-    /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
-           with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
-    if (options.parkAndRide) {
-      this.stateData.vehicleParked = options.arriveBy;
-      this.stateData.currentMode =
-        this.stateData.vehicleParked
-          ? TraverseMode.WALK
-          : options.streetSubRequestModes.getBicycle() ? TraverseMode.BICYCLE : TraverseMode.CAR;
-    }
-    this.walkDistance = 0;
-    this.time = timeSeconds * 1000;
-  }
-
-  /**
-   * Create a state editor to produce a child of this state, which will be the result of
-   * traversing the given edge.
-   *
-   * @param e
-   * @return
+   * Create a state editor to produce a child of this state, which will be the result of traversing
+   * the given edge.
    */
   public StateEditor edit(Edge e) {
     return new StateEditor(this, e);
-  }
-
-  protected State clone() {
-    State ret;
-    try {
-      ret = (State) super.clone();
-    } catch (CloneNotSupportedException e1) {
-      throw new IllegalStateException("This is not happening");
-    }
-    return ret;
-  }
-
-  /*
-   * FIELD ACCESSOR METHODS States are immutable, so they have only get methods. The corresponding
-   * set methods are in StateEditor.
-   */
-
-  public String toString() {
-    return (
-      "<State " +
-      new Date(getTimeInMillis()) +
-      " [" +
-      weight +
-      "] " +
-      (isRentingVehicle() ? "VEHICLE_RENT " : "") +
-      (isVehicleParked() ? "VEHICLE_PARKED " : "") +
-      vertex +
-      ">"
-    );
   }
 
   public String toStringVerbose() {
@@ -281,6 +250,11 @@ public class State implements Cloneable {
       ">"
     );
   }
+
+  /*
+   * FIELD ACCESSOR METHODS States are immutable, so they have only get methods. The corresponding
+   * set methods are in StateEditor.
+   */
 
   public CarPickupState getCarPickupState() {
     return stateData.carPickupState;
@@ -378,27 +352,8 @@ public class State implements Cloneable {
     return backState != null ? (int) (getTimeSeconds() - backState.getTimeSeconds()) : 0;
   }
 
-  private int getAbsTimeDeltaSeconds() {
-    return Math.abs(getTimeDeltaSeconds());
-  }
-
-  private double getWalkDistanceDelta() {
-    if (backState != null) {
-      return Math.abs(this.walkDistance - backState.walkDistance);
-    } else {
-      return 0.0;
-    }
-  }
-
   public double getWeightDelta() {
     return this.weight - backState.weight;
-  }
-
-  void checkNegativeWeight() {
-    double dw = this.weight - backState.weight;
-    if (dw < 0) {
-      throw new NegativeWeightException(String.valueOf(dw) + " on edge " + backEdge);
-    }
   }
 
   public State getBackState() {
@@ -431,23 +386,20 @@ public class State implements Cloneable {
   }
 
   /**
-   * Extend an exiting result chain by appending this result to the existing chain. The usage
-   * model looks like this:
+   * Extend an exiting result chain by appending this result to the existing chain. The usage model
+   * looks like this:
    *
    * <code>
    * TraverseResult result = null;
-   *
-   * for( ... ) {
-   *   TraverseResult individualResult = ...;
-   *   result = individualResult.addToExistingResultChain(result);
+   * <p>
+   * for( ... ) { TraverseResult individualResult = ...; result = individualResult.addToExistingResultChain(result);
    * }
-   *
+   * <p>
    * return result;
    * </code>
    *
    * @param existingResultChain the tail of an existing result chain, or null if the chain has not
-   *        been started
-   * @return
+   *                            been started
    */
   public State addToExistingResultChain(State existingResultChain) {
     if (this.getNextResult() != null) {
@@ -469,30 +421,11 @@ public class State implements Cloneable {
    * This method is on State rather than RoutingRequest because we care whether the user is in
    * possession of a rented bike.
    *
-   * @return BICYCLE if routing with an owned bicycle, or if at this state the user is holding on
-   *         to a rented bicycle.
+   * @return BICYCLE if routing with an owned bicycle, or if at this state the user is holding on to
+   * a rented bicycle.
    */
   public TraverseMode getNonTransitMode() {
     return stateData.currentMode;
-  }
-
-  // TODO: There is no documentation about what this means. No one knows precisely.
-  // Needs to be replaced with clearly defined fields.
-
-  private State reversedClone() {
-    // We no longer compensate for schedule slack (minTransferTime) here.
-    // It is distributed symmetrically over all preboard and prealight edges.
-    State newState = new State(
-      this.vertex,
-      getTimeSeconds(),
-      stateData.opt.reversedClone(),
-      stateData.rctx
-    );
-    // TODO Check if those two lines are needed:
-    newState.stateData.vehicleRentalState = stateData.vehicleRentalState;
-    newState.stateData.vehicleParked = stateData.vehicleParked;
-    newState.stateData.carPickupState = stateData.carPickupState;
-    return newState;
   }
 
   public long getTimeInMillis() {
@@ -553,15 +486,15 @@ public class State implements Cloneable {
   }
 
   /**
-   * Reverse the path implicit in the given state, re-traversing all edges in the opposite
-   * direction so as to remove any unnecessary waiting in the resulting itinerary. This produces a
-   * path that passes through all the same edges, but which may have a shorter overall duration
-   * due to different weights on time-dependent (e.g. transit boarding) edges. If the optimize
-   * parameter is false, the path will be reversed but will have the same duration. This is the
-   * result of combining the functions from GraphPath optimize and reverse.
+   * Reverse the path implicit in the given state, re-traversing all edges in the opposite direction
+   * so as to remove any unnecessary waiting in the resulting itinerary. This produces a path that
+   * passes through all the same edges, but which may have a shorter overall duration due to
+   * different weights on time-dependent (e.g. transit boarding) edges. If the optimize parameter is
+   * false, the path will be reversed but will have the same duration. This is the result of
+   * combining the functions from GraphPath optimize and reverse.
    *
-   * @return a state at the other end (or this end, in the case of a forward search)
-   * of a reversed, optimized path
+   * @return a state at the other end (or this end, in the case of a forward search) of a reversed,
+   * optimized path
    */
   public State reverse() {
     State orig = this;
@@ -622,11 +555,73 @@ public class State implements Cloneable {
     return ret;
   }
 
+  // TODO: There is no documentation about what this means. No one knows precisely.
+  // Needs to be replaced with clearly defined fields.
+
   public boolean hasEnteredNoThruTrafficArea() {
     return stateData.enteredNoThroughTrafficArea;
   }
 
   public boolean mayKeepRentedVehicleAtDestination() {
     return stateData.mayKeepRentedVehicleAtDestination;
+  }
+
+  protected State clone() {
+    State ret;
+    try {
+      ret = (State) super.clone();
+    } catch (CloneNotSupportedException e1) {
+      throw new IllegalStateException("This is not happening");
+    }
+    return ret;
+  }
+
+  public String toString() {
+    return (
+      "<State " +
+      new Date(getTimeInMillis()) +
+      " [" +
+      weight +
+      "] " +
+      (isRentingVehicle() ? "VEHICLE_RENT " : "") +
+      (isVehicleParked() ? "VEHICLE_PARKED " : "") +
+      vertex +
+      ">"
+    );
+  }
+
+  void checkNegativeWeight() {
+    double dw = this.weight - backState.weight;
+    if (dw < 0) {
+      throw new NegativeWeightException(String.valueOf(dw) + " on edge " + backEdge);
+    }
+  }
+
+  private int getAbsTimeDeltaSeconds() {
+    return Math.abs(getTimeDeltaSeconds());
+  }
+
+  private double getWalkDistanceDelta() {
+    if (backState != null) {
+      return Math.abs(this.walkDistance - backState.walkDistance);
+    } else {
+      return 0.0;
+    }
+  }
+
+  private State reversedClone() {
+    // We no longer compensate for schedule slack (minTransferTime) here.
+    // It is distributed symmetrically over all preboard and prealight edges.
+    State newState = new State(
+      this.vertex,
+      getTimeSeconds(),
+      stateData.opt.reversedClone(),
+      stateData.rctx
+    );
+    // TODO Check if those two lines are needed:
+    newState.stateData.vehicleRentalState = stateData.vehicleRentalState;
+    newState.stateData.vehicleParked = stateData.vehicleParked;
+    newState.stateData.carPickupState = stateData.carPickupState;
+    return newState;
   }
 }

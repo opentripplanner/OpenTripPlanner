@@ -6,9 +6,8 @@ import java.util.List;
 import org.opentripplanner.datastore.DataSource;
 
 /**
- * A named group of NeTEx file entries. The entries are grouped together
- * with a set of shared group entries and a set of _individual_
- * entries.
+ * A named group of NeTEx file entries. The entries are grouped together with a set of shared group
+ * entries and a set of _individual_ entries.
  */
 public class GroupEntries {
 
@@ -24,19 +23,19 @@ public class GroupEntries {
     return name;
   }
 
-  void addSharedEntry(DataSource entry) {
-    sharedEntries.add(entry);
-  }
-
   public Collection<DataSource> sharedEntries() {
     return sharedEntries;
   }
 
-  void addIndependentEntries(DataSource entry) {
-    entries.add(entry);
-  }
-
   public Collection<DataSource> independentEntries() {
     return entries;
+  }
+
+  void addSharedEntry(DataSource entry) {
+    sharedEntries.add(entry);
+  }
+
+  void addIndependentEntries(DataSource entry) {
+    entries.add(entry);
   }
 }

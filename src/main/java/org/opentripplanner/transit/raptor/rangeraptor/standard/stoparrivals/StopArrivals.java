@@ -9,7 +9,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArriva
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class StopArrivals<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
@@ -24,7 +23,8 @@ public final class StopArrivals<T extends RaptorTripSchedule> implements BestNum
   }
 
   /**
-   * Setup egress arrivals with a callback which is notified when a new transit egress arrival happens.
+   * Setup egress arrivals with a callback which is notified when a new transit egress arrival
+   * happens.
    */
   public void setupEgressStopStates(
     EgressPaths egressPaths,
@@ -74,7 +74,8 @@ public final class StopArrivals<T extends RaptorTripSchedule> implements BestNum
   }
 
   /**
-   * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
+   * Set the time at a transit index iff it is optimal. This sets both the best time and the
+   * transfer time
    */
   void transferToStop(int fromStop, RaptorTransfer transfer, int arrivalTime) {
     int stop = transfer.stop();
@@ -99,10 +100,6 @@ public final class StopArrivals<T extends RaptorTripSchedule> implements BestNum
 
   /* private methods */
 
-  private int round() {
-    return roundProvider.round();
-  }
-
   TransitArrival<T> previousTransit(int boardStopIndex) {
     final int prevRound = round() - 1;
     int stopIndex = boardStopIndex;
@@ -117,6 +114,10 @@ public final class StopArrivals<T extends RaptorTripSchedule> implements BestNum
     return state.arrivedByTransit()
       ? TransitArrival.create(state.trip(), stopIndex, state.onBoardArrivalTime())
       : null;
+  }
+
+  private int round() {
+    return roundProvider.round();
   }
 
   private StopArrivalState<T> getOrCreateStopIndex(final int round, final int stop) {

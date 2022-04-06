@@ -11,15 +11,13 @@ import org.opentripplanner.model.TransitEntity;
 
 public class EntityByIdTest {
 
-  public static final String FEED_ID = "F";
+  private static final String FEED_ID = "F";
   private static final FeedScopedId ID = new FeedScopedId(FEED_ID, "99");
-  private static final FeedScopedId FAKE_ID = new FeedScopedId(FEED_ID, "77");
-
   private static final EntityByIdTest.E E = new E(ID);
   private static final String E_TO_STRING = E.toString();
   private static final String LIST_OF_E_TO_STRING = String.format("[%s]", E_TO_STRING);
   private static final String MAP_OF_E_TO_STRING = String.format("{%s=%s}", ID, E_TO_STRING);
-
+  private static final FeedScopedId FAKE_ID = new FeedScopedId(FEED_ID, "77");
   private final EntityById<E> subject = new EntityById<>();
 
   @Test

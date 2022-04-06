@@ -58,6 +58,13 @@ public class RaptorRequestTransferCache {
     }
 
     @Override
+    public int hashCode() {
+      // transfersByStopIndex is ignored on purpose since it should not change (there is only
+      // one instance per graph) and calculating the hashCode() would be expensive
+      return options.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -72,19 +79,12 @@ public class RaptorRequestTransferCache {
         transfersByStopIndex == cacheKey.transfersByStopIndex && options.equals(cacheKey.options)
       );
     }
-
-    @Override
-    public int hashCode() {
-      // transfersByStopIndex is ignored on purpose since it should not change (there is only
-      // one instance per graph) and calculating the hashCode() would be expensive
-      return options.hashCode();
-    }
   }
 
   /**
    * This contains an extract of the parameters which may influence transfers. The possible values
    * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RoutingRequest)}.
-   *
+   * <p>
    * TODO: the bikeWalking options are not used.
    */
   private static class StreetRelevantOptions {
@@ -137,6 +137,31 @@ public class RaptorRequestTransferCache {
     }
 
     @Override
+    public int hashCode() {
+      return Objects.hash(
+        transferMode,
+        optimize,
+        bikeTriangleSafetyFactor,
+        bikeTriangleSlopeFactor,
+        bikeTriangleTimeFactor,
+        wheelchairAccessible,
+        maxWheelchairSlope,
+        walkSpeed,
+        bikeSpeed,
+        walkReluctance,
+        stairsReluctance,
+        turnReluctance,
+        elevatorBoardCost,
+        elevatorBoardTime,
+        elevatorHopCost,
+        elevatorHopTime,
+        bikeSwitchCost,
+        bikeSwitchTime,
+        stairsTimeFactor
+      );
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -165,31 +190,6 @@ public class RaptorRequestTransferCache {
         bikeSwitchTime == that.bikeSwitchTime &&
         transferMode == that.transferMode &&
         optimize == that.optimize
-      );
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(
-        transferMode,
-        optimize,
-        bikeTriangleSafetyFactor,
-        bikeTriangleSlopeFactor,
-        bikeTriangleTimeFactor,
-        wheelchairAccessible,
-        maxWheelchairSlope,
-        walkSpeed,
-        bikeSpeed,
-        walkReluctance,
-        stairsReluctance,
-        turnReluctance,
-        elevatorBoardCost,
-        elevatorBoardTime,
-        elevatorHopCost,
-        elevatorHopTime,
-        bikeSwitchCost,
-        bikeSwitchTime,
-        stairsTimeFactor
       );
     }
   }

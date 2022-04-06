@@ -16,7 +16,8 @@ class TripAssert {
   }
 
   /**
-   * @param arrivalTime  The search add the boardSlack, so we use 'arrivalTime' as input to the search
+   * @param arrivalTime  The search add the boardSlack, so we use 'arrivalTime' as input to the
+   *                     search
    * @param stopPosition The stop position to board
    */
   TripAssert search(int arrivalTime, int stopPosition) {
@@ -26,9 +27,11 @@ class TripAssert {
   }
 
   /**
-   * @param arrivalTime    The search add the boardSlack, so we use 'arrivalTime' as input to the search
+   * @param arrivalTime    The search add the boardSlack, so we use 'arrivalTime' as input to the
+   *                       search
    * @param stopPosition   The stop position to board
-   * @param tripIndexLimit the index of a previous tripSchedule found, used to search for a better trip. (exclusive)
+   * @param tripIndexLimit the index of a previous tripSchedule found, used to search for a better
+   *                       trip. (exclusive)
    */
   TripAssert search(int arrivalTime, int stopPosition, int tripIndexLimit) {
     this.stopPosition = stopPosition;

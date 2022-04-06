@@ -27,12 +27,11 @@ public class PathStringBuilder {
   }
 
   /**
-   * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the
-   *                           index is used in the result string.
-   * @param padDuration        This can be set to {@code true} for padding the duration output.
-   *                           This would be used in cases were several similar paths are listed.
-   *                           If the legs are similar, the path elements is more likely to be
-   *                           aligned.
+   * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the index
+   *                         is used in the result string.
+   * @param padDuration      This can be set to {@code true} for padding the duration output. This
+   *                         would be used in cases were several similar paths are listed. If the
+   *                         legs are similar, the path elements is more likely to be aligned.
    */
   public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver, boolean padDuration) {
     this.stopNameResolver = RaptorStopNameResolver.nullSafe(stopNameResolver);
@@ -45,8 +44,8 @@ public class PathStringBuilder {
   }
 
   /**
-   * The given {@code stopIndex} is translated to stop name using the {@code stopNameTranslator}
-   * set in the constructor. If not translator is set the stopIndex is used.
+   * The given {@code stopIndex} is translated to stop name using the {@code stopNameTranslator} set
+   * in the constructor. If not translator is set the stopIndex is used.
    */
   public PathStringBuilder stop(int stopIndex) {
     return stop(stopNameResolver.apply(stopIndex));
@@ -102,8 +101,8 @@ public class PathStringBuilder {
   }
 
   /**
-   * Add a cost to the string with an optional unit. Try to be consistent with unit naming,
-   * use lower-case:
+   * Add a cost to the string with an optional unit. Try to be consistent with unit naming, use
+   * lower-case:
    * <ul>
    *     <li>{@code null} - Generalized-cost (no unit used)</li>
    *     <li>{@code "wtc"} - Wait-time cost</li>

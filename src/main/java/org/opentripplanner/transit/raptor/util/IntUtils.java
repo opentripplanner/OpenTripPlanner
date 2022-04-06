@@ -14,8 +14,8 @@ public final class IntUtils {
   private IntUtils() {}
 
   /**
-   * Convert an integer to a String, if the value equals the {@code notSetValue} parameter
-   * an empty string is returned.
+   * Convert an integer to a String, if the value equals the {@code notSetValue} parameter an empty
+   * string is returned.
    */
   public static String intToString(int value, int notSetValue) {
     return value == notSetValue ? "" : Integer.toString(value);

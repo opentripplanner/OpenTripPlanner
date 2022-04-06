@@ -23,16 +23,9 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  */
 class Area {
 
-  public static class AreaConstructionException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-  }
-
+  final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
   OSMWithTags parent;
-
-  final List<Ring> outermostRings;
-
   public MultiPolygon jtsMultiPolygon;
 
   Area(
@@ -89,21 +82,6 @@ class Area {
     // run this at end of ctor so that exception
     // can be caught in the right place
     jtsMultiPolygon = calculateJTSMultiPolygon();
-  }
-
-  private MultiPolygon calculateJTSMultiPolygon() {
-    List<Polygon> polygons = new ArrayList<>();
-    for (Ring ring : outermostRings) {
-      polygons.add(ring.jtsPolygon);
-    }
-    MultiPolygon jtsMultiPolygon = GeometryUtils
-      .getGeometryFactory()
-      .createMultiPolygon(polygons.toArray(new Polygon[0]));
-    if (!jtsMultiPolygon.isValid()) {
-      throw new AreaConstructionException();
-    }
-
-    return jtsMultiPolygon;
   }
 
   public List<TLongList> constructRings(List<OSMWay> ways) {
@@ -165,6 +143,21 @@ class Area {
     } else {
       return null;
     }
+  }
+
+  private MultiPolygon calculateJTSMultiPolygon() {
+    List<Polygon> polygons = new ArrayList<>();
+    for (Ring ring : outermostRings) {
+      polygons.add(ring.jtsPolygon);
+    }
+    MultiPolygon jtsMultiPolygon = GeometryUtils
+      .getGeometryFactory()
+      .createMultiPolygon(polygons.toArray(new Polygon[0]));
+    if (!jtsMultiPolygon.isValid()) {
+      throw new AreaConstructionException();
+    }
+
+    return jtsMultiPolygon;
   }
 
   private boolean constructRingsRecursive(
@@ -242,5 +235,10 @@ class Area {
       }
     }
     return false;
+  }
+
+  public static class AreaConstructionException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
   }
 }

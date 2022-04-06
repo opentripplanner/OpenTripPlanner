@@ -12,34 +12,19 @@ public class LegacyGraphQLRentalVehicleImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicle {
 
   @Override
+  public DataFetcher<Boolean> allowPickupNow() {
+    return environment -> getSource(environment).allowPickupNow();
+  }
+
+  @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment ->
       new Relay.ResolvedGlobalId("RentalVehicle", getSource(environment).getId().toString());
   }
 
   @Override
-  public DataFetcher<String> vehicleId() {
-    return environment -> getSource(environment).getId().toString();
-  }
-
-  @Override
-  public DataFetcher<RentalVehicleType> vehicleType() {
-    return environment -> getSource(environment).vehicleType;
-  }
-
-  @Override
-  public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName().toString(environment.getLocale());
-  }
-
-  @Override
-  public DataFetcher<Boolean> allowPickupNow() {
-    return environment -> getSource(environment).allowPickupNow();
-  }
-
-  @Override
-  public DataFetcher<String> network() {
-    return environment -> getSource(environment).getNetwork();
+  public DataFetcher<Double> lat() {
+    return environment -> getSource(environment).getLatitude();
   }
 
   @Override
@@ -48,8 +33,13 @@ public class LegacyGraphQLRentalVehicleImpl
   }
 
   @Override
-  public DataFetcher<Double> lat() {
-    return environment -> getSource(environment).getLatitude();
+  public DataFetcher<String> name() {
+    return environment -> getSource(environment).getName().toString(environment.getLocale());
+  }
+
+  @Override
+  public DataFetcher<String> network() {
+    return environment -> getSource(environment).getNetwork();
   }
 
   @Override
@@ -60,6 +50,16 @@ public class LegacyGraphQLRentalVehicleImpl
   @Override
   public DataFetcher<VehicleRentalStationUris> rentalUris() {
     return environment -> getSource(environment).getRentalUris();
+  }
+
+  @Override
+  public DataFetcher<String> vehicleId() {
+    return environment -> getSource(environment).getId().toString();
+  }
+
+  @Override
+  public DataFetcher<RentalVehicleType> vehicleType() {
+    return environment -> getSource(environment).vehicleType;
   }
 
   private VehicleRentalVehicle getSource(DataFetchingEnvironment environment) {

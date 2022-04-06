@@ -23,7 +23,7 @@ public class GtfsFeedId {
 
   /**
    * Constructs a new feed id.
-   *
+   * <p>
    * If the passed id is null or an empty string a unique feed id will be generated.
    *
    * @param id The feed id
@@ -51,12 +51,12 @@ public class GtfsFeedId {
      * This will try to fetch the experimental feed_id field from the feed_info.txt file.
      * </p>
      * <p>
-     * If the feed does not contain a feed_info.txt or a feed_id field a default GtfsFeedId will be created.
+     * If the feed does not contain a feed_info.txt or a feed_id field a default GtfsFeedId will be
+     * created.
      * </p>
      *
      * @param source the input source
      * @return A GtfsFeedId
-     * @throws RuntimeException
      * @see <a href="http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
      */
     public Builder fromGtfsFeed(CsvInputSource source) {
@@ -76,6 +76,20 @@ public class GtfsFeedId {
     }
 
     /**
+     * Creates a new GtfsFeedId.
+     *
+     * @return A GtfsFeedId
+     */
+    public GtfsFeedId build() {
+      id = cleanId(id);
+      if (id == null || id.trim().length() == 0) {
+        id = String.valueOf(FEED_ID_COUNTER);
+      }
+      FEED_ID_COUNTER++;
+      return new GtfsFeedId(id);
+    }
+
+    /**
      * Cleans the id before it is set. This method ensures that the id is a valid id.
      *
      * @param id The feed id
@@ -88,20 +102,6 @@ public class GtfsFeedId {
       // 1. Underscore is used as an separator by OBA.
       // 2. Colon is used as an separator in OTP.
       return id.replaceAll("_", "").replaceAll(":", "");
-    }
-
-    /**
-     * Creates a new GtfsFeedId.
-     *
-     * @return A GtfsFeedId
-     */
-    public GtfsFeedId build() {
-      id = cleanId(id);
-      if (id == null || id.trim().length() == 0) {
-        id = String.valueOf(FEED_ID_COUNTER);
-      }
-      FEED_ID_COUNTER++;
-      return new GtfsFeedId(id);
     }
   }
 }

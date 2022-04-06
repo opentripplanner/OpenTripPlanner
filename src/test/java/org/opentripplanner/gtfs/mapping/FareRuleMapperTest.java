@@ -34,6 +34,10 @@ public class FareRuleMapperTest {
   private static final String ORIGIN_ID = "Origin Id";
 
   private static final Route ROUTE = new Route();
+  private final FareRuleMapper subject = new FareRuleMapper(
+    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)),
+    new FareAttributeMapper()
+  );
 
   static {
     FARE_ATTRIBUTE.setId(AGENCY_AND_ID);
@@ -46,11 +50,6 @@ public class FareRuleMapperTest {
     FARE_RULE.setOriginId(ORIGIN_ID);
     FARE_RULE.setRoute(ROUTE);
   }
-
-  private final FareRuleMapper subject = new FareRuleMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)),
-    new FareAttributeMapper()
-  );
 
   @Test
   public void testMapCollection() throws Exception {

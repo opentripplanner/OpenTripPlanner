@@ -24,8 +24,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up
  * an OTP server depending on command line options. OTPMain is a concrete class making it possible
  * to construct one with custom CommandLineParameters and use its graph builder construction method
- * from web services or scripts, not just from the
- * static main function below.
+ * from web services or scripts, not just from the static main function below.
  */
 public class OTPMain {
 
@@ -43,7 +42,8 @@ public class OTPMain {
   }
 
   /**
-   * ENTRY POINT: This is the main method that is called when running otp.jar from the command line.
+   * ENTRY POINT: This is the main method that is called when running otp.jar from the command
+   * line.
    */
   public static void main(String[] args) {
     try {
@@ -60,8 +60,8 @@ public class OTPMain {
   }
 
   /**
-   * Parse and validate command line parameters. If the arguments is invalid the
-   * method uses {@code System.exit()} to exit the application.
+   * Parse and validate command line parameters. If the arguments is invalid the method uses {@code
+   * System.exit()} to exit the application.
    */
   private static CommandLineParameters parseAndValidateCmdLine(String[] args) {
     CommandLineParameters params = new CommandLineParameters();
@@ -93,9 +93,9 @@ public class OTPMain {
   }
 
   /**
-   * All startup logic is in an instance method instead of the static main method so it is possible to build graphs
-   * from web services or scripts, not just from the command line. If options cause an OTP API server to start up,
-   * this method will return when the web server shuts down.
+   * All startup logic is in an instance method instead of the static main method so it is possible
+   * to build graphs from web services or scripts, not just from the command line. If options cause
+   * an OTP API server to start up, this method will return when the web server shuts down.
    *
    * @throws RuntimeException if an error occurs while loading the graph.
    */

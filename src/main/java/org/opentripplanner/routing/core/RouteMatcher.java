@@ -9,24 +9,20 @@ import org.opentripplanner.model.Route;
 
 /**
  * A RouteMatcher is a collection of routes based on IDs, short name and/or agency IDs.
- *
- * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name only.
- * Support for other matching expression can be easily added later on.
+ * <p>
+ * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name
+ * only. Support for other matching expression can be easily added later on.
  */
 public class RouteMatcher implements Cloneable, Serializable {
 
   private static final long serialVersionUID = 8066547338465440312L;
-
+  private static final RouteMatcher EMPTY_MATCHER = new RouteMatcher();
   /* Set of full matching route ids (agency ID + route ID) */
   private final HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<>();
-
   /* Set of full matching route code/names (agency ID + route code/name) */
   private final HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<>();
-
   /* Set of matching route names (without specifying an agency ID) */
   private final HashSet<String> routeNames = new HashSet<>();
-
-  private static final RouteMatcher EMPTY_MATCHER = new RouteMatcher();
 
   private RouteMatcher() {}
 
@@ -50,16 +46,16 @@ public class RouteMatcher implements Cloneable, Serializable {
 
   /**
    * Build a new RouteMatcher from a string representation.
+   * TODO why do we want to accept route name strings when we have IDs? Break backward compatibility.
+   * FIXME this is the only place we are still using underscores as scope separators. Rethink this from scratch, see #1671.
    *
    * @param routeSpecList A comma-separated list of route spec, each of the format
-   *        [agencyId]_[routeName]_[routeId] Please note that this format is not really intuitive
-   *        as it does not follow the OBA-gtfslib AgencyAndId standard ('agencyID_routeId'). This
-   *        was kept for backward-compatibility purposes. If the original routeName contains some
-   *        "_" each *must* be replaced by a space. If the agency or route ID contains a "_" they
-   *        must be escaped using a backslash.
-   *        TODO why do we want to accept route name strings when we have IDs? Break backward compatibility.
-   *        FIXME this is the only place we are still using underscores as scope separators. Rethink this from scratch, see #1671.
-   * @return A RouteMatcher
+   *                      [agencyId]_[routeName]_[routeId] Please note that this format is not
+   *                      really intuitive as it does not follow the OBA-gtfslib AgencyAndId
+   *                      standard ('agencyID_routeId'). This was kept for backward-compatibility
+   *                      purposes. If the original routeName contains some "_" each *must* be
+   *                      replaced by a space. If the agency or route ID contains a "_" they must be
+   *                      escaped using a backslash.
    * @throws IllegalArgumentException If the string representation is invalid.
    */
   public static RouteMatcher parse(String routeSpecList) {
@@ -150,13 +146,8 @@ public class RouteMatcher implements Cloneable, Serializable {
   }
 
   @Override
-  public String toString() {
-    return String.format(
-      "RouteMatcher<agencyAndRouteIds=%s agencyIdAndRouteNames=%s routeNames=%s>",
-      agencyAndRouteIds,
-      agencyIdAndRouteNames,
-      routeNames
-    );
+  public int hashCode() {
+    return agencyAndRouteIds.hashCode() + agencyIdAndRouteNames.hashCode() + routeNames.hashCode();
   }
 
   @Override
@@ -175,11 +166,6 @@ public class RouteMatcher implements Cloneable, Serializable {
     );
   }
 
-  @Override
-  public int hashCode() {
-    return agencyAndRouteIds.hashCode() + agencyIdAndRouteNames.hashCode() + routeNames.hashCode();
-  }
-
   public RouteMatcher clone() {
     try {
       return (RouteMatcher) super.clone();
@@ -187,5 +173,15 @@ public class RouteMatcher implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public String toString() {
+    return String.format(
+      "RouteMatcher<agencyAndRouteIds=%s agencyIdAndRouteNames=%s routeNames=%s>",
+      agencyAndRouteIds,
+      agencyIdAndRouteNames,
+      routeNames
+    );
   }
 }

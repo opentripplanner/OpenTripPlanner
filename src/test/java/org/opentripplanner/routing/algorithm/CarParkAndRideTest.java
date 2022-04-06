@@ -11,11 +11,9 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 public class CarParkAndRideTest extends ParkAndRideTest {
 
   /**
-   *                      B+C Park             Bike Park
-   *      ALL        WALK    |  WALK       WALK    |   ALL
-   * A --------> B --------> C -------> D -------> E --------> F
-   *  \         /                       |
-   *   Car Park                      Car Park
+   * B+C Park             Bike Park ALL        WALK    |  WALK       WALK    |   ALL A --------> B
+   * --------> C -------> D -------> E --------> F \         /                       | Car Park
+   * Car Park
    */
 
   private StreetVertex A, B, C, D, E, F;

@@ -17,8 +17,8 @@ import javax.annotation.Nonnull;
 public class TimeUtils {
 
   /**
-   * This constant is used to represent a service time, which is not set.
-   * This typically is used in the requestWhen an integer is used to represent a service time in seconds
+   * This constant is used to represent a service time, which is not set. This typically is used in
+   * the requestWhen an integer is used to represent a service time in seconds
    */
   public static final int NOT_SET = -1_000_000;
 
@@ -36,9 +36,8 @@ public class TimeUtils {
   }
 
   /**
-   * Parse a time into seconds past midnight.
-   * Format accepted for time: HH, HH:MM and HH:MM:SS
-   * In addition a day offset is allowed: (+|-)DDd. Examples:
+   * Parse a time into seconds past midnight. Format accepted for time: HH, HH:MM and HH:MM:SS In
+   * addition a day offset is allowed: (+|-)DDd. Examples:
    * <pre>
    *  00:00:00  =>  01:00:00
    *         1  =>  01:00:00
@@ -93,8 +92,8 @@ public class TimeUtils {
   }
 
   /**
-   * Same as {@link #time(String)}, but returns default value if input is {@code null}, an empty string or
-   * only contains whitespace.
+   * Same as {@link #time(String)}, but returns default value if input is {@code null}, an empty
+   * string or only contains whitespace.
    */
   public static int time(String hhmmss, int defaultValue) {
     if (hhmmss == null || hhmmss.isBlank()) {
@@ -104,9 +103,9 @@ public class TimeUtils {
   }
 
   /**
-   * Parse a string of times like "00:20 01:20 05:57:30" into an array of local times.
-   * This can be very helpful when specifying a schedule using a sting instead of using a
-   * int array with seconds past midnight.
+   * Parse a string of times like "00:20 01:20 05:57:30" into an array of local times. This can be
+   * very helpful when specifying a schedule using a sting instead of using a int array with seconds
+   * past midnight.
    */
   public static int[] times(@Nonnull String input) {
     return Arrays.stream(input.split("[ ,;]+")).mapToInt(TimeUtils::time).toArray();
@@ -152,15 +151,15 @@ public class TimeUtils {
   /**
    * This method take a date, a time in seconds and a zoneId and create a {@link ZonedDateTime}.
    * <p>
-   * This method follow the GTFS specification for time: "The time is measured from
-   * 'noon minus 12h' of the service day (effectively midnight except for days on which
-   * daylight savings time changes occur." See https://developers.google.com/transit/gtfs/reference#field_types
+   * This method follow the GTFS specification for time: "The time is measured from 'noon minus 12h'
+   * of the service day (effectively midnight except for days on which daylight savings time changes
+   * occur." See https://developers.google.com/transit/gtfs/reference#field_types
    * <p>
-   * Note! The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
-   * library; Hence this method is already changed. To convert into the legacy Calendar use
-   * {@link GregorianCalendar#from(ZonedDateTime)} method.
+   * Note! The itinerary uses the old Java Calendar, but we would like to migrate to the new
+   * java.time library; Hence this method is already changed. To convert into the legacy Calendar
+   * use {@link GregorianCalendar#from(ZonedDateTime)} method.
    *
-   * @param date the "service" date
+   * @param date    the "service" date
    * @param seconds number of seconds since noon minus 12 hours (midnight).
    */
   public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {

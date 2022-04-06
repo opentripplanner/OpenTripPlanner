@@ -198,8 +198,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   /**
    * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
    * <p>
-   * Normally these trip times are interpolated/repaired during the graph build but for flex this
-   * is exactly what we don't want. Here we check that the interpolation process is skipped.
+   * Normally these trip times are interpolated/repaired during the graph build but for flex this is
+   * exactly what we don't want. Here we check that the interpolation process is skipped.
    *
    * @see org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation#interpolateStopTimes(List)
    */
@@ -225,6 +225,11 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertNotNull(lincolnGraph);
   }
 
+  @BeforeAll
+  static void setup() {
+    graph = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+  }
+
   private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,
@@ -248,11 +253,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     );
 
     return result.getItineraries();
-  }
-
-  @BeforeAll
-  static void setup() {
-    graph = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
   }
 
   private static NearbyStop getNearbyStop(FlexTrip trip) {

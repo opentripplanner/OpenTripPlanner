@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
  * OTP APIs. This only produces itineraries for non-transit searches, as well as the non-transit
- * parts of itineraries containing transit, while the whole transit itinerary is produced by
- * {@link RaptorPathToItineraryMapper}.
+ * parts of itineraries containing transit, while the whole transit itinerary is produced by {@link
+ * RaptorPathToItineraryMapper}.
  */
 public class GraphPathToItineraryMapper {
 
@@ -69,6 +69,19 @@ public class GraphPathToItineraryMapper {
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
 
+  public static boolean isRentalPickUp(State state) {
+    return (
+      state.getBackEdge() instanceof VehicleRentalEdge &&
+      (state.getBackState() == null || !state.getBackState().isRentingVehicle())
+    );
+  }
+
+  public static boolean isRentalDropOff(State state) {
+    return (
+      state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isRentingVehicle()
+    );
+  }
+
   /**
    * Generates a TripPlan from a set of paths
    */
@@ -86,8 +99,8 @@ public class GraphPathToItineraryMapper {
   }
 
   /**
-   * Generate an itinerary from a {@link GraphPath}. This method first slices the list of states
-   * at the leg boundaries. These smaller state arrays are then used to generate legs.
+   * Generate an itinerary from a {@link GraphPath}. This method first slices the list of states at
+   * the leg boundaries. These smaller state arrays are then used to generate legs.
    *
    * @param path The graph path to base the itinerary on
    * @return The generated itinerary
@@ -121,12 +134,6 @@ public class GraphPathToItineraryMapper {
     itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isRentingVehicleFromStation();
 
     return itinerary;
-  }
-
-  private Calendar makeCalendar(State state) {
-    Calendar calendar = Calendar.getInstance(timeZone);
-    calendar.setTimeInMillis(state.getTimeInMillis());
-    return calendar;
   }
 
   /**
@@ -206,6 +213,148 @@ public class GraphPathToItineraryMapper {
   }
 
   /**
+   * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
+   */
+  private static void setPathwayInfo(StreetLeg leg, List<State> legStates) {
+    for (State legsState : legStates) {
+      if (legsState.getBackEdge() instanceof PathwayEdge pe) {
+        leg.setPathwayId(pe.getId());
+        return;
+      }
+    }
+  }
+
+  /**
+   * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
+   *
+   * @param itinerary The itinerary to calculate the elevation changes for
+   * @param edges     The edges that go with the itinerary
+   */
+  private static void calculateElevations(Itinerary itinerary, List<Edge> edges) {
+    for (Edge edge : edges) {
+      if (!(edge instanceof StreetEdge edgeWithElevation)) {
+        continue;
+      }
+      PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
+
+      if (coordinates == null) continue;
+      // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
+      if (coordinates.getDimension() != 2) continue;
+
+      for (int i = 0; i < coordinates.size() - 1; i++) {
+        double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
+
+        if (change > 0) {
+          itinerary.elevationGained += change;
+        } else if (change < 0) {
+          itinerary.elevationLost -= change;
+        }
+      }
+    }
+  }
+
+  /**
+   * Resolve mode from states.
+   *
+   * @param states The states that go with the leg
+   */
+  private static TraverseMode resolveMode(List<State> states) {
+    for (State state : states) {
+      TraverseMode mode = state.getNonTransitMode();
+
+      if (mode != null) {
+        // Resolve correct mode if renting vehicle
+        if (state.isRentingVehicle()) {
+          return switch (state.stateData.rentalVehicleFormFactor) {
+            case BICYCLE, OTHER -> TraverseMode.BICYCLE;
+            case SCOOTER, MOPED -> TraverseMode.SCOOTER;
+            case CAR -> TraverseMode.CAR;
+          };
+        } else {
+          return mode;
+        }
+      }
+    }
+
+    // Fallback to walking
+    return TraverseMode.WALK;
+  }
+
+  private static List<P2<Double>> encodeElevationProfileWithNaN(
+    Edge edge,
+    double distanceOffset,
+    double heightOffset
+  ) {
+    var elevations = encodeElevationProfile(edge, distanceOffset, heightOffset);
+    if (elevations.isEmpty()) {
+      return List.of(
+        new P2<>(distanceOffset, Double.NaN),
+        new P2<>(distanceOffset + edge.getDistanceMeters(), Double.NaN)
+      );
+    }
+    return elevations;
+  }
+
+  private static List<P2<Double>> encodeElevationProfile(
+    Edge edge,
+    double distanceOffset,
+    double heightOffset
+  ) {
+    ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
+
+    if (!(edge instanceof StreetEdge elevEdge)) {
+      return out;
+    }
+    if (elevEdge.getElevationProfile() == null) {
+      return out;
+    }
+
+    Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
+    for (final Coordinate coordinate : coordArr) {
+      out.add(new P2<>(coordinate.x + distanceOffset, coordinate.y + heightOffset));
+    }
+
+    return out;
+  }
+
+  /**
+   * Make a {@link Place} to add to a {@link Leg}.
+   *
+   * @param state The {@link State}.
+   * @return The resulting {@link Place} object.
+   */
+  private static Place makePlace(State state) {
+    Vertex vertex = state.getVertex();
+    I18NString name = vertex.getName();
+
+    //This gets nicer names instead of osm:node:id when changing mode of transport
+    //Names are generated from all the streets in a corner, same as names in origin and destination
+    //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
+    if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
+      name = ((StreetVertex) vertex).getIntersectionName();
+    }
+
+    if (vertex instanceof TransitStopVertex) {
+      return Place.forStop(((TransitStopVertex) vertex).getStop());
+    } else if (vertex instanceof VehicleRentalStationVertex) {
+      return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex);
+    } else if (vertex instanceof VehicleParkingEntranceVertex) {
+      return Place.forVehicleParkingEntrance(
+        (VehicleParkingEntranceVertex) vertex,
+        state.getOptions()
+      );
+    } else {
+      return Place.normal(vertex, name);
+    }
+  }
+
+  private Calendar makeCalendar(State state) {
+    Calendar calendar = Calendar.getInstance(timeZone);
+    calendar.setTimeInMillis(state.getTimeInMillis());
+    return calendar;
+  }
+
+  /**
    * Generate a flex leg from the states belonging to the flex leg
    */
   private Leg generateFlexLeg(List<State> states) {
@@ -225,8 +374,7 @@ public class GraphPathToItineraryMapper {
   /**
    * Generate one leg of an itinerary from a list of {@link State}.
    *
-   *
-   * @param states The list of states to base the leg on
+   * @param states       The list of states to base the leg on
    * @param previousStep the previous walk step, so that the first relative turn direction is
    *                     calculated correctly
    * @return The generated leg
@@ -298,76 +446,9 @@ public class GraphPathToItineraryMapper {
   }
 
   /**
-   * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
-   */
-  private static void setPathwayInfo(StreetLeg leg, List<State> legStates) {
-    for (State legsState : legStates) {
-      if (legsState.getBackEdge() instanceof PathwayEdge pe) {
-        leg.setPathwayId(pe.getId());
-        return;
-      }
-    }
-  }
-
-  /**
-   * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
-   *
-   * @param itinerary The itinerary to calculate the elevation changes for
-   * @param edges The edges that go with the itinerary
-   */
-  private static void calculateElevations(Itinerary itinerary, List<Edge> edges) {
-    for (Edge edge : edges) {
-      if (!(edge instanceof StreetEdge edgeWithElevation)) {
-        continue;
-      }
-      PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
-
-      if (coordinates == null) continue;
-      // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
-      if (coordinates.getDimension() != 2) continue;
-
-      for (int i = 0; i < coordinates.size() - 1; i++) {
-        double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
-
-        if (change > 0) {
-          itinerary.elevationGained += change;
-        } else if (change < 0) {
-          itinerary.elevationLost -= change;
-        }
-      }
-    }
-  }
-
-  /**
-   * Resolve mode from states.
-   * @param states The states that go with the leg
-   */
-  private static TraverseMode resolveMode(List<State> states) {
-    for (State state : states) {
-      TraverseMode mode = state.getNonTransitMode();
-
-      if (mode != null) {
-        // Resolve correct mode if renting vehicle
-        if (state.isRentingVehicle()) {
-          return switch (state.stateData.rentalVehicleFormFactor) {
-            case BICYCLE, OTHER -> TraverseMode.BICYCLE;
-            case SCOOTER, MOPED -> TraverseMode.SCOOTER;
-            case CAR -> TraverseMode.CAR;
-          };
-        } else {
-          return mode;
-        }
-      }
-    }
-
-    // Fallback to walking
-    return TraverseMode.WALK;
-  }
-
-  /**
    * Add mode and alerts fields to a {@link StreetLeg}.
    *
-   * @param leg The leg to add the mode and alerts to
+   * @param leg    The leg to add the mode and alerts to
    * @param states The states that go with the leg
    */
   private void addStreetNotes(StreetLeg leg, List<State> states) {
@@ -417,86 +498,5 @@ public class GraphPathToItineraryMapper {
     }
 
     return elevationProfile;
-  }
-
-  private static List<P2<Double>> encodeElevationProfileWithNaN(
-    Edge edge,
-    double distanceOffset,
-    double heightOffset
-  ) {
-    var elevations = encodeElevationProfile(edge, distanceOffset, heightOffset);
-    if (elevations.isEmpty()) {
-      return List.of(
-        new P2<>(distanceOffset, Double.NaN),
-        new P2<>(distanceOffset + edge.getDistanceMeters(), Double.NaN)
-      );
-    }
-    return elevations;
-  }
-
-  private static List<P2<Double>> encodeElevationProfile(
-    Edge edge,
-    double distanceOffset,
-    double heightOffset
-  ) {
-    ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
-
-    if (!(edge instanceof StreetEdge elevEdge)) {
-      return out;
-    }
-    if (elevEdge.getElevationProfile() == null) {
-      return out;
-    }
-
-    Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
-    for (final Coordinate coordinate : coordArr) {
-      out.add(new P2<>(coordinate.x + distanceOffset, coordinate.y + heightOffset));
-    }
-
-    return out;
-  }
-
-  /**
-   * Make a {@link Place} to add to a {@link Leg}.
-   *
-   * @param state The {@link State}.
-   * @return The resulting {@link Place} object.
-   */
-  private static Place makePlace(State state) {
-    Vertex vertex = state.getVertex();
-    I18NString name = vertex.getName();
-
-    //This gets nicer names instead of osm:node:id when changing mode of transport
-    //Names are generated from all the streets in a corner, same as names in origin and destination
-    //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
-    if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
-      name = ((StreetVertex) vertex).getIntersectionName();
-    }
-
-    if (vertex instanceof TransitStopVertex) {
-      return Place.forStop(((TransitStopVertex) vertex).getStop());
-    } else if (vertex instanceof VehicleRentalStationVertex) {
-      return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex);
-    } else if (vertex instanceof VehicleParkingEntranceVertex) {
-      return Place.forVehicleParkingEntrance(
-        (VehicleParkingEntranceVertex) vertex,
-        state.getOptions()
-      );
-    } else {
-      return Place.normal(vertex, name);
-    }
-  }
-
-  public static boolean isRentalPickUp(State state) {
-    return (
-      state.getBackEdge() instanceof VehicleRentalEdge &&
-      (state.getBackState() == null || !state.getBackState().isRentingVehicle())
-    );
-  }
-
-  public static boolean isRentalDropOff(State state) {
-    return (
-      state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isRentingVehicle()
-    );
   }
 }

@@ -41,8 +41,8 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   }
 
   @Override
-  public boolean isTransferLeg() {
-    return true;
+  public int fromTime() {
+    return fromTime;
   }
 
   @Override
@@ -51,8 +51,8 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   }
 
   @Override
-  public int fromTime() {
-    return fromTime;
+  public int toTime() {
+    return toTime;
   }
 
   @Override
@@ -61,13 +61,13 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   }
 
   @Override
-  public int toTime() {
-    return toTime;
+  public int generalizedCost() {
+    return cost;
   }
 
   @Override
-  public int generalizedCost() {
-    return cost;
+  public boolean isTransferLeg() {
+    return true;
   }
 
   @Override
@@ -76,8 +76,8 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   }
 
   @Override
-  public String toString() {
-    return "Walk " + asString(toStop());
+  public int hashCode() {
+    return Objects.hash(toStop, toTime, fromStop, fromTime, next);
   }
 
   @Override
@@ -99,7 +99,7 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(toStop, toTime, fromStop, fromTime, next);
+  public String toString() {
+    return "Walk " + asString(toStop());
   }
 }

@@ -9,21 +9,19 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 /**
- * This class is responsible for keeping track of the overall best times and
- * the best "on-board" times. In addition, it keeps track of times updated
- * in the current round and previous round. It is optimized for performance,
- * all information here is also in the state, but this class keeps things in
- * the fastest possible data structure.
+ * This class is responsible for keeping track of the overall best times and the best "on-board"
+ * times. In addition, it keeps track of times updated in the current round and previous round. It
+ * is optimized for performance, all information here is also in the state, but this class keeps
+ * things in the fastest possible data structure.
  * <p/>
- * We keep track of the best over all times to be able to drop a new arrivals
- * exceeding the time already found by another branch.
+ * We keep track of the best over all times to be able to drop a new arrivals exceeding the time
+ * already found by another branch.
  * <p/>
- * We need to keep track of the arrive "on-board" times(transit and flex-on-board arrivals),
- * not only the overall bet times, to find all the best transfers. When arriving at a stop
- * on-board, we need to find all transfers to other stops, event if there is another transfer
- * arrival with a better arrival time. The reason is that after transfer to the next stop, the
- * new arrival may become the best time at that stop. Two transfers that are after each other are not
- * allowed.
+ * We need to keep track of the arrive "on-board" times(transit and flex-on-board arrivals), not
+ * only the overall bet times, to find all the best transfers. When arriving at a stop on-board, we
+ * need to find all transfers to other stops, event if there is another transfer arrival with a
+ * better arrival time. The reason is that after transfer to the next stop, the new arrival may
+ * become the best time at that stop. Two transfers that are after each other are not allowed.
  */
 public final class BestTimes {
 
@@ -31,19 +29,16 @@ public final class BestTimes {
   private final int[] times;
 
   /**
-   * The best "on-board" arrival times to reach a stop, across rounds and iterations.
-   * It includes both transit arrivals and access-on-board arrivals.
+   * The best "on-board" arrival times to reach a stop, across rounds and iterations. It includes
+   * both transit arrivals and access-on-board arrivals.
    */
   private final int[] onBoardTimes;
-
+  private final BitSet onBoardReachedCurrentRound;
+  private final TransitCalculator<?> calculator;
   /** Stops touched in the CURRENT round. */
   private BitSet reachedCurrentRound;
-  private final BitSet onBoardReachedCurrentRound;
-
   /** Stops touched by in LAST round. */
   private BitSet reachedLastRound;
-
-  private final TransitCalculator<?> calculator;
 
   public BestTimes(int nStops, TransitCalculator<?> calculator, WorkerLifeCycle lifeCycle) {
     this.calculator = calculator;
@@ -68,31 +63,10 @@ public final class BestTimes {
   }
 
   /**
-   * Clear all reached flags before we start a new iteration.
-   * This is important so stops visited in the previous
-   * iteration in the last round does not "overflow" into
-   * the next iteration.
-   */
-  private void setupIteration() {
-    // clear all touched stops to avoid constant reëxploration
-    reachedCurrentRound.clear();
-    onBoardReachedCurrentRound.clear();
-  }
-
-  /**
    * @return true if at least one stop arrival was reached last round (best overall).
    */
   public boolean isCurrentRoundUpdated() {
     return !reachedCurrentRound.isEmpty();
-  }
-
-  /**
-   * Prepare this class for the next round updating reached flags.
-   */
-  private void prepareForNextRound() {
-    swapReachedCurrentAndLastRound();
-    reachedCurrentRound.clear();
-    onBoardReachedCurrentRound.clear();
   }
 
   /**
@@ -107,13 +81,6 @@ public final class BestTimes {
    */
   public BitSetIterator onBoardStopArrivalsReachedCurrentRound() {
     return new BitSetIterator(onBoardReachedCurrentRound);
-  }
-
-  /**
-   * @return true if the given stop was reached by on-board in the current round.
-   */
-  boolean isStopReachedOnBoardInCurrentRound(int stop) {
-    return onBoardReachedCurrentRound.get(stop);
   }
 
   /**
@@ -174,6 +141,32 @@ public final class BestTimes {
       .addBitSetSize("onBoardReachedCurrentRound", onBoardReachedCurrentRound)
       .addBitSetSize("reachedLastRound", reachedLastRound)
       .toString();
+  }
+
+  /**
+   * @return true if the given stop was reached by on-board in the current round.
+   */
+  boolean isStopReachedOnBoardInCurrentRound(int stop) {
+    return onBoardReachedCurrentRound.get(stop);
+  }
+
+  /**
+   * Clear all reached flags before we start a new iteration. This is important so stops visited in
+   * the previous iteration in the last round does not "overflow" into the next iteration.
+   */
+  private void setupIteration() {
+    // clear all touched stops to avoid constant reëxploration
+    reachedCurrentRound.clear();
+    onBoardReachedCurrentRound.clear();
+  }
+
+  /**
+   * Prepare this class for the next round updating reached flags.
+   */
+  private void prepareForNextRound() {
+    swapReachedCurrentAndLastRound();
+    reachedCurrentRound.clear();
+    onBoardReachedCurrentRound.clear();
   }
 
   /* private methods */

@@ -50,16 +50,16 @@ public class ThrottleLogger extends AbstractFilterLogger {
   }
 
   /**
-   * This method check if the throttle timeout is set and return {@code true} if it is. It also
-   * set the next timeout. The write/read operations are NOT synchronized which may cause two or
-   * more concurrent calls to both return {@code false}, hence causing two log events for the same
+   * This method check if the throttle timeout is set and return {@code true} if it is. It also set
+   * the next timeout. The write/read operations are NOT synchronized which may cause two or more
+   * concurrent calls to both return {@code false}, hence causing two log events for the same
    * throttle time period - which is a minor drawback. The throttle do however guarantee that at
    * least one event is logged for each throttle time period. This is guaranteed based on the
    * assumption that writing to the {@code timeout} (primitive long) is an atomic operation.
    * <p>
-   * In a worst case scenario, each thread keep their local version of the {@code timeout} and
-   * one log message from each thread is printed every second. This can behave differently
-   * from one JVM to anther.
+   * In a worst case scenario, each thread keep their local version of the {@code timeout} and one
+   * log message from each thread is printed every second. This can behave differently from one JVM
+   * to anther.
    */
   private boolean throttle() {
     long time = System.currentTimeMillis();

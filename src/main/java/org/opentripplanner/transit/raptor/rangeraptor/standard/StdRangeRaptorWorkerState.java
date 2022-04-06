@@ -12,16 +12,17 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 /**
- * Tracks the state of a standard Range Raptor search, specifically the best arrival times at each transit stop
- * at the end of a particular round, along with associated data to reconstruct paths etc.
+ * Tracks the state of a standard Range Raptor search, specifically the best arrival times at each
+ * transit stop at the end of a particular round, along with associated data to reconstruct paths
+ * etc.
  * <p>
- * This is grouped into a separate class (rather than just having the fields in the raptor worker class) because we
- * want to separate the logic of maintaining stop arrival state and performing the steps of the algorithm. This
- * also make it possible to have more than one state implementation, which have ben used in the past to test different
- * memory optimizations.
+ * This is grouped into a separate class (rather than just having the fields in the raptor worker
+ * class) because we want to separate the logic of maintaining stop arrival state and performing the
+ * steps of the algorithm. This also make it possible to have more than one state implementation,
+ * which have ben used in the past to test different memory optimizations.
  * <p>
- * Note that this represents the entire state of the Range Raptor search for all rounds. The {@code stopArrivalsState}
- * implementation can be swapped to achieve different results.
+ * Note that this represents the entire state of the Range Raptor search for all rounds. The {@code
+ * stopArrivalsState} implementation can be swapped to achieve different results.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -29,14 +30,14 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   implements StdWorkerState<T> {
 
   /**
-   * The best times to reach each stop, whether via a transfer or via transit directly.
-   * This is the bare minimum to execute the algorithm.
+   * The best times to reach each stop, whether via a transfer or via transit directly. This is the
+   * bare minimum to execute the algorithm.
    */
   private final BestTimes bestTimes;
 
   /**
-   * Track the stop arrivals to be able to return some kind of result. Depending on the
-   * desired result, different implementation is injected.
+   * Track the stop arrivals to be able to return some kind of result. Depending on the desired
+   * result, different implementation is injected.
    */
   private final StopArrivalsState<T> stopArrivalsState;
 
@@ -71,39 +72,18 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public BitSetIterator stopsTouchedByTransitCurrentRound() {
-    return bestTimes.onBoardStopArrivalsReachedCurrentRound();
-  }
-
-  @Override
   public IntIterator stopsTouchedPreviousRound() {
     return bestTimes.stopsReachedLastRound();
   }
 
   @Override
-  public boolean isStopReachedInPreviousRound(int stop) {
-    return bestTimes.isStopReachedLastRound(stop);
+  public BitSetIterator stopsTouchedByTransitCurrentRound() {
+    return bestTimes.onBoardStopArrivalsReachedCurrentRound();
   }
 
-  /**
-   * Return the "best time" found in the previous round. This is used to calculate the board/alight
-   * time in the next round.
-   * <p/>
-   * PLEASE OVERRIDE!
-   * <p/>
-   * The implementation here is not correct - please override if you plan to use any result paths
-   * or "rounds" as "number of transfers". The implementation is OK if the only thing you care
-   * about is the "arrival time".
-   */
   @Override
-  public int bestTimePreviousRound(int stop) {
-    // This is a simplification, *bestTimes* might get updated during the current round;
-    // Hence leading to a new boarding from the same stop in the same round.
-    // If we do not count rounds or track paths, this is OK. But be sure to override this
-    // method with the best time from the previous round if you care about number of
-    // transfers and results paths.
-
-    return stopArrivalsState.bestTimePreviousRound(stop);
+  public boolean isDestinationReachedInCurrentRound() {
+    return arrivedAtDestinationCheck.arrivedAtDestinationCurrentRound();
   }
 
   @Override
@@ -131,7 +111,50 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   /**
-   * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the transitTime.
+   * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
+   */
+  @Override
+  public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+    int arrivalTimeTransit = bestTimes.onBoardTime(fromStop);
+    while (transfers.hasNext()) {
+      transferToStop(arrivalTimeTransit, fromStop, transfers.next());
+    }
+  }
+
+  @Override
+  public Collection<Path<T>> extractPaths() {
+    return stopArrivalsState.extractPaths();
+  }
+
+  @Override
+  public boolean isStopReachedInPreviousRound(int stop) {
+    return bestTimes.isStopReachedLastRound(stop);
+  }
+
+  /**
+   * Return the "best time" found in the previous round. This is used to calculate the board/alight
+   * time in the next round.
+   * <p/>
+   * PLEASE OVERRIDE!
+   * <p/>
+   * The implementation here is not correct - please override if you plan to use any result paths or
+   * "rounds" as "number of transfers". The implementation is OK if the only thing you care about is
+   * the "arrival time".
+   */
+  @Override
+  public int bestTimePreviousRound(int stop) {
+    // This is a simplification, *bestTimes* might get updated during the current round;
+    // Hence leading to a new boarding from the same stop in the same round.
+    // If we do not count rounds or track paths, this is OK. But be sure to override this
+    // method with the best time from the previous round if you care about number of
+    // transfers and results paths.
+
+    return stopArrivalsState.bestTimePreviousRound(stop);
+  }
+
+  /**
+   * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the
+   * transitTime.
    */
   @Override
   public void transitToStop(int stop, int arrivalTime, int boardStop, int boardTime, T trip) {
@@ -160,22 +183,6 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return stopArrivalsState.previousTransit(boardStopIndex);
   }
 
-  /**
-   * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
-   */
-  @Override
-  public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-    int arrivalTimeTransit = bestTimes.onBoardTime(fromStop);
-    while (transfers.hasNext()) {
-      transferToStop(arrivalTimeTransit, fromStop, transfers.next());
-    }
-  }
-
-  @Override
-  public Collection<Path<T>> extractPaths() {
-    return stopArrivalsState.extractPaths();
-  }
-
   private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
     // Use the calculator to make sure the calculation is done correct for a normal
     // forward search and a reverse search.
@@ -195,11 +202,6 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     } else {
       stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
     }
-  }
-
-  @Override
-  public boolean isDestinationReachedInCurrentRound() {
-    return arrivedAtDestinationCheck.arrivedAtDestinationCurrentRound();
   }
 
   /* private methods */

@@ -32,6 +32,8 @@ public class TransportModeSlack {
   private static final GraphQLOutputType SLACK_OUTPUT_TYPE;
   public static final GraphQLList SLACK_LIST_INPUT_TYPE;
   public static final GraphQLList SLACK_LIST_OUTPUT_TYPE;
+  public final int slack;
+  public final List<TransitMode> modes;
 
   static {
     BOARD_SLACK_DESCRIPTION =
@@ -78,19 +80,9 @@ public class TransportModeSlack {
     SLACK_LIST_OUTPUT_TYPE = GraphQLList.list(SLACK_OUTPUT_TYPE);
   }
 
-  public final int slack;
-  public final List<TransitMode> modes;
-
   private TransportModeSlack(int slack, List<TransitMode> modes) {
     this.slack = slack;
     this.modes = modes;
-  }
-
-  private static String defaultDescription(String groupName) {
-    return String.format(
-      "This is the default value used, if not overridden by the '%s'.",
-      groupName
-    );
   }
 
   public static String boardSlackDescription(String byGroupName) {
@@ -110,20 +102,6 @@ public class TransportModeSlack {
     Map<TransitMode, Integer> defaultValues
   ) {
     return slackByGroupDescription(name) + " " + defaultsToString(defaultValues);
-  }
-
-  @Override
-  public String toString() {
-    if (modes == null) {
-      return "{slack: " + slack + "}";
-    }
-    return (
-      "{" +
-      modes.stream().map(TransportModeSlack::serializeTransportMode).collect(Collectors.toList()) +
-      " : " +
-      slack +
-      "}"
-    );
   }
 
   public static List<TransportModeSlack> mapToApiList(Map<TransitMode, Integer> domain) {
@@ -151,6 +129,27 @@ public class TransportModeSlack {
       }
     }
     return result;
+  }
+
+  @Override
+  public String toString() {
+    if (modes == null) {
+      return "{slack: " + slack + "}";
+    }
+    return (
+      "{" +
+      modes.stream().map(TransportModeSlack::serializeTransportMode).collect(Collectors.toList()) +
+      " : " +
+      slack +
+      "}"
+    );
+  }
+
+  private static String defaultDescription(String groupName) {
+    return String.format(
+      "This is the default value used, if not overridden by the '%s'.",
+      groupName
+    );
   }
 
   private static String defaultsToString(Map<TransitMode, Integer> byMode) {

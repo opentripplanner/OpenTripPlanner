@@ -40,13 +40,13 @@ public class SiriTripPatternCache {
   }
 
   /**
-   * Get cached trip pattern or create one if it doesn't exist yet. If a trip pattern is created, vertices
-   * and edges for this trip pattern are also created in the graph.
+   * Get cached trip pattern or create one if it doesn't exist yet. If a trip pattern is created,
+   * vertices and edges for this trip pattern are also created in the graph.
    *
    * @param stopPattern stop pattern to retrieve/create trip pattern
-   * @param trip Trip containing route of new trip pattern in case a new trip pattern will be created
-   * @param graph graph to add vertices and edges in case a new trip pattern will be created
-   * @param serviceDate
+   * @param trip        Trip containing route of new trip pattern in case a new trip pattern will be
+   *                    created
+   * @param graph       graph to add vertices and edges in case a new trip pattern will be created
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
@@ -180,17 +180,17 @@ class StopPatternServiceDateKey {
   }
 
   @Override
+  public int hashCode() {
+    return stopPattern.hashCode() + serviceDate.hashCode();
+  }
+
+  @Override
   public boolean equals(Object thatObject) {
     if (!(thatObject instanceof StopPatternServiceDateKey)) {
       return false;
     }
     StopPatternServiceDateKey that = (StopPatternServiceDateKey) thatObject;
     return (this.stopPattern.equals(that.stopPattern) & this.serviceDate.equals(that.serviceDate));
-  }
-
-  @Override
-  public int hashCode() {
-    return stopPattern.hashCode() + serviceDate.hashCode();
   }
 }
 
@@ -205,16 +205,16 @@ class TripServiceDateKey {
   }
 
   @Override
+  public int hashCode() {
+    return trip.hashCode() + serviceDate.hashCode();
+  }
+
+  @Override
   public boolean equals(Object thatObject) {
     if (!(thatObject instanceof TripServiceDateKey)) {
       return false;
     }
     TripServiceDateKey that = (TripServiceDateKey) thatObject;
     return (this.trip.equals(that.trip) & this.serviceDate.equals(that.serviceDate));
-  }
-
-  @Override
-  public int hashCode() {
-    return trip.hashCode() + serviceDate.hashCode();
   }
 }

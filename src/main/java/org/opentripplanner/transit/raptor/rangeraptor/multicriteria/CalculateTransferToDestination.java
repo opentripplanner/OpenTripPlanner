@@ -8,8 +8,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPat
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
- * This class listen to pareto set egress stop arrivals and on accepted
- * transit arrivals make the transfer to the destination.
+ * This class listen to pareto set egress stop arrivals and on accepted transit arrivals make the
+ * transfer to the destination.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

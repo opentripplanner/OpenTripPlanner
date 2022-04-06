@@ -119,7 +119,7 @@ public class OSMWayTest {
 
   /**
    * Tests if cars can drive on unclassified highways with bicycleDesignated
-   *
+   * <p>
    * Check for bug #1878 and PR #1880
    */
   @Test
@@ -136,8 +136,8 @@ public class OSMWayTest {
   }
 
   /**
-   * Tests that motorcar/bicycle/foot private don't add permissions
-   * but yes add permission if access is no
+   * Tests that motorcar/bicycle/foot private don't add permissions but yes add permission if access
+   * is no
    */
   @Test
   public void testMotorCarTagAllowedPermissions() {
@@ -170,8 +170,8 @@ public class OSMWayTest {
   }
 
   /**
-   * Tests that motorcar/bicycle/foot private don't add permissions
-   * but no remove permission if access is yes
+   * Tests that motorcar/bicycle/foot private don't add permissions but no remove permission if
+   * access is yes
    */
   @Test
   public void testMotorCarTagDeniedPermissions() {
@@ -200,9 +200,9 @@ public class OSMWayTest {
   }
 
   /**
-   * Tests that motor_vehicle/bicycle/foot private don't add permissions
-   * but yes add permission if access is no
-   *
+   * Tests that motor_vehicle/bicycle/foot private don't add permissions but yes add permission if
+   * access is no
+   * <p>
    * Support for motor_vehicle was added in #1881
    */
   @Test
@@ -236,9 +236,9 @@ public class OSMWayTest {
   }
 
   /**
-   * Tests that motor_vehicle/bicycle/foot private don't add permissions
-   * but no remove permission if access is yes
-   *
+   * Tests that motor_vehicle/bicycle/foot private don't add permissions but no remove permission if
+   * access is yes
+   * <p>
    * Support for motor_vehicle was added in #1881
    */
   @Test
@@ -265,17 +265,6 @@ public class OSMWayTest {
         way.addTag("foot", "private");
         permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allowsNothing());*/
-  }
-
-  private P2<StreetTraversalPermission> getWayProperties(OSMWay way) {
-    WayPropertySet wayPropertySet = new WayPropertySet();
-    WayProperties wayData = wayPropertySet.getDataForWay(way);
-
-    StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(
-      way,
-      wayData.getPermission()
-    );
-    return OSMFilter.getPermissions(permissions, way);
   }
 
   @Test
@@ -335,5 +324,16 @@ public class OSMWayTest {
 
     assertTrue(permissionPair.first.allows(StreetTraversalPermission.CAR));
     assertFalse(permissionPair.second.allows(StreetTraversalPermission.CAR));
+  }
+
+  private P2<StreetTraversalPermission> getWayProperties(OSMWay way) {
+    WayPropertySet wayPropertySet = new WayPropertySet();
+    WayProperties wayData = wayPropertySet.getDataForWay(way);
+
+    StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(
+      way,
+      wayData.getPermission()
+    );
+    return OSMFilter.getPermissions(permissions, way);
   }
 }

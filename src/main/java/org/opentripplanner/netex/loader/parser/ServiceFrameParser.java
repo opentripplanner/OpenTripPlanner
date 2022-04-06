@@ -69,6 +69,10 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     this.flexibleStopPlaceById = flexibleStopPlaceById;
   }
 
+  static void logSummary() {
+    PASSENGER_STOP_ASSIGNMENT_LOGGER.logTotal("PassengerStopAssignment with empty quay ref.");
+  }
+
   @Override
   void parse(Service_VersionFrameStructure frame) {
     parseStopAssignments(frame.getStopAssignments());
@@ -134,10 +138,6 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     // update references
     index.networkIdByGroupOfLineId.addAll(networkIdByGroupOfLineId);
-  }
-
-  static void logSummary() {
-    PASSENGER_STOP_ASSIGNMENT_LOGGER.logTotal("PassengerStopAssignment with empty quay ref.");
   }
 
   private void parseStopAssignments(StopAssignmentsInFrame_RelStructure stopAssignments) {

@@ -48,11 +48,6 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int onTripIndex() {
-    return onTripIndex;
-  }
-
-  @Override
   public void prepareForTransitWith() {
     this.onTripIndex = NOT_SET;
     this.onTripBoardTime = NOT_SET;
@@ -78,6 +73,11 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
+  public TransitArrival<T> previousTransit(int boardStopIndex) {
+    return state.previousTransit(boardStopIndex);
+  }
+
+  @Override
   public void board(
     int stopIndex,
     final int earliestBoardTime,
@@ -90,7 +90,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
   }
 
   @Override
-  public TransitArrival<T> previousTransit(int boardStopIndex) {
-    return state.previousTransit(boardStopIndex);
+  public int onTripIndex() {
+    return onTripIndex;
   }
 }

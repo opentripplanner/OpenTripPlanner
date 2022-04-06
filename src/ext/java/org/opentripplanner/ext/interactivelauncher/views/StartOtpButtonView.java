@@ -3,7 +3,8 @@ package org.opentripplanner.ext.interactivelauncher.views;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.adjustSize;
 
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JButton;
 
 class StartOtpButtonView {
 

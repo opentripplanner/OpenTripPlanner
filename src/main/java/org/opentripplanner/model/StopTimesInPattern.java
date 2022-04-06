@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Some stopTimes all in the same pattern.
- * TripTimeShort should probably be renamed StopTimeShort
+ * Some stopTimes all in the same pattern. TripTimeShort should probably be renamed StopTimeShort
  */
 public class StopTimesInPattern {
 

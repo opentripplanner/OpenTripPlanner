@@ -8,8 +8,8 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 public class LegacyGraphQLSeverityMapper {
 
   /**
-   * Returns LegacyGraphQL API string counter part for internal {@link AlertSeverity} enum.
-   * Defaults to returning UNKNOWN_SEVERITY.
+   * Returns LegacyGraphQL API string counter part for internal {@link AlertSeverity} enum. Defaults
+   * to returning UNKNOWN_SEVERITY.
    */
   public static String getLegacyGraphQLSeverity(AlertSeverity severity) {
     if (severity == null) {

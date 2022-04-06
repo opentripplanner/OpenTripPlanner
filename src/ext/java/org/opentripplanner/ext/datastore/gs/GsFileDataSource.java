@@ -14,8 +14,8 @@ import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 
 /**
- * This class is a wrapper around and EXISTING Google Cloud Store bucket blob. It can
- * be read and overwritten.
+ * This class is a wrapper around and EXISTING Google Cloud Store bucket blob. It can be read and
+ * overwritten.
  * <p>
  * Reading compressed blobs is supported. The only format supported is gzip (extension .gz).
  */
@@ -24,9 +24,9 @@ class GsFileDataSource extends AbstractGsDataSource implements DataSource {
   private final Blob blob;
 
   /**
-   * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files
-   * as well as normal files. It does not handle directories({@link DirectoryDataSource}) or
-   * zip-files {@link ZipFileDataSource} which contain multiple files.
+   * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files as
+   * well as normal files. It does not handle directories({@link DirectoryDataSource}) or zip-files
+   * {@link ZipFileDataSource} which contain multiple files.
    */
   GsFileDataSource(Blob blob, FileType type) {
     super(blob.getBlobId(), type);

@@ -45,8 +45,8 @@ public class TransferForPattern implements Comparable<TransferForPattern> {
   }
 
   /**
-   * A transfer either apply to all target-trips (station-, stop- and route-transfer-points) or
-   * to a specific trip (trip-transfer-point).
+   * A transfer either apply to all target-trips (station-, stop- and route-transfer-points) or to a
+   * specific trip (trip-transfer-point).
    */
   public boolean applyToAllTargetTrips() {
     return targetTrip == null;
@@ -54,6 +54,7 @@ public class TransferForPattern implements Comparable<TransferForPattern> {
 
   /**
    * return {@code true} if this transfer apply to the specified trip, and only that trip.
+   *
    * @see #applyToAllTargetTrips()
    */
   public boolean applyToTargetTrip(Trip targetTrip) {
@@ -61,8 +62,8 @@ public class TransferForPattern implements Comparable<TransferForPattern> {
   }
 
   /**
-   * Transfers should be sorted after the specificityRanking, this make sure the
-   * transfer with the highest ranking is used by raptor.
+   * Transfers should be sorted after the specificityRanking, this make sure the transfer with the
+   * highest ranking is used by raptor.
    */
   @Override
   public int compareTo(TransferForPattern o) {

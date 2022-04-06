@@ -26,9 +26,6 @@ public class SpeedTestTimer {
   private static final NamingConvention NAMING_CONVENTION = createNamingConvention();
 
   private static final long NANOS_TO_MILLIS = 1000000;
-
-  public record Result(String name, int min, int max, int mean, int totTime, int count) {}
-
   private final Clock clock = Clock.SYSTEM;
   private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
   private final CompositeMeterRegistry registry = new CompositeMeterRegistry(
@@ -36,6 +33,10 @@ public class SpeedTestTimer {
     List.of(loggerRegistry)
   );
   private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
+
+  public static int nanosToMillisecond(long nanos) {
+    return (int) (nanos / NANOS_TO_MILLIS);
+  }
 
   public List<Result> getResults() {
     var results = new ArrayList<Result>();
@@ -128,19 +129,6 @@ public class SpeedTestTimer {
       .sum();
   }
 
-  private Stream<Timer> getTotalTimers(String timerName) {
-    return registry
-      .find(timerName)
-      .meters()
-      .stream()
-      .filter(Timer.class::isInstance)
-      .map(Timer.class::cast);
-  }
-
-  public static int nanosToMillisecond(long nanos) {
-    return (int) (nanos / NANOS_TO_MILLIS);
-  }
-
   private static String getFullName(Meter timer) {
     var sb = new StringBuilder(timer.getId().getConventionName(NAMING_CONVENTION));
     if (timer.getId().getTag("tags") != null) {
@@ -175,4 +163,15 @@ public class SpeedTestTimer {
       }
     };
   }
+
+  private Stream<Timer> getTotalTimers(String timerName) {
+    return registry
+      .find(timerName)
+      .meters()
+      .stream()
+      .filter(Timer.class::isInstance)
+      .map(Timer.class::cast);
+  }
+
+  public record Result(String name, int min, int max, int mean, int totTime, int count) {}
 }

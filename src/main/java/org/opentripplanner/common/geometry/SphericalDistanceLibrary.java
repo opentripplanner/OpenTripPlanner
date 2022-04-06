@@ -1,6 +1,12 @@
 package org.opentripplanner.common.geometry;
 
-import static org.apache.commons.math3.util.FastMath.*;
+import static org.apache.commons.math3.util.FastMath.abs;
+import static org.apache.commons.math3.util.FastMath.atan2;
+import static org.apache.commons.math3.util.FastMath.cos;
+import static org.apache.commons.math3.util.FastMath.sin;
+import static org.apache.commons.math3.util.FastMath.sqrt;
+import static org.apache.commons.math3.util.FastMath.toDegrees;
+import static org.apache.commons.math3.util.FastMath.toRadians;
 
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
@@ -36,9 +42,10 @@ public abstract class SphericalDistanceLibrary {
   }
 
   /**
-   * Compute an (approximated) distance between a point and a linestring expressed in standard geographical
-   * coordinates (lon, lat in degrees).
-   * @param point The coordinates of the point (longitude, latitude degrees).
+   * Compute an (approximated) distance between a point and a linestring expressed in standard
+   * geographical coordinates (lon, lat in degrees).
+   *
+   * @param point      The coordinates of the point (longitude, latitude degrees).
    * @param lineString The set of points representing the polyline, in the same coordinate system.
    * @return The (approximated) distance, in meters, between the point and the linestring.
    */
@@ -55,6 +62,7 @@ public abstract class SphericalDistanceLibrary {
 
   /**
    * Compute the length of a polyline
+   *
    * @param lineString The polyline in (longitude, latitude degrees).
    * @return The length, in meters, of the linestring.
    */
@@ -70,6 +78,7 @@ public abstract class SphericalDistanceLibrary {
 
   /**
    * Compute the (approximated) length of a polyline
+   *
    * @param lineString The polyline in (longitude, latitude degrees).
    * @return The (approximated) length, in meters, of the linestring.
    */
@@ -84,6 +93,7 @@ public abstract class SphericalDistanceLibrary {
 
   /**
    * Compute the (approximated) length of a polyline, with known cos(lat).
+   *
    * @param lineString The polyline in (longitude, latitude degrees).
    * @return The (approximated) length, in meters, of the linestring.
    */
@@ -91,29 +101,13 @@ public abstract class SphericalDistanceLibrary {
     return equirectangularProject(lineString, cosLat).getLength() * RADIUS_OF_EARTH_IN_M;
   }
 
-  /**
-   * Equirectangular project a polyline.
-   * @param lineString
-   * @param cosLat cos(lat) of the projection center point.
-   * @return The projected polyline. Coordinates in radians.
-   */
-  private static LineString equirectangularProject(LineString lineString, double cosLat) {
-    Coordinate[] coords = lineString.getCoordinates();
-    Coordinate[] coords2 = new Coordinate[coords.length];
-    for (int i = 0; i < coords.length; i++) {
-      coords2[i] =
-        new Coordinate(Math.toRadians(coords[i].x) * cosLat, Math.toRadians(coords[i].y));
-    }
-    return GeometryUtils.getGeometryFactory().createLineString(coords2);
-  }
-
   public static double distance(double lat1, double lon1, double lat2, double lon2) {
     return distance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
   }
 
   /**
-   * Compute an (approximated) distance between two points, with a known cos(lat).
-   * Be careful, this is approximated and never check for the validity of input cos(lat).
+   * Compute an (approximated) distance between two points, with a known cos(lat). Be careful, this
+   * is approximated and never check for the validity of input cos(lat).
    */
   public static double fastDistance(double lat1, double lon1, double lat2, double lon2) {
     return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
@@ -138,9 +132,9 @@ public abstract class SphericalDistanceLibrary {
   }
 
   /**
-   * Approximated, fast and under-estimated equirectangular distance between two points.
-   * Works only for small delta lat/lon, fall-back on exact distance if not the case.
-   * See: http://www.movable-type.co.uk/scripts/latlong.html
+   * Approximated, fast and under-estimated equirectangular distance between two points. Works only
+   * for small delta lat/lon, fall-back on exact distance if not the case. See:
+   * http://www.movable-type.co.uk/scripts/latlong.html
    */
   public static double fastDistance(
     double lat1,
@@ -157,22 +151,20 @@ public abstract class SphericalDistanceLibrary {
     return radius * sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
   }
 
-  private static double p2(double a) {
-    return a * a;
-  }
-
   /**
    * @param distanceMeters Distance in meters.
-   * @return The number of degree for the given distance. For degrees latitude, this is nearly correct. For degrees
-   *         longitude, this is an overestimate because meridians converge toward the poles.
+   * @return The number of degree for the given distance. For degrees latitude, this is nearly
+   * correct. For degrees longitude, this is an overestimate because meridians converge toward the
+   * poles.
    */
   public static double metersToDegrees(double distanceMeters) {
     return 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
   }
 
   /**
-   * @return the approximate number of meters for the given number of degrees latitude. If degrees longitude are
-   *         supplied, this is an overestimate anywhere off the equator because meridians converge toward the poles.
+   * @return the approximate number of meters for the given number of degrees latitude. If degrees
+   * longitude are supplied, this is an overestimate anywhere off the equator because meridians
+   * converge toward the poles.
    */
   public static double degreesLatitudeToMeters(double degreesLatitude) {
     return (2 * Math.PI * RADIUS_OF_EARTH_IN_M) * degreesLatitude / 360;
@@ -180,10 +172,9 @@ public abstract class SphericalDistanceLibrary {
 
   /**
    * @param distanceMeters Distance in meters.
-   * @param latDeg Latitude of center point, in degree.
-   * @return The number of longitude degree for the given distance. This is a slight overestimate
-   *         as the number of degree of longitude for a given distance depends on the exact
-   *         latitude.
+   * @param latDeg         Latitude of center point, in degree.
+   * @return The number of longitude degree for the given distance. This is a slight overestimate as
+   * the number of degree of longitude for a given distance depends on the exact latitude.
    */
   public static double metersToLonDegrees(double distanceMeters, double latDeg) {
     double dLatDeg = 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
@@ -218,5 +209,25 @@ public abstract class SphericalDistanceLibrary {
     double lonTo = toDegrees(lonRadians + lonOffset);
 
     return new Envelope(new Coordinate(lonFrom, latFrom), new Coordinate(lonTo, latTo));
+  }
+
+  /**
+   * Equirectangular project a polyline.
+   *
+   * @param cosLat cos(lat) of the projection center point.
+   * @return The projected polyline. Coordinates in radians.
+   */
+  private static LineString equirectangularProject(LineString lineString, double cosLat) {
+    Coordinate[] coords = lineString.getCoordinates();
+    Coordinate[] coords2 = new Coordinate[coords.length];
+    for (int i = 0; i < coords.length; i++) {
+      coords2[i] =
+        new Coordinate(Math.toRadians(coords[i].x) * cosLat, Math.toRadians(coords[i].y));
+    }
+    return GeometryUtils.getGeometryFactory().createLineString(coords2);
+  }
+
+  private static double p2(double a) {
+    return a * a;
   }
 }

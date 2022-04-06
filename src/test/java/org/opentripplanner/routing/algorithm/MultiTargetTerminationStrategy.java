@@ -8,9 +8,9 @@ import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A termination strategy that terminates after multiple targets have been reached.
- *
- * Useful for implementing a restricted batch search - i.e. doing one-to-many search
- * without building a full shortest path tree.
+ * <p>
+ * Useful for implementing a restricted batch search - i.e. doing one-to-many search without
+ * building a full shortest path tree.
  *
  * @author avi
  */
@@ -25,8 +25,7 @@ public class MultiTargetTerminationStrategy implements SearchTerminationStrategy
   }
 
   /**
-   * Updates the list of reached targets and returns True if all the
-   * targets have been reached.
+   * Updates the list of reached targets and returns True if all the targets have been reached.
    */
   @Override
   public boolean shouldSearchTerminate(State current) {

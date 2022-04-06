@@ -21,17 +21,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is a wrapper around an {@link OtpDataStore} adding the ability to filter
- * which data source input files should be used and validate the available input files
- * against the command line parameters set.
+ * This is a wrapper around an {@link OtpDataStore} adding the ability to filter which data source
+ * input files should be used and validate the available input files against the command line
+ * parameters set.
  * <p/>
- * After this class is validated the {@link #has(FileType)} method can be used to
- * determine if a the build process should include a file in the build.
+ * After this class is validated the {@link #has(FileType)} method can be used to determine if a the
+ * build process should include a file in the build.
  * <p/>
- * By separating this from the builder, this class can be constructed early, causing
- * a validation of the available data-sources against the configuration - and then if
- * not valid - abort the entire OTP startup early, before spending time on loading any
- * data - like the streetGraph.
+ * By separating this from the builder, this class can be constructed early, causing a validation of
+ * the available data-sources against the configuration - and then if not valid - abort the entire
+ * OTP startup early, before spending time on loading any data - like the streetGraph.
  */
 public class GraphBuilderDataSources {
 
@@ -67,9 +66,8 @@ public class GraphBuilderDataSources {
   }
 
   /**
-   * Create a wrapper around the data-store and resolve which files to
-   * import and export. Validate these files against the given command line
-   * arguments and the graph build parameters.
+   * Create a wrapper around the data-store and resolve which files to import and export. Validate
+   * these files against the given command line arguments and the graph build parameters.
    */
   public static GraphBuilderDataSources create(
     CommandLineParameters cli,
@@ -77,6 +75,10 @@ public class GraphBuilderDataSources {
     OtpDataStore store
   ) {
     return new GraphBuilderDataSources(cli, bc, store);
+  }
+
+  public DataSource getOutputGraph() {
+    return outputGraph;
   }
 
   /**
@@ -97,10 +99,6 @@ public class GraphBuilderDataSources {
 
   File getCacheDirectory() {
     return cacheDirectory;
-  }
-
-  public DataSource getOutputGraph() {
-    return outputGraph;
   }
 
   /* private methods */

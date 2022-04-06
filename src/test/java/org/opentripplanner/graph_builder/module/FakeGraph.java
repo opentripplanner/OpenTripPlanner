@@ -21,7 +21,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
- * Get graphs of Columbus Ohio with real OSM streets and a synthetic transit system for use in testing.
+ * Get graphs of Columbus Ohio with real OSM streets and a synthetic transit system for use in
+ * testing.
  */
 public class FakeGraph {
 

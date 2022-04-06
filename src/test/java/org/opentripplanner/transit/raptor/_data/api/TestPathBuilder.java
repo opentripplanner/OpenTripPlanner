@@ -13,9 +13,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
 /**
- * Utility to help build paths for testing. The path builder is "reusable",
- * every time the {@code access(...)} methods are called the builder reset it self.
- *
+ * Utility to help build paths for testing. The path builder is "reusable", every time the {@code
+ * access(...)} methods are called the builder reset it self.
+ * <p>
  * If the {@code costCalculator} is null, paths will not include cost.
  */
 public class TestPathBuilder {
@@ -25,8 +25,8 @@ public class TestPathBuilder {
   @Nullable
   private final CostCalculator costCalculator;
 
-  private PathBuilder<TestTripSchedule> builder;
   private final int alightSlack;
+  private PathBuilder<TestTripSchedule> builder;
   private int startTime;
 
   public TestPathBuilder(int alightSlack, @Nullable CostCalculator costCalculator) {
@@ -35,8 +35,8 @@ public class TestPathBuilder {
   }
 
   /**
-   * Create access starting at the fixed given {@code starting}. Opening hours is used to
-   * enforce the access start time and prevent time-shifting it.
+   * Create access starting at the fixed given {@code starting}. Opening hours is used to enforce
+   * the access start time and prevent time-shifting it.
    */
   public TestPathBuilder access(int startTime, int duration, int toStop) {
     return access(startTime, TestTransfer.walk(toStop, duration, startTime, startTime));

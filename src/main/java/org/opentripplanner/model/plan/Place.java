@@ -27,8 +27,8 @@ public class Place {
   public final WgsCoordinate coordinate;
 
   /**
-   * Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit stop)
-   * Mostly used for better localization of bike sharing and P+R station names
+   * Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit stop) Mostly used for better
+   * localization of bike sharing and P+R station names
    */
   public final VertexType vertexType;
 
@@ -61,48 +61,6 @@ public class Place {
     this.stop = stop;
     this.vehicleRentalPlace = vehicleRentalPlace;
     this.vehicleParkingWithEntrance = vehicleParkingWithEntrance;
-  }
-
-  /**
-   * Test if the place is likely to be at the same location. First check the coordinates
-   * then check the stopId [if it exist].
-   */
-  public boolean sameLocation(Place other) {
-    if (this == other) {
-      return true;
-    }
-    if (coordinate != null) {
-      return coordinate.sameLocation(other.coordinate);
-    }
-    return stop != null && stop.equals(other.stop);
-  }
-
-  /**
-   * Return a short version to be used in other classes toStringMethods. Should return
-   * just the necessary information for a human to identify the place in a given the context.
-   */
-  public String toStringShort() {
-    StringBuilder buf = new StringBuilder(name.toString());
-    if (stop != null) {
-      buf.append(" (").append(stop.getId()).append(")");
-    } else {
-      buf.append(" ").append(coordinate.toString());
-    }
-
-    return buf.toString();
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(Place.class)
-      .addStr("name", name.toString())
-      .addObj("stop", stop)
-      .addObj("coordinate", coordinate)
-      .addEnum("vertexType", vertexType)
-      .addObj("vehicleRentalPlace", vehicleRentalPlace)
-      .addObj("vehicleParkingEntrance", vehicleParkingWithEntrance)
-      .toString();
   }
 
   public static Place normal(Double lat, Double lon, I18NString name) {
@@ -182,5 +140,47 @@ public class Place {
         .realtime(realTime)
         .build()
     );
+  }
+
+  /**
+   * Test if the place is likely to be at the same location. First check the coordinates then check
+   * the stopId [if it exist].
+   */
+  public boolean sameLocation(Place other) {
+    if (this == other) {
+      return true;
+    }
+    if (coordinate != null) {
+      return coordinate.sameLocation(other.coordinate);
+    }
+    return stop != null && stop.equals(other.stop);
+  }
+
+  /**
+   * Return a short version to be used in other classes toStringMethods. Should return just the
+   * necessary information for a human to identify the place in a given the context.
+   */
+  public String toStringShort() {
+    StringBuilder buf = new StringBuilder(name.toString());
+    if (stop != null) {
+      buf.append(" (").append(stop.getId()).append(")");
+    } else {
+      buf.append(" ").append(coordinate.toString());
+    }
+
+    return buf.toString();
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(Place.class)
+      .addStr("name", name.toString())
+      .addObj("stop", stop)
+      .addObj("coordinate", coordinate)
+      .addEnum("vertexType", vertexType)
+      .addObj("vehicleRentalPlace", vehicleRentalPlace)
+      .addObj("vehicleParkingEntrance", vehicleParkingWithEntrance)
+      .toString();
   }
 }

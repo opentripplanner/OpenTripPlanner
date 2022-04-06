@@ -53,13 +53,13 @@ public interface GroupId<T extends GroupId<T>> {
   boolean match(T other);
 
   /**
-   * There are cases where two groupIds A and B is no symmetrical. Let say A can be used as
-   * a group-id for both itinerary I and II, but B is only valid as a groupId for II. Then
-   * this method should return A for both: {@code  A.merge(B)} and {@code B.merge(A)}. If both
-   * group-ids can be used or are identical, any of them can be returned.
+   * There are cases where two groupIds A and B is no symmetrical. Let say A can be used as a
+   * group-id for both itinerary I and II, but B is only valid as a groupId for II. Then this method
+   * should return A for both: {@code  A.merge(B)} and {@code B.merge(A)}. If both group-ids can be
+   * used or are identical, any of them can be returned.
    * <p>
-   * The reason why we need this is best explained with an example: We want to group by the
-   * legs that pose 80% of the distance traveled. We have the following possible itineraries:
+   * The reason why we need this is best explained with an example: We want to group by the legs
+   * that pose 80% of the distance traveled. We have the following possible itineraries:
    * <pre>
    *   I : Origin ~ Bus A 100 km ~ Destination
    *  II : Origin ~ Bus B 15 km ~ Bus A 85 km ~ Destination
@@ -73,12 +73,12 @@ public interface GroupId<T extends GroupId<T>> {
    * III : "AB"   // A (75%) is longer; hence comes first and than B (25%) > 80%
    *  IV : "AD"   // A is longer, then D
    * </pre>
-   * So all of these trips have the same main part "A" and we want to group them together.
-   * We do so by comparing the keys, if one is a prefix of another then they belong to the same
-   * group. But what about III and IV? By them self they are not the same group, but if we use
-   * the groupId for A or B ad a key to the group, both fall into the same group. So, to be
-   * deterministic we use this {@code merge(..)} method to return the group-id that is the
-   * most general one - the id able to represent the biggest set of trips.
+   * So all of these trips have the same main part "A" and we want to group them together. We do so
+   * by comparing the keys, if one is a prefix of another then they belong to the same group. But
+   * what about III and IV? By them self they are not the same group, but if we use the groupId for
+   * A or B ad a key to the group, both fall into the same group. So, to be deterministic we use
+   * this {@code merge(..)} method to return the group-id that is the most general one - the id able
+   * to represent the biggest set of trips.
    */
   T merge(T other);
 }

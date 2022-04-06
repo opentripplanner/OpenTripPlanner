@@ -23,6 +23,7 @@ public class ServiceCalendarDateMapperTest {
   private static final ServiceDate DATE = new ServiceDate(2017, 10, 15);
 
   private static final int EXCEPTION_TYPE = 2;
+  private final ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
 
   static {
     SERVICE_DATE.setId(ID);
@@ -30,8 +31,6 @@ public class ServiceCalendarDateMapperTest {
     SERVICE_DATE.setExceptionType(EXCEPTION_TYPE);
     SERVICE_DATE.setServiceId(AGENCY_AND_ID);
   }
-
-  private final ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
 
   @Test
   public void testMapCollection() {

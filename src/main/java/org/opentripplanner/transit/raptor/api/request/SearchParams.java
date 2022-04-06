@@ -9,8 +9,8 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 /**
- * The responsibility of this class is to encapsulate a Range Raptor travel request
- * search parameters.
+ * The responsibility of this class is to encapsulate a Range Raptor travel request search
+ * parameters.
  */
 public class SearchParams {
 
@@ -22,8 +22,8 @@ public class SearchParams {
    * cases/system happens when DST is adjusted.
    * <p>
    * We do not use {@link Integer#MIN_VALUE} because this could potentially lead to overflow
-   * situations which would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
-   * number - not an exception.
+   * situations which would be very hard to debug. Add -1 to MIN_VALUE and you get a positive number
+   * - not an exception.
    */
   public static final int TIME_NOT_SET = -9_999_999;
 
@@ -72,10 +72,6 @@ public class SearchParams {
     this.egressPaths = List.copyOf(builder.egressPaths());
   }
 
-  static SearchParams defaults() {
-    return new SearchParams();
-  }
-
   /**
    * TODO OTP2 Cleanup doc:
    * The beginning of the departure window, in seconds since midnight. Inclusive.
@@ -87,7 +83,6 @@ public class SearchParams {
    * <p/>
    * Required. Must be a positive integer, seconds since midnight(transit service time).
    * Required for 'depart after'. Must be a positive integer, seconds since midnight(transit service time).
-   *
    */
   public int earliestDepartureTime() {
     return earliestDepartureTime;
@@ -141,17 +136,17 @@ public class SearchParams {
   }
 
   /**
-   * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is
-   * required if this parameter is set. This parameter is not allowed if the
-   * {@link #timetableEnabled} is enabled.
+   * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is required
+   * if this parameter is set. This parameter is not allowed if the {@link #timetableEnabled} is
+   * enabled.
    */
   public boolean preferLateArrival() {
     return preferLateArrival;
   }
 
   /**
-   * RangeRaptor is designed to search until the destination is reached and then
-   * {@code numberOfAdditionalTransfers} more rounds.
+   * RangeRaptor is designed to search until the destination is reached and then {@code
+   * numberOfAdditionalTransfers} more rounds.
    * <p/>
    * The default value is 5.
    */
@@ -163,8 +158,7 @@ public class SearchParams {
    * This is an absolute limit to the number of transfers. The preferred way to limit the transfers
    * is to use the {@link #numberOfAdditionalTransfers()}.
    * <p/>
-   * The default is to use the limit in the tuning parameters
-   * {@link RaptorTuningParameters#maxNumberOfTransfers()}.
+   * The default is to use the limit in the tuning parameters {@link RaptorTuningParameters#maxNumberOfTransfers()}.
    */
   public int maxNumberOfTransfers() {
     return maxNumberOfTransfers;
@@ -175,11 +169,12 @@ public class SearchParams {
   }
 
   /**
-   * This accept none optimal trips if they are close enough - if and only if they represent an optimal path
-   * for their given iteration. I other words this slack only relax the pareto comparison at the destination.
+   * This accept none optimal trips if they are close enough - if and only if they represent an
+   * optimal path for their given iteration. I other words this slack only relax the pareto
+   * comparison at the destination.
    * <p/>
-   * Let {@code c} be the existing minimum pareto optimal cost to to beat. Then a trip with cost {@code c'}
-   * is accepted if the following is true:
+   * Let {@code c} be the existing minimum pareto optimal cost to to beat. Then a trip with cost
+   * {@code c'} is accepted if the following is true:
    * <pre>
    * c' < Math.round(c * relaxCostAtDestination)
    * </pre>
@@ -195,14 +190,13 @@ public class SearchParams {
   }
 
   /**
-   * Time table allow a Journey to be included in the result if it depart from the origin
-   * AFTER another Journey, even if the first departure have lower cost, number of transfers,
-   * and shorter travel time. For two Journeys that depart at the same time only the best one
-   * will be included (both if they are mutually dominating each other).
+   * Time table allow a Journey to be included in the result if it depart from the origin AFTER
+   * another Journey, even if the first departure have lower cost, number of transfers, and shorter
+   * travel time. For two Journeys that depart at the same time only the best one will be included
+   * (both if they are mutually dominating each other).
    * <p/>
-   * Setting this parameter to "TRUE" will increase the number of paths returned. The
-   * performance impact is small since the check only affect the pareto check at the
-   * destination.
+   * Setting this parameter to "TRUE" will increase the number of paths returned. The performance
+   * impact is small since the check only affect the pareto check at the destination.
    * <p/>
    * The default value is FALSE.
    */
@@ -211,9 +205,9 @@ public class SearchParams {
   }
 
   /**
-   * If enabled guaranteed transfers are used during routing, if not they are ignored.
-   * Some of the profiles do not support guaranteed transfers, for these profiles this
-   * flag is ignored. Transfers are supported for all profiles returning paths.
+   * If enabled guaranteed transfers are used during routing, if not they are ignored. Some of the
+   * profiles do not support guaranteed transfers, for these profiles this flag is ignored.
+   * Transfers are supported for all profiles returning paths.
    */
   public boolean constrainedTransfersEnabled() {
     return constrainedTransfersEnabled;
@@ -231,8 +225,8 @@ public class SearchParams {
   /**
    * List of all possible egress paths to reach the destination using the street network.
    * <p>
-   * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path
-   * start, NOT the destination - think of it as a reversed path.
+   * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path start, NOT the
+   * destination - think of it as a reversed path.
    * <p/>
    * Required, at least one egress path must exist.
    */
@@ -251,17 +245,16 @@ public class SearchParams {
   }
 
   @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(SearchParams.class)
-      .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
-      .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
-      .addDurationSec("searchWindow", searchWindowInSeconds)
-      .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
-      .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
-      .addCollection("accessPaths", accessPaths, 5)
-      .addCollection("egressPaths", egressPaths, 5)
-      .toString();
+  public int hashCode() {
+    return Objects.hash(
+      earliestDepartureTime,
+      latestArrivalTime,
+      searchWindowInSeconds,
+      preferLateArrival,
+      accessPaths,
+      egressPaths,
+      numberOfAdditionalTransfers
+    );
   }
 
   @Override
@@ -285,16 +278,21 @@ public class SearchParams {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(
-      earliestDepartureTime,
-      latestArrivalTime,
-      searchWindowInSeconds,
-      preferLateArrival,
-      accessPaths,
-      egressPaths,
-      numberOfAdditionalTransfers
-    );
+  public String toString() {
+    return ToStringBuilder
+      .of(SearchParams.class)
+      .addServiceTime("earliestDepartureTime", earliestDepartureTime, TIME_NOT_SET)
+      .addServiceTime("latestArrivalTime", latestArrivalTime, TIME_NOT_SET)
+      .addDurationSec("searchWindow", searchWindowInSeconds)
+      .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
+      .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+      .addCollection("accessPaths", accessPaths, 5)
+      .addCollection("egressPaths", egressPaths, 5)
+      .toString();
+  }
+
+  static SearchParams defaults() {
+    return new SearchParams();
   }
 
   /* private methods */

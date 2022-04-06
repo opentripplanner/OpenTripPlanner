@@ -14,9 +14,8 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 
 /**
- * A map from any TransferPoint to an instances of type E. This is used to look up
- * entities by trip and stop. The {@link TransferPoint} class only plays a role when the map is
- * created.
+ * A map from any TransferPoint to an instances of type E. This is used to look up entities by trip
+ * and stop. The {@link TransferPoint} class only plays a role when the map is created.
  */
 class TransferPointMap<E> {
 

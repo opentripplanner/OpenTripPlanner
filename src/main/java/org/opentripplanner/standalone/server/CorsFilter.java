@@ -13,17 +13,15 @@ import javax.ws.rs.core.Response;
  * The Same Origin Policy states that JavaScript code (or other scripts) running on a web page may
  * not interact with resources originating from sites with a different hostname, protocol, or port
  * number.
- *
+ * <p>
  * We used to use JSONP ("JSON with padding") as a way to get around this. Despite being very
- * common, this is of course a big hack to defeat a security policy. Modern
- * browsers respect "Cross Origin Resource Sharing" (CORS) headers, so we
- * have switched to that system.
+ * common, this is of course a big hack to defeat a security policy. Modern browsers respect "Cross
+ * Origin Resource Sharing" (CORS) headers, so we have switched to that system.
  */
 class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
   /**
-   * CORS request filter.
-   * Hijack "preflight" OPTIONS requests before the Jersey resources get them.
+   * CORS request filter. Hijack "preflight" OPTIONS requests before the Jersey resources get them.
    * The response will then pass through the CORS response filter on its way back out.
    */
   @Override
@@ -46,9 +44,8 @@ class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
   }
 
   /**
-   * CORS response filter. Allow requests from anywhere.
-   * Just echo back the contents of the Origin header.
-   * Allow credentials if the transport layer is secure.
+   * CORS response filter. Allow requests from anywhere. Just echo back the contents of the Origin
+   * header. Allow credentials if the transport layer is secure.
    */
   @Override
   public void filter(ContainerRequestContext request, ContainerResponseContext response)

@@ -2,7 +2,6 @@ package org.opentripplanner.ext.transmodelapi;
 
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
-import graphql.GraphQLException;
 import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;

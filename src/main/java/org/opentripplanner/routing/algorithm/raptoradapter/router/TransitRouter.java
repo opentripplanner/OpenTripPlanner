@@ -66,6 +66,23 @@ public class TransitRouter {
     this.debugTimingAggregator = debugTimingAggregator;
   }
 
+  public static TransitRouterResult route(
+    RoutingRequest request,
+    Router router,
+    ZonedDateTime transitSearchTimeZero,
+    AdditionalSearchDays additionalSearchDays,
+    DebugTimingAggregator debugTimingAggregator
+  ) {
+    var transitRouter = new TransitRouter(
+      request,
+      router,
+      transitSearchTimeZero,
+      additionalSearchDays,
+      debugTimingAggregator
+    );
+    return transitRouter.route();
+  }
+
   private TransitRouterResult route() {
     if (request.modes.transitModes.isEmpty()) {
       return new TransitRouterResult(List.of(), null);
@@ -272,8 +289,8 @@ public class TransitRouter {
   }
 
   /**
-   * If no paths or search window is found, we assume there is no transit connection between
-   * the origin and destination.
+   * If no paths or search window is found, we assume there is no transit connection between the
+   * origin and destination.
    */
   private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
     int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
@@ -282,22 +299,5 @@ public class TransitRouter {
         List.of(new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null))
       );
     }
-  }
-
-  public static TransitRouterResult route(
-    RoutingRequest request,
-    Router router,
-    ZonedDateTime transitSearchTimeZero,
-    AdditionalSearchDays additionalSearchDays,
-    DebugTimingAggregator debugTimingAggregator
-  ) {
-    var transitRouter = new TransitRouter(
-      request,
-      router,
-      transitSearchTimeZero,
-      additionalSearchDays,
-      debugTimingAggregator
-    );
-    return transitRouter.route();
   }
 }

@@ -43,6 +43,7 @@ public class PathwayNodeMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
+  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_NODE);
@@ -59,8 +60,6 @@ public class PathwayNodeMapperTest {
     STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
     STOP.setZoneId(ZONE_ID);
   }
-
-  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() throws Exception {

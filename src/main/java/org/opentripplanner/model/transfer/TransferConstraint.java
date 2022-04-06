@@ -34,15 +34,14 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   /**
    * GUARANTIED is not a priority, but we assign a cost to it to be able to compare it with other
    * transfers with a priority. The cost is better than a pure prioritized transfer, but the
-   * priority and GUARANTIED attribute is added together; Hence a (GUARANTIED, RECOMMENDED)
-   * transfer is better than (GUARANTIED, ALLOWED).
+   * priority and GUARANTIED attribute is added together; Hence a (GUARANTIED, RECOMMENDED) transfer
+   * is better than (GUARANTIED, ALLOWED).
    */
   private static final int GUARANTIED_TRANSFER_COST = 20_00;
 
   /**
-   * A cost penalty of 10 points is added to a Transfer which is NOT stay-seated or guaranteed.
-   * This makes sure that stay-seated and guaranteed transfers take precedence over the priority
-   * cost.
+   * A cost penalty of 10 points is added to a Transfer which is NOT stay-seated or guaranteed. This
+   * makes sure that stay-seated and guaranteed transfers take precedence over the priority cost.
    */
   private static final int NONE_FACILITATED_COST = 30_00;
 
@@ -57,8 +56,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   public static final int ZERO_COST = 0;
 
   /**
-   * Used with {@link #getMaxWaitTime()} and {@link #getMinTransferTime()} to indicate
-   * the parameter is not available.
+   * Used with {@link #getMaxWaitTime()} and {@link #getMinTransferTime()} to indicate the parameter
+   * is not available.
    */
   public static final int NOT_SET = -1;
 
@@ -92,6 +91,31 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   }
 
   /**
+   * Calculate a cost for prioritizing transfers in a path, to select the best path with respect to
+   * transfers. This cost is not related in any way to the path generalized-cost. It takes only the
+   * transfer constraint attributes in consideration.
+   * <p>
+   * When comparing paths that ride the same trips, this can be used to find the optimal places to
+   * do the transfers. The cost is created to prioritize the following:
+   * <ol>
+   *     <li>{@code stay-seated} - cost: 10 points</li>
+   *     <li>{@code guaranteed} - cost: 20 points</li>
+   *     <li>None facilitated  - cost: 30 points</li>
+   * </ol>
+   * In addition, the {@code priority} cost is added. See {@link TransferPriority#cost()}.
+   *
+   * @param c The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
+   *          street generated transfer.
+   */
+  public static int cost(@Nullable TransferConstraint c) {
+    return c == null ? DEFAULT_COST : c.cost();
+  }
+
+  public static Builder create() {
+    return new Builder();
+  }
+
+  /**
    * @see #cost(TransferConstraint)
    */
   public int cost() {
@@ -102,31 +126,24 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     return priority;
   }
 
-  /**
-   * Also known as interlining of GTFS trips with the same block id.
-   */
-  public boolean isStaySeated() {
-    return staySeated;
-  }
-
   public boolean isGuaranteed() {
     return guaranteed;
   }
 
   /**
-   * A facilitated transfer is allowed even if there might not be enough time to walk or
-   * if the alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
+   * A facilitated transfer is allowed even if there might not be enough time to walk or if the
+   * alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
    * <p>
-   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
-   * is either stay-seated or guaranteed. High priority transfers are not facilitated.
+   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer is
+   * either stay-seated or guaranteed. High priority transfers are not facilitated.
    */
   public boolean isFacilitated() {
     return staySeated || guaranteed;
   }
 
   /**
-   * This switch enables transfers in Raptor, ignoring transfer constraints with for example
-   * only priority set.
+   * This switch enables transfers in Raptor, ignoring transfer constraints with for example only
+   * priority set.
    */
   public boolean includeInRaptorRouting() {
     return includeInRaptorRouting;
@@ -145,8 +162,15 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   }
 
   /**
-   * Maximum time after scheduled departure time the connecting transport is guarantied to wait
-   * for the delayed trip.
+   * Also known as interlining of GTFS trips with the same block id.
+   */
+  public boolean isStaySeated() {
+    return staySeated;
+  }
+
+  /**
+   * Maximum time after scheduled departure time the connecting transport is guarantied to wait for
+   * the delayed trip.
    * <p>
    * THIS IS NOT CONSIDERED IN RAPTOR. OTP relies on real-time data for this, so if the "from"
    * vehicle is delayed, then the real time system is also responsible for propagating the delay
@@ -157,12 +181,12 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   }
 
   /**
-   * The min-transfer-time specify lower bound for the transfer time.
-   * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch}
+   * The min-transfer-time specify lower bound for the transfer time. {@link
+   * org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch}
    * uses this to make sure at least the amount of seconds specified is available to do the
-   * transfer. If the path transfer takes more time than specified by the
-   * {@code min-transfer-time} then the path transfer is used. Normal slack parameters are added
-   * to the path transfer, but not to the {@code min-transfer-time}.
+   * transfer. If the path transfer takes more time than specified by the {@code min-transfer-time}
+   * then the path transfer is used. Normal slack parameters are added to the path transfer, but not
+   * to the {@code min-transfer-time}.
    */
   public int getMinTransferTime() {
     return minTransferTime;
@@ -210,30 +234,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   }
 
   /**
-   * Calculate a cost for prioritizing transfers in a path, to select the best path with respect to
-   * transfers. This cost is not related in any way to the path generalized-cost. It takes only the
-   * transfer constraint attributes in consideration.
-   * <p>
-   * When comparing paths that ride the same trips, this can be used to find the optimal places to
-   * do the transfers. The cost is created to prioritize the following:
-   * <ol>
-   *     <li>{@code stay-seated} - cost: 10 points</li>
-   *     <li>{@code guaranteed} - cost: 20 points</li>
-   *     <li>None facilitated  - cost: 30 points</li>
-   * </ol>
-   * In addition, the {@code priority} cost is added. See {@link TransferPriority#cost()}.
-   *
-   * @param c The transfer to return a cost for, or {@code null} if the transfer is a regular OSM
-   *          street generated transfer.
-   */
-  public static int cost(@Nullable TransferConstraint c) {
-    return c == null ? DEFAULT_COST : c.cost();
-  }
-
-  /**
-   * Return a cost for stay-seated, guaranteed or none-facilitated transfers. This is
-   * used to prioritize stay-seated over guaranteed, and guaranteed over non-facilitated
-   * transfers.
+   * Return a cost for stay-seated, guaranteed or none-facilitated transfers. This is used to
+   * prioritize stay-seated over guaranteed, and guaranteed over non-facilitated transfers.
    */
   private int facilitatedCost() {
     if (staySeated) {
@@ -247,10 +249,6 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
   private boolean isMaxWaitTimeSet() {
     return maxWaitTime != NOT_SET;
-  }
-
-  public static Builder create() {
-    return new Builder();
   }
 
   public static class Builder {

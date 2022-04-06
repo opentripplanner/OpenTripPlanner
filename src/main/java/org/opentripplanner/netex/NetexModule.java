@@ -20,11 +20,9 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 
 /**
- * This module is used for importing the NeTEx CEN Technical Standard for exchanging
- * Public Transport schedules and related data
- * (<a href="http://netex-cen.eu/">http://netex-cen.eu/</a>). Currently it only supports the
- * Norwegian profile
- * (<a href="https://enturas.atlassian.net/wiki/spaces/PUBLIC/">https://enturas.atlassian.net/wiki/spaces/PUBLIC/</a>),
+ * This module is used for importing the NeTEx CEN Technical Standard for exchanging Public
+ * Transport schedules and related data (<a href="http://netex-cen.eu/">http://netex-cen.eu/</a>).
+ * Currently it only supports the Norwegian profile (<a href="https://enturas.atlassian.net/wiki/spaces/PUBLIC/">https://enturas.atlassian.net/wiki/spaces/PUBLIC/</a>),
  * but it is intended to be updated later to support other profiles.
  */
 public class NetexModule implements GraphBuilderModule {

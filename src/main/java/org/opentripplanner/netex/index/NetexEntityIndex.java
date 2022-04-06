@@ -37,31 +37,32 @@ import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
 
 /**
- * This class holds indexes of Netex objects for lookup during the NeTEx import using the
- * {@link NetexEntityIndexReadOnlyView}.
+ * This class holds indexes of Netex objects for lookup during the NeTEx import using the {@link
+ * NetexEntityIndexReadOnlyView}.
  * <p>
- * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared data</em>,
- * and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to avoid keeping everything
- * in memory and to be able to override values in a more specific(lower) level.
+ * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared
+ * data</em>, and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to
+ * avoid keeping everything in memory and to be able to override values in a more specific(lower)
+ * level.
  * <p>
- * There is one instance of this class for <em>shard data</em> - the ROOT.
- * For each <em>group of shared data</em> a new {@code NetexImportDataIndex} is created with the ROOT as a
- * parent. When such <em>group of shared data</em> is not needed any more it is discard and become
- * ready for garbage collection.
- * For each <em>single files</em> a new {@code NetexImportDataIndex} is created with the corresponding
+ * There is one instance of this class for <em>shard data</em> - the ROOT. For each <em>group of
+ * shared data</em> a new {@code NetexImportDataIndex} is created with the ROOT as a parent. When
+ * such <em>group of shared data</em> is not needed any more it is discard and become ready for
+ * garbage collection. For each <em>single files</em> a new {@code NetexImportDataIndex} is created
+ * with the corresponding
  * <em>group of shared data</em> as parent. The <em>single files</em> object is thrown away when
  * the file is loaded.
  * <p>
- * This hierarchy make it possible to override values in child instances of the {@code NetexImportDataIndex}
- * and save memory during the load operation, because data not needed any more can be thrown away.
+ * This hierarchy make it possible to override values in child instances of the {@code
+ * NetexImportDataIndex} and save memory during the load operation, because data not needed any more
+ * can be thrown away.
  * <p>
- * The hierarchy implementation is delegated to the
- * {@link org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap} and the
- * {@link HierarchicalElement} classes.
+ * The hierarchy implementation is delegated to the {@link org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap}
+ * and the {@link HierarchicalElement} classes.
  * <p/>
- * The mapping code should not insert entities, so an instance of this class implements the
- * {@link NetexEntityIndexReadOnlyView} which is passed to the mapping code for translation into
- * OTP domain model objects.
+ * The mapping code should not insert entities, so an instance of this class implements the {@link
+ * NetexEntityIndexReadOnlyView} which is passed to the mapping code for translation into OTP domain
+ * model objects.
  */
 public class NetexEntityIndex {
 
@@ -145,6 +146,7 @@ public class NetexEntityIndex {
 
   /**
    * Create a child node.
+   *
    * @param parent can not be <code>null</code>.
    */
   public NetexEntityIndex(NetexEntityIndex parent) {
@@ -186,8 +188,8 @@ public class NetexEntityIndex {
 
   /**
    * Prepare to for indexing of a new sub-level of entities(shared-files, shared-group-files and
-   * group-files). This is a life-cycle method used to notify this class that a new dataset is
-   * about to be processed. Any existing intermediate state must be saved(pushed down the stack).
+   * group-files). This is a life-cycle method used to notify this class that a new dataset is about
+   * to be processed. Any existing intermediate state must be saved(pushed down the stack).
    */
   public NetexEntityIndex push() {
     return new NetexEntityIndex(this);
@@ -317,13 +319,13 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef() {
-        return flexibleStopPlaceByStopPointRef;
+      public ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef() {
+        return quayIdByStopPointRef;
       }
 
       @Override
-      public ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef() {
-        return quayIdByStopPointRef;
+      public ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef() {
+        return flexibleStopPlaceByStopPointRef;
       }
 
       @Override
@@ -357,13 +359,13 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public String getTimeZone() {
-        return timeZone.get();
+      public ReadOnlyHierarchicalMapById<Branding> getBrandingById() {
+        return brandingById;
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<Branding> getBrandingById() {
-        return brandingById;
+      public String getTimeZone() {
+        return timeZone.get();
       }
     };
   }

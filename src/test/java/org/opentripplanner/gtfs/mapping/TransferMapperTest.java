@@ -49,6 +49,14 @@ public class TransferMapperTest {
   private static final Transfer TRANSFER = new Transfer();
 
   private static final DataImportIssueStore issueStore = new DataImportIssueStore(true);
+  private final TransferMapper subject = new TransferMapper(
+    ROUTE_MAPPER,
+    STATION_MAPPER,
+    STOP_MAPPER,
+    TRIP_MAPPER,
+    new TripStopTimes(),
+    issueStore
+  );
 
   static {
     FROM_ROUTE.setId(AGENCY_AND_ID);
@@ -68,15 +76,6 @@ public class TransferMapperTest {
     TRANSFER.setMinTransferTime(MIN_TRANSFER_TIME);
     TRANSFER.setTransferType(TRANSFER_TYPE);
   }
-
-  private final TransferMapper subject = new TransferMapper(
-    ROUTE_MAPPER,
-    STATION_MAPPER,
-    STOP_MAPPER,
-    TRIP_MAPPER,
-    new TripStopTimes(),
-    issueStore
-  );
   /*
     @Test
     public void testMapCollection() throws Exception {

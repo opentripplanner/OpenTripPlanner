@@ -65,33 +65,6 @@ public class RoutingResponseMapper {
     );
   }
 
-  @Nullable
-  private static TripSearchMetadata createTripSearchMetadata(
-    RoutingRequest request,
-    SearchParams searchParams,
-    Itinerary firstRemovedItinerary
-  ) {
-    if (searchParams == null) {
-      return null;
-    }
-
-    Instant reqTime = request.getDateTime();
-
-    if (request.arriveBy) {
-      return TripSearchMetadata.createForArriveBy(
-        reqTime,
-        searchParams.searchWindowInSeconds(),
-        firstRemovedItinerary == null ? null : firstRemovedItinerary.endTime().toInstant()
-      );
-    } else {
-      return TripSearchMetadata.createForDepartAfter(
-        reqTime,
-        searchParams.searchWindowInSeconds(),
-        firstRemovedItinerary == null ? null : firstRemovedItinerary.startTime().toInstant()
-      );
-    }
-  }
-
   public static PageCursorFactory mapIntoPageCursorFactory(
     SortOrder sortOrder,
     ZonedDateTime transitSearchTimeZero,
@@ -127,6 +100,33 @@ public class RoutingResponseMapper {
     }
 
     return factory;
+  }
+
+  @Nullable
+  private static TripSearchMetadata createTripSearchMetadata(
+    RoutingRequest request,
+    SearchParams searchParams,
+    Itinerary firstRemovedItinerary
+  ) {
+    if (searchParams == null) {
+      return null;
+    }
+
+    Instant reqTime = request.getDateTime();
+
+    if (request.arriveBy) {
+      return TripSearchMetadata.createForArriveBy(
+        reqTime,
+        searchParams.searchWindowInSeconds(),
+        firstRemovedItinerary == null ? null : firstRemovedItinerary.endTime().toInstant()
+      );
+    } else {
+      return TripSearchMetadata.createForDepartAfter(
+        reqTime,
+        searchParams.searchWindowInSeconds(),
+        firstRemovedItinerary == null ? null : firstRemovedItinerary.startTime().toInstant()
+      );
+    }
   }
 
   private static void logPagingInformation(

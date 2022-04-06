@@ -103,7 +103,6 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
   /**
    * Detailed testing of OSM graph building using a very small chunk of NYC (SOHO-ish).
-   * @throws Exception
    */
   @Test
   public void testBuildGraphDetailed() throws Exception {
@@ -152,57 +151,6 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         fail();
       }
       edgeEndpoints.add(endpoints);
-    }
-  }
-
-  /**
-   * This reads test file with area
-   * and tests if it can be routed if visibility is used and if it isn't
-   *
-   * Routing needs to be successful in both options since without visibility calculation
-   * area rings are used.
-   * @param skipVisibility if true visibility calculations are skipped
-   * @throws UnsupportedEncodingException
-   */
-  private void testBuildingAreas(boolean skipVisibility) throws UnsupportedEncodingException {
-    Graph graph = new Graph();
-
-    OpenStreetMapModule loader = new OpenStreetMapModule();
-    loader.skipVisibility = skipVisibility;
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-
-    File file = new File(
-      URLDecoder.decode(
-        getClass().getResource("usf_area.osm.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
-
-    loader.setProvider(provider);
-
-    loader.buildGraph(graph, extra);
-    graph.getStreetIndex();
-
-    Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
-
-    RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
-
-    //This are vertices that can be connected only over edges on area (with correct permissions)
-    //It tests if it is possible to route over area without visibility calculations
-    Vertex bottomV = graph.getVertex("osm:node:580290955");
-    Vertex topV = graph.getVertex("osm:node:559271124");
-
-    RoutingContext routingContext = new RoutingContext(request, router.graph, bottomV, topV);
-
-    GraphPathFinder graphPathFinder = new GraphPathFinder(router);
-    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
-
-    assertNotNull(pathList);
-    assertFalse(pathList.isEmpty());
-    for (GraphPath path : pathList) {
-      assertFalse(path.states.isEmpty());
     }
   }
 
@@ -326,6 +274,57 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
     );
 
     assertEquals("Kreuzung first mit second", localizedString.toString(new Locale("de")));
+  }
+
+  /**
+   * This reads test file with area and tests if it can be routed if visibility is used and if it
+   * isn't
+   * <p>
+   * Routing needs to be successful in both options since without visibility calculation area rings
+   * are used.
+   *
+   * @param skipVisibility if true visibility calculations are skipped
+   */
+  private void testBuildingAreas(boolean skipVisibility) throws UnsupportedEncodingException {
+    Graph graph = new Graph();
+
+    OpenStreetMapModule loader = new OpenStreetMapModule();
+    loader.skipVisibility = skipVisibility;
+    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+
+    File file = new File(
+      URLDecoder.decode(
+        getClass().getResource("usf_area.osm.pbf").getFile(),
+        StandardCharsets.UTF_8
+      )
+    );
+    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+
+    loader.setProvider(provider);
+
+    loader.buildGraph(graph, extra);
+    graph.getStreetIndex();
+
+    Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
+
+    RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
+
+    //This are vertices that can be connected only over edges on area (with correct permissions)
+    //It tests if it is possible to route over area without visibility calculations
+    Vertex bottomV = graph.getVertex("osm:node:580290955");
+    Vertex topV = graph.getVertex("osm:node:559271124");
+
+    RoutingContext routingContext = new RoutingContext(request, router.graph, bottomV, topV);
+
+    GraphPathFinder graphPathFinder = new GraphPathFinder(router);
+    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
+
+    assertNotNull(pathList);
+    assertFalse(pathList.isEmpty());
+    for (GraphPath path : pathList) {
+      assertFalse(path.states.isEmpty());
+    }
   }
   // disabled pending discussion with author (AMB)
   // @Test

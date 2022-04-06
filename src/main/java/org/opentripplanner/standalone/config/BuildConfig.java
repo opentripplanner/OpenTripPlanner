@@ -54,13 +54,13 @@ public class BuildConfig {
   private final JsonNode rawJson;
 
   /**
-   * The config-version is a parameter which each OTP deployment may set to be able to
-   * query the OTP server and verify that it uses the correct version of the config. The
-   * version must be injected into the config in the operation deployment pipeline. How this
-   * is done is up to the deployment.
+   * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
+   * server and verify that it uses the correct version of the config. The version must be injected
+   * into the config in the operation deployment pipeline. How this is done is up to the
+   * deployment.
    * <p>
-   * The config-version have no effect on OTP, and is provided as is on the API. There is
-   * no syntax or format check on the version and it can be any string.
+   * The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+   * or format check on the version and it can be any string.
    * <p>
    * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
    * <p>
@@ -69,14 +69,14 @@ public class BuildConfig {
   public final String configVersion;
 
   /**
-   * Generates nice HTML report of Graph errors/warnings. They are stored in the same location
-   * as the graph.
+   * Generates nice HTML report of Graph errors/warnings. They are stored in the same location as
+   * the graph.
    */
   public final boolean dataImportReport;
 
   /**
-   * If the number of issues is larger then {@code #maxDataImportIssuesPerFile}, then the files
-   * will be split in multiple files. Since browsers have problems opening large HTML files.
+   * If the number of issues is larger then {@code #maxDataImportIssuesPerFile}, then the files will
+   * be split in multiple files. Since browsers have problems opening large HTML files.
    */
   public final int maxDataImportIssuesPerFile;
 
@@ -96,8 +96,8 @@ public class BuildConfig {
   public final boolean stationTransfers;
 
   /**
-   * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
-   * Perhaps this should be a runtime router parameter rather than a graph build parameter.
+   * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the
+   * street. Perhaps this should be a runtime router parameter rather than a graph build parameter.
    */
   public final double subwayAccessTime;
 
@@ -107,7 +107,8 @@ public class BuildConfig {
   public final boolean streets;
 
   /**
-   * Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.
+   * Embed the Router config in the graph, which allows it to be sent to a server fully configured
+   * over the wire.
    */
   public final boolean embedRouterConfig;
 
@@ -131,8 +132,8 @@ public class BuildConfig {
 
   /**
    * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
-   * are defined in meters in the source data. If, for example, decimetres are used in the source data,
-   * this should be set to 0.1.
+   * are defined in meters in the source data. If, for example, decimetres are used in the source
+   * data, this should be set to 0.1.
    */
   public final double elevationUnitMultiplier;
 
@@ -152,112 +153,129 @@ public class BuildConfig {
   public final WayPropertySetSource osmWayPropertySet;
 
   /**
-   * When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS,
-   * one for WAYS and last one for NODES. Instead of reading the data source 3 times it might be
-   * faster to cache the entire osm file im memory. The trade off is of cause that OTP might use
-   * more memory while loading osm data. You can use this parameter to choose what is best for
-   * your deployment depending on your infrastructure. Set the parameter to {@code true} to cache
-   * the data, and to {@code false} to read the stream from the source each time. The default
-   * value is {@code false}.
+   * When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
+   * for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
+   * to cache the entire osm file im memory. The trade off is of cause that OTP might use more
+   * memory while loading osm data. You can use this parameter to choose what is best for your
+   * deployment depending on your infrastructure. Set the parameter to {@code true} to cache the
+   * data, and to {@code false} to read the stream from the source each time. The default value is
+   * {@code false}.
    */
   public final boolean osmCacheDataInMem;
-
   /**
-   * Whether we should create car P+R stations from OSM data.
-   */
-  public boolean staticParkAndRide;
-
-  /**
-   * Whether we should create bike P+R stations from OSM data.
-   */
-  public boolean staticBikeParkAndRide;
-
-  /**
-   * Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle
-   */
-  public int maxInterlineDistance;
-
-  /**
-   * This field indicates the pruning threshold for islands without stops.
-   * Any such island under this size will be pruned.
+   * This field indicates the pruning threshold for islands without stops. Any such island under
+   * this size will be pruned.
    */
   public final int pruningThresholdIslandWithoutStops;
-
   /**
-   * This field indicates the pruning threshold for islands with stops.
-   * Any such island under this size will be pruned.
+   * This field indicates the pruning threshold for islands with stops. Any such island under this
+   * size will be pruned.
    */
   public final int pruningThresholdIslandWithStops;
-
   /**
-   * This field indicates whether walking should be allowed on OSM ways
-   * tagged with "foot=discouraged".
+   * This field indicates whether walking should be allowed on OSM ways tagged with
+   * "foot=discouraged".
    */
   public final boolean banDiscouragedWalking;
-
   /**
-   * This field indicates whether bicycling should be allowed on OSM ways
-   * tagged with "bicycle=discouraged".
+   * This field indicates whether bicycling should be allowed on OSM ways tagged with
+   * "bicycle=discouraged".
    */
   public final boolean banDiscouragedBiking;
-
   /**
    * Transfers up to this duration with the default walk speed value will be pre-calculated and
    * included in the Graph.
    */
   public final double maxTransferDurationSeconds;
-
   /**
-   * This will add extra edges when linking a stop to a platform, to prevent detours along the platform edge.
+   * This will add extra edges when linking a stop to a platform, to prevent detours along the
+   * platform edge.
    */
   public final Boolean extraEdgesStopPlatformLink;
-
   /**
-   * The distance between elevation samples in meters. Defaults to 10m, the approximate resolution of 1/3
-   * arc-second NED data. This should not be smaller than the horizontal resolution of the height data used.
+   * Netex specific build parameters.
+   */
+  public final NetexConfig netex;
+  /**
+   * Otp auto detect input and output files using the command line supplied paths. This parameter
+   * make it possible to override this by specifying a path for each file. All parameters in the
+   * storage section is optional, and the fallback is to use the auto detection. It is OK to
+   * autodetect some file and specify the path to others.
+   */
+  public final StorageConfig storage;
+  public final List<RoutingRequest> transferRequests;
+  /**
+   * Visibility calculations for an area will not be done if there are more nodes than this limit.
+   */
+  public final int maxAreaNodes;
+  /**
+   * Config for the DataOverlay Sandbox module
+   */
+  public final DataOverlayConfig dataOverlay;
+  /**
+   * This field is used for mapping routes geometry shapes. It determines max distance between shape
+   * points and their stop sequence. If mapper can not find any stops within this radius it will
+   * default to simple stop-to-stop geometry instead.
+   */
+  public final double maxStopToShapeSnapDistance;
+  /**
+   * Whether we should create car P+R stations from OSM data.
+   */
+  public boolean staticParkAndRide;
+  /**
+   * Whether we should create bike P+R stations from OSM data.
+   */
+  public boolean staticBikeParkAndRide;
+  /**
+   * Maximal distance between stops in meters that will connect consecutive trips that are made with
+   * same vehicle
+   */
+  public int maxInterlineDistance;
+  /**
+   * The distance between elevation samples in meters. Defaults to 10m, the approximate resolution
+   * of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the
+   * height data used.
    */
   public double distanceBetweenElevationSamples;
-
   /**
-   * The maximum distance to propagate elevation to vertices which have no elevation. By default, this
-   * is 2000 meters.
+   * The maximum distance to propagate elevation to vertices which have no elevation. By default,
+   * this is 2000 meters.
    */
   public double maxElevationPropagationMeters;
-
   /**
-   * When set to true (it is by default), the elevation module will attempt to read this file in order to reuse
-   * calculations of elevation data for various coordinate sequences instead of recalculating them all over again.
+   * When set to true (it is by default), the elevation module will attempt to read this file in
+   * order to reuse calculations of elevation data for various coordinate sequences instead of
+   * recalculating them all over again.
    */
   public boolean readCachedElevations;
-
   /**
-   * When set to true (it is false by default), the elevation module will create a file of a lookup map of the
-   * LineStrings and the corresponding calculated elevation data for those coordinates. Subsequent graph builds can
-   * reuse the data in this file to avoid recalculating all the elevation data again.
+   * When set to true (it is false by default), the elevation module will create a file of a lookup
+   * map of the LineStrings and the corresponding calculated elevation data for those coordinates.
+   * Subsequent graph builds can reuse the data in this file to avoid recalculating all the
+   * elevation data again.
    */
   public boolean writeCachedElevations;
-
   /**
-   * When set to true (it is false by default), the elevation module will include the Ellipsoid to Geiod difference in
-   * the calculations of every point along every StreetWithElevationEdge in the graph.
-   *
-   * NOTE: if this is set to true for graph building, make sure to not set the value of
-   * {@link RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to all of the
-   * elevation values in the street edges.
+   * When set to true (it is false by default), the elevation module will include the Ellipsoid to
+   * Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
+   * graph.
+   * <p>
+   * NOTE: if this is set to true for graph building, make sure to not set the value of {@link
+   * RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to all of
+   * the elevation values in the street edges.
    */
   public boolean includeEllipsoidToGeoidDifference;
-
   /**
-   * Whether or not to multi-thread the elevation calculations in the elevation module. The default is set to false.
-   * For unknown reasons that seem to depend on data and machine settings, it might be faster to use a single
-   * processor. If multi-threading is activated, parallel streams will be used to calculate the elevations.
+   * Whether or not to multi-thread the elevation calculations in the elevation module. The default
+   * is set to false. For unknown reasons that seem to depend on data and machine settings, it might
+   * be faster to use a single processor. If multi-threading is activated, parallel streams will be
+   * used to calculate the elevations.
    */
   public boolean multiThreadElevationCalculations;
-
   /**
    * Limit the import of transit services to the given START date. Inclusive. If set, any transit
-   * service on a day BEFORE the given date is dropped and will not be part of the graph.
-   * Use an absolute date or a period relative to the date the graph is build(BUILD_DAY).
+   * service on a day BEFORE the given date is dropped and will not be part of the graph. Use an
+   * absolute date or a period relative to the date the graph is build(BUILD_DAY).
    * <p>
    * Optional, defaults to "-P1Y" (BUILD_DAY minus 1 year). Use an empty string to make it
    * unbounded.
@@ -269,15 +287,15 @@ public class BuildConfig {
    *     <li>{@code "-P1Y2M"} - BUILD_DAY minus 1 year and 2 months.</li>
    *     <li>{@code ""} - Unlimited, no upper bound.</li>
    * </ul>
+   *
    * @see LocalDate#parse(CharSequence) for date format accepted.
    * @see Period#parse(CharSequence) for period format accepted.
    */
   public LocalDate transitServiceStart;
-
   /**
    * Limit the import of transit services to the given END date. Inclusive. If set, any transit
-   * service on a day AFTER the given date is dropped and will not be part of the graph.
-   * Use an absolute date or a period relative to the date the graph is build(BUILD_DAY).
+   * service on a day AFTER the given date is dropped and will not be part of the graph. Use an
+   * absolute date or a period relative to the date the graph is build(BUILD_DAY).
    * <p>
    * Optional, defaults to "P3Y" (BUILD_DAY plus 3 years). Use an empty string to make it
    * unbounded.
@@ -289,48 +307,17 @@ public class BuildConfig {
    *     <li>{@code "P1Y6M5D"} - BUILD_DAY plus 1 year, 6 months and 5 days.</li>
    *     <li>{@code ""} - Unlimited, no lower bound.</li>
    * </ul>
+   *
    * @see LocalDate#parse(CharSequence) for date format accepted.
    * @see Period#parse(CharSequence) for period format accepted.
    */
   public LocalDate transitServiceEnd;
 
   /**
-   * Netex specific build parameters.
-   */
-  public final NetexConfig netex;
-
-  /**
-   * Otp auto detect input and output files using the command line supplied paths. This parameter
-   * make it possible to override this by specifying a path for each file. All parameters in the
-   * storage section is optional, and the fallback is to use the auto detection. It is OK to
-   * autodetect some file and specify the path to others.
-   */
-  public final StorageConfig storage;
-
-  public final List<RoutingRequest> transferRequests;
-
-  /**
-   * Visibility calculations for an area will not be done if there are more nodes than this limit.
-   */
-  public final int maxAreaNodes;
-
-  /**
-   * Config for the DataOverlay Sandbox module
-   */
-  public final DataOverlayConfig dataOverlay;
-
-  /**
-   * This field is used for mapping routes geometry shapes.
-   * It determines max distance between shape points and their stop sequence.
-   * If mapper can not find any stops within this radius it will default to simple stop-to-stop geometry instead.
-   */
-  public final double maxStopToShapeSnapDistance;
-
-  /**
-   * Set all parameters from the given Jackson JSON tree, applying defaults.
-   * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
-   * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
-   * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
+   * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
+   * MissingNode.getInstance() will cause all the defaults to be applied. This could be done
+   * automatically with the "reflective query scraper" but it's less type safe and less clear. Until
+   * that class is more type safe, it seems simpler to just list out the parameters by name here.
    */
   public BuildConfig(JsonNode node, String source, boolean logUnusedParams) {
     NodeAdapter c = new NodeAdapter(node, source);

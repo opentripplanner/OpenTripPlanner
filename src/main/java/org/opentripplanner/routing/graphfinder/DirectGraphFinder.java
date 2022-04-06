@@ -24,8 +24,8 @@ public class DirectGraphFinder implements GraphFinder {
   }
 
   /**
-   * Return all stops within a certain radius of the given vertex, using straight-line distance independent of streets.
-   * If the origin vertex is a StopVertex, the result will include it.
+   * Return all stops within a certain radius of the given vertex, using straight-line distance
+   * independent of streets. If the origin vertex is a StopVertex, the result will include it.
    */
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {

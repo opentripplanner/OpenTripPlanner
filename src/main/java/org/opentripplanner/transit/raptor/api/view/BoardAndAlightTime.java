@@ -50,21 +50,8 @@ public class BoardAndAlightTime {
   }
 
   @Override
-  public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
-      .addText("[")
-      .addObj(trip.pattern().stopIndex(boardStopPos))
-      .addText(" ~ ")
-      .addServiceTime(boardTime())
-      .addText(" ")
-      .addServiceTime(alightTime())
-      .addText("(")
-      .addDuration(alightTime() - boardTime())
-      .addText(") ~ ")
-      .addObj(trip.pattern().stopIndex(alightStopPos))
-      .addText("]")
-      .toString();
+  public int hashCode() {
+    return Objects.hash(boardStopPos, alightStopPos);
   }
 
   @Override
@@ -80,7 +67,20 @@ public class BoardAndAlightTime {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(boardStopPos, alightStopPos);
+  public String toString() {
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("[")
+      .addObj(trip.pattern().stopIndex(boardStopPos))
+      .addText(" ~ ")
+      .addServiceTime(boardTime())
+      .addText(" ")
+      .addServiceTime(alightTime())
+      .addText("(")
+      .addDuration(alightTime() - boardTime())
+      .addText(") ~ ")
+      .addObj(trip.pattern().stopIndex(alightStopPos))
+      .addText("]")
+      .toString();
   }
 }

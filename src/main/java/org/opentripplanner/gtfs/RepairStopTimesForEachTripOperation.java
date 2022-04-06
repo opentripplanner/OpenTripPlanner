@@ -25,8 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for cleaning stop times, removing duplicates, correcting bad data
- * and so on. This only applies to GTFS imports.
+ * This class is responsible for cleaning stop times, removing duplicates, correcting bad data and
+ * so on. This only applies to GTFS imports.
  */
 public class RepairStopTimesForEachTripOperation {
 
@@ -82,10 +82,10 @@ public class RepairStopTimesForEachTripOperation {
   }
 
   /**
-   * Filter out any series of stop times that refer to the same stop. This is very inefficient in
-   * an array-backed list, but we are assuming that this is a rare occurrence. The alternative is
-   * to copy every list of stop times during filtering.
-   *
+   * Filter out any series of stop times that refer to the same stop. This is very inefficient in an
+   * array-backed list, but we are assuming that this is a rare occurrence. The alternative is to
+   * copy every list of stop times during filtering.
+   * <p>
    * TODO: OBA GFTS makes the stoptime lists unmodifiable, so this will not work.
    * We need to copy any modified list.
    *
@@ -126,8 +126,8 @@ public class RepairStopTimesForEachTripOperation {
 
   /**
    * Scan through the given list, looking for clearly incorrect series of stoptimes. This includes
-   * duplicate times (0-time hops), as well as negative, fast or slow hops.
-   * {@link DataImportIssue}s are reported to reveal the problems to the user.
+   * duplicate times (0-time hops), as well as negative, fast or slow hops. {@link DataImportIssue}s
+   * are reported to reveal the problems to the user.
    *
    * @param stopTimes the stoptimes to be filtered (from a single trip)
    * @return whether the stop time is usable
@@ -220,9 +220,9 @@ public class RepairStopTimesForEachTripOperation {
   }
 
   /**
-   * Scan through the given list of stoptimes, interpolating the missing (unset) ones.
-   * This is currently done by assuming equidistant stops and constant speed.
-   * While we may not be able to improve the constant speed assumption, we can
+   * Scan through the given list of stoptimes, interpolating the missing (unset) ones. This is
+   * currently done by assuming equidistant stops and constant speed. While we may not be able to
+   * improve the constant speed assumption, we can
    * TODO: use route matching (or shape distance etc.) to improve inter-stop distances
    *
    * @param stopTimes the stoptimes (from a single trip) to be interpolated

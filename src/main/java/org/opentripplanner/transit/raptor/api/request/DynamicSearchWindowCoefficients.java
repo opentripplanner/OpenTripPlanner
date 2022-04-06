@@ -2,10 +2,10 @@ package org.opentripplanner.transit.raptor.api.request;
 
 /**
  * The dynamic search window coefficients is used to calculate EDT(earliest-departure-time),
- * LAT(latest-arrival-time) and SW(raptor-search-window) request parameters using heuristics.
- * The heuristics perform a Raptor search (one-iteration) to find a trip which we use to find a
- * lower bound for the travel duration time - the "minTransitTime". The heuristic search is used
- * for other purposes too, and is very fast.
+ * LAT(latest-arrival-time) and SW(raptor-search-window) request parameters using heuristics. The
+ * heuristics perform a Raptor search (one-iteration) to find a trip which we use to find a lower
+ * bound for the travel duration time - the "minTransitTime". The heuristic search is used for other
+ * purposes too, and is very fast.
  * <p>
  * At least the EDT or the LAT must be passed into Raptor to perform a Range Raptor search. If
  * unknown/missing the parameters(EDT, LAT, DW) is dynamically calculated. The dynamic coefficients
@@ -31,18 +31,18 @@ package org.opentripplanner.transit.raptor.api.request;
  */
 public interface DynamicSearchWindowCoefficients {
   /**
-   * {@code T} - The coefficient to multiply with {@code minTransitTime}. Use a value between
-   * {@code 0.0} to {@code 3.0}. Using {@code 0.0} will eliminate the {@code minTransitTime}
-   * from the dynamic raptor-search-window calculation.
+   * {@code T} - The coefficient to multiply with {@code minTransitTime}. Use a value between {@code
+   * 0.0} to {@code 3.0}. Using {@code 0.0} will eliminate the {@code minTransitTime} from the
+   * dynamic raptor-search-window calculation.
    */
   default double minTransitTimeCoefficient() {
     return 0.5f;
   }
 
   /**
-   * {@code T} - The coefficient to multiply with {@code minWaitTime}. Use a value between
-   * {@code 0.0} to {@code 1.0}. Using {@code 0.0} will eliminate the {@code minWaitTime}
-   * from the dynamic raptor-search-window calculation.
+   * {@code T} - The coefficient to multiply with {@code minWaitTime}. Use a value between {@code
+   * 0.0} to {@code 1.0}. Using {@code 0.0} will eliminate the {@code minWaitTime} from the dynamic
+   * raptor-search-window calculation.
    */
   default double minWaitTimeCoefficient() {
     return 0.5f;
@@ -61,8 +61,8 @@ public interface DynamicSearchWindowCoefficients {
    * cases to cause very long search windows. Long search windows consumes a lot of resources and
    * may take a long time. Use this parameter to tune the desired maximum search time.
    * <p>
-   * This is the parameter that affect the response time most, the downside is that a search is
-   * only guarantied to be pareto-optimal within a search-window.
+   * This is the parameter that affect the response time most, the downside is that a search is only
+   * guarantied to be pareto-optimal within a search-window.
    * <p>
    * The default is 3 hours. The unit is minutes.
    */
@@ -71,9 +71,9 @@ public interface DynamicSearchWindowCoefficients {
   }
 
   /**
-   * {@code N} - The search window is rounded of to the closest multiplication of N minutes.
-   * If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed
-   * search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes.
+   * {@code N} - The search window is rounded of to the closest multiplication of N minutes. If N=10
+   * minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5
+   * minutes and 17 seconds it will be rounded up to 10 minutes.
    * <p/>
    * Use a value between {@code 1 and 60}. This should be less than the {@code C}
    * (min-raptor-search-window) coefficient.

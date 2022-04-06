@@ -13,25 +13,15 @@ import java.util.Map;
  */
 public class Fare {
 
-  public enum FareType implements Serializable {
-    regular,
-    student,
-    senior,
-    tram,
-    special,
-    youth,
-  }
-
   /**
    * A mapping from {@link FareType} to {@link Money}.
    */
   public HashMap<FareType, Money> fare;
-
   /**
-   * A mapping from {@link FareType} to a list of {@link FareComponent}.
-   * The FareComponents are stored in an array instead of a list because JAXB doesn't know how to deal with
-   * interfaces when serializing a trip planning response, and List is an interface.
-   * See https://stackoverflow.com/a/1119241/778449
+   * A mapping from {@link FareType} to a list of {@link FareComponent}. The FareComponents are
+   * stored in an array instead of a list because JAXB doesn't know how to deal with interfaces when
+   * serializing a trip planning response, and List is an interface. See
+   * https://stackoverflow.com/a/1119241/778449
    */
   public HashMap<FareType, FareComponent[]> details;
 
@@ -88,5 +78,14 @@ public class Fare {
     }
     buffer.append(")");
     return buffer.toString();
+  }
+
+  public enum FareType implements Serializable {
+    regular,
+    student,
+    senior,
+    tram,
+    special,
+    youth,
   }
 }

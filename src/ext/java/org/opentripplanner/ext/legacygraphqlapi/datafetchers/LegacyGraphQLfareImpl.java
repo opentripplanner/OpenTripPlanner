@@ -10,8 +10,13 @@ import org.opentripplanner.routing.core.Money;
 public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFare {
 
   @Override
-  public DataFetcher<String> type() {
-    return environment -> (String) getSource(environment).get("name");
+  public DataFetcher<Integer> cents() {
+    return environment -> ((Money) getSource(environment).get("fare")).getCents();
+  }
+
+  @Override
+  public DataFetcher<Iterable<FareComponent>> components() {
+    return environment -> (Iterable<FareComponent>) getSource(environment).get("details");
   }
 
   @Override
@@ -21,13 +26,8 @@ public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Integer> cents() {
-    return environment -> ((Money) getSource(environment).get("fare")).getCents();
-  }
-
-  @Override
-  public DataFetcher<Iterable<FareComponent>> components() {
-    return environment -> (Iterable<FareComponent>) getSource(environment).get("details");
+  public DataFetcher<String> type() {
+    return environment -> (String) getSource(environment).get("name");
   }
 
   private Map<String, Object> getSource(DataFetchingEnvironment environment) {

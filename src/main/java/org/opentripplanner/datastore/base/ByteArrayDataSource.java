@@ -8,9 +8,9 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 
 /**
- * This data source keep its data in memory as a byte array. You may insert data using
- * {@link #withBytes(byte[])} or {@link #asOutputStream()}. To access data you can use the
- * {@link #asBytes()} or reading the input stream {@link #asInputStream()}.
+ * This data source keep its data in memory as a byte array. You may insert data using {@link
+ * #withBytes(byte[])} or {@link #asOutputStream()}. To access data you can use the {@link
+ * #asBytes()} or reading the input stream {@link #asInputStream()}.
  * <p>
  * Any existing data in the datasource will be erased if you insert data using the output stream
  * {@link #asOutputStream()} or set the byte array {@link #withBytes(byte[])}.
@@ -87,11 +87,11 @@ public class ByteArrayDataSource implements DataSource {
   }
 
   /**
-   * Clean any existing data, and return a new {@link OutputStream} which can be used to insert
-   * data into the byte array.
+   * Clean any existing data, and return a new {@link OutputStream} which can be used to insert data
+   * into the byte array.
    * <p>
-   * If the source is created with {@code writable = false} then the {@link #asOutputStream()}
-   * will throw an exception, instead use the {@link #withBytes(byte[])} to inject data.
+   * If the source is created with {@code writable = false} then the {@link #asOutputStream()} will
+   * throw an exception, instead use the {@link #withBytes(byte[])} to inject data.
    */
   @Override
   public OutputStream asOutputStream() {

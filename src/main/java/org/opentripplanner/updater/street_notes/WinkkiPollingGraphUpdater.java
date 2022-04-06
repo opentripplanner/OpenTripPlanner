@@ -9,7 +9,7 @@ import org.opentripplanner.util.NonLocalizedString;
  * Example implementation of a WFS based street note updater, which can be used to retrieve
  * roadworks and other temporary obstacles from a WFS interface provided by the City of Helsinki's
  * planning department.
- *
+ * <p>
  * Usage example:
  *
  * <pre>

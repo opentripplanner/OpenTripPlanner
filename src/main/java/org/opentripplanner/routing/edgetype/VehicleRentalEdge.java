@@ -14,7 +14,6 @@ import org.opentripplanner.util.I18NString;
  * Renting or dropping off a rented vehicle edge.
  *
  * @author laurent
- *
  */
 public class VehicleRentalEdge extends Edge {
 
@@ -174,16 +173,6 @@ public class VehicleRentalEdge extends Edge {
   }
 
   @Override
-  public double getDistanceMeters() {
-    return 0;
-  }
-
-  @Override
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
   public I18NString getName() {
     return getToVertex().getName();
   }
@@ -193,9 +182,19 @@ public class VehicleRentalEdge extends Edge {
     return false;
   }
 
+  @Override
+  public LineString getGeometry() {
+    return null;
+  }
+
+  @Override
+  public double getDistanceMeters() {
+    return 0;
+  }
+
   /**
    * @param stationNetwork The station network where we want to drop the bike off.
-   * @param rentedNetwork The networks of the station we rented the bike from.
+   * @param rentedNetwork  The networks of the station we rented the bike from.
    * @return true if the bike can be dropped off here, false if not.
    */
   private boolean hasCompatibleNetworks(String stationNetwork, String rentedNetwork) {

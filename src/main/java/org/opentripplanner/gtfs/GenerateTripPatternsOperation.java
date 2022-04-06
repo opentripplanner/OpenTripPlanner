@@ -92,10 +92,9 @@ public class GenerateTripPatternsOperation {
   }
 
   /**
-   * First, record which trips are used by one or more frequency entries.
-   * These trips will be ignored for the purposes of non-frequency routing, and
-   * all the frequency entries referencing the same trip can be added at once to the same
-   * Timetable/TripPattern.
+   * First, record which trips are used by one or more frequency entries. These trips will be
+   * ignored for the purposes of non-frequency routing, and all the frequency entries referencing
+   * the same trip can be added at once to the same Timetable/TripPattern.
    */
   private void collectFrequencyByTrip() {
     for (Frequency freq : transitDaoBuilder.getFrequencies()) {
@@ -169,9 +168,9 @@ public class GenerateTripPatternsOperation {
   }
 
   /**
-   * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route
-   * id, the direction and an integer. This only works if the Collection of TripPattern includes
-   * every TripPattern for the agency.
+   * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id,
+   * the direction and an integer. This only works if the Collection of TripPattern includes every
+   * TripPattern for the agency.
    */
   private FeedScopedId generateUniqueIdForTripPattern(Route route, int directionId) {
     FeedScopedId routeId = route.getId();

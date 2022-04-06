@@ -5,15 +5,16 @@ import java.util.function.IntFunction;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * The responsibility of this class is to compare two int arrays and list all elements
- * that differ. You may provide a list of indexes to compare or compare all elements.
+ * The responsibility of this class is to compare two int arrays and list all elements that differ.
+ * You may provide a list of indexes to compare or compare all elements.
  * <p/>
  * The result is returned as a multi-line string.
  * <p/>
- * If the header line exceeds 2000 characters and you compare all elements the comparison is aborted.
+ * If the header line exceeds 2000 characters and you compare all elements the comparison is
+ * aborted.
  * <p/>
- * Both regular numbers and time is supported. The time uses the {@link TimeUtils#timeToStrCompact(int)}
- * to print all times.
+ * Both regular numbers and time is supported. The time uses the {@link
+ * TimeUtils#timeToStrCompact(int)} to print all times.
  */
 public class CompareIntArrays {
 

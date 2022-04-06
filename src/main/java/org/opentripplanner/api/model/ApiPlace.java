@@ -18,14 +18,13 @@ public class ApiPlace {
   public String stopId = null;
 
   /**
-   * The "code" of the stop. Depending on the transit agency, this is often
-   * something that users care about.
+   * The "code" of the stop. Depending on the transit agency, this is often something that users
+   * care about.
    */
   public String stopCode = null;
 
   /**
    * The code or name identifying the quay/platform the vehicle will arrive at or depart from
-   *
    */
   public String platformCode = null;
 
@@ -62,8 +61,8 @@ public class ApiPlace {
   public Integer stopSequence;
 
   /**
-   * Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit stop)
-   * Mostly used for better localization of bike sharing and P+R station names
+   * Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit stop) Mostly used for better
+   * localization of bike sharing and P+R station names
    */
   public ApiVertexType vertexType;
 

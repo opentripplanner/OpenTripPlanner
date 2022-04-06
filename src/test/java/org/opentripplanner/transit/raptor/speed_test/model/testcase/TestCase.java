@@ -44,6 +44,18 @@ public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
     return definition.toString();
   }
 
+  public int numberOfResults() {
+    return results.actualResults().size();
+  }
+
+  public int transitTimeMs() {
+    return results.transitTimeMs();
+  }
+
+  public int totalTimeMs() {
+    return results.totalTimeMs();
+  }
+
   /**
    * The test case is not run or no itineraries found.
    */
@@ -56,17 +68,5 @@ public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
    */
   List<Result> actualResults() {
     return results.actualResults();
-  }
-
-  public int numberOfResults() {
-    return results.actualResults().size();
-  }
-
-  public int transitTimeMs() {
-    return results.transitTimeMs();
-  }
-
-  public int totalTimeMs() {
-    return results.totalTimeMs();
   }
 }

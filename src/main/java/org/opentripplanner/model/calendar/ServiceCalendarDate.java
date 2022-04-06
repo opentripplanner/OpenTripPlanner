@@ -12,7 +12,7 @@ import org.opentripplanner.model.FeedScopedId;
  *     patterns defined.
  *     <li>Omit {@link ServiceCalendar} and use this class to specify each date of service.
  * </ol>
- *
+ * <p>
  * This class is immutable.
  */
 public final class ServiceCalendarDate implements Serializable, Comparable<ServiceCalendarDate> {
@@ -42,8 +42,8 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
   }
 
   /**
-   * Create a service calendar date on the given date with the given id. The 'exceptionType'
-   * is set to 'EXCEPTION_TYPE_ADD'.
+   * Create a service calendar date on the given date with the given id. The 'exceptionType' is set
+   * to 'EXCEPTION_TYPE_ADD'.
    */
   public static ServiceCalendarDate create(FeedScopedId serviceId, ServiceDate date) {
     return new ServiceCalendarDate(serviceId, date, EXCEPTION_TYPE_ADD);
@@ -62,6 +62,11 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(serviceId, date);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -71,11 +76,6 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
     }
     ServiceCalendarDate that = (ServiceCalendarDate) o;
     return Objects.equals(serviceId, that.serviceId) && Objects.equals(date, that.date);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(serviceId, date);
   }
 
   @Override

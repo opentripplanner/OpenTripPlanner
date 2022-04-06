@@ -7,15 +7,15 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
 /**
- * This class create a group identifier for an itinerary based on the set of the longest
- * transit legs which together account for more than 'p' part of the total distance(including
- * non-transit). We call this set of legs the 'key-set'. Non-transit itineraries all get their own
- * group; Hence are considered different. Only transit legs can be part of the key.
+ * This class create a group identifier for an itinerary based on the set of the longest transit
+ * legs which together account for more than 'p' part of the total distance(including non-transit).
+ * We call this set of legs the 'key-set'. Non-transit itineraries all get their own group; Hence
+ * are considered different. Only transit legs can be part of the key.
  * <p>
- * Two itineraries can be almost identical, but still have differences in the size of the
- * key-set. Riding any trip just one extra stop might include/exclude a leg in/from the key-set.
- * To account for this, we say two itineraries, A and B, are the same if the key-set of A is
- * contained in B OR the key-set of B is contained in A. Any "extra" legs in the key-set is ignored.
+ * Two itineraries can be almost identical, but still have differences in the size of the key-set.
+ * Riding any trip just one extra stop might include/exclude a leg in/from the key-set. To account
+ * for this, we say two itineraries, A and B, are the same if the key-set of A is contained in B OR
+ * the key-set of B is contained in A. Any "extra" legs in the key-set is ignored.
  * <p>
  * Two legs are considered the same if they are riding the same transit trip and overlap in time.
  * So, for example where a transfer happens do not affect the result, unless one of the legs fall
@@ -45,11 +45,6 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
   }
 
   @Override
-  public GroupByTripIdAndDistance merge(GroupByTripIdAndDistance other) {
-    return keySet.size() <= other.keySet.size() ? this : other;
-  }
-
-  @Override
   public boolean match(GroupByTripIdAndDistance other) {
     if (this == other) {
       return true;
@@ -61,6 +56,16 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
     }
 
     return isTheSame(this.keySet, other.keySet);
+  }
+
+  @Override
+  public GroupByTripIdAndDistance merge(GroupByTripIdAndDistance other) {
+    return keySet.size() <= other.keySet.size() ? this : other;
+  }
+
+  @Override
+  public String toString() {
+    return keySet.toString();
   }
 
   /** package local to be unit-testable */
@@ -94,22 +99,11 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
     return List.copyOf(keySet);
   }
 
-  @Override
-  public String toString() {
-    return keySet.toString();
-  }
-
   /* private methods */
 
-  private void assertPIsValid(double p) {
-    if (p > 0.99 || p < 0.50) {
-      throw new IllegalArgumentException("'p' is not between 0.01 and 0.99: " + p);
-    }
-  }
-
   /**
-   * Compare to set of legs and return {@code true} if the two sets contains the same
-   * set. If the sets are different in size any extra elements are ignored.
+   * Compare to set of legs and return {@code true} if the two sets contains the same set. If the
+   * sets are different in size any extra elements are ignored.
    */
   private static boolean isTheSame(List<Leg> a, List<Leg> b) {
     // If a and b is different in length, than we want to use the shortest list and
@@ -128,5 +122,11 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
       }
     }
     return true;
+  }
+
+  private void assertPIsValid(double p) {
+    if (p > 0.99 || p < 0.50) {
+      throw new IllegalArgumentException("'p' is not between 0.01 and 0.99: " + p);
+    }
   }
 }

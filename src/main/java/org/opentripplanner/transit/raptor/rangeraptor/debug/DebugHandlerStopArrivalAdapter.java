@@ -22,8 +22,8 @@ final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<A
   }
 
   /**
-   * List all stops used to arrive at current stop arrival. This method can be SLOW,
-   * should only be used in code that does not need to be fast, like debugging.
+   * List all stops used to arrive at current stop arrival. This method can be SLOW, should only be
+   * used in code that does not need to be fast, like debugging.
    */
   private Iterable<Integer> listStopsForDebugging(ArrivalView<?> it) {
     LinkedList<Integer> stops = new LinkedList<>();

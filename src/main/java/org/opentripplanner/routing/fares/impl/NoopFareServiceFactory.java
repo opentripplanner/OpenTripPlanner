@@ -8,8 +8,8 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 
 /**
- * Create a FareServiceFactory which create a noop fare service. That is a fare service
- * that does nothing.
+ * Create a FareServiceFactory which create a noop fare service. That is a fare service that does
+ * nothing.
  */
 class NoopFareServiceFactory implements FareServiceFactory {
 
@@ -30,8 +30,8 @@ class NoopFareServiceFactory implements FareServiceFactory {
   }
 
   /**
-   * A Noop {@link FareService} implementation. Must be serializable; Hence
-   * have a default constructor.
+   * A Noop {@link FareService} implementation. Must be serializable; Hence have a default
+   * constructor.
    */
   private static class NoopFareService implements FareService {
 

@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
@@ -20,9 +21,9 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * This class is used to diff two set of paths. You may ask for the diff result
- * or pass in a logger to print the diff. Here is an example with two set with the to same paths
- * in both, but where the first path differ in cost:
+ * This class is used to diff two set of paths. You may ask for the diff result or pass in a logger
+ * to print the diff. Here is an example with two set with the to same paths in both, but where the
+ * first path differ in cost:
  * <pre>
  * STATUS  | TX | DURATION |  COST | WALK |   START  |    END   | PATH
  * DROPPED |  1 |   21m26s | 22510 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $22510]
@@ -71,7 +72,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
       List.of("STATUS", "TX", "Duration", "Cost", "Walk", "Start", "End", "Path")
     );
 
-    for (DiffTool.Entry<PathDiff<T>> e : result) {
+    for (DiffEntry<PathDiff<T>> e : result) {
       if (skipEquals && e.isEqual()) {
         continue;
       }
@@ -90,7 +91,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
     logger.accept("Compare " + leftLabel + " with " + rightLabel + "\n" + tbl.toString());
   }
 
-  public static <T extends RaptorTripSchedule> List<DiffTool.Entry<PathDiff<T>>> diff(
+  public static <T extends RaptorTripSchedule> List<DiffEntry<PathDiff<T>>> diff(
     Collection<? extends Path<T>> left,
     Collection<? extends Path<T>> right,
     boolean skipCost

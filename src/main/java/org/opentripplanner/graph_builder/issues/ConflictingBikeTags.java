@@ -18,6 +18,11 @@ public class ConflictingBikeTags implements DataImportIssue {
   }
 
   @Override
+  public String getMessage() {
+    return String.format(FMT, wayId);
+  }
+
+  @Override
   public String getHTMLMessage() {
     if (wayId > 0) {
       return String.format(HTMLFMT, wayId, wayId);
@@ -25,10 +30,5 @@ public class ConflictingBikeTags implements DataImportIssue {
     } else {
       return getMessage();
     }
-  }
-
-  @Override
-  public String getMessage() {
-    return String.format(FMT, wayId);
   }
 }

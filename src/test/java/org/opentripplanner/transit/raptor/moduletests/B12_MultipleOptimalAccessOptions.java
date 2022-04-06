@@ -25,23 +25,23 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * This test focus on selecting the correct start on the journey, where a trip L1 competes with
- * a flex access to get to stop C. The Flex access arrives at C one minute after Trip L1 + walking,
- * but the flex arrives on-board. This should give the flex an advantage, the ability to transfer
- * to a nearby stop. In this test we manipulate the EGRESS for make the two paths optional. If we
- * can get both paths (start with flex access or trip L1) as optimal results by changing the
- * egress, then we have proven that both these results are kept in stop arrival at stop C.
+ * This test focus on selecting the correct start on the journey, where a trip L1 competes with a
+ * flex access to get to stop C. The Flex access arrives at C one minute after Trip L1 + walking,
+ * but the flex arrives on-board. This should give the flex an advantage, the ability to transfer to
+ * a nearby stop. In this test we manipulate the EGRESS for make the two paths optional. If we can
+ * get both paths (start with flex access or trip L1) as optimal results by changing the egress,
+ * then we have proven that both these results are kept in stop arrival at stop C.
  * <p>
- * Further this test also makes sure the path is constructed correctly when we have a mix of
- * access, transfer and transit at the same stop, in the same Raptor round. Two walking legs are
- * not allowed after each other.
+ * Further this test also makes sure the path is constructed correctly when we have a mix of access,
+ * transfer and transit at the same stop, in the same Raptor round. Two walking legs are not allowed
+ * after each other.
  * <p>
  * <img src="images/B12.svg" width="548" height="206"/>
  * <p>
  * We use the same data and changes the egress walk leg to cover all cases. The egress walk leg
  * becomes optimal is it is 3 minutes, while the flex is optimal when we set the egress to 10
- * minutes. Trip L2 is faster than trip L1, but must be using the FLEX egress - since it arrive
- * at the stop C by walking.
+ * minutes. Trip L2 is faster than trip L1, but must be using the FLEX egress - since it arrive at
+ * the stop C by walking.
  * <p>
  * Note! The 'earliest-departure-time' is set to 00:02, and the board and alight slacks are zero.
  */
@@ -87,22 +87,6 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  /**
-   * This set the egress-paths, so the flex access become optimal. The Egress from
-   * Stop E to Stop F is set to 3 minutes.
-   */
-  private void withFlexAccessAsBestOption() {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D3m));
-  }
-
-  /**
-   * This set the egress-paths, so trip L1 is the best way to begin the journey. The Egress from
-   * Stop E to Stop F is set to 1 minute.
-   */
-  private void withTripL1AsBestStartOption() {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D1m));
-  }
-
   @Test
   public void standardExpectFlex() {
     requestBuilder.profile(STANDARD);
@@ -142,6 +126,22 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
     String actual = runSearch();
 
     assertEquals(join(EXPECTED_FLEX_MC, EXPECTED_WALK_MC), actual);
+  }
+
+  /**
+   * This set the egress-paths, so the flex access become optimal. The Egress from Stop E to Stop F
+   * is set to 3 minutes.
+   */
+  private void withFlexAccessAsBestOption() {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D3m));
+  }
+
+  /**
+   * This set the egress-paths, so trip L1 is the best way to begin the journey. The Egress from
+   * Stop E to Stop F is set to 1 minute.
+   */
+  private void withTripL1AsBestStartOption() {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D1m));
   }
 
   private String runSearch() {

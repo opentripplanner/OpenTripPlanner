@@ -11,28 +11,12 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
  */
 public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
-  public static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
-    // This is important with respect to performance. Using the short-circuit logical OR(||) is
-    // faster than bitwise inclusive OR(|) (even between boolean expressions)
-    return (l, r) ->
-      l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.cost < r.cost;
-  }
-
-  public static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeAndRound() {
-    return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound;
-  }
-
   private final AbstractStopArrival<T> previous;
-
   /**
-   * We want transits to dominate transfers so we increment the round not only between
-   * RangeRaptor rounds, but for transits and transfers also. The access path is paretoRound 0,
-   * the first transit path is 1. The following transfer path, if it exist, is paretoRound 2, and
-   * the next transit is 3, and so on.
+   * We want transits to dominate transfers so we increment the round not only between RangeRaptor
+   * rounds, but for transits and transfers also. The access path is paretoRound 0, the first
+   * transit path is 1. The following transfer path, if it exist, is paretoRound 2, and the next
+   * transit is 3, and so on.
    * <p/>
    * The relationship between Range Raptor round and paretoRound can be described by this formula:
    * <pre>
@@ -48,11 +32,11 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   /**
    * Transit or transfer.
    *
-   * @param previous the previous arrival visited for the current trip
+   * @param previous             the previous arrival visited for the current trip
    * @param paretoRoundIncrement the increment to add to the paretoRound
-   * @param stop stop index for this arrival
-   * @param arrivalTime the arrival time for this stop index
-   * @param cost the total accumulated cost at this stop arrival
+   * @param stop                 stop index for this arrival
+   * @param arrivalTime          the arrival time for this stop index
+   * @param cost                 the total accumulated cost at this stop arrival
    */
   AbstractStopArrival(
     AbstractStopArrival<T> previous,
@@ -87,9 +71,19 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     this.cost = initialCost;
   }
 
-  @Override
-  public final int round() {
-    return (paretoRound + 1) / 2;
+  public static <
+    T extends RaptorTripSchedule
+  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
+    // This is important with respect to performance. Using the short-circuit logical OR(||) is
+    // faster than bitwise inclusive OR(|) (even between boolean expressions)
+    return (l, r) ->
+      l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.cost < r.cost;
+  }
+
+  public static <
+    T extends RaptorTripSchedule
+  > ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeAndRound() {
+    return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound;
   }
 
   @Override
@@ -98,8 +92,22 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   }
 
   @Override
+  public final int round() {
+    return (paretoRound + 1) / 2;
+  }
+
+  @Override
   public final int arrivalTime() {
     return arrivalTime;
+  }
+
+  public int cost() {
+    return cost;
+  }
+
+  @Override
+  public final AbstractStopArrival<T> previous() {
+    return previous;
   }
 
   public int travelDuration() {
@@ -110,26 +118,9 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
   }
 
-  /**
-   * @return previous state or throw a NPE if no previousArrival exist.
-   */
-  final int previousStop() {
-    //noinspection ConstantConditions
-    return previous.stop;
-  }
-
   @Override
-  public final AbstractStopArrival<T> previous() {
-    return previous;
-  }
-
-  public int cost() {
-    return cost;
-  }
-
-  @Override
-  public String toString() {
-    return asString();
+  public final int hashCode() {
+    throw new IllegalStateException("Avoid using hashCode() and equals() for this class.");
   }
 
   @Override
@@ -138,7 +129,15 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
   }
 
   @Override
-  public final int hashCode() {
-    throw new IllegalStateException("Avoid using hashCode() and equals() for this class.");
+  public String toString() {
+    return asString();
+  }
+
+  /**
+   * @return previous state or throw a NPE if no previousArrival exist.
+   */
+  final int previousStop() {
+    //noinspection ConstantConditions
+    return previous.stop;
   }
 }

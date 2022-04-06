@@ -27,20 +27,8 @@ public class GtfsRealtimeAlertsUpdaterParameters implements PollingGraphUpdaterP
     this.frequencySec = getFrequencySec;
   }
 
-  String getFeedId() {
-    return feedId;
-  }
-
   public String getUrl() {
     return url;
-  }
-
-  int getEarlyStartSec() {
-    return earlyStartSec;
-  }
-
-  boolean fuzzyTripMatching() {
-    return fuzzyTripMatching;
   }
 
   @Override
@@ -51,5 +39,17 @@ public class GtfsRealtimeAlertsUpdaterParameters implements PollingGraphUpdaterP
   @Override
   public String getConfigRef() {
     return configRef;
+  }
+
+  String getFeedId() {
+    return feedId;
+  }
+
+  int getEarlyStartSec() {
+    return earlyStartSec;
+  }
+
+  boolean fuzzyTripMatching() {
+    return fuzzyTripMatching;
   }
 }

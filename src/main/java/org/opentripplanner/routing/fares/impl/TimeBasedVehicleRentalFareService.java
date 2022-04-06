@@ -32,6 +32,19 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
     this.pricing_by_second = pricingBySecond;
   }
 
+  @Override
+  public Fare getCost(Itinerary itinerary) {
+    var totalCost = itinerary.legs
+      .stream()
+      .filter(l -> l.getRentedVehicle())
+      .mapToInt(this::getLegCost)
+      .sum();
+
+    Fare fare = new Fare();
+    fare.addFare(FareType.regular, new WrappedCurrency(currency), totalCost);
+    return fare;
+  }
+
   private int getLegCost(Leg pathLeg) {
     int rideCost = 0;
     long rideTime = pathLeg.getDuration();
@@ -44,18 +57,5 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
       }
     }
     return rideCost;
-  }
-
-  @Override
-  public Fare getCost(Itinerary itinerary) {
-    var totalCost = itinerary.legs
-      .stream()
-      .filter(l -> l.getRentedVehicle())
-      .mapToInt(this::getLegCost)
-      .sum();
-
-    Fare fare = new Fare();
-    fare.addFare(FareType.regular, new WrappedCurrency(currency), totalCost);
-    return fare;
   }
 }

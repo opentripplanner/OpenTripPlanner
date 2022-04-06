@@ -39,29 +39,26 @@ import org.slf4j.LoggerFactory;
 /**
  * this module is part of the  {@link org.opentripplanner.graph_builder.services.GraphBuilderModule}
  * process. It extends the functionality of PruneFloatingIslands by considering also through traffic
- * limitations. It is quite common that no thru edges break connectivity of the graph, creating islands.
- * The quality of the graph can be improved by converting such islands to nothru state so that routing
- * can start / end from such an island.
+ * limitations. It is quite common that no thru edges break connectivity of the graph, creating
+ * islands. The quality of the graph can be improved by converting such islands to nothru state so
+ * that routing can start / end from such an island.
  */
 public class PruneNoThruIslands implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
 
   private static final int islandCounter = 0;
-
+  private final StreetLinkerModule streetLinkerModule;
   /**
-   * this field indicate the maximum size for island without stops
-   * island under this size will be pruned.
+   * this field indicate the maximum size for island without stops island under this size will be
+   * pruned.
    */
   private int pruningThresholdIslandWithoutStops;
-
   /**
-   * this field indicate the maximum size for island with stops
-   * island under this size will be pruned.
+   * this field indicate the maximum size for island with stops island under this size will be
+   * pruned.
    */
   private int pruningThresholdIslandWithStops;
-
-  private final StreetLinkerModule streetLinkerModule;
 
   public PruneNoThruIslands(StreetLinkerModule streetLinkerModule) {
     this.streetLinkerModule = streetLinkerModule;

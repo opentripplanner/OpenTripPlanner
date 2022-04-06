@@ -10,17 +10,15 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 /**
- * The purpose of this class is to optimize the search for a trip schedule for
- * a given pattern and stop. Normally the search scan from the upper bound index
- * and down, it can do so because the trips are ordered after the FIRST stop
- * alight times. We also assume that trips do not pass each other; Hence
- * trips in service on a given day will also be in order for all other stops.
- * For trips operating on different service days (no overlapping) this assumption
- * is not necessary true.
+ * The purpose of this class is to optimize the search for a trip schedule for a given pattern and
+ * stop. Normally the search scan from the upper bound index and down, it can do so because the
+ * trips are ordered after the FIRST stop alight times. We also assume that trips do not pass each
+ * other; Hence trips in service on a given day will also be in order for all other stops. For trips
+ * operating on different service days (no overlapping) this assumption is not necessary true.
  * <p>
- * The search use a binary search if the number of trip schedules is above a
- * given threshold. A linear search is slow when the number of schedules is very
- * large, let say more than 300 trip schedules.
+ * The search use a binary search if the number of trip schedules is above a given threshold. A
+ * linear search is slow when the number of schedules is very large, let say more than 300 trip
+ * schedules.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -49,23 +47,23 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   /* TripScheduleBoardOrAlightEvent implementation using fly-weight pattern */
 
   @Override
-  public T getTrip() {
-    return candidateTrip;
-  }
-
-  @Override
   public int getTripIndex() {
     return candidateTripIndex;
   }
 
   @Override
-  public int getTime() {
-    return candidateTrip.arrival(stopPositionInPattern);
+  public T getTrip() {
+    return candidateTrip;
   }
 
   @Override
   public int getStopPositionInPattern() {
     return stopPositionInPattern;
+  }
+
+  @Override
+  public int getTime() {
+    return candidateTrip.arrival(stopPositionInPattern);
   }
 
   @Override
@@ -191,8 +189,8 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   }
 
   /**
-   * Do a binary search to find the approximate lower bound index for where to start the search.
-   * We IGNORE if the trip schedule is in service.
+   * Do a binary search to find the approximate lower bound index for where to start the search. We
+   * IGNORE if the trip schedule is in service.
    * <p/>
    * This is just a guess and we return when the trip with a best valid arrival is in the range of
    * the next {@link #nTripsBinarySearchThreshold}.

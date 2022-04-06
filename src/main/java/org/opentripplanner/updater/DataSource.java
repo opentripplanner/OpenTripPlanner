@@ -9,6 +9,7 @@ import java.util.List;
 public interface DataSource<T> {
   /**
    * Fetch current data about given type and availability from this source.
+   *
    * @return true if this operation may have changed something in the list of types.
    */
   boolean update();

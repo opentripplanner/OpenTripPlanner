@@ -15,13 +15,8 @@ public class LegacyGraphQLItineraryImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {
 
   @Override
-  public DataFetcher<Long> startTime() {
-    return environment -> getSource(environment).startTime().getTime().getTime();
-  }
-
-  @Override
-  public DataFetcher<Long> endTime() {
-    return environment -> getSource(environment).endTime().getTime().getTime();
+  public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
+    return environment -> getSource(environment).arrivedAtDestinationWithRentedVehicle;
   }
 
   @Override
@@ -30,28 +25,18 @@ public class LegacyGraphQLItineraryImpl
   }
 
   @Override
-  public DataFetcher<Integer> generalizedCost() {
-    return environment -> getSource(environment).generalizedCost;
+  public DataFetcher<Double> elevationGained() {
+    return environment -> getSource(environment).elevationGained;
   }
 
   @Override
-  public DataFetcher<Long> waitingTime() {
-    return environment -> (long) getSource(environment).waitingTimeSeconds;
+  public DataFetcher<Double> elevationLost() {
+    return environment -> getSource(environment).elevationLost;
   }
 
   @Override
-  public DataFetcher<Long> walkTime() {
-    return environment -> (long) getSource(environment).nonTransitTimeSeconds;
-  }
-
-  @Override
-  public DataFetcher<Double> walkDistance() {
-    return environment -> getSource(environment).nonTransitDistanceMeters;
-  }
-
-  @Override
-  public DataFetcher<Iterable<Leg>> legs() {
-    return environment -> getSource(environment).legs;
+  public DataFetcher<Long> endTime() {
+    return environment -> getSource(environment).endTime().getTime().getTime();
   }
 
   @Override
@@ -76,23 +61,38 @@ public class LegacyGraphQLItineraryImpl
   }
 
   @Override
-  public DataFetcher<Double> elevationGained() {
-    return environment -> getSource(environment).elevationGained;
+  public DataFetcher<Integer> generalizedCost() {
+    return environment -> getSource(environment).generalizedCost;
   }
 
   @Override
-  public DataFetcher<Double> elevationLost() {
-    return environment -> getSource(environment).elevationLost;
+  public DataFetcher<Iterable<Leg>> legs() {
+    return environment -> getSource(environment).legs;
   }
 
   @Override
-  public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
-    return environment -> getSource(environment).arrivedAtDestinationWithRentedVehicle;
+  public DataFetcher<Long> startTime() {
+    return environment -> getSource(environment).startTime().getTime().getTime();
   }
 
   @Override
   public DataFetcher<Iterable<SystemNotice>> systemNotices() {
     return environment -> getSource(environment).systemNotices;
+  }
+
+  @Override
+  public DataFetcher<Long> waitingTime() {
+    return environment -> (long) getSource(environment).waitingTimeSeconds;
+  }
+
+  @Override
+  public DataFetcher<Double> walkDistance() {
+    return environment -> getSource(environment).nonTransitDistanceMeters;
+  }
+
+  @Override
+  public DataFetcher<Long> walkTime() {
+    return environment -> (long) getSource(environment).nonTransitTimeSeconds;
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

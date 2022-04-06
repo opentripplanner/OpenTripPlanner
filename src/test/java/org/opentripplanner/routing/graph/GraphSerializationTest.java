@@ -23,12 +23,12 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 
 /**
- * Tests that saving a graph and reloading it (round trip through serialization and deserialization) does not corrupt
- * the graph, and yields exactly the same data.
- *
- * We tried several existing libraries to perform the comparison but nothing did exactly what we needed in a way that
- * we could control precisely.
- *
+ * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
+ * does not corrupt the graph, and yields exactly the same data.
+ * <p>
+ * We tried several existing libraries to perform the comparison but nothing did exactly what we
+ * needed in a way that we could control precisely.
+ * <p>
  * Created by abyrd on 2018-10-26
  */
 public class GraphSerializationTest {
@@ -57,14 +57,16 @@ public class GraphSerializationTest {
   // serialization and deserialization should produce identical graphs.
 
   /**
-   * Test comparison of two references to the same graph. This should obviously yield no differences at all,
-   * and allows us to perform a very deep comparison of almost the entire object graph because there are no problems
-   * with lists being reordered, transient indexes being rebuilt, etc. The ObjectDiffer supports such comparisons
-   * of identical objects with a special switch specifically for testing.
-   *
-   * This is as much a test of the ObjectDiffer itself as of OpenTripPlanner serialization. It is situated here
-   * instead of in the same package as ObjectDiffer so it has access to the OpenTripPlanner classes, which provide a
-   * suitably complex tangle of fields and references for exercising all the differ's capabilities.
+   * Test comparison of two references to the same graph. This should obviously yield no differences
+   * at all, and allows us to perform a very deep comparison of almost the entire object graph
+   * because there are no problems with lists being reordered, transient indexes being rebuilt, etc.
+   * The ObjectDiffer supports such comparisons of identical objects with a special switch
+   * specifically for testing.
+   * <p>
+   * This is as much a test of the ObjectDiffer itself as of OpenTripPlanner serialization. It is
+   * situated here instead of in the same package as ObjectDiffer so it has access to the
+   * OpenTripPlanner classes, which provide a suitably complex tangle of fields and references for
+   * exercising all the differ's capabilities.
    */
   @Test
   public void compareGraphToItself() {
@@ -101,32 +103,6 @@ public class GraphSerializationTest {
     Graph graph1 = new Graph();
     Graph graph2 = new Graph();
     assertNoDifferences(graph1, graph2);
-  }
-
-  /**
-   * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
-   */
-  private void testRoundTrip(Graph originalGraph) throws Exception {
-    // The cached timezone in the graph is transient and lazy-initialized.
-    // Previous tests may have caused a timezone to be cached.
-    originalGraph.clearTimeZone();
-    // Now round-trip the graph through serialization.
-    File tempFile = TempFile.createTempFile("graph", "pdx");
-    SerializedGraphObject serializedObj = new SerializedGraphObject(
-      originalGraph,
-      BuildConfig.DEFAULT,
-      RouterConfig.DEFAULT
-    );
-    serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
-    Graph copiedGraph1 = SerializedGraphObject.load(tempFile);
-    // Index both graph - we do no know if the original is indexed, because it is cached and
-    // might be indexed by other tests.
-    originalGraph.index();
-    copiedGraph1.index();
-    assertNoDifferences(originalGraph, copiedGraph1);
-    Graph copiedGraph2 = SerializedGraphObject.load(tempFile);
-    copiedGraph2.index();
-    assertNoDifferences(copiedGraph1, copiedGraph2);
   }
 
   private static void assertNoDifferences(Graph g1, Graph g2) {
@@ -168,5 +144,32 @@ public class GraphSerializationTest {
     objectDiffer.printSummary();
     // Print differences before assertion so we can see what went wrong.
     assertFalse(objectDiffer.hasDifferences());
+  }
+
+  /**
+   * Tests that saving a Graph to disk and reloading it results in a separate but semantically
+   * identical Graph.
+   */
+  private void testRoundTrip(Graph originalGraph) throws Exception {
+    // The cached timezone in the graph is transient and lazy-initialized.
+    // Previous tests may have caused a timezone to be cached.
+    originalGraph.clearTimeZone();
+    // Now round-trip the graph through serialization.
+    File tempFile = TempFile.createTempFile("graph", "pdx");
+    SerializedGraphObject serializedObj = new SerializedGraphObject(
+      originalGraph,
+      BuildConfig.DEFAULT,
+      RouterConfig.DEFAULT
+    );
+    serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
+    Graph copiedGraph1 = SerializedGraphObject.load(tempFile);
+    // Index both graph - we do no know if the original is indexed, because it is cached and
+    // might be indexed by other tests.
+    originalGraph.index();
+    copiedGraph1.index();
+    assertNoDifferences(originalGraph, copiedGraph1);
+    Graph copiedGraph2 = SerializedGraphObject.load(tempFile);
+    copiedGraph2.index();
+    assertNoDifferences(copiedGraph1, copiedGraph2);
   }
 }

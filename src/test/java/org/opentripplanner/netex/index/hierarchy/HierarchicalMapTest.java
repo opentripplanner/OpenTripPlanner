@@ -38,8 +38,8 @@ import org.opentripplanner.netex.index.api.HMapValidationRule;
  *  State     |           | Schwarzenegger |          | Schwarzenegger |
  *  City      |           |                | Eastwood | Reagan         |
  * </pre>
- * Now we use this test setup to test the {@link HierarchicalMap} and
- * {@link AbstractHierarchicalMap} class.
+ * Now we use this test setup to test the {@link HierarchicalMap} and {@link
+ * AbstractHierarchicalMap} class.
  */
 public class HierarchicalMapTest {
 

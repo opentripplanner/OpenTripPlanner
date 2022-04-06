@@ -32,16 +32,6 @@ public abstract class AbstractFilterLogger implements Logger {
     this.delegate = delegate;
   }
 
-  /**
-   * This method is called from all {@code info, warn, and error}, if it return {@code true}
-   * the log event is muted, if not the event is logged.
-   */
-  abstract boolean mute();
-
-  Logger getDelegate() {
-    return delegate;
-  }
-
   @Override
   public String getName() {
     return delegate.getName();
@@ -435,5 +425,15 @@ public abstract class AbstractFilterLogger implements Logger {
       return;
     }
     delegate.error(marker, msg, t);
+  }
+
+  /**
+   * This method is called from all {@code info, warn, and error}, if it return {@code true} the log
+   * event is muted, if not the event is logged.
+   */
+  abstract boolean mute();
+
+  Logger getDelegate() {
+    return delegate;
   }
 }

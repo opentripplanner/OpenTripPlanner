@@ -6,8 +6,8 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.EgressPathView;
 
 /**
- * The purpose of this class is hold information about a destination arrival and
- * compute the values for arrival time and cost.
+ * The purpose of this class is hold information about a destination arrival and compute the values
+ * for arrival time and cost.
  * <p/>
  * Compared with the ParetoSet of each stop we need two extra criteria:
  * <ul>

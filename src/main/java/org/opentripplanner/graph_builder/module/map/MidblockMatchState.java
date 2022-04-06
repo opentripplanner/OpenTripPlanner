@@ -17,14 +17,10 @@ public class MidblockMatchState extends MatchState {
   private static final double MAX_ERROR = 1000;
 
   private final LinearLocation edgeIndex;
-
-  public LinearLocation routeIndex;
-
-  Geometry routeGeometry;
-
   private final Geometry edgeGeometry;
-
   private final LocationIndexedLine indexedEdge;
+  public LinearLocation routeIndex;
+  Geometry routeGeometry;
 
   public MidblockMatchState(
     MatchState parent,
@@ -228,6 +224,22 @@ public class MidblockMatchState extends MatchState {
     }
   }
 
+  public int hashCode() {
+    return (edge.hashCode() * 1337 + hashCode(edgeIndex)) * 1337 + hashCode(routeIndex);
+  }
+
+  public boolean equals(Object o) {
+    if (!(o instanceof MidblockMatchState)) {
+      return false;
+    }
+    MidblockMatchState other = (MidblockMatchState) o;
+    return (
+      other.edge == edge &&
+      other.edgeIndex.compareTo(edgeIndex) == 0 &&
+      other.routeIndex.compareTo(routeIndex) == 0
+    );
+  }
+
   public String toString() {
     return (
       "MidblockMatchState(" +
@@ -241,10 +253,6 @@ public class MidblockMatchState extends MatchState {
     );
   }
 
-  public int hashCode() {
-    return (edge.hashCode() * 1337 + hashCode(edgeIndex)) * 1337 + hashCode(routeIndex);
-  }
-
   private int hashCode(LinearLocation location) {
     return (
       location.getComponentIndex() *
@@ -252,18 +260,6 @@ public class MidblockMatchState extends MatchState {
       location.getSegmentIndex() *
       37 +
       Double.valueOf(location.getSegmentFraction()).hashCode()
-    );
-  }
-
-  public boolean equals(Object o) {
-    if (!(o instanceof MidblockMatchState)) {
-      return false;
-    }
-    MidblockMatchState other = (MidblockMatchState) o;
-    return (
-      other.edge == edge &&
-      other.edgeIndex.compareTo(edgeIndex) == 0 &&
-      other.routeIndex.compareTo(routeIndex) == 0
     );
   }
 }

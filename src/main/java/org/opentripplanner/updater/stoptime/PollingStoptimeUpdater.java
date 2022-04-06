@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Update OTP stop time tables from some (realtime) source
- *
+ * <p>
  * Usage example:
  *
  * <pre>
@@ -22,44 +22,35 @@ import org.slf4j.LoggerFactory;
  * rt.url = http://host.tld/path
  * rt.feedId = TA
  * </pre>
- *
  */
 public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
-
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  private WriteToGraphCallback saveResultOnGraph;
-
   /**
    * Update streamer
    */
   private final TripUpdateSource updateSource;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer logFrequency;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer maxSnapshotFrequency;
-
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private final Boolean purgeExpiredData;
-
   /**
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
-
   private final boolean fuzzyTripMatching;
-
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  private WriteToGraphCallback saveResultOnGraph;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer logFrequency;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer maxSnapshotFrequency;
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
@@ -121,6 +112,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
   }
 
+  @Override
+  public void teardown() {}
+
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
    * applies those updates to the graph.
@@ -141,9 +135,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
       saveResultOnGraph.execute(runnable);
     }
   }
-
-  @Override
-  public void teardown() {}
 
   public String toString() {
     String s = (updateSource == null) ? "NONE" : updateSource.toString();

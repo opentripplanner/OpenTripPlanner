@@ -26,11 +26,9 @@ import org.rutebanken.netex.model.StopPointInJourneyPattern;
 /**
  * Maps booking info from NeTEx BookingArrangements, FlexibleServiceProperties, and FlexibleLine
  * into OTP BookingInfo.
- *
- * The precedence is as follows:
- * 1. BookingArrangements
- * 2. FlexibleServiceProperties
- * 3. FlexibleLine
+ * <p>
+ * The precedence is as follows: 1. BookingArrangements 2. FlexibleServiceProperties 3.
+ * FlexibleLine
  */
 public class BookingInfoMapper {
 
@@ -57,6 +55,42 @@ public class BookingInfoMapper {
       return map(flexibleLine, ref("FlexibleLine", flexibleLine));
     }
     return null;
+  }
+
+  private static BookingTime mapLatestBookingTime(
+    LocalTime latestBookingTime,
+    PurchaseWhenEnumeration purchaseWhen
+  ) {
+    switch (purchaseWhen) {
+      case UNTIL_PREVIOUS_DAY:
+        return new BookingTime(latestBookingTime, 1);
+      case DAY_OF_TRAVEL_ONLY:
+      case ADVANCE_ONLY:
+      case ADVANCE_AND_DAY_OF_TRAVEL:
+        return new BookingTime(latestBookingTime, 0);
+      case TIME_OF_TRAVEL_ONLY:
+        return null;
+      default:
+        throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
+    }
+  }
+
+  private static BookingTime mapEarliestBookingTime(PurchaseWhenEnumeration purchaseWhen) {
+    switch (purchaseWhen) {
+      case UNTIL_PREVIOUS_DAY:
+      case ADVANCE_ONLY:
+      case ADVANCE_AND_DAY_OF_TRAVEL:
+      case TIME_OF_TRAVEL_ONLY:
+        return null;
+      case DAY_OF_TRAVEL_ONLY:
+        return new BookingTime(LocalTime.MIDNIGHT, 0);
+      default:
+        throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
+    }
+  }
+
+  private static String ref(String type, EntityStructure entity) {
+    return type + "(" + entity.getId() + ")";
   }
 
   private BookingInfo map(BookingArrangementsStructure bookingArrangements, String entityRef) {
@@ -160,41 +194,5 @@ public class BookingInfoMapper {
       null,
       null
     );
-  }
-
-  private static BookingTime mapLatestBookingTime(
-    LocalTime latestBookingTime,
-    PurchaseWhenEnumeration purchaseWhen
-  ) {
-    switch (purchaseWhen) {
-      case UNTIL_PREVIOUS_DAY:
-        return new BookingTime(latestBookingTime, 1);
-      case DAY_OF_TRAVEL_ONLY:
-      case ADVANCE_ONLY:
-      case ADVANCE_AND_DAY_OF_TRAVEL:
-        return new BookingTime(latestBookingTime, 0);
-      case TIME_OF_TRAVEL_ONLY:
-        return null;
-      default:
-        throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
-    }
-  }
-
-  private static BookingTime mapEarliestBookingTime(PurchaseWhenEnumeration purchaseWhen) {
-    switch (purchaseWhen) {
-      case UNTIL_PREVIOUS_DAY:
-      case ADVANCE_ONLY:
-      case ADVANCE_AND_DAY_OF_TRAVEL:
-      case TIME_OF_TRAVEL_ONLY:
-        return null;
-      case DAY_OF_TRAVEL_ONLY:
-        return new BookingTime(LocalTime.MIDNIGHT, 0);
-      default:
-        throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
-    }
-  }
-
-  private static String ref(String type, EntityStructure entity) {
-    return type + "(" + entity.getId() + ")";
   }
 }

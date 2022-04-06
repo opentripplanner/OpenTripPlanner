@@ -17,11 +17,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
 /**
- * This class is responsible for creating a a result collector - the
- * set of paths.
+ * This class is responsible for creating a a result collector - the set of paths.
  * <p/>
- * This class have REQUEST scope, so a new instance should be created
- * for each new request/travel search.
+ * This class have REQUEST scope, so a new instance should be created for each new request/travel
+ * search.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -34,9 +33,8 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a new {@link DestinationArrivalPaths} each time it is invoked.
-   * The given {@code includeCost} decide if the cost should be included in the
-   * pareto set criteria or not.
+   * Create a new {@link DestinationArrivalPaths} each time it is invoked. The given {@code
+   * includeCost} decide if the cost should be included in the pareto set criteria or not.
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
     return new DestinationArrivalPaths<>(

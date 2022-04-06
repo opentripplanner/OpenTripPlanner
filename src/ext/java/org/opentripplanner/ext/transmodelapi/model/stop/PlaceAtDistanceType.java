@@ -58,8 +58,8 @@ public class PlaceAtDistanceType {
   }
 
   /**
-   * Create PlaceAndDistance objects for all unique stopPlaces according to specified
-   * multiModalMode if client has requested stopPlace type.
+   * Create PlaceAndDistance objects for all unique stopPlaces according to specified multiModalMode
+   * if client has requested stopPlace type.
    * <p>
    * Necessary because nearest does not support StopPlace (stations), so we need to fetch quays
    * instead and map the response.

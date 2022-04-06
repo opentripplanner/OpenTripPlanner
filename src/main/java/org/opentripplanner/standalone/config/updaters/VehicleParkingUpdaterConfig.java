@@ -23,14 +23,6 @@ public class VehicleParkingUpdaterConfig {
     CONFIG_MAPPING.put("bicycle-park-api", DataSourceType.BICYCLE_PARK_API);
   }
 
-  private static DataSourceType mapStringToSourceType(String typeKey) {
-    DataSourceType type = CONFIG_MAPPING.get(typeKey);
-    if (type == null) {
-      throw new OtpAppException("The updater source type is unknown: " + typeKey);
-    }
-    return type;
-  }
-
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
     var sourceType = mapStringToSourceType(c.asText("sourceType"));
     var feedId = c.asText("feedId", null);
@@ -69,5 +61,13 @@ public class VehicleParkingUpdaterConfig {
       default:
         throw new OtpAppException("The updater source type is unhandled: " + sourceType);
     }
+  }
+
+  private static DataSourceType mapStringToSourceType(String typeKey) {
+    DataSourceType type = CONFIG_MAPPING.get(typeKey);
+    if (type == null) {
+      throw new OtpAppException("The updater source type is unknown: " + typeKey);
+    }
+    return type;
   }
 }

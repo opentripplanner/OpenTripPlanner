@@ -15,14 +15,54 @@ public class LegacyGraphQLBikeRentalStationImpl
   final String STATE_OFF = "Station off";
 
   @Override
+  public DataFetcher<Boolean> allowDropoff() {
+    return environment -> getSource(environment).isAllowDropoff();
+  }
+
+  @Override
+  public DataFetcher<Boolean> allowDropoffNow() {
+    return environment -> getSource(environment).allowDropoffNow();
+  }
+
+  @Override
+  public DataFetcher<Boolean> allowOverloading() {
+    return environment -> getSource(environment).isAllowOverloading();
+  }
+
+  @Override
+  public DataFetcher<Boolean> allowPickup() {
+    return environment -> getSource(environment).isAllowPickup();
+  }
+
+  @Override
+  public DataFetcher<Boolean> allowPickupNow() {
+    return environment -> getSource(environment).allowPickupNow();
+  }
+
+  @Override
+  public DataFetcher<Integer> bikesAvailable() {
+    return environment -> getSource(environment).getVehiclesAvailable();
+  }
+
+  @Override
+  public DataFetcher<Integer> capacity() {
+    return environment -> getSource(environment).getCapacity();
+  }
+
+  @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment ->
       new Relay.ResolvedGlobalId("BikeRentalStation", getSource(environment).getId().toString());
   }
 
   @Override
-  public DataFetcher<String> stationId() {
-    return environment -> getSource(environment).getStationId();
+  public DataFetcher<Double> lat() {
+    return environment -> getSource(environment).getLatitude();
+  }
+
+  @Override
+  public DataFetcher<Double> lon() {
+    return environment -> getSource(environment).getLongitude();
   }
 
   @Override
@@ -31,8 +71,24 @@ public class LegacyGraphQLBikeRentalStationImpl
   }
 
   @Override
-  public DataFetcher<Integer> bikesAvailable() {
-    return environment -> getSource(environment).getVehiclesAvailable();
+  public DataFetcher<Iterable<String>> networks() {
+    return environment -> List.of(getSource(environment).getNetwork());
+  }
+
+  @Override
+  public DataFetcher<Boolean> operative() {
+    return environment ->
+      getSource(environment).isAllowPickup() && getSource(environment).isAllowDropoff();
+  }
+
+  @Override
+  public DataFetcher<Boolean> realtime() {
+    return environment -> getSource(environment).isRealTimeData();
+  }
+
+  @Override
+  public DataFetcher<VehicleRentalStationUris> rentalUris() {
+    return environment -> getSource(environment).getRentalUris();
   }
 
   @Override
@@ -56,64 +112,8 @@ public class LegacyGraphQLBikeRentalStationImpl
   }
 
   @Override
-  public DataFetcher<Boolean> realtime() {
-    return environment -> getSource(environment).isRealTimeData();
-  }
-
-  @Override
-  public DataFetcher<Boolean> allowDropoff() {
-    return environment -> getSource(environment).isAllowDropoff();
-  }
-
-  @Override
-  public DataFetcher<Boolean> allowDropoffNow() {
-    return environment -> getSource(environment).allowDropoffNow();
-  }
-
-  @Override
-  public DataFetcher<Boolean> allowPickup() {
-    return environment -> getSource(environment).isAllowPickup();
-  }
-
-  @Override
-  public DataFetcher<Boolean> allowPickupNow() {
-    return environment -> getSource(environment).allowPickupNow();
-  }
-
-  @Override
-  public DataFetcher<Iterable<String>> networks() {
-    return environment -> List.of(getSource(environment).getNetwork());
-  }
-
-  @Override
-  public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).getLongitude();
-  }
-
-  @Override
-  public DataFetcher<Double> lat() {
-    return environment -> getSource(environment).getLatitude();
-  }
-
-  @Override
-  public DataFetcher<Boolean> allowOverloading() {
-    return environment -> getSource(environment).isAllowOverloading();
-  }
-
-  @Override
-  public DataFetcher<Integer> capacity() {
-    return environment -> getSource(environment).getCapacity();
-  }
-
-  @Override
-  public DataFetcher<Boolean> operative() {
-    return environment ->
-      getSource(environment).isAllowPickup() && getSource(environment).isAllowDropoff();
-  }
-
-  @Override
-  public DataFetcher<VehicleRentalStationUris> rentalUris() {
-    return environment -> getSource(environment).getRentalUris();
+  public DataFetcher<String> stationId() {
+    return environment -> getSource(environment).getStationId();
   }
 
   private VehicleRentalPlace getSource(DataFetchingEnvironment environment) {

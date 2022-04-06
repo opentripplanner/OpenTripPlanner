@@ -24,6 +24,9 @@ public class GrizzlyServer {
   private static final Logger LOG = LoggerFactory.getLogger(GrizzlyServer.class);
 
   private static final int MIN_THREADS = 4;
+  /** The command line parameters, including things like port number and content directories. */
+  private final CommandLineParameters params;
+  private final Application app;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
@@ -32,10 +35,6 @@ public class GrizzlyServer {
     SLF4JBridgeHandler.install();
   }
 
-  /** The command line parameters, including things like port number and content directories. */
-  private final CommandLineParameters params;
-  private final Application app;
-
   /** Construct a Grizzly server with the given IoC injector and command line parameters. */
   public GrizzlyServer(CommandLineParameters params, Application app) {
     this.params = params;
@@ -43,28 +42,9 @@ public class GrizzlyServer {
   }
 
   /**
-   * OTP is CPU-bound, so we want roughly as many worker threads as we have cores, subject to some constraints.
-   */
-  private int getMaxThreads() {
-    int maxThreads = Runtime.getRuntime().availableProcessors();
-    LOG.info("Java reports that this machine has {} available processors.", maxThreads);
-    // Testing shows increased throughput up to 1.25x as many threads as cores
-    maxThreads *= 1.25;
-    if (params.maxThreads != null) {
-      maxThreads = params.maxThreads;
-      LOG.info("Based on configuration, forced max thread pool size to {} threads.", maxThreads);
-    }
-    if (maxThreads < MIN_THREADS) {
-      // Some machines apparently report 1 processor even when they have 8.
-      maxThreads = MIN_THREADS;
-    }
-    LOG.info("Maximum HTTP handler thread pool size will be {} threads.", maxThreads);
-    return maxThreads;
-  }
-
-  /**
-   * This function goes through roughly the same steps as Jersey's GrizzlyServerFactory, but we instead construct
-   * an HttpServer and NetworkListener manually so we can set the number of threads and other details.
+   * This function goes through roughly the same steps as Jersey's GrizzlyServerFactory, but we
+   * instead construct an HttpServer and NetworkListener manually so we can set the number of
+   * threads and other details.
    */
   public void run() {
     LOG.info(
@@ -175,5 +155,26 @@ public class GrizzlyServer {
     // Clean up graceful shutdown hook before shutting down Grizzly.
     Runtime.getRuntime().removeShutdownHook(shutdownThread);
     httpServer.shutdown();
+  }
+
+  /**
+   * OTP is CPU-bound, so we want roughly as many worker threads as we have cores, subject to some
+   * constraints.
+   */
+  private int getMaxThreads() {
+    int maxThreads = Runtime.getRuntime().availableProcessors();
+    LOG.info("Java reports that this machine has {} available processors.", maxThreads);
+    // Testing shows increased throughput up to 1.25x as many threads as cores
+    maxThreads *= 1.25;
+    if (params.maxThreads != null) {
+      maxThreads = params.maxThreads;
+      LOG.info("Based on configuration, forced max thread pool size to {} threads.", maxThreads);
+    }
+    if (maxThreads < MIN_THREADS) {
+      // Some machines apparently report 1 processor even when they have 8.
+      maxThreads = MIN_THREADS;
+    }
+    LOG.info("Maximum HTTP handler thread pool size will be {} threads.", maxThreads);
+    return maxThreads;
   }
 }

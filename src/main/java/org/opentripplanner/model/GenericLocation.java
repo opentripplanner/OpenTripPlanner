@@ -22,8 +22,8 @@ public class GenericLocation {
   public final FeedScopedId stopId;
 
   /**
-   * Coordinates of the location. These can be used by themselves or as a fallback if placeId is
-   * not found.
+   * Coordinates of the location. These can be used by themselves or as a fallback if placeId is not
+   * found.
    */
   public final Double lat;
 
@@ -43,6 +43,10 @@ public class GenericLocation {
     this.lng = lng;
   }
 
+  public static GenericLocation fromStopId(String name, String feedId, String stopId) {
+    return new GenericLocation(name, new FeedScopedId(feedId, stopId), null, null);
+  }
+
   /**
    * Returns this as a Coordinate object.
    */
@@ -55,10 +59,6 @@ public class GenericLocation {
 
   public boolean isSpecified() {
     return stopId != null || (lat != null && lng != null);
-  }
-
-  public static GenericLocation fromStopId(String name, String feedId, String stopId) {
-    return new GenericLocation(name, new FeedScopedId(feedId, stopId), null, null);
   }
 
   @Override

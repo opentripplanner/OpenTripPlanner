@@ -9,17 +9,17 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * This class is responsible for holding information about a test result - a single
- * itinerary. The result can be expected or actual, both represented by this class.
+ * This class is responsible for holding information about a test result - a single itinerary. The
+ * result can be expected or actual, both represented by this class.
  * <p>
- * Implementation details: This is NOT converted into a record, because it is hard to
- * enforce the restrictions on agencies, modes, routes and stops. Second, it is not
- * much simpler/less code.
+ * Implementation details: This is NOT converted into a record, because it is hard to enforce the
+ * restrictions on agencies, modes, routes and stops. Second, it is not much simpler/less code.
  */
 class Result {
 
   /**
-   * The status is not final; This allows to update the status when matching expected and actual results.
+   * The status is not final; This allows to update the status when matching expected and actual
+   * results.
    */
   final String testCaseId;
   final Integer nTransfers;
@@ -37,7 +37,10 @@ class Result {
   final List<String> routes;
   /** A list of stops in tha same order as they appear in the journey. */
   final List<String> stops;
-  /** Summary description of the journey, like: "Walk 2m ~ Stop A ~ Route L1 12:00 - 12:30 ~ Stop B ~ Walk 3m" */
+  /**
+   * Summary description of the journey, like: "Walk 2m ~ Stop A ~ Route L1 12:00 - 12:30 ~ Stop B ~
+   * Walk 3m"
+   */
   final String details;
 
   Result(
@@ -78,21 +81,6 @@ class Result {
     );
   }
 
-  private static Comparator<Result> compareCost(boolean skipCost) {
-    return (r1, r2) -> {
-      if (skipCost) {
-        return 0;
-      }
-      if (r1.cost == null || r1.cost.equals(0)) {
-        return 0;
-      }
-      if (r2.cost == null || r2.cost.equals(0)) {
-        return 0;
-      }
-      return -(r2.cost - r1.cost);
-    };
-  }
-
   /** Create a compact String representation of an itinerary. */
   @Override
   public String toString() {
@@ -121,6 +109,21 @@ class Result {
       }
     }
     return a.size() - b.size();
+  }
+
+  private static Comparator<Result> compareCost(boolean skipCost) {
+    return (r1, r2) -> {
+      if (skipCost) {
+        return 0;
+      }
+      if (r1.cost == null || r1.cost.equals(0)) {
+        return 0;
+      }
+      if (r2.cost == null || r2.cost.equals(0)) {
+        return 0;
+      }
+      return -(r2.cost - r1.cost);
+    };
   }
 
   private static <T> List<T> sortedList(Collection<T> values) {

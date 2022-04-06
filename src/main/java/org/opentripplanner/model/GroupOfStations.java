@@ -8,21 +8,17 @@ import org.opentripplanner.util.I18NString;
 
 /**
  * A grouping that can contain a mix of Stations and MultiModalStations. It can be used to link
- * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster
- * of stops that naturally belong together.
+ * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster of
+ * stops that naturally belong together.
  */
 public class GroupOfStations extends TransitEntity implements StopCollection {
 
   private static final long serialVersionUID = 1L;
-
+  private final Set<StopCollection> childStations = new HashSet<>();
   private I18NString name;
-
   // TODO Map from NeTEx
   private PurposeOfGrouping purposeOfGrouping;
-
   private WgsCoordinate coordinate;
-
-  private final Set<StopCollection> childStations = new HashSet<>();
 
   public GroupOfStations(FeedScopedId id) {
     super(id);
@@ -36,6 +32,12 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
     this.name = name;
   }
 
+  public Collection<StopLocation> getChildStops() {
+    return this.childStations.stream()
+      .flatMap(s -> s.getChildStops().stream())
+      .collect(Collectors.toUnmodifiableList());
+  }
+
   @Override
   public WgsCoordinate getCoordinate() {
     return coordinate;
@@ -43,12 +45,6 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
 
   public void setCoordinate(WgsCoordinate coordinate) {
     this.coordinate = coordinate;
-  }
-
-  public Collection<StopLocation> getChildStops() {
-    return this.childStations.stream()
-      .flatMap(s -> s.getChildStops().stream())
-      .collect(Collectors.toUnmodifiableList());
   }
 
   public Collection<StopCollection> getChildStations() {
@@ -84,8 +80,8 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
      */
     GENERALIZATION,
     /**
-     * Stop places in proximity to each other which have a natural geospatial- or
-     * public transport related relationship.
+     * Stop places in proximity to each other which have a natural geospatial- or public transport
+     * related relationship.
      */
     CLUSTER,
   }

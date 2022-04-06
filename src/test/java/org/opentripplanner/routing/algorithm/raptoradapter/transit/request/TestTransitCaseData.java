@@ -24,6 +24,11 @@ public final class TestTransitCaseData {
 
   public static final int OFFSET = 0;
 
+  static {
+    setupStationStopRelationship(STATION_A, STOP_A);
+    setupStationStopRelationship(STATION_B, STOP_B);
+  }
+
   public static FeedScopedId id(String id) {
     return new FeedScopedId("F", id);
   }
@@ -35,11 +40,6 @@ public final class TestTransitCaseData {
       }
     }
     throw new IllegalArgumentException();
-  }
-
-  static {
-    setupStationStopRelationship(STATION_A, STOP_A);
-    setupStationStopRelationship(STATION_B, STOP_B);
   }
 
   private static void setupStationStopRelationship(Station station, Stop... stops) {

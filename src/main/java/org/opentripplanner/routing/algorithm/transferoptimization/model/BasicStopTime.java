@@ -25,14 +25,8 @@ final class BasicStopTime implements StopTime {
   }
 
   @Override
-  public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
-      .addText("[")
-      .addNum(stop)
-      .addServiceTime(time)
-      .addText("]")
-      .toString();
+  public int hashCode() {
+    return Objects.hash(stop, time);
   }
 
   @Override
@@ -48,7 +42,13 @@ final class BasicStopTime implements StopTime {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(stop, time);
+  public String toString() {
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("[")
+      .addNum(stop)
+      .addServiceTime(time)
+      .addText("]")
+      .toString();
   }
 }

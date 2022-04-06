@@ -18,11 +18,9 @@ import org.slf4j.LoggerFactory;
  * tile rendering context (bounding box, image graphic context, affine transform, etc...) and call
  * the renderer to paint the tile.
  *
+ * @author laurent
  * @see GraphInspectorTileResource
  * @see TileRenderer
- *
- * @author laurent
- *
  */
 public class TileRendererManager {
 
@@ -97,10 +95,8 @@ public class TileRendererManager {
 
   /**
    * Gets all renderers
-   *
-   * Used to return list of renderers to client.
-   * Could be also used to show legend.
-   * @return
+   * <p>
+   * Used to return list of renderers to client. Could be also used to show legend.
    */
   public Map<String, TileRenderer> getRenderers() {
     return renderers;

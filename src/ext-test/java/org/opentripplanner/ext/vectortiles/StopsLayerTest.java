@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vectortiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;

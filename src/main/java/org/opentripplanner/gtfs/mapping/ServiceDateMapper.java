@@ -6,7 +6,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 /** Responsible for mapping GTFS ServiceDate into the OTP model. */
 class ServiceDateMapper {
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   static ServiceDate mapServiceDate(org.onebusaway.gtfs.model.calendar.ServiceDate orginal) {
     return orginal == null
       ? null

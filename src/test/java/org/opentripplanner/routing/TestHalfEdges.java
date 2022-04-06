@@ -51,14 +51,13 @@ import org.opentripplanner.util.TestUtils;
 
 public class TestHalfEdges {
 
+  @Rule
+  public final ExpectedException exception = ExpectedException.none();
+
   Graph graph;
-
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
-
   private IntersectionVertex br, tr, bl, tl;
-
   private TransitStopVertex station1;
-
   private TransitStopVertex station2;
 
   public LineString createGeometry(Vertex a, Vertex b) {
@@ -68,9 +67,6 @@ public class TestHalfEdges {
     cs[1] = b.getCoordinate();
     return factory.createLineString(cs);
   }
-
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
   @Before
   public void setUp() {
@@ -464,8 +460,8 @@ public class TestHalfEdges {
   }
 
   /**
-   * Test that alerts on split streets are preserved, i.e. if there are alerts on the street that is split the same alerts should be present on the
-   * new street.
+   * Test that alerts on split streets are preserved, i.e. if there are alerts on the street that is
+   * split the same alerts should be present on the new street.
    */
   @Test
   public void testStreetSplittingAlerts() {

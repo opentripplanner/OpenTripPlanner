@@ -2,7 +2,6 @@ package org.opentripplanner.ext.transmodelapi.model.timetable;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.SERVICE_ALTERATION;
 
-import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;

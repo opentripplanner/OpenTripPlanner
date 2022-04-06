@@ -30,6 +30,26 @@ public class HierarchicalMap<K, V> extends AbstractHierarchicalMap<K, V> {
     return (HierarchicalMap<K, V>) super.parent();
   }
 
+  @Override
+  V localGet(K key) {
+    return map.get(key);
+  }
+
+  @Override
+  boolean localContainsKey(K key) {
+    return map.containsKey(key);
+  }
+
+  @Override
+  protected int localSize() {
+    return map.size();
+  }
+
+  @Override
+  void localRemove(K key) {
+    map.remove(key);
+  }
+
   /**
    * Add a new pair of {@code key & value} to the local map instance.
    */
@@ -64,25 +84,5 @@ public class HierarchicalMap<K, V> extends AbstractHierarchicalMap<K, V> {
   @Override
   public boolean localIsEmpty() {
     return map.isEmpty();
-  }
-
-  @Override
-  V localGet(K key) {
-    return map.get(key);
-  }
-
-  @Override
-  boolean localContainsKey(K key) {
-    return map.containsKey(key);
-  }
-
-  @Override
-  protected int localSize() {
-    return map.size();
-  }
-
-  @Override
-  void localRemove(K key) {
-    map.remove(key);
   }
 }

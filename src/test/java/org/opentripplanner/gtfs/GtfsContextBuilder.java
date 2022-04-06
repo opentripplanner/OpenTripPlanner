@@ -16,23 +16,24 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
 /**
- * This class helps building GtfsContext and post process
- * the GtfsDao by repairing StopTimes(optional) and generating TripPatterns(optional).
- * This done in the {@link GtfsModule} in the production code.
+ * This class helps building GtfsContext and post process the GtfsDao by repairing
+ * StopTimes(optional) and generating TripPatterns(optional). This done in the {@link GtfsModule} in
+ * the production code.
  */
 public class GtfsContextBuilder {
 
   private final GtfsFeedId feedId;
 
   private final OtpTransitServiceBuilder transitBuilder;
-
+  private final boolean repairStopTimesAndGenerateTripPatterns = true;
   private CalendarService calendarService = null;
-
   private DataImportIssueStore issueStore = null;
-
   private Deduplicator deduplicator;
 
-  private final boolean repairStopTimesAndGenerateTripPatterns = true;
+  public GtfsContextBuilder(GtfsFeedId feedId, OtpTransitServiceBuilder transitBuilder) {
+    this.feedId = feedId;
+    this.transitBuilder = transitBuilder;
+  }
 
   public static GtfsContextBuilder contextBuilder(String path) throws IOException {
     return contextBuilder(null, path);
@@ -51,11 +52,6 @@ public class GtfsContextBuilder {
     OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();
     return new GtfsContextBuilder(feedId, transitBuilder)
       .withDataImportIssueStore(new DataImportIssueStore(false));
-  }
-
-  public GtfsContextBuilder(GtfsFeedId feedId, OtpTransitServiceBuilder transitBuilder) {
-    this.feedId = feedId;
-    this.transitBuilder = transitBuilder;
   }
 
   public GtfsFeedId getFeedId() {
@@ -103,10 +99,9 @@ public class GtfsContextBuilder {
   }
 
   /**
-   * By default this method is part of the {@link #build()} method.
-   * But in cases where you want to change the dao after building the
-   * context, and these changes will affect the TripPatterns generation,
-   * you should do the following:
+   * By default this method is part of the {@link #build()} method. But in cases where you want to
+   * change the dao after building the context, and these changes will affect the TripPatterns
+   * generation, you should do the following:
    *
    * <pre>
    * GtfsContextBuilder contextBuilder = &lt;create context builder>;
@@ -129,6 +124,10 @@ public class GtfsContextBuilder {
   }
 
   /* private stuff */
+
+  private static GtfsImport gtfsImport(String defaultFeedId, String path) throws IOException {
+    return new GtfsImport(defaultFeedId, new File(path));
+  }
 
   private void repairStopTimesForEachTrip() {
     new RepairStopTimesForEachTripOperation(transitBuilder.getStopTimesSortedByTrip(), issueStore)
@@ -157,10 +156,6 @@ public class GtfsContextBuilder {
       deduplicator = new Deduplicator();
     }
     return deduplicator;
-  }
-
-  private static GtfsImport gtfsImport(String defaultFeedId, String path) throws IOException {
-    return new GtfsImport(defaultFeedId, new File(path));
   }
 
   private static class GtfsContextImpl implements GtfsContext {

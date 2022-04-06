@@ -5,8 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Holds credentials and a bucket ID for downloading things from an Amazon S3 bucket.
- * These configuration options can be loaded from JSON using the fromJson method.
+ * Holds credentials and a bucket ID for downloading things from an Amazon S3 bucket. These
+ * configuration options can be loaded from JSON using the fromJson method.
  */
 public class S3BucketConfig {
 

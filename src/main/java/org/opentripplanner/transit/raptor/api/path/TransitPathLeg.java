@@ -55,6 +55,11 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
     return constrainedTransferAfterLeg;
   }
 
+  @Override
+  public int fromTime() {
+    return boardAndAlightTime.boardTime();
+  }
+
   /**
    * The stop index where the leg starts. Also called departure stop index.
    */
@@ -64,8 +69,8 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
   }
 
   @Override
-  public int fromTime() {
-    return boardAndAlightTime.boardTime();
+  public int toTime() {
+    return boardAndAlightTime.alightTime();
   }
 
   /**
@@ -74,11 +79,6 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
   @Override
   public int toStop() {
     return alightStop;
-  }
-
-  @Override
-  public int toTime() {
-    return boardAndAlightTime.alightTime();
   }
 
   @Override
@@ -104,6 +104,11 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(boardAndAlightTime, trip, next);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -117,11 +122,6 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
       trip.equals(that.trip) &&
       next.equals(that.next)
     );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(boardAndAlightTime, trip, next);
   }
 
   @Override

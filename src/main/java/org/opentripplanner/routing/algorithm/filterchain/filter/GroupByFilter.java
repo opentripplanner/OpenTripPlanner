@@ -8,8 +8,8 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 /**
- * This filter groups the itineraries using a group-id and filter each group
- * by the given {@code filter}.
+ * This filter groups the itineraries using a group-id and filter each group by the given {@code
+ * filter}.
  *
  * @see GroupId on how to group itineraries
  */

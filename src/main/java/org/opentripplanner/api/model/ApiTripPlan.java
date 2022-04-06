@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class ApiTripPlan {
 
-  /**  The time and date of travel */
+  /** The time and date of travel */
   public Date date;
 
   /** The origin */

@@ -32,7 +32,7 @@ public class LocationGroupMapper {
     return MapUtils.mapToList(allLocationGroups, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   FlexLocationGroup map(org.onebusaway.gtfs.model.LocationGroup orginal) {
     return orginal == null ? null : mappedLocationGroups.computeIfAbsent(orginal, this::doMap);
   }

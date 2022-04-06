@@ -6,11 +6,13 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
- * Represents a location on a street, somewhere between the two corners. This is used when computing the first and last segments of a trip, for trips
- * that start or end between two intersections. Also for situating bus stops in the middle of street segments.
+ * Represents a location on a street, somewhere between the two corners. This is used when computing
+ * the first and last segments of a trip, for trips that start or end between two intersections.
+ * Also for situating bus stops in the middle of street segments.
  */
 public class StreetLocation extends StreetVertex {
 
+  private static final long serialVersionUID = 1L;
   private boolean wheelchairAccessible;
 
   // maybe name should just be pulled from street being split
@@ -25,14 +27,17 @@ public class StreetLocation extends StreetVertex {
     super(null, id, nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
   }
 
-  private static final long serialVersionUID = 1L;
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
+  }
 
   public void setWheelchairAccessible(boolean wheelchairAccessible) {
     this.wheelchairAccessible = wheelchairAccessible;
   }
 
-  public boolean isWheelchairAccessible() {
-    return wheelchairAccessible;
+  @Override
+  public int hashCode() {
+    return getCoordinate().hashCode();
   }
 
   public boolean equals(Object o) {
@@ -41,10 +46,5 @@ public class StreetLocation extends StreetVertex {
       return other.getCoordinate().equals(getCoordinate());
     }
     return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return getCoordinate().hashCode();
   }
 }

@@ -38,19 +38,16 @@ import uk.org.siri.www.siri.SiriType;
 
 /**
  * This class starts a Google PubSub subscription
- *
- * NOTE:
- *   - Path to Google credentials (.json-file) MUST exist in environment-variable "GOOGLE_APPLICATION_CREDENTIALS"
- *     as described here: https://cloud.google.com/docs/authentication/getting-started
- *   - ServiceAccount need access to create subscription ("editor")
- *
- *
- *
- * Startup-flow:
- *   1. Create subscription to topic. Subscription will receive all updates after creation.
- *   2. Fetch current data to initialize state.
- *   3. Flag updater as initialized
- *   3. Start receiving updates from Pubsub-subscription
+ * <p>
+ * NOTE: - Path to Google credentials (.json-file) MUST exist in environment-variable
+ * "GOOGLE_APPLICATION_CREDENTIALS" as described here: https://cloud.google.com/docs/authentication/getting-started
+ * - ServiceAccount need access to create subscription ("editor")
+ * <p>
+ * <p>
+ * <p>
+ * Startup-flow: 1. Create subscription to topic. Subscription will receive all updates after
+ * creation. 2. Fetch current data to initialize state. 3. Flag updater as initialized 3. Start
+ * receiving updates from Pubsub-subscription
  *
  *
  * <pre>
@@ -59,7 +56,6 @@ import uk.org.siri.www.siri.SiriType;
  *   "topicName": "protobuf.estimated_timetables",                                      // Google Cloud Pubsub topic
  *   "dataInitializationUrl": "http://server/realtime/protobuf/et"  // Optional URL used to initialize OTP with all existing data
  * </pre>
- *
  */
 public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
@@ -68,35 +64,28 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private static final transient AtomicLong messageCounter = new AtomicLong(0);
   private static final transient AtomicLong updateCounter = new AtomicLong(0);
   private static final transient AtomicLong sizeCounter = new AtomicLong(0);
-
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  private WriteToGraphCallback saveResultOnGraph;
-
-  private SiriTimetableSnapshotSource snapshotSource;
-
   /**
    * The URL used to fetch all initial updates
    */
   private final URI dataInitializationUrl;
-
   /**
    * The ID for the static feed to which these TripUpdates are applied
    */
   private final String feedId;
-
   /**
    * The number of seconds to wait before reconnecting after a failed connection.
    */
   private final int reconnectPeriodSec;
-
   private final SubscriptionAdminClient subscriptionAdminClient;
   private final ProjectSubscriptionName subscriptionName;
   private final ProjectTopicName topic;
   private final PushConfig pushConfig;
   private final String configRef;
-
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  private WriteToGraphCallback saveResultOnGraph;
+  private SiriTimetableSnapshotSource snapshotSource;
   private transient long startTime;
   private boolean primed;
 
@@ -144,18 +133,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       }
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-
-  private void addShutdownHook() {
-    // TODO: This should probably be on a higher level?
-    try {
-      Runtime.getRuntime().addShutdownHook(new Thread(this::teardown));
-      LOG.info("Shutdown-hook to clean up Google Pubsub subscription has been added.");
-    } catch (IllegalStateException e) {
-      // Handling cornercase when instance is being shut down before it has been initialized
-      LOG.info("Instance is already shutting down - cleaning up immediately.", e);
-      teardown();
     }
   }
 
@@ -251,10 +228,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
   }
 
-  private long now() {
-    return ZonedDateTime.now().toInstant().toEpochMilli();
-  }
-
   @Override
   public void teardown() {
     if (subscriptionAdminClient != null) {
@@ -276,6 +249,22 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   @Override
   public String getConfigRef() {
     return configRef;
+  }
+
+  private void addShutdownHook() {
+    // TODO: This should probably be on a higher level?
+    try {
+      Runtime.getRuntime().addShutdownHook(new Thread(this::teardown));
+      LOG.info("Shutdown-hook to clean up Google Pubsub subscription has been added.");
+    } catch (IllegalStateException e) {
+      // Handling cornercase when instance is being shut down before it has been initialized
+      LOG.info("Instance is already shutting down - cleaning up immediately.", e);
+      teardown();
+    }
+  }
+
+  private long now() {
+    return ZonedDateTime.now().toInstant().toEpochMilli();
   }
 
   private String getTimeSinceStartupString() {

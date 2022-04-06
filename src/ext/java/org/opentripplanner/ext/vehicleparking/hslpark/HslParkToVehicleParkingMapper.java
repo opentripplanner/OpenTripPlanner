@@ -37,6 +37,18 @@ public class HslParkToVehicleParkingMapper {
     this.feedId = feedId;
   }
 
+  public static FeedScopedId createIdForNode(JsonNode jsonNode, String idName, String feedId) {
+    String id = jsonNode.path(idName).asText();
+    return new FeedScopedId(feedId, id);
+  }
+
+  public static Integer parseIntegerValue(JsonNode jsonNode, String fieldName) {
+    if (!jsonNode.has(fieldName)) {
+      return null;
+    }
+    return jsonNode.get(fieldName).asInt();
+  }
+
   public VehicleParking parsePark(JsonNode jsonNode) {
     var vehicleParkId = createIdForNode(jsonNode, "id", feedId);
     try {
@@ -102,18 +114,6 @@ public class HslParkToVehicleParkingMapper {
       log.warn("Error parsing park " + vehicleParkId, e);
       return null;
     }
-  }
-
-  public static FeedScopedId createIdForNode(JsonNode jsonNode, String idName, String feedId) {
-    String id = jsonNode.path(idName).asText();
-    return new FeedScopedId(feedId, id);
-  }
-
-  public static Integer parseIntegerValue(JsonNode jsonNode, String fieldName) {
-    if (!jsonNode.has(fieldName)) {
-      return null;
-    }
-    return jsonNode.get(fieldName).asInt();
   }
 
   private VehicleParkingSpaces parseVehicleSpaces(

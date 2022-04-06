@@ -51,8 +51,8 @@ public class TransitLayer {
 
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
-   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace
-   * entire keys and their values in the map.
+   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace entire
+   * keys and their values in the map.
    */
   public TransitLayer(TransitLayer transitLayer) {
     this(
@@ -105,11 +105,10 @@ public class TransitLayer {
   }
 
   /**
-   * This is the time zone which is used for interpreting all local "service" times
-   * (in transfers, trip schedules and so on). This is the time zone of the internal OTP
-   * time - which is used in logging and debugging. This is independent of the time zone
-   * of imported data and of the time zone used on any API - it can be the same, but it does
-   * not need to.
+   * This is the time zone which is used for interpreting all local "service" times (in transfers,
+   * trip schedules and so on). This is the time zone of the internal OTP time - which is used in
+   * logging and debugging. This is independent of the time zone of imported data and of the time
+   * zone used on any API - it can be the same, but it does not need to.
    */
   public ZoneId getTransitDataZoneId() {
     return transitDataZoneId;

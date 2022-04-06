@@ -14,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for serializing a GraphQL {@link ExecutionResult} into a String, which can be returned as
- * the body of the HTTP response. This differs from the mapper provided by {@link JSONObjectMapperProvider}, by
- * serializing all fields in the objects, including null fields.
+ * This class is responsible for serializing a GraphQL {@link ExecutionResult} into a String, which
+ * can be returned as the body of the HTTP response. This differs from the mapper provided by {@link
+ * JSONObjectMapperProvider}, by serializing all fields in the objects, including null fields.
  */
 public class GraphQLResponseSerializer {
 

@@ -22,8 +22,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class generates a nice HTML graph import data issue report.
+ * <p>
+ * They are created with the help of getHTMLMessage function in {@link DataImportIssue} derived
+ * classes.
  *
- * They are created with the help of getHTMLMessage function in {@link DataImportIssue} derived classes.
  * @author mabu
  */
 public class DataImportIssuesToHTML implements GraphBuilderModule {
@@ -53,9 +55,6 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
     this.reportDirectory = reportDirectory;
     this.maxNumberOfIssuesPerFile = maxNumberOfIssuesPerFile;
   }
-
-  @Override
-  public void checkInputs() {}
 
   @Override
   public void buildGraph(
@@ -115,9 +114,12 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
     }
   }
 
+  @Override
+  public void checkInputs() {}
+
   /**
-   * Delete report if it exist, and return true if successful. Return {@code false} if the
-   * {@code reportDirectory} is {@code null} or the directory can NOT be deleted.
+   * Delete report if it exist, and return true if successful. Return {@code false} if the {@code
+   * reportDirectory} is {@code null} or the directory can NOT be deleted.
    */
   private boolean deleteReportDirectoryAndContent() {
     if (reportDirectory == null) {
@@ -145,12 +147,12 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
 
   /**
    * Creates file with given type of issues
-   *
-   * If number of issues is larger then 'maxNumberOfIssuesPerFile' multiple files are generated.
-   * And named issueClassName1,2,3 etc.
+   * <p>
+   * If number of issues is larger then 'maxNumberOfIssuesPerFile' multiple files are generated. And
+   * named issueClassName1,2,3 etc.
    *
    * @param issueTypeName name of import data issue class and then also filename
-   * @param issues list of all import data issue with that class
+   * @param issues        list of all import data issue with that class
    */
   private void addIssues(String issueTypeName, List<String> issues) {
     HTMLWriter file_writer;
@@ -173,12 +175,25 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
 
   /**
    * Groups issues according to issue type, using the classname as type name.
-   *
-   * All issues are saved together in multimap where key is issue classname
-   * and values are list of issue with that class
+   * <p>
+   * All issues are saved together in multimap where key is issue classname and values are list of
+   * issue with that class
    */
   private void addIssue(DataImportIssue issue) {
     issues.put(issue.getType(), issue.getHTMLMessage());
+  }
+
+  private void closeReportDirectory() {
+    try {
+      reportDirectory.close();
+    } catch (IOException e) {
+      LOG.warn(
+        "Failed to close report directory: {}, details: {}. ",
+        reportDirectory.path(),
+        e.getLocalizedMessage(),
+        e
+      );
+    }
   }
 
   class HTMLWriter {
@@ -305,19 +320,6 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
       for (Map.Entry<String, String> it : writerIssues.entries()) {
         out.printf(FMT, it.getValue());
       }
-    }
-  }
-
-  private void closeReportDirectory() {
-    try {
-      reportDirectory.close();
-    } catch (IOException e) {
-      LOG.warn(
-        "Failed to close report directory: {}, details: {}. ",
-        reportDirectory.path(),
-        e.getLocalizedMessage(),
-        e
-      );
     }
   }
 }

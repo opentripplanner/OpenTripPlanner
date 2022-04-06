@@ -13,7 +13,7 @@ import org.opentripplanner.util.OtpAppException;
  *   <li>Magic number: {@code "OpenTripPlannerGraph"}</li>
  *   <li>The graph file serialization compatibility id</li>
  * </ol>
- *
+ * <p>
  * This class represent the header and contain logic to parse and validate it.
  */
 public class GraphFileHeader implements Serializable {
@@ -83,11 +83,11 @@ public class GraphFileHeader implements Serializable {
   }
 
   /**
-   * The OTP serialization version id. If OTP and a Graph.obj file have the same id,
-   * then OTP is compatible with the graph and should be able to deserialize it.
+   * The OTP serialization version id. If OTP and a Graph.obj file have the same id, then OTP is
+   * compatible with the graph and should be able to deserialize it.
    * <p>
-   * The returned id do NOT include the prefix '0's. In the serialized form as bytes
-   * it have a fixed length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
+   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a fixed
+   * length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
    */
   public String otpSerializationVersionId() {
     return otpSerializationVersionId;
@@ -106,6 +106,11 @@ public class GraphFileHeader implements Serializable {
   }
 
   @Override
+  public int hashCode() {
+    return otpSerializationVersionId.hashCode();
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -118,18 +123,13 @@ public class GraphFileHeader implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return otpSerializationVersionId.hashCode();
-  }
-
-  @Override
   public String toString() {
     return asString();
   }
 
   /**
-   * Pad the given text until it have the expected length {@link #ID_LENGTH}
-   * using the {@link #ID_PREFIX}.
+   * Pad the given text until it have the expected length {@link #ID_LENGTH} using the {@link
+   * #ID_PREFIX}.
    */
   static String padId(String text) {
     StringBuilder buf = new StringBuilder();

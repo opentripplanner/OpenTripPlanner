@@ -14,8 +14,8 @@ import java.util.Set;
 import org.junit.Test;
 
 /**
- * This test extends the tests performed in {@link HierarchicalMapTest} with respect to
- * the few extra features that is added in the {@link HierarchicalMapById} class.
+ * This test extends the tests performed in {@link HierarchicalMapTest} with respect to the few
+ * extra features that is added in the {@link HierarchicalMapById} class.
  */
 public class HierarchicalMapByIdTest {
 
@@ -40,8 +40,8 @@ public class HierarchicalMapByIdTest {
   }
 
   /**
-   * Add entity using the one argument add method verify that it can be retrieved
-   * using its id from the map.
+   * Add entity using the one argument add method verify that it can be retrieved using its id from
+   * the map.
    */
   @Test
   public void addEntityWithOneArgument() {

@@ -14,6 +14,11 @@ public interface EntitySelector {
     }
 
     @Override
+    public int hashCode() {
+      return agencyId.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -24,11 +29,6 @@ public interface EntitySelector {
       Agency agency = (Agency) o;
       return agencyId.equals(agency.agencyId);
     }
-
-    @Override
-    public int hashCode() {
-      return agencyId.hashCode();
-    }
   }
 
   class Stop implements EntitySelector {
@@ -37,6 +37,11 @@ public interface EntitySelector {
 
     public Stop(FeedScopedId stopId) {
       this.stopId = stopId;
+    }
+
+    @Override
+    public int hashCode() {
+      return stopId.hashCode();
     }
 
     @Override
@@ -50,11 +55,6 @@ public interface EntitySelector {
       Stop stop = (Stop) o;
       return stopId.equals(stop.stopId);
     }
-
-    @Override
-    public int hashCode() {
-      return stopId.hashCode();
-    }
   }
 
   class Route implements EntitySelector {
@@ -63,6 +63,11 @@ public interface EntitySelector {
 
     public Route(FeedScopedId routeId) {
       this.routeId = routeId;
+    }
+
+    @Override
+    public int hashCode() {
+      return routeId.hashCode();
     }
 
     @Override
@@ -75,11 +80,6 @@ public interface EntitySelector {
       }
       Route route = (Route) o;
       return routeId.equals(route.routeId);
-    }
-
-    @Override
-    public int hashCode() {
-      return routeId.hashCode();
     }
   }
 
@@ -97,6 +97,15 @@ public interface EntitySelector {
     public Trip(FeedScopedId tripId, ServiceDate serviceDate) {
       this.tripId = tripId;
       this.serviceDate = serviceDate;
+    }
+
+    @Override
+    public int hashCode() {
+      if (hash == -1) {
+        int serviceDateResult = serviceDate == null ? 0 : serviceDate.hashCode();
+        hash = 31 * serviceDateResult + tripId.hashCode();
+      }
+      return hash;
     }
 
     @Override
@@ -118,15 +127,6 @@ public interface EntitySelector {
 
       return tripId.equals(trip.tripId);
     }
-
-    @Override
-    public int hashCode() {
-      if (hash == -1) {
-        int serviceDateResult = serviceDate == null ? 0 : serviceDate.hashCode();
-        hash = 31 * serviceDateResult + tripId.hashCode();
-      }
-      return hash;
-    }
   }
 
   class StopAndRoute implements EntitySelector {
@@ -135,6 +135,11 @@ public interface EntitySelector {
 
     public StopAndRoute(FeedScopedId stopId, FeedScopedId routeId) {
       this.stopAndRoute = new StopAndRouteOrTripKey(stopId, routeId);
+    }
+
+    @Override
+    public int hashCode() {
+      return stopAndRoute.hashCode();
     }
 
     @Override
@@ -147,11 +152,6 @@ public interface EntitySelector {
       }
       StopAndRoute that = (StopAndRoute) o;
       return stopAndRoute.equals(that.stopAndRoute);
-    }
-
-    @Override
-    public int hashCode() {
-      return stopAndRoute.hashCode();
     }
   }
 
@@ -168,6 +168,11 @@ public interface EntitySelector {
     }
 
     @Override
+    public int hashCode() {
+      return stopAndTrip.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -177,11 +182,6 @@ public interface EntitySelector {
       }
       StopAndTrip that = (StopAndTrip) o;
       return stopAndTrip.equals(that.stopAndTrip);
-    }
-
-    @Override
-    public int hashCode() {
-      return stopAndTrip.hashCode();
     }
   }
 
@@ -194,6 +194,11 @@ public interface EntitySelector {
     }
 
     @Override
+    public int hashCode() {
+      return Objects.hash(description);
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -203,11 +208,6 @@ public interface EntitySelector {
       }
       Unknown that = (Unknown) o;
       return description.equals(that.description);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(description);
     }
   }
 
@@ -223,6 +223,11 @@ public interface EntitySelector {
     }
 
     @Override
+    public int hashCode() {
+      return 37 * routeType * Objects.hash(feedId);
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -232,11 +237,6 @@ public interface EntitySelector {
       }
       RouteType that = (RouteType) o;
       return routeType == that.routeType && feedId.equals(that.feedId);
-    }
-
-    @Override
-    public int hashCode() {
-      return 37 * routeType * Objects.hash(feedId);
     }
   }
 
@@ -252,6 +252,12 @@ public interface EntitySelector {
     }
 
     @Override
+    public int hashCode() {
+      int agencyHash = Objects.hash(agencyId);
+      return 37 * routeType * agencyHash;
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -261,12 +267,6 @@ public interface EntitySelector {
       }
       RouteTypeAndAgency that = (RouteTypeAndAgency) o;
       return routeType == that.routeType && agencyId.equals(that.agencyId);
-    }
-
-    @Override
-    public int hashCode() {
-      int agencyHash = Objects.hash(agencyId);
-      return 37 * routeType * agencyHash;
     }
   }
 
@@ -282,6 +282,12 @@ public interface EntitySelector {
     }
 
     @Override
+    public int hashCode() {
+      int routeHash = Objects.hash(routeId);
+      return 41 * directionId * routeHash;
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -291,12 +297,6 @@ public interface EntitySelector {
       }
       DirectionAndRoute that = (DirectionAndRoute) o;
       return directionId == that.directionId && routeId.equals(that.routeId);
-    }
-
-    @Override
-    public int hashCode() {
-      int routeHash = Objects.hash(routeId);
-      return 41 * directionId * routeHash;
     }
   }
 
@@ -323,6 +323,11 @@ public interface EntitySelector {
     }
 
     @Override
+    public int hashCode() {
+      return hash;
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -342,11 +347,6 @@ public interface EntitySelector {
       }
 
       return serviceDate != null ? serviceDate.equals(that.serviceDate) : that.serviceDate == null;
-    }
-
-    @Override
-    public int hashCode() {
-      return hash;
     }
   }
 }

@@ -116,6 +116,10 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     return tails.stream().map(it -> it.build(iterationDepartureTime)).collect(Collectors.toSet());
   }
 
+  private static <T> T last(List<T> list) {
+    return list.get(list.size() - 1);
+  }
+
   private Set<OptimizedPathTail<T>> findBestTransferOption(
     Path<T> originalPath,
     List<TransitPathLeg<T>> originalTransitLegs,
@@ -189,8 +193,8 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Insert the access leg and the following transfer.
-   * The transfer can only exist if the access has rides (is FLEX).
+   * Insert the access leg and the following transfer. The transfer can only exist if the access has
+   * rides (is FLEX).
    */
   private void insertAccess(Path<T> originalPath, Set<OptimizedPathTail<T>> tails) {
     var accessLeg = originalPath.accessLeg();
@@ -217,13 +221,13 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a new {@link OptimizedPathTail} for the originalLeg with the given
-   * transfer, earliest-departure-time and following leg (tail).
-   *
-   * Since the previous leg is not yet known, the earliest-departure-time is used instead.
-   * For the first transit leg in a path the {@code earliestDepartureTime} must be set to
-   * the correct values (the access-leg-arrival-time), for all other cases it only need to be
-   * before the first possible boarding.
+   * Create a new {@link OptimizedPathTail} for the originalLeg with the given transfer,
+   * earliest-departure-time and following leg (tail).
+   * <p>
+   * Since the previous leg is not yet known, the earliest-departure-time is used instead. For the
+   * first transit leg in a path the {@code earliestDepartureTime} must be set to the correct values
+   * (the access-leg-arrival-time), for all other cases it only need to be before the first possible
+   * boarding.
    */
   private OptimizedPathTail<T> createNewTransitLegTail(
     TransitPathLeg<T> originalLeg,
@@ -245,9 +249,5 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
           .collect(Collectors.toList())
       )
       .collect(Collectors.toList());
-  }
-
-  private static <T> T last(List<T> list) {
-    return list.get(list.size() - 1);
   }
 }

@@ -106,12 +106,9 @@ public class ConstantsForTests {
   );
 
   private static ConstantsForTests instance = null;
-
-  private Graph portlandGraph = null;
-
-  private Graph portlandGraphWithElevation = null;
-
   private final Graph minNetexGraph = null;
+  private Graph portlandGraph = null;
+  private Graph portlandGraphWithElevation = null;
 
   private ConstantsForTests() {}
 
@@ -130,28 +127,7 @@ public class ConstantsForTests {
   }
 
   /**
-   * Returns a cached copy of the Portland graph, which may have been initialized.
-   */
-  public synchronized Graph getCachedPortlandGraph() {
-    if (portlandGraph == null) {
-      portlandGraph = buildNewPortlandGraph(false);
-    }
-    return portlandGraph;
-  }
-
-  /**
-   * Returns a cached copy of the Portland graph, which may have been initialized.
-   */
-  public synchronized Graph getCachedPortlandGraphWithElevation() {
-    if (portlandGraphWithElevation == null) {
-      portlandGraphWithElevation = buildNewPortlandGraph(true);
-    }
-    return portlandGraphWithElevation;
-  }
-
-  /**
    * Builds a new graph using the Portland test data.
-   * @param withElevation
    */
   public static Graph buildNewPortlandGraph(boolean withElevation) {
     try {
@@ -191,32 +167,6 @@ public class ConstantsForTests {
 
       return graph;
     } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static void addGtfsToGraph(
-    Graph graph,
-    String file,
-    FareServiceFactory fareServiceFactory,
-    @Nullable String feedId
-  ) {
-    try {
-      var context = contextBuilder(feedId, file).withIssueStoreAndDeduplicator(graph).build();
-
-      AddTransitModelEntitiesToGraph.addToGraph(context, graph);
-      GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-      factory.setFareServiceFactory(fareServiceFactory);
-      factory.run(graph);
-      graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
-
-      graph.updateTransitFeedValidity(
-        context.getCalendarServiceData(),
-        new DataImportIssueStore(false)
-      );
-      graph.index();
-      graph.hasTransit = true;
-    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -284,6 +234,52 @@ public class ConstantsForTests {
       }
       return graph;
     } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Returns a cached copy of the Portland graph, which may have been initialized.
+   */
+  public synchronized Graph getCachedPortlandGraph() {
+    if (portlandGraph == null) {
+      portlandGraph = buildNewPortlandGraph(false);
+    }
+    return portlandGraph;
+  }
+
+  /**
+   * Returns a cached copy of the Portland graph, which may have been initialized.
+   */
+  public synchronized Graph getCachedPortlandGraphWithElevation() {
+    if (portlandGraphWithElevation == null) {
+      portlandGraphWithElevation = buildNewPortlandGraph(true);
+    }
+    return portlandGraphWithElevation;
+  }
+
+  private static void addGtfsToGraph(
+    Graph graph,
+    String file,
+    FareServiceFactory fareServiceFactory,
+    @Nullable String feedId
+  ) {
+    try {
+      var context = contextBuilder(feedId, file).withIssueStoreAndDeduplicator(graph).build();
+
+      AddTransitModelEntitiesToGraph.addToGraph(context, graph);
+      GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
+      factory.setFareServiceFactory(fareServiceFactory);
+      factory.run(graph);
+      graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
+
+      graph.updateTransitFeedValidity(
+        context.getCalendarServiceData(),
+        new DataImportIssueStore(false)
+      );
+      graph.index();
+      graph.hasTransit = true;
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

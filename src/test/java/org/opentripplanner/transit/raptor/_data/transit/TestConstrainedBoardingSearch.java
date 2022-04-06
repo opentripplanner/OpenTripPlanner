@@ -19,10 +19,8 @@ public class TestConstrainedBoardingSearch
 
   /** Index of guaranteed transfers by fromStopPos */
   private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos = new TIntObjectHashMap<>();
-
-  private int currentTargetStopPos;
-
   private final BiPredicate<Integer, Integer> timeAfterOrEqual;
+  private int currentTargetStopPos;
 
   TestConstrainedBoardingSearch(boolean forward) {
     this.timeAfterOrEqual = forward ? (a, b) -> a >= b : (a, b) -> a <= b;
@@ -68,6 +66,15 @@ public class TestConstrainedBoardingSearch
       .collect(Collectors.toList());
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TestConstrainedBoardingSearch.class)
+      .addNum("currentTargetStopPos", currentTargetStopPos)
+      .addObj("index", transfersByFromStopPos)
+      .toString();
+  }
+
   /**
    * The the {@code source/target} is the trips in order of the search direction (forward or
    * reverse). For reverse search it is the opposite from {@code from/to} in the result path.
@@ -97,15 +104,6 @@ public class TestConstrainedBoardingSearch
         targetTime
       )
     );
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(TestConstrainedBoardingSearch.class)
-      .addNum("currentTargetStopPos", currentTargetStopPos)
-      .addObj("index", transfersByFromStopPos)
-      .toString();
   }
 
   void clear() {

@@ -91,27 +91,6 @@ public class BarrierVertexTest {
     assertEquals(StreetTraversalPermission.NONE, bv.getBarrierPermissions());
   }
 
-  /**
-   * Create an edge. If twoWay, create two edges (back and forth).
-   *
-   * @param vA
-   * @param vB
-   * @param length
-   * @param back true if this is a reverse edge
-   */
-  private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
-    String name = String.format("%s_%s", labelA, labelB);
-    Coordinate[] coords = new Coordinate[2];
-    coords[0] = vA.getCoordinate();
-    coords[1] = vB.getCoordinate();
-    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
-
-    StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
-  }
-
   @Test
   public void testStreetsWithBollard() {
     Graph graph = new Graph();
@@ -172,5 +151,23 @@ public class BarrierVertexTest {
     assertFalse(no_bike_to_endVertex.canTraverseIncludingBarrier(TraverseMode.CAR));
     assertFalse(no_bike_to_endVertex.canTraverseIncludingBarrier(TraverseMode.BICYCLE));
     assertTrue(no_bike_to_endVertex.canTraverseIncludingBarrier(TraverseMode.WALK));
+  }
+
+  /**
+   * Create an edge. If twoWay, create two edges (back and forth).
+   *
+   * @param back true if this is a reverse edge
+   */
+  private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
+    String labelA = vA.getLabel();
+    String labelB = vB.getLabel();
+    String name = String.format("%s_%s", labelA, labelB);
+    Coordinate[] coords = new Coordinate[2];
+    coords[0] = vA.getCoordinate();
+    coords[1] = vB.getCoordinate();
+    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+    StreetTraversalPermission perm = StreetTraversalPermission.ALL;
+    return new StreetEdge(vA, vB, geom, name, length, perm, back);
   }
 }

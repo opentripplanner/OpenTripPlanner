@@ -79,9 +79,9 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
   }
 
   /**
-   * The Range Raptor iteration departure time. This can be used in the path-pareto-function to make sure
-   * all results found in previous iterations are kept, and not dominated by new results.
-   * This is used for the time-table view.
+   * The Range Raptor iteration departure time. This can be used in the path-pareto-function to make
+   * sure all results found in previous iterations are kept, and not dominated by new results. This
+   * is used for the time-table view.
    */
   public final int rangeRaptorIterationDepartureTime() {
     return iterationDepartureTime;
@@ -116,8 +116,8 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
   }
 
   /**
-   * The total number of transfers for this journey, excluding any transfers from/to/within
-   * access or egress transfers. This method returns the number of transit legs minus one.
+   * The total number of transfers for this journey, excluding any transfers from/to/within access
+   * or egress transfers. This method returns the number of transit legs minus one.
    *
    * @return the number of transfers or zero.
    */
@@ -137,9 +137,8 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
   }
 
   /**
-   * The first leg/path of this journey - which is linked to the next and so on. The leg
-   * can contain sub-legs, for example: walk-flex-walk.
-   *
+   * The first leg/path of this journey - which is linked to the next and so on. The leg can contain
+   * sub-legs, for example: walk-flex-walk.
    */
   public final AccessPathLeg<T> accessLeg() {
     return accessLeg;
@@ -188,8 +187,57 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(startTime, endTime, numberOfTransfers, accessLeg);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Path<?> path = (Path<?>) o;
+    return (
+      startTime == path.startTime &&
+      endTime == path.endTime &&
+      numberOfTransfers == path.numberOfTransfers &&
+      Objects.equals(accessLeg, path.accessLeg)
+    );
+  }
+
+  @Override
   public String toString() {
     return buildString(false, null, null);
+  }
+
+  /**
+   * Sort paths in order:
+   * <ol>
+   *   <li>Earliest arrival time first,
+   *   <li>Then latest departure time
+   *   <li>Then lowest cost
+   *   <li>Then lowest number of transfers
+   * </ol>
+   */
+  @Override
+  public int compareTo(Path<T> other) {
+    int c = endTime - other.endTime;
+    if (c != 0) {
+      return c;
+    }
+    c = other.startTime - startTime;
+    if (c != 0) {
+      return c;
+    }
+    c = generalizedCost - other.generalizedCost;
+    if (c != 0) {
+      return c;
+    }
+    c = numberOfTransfers - other.numberOfTransfers;
+    return c;
   }
 
   protected String toString(boolean detailed, RaptorStopNameResolver stopNameResolver) {
@@ -272,66 +320,11 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
     return buf.toString();
   }
 
-  private void addWalkDetails(boolean detailed, PathStringBuilder buf, PathLeg<T> leg) {
-    if (detailed) {
-      buf.timeAndCostCentiSec(leg.fromTime(), leg.toTime(), leg.generalizedCost());
-    }
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Path<?> path = (Path<?>) o;
-    return (
-      startTime == path.startTime &&
-      endTime == path.endTime &&
-      numberOfTransfers == path.numberOfTransfers &&
-      Objects.equals(accessLeg, path.accessLeg)
-    );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(startTime, endTime, numberOfTransfers, accessLeg);
-  }
-
-  /**
-   * Sort paths in order:
-   * <ol>
-   *   <li>Earliest arrival time first,
-   *   <li>Then latest departure time
-   *   <li>Then lowest cost
-   *   <li>Then lowest number of transfers
-   * </ol>
-   */
-  @Override
-  public int compareTo(Path<T> other) {
-    int c = endTime - other.endTime;
-    if (c != 0) {
-      return c;
-    }
-    c = other.startTime - startTime;
-    if (c != 0) {
-      return c;
-    }
-    c = generalizedCost - other.generalizedCost;
-    if (c != 0) {
-      return c;
-    }
-    c = numberOfTransfers - other.numberOfTransfers;
-    return c;
-  }
-
-  /* private methods */
-
   private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
     return (EgressPathLeg<S>) leg.stream().reduce((a, b) -> b).orElseThrow();
   }
+
+  /* private methods */
 
   private static <S extends RaptorTripSchedule> int countNumberOfTransfers(
     AccessPathLeg<S> accessLeg,
@@ -348,5 +341,11 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>> {
 
     // Remove one boarding to get the count of transfers only.
     return nAccessRides + nTransitRides + nEgressRides - 1;
+  }
+
+  private void addWalkDetails(boolean detailed, PathStringBuilder buf, PathLeg<T> leg) {
+    if (detailed) {
+      buf.timeAndCostCentiSec(leg.fromTime(), leg.toTime(), leg.generalizedCost());
+    }
   }
 }

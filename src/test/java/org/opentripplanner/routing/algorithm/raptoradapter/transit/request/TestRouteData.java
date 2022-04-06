@@ -82,20 +82,6 @@ public class TestRouteData {
     this.timetable = patternForDates;
   }
 
-  private Trip parseTripInfo(
-    String route,
-    String tripTimes,
-    List<Stop> stops,
-    Deduplicator deduplicator
-  ) {
-    var trip = new Trip(id(route + "-" + stopTimesByTrip.size() + 1));
-    trip.setRoute(this.route);
-    var stopTimes = stopTimes(trip, stops, tripTimes);
-    this.stopTimesByTrip.put(trip, stopTimes);
-    this.tripTimesByTrip.put(trip, new TripTimes(trip, stopTimes, deduplicator));
-    return trip;
-  }
-
   public Route getRoute() {
     return route;
   }
@@ -130,14 +116,6 @@ public class TestRouteData {
     return raptorTripPattern;
   }
 
-  private List<StopTime> getStopTimes() {
-    return stopTimesByTrip.get(currentTrip);
-  }
-
-  int[] stopIndexes(Collection<StopTime> times) {
-    return times.stream().mapToInt(it -> stopIndex(it.getStop())).toArray();
-  }
-
   public int stopPosition(StopLocation stop) {
     List<StopTime> times = firstTrip().getStopTimes();
     for (int i = 0; i < times.size(); ++i) {
@@ -146,6 +124,28 @@ public class TestRouteData {
       }
     }
     throw new IllegalArgumentException();
+  }
+
+  int[] stopIndexes(Collection<StopTime> times) {
+    return times.stream().mapToInt(it -> stopIndex(it.getStop())).toArray();
+  }
+
+  private Trip parseTripInfo(
+    String route,
+    String tripTimes,
+    List<Stop> stops,
+    Deduplicator deduplicator
+  ) {
+    var trip = new Trip(id(route + "-" + stopTimesByTrip.size() + 1));
+    trip.setRoute(this.route);
+    var stopTimes = stopTimes(trip, stops, tripTimes);
+    this.stopTimesByTrip.put(trip, stopTimes);
+    this.tripTimesByTrip.put(trip, new TripTimes(trip, stopTimes, deduplicator));
+    return trip;
+  }
+
+  private List<StopTime> getStopTimes() {
+    return stopTimesByTrip.get(currentTrip);
   }
 
   private List<StopTime> stopTimes(Trip trip, List<Stop> stops, String timesAsString) {

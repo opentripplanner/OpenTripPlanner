@@ -19,11 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Uses the shapes from GTFS to determine which streets buses drive on. This is used to improve the quality of
- * the shapes shown for the user.
- *
- * GTFS provides a mapping from trips→shapes. This module provides a mapping from stops→trips and shapes→edges.
- * Then transitively we get a mapping from stop→edges.
+ * Uses the shapes from GTFS to determine which streets buses drive on. This is used to improve the
+ * quality of the shapes shown for the user.
+ * <p>
+ * GTFS provides a mapping from trips→shapes. This module provides a mapping from stops→trips and
+ * shapes→edges. Then transitively we get a mapping from stop→edges.
  */
 public class BusRouteStreetMatcher implements GraphBuilderModule {
 

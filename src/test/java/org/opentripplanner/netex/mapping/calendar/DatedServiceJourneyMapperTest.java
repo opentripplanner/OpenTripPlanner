@@ -4,20 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDatedServiceJourney;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 

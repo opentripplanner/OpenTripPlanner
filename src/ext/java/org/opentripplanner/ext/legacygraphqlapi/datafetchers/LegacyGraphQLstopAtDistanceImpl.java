@@ -10,6 +10,11 @@ public class LegacyGraphQLstopAtDistanceImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLStopAtDistance {
 
   @Override
+  public DataFetcher<Integer> distance() {
+    return environment -> (int) getSource(environment).distance;
+  }
+
+  @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment ->
       new Relay.ResolvedGlobalId(
@@ -21,11 +26,6 @@ public class LegacyGraphQLstopAtDistanceImpl
   @Override
   public DataFetcher<Object> stop() {
     return environment -> getSource(environment).stop;
-  }
-
-  @Override
-  public DataFetcher<Integer> distance() {
-    return environment -> (int) getSource(environment).distance;
   }
 
   private NearbyStop getSource(DataFetchingEnvironment environment) {

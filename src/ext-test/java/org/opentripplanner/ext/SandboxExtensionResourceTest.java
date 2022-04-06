@@ -9,9 +9,8 @@ import java.io.LineNumberReader;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test has NOTHING to do with the OJP extension. The test just make
- * sure that the Maven project is correctly set up and that the 'ext-test/resources'
- * is available on classpath.
+ * This test has NOTHING to do with the OJP extension. The test just make sure that the Maven
+ * project is correctly set up and that the 'ext-test/resources' is available on classpath.
  */
 public class SandboxExtensionResourceTest {
 

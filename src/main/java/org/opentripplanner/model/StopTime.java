@@ -5,8 +5,8 @@ import java.util.List;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model,
- * it is not kept as part of the Graph.
+ * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model, it is not
+ * kept as part of the Graph.
  * <p/>
  * TODO OTP2 - Refactor the mapping so it do not create these objecs, but map directly into the target
  *           - object structure.
@@ -230,20 +230,20 @@ public final class StopTime implements Comparable<StopTime> {
     this.farePeriodId = farePeriodId;
   }
 
-  public void setFlexWindowStart(int flexWindowStart) {
-    this.flexWindowStart = flexWindowStart;
-  }
-
   public int getFlexWindowStart() {
     return flexWindowStart;
   }
 
-  public void setFlexWindowEnd(int flexWindowEnd) {
-    this.flexWindowEnd = flexWindowEnd;
+  public void setFlexWindowStart(int flexWindowStart) {
+    this.flexWindowStart = flexWindowStart;
   }
 
   public int getFlexWindowEnd() {
     return flexWindowEnd;
+  }
+
+  public void setFlexWindowEnd(int flexWindowEnd) {
+    this.flexWindowEnd = flexWindowEnd;
   }
 
   public int getFlexContinuousPickup() {

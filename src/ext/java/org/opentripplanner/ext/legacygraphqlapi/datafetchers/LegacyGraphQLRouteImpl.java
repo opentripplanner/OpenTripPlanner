@@ -22,91 +22,8 @@ import org.opentripplanner.routing.services.TransitAlertService;
 public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRoute {
 
   @Override
-  public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("Route", getSource(environment).getId().toString());
-  }
-
-  @Override
-  public DataFetcher<String> gtfsId() {
-    return environment -> getSource(environment).getId().toString();
-  }
-
-  @Override
   public DataFetcher<Agency> agency() {
     return environment -> getSource(environment).getAgency();
-  }
-
-  @Override
-  public DataFetcher<String> shortName() {
-    return environment -> getSource(environment).getShortName();
-  }
-
-  @Override
-  public DataFetcher<String> longName() {
-    return environment -> getSource(environment).getLongName();
-  }
-
-  @Override
-  public DataFetcher<String> mode() {
-    return environment -> getSource(environment).getMode().name();
-  }
-
-  @Override
-  public DataFetcher<Integer> type() {
-    return environment -> getSource(environment).getGtfsType();
-  }
-
-  @Override
-  public DataFetcher<String> desc() {
-    return environment -> getSource(environment).getDesc();
-  }
-
-  @Override
-  public DataFetcher<String> url() {
-    return environment -> getSource(environment).getUrl();
-  }
-
-  @Override
-  public DataFetcher<String> color() {
-    return environment -> getSource(environment).getColor();
-  }
-
-  @Override
-  public DataFetcher<String> textColor() {
-    return environment -> getSource(environment).getTextColor();
-  }
-
-  @Override
-  public DataFetcher<String> bikesAllowed() {
-    return environment -> {
-      switch (getSource(environment).getBikesAllowed()) {
-        case UNKNOWN:
-          return "NO_INFORMATION";
-        case ALLOWED:
-          return "POSSIBLE";
-        case NOT_ALLOWED:
-          return "NOT_POSSIBLE";
-        default:
-          return null;
-      }
-    };
-  }
-
-  @Override
-  public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment ->
-      getRoutingService(environment).getPatternsForRoute().get(getSource(environment));
-  }
-
-  @Override
-  public DataFetcher<Iterable<Object>> stops() {
-    return environment -> getStops(environment);
-  }
-
-  @Override
-  public DataFetcher<Iterable<Trip>> trips() {
-    return environment -> getTrips(environment);
   }
 
   @Override
@@ -205,6 +122,89 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
         return getAlertService(environment).getRouteAlerts(getSource(environment).getId());
       }
     };
+  }
+
+  @Override
+  public DataFetcher<String> bikesAllowed() {
+    return environment -> {
+      switch (getSource(environment).getBikesAllowed()) {
+        case UNKNOWN:
+          return "NO_INFORMATION";
+        case ALLOWED:
+          return "POSSIBLE";
+        case NOT_ALLOWED:
+          return "NOT_POSSIBLE";
+        default:
+          return null;
+      }
+    };
+  }
+
+  @Override
+  public DataFetcher<String> color() {
+    return environment -> getSource(environment).getColor();
+  }
+
+  @Override
+  public DataFetcher<String> desc() {
+    return environment -> getSource(environment).getDesc();
+  }
+
+  @Override
+  public DataFetcher<String> gtfsId() {
+    return environment -> getSource(environment).getId().toString();
+  }
+
+  @Override
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment ->
+      new Relay.ResolvedGlobalId("Route", getSource(environment).getId().toString());
+  }
+
+  @Override
+  public DataFetcher<String> longName() {
+    return environment -> getSource(environment).getLongName();
+  }
+
+  @Override
+  public DataFetcher<String> mode() {
+    return environment -> getSource(environment).getMode().name();
+  }
+
+  @Override
+  public DataFetcher<Iterable<TripPattern>> patterns() {
+    return environment ->
+      getRoutingService(environment).getPatternsForRoute().get(getSource(environment));
+  }
+
+  @Override
+  public DataFetcher<String> shortName() {
+    return environment -> getSource(environment).getShortName();
+  }
+
+  @Override
+  public DataFetcher<Iterable<Object>> stops() {
+    return environment -> getStops(environment);
+  }
+
+  @Override
+  public DataFetcher<String> textColor() {
+    return environment -> getSource(environment).getTextColor();
+  }
+
+  @Override
+  public DataFetcher<Iterable<Trip>> trips() {
+    return environment -> getTrips(environment);
+  }
+
+  @Override
+  public DataFetcher<Integer> type() {
+    return environment -> getSource(environment).getGtfsType();
+  }
+
+  @Override
+  public DataFetcher<String> url() {
+    return environment -> getSource(environment).getUrl();
   }
 
   private Iterable<Object> getStops(DataFetchingEnvironment environment) {

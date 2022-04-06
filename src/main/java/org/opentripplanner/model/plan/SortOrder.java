@@ -1,8 +1,8 @@
 package org.opentripplanner.model.plan;
 
 /**
- * OTP sort the returned itineraries according to the request {@code arriveBy} flag. The
- * paging may override the sort order.
+ * OTP sort the returned itineraries according to the request {@code arriveBy} flag. The paging may
+ * override the sort order.
  */
 public enum SortOrder {
   /**
@@ -33,8 +33,8 @@ public enum SortOrder {
 
   /**
    * The itineraries are sorted with by arrival time with the earliest arrival time first. When
-   * paging we need to know which end of the list of itineraries we should crop. This method is
-   * used to decide that together with the current page type (next/previous).
+   * paging we need to know which end of the list of itineraries we should crop. This method is used
+   * to decide that together with the current page type (next/previous).
    * <p>
    * This return {@code true} for the default depart-after search, and {@code false} for an
    * arrive-by search.

@@ -9,9 +9,9 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
 
 /**
- * This class is responsible for flagging itineraries for deletion based on a
- * predicate in the supplied ItineraryDeletionFlagger. The itineraries are not actually deleted
- * at this point, just flagged. They are typically deleted later if debug mode is disabled.
+ * This class is responsible for flagging itineraries for deletion based on a predicate in the
+ * supplied ItineraryDeletionFlagger. The itineraries are not actually deleted at this point, just
+ * flagged. They are typically deleted later if debug mode is disabled.
  */
 public class DeletionFlaggingFilter implements ItineraryListFilter {
 

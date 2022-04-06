@@ -11,11 +11,11 @@ import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.util.I18NString;
 
 /**
- * A relatively low cost edge for alighting from an elevator.
- * All narrative generation is done by the ElevatorAlightEdge (other edges are silent), because
- * it is the only edge that knows where the user is to get off.
- * @author mattwigway
+ * A relatively low cost edge for alighting from an elevator. All narrative generation is done by
+ * the ElevatorAlightEdge (other edges are silent), because it is the only edge that knows where the
+ * user is to get off.
  *
+ * @author mattwigway
  */
 public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
@@ -27,9 +27,8 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
   private final I18NString level;
 
   /**
-   * The polyline geometry of this edge.
-   * It's generally a polyline with two coincident points, but some elevators have horizontal
-   * dimension, e.g. the ones on the Eiffel Tower.
+   * The polyline geometry of this edge. It's generally a polyline with two coincident points, but
+   * some elevators have horizontal dimension, e.g. the ones on the Eiffel Tower.
    */
   private final LineString the_geom;
 
@@ -51,21 +50,15 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
     the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
   }
 
+  public String toString() {
+    return "ElevatorAlightEdge(" + fromv + " -> " + tov + ")";
+  }
+
   @Override
   public State traverse(State s0) {
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
     s1.incrementWeight(1);
     return s1.makeState();
-  }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
-  }
-
-  @Override
-  public LineString getGeometry() {
-    return the_geom;
   }
 
   /**
@@ -78,6 +71,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
 
   /**
    * The name is not bogus; it's level n from OSM.
+   *
    * @author mattwigway
    */
   @Override
@@ -85,7 +79,13 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
     return false;
   }
 
-  public String toString() {
-    return "ElevatorAlightEdge(" + fromv + " -> " + tov + ")";
+  @Override
+  public LineString getGeometry() {
+    return the_geom;
+  }
+
+  @Override
+  public double getDistanceMeters() {
+    return 0;
   }
 }

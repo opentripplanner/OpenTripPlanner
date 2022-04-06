@@ -38,15 +38,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A in-memory implementation of {@link OtpTransitService}. It's super fast for most
- * methods, but only if you have enough memory to load your entire {@link OtpTransitService}
- * into memory.
+ * A in-memory implementation of {@link OtpTransitService}. It's super fast for most methods, but
+ * only if you have enough memory to load your entire {@link OtpTransitService} into memory.
  * <p>
- * This class is read only, to enforce consistency after generating indexes and ids.
- * You will get an exception if you try to add entities to one of the collections.
- * If you need to modify a {@link OtpTransitService}, you can create a new
- * {@link OtpTransitServiceBuilder} based on your old data, do your modification and
- * create a new unmodifiable instance.
+ * This class is read only, to enforce consistency after generating indexes and ids. You will get an
+ * exception if you try to add entities to one of the collections. If you need to modify a {@link
+ * OtpTransitService}, you can create a new {@link OtpTransitServiceBuilder} based on your old data,
+ * do your modification and create a new unmodifiable instance.
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
@@ -140,6 +138,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
+  public Collection<Operator> getAllOperators() {
+    return operators;
+  }
+
+  @Override
   public Collection<FareAttribute> getAllFareAttributes() {
     return fareAttributes;
   }
@@ -165,8 +168,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   /**
-   * Map from Transit Entity(id) to Notices. We need to use Serializable as a common type
-   * for ids, since some entities have String, while other have FeedScopeId ids.
+   * Map from Transit Entity(id) to Notices. We need to use Serializable as a common type for ids,
+   * since some entities have String, while other have FeedScopeId ids.
    */
   @Override
   public Multimap<TransitEntity, Notice> getNoticeAssignments() {
@@ -176,11 +179,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<Pathway> getAllPathways() {
     return pathways;
-  }
-
-  @Override
-  public Collection<Operator> getAllOperators() {
-    return operators;
   }
 
   @Override
@@ -265,19 +263,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   /*  Private Methods */
 
-  private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(
-    Multimap<FeedScopedId, ShapePoint> shapePoints
-  ) {
-    Map<FeedScopedId, List<ShapePoint>> map = new HashMap<>();
-    for (Map.Entry<FeedScopedId, Collection<ShapePoint>> entry : shapePoints.asMap().entrySet()) {
-      map.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-    }
-    for (List<ShapePoint> list : map.values()) {
-      Collections.sort(list);
-    }
-    return map;
-  }
-
   /**
    * Convert the given collection into a new immutable List.
    */
@@ -289,5 +274,18 @@ class OtpTransitServiceImpl implements OtpTransitService {
       list = new ArrayList<>(c);
     }
     return Collections.unmodifiableList(list);
+  }
+
+  private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(
+    Multimap<FeedScopedId, ShapePoint> shapePoints
+  ) {
+    Map<FeedScopedId, List<ShapePoint>> map = new HashMap<>();
+    for (Map.Entry<FeedScopedId, Collection<ShapePoint>> entry : shapePoints.asMap().entrySet()) {
+      map.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+    }
+    for (List<ShapePoint> list : map.values()) {
+      Collections.sort(list);
+    }
+    return map;
   }
 }

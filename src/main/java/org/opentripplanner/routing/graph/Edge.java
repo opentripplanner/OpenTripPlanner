@@ -11,8 +11,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.util.I18NString;
 
 /**
- * This is the standard implementation of an edge with fixed from and to Vertex instances;
- * all standard OTP edges are subclasses of this.
+ * This is the standard implementation of an edge with fixed from and to Vertex instances; all
+ * standard OTP edges are subclasses of this.
  */
 public abstract class Edge implements Serializable {
 
@@ -54,7 +54,8 @@ public abstract class Edge implements Serializable {
   }
 
   /**
-   * Checks equivalency to another edge. Default implementation is trivial equality, but subclasses may want to do something more tricky.
+   * Checks equivalency to another edge. Default implementation is trivial equality, but subclasses
+   * may want to do something more tricky.
    */
   public boolean isEquivalentTo(Edge e) {
     return this == e;
@@ -69,8 +70,6 @@ public abstract class Edge implements Serializable {
 
   /**
    * Get a direction on paths where it matters, or null
-   *
-   * @return
    */
   public String getDirection() {
     return null;
@@ -91,6 +90,10 @@ public abstract class Edge implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(fromv, tov);
+  }
+
+  public String toString() {
+    return String.format("%s (%s -> %s)", getClass().getName(), fromv, tov);
   }
 
   /**
@@ -126,10 +129,6 @@ public abstract class Edge implements Serializable {
     return false;
   }
 
-  public String toString() {
-    return String.format("%s (%s -> %s)", getClass().getName(), fromv, tov);
-  }
-
   // The next few functions used to live in EdgeNarrative, which has now been
   // removed
   // @author mattwigway
@@ -143,10 +142,10 @@ public abstract class Edge implements Serializable {
   }
 
   /**
-   * The distance to walk adjusted for elevation and obstacles. This is used together
-   * with the walking speed to find the actual walking transfer time. This plus
-   * {@link #getDistanceIndependentTime()} is used to calculate the actual-transfer-time
-   * given a walking speed.
+   * The distance to walk adjusted for elevation and obstacles. This is used together with the
+   * walking speed to find the actual walking transfer time. This plus {@link
+   * #getDistanceIndependentTime()} is used to calculate the actual-transfer-time given a walking
+   * speed.
    * <p>
    * Unit: meters. Default: 0.
    */
@@ -155,9 +154,9 @@ public abstract class Edge implements Serializable {
   }
 
   /**
-   * This is the transfer time(duration) spent NOT moving like time in in elevators, escalators
-   * and waiting on read light when crossing a street. This is used together with
-   * {@link #getEffectiveWalkDistance()} to calculate the actual-transfer-time.
+   * This is the transfer time(duration) spent NOT moving like time in in elevators, escalators and
+   * waiting on read light when crossing a street. This is used together with {@link
+   * #getEffectiveWalkDistance()} to calculate the actual-transfer-time.
    * <p>
    * Unit: seconds. Default: 0.
    */

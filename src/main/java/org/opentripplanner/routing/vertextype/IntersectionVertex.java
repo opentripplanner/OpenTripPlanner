@@ -17,18 +17,10 @@ public class IntersectionVertex extends StreetVertex {
   public boolean trafficLight;
 
   /**
-   * Is this a free-flowing intersection, i.e. should it have no delay at all? e.g., freeway ramps, etc.
+   * Is this a free-flowing intersection, i.e. should it have no delay at all? e.g., freeway ramps,
+   * etc.
    */
   public boolean freeFlowing;
-
-  /** Returns true if this.freeFlowing or if it appears that this vertex is free-flowing */
-  public boolean inferredFreeFlowing() {
-    if (this.freeFlowing) {
-      return true;
-    }
-
-    return getDegreeIn() == 1 && getDegreeOut() == 1 && !this.trafficLight;
-  }
 
   //For testing only
   public IntersectionVertex(Graph g, String label, double x, double y, String name) {
@@ -43,5 +35,14 @@ public class IntersectionVertex extends StreetVertex {
 
   public IntersectionVertex(Graph g, String label, double x, double y) {
     this(g, label, x, y, new NonLocalizedString(label));
+  }
+
+  /** Returns true if this.freeFlowing or if it appears that this vertex is free-flowing */
+  public boolean inferredFreeFlowing() {
+    if (this.freeFlowing) {
+      return true;
+    }
+
+    return getDegreeIn() == 1 && getDegreeOut() == 1 && !this.trafficLight;
   }
 }

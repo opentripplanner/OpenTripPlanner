@@ -32,8 +32,8 @@ public class CalendarServiceBuilder {
   }
 
   /**
-   * Use this method to add dates used by a ServiceJourney, and return the serviceId
-   * which can be used to reference the given set of dates.
+   * Use this method to add dates used by a ServiceJourney, and return the serviceId which can be
+   * used to reference the given set of dates.
    * <p>
    * THIS METHOD IS THREAD-SAFE
    *

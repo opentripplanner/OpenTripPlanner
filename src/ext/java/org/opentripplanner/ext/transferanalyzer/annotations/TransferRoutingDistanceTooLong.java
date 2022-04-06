@@ -4,8 +4,8 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.Stop;
 
 /**
- * Represents two stops where the routing distance between them (using OSM data) is much longer than the euclidean
- * distance
+ * Represents two stops where the routing distance between them (using OSM data) is much longer than
+ * the euclidean distance
  */
 public class TransferRoutingDistanceTooLong implements DataImportIssue {
 

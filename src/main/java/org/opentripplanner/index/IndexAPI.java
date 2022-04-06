@@ -72,6 +72,10 @@ public class IndexAPI {
 
   private final OTPServer otpServer;
 
+  /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
+  @Context
+  UriInfo uriInfo;
+
   public IndexAPI(
     @Context OTPServer otpServer,
     /**
@@ -82,10 +86,6 @@ public class IndexAPI {
   ) {
     this.otpServer = otpServer;
   }
-
-  /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
-  @Context
-  UriInfo uriInfo;
 
   @GET
   @Path("/feeds")
@@ -282,6 +282,7 @@ public class IndexAPI {
 
   /**
    * Return upcoming vehicle arrival/departure times at the given stop.
+   *
    * @param date in YYYYMMDD or YYYY-MM-DD format
    */
   @GET
@@ -559,10 +560,6 @@ public class IndexAPI {
 
   /* PRIVATE METHODS */
 
-  private RoutingService createRoutingService() {
-    return otpServer.createRoutingRequestService();
-  }
-
   private static FeedScopedId createId(String name, String value) {
     return FeedScopedIdMapper.mapToDomain(name, value);
   }
@@ -634,5 +631,9 @@ public class IndexAPI {
   private static TripPattern getTripPattern(RoutingService routingService, Trip trip) {
     TripPattern pattern = routingService.getPatternForTrip().get(trip);
     return validateExist("TripPattern", pattern, "trip", trip.getId());
+  }
+
+  private RoutingService createRoutingService() {
+    return otpServer.createRoutingRequestService();
   }
 }

@@ -22,9 +22,10 @@ import org.opentripplanner.routing.vertextype.OsmVertex;
 public class ElevationModuleTest {
 
   /**
-   * Tests whether elevation can be properly set using s3 bucket tiles. This test is ignored by default because it
-   * would require checking in a file to this repository that is about 450mb large.
-   *
+   * Tests whether elevation can be properly set using s3 bucket tiles. This test is ignored by
+   * default because it would require checking in a file to this repository that is about 450mb
+   * large.
+   * <p>
    * To setup this test, copy everything in the /var/otp/cache/ned into
    * .../src/test/resources/org/opentripplanner/graph_builder/module/ned/
    */

@@ -45,11 +45,10 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The actual request used to perform the travel search. In the case of a multi-criteria
-   * search, heuristics is used to optimize the search and the request is changed to account
-   * for this. Also, different optimization may add filters (stop filter) to the request.
-   * Heuristics is also used to "guess" on an appropriate search-window, earliest-departure-time
-   * and latest-arrival-time.
+   * The actual request used to perform the travel search. In the case of a multi-criteria search,
+   * heuristics is used to optimize the search and the request is changed to account for this. Also,
+   * different optimization may add filters (stop filter) to the request. Heuristics is also used to
+   * "guess" on an appropriate search-window, earliest-departure-time and latest-arrival-time.
    */
   public RaptorRequest<T> requestUsed() {
     return requestUsed;

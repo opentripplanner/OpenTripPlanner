@@ -44,8 +44,8 @@ public class HierarchicalVersionMapByIdTest {
   }
 
   /**
-   * Add entity using the one argument add method verify that it can be retrieved
-   * using its id from the map.
+   * Add entity using the one argument add method verify that it can be retrieved using its id from
+   * the map.
    */
   @Test
   public void addEntityWithOneArgument() {

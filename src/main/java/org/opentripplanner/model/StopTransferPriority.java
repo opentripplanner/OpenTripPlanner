@@ -1,17 +1,16 @@
 package org.opentripplanner.model;
 
 /**
- * Categorize how suitable a Station or Transfer is it for transfer. The values arrange
- * stops from transfer DISCOURAGED to PREFERRED. First of all this should encourage
- * transfers between two trips/routes to happen at the best possible location if there
- * are multiple stop to choose from. But, it will also apply to score a journey over
- * another one, if one of the journeys score better on the transfers, and they have the
- * same cost.
+ * Categorize how suitable a Station or Transfer is it for transfer. The values arrange stops from
+ * transfer DISCOURAGED to PREFERRED. First of all this should encourage transfers between two
+ * trips/routes to happen at the best possible location if there are multiple stop to choose from.
+ * But, it will also apply to score a journey over another one, if one of the journeys score better
+ * on the transfers, and they have the same cost.
  */
 public enum StopTransferPriority {
   /**
-   * Block transfers from/to this stop. In OTP this is not a definitive block,
-   * just a huge penalty is added to the cost function.
+   * Block transfers from/to this stop. In OTP this is not a definitive block, just a huge penalty
+   * is added to the cost function.
    * <p>
    * NeTEx equivalent is NO_INTERCHANGE.
    */

@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -24,13 +23,12 @@ public class GraphPath {
    * Construct a GraphPath based on the given state by following back-edge fields all the way back
    * to the origin of the search. This constructs a proper Java list of states (allowing random
    * access etc.) from the predecessor information left in states by the search algorithm.
-   *
+   * <p>
    * Optionally re-traverses all edges backward in order to remove excess waiting time from the
    * final itinerary presented to the user. When planning with departure time, the edges will then
    * be re-traversed once more in order to move the waiting time forward in time, towards the end.
-   *  @param s
-   *            - the state for which a path is requested
    *
+   * @param s - the state for which a path is requested
    */
   public GraphPath(State s) {
     walkDistance = s.getWalkDistance();
@@ -63,7 +61,6 @@ public class GraphPath {
 
   /**
    * Returns the start time of the trip in seconds since the epoch.
-   * @return
    */
   public long getStartTime() {
     return states.getFirst().getTimeSeconds();
@@ -71,7 +68,6 @@ public class GraphPath {
 
   /**
    * Returns the end time of the trip in seconds since the epoch.
-   * @return
    */
   public long getEndTime() {
     return states.getLast().getTimeSeconds();
@@ -79,7 +75,6 @@ public class GraphPath {
 
   /**
    * Returns the duration of the trip in seconds.
-   * @return
    */
   public int getDuration() {
     // test to see if it is the same as getStartTime - getEndTime;
@@ -88,7 +83,6 @@ public class GraphPath {
 
   /**
    * Returns the total distance of all the edges in this path
-   * @return
    */
   public double getDistanceMeters() {
     return edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
@@ -108,7 +102,6 @@ public class GraphPath {
 
   /**
    * Returns the geometry for the entire path
-   * @return
    */
   public LineString getGeometry() {
     CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -129,8 +122,9 @@ public class GraphPath {
     return GeometryUtils.getGeometryFactory().createLineString(coordinates);
   }
 
-  public String toString() {
-    return "GraphPath(nStates=" + states.size() + ")";
+  // must compare edges, not states, since states are different at each search
+  public int hashCode() {
+    return this.edges.hashCode();
   }
 
   /**
@@ -141,9 +135,8 @@ public class GraphPath {
     return false;
   }
 
-  // must compare edges, not states, since states are different at each search
-  public int hashCode() {
-    return this.edges.hashCode();
+  public String toString() {
+    return "GraphPath(nStates=" + states.size() + ")";
   }
 
   /****

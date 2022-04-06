@@ -3,8 +3,8 @@ package org.opentripplanner.model;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 /**
- * This is a response model class which holds data that will be serialized and returned to the client.
- * It is not used internally in routing.
+ * This is a response model class which holds data that will be serialized and returned to the
+ * client. It is not used internally in routing.
  */
 public class VehicleRentalStationInfo {
 

@@ -45,9 +45,10 @@ public interface ItineraryDeletionFlagger {
   // Tagging options:
 
   /**
-   * Should itineraries already marked for deletion by previous deletionflagger be removed from the list
-   * passed to {@link ItineraryDeletionFlagger#getFlaggedItineraries(List)}. The default value is true, as usually
-   * the already removed itineraries are not needed further in the filter chain.
+   * Should itineraries already marked for deletion by previous deletionflagger be removed from the
+   * list passed to {@link ItineraryDeletionFlagger#getFlaggedItineraries(List)}. The default value
+   * is true, as usually the already removed itineraries are not needed further in the filter
+   * chain.
    */
   default boolean skipAlreadyFlaggedItineraries() {
     return true;

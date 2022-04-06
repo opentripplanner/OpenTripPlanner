@@ -84,13 +84,13 @@ class StateDebugger<T extends RaptorTripSchedule> {
   }
 
   /**
-   * This method mimic the logic in the worker/state. A better approach would be
-   * to do the logging where the changes happen as in the multi-criteria version,
-   * but that would lead to a much more complicated instrumentation. So, this
-   * method replicate the logic that is done in the worker and state classes combined.
+   * This method mimic the logic in the worker/state. A better approach would be to do the logging
+   * where the changes happen as in the multi-criteria version, but that would lead to a much more
+   * complicated instrumentation. So, this method replicate the logic that is done in the worker and
+   * state classes combined.
    * <p>
-   * Note! Arrivals in the state is not dropped by this method, this class only notify the
-   * debug handler about arrivals that are about to be dropped.
+   * Note! Arrivals in the state is not dropped by this method, this class only notify the debug
+   * handler about arrivals that are about to be dropped.
    */
   private void drop(int stop, boolean onBoard, boolean newBestOverall) {
     final int round = round();

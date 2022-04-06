@@ -101,10 +101,6 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       .build();
   }
 
-  abstract VehicleParkingSpaces parseCapacity(JsonNode jsonNode);
-
-  abstract VehicleParkingSpaces parseAvailability(JsonNode jsonNode);
-
   protected VehicleParkingSpaces parseVehicleSpaces(
     JsonNode node,
     String bicycleTag,
@@ -121,6 +117,10 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
     return createVehiclePlaces(carSpaces, wheelchairAccessibleCarSpaces, bicycleSpaces);
   }
+
+  abstract VehicleParkingSpaces parseCapacity(JsonNode jsonNode);
+
+  abstract VehicleParkingSpaces parseAvailability(JsonNode jsonNode);
 
   private VehicleParkingSpaces createVehiclePlaces(
     Integer carSpaces,

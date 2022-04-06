@@ -95,54 +95,9 @@ public class VehiclePositionPatternMatcher {
     }
   }
 
-  private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
-    String feedId,
-    VehiclePosition vehiclePosition
-  ) {
-    if (!vehiclePosition.hasTrip()) {
-      LOG.warn("Realtime vehicle positions {} has no trip ID. Ignoring.", vehiclePosition);
-      return null;
-    }
-
-    String tripId = vehiclePosition.getTrip().getTripId();
-    Trip trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
-    if (trip == null) {
-      LOG.warn(
-        "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
-        feedId,
-        tripId
-      );
-      return null;
-    }
-
-    var localDate = Optional
-      .of(vehiclePosition.getTrip().getStartDate())
-      .map(Strings::emptyToNull)
-      .flatMap(ServiceDate::parseStringToOptional);
-
-    if (localDate.isEmpty()) {
-      LOG.warn(
-        "Trip with id {} doesn't contain a valid start_data which is required. Ignoring.",
-        vehiclePosition.getTrip().getTripId()
-      );
-      return null;
-    }
-
-    TripPattern pattern = getPatternForTrip.apply(trip, localDate.get());
-    if (pattern == null) {
-      LOG.warn("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
-      return null;
-    }
-
-    // Add position to pattern
-    var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), trip);
-
-    return new T2<>(pattern, newPosition);
-  }
-
   /**
-   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used
-   * by the API.
+   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used by
+   * the API.
    */
   private static RealtimeVehiclePosition mapVehiclePosition(
     VehiclePosition vehiclePosition,
@@ -208,5 +163,50 @@ public class VehiclePositionPatternMatcher {
       case INCOMING_AT -> StopStatus.INCOMING_AT;
       case STOPPED_AT -> StopStatus.STOPPED_AT;
     };
+  }
+
+  private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
+    String feedId,
+    VehiclePosition vehiclePosition
+  ) {
+    if (!vehiclePosition.hasTrip()) {
+      LOG.warn("Realtime vehicle positions {} has no trip ID. Ignoring.", vehiclePosition);
+      return null;
+    }
+
+    String tripId = vehiclePosition.getTrip().getTripId();
+    Trip trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
+    if (trip == null) {
+      LOG.warn(
+        "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
+        feedId,
+        tripId
+      );
+      return null;
+    }
+
+    var localDate = Optional
+      .of(vehiclePosition.getTrip().getStartDate())
+      .map(Strings::emptyToNull)
+      .flatMap(ServiceDate::parseStringToOptional);
+
+    if (localDate.isEmpty()) {
+      LOG.warn(
+        "Trip with id {} doesn't contain a valid start_data which is required. Ignoring.",
+        vehiclePosition.getTrip().getTripId()
+      );
+      return null;
+    }
+
+    TripPattern pattern = getPatternForTrip.apply(trip, localDate.get());
+    if (pattern == null) {
+      LOG.warn("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
+      return null;
+    }
+
+    // Add position to pattern
+    var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), trip);
+
+    return new T2<>(pattern, newPosition);
   }
 }

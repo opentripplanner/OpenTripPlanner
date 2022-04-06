@@ -25,15 +25,15 @@ public class TripPatternForDate {
   private final TripPatternWithRaptorStopIndexes tripPattern;
 
   /**
-   * The filtered TripSchedules for only those trips in the TripPattern that are active on the
-   * given day. Invariant: this array should contain a subset of the TripSchedules in
+   * The filtered TripSchedules for only those trips in the TripPattern that are active on the given
+   * day. Invariant: this array should contain a subset of the TripSchedules in
    * tripPattern.tripSchedules.
    */
   private final List<TripTimes> tripTimes;
 
   /**
-   * The filtered FrequencyEntries for only those entries in the TripPattern that are active on
-   * the given day. Invariant: this array should contain a subset of the TripSchedules in
+   * The filtered FrequencyEntries for only those entries in the TripPattern that are active on the
+   * given day. Invariant: this array should contain a subset of the TripSchedules in
    * tripPattern.frequencyEntries.
    */
   private final List<FrequencyEntry> frequencies;
@@ -157,6 +157,11 @@ public class TripPatternForDate {
     );
   }
 
+  @Override
+  public String toString() {
+    return "TripPatternForDate{" + "tripPattern=" + tripPattern + ", localDate=" + localDate + '}';
+  }
+
   @Nullable
   public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
     ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes);
@@ -176,10 +181,5 @@ public class TripPatternForDate {
     }
 
     return new TripPatternForDate(tripPattern, filteredTripTimes, filteredFrequencies, localDate);
-  }
-
-  @Override
-  public String toString() {
-    return "TripPatternForDate{" + "tripPattern=" + tripPattern + ", localDate=" + localDate + '}';
   }
 }

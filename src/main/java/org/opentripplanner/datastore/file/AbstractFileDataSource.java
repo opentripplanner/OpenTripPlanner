@@ -14,9 +14,9 @@ public abstract class AbstractFileDataSource implements DataSource {
   final FileType type;
 
   /**
-   * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files
-   * as well as normal files. It does not handle directories({@link DirectoryDataSource}) or
-   * zip-files {@link ZipFileDataSource} which contain multiple files.
+   * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files as
+   * well as normal files. It does not handle directories({@link DirectoryDataSource}) or zip-files
+   * {@link ZipFileDataSource} which contain multiple files.
    */
   AbstractFileDataSource(File file, FileType type) {
     this.file = file;
@@ -62,8 +62,8 @@ public abstract class AbstractFileDataSource implements DataSource {
   }
 
   @Override
-  public String toString() {
-    return type + " " + path();
+  public int hashCode() {
+    return Objects.hash(file, type);
   }
 
   @Override
@@ -79,7 +79,7 @@ public abstract class AbstractFileDataSource implements DataSource {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(file, type);
+  public String toString() {
+    return type + " " + path();
   }
 }

@@ -24,6 +24,10 @@ public class VehicleParkingWithEntrance {
     this.realtime = realtime;
   }
 
+  public static VehicleParkingWithEntranceBuilder builder() {
+    return new VehicleParkingWithEntranceBuilder();
+  }
+
   public VehicleParking getVehicleParking() {
     return this.vehicleParking;
   }
@@ -34,10 +38,6 @@ public class VehicleParkingWithEntrance {
 
   public boolean isRealtime() {
     return realtime;
-  }
-
-  public static VehicleParkingWithEntranceBuilder builder() {
-    return new VehicleParkingWithEntranceBuilder();
   }
 
   public static class VehicleParkingWithEntranceBuilder {

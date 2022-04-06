@@ -35,6 +35,7 @@ public class FareAttributeMapperTest {
   private static final int TRANSFER_DURATION = 3;
 
   private static final int TRANSFERS = 2;
+  private final FareAttributeMapper subject = new FareAttributeMapper();
 
   static {
     FARE_ATTRIBUTE.setId(ID);
@@ -47,8 +48,6 @@ public class FareAttributeMapperTest {
     FARE_ATTRIBUTE.setTransferDuration(TRANSFER_DURATION);
     FARE_ATTRIBUTE.setTransfers(TRANSFERS);
   }
-
-  private final FareAttributeMapper subject = new FareAttributeMapper();
 
   @Test
   public void testMapCollection() throws Exception {

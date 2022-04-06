@@ -20,12 +20,12 @@ public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
   }
 
   @Override
-  public boolean skipAlreadyFlaggedItineraries() {
-    return false;
+  public Predicate<Itinerary> predicate() {
+    return it -> it.startTime().getTimeInMillis() > limitMs;
   }
 
   @Override
-  public Predicate<Itinerary> predicate() {
-    return it -> it.startTime().getTimeInMillis() > limitMs;
+  public boolean skipAlreadyFlaggedItineraries() {
+    return false;
   }
 }

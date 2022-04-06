@@ -25,6 +25,10 @@ class ItinerariesCalculateLegTotals {
     calculate(legs);
   }
 
+  int transfers() {
+    return nTransitLegs == 0 ? 0 : nTransitLegs - 1;
+  }
+
   private void calculate(List<Leg> legs) {
     long startTimeMs = legs.get(0).getStartTime().getTimeInMillis();
     long endTimeMs = legs.get(legs.size() - 1).getEndTime().getTimeInMillis();
@@ -53,9 +57,5 @@ class ItinerariesCalculateLegTotals {
       }
     }
     this.waitingTimeSeconds = totalDurationSeconds - (transitTimeSeconds + nonTransitTimeSeconds);
-  }
-
-  int transfers() {
-    return nTransitLegs == 0 ? 0 : nTransitLegs - 1;
   }
 }

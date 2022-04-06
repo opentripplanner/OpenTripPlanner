@@ -10,13 +10,13 @@ public class LegacyGraphQLserviceTimeRangeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLServiceTimeRange {
 
   @Override
-  public DataFetcher<Long> start() {
-    return environment -> getRoutingService(environment).getTransitServiceStarts();
+  public DataFetcher<Long> end() {
+    return environment -> getRoutingService(environment).getTransitServiceEnds();
   }
 
   @Override
-  public DataFetcher<Long> end() {
-    return environment -> getRoutingService(environment).getTransitServiceEnds();
+  public DataFetcher<Long> start() {
+    return environment -> getRoutingService(environment).getTransitServiceStarts();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

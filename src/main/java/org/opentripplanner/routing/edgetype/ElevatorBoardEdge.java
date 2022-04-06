@@ -14,17 +14,16 @@ import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A relatively high cost edge for boarding an elevator.
- * @author mattwigway
  *
+ * @author mattwigway
  */
 public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
   private static final long serialVersionUID = 3925814840369402222L;
 
   /**
-   * The polyline geometry of this edge.
-   * It's generally a polyline with two coincident points, but some elevators have horizontal
-   * dimension, e.g. the ones on the Eiffel Tower.
+   * The polyline geometry of this edge. It's generally a polyline with two coincident points, but
+   * some elevators have horizontal dimension, e.g. the ones on the Eiffel Tower.
    */
   private final LineString the_geom;
 
@@ -35,6 +34,10 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
     coords[0] = new Coordinate(from.getX(), from.getY());
     coords[1] = new Coordinate(to.getX(), to.getY());
     the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+  }
+
+  public String toString() {
+    return "ElevatorBoardEdge(" + fromv + " -> " + tov + ")";
   }
 
   @Override
@@ -52,8 +55,18 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
   }
 
   @Override
-  public double getDistanceMeters() {
-    return 0;
+  public I18NString getName() {
+    // TODO: i18n
+    return new NonLocalizedString("Elevator");
+  }
+
+  /**
+   * Since board edges always are called Elevator, the name is utterly and completely bogus but is
+   * never included in plans..
+   */
+  @Override
+  public boolean hasBogusName() {
+    return true;
   }
 
   @Override
@@ -62,22 +75,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
   }
 
   @Override
-  public I18NString getName() {
-    // TODO: i18n
-    return new NonLocalizedString("Elevator");
-  }
-
-  /**
-   * Since board edges always are called Elevator,
-   * the name is utterly and completely bogus but is never included
-   * in plans..
-   */
-  @Override
-  public boolean hasBogusName() {
-    return true;
-  }
-
-  public String toString() {
-    return "ElevatorBoardEdge(" + fromv + " -> " + tov + ")";
+  public double getDistanceMeters() {
+    return 0;
   }
 }

@@ -35,6 +35,18 @@ public class VehicleParkingEdge extends Edge {
     return vehicleParking;
   }
 
+  public boolean equals(Object o) {
+    if (o instanceof VehicleParkingEdge) {
+      VehicleParkingEdge other = (VehicleParkingEdge) o;
+      return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
+    }
+    return false;
+  }
+
+  public String toString() {
+    return "VehicleParkingEdge(" + fromv + " -> " + tov + ")";
+  }
+
   @Override
   public State traverse(State s0) {
     RoutingRequest options = s0.getOptions();
@@ -48,6 +60,26 @@ public class VehicleParkingEdge extends Edge {
     } else {
       return traversePark(s0);
     }
+  }
+
+  @Override
+  public I18NString getName() {
+    return getToVertex().getName();
+  }
+
+  @Override
+  public boolean hasBogusName() {
+    return false;
+  }
+
+  @Override
+  public LineString getGeometry() {
+    return null;
+  }
+
+  @Override
+  public double getDistanceMeters() {
+    return 0;
   }
 
   protected State traverseUnPark(State s0) {
@@ -124,37 +156,5 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementTimeInSeconds(parkingTime);
     s0e.setVehicleParked(true, TraverseMode.WALK);
     return s0e.makeState();
-  }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
-  }
-
-  @Override
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
-  public I18NString getName() {
-    return getToVertex().getName();
-  }
-
-  @Override
-  public boolean hasBogusName() {
-    return false;
-  }
-
-  public boolean equals(Object o) {
-    if (o instanceof VehicleParkingEdge) {
-      VehicleParkingEdge other = (VehicleParkingEdge) o;
-      return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
-    }
-    return false;
-  }
-
-  public String toString() {
-    return "VehicleParkingEdge(" + fromv + " -> " + tov + ")";
   }
 }

@@ -46,7 +46,10 @@ public class TripTimeOnDate {
     this.midnight = midnight.getEpochSecond();
   }
 
-  /** Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns. */
+  /**
+   * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
+   * StopPatterns.
+   */
   public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip) {
     TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));
     List<TripTimeOnDate> out = new ArrayList<>();
@@ -57,7 +60,9 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns.
+   * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
+   * StopPatterns.
+   *
    * @param serviceDay service day to set, if null none is set
    */
   public static List<TripTimeOnDate> fromTripTimes(

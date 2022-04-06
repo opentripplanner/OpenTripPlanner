@@ -2,7 +2,6 @@ package org.opentripplanner.api.model;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.TraverseModeMapper;
@@ -15,34 +14,20 @@ import org.opentripplanner.util.WorldEnvelope;
 
 public class ApiRouterInfo {
 
-  public String routerId;
-
-  public Geometry polygon;
-
-  public Date buildTime;
-
-  public long transitServiceStarts;
-
-  public long transitServiceEnds;
-
-  public List<String> transitModes;
-
   private final WorldEnvelope envelope;
-
-  public double centerLatitude;
-
-  public double centerLongitude;
-
-  public boolean hasParkRide;
-
-  public boolean hasBikeSharing;
-
   public final boolean hasBikePark;
-
   public final boolean hasCarPark;
-
   public final boolean hasVehicleParking;
-
+  public String routerId;
+  public Geometry polygon;
+  public Date buildTime;
+  public long transitServiceStarts;
+  public long transitServiceEnds;
+  public List<String> transitModes;
+  public double centerLatitude;
+  public double centerLongitude;
+  public boolean hasParkRide;
+  public boolean hasBikeSharing;
   public List<TravelOption> travelOptions;
 
   /** TODO: Do not pass in the graph here, do this in a mapper instead. */
@@ -103,10 +88,11 @@ public class ApiRouterInfo {
   }
 
   /**
-   * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used.
-   *
-   * It is first called when OSM is loaded. Then after transit data is loaded.
-   * So that center is set in all combinations of street and transit loading.
+   * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit
+   * is used.
+   * <p>
+   * It is first called when OSM is loaded. Then after transit data is loaded. So that center is set
+   * in all combinations of street and transit loading.
    */
   public void setCenter(Coordinate center) {
     //Transit data was loaded and center was calculated with calculateTransitCenter
@@ -116,6 +102,7 @@ public class ApiRouterInfo {
 
   /**
    * Set center coordinate from mean coordinates of bounding box.
+   *
    * @see #setCenter(Coordinate)
    */
   public void calculateCenter() {

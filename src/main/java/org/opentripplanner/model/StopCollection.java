@@ -13,8 +13,7 @@ public interface StopCollection {
   I18NString getName();
 
   /**
-   * Implementations should go down the hierarchy and return all the underlying stops
-   * recursively.
+   * Implementations should go down the hierarchy and return all the underlying stops recursively.
    */
   Collection<StopLocation> getChildStops();
 

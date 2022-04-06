@@ -9,6 +9,7 @@ public class BrandingMapper {
 
   /**
    * Convert GTFS Route entity into OTP Branding model.
+   *
    * @param route GTFS Route entity
    * @return OTP branding model. Null if route branding url is not present.
    */

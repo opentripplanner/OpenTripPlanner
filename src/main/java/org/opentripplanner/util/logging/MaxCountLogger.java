@@ -32,19 +32,19 @@ public class MaxCountLogger extends AbstractFilterLogger {
     return new MaxCountLogger(log);
   }
 
-  @Override
-  boolean mute() {
-    ++count;
-    return count > MAX_COUNT;
-  }
-
   /**
-   * Log the total number of log events if at least one event was muted. The log text is
-   * formatted like this: {@code "TOTAL: n - %message%" }.
+   * Log the total number of log events if at least one event was muted. The log text is formatted
+   * like this: {@code "TOTAL: n - %message%" }.
    */
   public void logTotal(String message) {
     if (mute()) {
       getDelegate().warn("TOTAL: {} - {}", count, message);
     }
+  }
+
+  @Override
+  boolean mute() {
+    ++count;
+    return count > MAX_COUNT;
   }
 }

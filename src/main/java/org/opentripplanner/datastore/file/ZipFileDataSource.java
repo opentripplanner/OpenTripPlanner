@@ -14,16 +14,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is a wrapper around a ZipFile, it can be used to read the content, but
- * not write to it. The {@link #asOutputStream()} is throwing an exception.
+ * This is a wrapper around a ZipFile, it can be used to read the content, but not write to it. The
+ * {@link #asOutputStream()} is throwing an exception.
  */
 public class ZipFileDataSource extends AbstractFileDataSource implements CompositeDataSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(ZipFileDataSource.class);
-
+  private final Collection<DataSource> content = new ArrayList<>();
   private boolean contentLoaded = false;
   private ZipFile zipFile;
-  private final Collection<DataSource> content = new ArrayList<>();
 
   public ZipFileDataSource(File file, FileType type) {
     super(file, type);

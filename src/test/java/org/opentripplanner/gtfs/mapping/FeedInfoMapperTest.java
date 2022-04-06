@@ -29,6 +29,7 @@ public class FeedInfoMapperTest {
   private static final String PUBLISHER_URL = "www.url.pub";
 
   private static final String VERSION = "Version";
+  private final FeedInfoMapper subject = new FeedInfoMapper(ID);
 
   static {
     FEED_INFO.setId(ID);
@@ -39,8 +40,6 @@ public class FeedInfoMapperTest {
     FEED_INFO.setPublisherUrl(PUBLISHER_URL);
     FEED_INFO.setVersion(VERSION);
   }
-
-  private final FeedInfoMapper subject = new FeedInfoMapper(ID);
 
   @Test
   public void testMapCollection() throws Exception {

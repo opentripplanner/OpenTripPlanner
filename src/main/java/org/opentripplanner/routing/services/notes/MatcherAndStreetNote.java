@@ -11,15 +11,13 @@ import org.opentripplanner.model.StreetNote;
 public class MatcherAndStreetNote implements Serializable {
 
   private static final long serialVersionUID = 1L;
+  private final NoteMatcher matcher;
+  private final StreetNote note;
 
   public MatcherAndStreetNote(NoteMatcher matcher, StreetNote note) {
     this.matcher = matcher;
     this.note = note;
   }
-
-  private final NoteMatcher matcher;
-
-  private final StreetNote note;
 
   public NoteMatcher getMatcher() {
     return matcher;

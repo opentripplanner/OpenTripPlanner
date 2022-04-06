@@ -126,17 +126,6 @@ public class TripCalendarBuilderTest {
       .toString();
   }
 
-  private ArrayListMultimap<String, DatedServiceJourney> dsj_2020_11_02(String sjId) {
-    var dsj = new DatedServiceJourney();
-    dsj.withOperatingDayRef(new OperatingDayRefStructure().withRef(OD_1));
-    dsj
-      .getJourneyRef()
-      .add(jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class));
-    ArrayListMultimap<String, DatedServiceJourney> map = ArrayListMultimap.create();
-    map.put(sjId, dsj);
-    return map;
-  }
-
   private static HierarchicalMapById<OperatingDay> operatingDays_2020_11_02() {
     HierarchicalMapById<OperatingDay> opDays = new HierarchicalMapById<>();
     opDays.add(
@@ -156,6 +145,17 @@ public class TripCalendarBuilderTest {
     // Simple assignments on 1.11.2020
     assignments.add(DAY_TYPE_1, createDayTypeAssignment(DAY_TYPE_1, D2020_11_01, AVAILABLE));
     return assignments;
+  }
+
+  private ArrayListMultimap<String, DatedServiceJourney> dsj_2020_11_02(String sjId) {
+    var dsj = new DatedServiceJourney();
+    dsj.withOperatingDayRef(new OperatingDayRefStructure().withRef(OD_1));
+    dsj
+      .getJourneyRef()
+      .add(jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class));
+    ArrayListMultimap<String, DatedServiceJourney> map = ArrayListMultimap.create();
+    map.put(sjId, dsj);
+    return map;
   }
 
   private String toStr(Map<String, Set<ServiceDate>> result, String key) {

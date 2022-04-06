@@ -115,11 +115,11 @@ public class FrequencyEntry implements Serializable {
   }
 
   /**
-   * Returns a disposable TripTimes for this frequency entry in which the vehicle
-   * passes the given stop index (not stop sequence number) at the given time.
-   * This allows us to separate the departure/arrival search process from
-   * actually instantiating a TripTimes, to avoid making too many short-lived clones.
-   * This delegation is a sign that maybe FrequencyEntry should subclass TripTimes.
+   * Returns a disposable TripTimes for this frequency entry in which the vehicle passes the given
+   * stop index (not stop sequence number) at the given time. This allows us to separate the
+   * departure/arrival search process from actually instantiating a TripTimes, to avoid making too
+   * many short-lived clones. This delegation is a sign that maybe FrequencyEntry should subclass
+   * TripTimes.
    */
   public TripTimes materialize(int stop, int time, boolean depart) {
     return tripTimes.timeShift(stop, time, depart);
@@ -130,13 +130,19 @@ public class FrequencyEntry implements Serializable {
     return (endTime - startTime) / headway;
   }
 
-  /** @return the minimum time in seconds since midnight at which a trip may depart on this frequency definition. */
+  /**
+   * @return the minimum time in seconds since midnight at which a trip may depart on this frequency
+   * definition.
+   */
   public int getMinDeparture() {
     // this is simple: the earliest this trip could depart is the time at which it starts plus the dwell at the first stop
     return tripTimes.getDepartureTime(0) - tripTimes.getArrivalTime(0) + startTime;
   }
 
-  /** @return the maximum time in seconds since midnight at which a trip may arrive on this frequency definition. */
+  /**
+   * @return the maximum time in seconds since midnight at which a trip may arrive on this frequency
+   * definition.
+   */
   public int getMaxArrival() {
     // The latest this trip could arrive is its last arrival time minus its first arrival time (the length of the trip),
     // plus the end time (the latest it could have arrived at the initial stop)

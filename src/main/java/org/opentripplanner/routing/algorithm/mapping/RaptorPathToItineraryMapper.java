@@ -39,10 +39,10 @@ import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 
 /**
- * This maps the paths found by the Raptor search algorithm to the itinerary structure currently used by OTP. The paths,
- * access/egress transfers and transit layer only contains the minimal information needed for routing. Additional
- * information has to be fetched from the graph index to create complete itineraries that can be shown in a trip
- * planner.
+ * This maps the paths found by the Raptor search algorithm to the itinerary structure currently
+ * used by OTP. The paths, access/egress transfers and transit layer only contains the minimal
+ * information needed for routing. Additional information has to be fetched from the graph index to
+ * create complete itineraries that can be shown in a trip planner.
  */
 public class RaptorPathToItineraryMapper {
 
@@ -61,9 +61,10 @@ public class RaptorPathToItineraryMapper {
   /**
    * Constructs an itinerary mapper for a request and a set of results
    *
-   * @param transitLayer the currently active transit layer (may have real-time data applied)
+   * @param transitLayer          the currently active transit layer (may have real-time data
+   *                              applied)
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
-   * @param request the current routing request
+   * @param request               the current routing request
    */
   public RaptorPathToItineraryMapper(
     Graph graph,

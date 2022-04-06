@@ -53,8 +53,8 @@ public class StorageConfig {
    * need to provide a path the the service credentials. Environment variables in the path is
    * resolved.
    * <p>
-   * Example: {@code "credentialsFile" : "${MY_GOC_SERVICE}"} or {@code "app-1-3983f9f66728.json"
-   * : "~/"}
+   * Example: {@code "credentialsFile" : "${MY_GOC_SERVICE}"} or {@code "app-1-3983f9f66728.json" :
+   * "~/"}
    * <p>
    * This is a path to a file on the local file system, not an URI.
    * <p>
@@ -63,8 +63,8 @@ public class StorageConfig {
   public final String gsCredentials;
 
   /**
-   * URI to the street graph object file for reading and writing. The file is created or
-   * overwritten if OTP saves the graph to the file.
+   * URI to the street graph object file for reading and writing. The file is created or overwritten
+   * if OTP saves the graph to the file.
    * <p>
    * Example: {@code "streetGraph" : "file:///Users/kelvin/otp/streetGraph.obj" }
    * <p>
@@ -73,8 +73,8 @@ public class StorageConfig {
   public final URI streetGraph;
 
   /**
-   * URI to the graph object file for reading and writing. The file is created or overwritten if
-   * OTP saves the graph to the file.
+   * URI to the graph object file for reading and writing. The file is created or overwritten if OTP
+   * saves the graph to the file.
    * <p>
    * Example: {@code "graph" : "gs://my-bucket/otp/graph.obj" }
    * <p>
@@ -103,7 +103,8 @@ public class StorageConfig {
   /**
    * Array of URIs to GTFS data files .
    * <p>
-   * Example: {@code "transit" : [ "file:///Users/kelvin/otp/gtfs.zip", "gs://my-bucket/gtfs.zip" ]" }
+   * Example: {@code "transit" : [ "file:///Users/kelvin/otp/gtfs.zip", "gs://my-bucket/gtfs.zip" ]"
+   * }
    * <p>
    * This parameter is optional.
    */
@@ -113,7 +114,8 @@ public class StorageConfig {
   /**
    * Array of URIs to Netex data files.
    * <p>
-   * Example: {@code "transit" : [ "file:///Users/kelvin/otp/netex.zip", "gs://my-bucket/netex.zip" ]" }
+   * Example: {@code "transit" : [ "file:///Users/kelvin/otp/netex.zip", "gs://my-bucket/netex.zip"
+   * ]" }
    * <p>
    * This parameter is optional.
    */
@@ -122,8 +124,8 @@ public class StorageConfig {
 
   /**
    * URI to the directory where the graph build report should be written to. The html report is
-   * written into this directory. If the directory exist, any existing files are deleted.
-   * If it does not exist, it is created.
+   * written into this directory. If the directory exist, any existing files are deleted. If it does
+   * not exist, it is created.
    * <p>
    * Example: {@code "osm" : "file:///Users/kelvin/otp/buildReport" }
    * <p>
@@ -133,8 +135,7 @@ public class StorageConfig {
 
   /**
    * Configure patterns for auto-detection of input files in the local base directory. Resolving
-   * input files is only provided for files in the base directory not for any external
-   * resources.
+   * input files is only provided for files in the base directory not for any external resources.
    */
   public final LocalFilenamePatterns localFileNamePatterns;
 
@@ -152,53 +153,51 @@ public class StorageConfig {
 
   /**
    * Configure patterns for auto-detection of input files in the local base directory. Resolving
-   * input files is only provided for files in the base directory not for any external
-   * resources.
+   * input files is only provided for files in the base directory not for any external resources.
    */
   public static class LocalFilenamePatterns {
 
     /**
-     * Patterns for matching GTFS zip-files or directories. If the filename contains the
-     * given pattern it is considered a match. Any legal Java Regular expression is allowed.
+     * Patterns for matching GTFS zip-files or directories. If the filename contains the given
+     * pattern it is considered a match. Any legal Java Regular expression is allowed.
      * <p>
      * This parameter is optional.
      * <p>
-     * Default: {@code (?i)gtfs} - Match all filenames that contain "gtfs". The default pattern
-     * is NOT case sensitive.
+     * Default: {@code (?i)gtfs} - Match all filenames that contain "gtfs". The default pattern is
+     * NOT case sensitive.
      */
     public final Pattern gtfs;
 
     /**
-     * Patterns for matching NeTEx zip files or directories. If the filename contains the
-     * given pattern it is considered a match. Any legal Java Regular expression is allowed.
+     * Patterns for matching NeTEx zip files or directories. If the filename contains the given
+     * pattern it is considered a match. Any legal Java Regular expression is allowed.
      * <p>
      * This parameter is optional.
      * <p>
-     * Default: {@code (?i)netex} - Match all filenames that contain "netex". The default
-     * pattern is NOT case sensitive.
+     * Default: {@code (?i)netex} - Match all filenames that contain "netex". The default pattern is
+     * NOT case sensitive.
      */
     public final Pattern netex;
 
     /**
-     * Pattern for matching Open Street Map input files. If the filename contains the
-     * given pattern it is considered a match. Any legal Java Regular expression is allowed.
+     * Pattern for matching Open Street Map input files. If the filename contains the given pattern
+     * it is considered a match. Any legal Java Regular expression is allowed.
      * <p>
      * This parameter is optional.
      * <p>
-     * Default: {@code (?i)(.pbf|.osm|.osm.xml)$} - Match all filenames that ends with suffix
-     * {@code .pbf}, {@code .osm} or {@code .osm.xml}. The default pattern is NOT case
-     * sensitive.
+     * Default: {@code (?i)(.pbf|.osm|.osm.xml)$} - Match all filenames that ends with suffix {@code
+     * .pbf}, {@code .osm} or {@code .osm.xml}. The default pattern is NOT case sensitive.
      */
     public final Pattern osm;
 
     /**
-     * Pattern for matching elevation DEM files. If the filename contains the
-     * given pattern it is considered a match. Any legal Java Regular expression is allowed.
+     * Pattern for matching elevation DEM files. If the filename contains the given pattern it is
+     * considered a match. Any legal Java Regular expression is allowed.
      * <p>
      * This parameter is optional.
      * <p>
-     * Default: {@code (?i).tiff?$} - Match all filenames that ends with suffix
-     * {@code .tif} or {@code .tiff}. The default pattern is NOT case sensitive.
+     * Default: {@code (?i).tiff?$} - Match all filenames that ends with suffix {@code .tif} or
+     * {@code .tiff}. The default pattern is NOT case sensitive.
      */
     public final Pattern dem;
 

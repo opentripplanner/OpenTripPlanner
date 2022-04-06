@@ -8,9 +8,9 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 /**
  * Maps NeTEx notice to OTP notice.
  * <p/>
- * This Mapper is stateful, it caches objects it already have mapped. Because
- * of this just one instance of the mapper should be used in a context where
- * the same Notice may appear more than once.
+ * This Mapper is stateful, it caches objects it already have mapped. Because of this just one
+ * instance of the mapper should be used in a context where the same Notice may appear more than
+ * once.
  */
 class NoticeMapper {
 

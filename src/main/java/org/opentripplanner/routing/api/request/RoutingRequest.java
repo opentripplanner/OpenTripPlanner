@@ -55,15 +55,15 @@ import org.slf4j.LoggerFactory;
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
  * route.
- *
+ * <p>
  * All defaults should be specified here in the RoutingRequest, NOT as annotations on query
  * parameters in web services that create RoutingRequests. This establishes a priority chain for
- * default values:
- * RoutingRequest field initializers, then JSON router config, then query parameters.
+ * default values: RoutingRequest field initializers, then JSON router config, then query
+ * parameters.
  *
- * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor router or other
- * non-transit routing (walk, bike, car etc.)
- *
+ * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor
+ * router or other non-transit routing (walk, bike, car etc.)
+ * <p>
  * TODO OTP2 Many fields are deprecated in this class, the reason is documented in the
  *           RoutingResource class, not here. Eventually the field will be removed from this
  *           class, but we want to keep it in the RoutingResource as long as we support the
@@ -78,13 +78,30 @@ public class RoutingRequest implements Cloneable, Serializable {
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
   /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
-
+  /**
+   * How close to do you have to be to the start or end to be considered "close".
+   *
+   * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
+   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+   */
+  private static final int MAX_CLOSENESS_METERS = 500;
   /** The complete list of incoming query parameters. */
   public final HashMap<String, String> parameters = new HashMap<>();
-
+  /** Configure the transfer optimization */
+  public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest();
+  /**
+   * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add a
+   * penalty to other modes (> 1.0). The type used here it the internal model {@link TransitMode}
+   * make sure to create a mapping for this before using it on the API.
+   * <p>
+   * If set, the alight-slack-for-mode override the default value {@code 1.0}.
+   * <p>
+   * This is a scalar multiplied with the time in second on board the transit vehicle. Default value
+   * is not-set(empty map).
+   */
+  private final Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
   /** The start location */
   public GenericLocation from;
-
   /** The end location */
   public GenericLocation to;
 
@@ -92,20 +109,19 @@ public class RoutingRequest implements Cloneable, Serializable {
    * An ordered list of intermediate locations to be visited.
    *
    * @deprecated TODO OTP2 - Regression. Not currently working in OTP2. Must be re-implemented
-   *                       - using raptor.
+   * - using raptor.
    */
   @Deprecated
   public List<GenericLocation> intermediatePlaces;
 
   /**
-   * This is the maximum duration in seconds for a direct street search. This is a performance
-   * limit and should therefore be set high. Results close to the limit are not guaranteed to be
-   * optimal. Use filters to limit what is presented to the client.
+   * This is the maximum duration in seconds for a direct street search. This is a performance limit
+   * and should therefore be set high. Results close to the limit are not guaranteed to be optimal.
+   * Use filters to limit what is presented to the client.
    *
    * @see ItineraryListFilter
    */
   public double maxDirectStreetDurationSeconds = Duration.ofHours(4).toSeconds();
-
   /**
    * This is the maximum duration in seconds for access/egress street searches. This is a
    * performance limit and should therefore be set high. Results close to the limit are not
@@ -114,17 +130,15 @@ public class RoutingRequest implements Cloneable, Serializable {
    * @see ItineraryListFilter
    */
   public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
-
   /**
-   * Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is
-   * done because some street modes searches are much more resource intensive than others.
+   * Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done
+   * because some street modes searches are much more resource intensive than others.
    */
   public Map<StreetMode, Double> maxAccessEgressDurationSecondsForMode = new HashMap<>();
-
   /**
    * The access/egress/direct/transit modes allowed for this main request. The parameter
    * "streetSubRequestModes" below is used for a single A Star sub request.
-   *
+   * <p>
    * // TODO OTP2 Street routing requests should eventually be split into its own request class.
    */
   public RequestModes modes = new RequestModes(
@@ -134,74 +148,68 @@ public class RoutingRequest implements Cloneable, Serializable {
     StreetMode.WALK,
     AllowedTransitMode.getAllTransitModes()
   );
-
   /**
-   * The set of TraverseModes allowed when doing creating sub requests and doing street routing.
-   * // TODO OTP2 Street routing requests should eventually be split into its own request class.
+   * The set of TraverseModes allowed when doing creating sub requests and doing street routing. //
+   * TODO OTP2 Street routing requests should eventually be split into its own request class.
    */
   public TraverseModeSet streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK); // defaults in constructor overwrite this
-
   /**
    * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
    */
   public BicycleOptimizeType bicycleOptimizeType = BicycleOptimizeType.SAFE;
-
   /**
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
    */
   private Instant dateTime = Instant.now();
-
   /**
    * This is the time/duration in seconds from the earliest-departure-time(EDT) to
-   * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest
-   * to latest arrival time (LAT - EAT).
+   * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
+   * latest arrival time (LAT - EAT).
    * <p>
    * All optimal travels that depart within the search window is guarantied to be found.
    * <p>
    * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
-   * Transit search as well; Hence this is named search-window and not raptor-search-window. Do
-   * not confuse this with the travel-window, which is the time between EDT to LAT.
+   * Transit search as well; Hence this is named search-window and not raptor-search-window. Do not
+   * confuse this with the travel-window, which is the time between EDT to LAT.
    * <p>
-   * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value
-   * is dynamically  assigned a suitable value, if not set. In a small to medium size operation
-   * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
-   * routes and infrequent long distant journeys, the best option is normally to use the dynamic
-   * auto assignment.
+   * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value is
+   * dynamically  assigned a suitable value, if not set. In a small to medium size operation you may
+   * use a fixed value, like 60 minutes. If you have a mixture of high frequency cities routes and
+   * infrequent long distant journeys, the best option is normally to use the dynamic auto
+   * assignment.
    * <p>
    * There is no need to set this when going to the next/previous page any more.
    */
   public Duration searchWindow;
-
   /**
-   * The expected maximum time a journey can last across all possible journeys for the current deployment.
-   * Normally you would just do an estimate and add enough slack, so you are sure that there is no journeys that
-   * falls outside this window. The parameter is used find all possible dates for the journey and then search only
-   * the services which run on those dates. The duration must include access, egress, wait-time and transit time
-   * for the whole journey. It should also take low frequency days/periods like holidays into account. In other words,
-   * pick the two points within your area that has the worst connection and then try to travel on the worst possible
-   * day, and find the maximum journey duration. Using a value that is too high has the effect of including more
-   * patterns in the search, hence, making it a bit slower. Recommended values would be from 12 hours(small
-   * town/city), 1 day (region) to 2 days (country like Norway).
+   * The expected maximum time a journey can last across all possible journeys for the current
+   * deployment. Normally you would just do an estimate and add enough slack, so you are sure that
+   * there is no journeys that falls outside this window. The parameter is used find all possible
+   * dates for the journey and then search only the services which run on those dates. The duration
+   * must include access, egress, wait-time and transit time for the whole journey. It should also
+   * take low frequency days/periods like holidays into account. In other words, pick the two points
+   * within your area that has the worst connection and then try to travel on the worst possible
+   * day, and find the maximum journey duration. Using a value that is too high has the effect of
+   * including more patterns in the search, hence, making it a bit slower. Recommended values would
+   * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
    */
   public Duration maxJourneyDuration = Duration.ofHours(24);
-
   /**
-   * Use the cursor to go to the next or previous "page" of trips.
-   * You should pass in the original request as is.
+   * Use the cursor to go to the next or previous "page" of trips. You should pass in the original
+   * request as is.
    * <p>
-   * The next page of itineraries will depart after the current results
-   * and the previous page of itineraries will depart before the current results.
+   * The next page of itineraries will depart after the current results and the previous page of
+   * itineraries will depart before the current results.
    * <p>
-   * The paging does not support timeTableView=false and arriveBy=true, this will result in
-   * none pareto-optimal results.
+   * The paging does not support timeTableView=false and arriveBy=true, this will result in none
+   * pareto-optimal results.
    */
   public PageCursor pageCursor;
-
   /**
    * Search for the best trip options within a time window. If {@code true} two itineraries are
-   * considered optimal if one is better on arrival time(earliest wins) and the other is better
-   * on departure time(latest wins).
+   * considered optimal if one is better on arrival time(earliest wins) and the other is better on
+   * departure time(latest wins).
    * <p>
    * In combination with {@code arriveBy} this parameter cover the following 3 use cases:
    * <ul>
@@ -210,7 +218,7 @@ public class RoutingRequest implements Cloneable, Serializable {
    *     {@code timetableView=true} and {@code arriveBy=false}. This is the default, and if the
    *     intention of the traveler is unknown, this gives the best result. This use-case includes
    *     all itineraries in the two next use-cases. This option also work well with paging.
-   *
+   * <p>
    *     Setting the {@code arriveBy=false}, covers the same use-case, but the input time is
    *     interpreted as latest-arrival-time, and not earliest-departure-time.
    *   </li>
@@ -228,74 +236,64 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Default: true
    */
   public boolean timetableView = true;
-
   /**
    * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
    */
   public boolean arriveBy = false;
-
   /**
    * Whether the trip must be wheelchair accessible.
    */
   public boolean wheelchairAccessible = false;
-
   /**
-   * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,
-   * but in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is
-   * a post search filter function. A side effect from reducing the result is that OTP2 cannot
-   * guarantee to find all pareto-optimal itineraries when paging. Also, a large search-window
-   * and a small {@code numItineraries} waste computer CPU calculation time.
+   * The maximum number of itineraries to return. In OTP1 this parameter terminates the search, but
+   * in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is a post
+   * search filter function. A side effect from reducing the result is that OTP2 cannot guarantee to
+   * find all pareto-optimal itineraries when paging. Also, a large search-window and a small {@code
+   * numItineraries} waste computer CPU calculation time.
    * <p>
-   * The default value is 50. This is a reasonably high threshold to prevent large amount of data
-   * to be returned. Consider tuning the search-window instead of setting this to a small value.
+   * The default value is 50. This is a reasonably high threshold to prevent large amount of data to
+   * be returned. Consider tuning the search-window instead of setting this to a small value.
    */
   public int numItineraries = 50;
-
   /** The maximum slope of streets for wheelchair trips. */
   public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
-
   /** Whether the planner should return intermediate stops lists for transit legs. */
   public boolean showIntermediateStops = false;
-
   /**
    * Human walk speed along streets, in meters per second.
-   *
-   * Default: 1.33 m/s ~ 3mph, <a href="http://en.wikipedia.org/wiki/Walking">avg. human walk speed</a>
+   * <p>
+   * Default: 1.33 m/s ~ 3mph, <a href="http://en.wikipedia.org/wiki/Walking">avg. human walk
+   * speed</a>
    */
   public double walkSpeed = 1.33;
-
   /**
    * Default: 5 m/s, ~11 mph, a random bicycling speed
    */
   public double bikeSpeed = 5;
-
   /**
    * Default: 1.33 m/s ~ Same as walkSpeed
    */
   public double bikeWalkingSpeed = 1.33;
-
   /**
    * Max car speed along streets, in meters per second.
-   *
+   * <p>
    * Default: 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide.
    */
   public double carSpeed = 40.0;
-
   public Locale locale = new Locale("en", "US");
-
   /**
-   * An extra penalty added on transfers (i.e. all boardings except the first one).
-   * Not to be confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a
-   * vehicle with and without a bicycle. The boardCosts are used to model the 'usual' perceived
-   * cost of using a transit vehicle, and the transferCost is used when a user requests even
-   * less transfers. In the latter case, we don't actually optimize for fewest transfers, as this
-   * can lead to absurd results. Consider a trip in New York from Grand Army
-   * Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to
-   * wait until midnight, when the 4 train runs local the whole way. The actual fastest route is
-   * the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour.
-   * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they
-   * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6.
-   * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
+   * An extra penalty added on transfers (i.e. all boardings except the first one). Not to be
+   * confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a vehicle with
+   * and without a bicycle. The boardCosts are used to model the 'usual' perceived cost of using a
+   * transit vehicle, and the transferCost is used when a user requests even less transfers. In the
+   * latter case, we don't actually optimize for fewest transfers, as this can lead to absurd
+   * results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's
+   * at noon. The true lowest transfers route is to wait until midnight, when the 4 train runs local
+   * the whole way. The actual fastest route is the 2/3 to the 4/5 at Nevins to the 6 at Union
+   * Square, which takes half an hour. Even someone optimizing for fewest transfers doesn't want to
+   * wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union
+   * Square, then transfer to the 6. If this takes less than optimize_transfer_penalty seconds, then
+   * that's what we'll return.
    */
   public int transferCost = 0;
 
@@ -303,171 +301,129 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Penalty for using a non-preferred transfer
    *
    * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-   *                       old functionality the same way, but we will try to map this parameter
-   *                       so it does work similar as before.
+   * old functionality the same way, but we will try to map this parameter
+   * so it does work similar as before.
    */
   @Deprecated
   public int nonpreferredTransferCost = 180;
 
-  /** Configure the transfer optimization */
-  public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest();
-
   /**
-   * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add
-   * a penalty to other modes (> 1.0). The type used here it the internal model
-   * {@link TransitMode} make sure to create a mapping for this before using it on the API.
-   * <p>
-   * If set, the alight-slack-for-mode override the default value {@code 1.0}.
-   * <p>
-   * This is a scalar multiplied with the time in second on board the transit vehicle. Default
-   * value is not-set(empty map).
-   */
-  private final Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
-
-  /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
-   *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
-   *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
-   *  observation should in no way be taken as scientific or definitive. Your mileage may vary.
+   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+   * Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept of
+   * not wanting to walk too much without asking for totally ridiculous itineraries, but this
+   * observation should in no way be taken as scientific or definitive. Your mileage may vary.
    */
   public double walkReluctance = 2.0;
-
   public double bikeWalkingReluctance = 5.0;
-
   public double bikeReluctance = 2.0;
-
   public double carReluctance = 2.0;
-
   /**
    * How much more time does it take to walk a flight of stairs compared to walking a similar
    * horizontal length
-   *
-   * Default value is based on:
-   * Fujiyama, T., & Tyler, N. (2010).
-   * Predicting the walking speed of pedestrians on stairs.
-   * Transportation Planning and Technology, 33(2), 177–202.
+   * <p>
+   * Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking speed of
+   * pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
    */
   public double stairsTimeFactor = 3.0;
-
   /** Used instead of walk reluctance for stairs */
   public double stairsReluctance = 2.0;
-
   /** Multiplicative factor on expected turning time. */
   public double turnReluctance = 1.0;
-
   /**
-   * How long does it take to get an elevator, on average (actually, it probably should be a bit *more* than average, to prevent optimistic trips)?
-   * Setting it to "seems like forever," while accurate, will probably prevent OTP from working correctly.
+   * How long does it take to get an elevator, on average (actually, it probably should be a bit
+   * *more* than average, to prevent optimistic trips)? Setting it to "seems like forever," while
+   * accurate, will probably prevent OTP from working correctly.
    */
   // TODO: how long does it /really/ take to get an elevator?
   public int elevatorBoardTime = 90;
-
   /** What is the cost of boarding an elevator? */
   public int elevatorBoardCost = 90;
-
   /** How long does it take to advance one floor on an elevator? */
   public int elevatorHopTime = 20;
 
+  // it is assumed that getting off an elevator is completely free
   /** What is the cost of travelling one floor on an elevator? */
   public int elevatorHopCost = 20;
-
-  // it is assumed that getting off an elevator is completely free
-
   /** Time to get on and off your own bike */
   public int bikeSwitchTime;
-
   /** Cost of getting on and off your own bike */
   public int bikeSwitchCost;
-
   /** Time to rent a vehicle */
   public int vehicleRentalPickupTime = 60;
-
   /**
-   * Cost of renting a vehicle. The cost is a bit more than actual time to model the associated cost and trouble.
+   * Cost of renting a vehicle. The cost is a bit more than actual time to model the associated cost
+   * and trouble.
    */
   public int vehicleRentalPickupCost = 120;
-
   /** Time to drop-off a rented vehicle */
   public int vehicleRentalDropoffTime = 30;
-
   /** Cost of dropping-off a rented vehicle */
   public int vehicleRentalDropoffCost = 30;
-
   /** The vehicle rental networks which may be used. If empty all networks may be used. */
   public Set<String> allowedVehicleRentalNetworks = Set.of();
-
   /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
   public Set<String> bannedVehicleRentalNetworks = Set.of();
-
   /** Time to park a bike */
   public int bikeParkTime = 60;
-
   /** Cost of parking a bike. */
   public int bikeParkCost = 120;
-
   /** Time to park a car */
   public int carParkTime = 60;
-
   /** Cost of parking a car. */
   public int carParkCost = 120;
-
   /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
   public Set<String> requiredVehicleParkingTags = Set.of();
-
   /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
   public Set<String> bannedVehicleParkingTags = Set.of();
-
   /**
-   * Time to park a car in a park and ride, w/o taking into account driving and walking cost
-   * (time to park, switch off, pick your stuff, lock the car, etc...)
+   * Time to park a car in a park and ride, w/o taking into account driving and walking cost (time
+   * to park, switch off, pick your stuff, lock the car, etc...)
    */
   public int carDropoffTime = 120;
-
   /** Time of getting in/out of a carPickup (taxi) */
   public int carPickupTime = 60;
-
   /** Cost of getting in/out of a carPickup (taxi) */
   public int carPickupCost = 120;
-
   /**
-   * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
-   * time as the same.
-   *
-   * It may be tempting to set this higher than walkReluctance (as studies often find this kind of preferences among
-   * riders) but the planner will take this literally and walk down a transit line to avoid waiting at a stop.
-   * This used to be set less than 1 (0.95) which would make waiting offboard preferable to waiting onboard in an
-   * interlined trip. That is also undesirable.
-   *
-   * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear.
+   * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
+   * multiplier. The default value treats wait and on-vehicle time as the same.
+   * <p>
+   * It may be tempting to set this higher than walkReluctance (as studies often find this kind of
+   * preferences among riders) but the planner will take this literally and walk down a transit line
+   * to avoid waiting at a stop. This used to be set less than 1 (0.95) which would make waiting
+   * offboard preferable to waiting onboard in an interlined trip. That is also undesirable.
+   * <p>
+   * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this
+   * problem could disappear.
    */
   public double waitReluctance = 1.0;
 
-  /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)
+  /**
+   * How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first
+   * boarding)
    *
    * @deprecated TODO OTP2 Probably a regression, but I'm not sure it worked correctly in OTP 1.X
-   *                          either. It could be a part of itinerary-filtering after a Raptor search.
-   * */
+   * either. It could be a part of itinerary-filtering after a Raptor search.
+   */
   @Deprecated
   public double waitAtBeginningFactor = 0.4;
 
   /**
    * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
-   * addition to the cost of the transfer(walking) and waiting-time. It is also in addition to
-   * the {@link #transferCost}.
+   * addition to the cost of the transfer(walking) and waiting-time. It is also in addition to the
+   * {@link #transferCost}.
    */
   public int walkBoardCost = 60 * 10;
-
   /**
-   * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.
-   * This is in addition to the cost of the transfer(biking) and waiting-time. It is also in
-   * addition to the {@link #transferCost}.
+   * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. This
+   * is in addition to the cost of the transfer(biking) and waiting-time. It is also in addition to
+   * the {@link #transferCost}.
    */
   public int bikeBoardCost = 60 * 10;
-
   /**
    * Do not use certain named agencies
    */
   private Set<FeedScopedId> bannedAgencies = Set.of();
-
   /**
    * Only use certain named agencies
    */
@@ -486,17 +442,18 @@ public class RoutingRequest implements Cloneable, Serializable {
   private Set<FeedScopedId> unpreferredAgencies = Set.of();
 
   /**
-   * Do not use certain named routes.
-   * The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
-   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see issue #1671.
+   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
+   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
+   * issue #1671.
    */
   private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
-
-  /** Only use certain named routes
+  /**
+   * Only use certain named routes
    */
   private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
-  /** Set of preferred routes by user.
+  /**
+   * Set of preferred routes by user.
    *
    * @deprecated TODO OTP2 Needs to be implemented
    */
@@ -533,13 +490,12 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Do not use certain trips
    */
   public Set<FeedScopedId> bannedTrips = Set.of();
-
   /**
-   * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
-   * must pass between exiting one transit vehicle and boarding another. This time is in addition
-   * to time it might take to walk between transit stops, the {@link #alightSlack}, and the
-   * {@link #boardSlack}. This time should also be overridden by specific transfer timing
-   * information in transfers.txt
+   * A global minimum transfer time (in seconds) that specifies the minimum amount of time that must
+   * pass between exiting one transit vehicle and boarding another. This time is in addition to time
+   * it might take to walk between transit stops, the {@link #alightSlack}, and the {@link
+   * #boardSlack}. This time should also be overridden by specific transfer timing information in
+   * transfers.txt
    * <p>
    * This only apply to transfers between two trips, it does not apply when boarding the first
    * transit.
@@ -547,7 +503,6 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Unit is seconds. Default value is 2 minutes.
    */
   public int transferSlack = 120;
-
   /**
    * The number of seconds to add before boarding a transit leg. It is recommended to use the
    * `boardTimes` in the `router-config.json` to set this for each mode.
@@ -555,19 +510,17 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Unit is seconds. Default value is 0.
    */
   public int boardSlack = 0;
-
   /**
-   * Has information how much time boarding a vehicle takes. Can be significant eg in airplanes
-   * or ferries.
+   * Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or
+   * ferries.
    * <p>
-   * If set, the board-slack-for-mode override the more general {@link #boardSlack}. This
-   * enables configuring the board-slack for airplane boarding to be 30 minutes and a slack
-   * for bus of 2 minutes.
+   * If set, the board-slack-for-mode override the more general {@link #boardSlack}. This enables
+   * configuring the board-slack for airplane boarding to be 30 minutes and a slack for bus of 2
+   * minutes.
    * <p>
    * Unit is seconds. Default value is not-set(empty map).
    */
   public Map<TransitMode, Integer> boardSlackForMode = new EnumMap<>(TransitMode.class);
-
   /**
    * The number of seconds to add after alighting a transit leg. It is recommended to use the
    * `alightTimes` in the `router-config.json` to set this for each mode.
@@ -575,82 +528,71 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Unit is seconds. Default value is 0.
    */
   public int alightSlack = 0;
-
   /**
-   * Has information how much time alighting a vehicle takes. Can be significant eg in airplanes
-   * or ferries.
+   * Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or
+   * ferries.
    * <p>
-   * If set, the alight-slack-for-mode override the more general {@link #alightSlack}. This
-   * enables configuring the alight-slack for train alighting to be 4 minutes and a bus alight
-   * slack to be 0 minutes.
+   * If set, the alight-slack-for-mode override the more general {@link #alightSlack}. This enables
+   * configuring the alight-slack for train alighting to be 4 minutes and a bus alight slack to be 0
+   * minutes.
    * <p>
    * Unit is seconds. Default value is not-set(empty map).
    */
   public Map<TransitMode, Integer> alightSlackForMode = new EnumMap<>(TransitMode.class);
-
   /**
-   * Ideally maxTransfers should be set in the router config, not here. Instead the client should
-   * be able to pass in a parameter for the max number of additional/extra transfers relative to
-   * the best trip (with the fewest possible transfers) within constraint of the other search
+   * Ideally maxTransfers should be set in the router config, not here. Instead the client should be
+   * able to pass in a parameter for the max number of additional/extra transfers relative to the
+   * best trip (with the fewest possible transfers) within constraint of the other search
    * parameters(TODO OTP2 Expose {@link org.opentripplanner.transit.raptor.api.request.SearchParams#numberOfAdditionalTransfers()}
-   * in APIs). This might be to complicated to explain to the customer, so we might stick to the
-   * old limit, but that have side-effects that you might not find any trips on a day where a
-   * critical part of the trip is not available, because of some real-time disruption.
-   *
+   * in APIs). This might be to complicated to explain to the customer, so we might stick to the old
+   * limit, but that have side-effects that you might not find any trips on a day where a critical
+   * part of the trip is not available, because of some real-time disruption.
+   * <p>
    * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
    */
   public Integer maxTransfers = 12;
-
   /**
-   * For the bike triangle, how important time is.
-   * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
+   * For the bike triangle, how important time is. triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor
+   * == 1
    */
   public double bikeTriangleTimeFactor;
-
   /** For the bike triangle, how important slope is */
   public double bikeTriangleSlopeFactor;
-
   /** For the bike triangle, how important safety is */
   public double bikeTriangleSafetyFactor;
-
   /**
-   * Whether or not vehicle rental availability information will be used to plan vehicle rental trips
+   * Whether or not vehicle rental availability information will be used to plan vehicle rental
+   * trips
    */
   public boolean useVehicleRentalAvailabilityInformation = false;
-
   /**
-   * Whether arriving at the destination with a rented (station) bicycle is allowed without
-   * dropping it off.
+   * Whether arriving at the destination with a rented (station) bicycle is allowed without dropping
+   * it off.
    *
    * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
    * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
    */
   public boolean allowKeepingRentedVehicleAtDestination = false;
-
   /**
    * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
    *
    * @see RoutingRequest#allowKeepingRentedVehicleAtDestination
    */
   public double keepingRentedVehicleAtDestinationCost = 0;
-
   /**
    * The deceleration speed of an automobile, in meters per second per second.
    */
   // 2.9 m/s/s: 65 mph - 0 mph in 10 seconds
   public double carDecelerationSpeed = 2.9;
-
   /**
    * The acceleration speed of an automobile, in meters per second per second.
    */
   // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
   public double carAccelerationSpeed = 2.9;
-
   /**
    * When true, realtime updates are ignored during this search.
    */
   public boolean ignoreRealtimeUpdates = false;
-
   /**
    * When true, trips cancelled in scheduled data are included in this search.
    */
@@ -660,7 +602,7 @@ public class RoutingRequest implements Cloneable, Serializable {
    * A transit stop that this trip must start from
    *
    * @deprecated TODO OTP2 Is this in use, what is is used for. It seems to overlap with
-   *                       the fromPlace parameter. Is is used for onBoard routing only?
+   * the fromPlace parameter. Is is used for onBoard routing only?
    */
   @Deprecated
   public FeedScopedId startingTransitStopId;
@@ -669,8 +611,8 @@ public class RoutingRequest implements Cloneable, Serializable {
    * A trip where this trip must start from (depart-onboard routing)
    *
    * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-   *                       old functionality the same way, but we will try to map this parameter
-   *                       so it does work similar as before.
+   * old functionality the same way, but we will try to map this parameter
+   * so it does work similar as before.
    */
   @Deprecated
   public FeedScopedId startingTransitTripId;
@@ -682,23 +624,23 @@ public class RoutingRequest implements Cloneable, Serializable {
   public boolean vehicleRental = false;
   public boolean parkAndRide = false;
   public boolean carPickup = false;
-
   public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
-
   /**
-   * If true vehicle parking availability information will be used to plan park and ride trips where it exists.
+   * If true vehicle parking availability information will be used to plan park and ride trips where
+   * it exists.
    */
   public boolean useVehicleParkingAvailabilityInformation = false;
-
-  /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
+  /**
+   * The function that compares paths converging on the same vertex to decide which ones continue to
+   * be explored.
+   */
   public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
   /**
    * Accept only paths that use transit (no street-only paths).
    *
    * @Deprecated TODO OTP2 Regression. Not currently working in OTP2. This is only used in the
-   *                       deprecated Transmodel GraphQL API.
-   *
+   * deprecated Transmodel GraphQL API.
    */
   @Deprecated
   public boolean onlyTransitTrips = false;
@@ -710,7 +652,8 @@ public class RoutingRequest implements Cloneable, Serializable {
   /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
   public boolean geoidElevation = false;
 
-  /** Which path comparator to use
+  /**
+   * Which path comparator to use
    *
    * @deprecated TODO OTP2 Regression. Not currently working in OTP2 at the moment.
    */
@@ -724,24 +667,23 @@ public class RoutingRequest implements Cloneable, Serializable {
    * The filled request parameters for penalties and thresholds values
    */
   public DataOverlayParameters dataOverlay = null;
-
   /**
    * Raptor can print all events when arriving at stops to system error. For developers only.
    */
   public DebugRaptor raptorDebugging = new DebugRaptor();
-
   /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
   public RaptorOptions raptorOptions = new RaptorOptions();
 
+  /* CONSTRUCTORS */
   /**
-   * List of OTP request tags, these are used to cross-cutting concerns like logging and
-   * micrometer tags. Currently, all tags are added to all the timer instances for this request.
+   * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
+   * tags. Currently, all tags are added to all the timer instances for this request.
    */
   public Tags tags = Tags.of();
-
-  /* CONSTRUCTORS */
+  private Envelope fromEnvelope;
+  private Envelope toEnvelope;
 
   /** Constructor for options; modes defaults to walk and transit */
   public RoutingRequest() {
@@ -760,6 +702,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.setStreetSubRequestModes(new TraverseModeSet(mode));
   }
 
+  /* ACCESSOR/SETTER METHODS */
+
   public RoutingRequest(TraverseMode mode, BicycleOptimizeType bicycleOptimizeType) {
     this(new TraverseModeSet(mode), bicycleOptimizeType);
   }
@@ -774,8 +718,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     this();
     this.modes = modes;
   }
-
-  /* ACCESSOR/SETTER METHODS */
 
   public boolean transitAllowed() {
     return streetSubRequestModes.isTransit();
@@ -955,9 +897,9 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   /**
-   * The search time for the current request. If the client have moved to the next page
-   * then this is the adjusted search time - the dateTime passed in is ignored and replaced with
-   * by a time from the pageToken.
+   * The search time for the current request. If the client have moved to the next page then this is
+   * the adjusted search time - the dateTime passed in is ignored and replaced with by a time from
+   * the pageToken.
    */
   public Instant getDateTime() {
     return dateTime;
@@ -991,9 +933,9 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   /**
-   * Adjust the 'dateTime' if the page cursor is set to "goto next/previous page".
-   * The date-time is used for many things, for example finding the days to search,
-   * but the transit search is using the cursor[if exist], not the date-time.
+   * Adjust the 'dateTime' if the page cursor is set to "goto next/previous page". The date-time is
+   * used for many things, for example finding the days to search, but the transit search is using
+   * the cursor[if exist], not the date-time.
    */
   public void applyPageCursor() {
     if (pageCursor != null) {
@@ -1009,8 +951,8 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   /**
-   * When paging we must crop the list of itineraries in the right end according to the
-   * sorting of the original search and according to the page cursor type (next or previous).
+   * When paging we must crop the list of itineraries in the right end according to the sorting of
+   * the original search and according to the page cursor type (next or previous).
    * <p>
    * We need to flip the cropping and crop the head/start of the itineraries when:
    * <ul>
@@ -1028,11 +970,11 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   /**
-   * Related to {@link #maxNumberOfItinerariesCropHead()}, but is {@code true} if we should
-   * crop the search-window head(in the beginning) or tail(in the end).
+   * Related to {@link #maxNumberOfItinerariesCropHead()}, but is {@code true} if we should crop the
+   * search-window head(in the beginning) or tail(in the end).
    * <p>
-   * For the first search we look if the sort is ascending(crop tail) or descending(crop head),
-   * and for paged results we look at the paging type: next(tail) and previous(head).
+   * For the first search we look if the sort is ascending(crop tail) or descending(crop head), and
+   * for paged results we look at the paging type: next(tail) and previous(head).
    */
   public boolean doCropSearchWindowAtTail() {
     if (pageCursor == null) {
@@ -1043,10 +985,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
   public void setNumItineraries(int numItineraries) {
     this.numItineraries = numItineraries;
-  }
-
-  public String toString() {
-    return toString(" ");
   }
 
   public String toString(String sep) {
@@ -1086,6 +1024,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
   }
 
+  /* INSTANCE METHODS */
+
   /**
    * Returns true if there are any intermediate places set.
    */
@@ -1094,7 +1034,8 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   /**
-   * Adds a GenericLocation to the end of the intermediatePlaces list. Will initialize intermediatePlaces if it is null.
+   * Adds a GenericLocation to the end of the intermediatePlaces list. Will initialize
+   * intermediatePlaces if it is null.
    */
   public void addIntermediatePlace(GenericLocation location) {
     if (this.intermediatePlaces == null) {
@@ -1102,8 +1043,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     this.intermediatePlaces.add(location);
   }
-
-  /* INSTANCE METHODS */
 
   public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
     RoutingRequest streetRequest = this.clone();
@@ -1199,6 +1138,10 @@ public class RoutingRequest implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  public String toString() {
+    return toString(" ");
   }
 
   public RoutingRequest reversedClone() {
@@ -1320,9 +1263,116 @@ public class RoutingRequest implements Cloneable, Serializable {
     return Duration.ofSeconds(seconds.longValue());
   }
 
+  /** Check if route is preferred according to this request. */
+  public long preferencesPenaltyForRoute(Route route) {
+    long preferences_penalty = 0;
+    FeedScopedId agencyID = route.getAgency().getId();
+    if (!preferredRoutes.equals(RouteMatcher.emptyMatcher()) || !preferredAgencies.isEmpty()) {
+      boolean isPreferedRoute = preferredRoutes.matches(route);
+      boolean isPreferedAgency = preferredAgencies.contains(agencyID);
+
+      if (!isPreferedRoute && !isPreferedAgency) {
+        preferences_penalty += otherThanPreferredRoutesPenalty;
+      }
+    }
+    boolean isUnpreferedRoute = unpreferredRoutes.matches(route);
+    boolean isUnpreferedAgency = unpreferredAgencies.contains(agencyID);
+    if (isUnpreferedRoute || isUnpreferedAgency) {
+      preferences_penalty += useUnpreferredRoutesPenalty;
+    }
+    return preferences_penalty;
+  }
+
   /**
-   * Checks if the route is banned. Also, if whitelisting is used, the route (or its agency) has
-   * to be whitelisted in order to not count as banned.
+   * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
+   * and speed. These three fields of the RoutingRequest should have values between 0 and 1, and
+   * should add up to 1. This setter function accepts any three numbers and will normalize them to
+   * add up to 1.
+   */
+  public void setTriangleNormalized(double safe, double slope, double time) {
+    if (safe == 0 && slope == 0 && time == 0) {
+      var oneThird = 1f / 3;
+      safe = oneThird;
+      slope = oneThird;
+      time = oneThird;
+    }
+    safe = setMinValue(safe);
+    slope = setMinValue(slope);
+    time = setMinValue(time);
+
+    double total = safe + slope + time;
+    if (total != 1) {
+      LOG.warn(
+        "Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other."
+      );
+    }
+
+    safe /= total;
+    slope /= total;
+    time /= total;
+    this.bikeTriangleSafetyFactor = safe;
+    this.bikeTriangleSlopeFactor = slope;
+    this.bikeTriangleTimeFactor = time;
+  }
+
+  /**
+   * Create a new ShortestPathTree instance using the DominanceFunction specified in this
+   * RoutingRequest.
+   */
+  public ShortestPathTree getNewShortestPathTree() {
+    return this.dominanceFunction.getNewShortestPathTree(this);
+  }
+
+  public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {
+    if ("duration".equals(pathComparator)) {
+      return new DurationComparator();
+    }
+    return new PathComparator(compareStartTimes);
+  }
+
+  /**
+   * Returns if the vertex is considered "close" to the start or end point of the request. This is
+   * useful if you want to allow loops in car routes under certain conditions.
+   * <p>
+   * Note: If you are doing Raptor access/egress searches this method does not take the possible
+   * intermediate points (stations) into account. This means that stations might be skipped because
+   * a car route to it cannot be found and a suboptimal route to another station is returned
+   * instead.
+   * <p>
+   * If you encounter a case of this, you can adjust this code to take this into account.
+   *
+   * @see RoutingRequest#MAX_CLOSENESS_METERS
+   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+   */
+  public boolean isCloseToStartOrEnd(Vertex vertex) {
+    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
+      return false;
+    }
+    if (fromEnvelope == null) {
+      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
+    }
+    if (toEnvelope == null) {
+      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
+    }
+    return (
+      fromEnvelope.intersects(vertex.getCoordinate()) ||
+      toEnvelope.intersects(vertex.getCoordinate())
+    );
+  }
+
+  private static Envelope getEnvelope(Coordinate c, int meters) {
+    double lat = SphericalDistanceLibrary.metersToDegrees(meters);
+    double lon = SphericalDistanceLibrary.metersToLonDegrees(meters, c.y);
+
+    Envelope env = new Envelope(c);
+    env.expandBy(lon, lat);
+
+    return env;
+  }
+
+  /**
+   * Checks if the route is banned. Also, if whitelisting is used, the route (or its agency) has to
+   * be whitelisted in order to not count as banned.
    *
    * @return True if the route is banned
    */
@@ -1367,120 +1417,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     return false;
   }
 
-  /** Check if route is preferred according to this request. */
-  public long preferencesPenaltyForRoute(Route route) {
-    long preferences_penalty = 0;
-    FeedScopedId agencyID = route.getAgency().getId();
-    if (!preferredRoutes.equals(RouteMatcher.emptyMatcher()) || !preferredAgencies.isEmpty()) {
-      boolean isPreferedRoute = preferredRoutes.matches(route);
-      boolean isPreferedAgency = preferredAgencies.contains(agencyID);
-
-      if (!isPreferedRoute && !isPreferedAgency) {
-        preferences_penalty += otherThanPreferredRoutesPenalty;
-      }
-    }
-    boolean isUnpreferedRoute = unpreferredRoutes.matches(route);
-    boolean isUnpreferedAgency = unpreferredAgencies.contains(agencyID);
-    if (isUnpreferedRoute || isUnpreferedAgency) {
-      preferences_penalty += useUnpreferredRoutesPenalty;
-    }
-    return preferences_penalty;
-  }
-
-  /**
-   * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness, and speed.
-   * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
-   * This setter function accepts any three numbers and will normalize them to add up to 1.
-   */
-  public void setTriangleNormalized(double safe, double slope, double time) {
-    if (safe == 0 && slope == 0 && time == 0) {
-      var oneThird = 1f / 3;
-      safe = oneThird;
-      slope = oneThird;
-      time = oneThird;
-    }
-    safe = setMinValue(safe);
-    slope = setMinValue(slope);
-    time = setMinValue(time);
-
-    double total = safe + slope + time;
-    if (total != 1) {
-      LOG.warn(
-        "Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other."
-      );
-    }
-
-    safe /= total;
-    slope /= total;
-    time /= total;
-    this.bikeTriangleSafetyFactor = safe;
-    this.bikeTriangleSlopeFactor = slope;
-    this.bikeTriangleTimeFactor = time;
-  }
-
   private double setMinValue(double value) {
     return Math.max(0, value);
-  }
-
-  /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
-  public ShortestPathTree getNewShortestPathTree() {
-    return this.dominanceFunction.getNewShortestPathTree(this);
-  }
-
-  public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {
-    if ("duration".equals(pathComparator)) {
-      return new DurationComparator();
-    }
-    return new PathComparator(compareStartTimes);
-  }
-
-  /**
-   * How close to do you have to be to the start or end to be considered "close".
-   *
-   * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
-   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
-   */
-  private static final int MAX_CLOSENESS_METERS = 500;
-  private Envelope fromEnvelope;
-  private Envelope toEnvelope;
-
-  /**
-   * Returns if the vertex is considered "close" to the start or end point of the request.
-   * This is useful if you want to allow loops in car routes under certain conditions.
-   *
-   * Note: If you are doing Raptor access/egress searches this method does not take the possible
-   * intermediate points (stations) into account. This means that stations might be skipped
-   * because a car route to it cannot be found and a suboptimal route to another station is
-   * returned instead.
-   *
-   * If you encounter a case of this, you can adjust this code to take this into account.
-   *
-   * @see RoutingRequest#MAX_CLOSENESS_METERS
-   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
-   */
-  public boolean isCloseToStartOrEnd(Vertex vertex) {
-    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
-      return false;
-    }
-    if (fromEnvelope == null) {
-      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
-    }
-    if (toEnvelope == null) {
-      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
-    }
-    return (
-      fromEnvelope.intersects(vertex.getCoordinate()) ||
-      toEnvelope.intersects(vertex.getCoordinate())
-    );
-  }
-
-  private static Envelope getEnvelope(Coordinate c, int meters) {
-    double lat = SphericalDistanceLibrary.metersToDegrees(meters);
-    double lon = SphericalDistanceLibrary.metersToLonDegrees(meters, c.y);
-
-    Envelope env = new Envelope(c);
-    env.expandBy(lon, lat);
-
-    return env;
   }
 }

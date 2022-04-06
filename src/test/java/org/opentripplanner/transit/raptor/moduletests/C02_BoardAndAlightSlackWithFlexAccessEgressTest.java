@@ -28,15 +28,14 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTestConstants {
 
+  /** The expected result is tha same for all tests */
+  private static final String EXPECTED_RESULT =
+    "Flex 2m 1x ~ B ~ " + "BUS R1 0:04 0:06 ~ C ~ " + "Flex 2m 1x " + "[0:00:30 0:09:10 8m40s 2tx]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
-
-  /** The expected result is tha same for all tests */
-  private static final String EXPECTED_RESULT =
-    "Flex 2m 1x ~ B ~ " + "BUS R1 0:04 0:06 ~ C ~ " + "Flex 2m 1x " + "[0:00:30 0:09:10 8m40s 2tx]";
 
   @BeforeEach
   public void setup() {

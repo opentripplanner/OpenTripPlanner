@@ -51,8 +51,8 @@ public class LegType {
           .name("aimedStartTime")
           .description("The aimed date and time this leg starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(// startTime is already adjusted for realtime - need to subtract delay to get aimed time
-          env -> leg(env).getStartTime().getTimeInMillis() - (1000L * leg(env).getDepartureDelay())
+          .dataFetcher(env -> // startTime is already adjusted for realtime - need to subtract delay to get aimed time
+            leg(env).getStartTime().getTimeInMillis() - (1000L * leg(env).getDepartureDelay())
           )
           .build()
       )
@@ -71,8 +71,8 @@ public class LegType {
           .name("aimedEndTime")
           .description("The aimed date and time this leg ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(// endTime is already adjusted for realtime - need to subtract delay to get aimed time
-          env -> leg(env).getEndTime().getTimeInMillis() - 1000L * leg(env).getArrivalDelay()
+          .dataFetcher(env -> // endTime is already adjusted for realtime - need to subtract delay to get aimed time
+            leg(env).getEndTime().getTimeInMillis() - 1000L * leg(env).getArrivalDelay()
           )
           .build()
       )

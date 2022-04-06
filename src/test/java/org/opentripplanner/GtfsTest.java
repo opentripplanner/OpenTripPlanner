@@ -52,62 +52,6 @@ public abstract class GtfsTest {
 
   public abstract String getFeedName();
 
-  @BeforeEach
-  protected void setUp() {
-    File gtfs = new File("src/test/resources/" + getFeedName());
-    File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
-    GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
-    feedId = new GtfsFeedId.Builder().id("FEED").build();
-    gtfsBundle.setFeedId(feedId);
-    List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
-    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
-      gtfsBundleList,
-      ServiceDateInterval.unbounded()
-    );
-
-    alertsUpdateHandler = new AlertsUpdateHandler();
-    graph = new Graph();
-
-    gtfsGraphBuilderImpl.buildGraph(graph, null);
-    // Set the agency ID to be used for tests to the first one in the feed.
-    String agencyId = graph.getAgencies().iterator().next().getId().getId();
-    System.out.printf("Set the agency ID for this test to %s\n", agencyId);
-    graph.index();
-    router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
-    timetableSnapshotSource = new TimetableSnapshotSource(graph);
-    timetableSnapshotSource.purgeExpiredData = false;
-    graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
-    alertPatchServiceImpl = new TransitAlertServiceImpl(graph);
-    alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
-    alertsUpdateHandler.setFeedId(feedId.getId());
-
-    try {
-      final boolean fullDataset = false;
-      InputStream inputStream = new FileInputStream(gtfsRealTime);
-      FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
-      List<FeedEntity> feedEntityList = feedMessage.getEntityList();
-      List<TripUpdate> updates = new ArrayList<>(feedEntityList.size());
-      for (FeedEntity feedEntity : feedEntityList) {
-        updates.add(feedEntity.getTripUpdate());
-      }
-      CalendarService calendarService = graph.getCalendarService();
-      Deduplicator deduplicator = graph.deduplicator;
-      GraphIndex graphIndex = graph.index;
-      Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-      timetableSnapshotSource.applyTripUpdates(
-        calendarService,
-        deduplicator,
-        graphIndex,
-        serviceCodes,
-        fullDataset,
-        updates,
-        feedId.getId()
-      );
-      alertsUpdateHandler.update(feedMessage);
-    } catch (Exception exception) {}
-  }
-
   public Itinerary plan(
     long dateTime,
     String fromVertex,
@@ -191,5 +135,61 @@ public abstract class GtfsTest {
     } else {
       assertNull(leg.getStreetNotes());
     }
+  }
+
+  @BeforeEach
+  protected void setUp() {
+    File gtfs = new File("src/test/resources/" + getFeedName());
+    File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
+    GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
+    feedId = new GtfsFeedId.Builder().id("FEED").build();
+    gtfsBundle.setFeedId(feedId);
+    List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
+    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
+      gtfsBundleList,
+      ServiceDateInterval.unbounded()
+    );
+
+    alertsUpdateHandler = new AlertsUpdateHandler();
+    graph = new Graph();
+
+    gtfsGraphBuilderImpl.buildGraph(graph, null);
+    // Set the agency ID to be used for tests to the first one in the feed.
+    String agencyId = graph.getAgencies().iterator().next().getId().getId();
+    System.out.printf("Set the agency ID for this test to %s\n", agencyId);
+    graph.index();
+    router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
+    timetableSnapshotSource = new TimetableSnapshotSource(graph);
+    timetableSnapshotSource.purgeExpiredData = false;
+    graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
+    alertPatchServiceImpl = new TransitAlertServiceImpl(graph);
+    alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
+    alertsUpdateHandler.setFeedId(feedId.getId());
+
+    try {
+      final boolean fullDataset = false;
+      InputStream inputStream = new FileInputStream(gtfsRealTime);
+      FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
+      List<FeedEntity> feedEntityList = feedMessage.getEntityList();
+      List<TripUpdate> updates = new ArrayList<>(feedEntityList.size());
+      for (FeedEntity feedEntity : feedEntityList) {
+        updates.add(feedEntity.getTripUpdate());
+      }
+      CalendarService calendarService = graph.getCalendarService();
+      Deduplicator deduplicator = graph.deduplicator;
+      GraphIndex graphIndex = graph.index;
+      Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
+      timetableSnapshotSource.applyTripUpdates(
+        calendarService,
+        deduplicator,
+        graphIndex,
+        serviceCodes,
+        fullDataset,
+        updates,
+        feedId.getId()
+      );
+      alertsUpdateHandler.update(feedMessage);
+    } catch (Exception exception) {}
   }
 }

@@ -5,11 +5,11 @@ public enum WheelChairBoarding {
   POSSIBLE(1),
   NOT_POSSIBLE(2);
 
+  public final int gtfsCode;
+
   WheelChairBoarding(int gtfsCode) {
     this.gtfsCode = gtfsCode;
   }
-
-  public final int gtfsCode;
 
   public static WheelChairBoarding valueOfGtfsCode(int gtfsCode) {
     for (WheelChairBoarding value : values()) {

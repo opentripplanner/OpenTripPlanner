@@ -11,19 +11,19 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 import org.opentripplanner.util.OTPFeature;
 
 /**
- * The responsibility of this class is to provide transfer constraints to the Raptor search
- * for a given pattern. The instance is stateful and not thread-safe. The current stop
- * position is checked for transfers, then the provider is asked to list all transfers
- * between the current pattern and the source trip stop arrival. The source is the "from"
- * point in a transfer for a forward search, and the "to" point in the reverse search.
+ * The responsibility of this class is to provide transfer constraints to the Raptor search for a
+ * given pattern. The instance is stateful and not thread-safe. The current stop position is checked
+ * for transfers, then the provider is asked to list all transfers between the current pattern and
+ * the source trip stop arrival. The source is the "from" point in a transfer for a forward search,
+ * and the "to" point in the reverse search.
  */
 public final class ConstrainedBoardingSearch
   implements RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> {
 
   /**
    * Abort the search after looking at 5 valid boardings. In the case where this happens, one of
-   * these trips are probably a better match. We abort to avoid stepping through all trips,
-   * possibly a large number (several days).
+   * these trips are probably a better match. We abort to avoid stepping through all trips, possibly
+   * a large number (several days).
    */
   private static final int ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS = 5;
 
@@ -100,23 +100,6 @@ public final class ConstrainedBoardingSearch
       departureTime,
       onTripEarliestBoardTime
     );
-  }
-
-  private Iterable<TransferForPattern> findMatchingTransfers(
-    TripSchedule tripSchedule,
-    int stopIndex
-  ) {
-    final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
-    // for performance reasons we use a for loop here as streams are much slower.
-    // I experimented with LinkedList and ArrayList and LinkedList was faster, presumably
-    // because insertion is quick and we don't need index-based access, only iteration.
-    var result = new LinkedList<TransferForPattern>();
-    for (var t : currentTransfers) {
-      if (t.matchesSourcePoint(stopIndex, trip)) {
-        result.add(t);
-      }
-    }
-    return result;
   }
 
   /**
@@ -216,5 +199,22 @@ public final class ConstrainedBoardingSearch
       }
     }
     return false;
+  }
+
+  private Iterable<TransferForPattern> findMatchingTransfers(
+    TripSchedule tripSchedule,
+    int stopIndex
+  ) {
+    final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
+    // for performance reasons we use a for loop here as streams are much slower.
+    // I experimented with LinkedList and ArrayList and LinkedList was faster, presumably
+    // because insertion is quick and we don't need index-based access, only iteration.
+    var result = new LinkedList<TransferForPattern>();
+    for (var t : currentTransfers) {
+      if (t.matchesSourcePoint(stopIndex, trip)) {
+        result.add(t);
+      }
+    }
+    return result;
   }
 }

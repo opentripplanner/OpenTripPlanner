@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 
 /**
@@ -34,9 +33,8 @@ public interface TransferOptimized {
   int NEUTRAL_COST = 0;
 
   /**
-   * Return the total transfer priority cost. This is completely separate from the
-   * generalized cost. Return {@code 0}(zero) if cost is neutral/no "special" transfer
-   * characteristics are present.
+   * Return the total transfer priority cost. This is completely separate from the generalized cost.
+   * Return {@code 0}(zero) if cost is neutral/no "special" transfer characteristics are present.
    * <p>
    * Precedence: first
    */
@@ -52,8 +50,8 @@ public interface TransferOptimized {
   int generalizedCostWaitTimeOptimized();
 
   /**
-   * Optimize so that the transfers happens as early as possible. This is normally the case when
-   * two trips visit the same stops - and two or more stops are possible transfer points.
+   * Optimize so that the transfers happens as early as possible. This is normally the case when two
+   * trips visit the same stops - and two or more stops are possible transfer points.
    * <p>
    * Precedence: third
    */

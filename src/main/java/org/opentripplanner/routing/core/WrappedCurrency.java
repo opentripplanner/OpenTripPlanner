@@ -5,8 +5,8 @@ import java.util.Locale;
 
 /**
  * A Bean wrapper class for java.util.Currency
- * @author novalis
  *
+ * @author novalis
  */
 public class WrappedCurrency {
 
@@ -40,8 +40,13 @@ public class WrappedCurrency {
     return value.getSymbol(l);
   }
 
-  public String toString() {
-    return value.toString();
+  public Currency getCurrency() {
+    return value;
+  }
+
+  @Override
+  public int hashCode() {
+    return value.hashCode();
   }
 
   public boolean equals(Object o) {
@@ -52,12 +57,7 @@ public class WrappedCurrency {
     return false;
   }
 
-  public Currency getCurrency() {
-    return value;
-  }
-
-  @Override
-  public int hashCode() {
-    return value.hashCode();
+  public String toString() {
+    return value.toString();
   }
 }

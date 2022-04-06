@@ -19,23 +19,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for managing the state and loading of complete GBFS datasets, and updating them according to individual feed's
- * TTL rules.
+ * Class for managing the state and loading of complete GBFS datasets, and updating them according
+ * to individual feed's TTL rules.
  */
 public class GbfsFeedLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoader.class);
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
+  /** One updater per feed type(?) */
+  private final Map<GBFSFeedName, GBFSFeedUpdater<?>> feedUpdaters = new HashMap<>();
+  private final Map<String, String> httpHeaders;
 
   static {
     objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
   }
-
-  /** One updater per feed type(?)*/
-  private final Map<GBFSFeedName, GBFSFeedUpdater<?>> feedUpdaters = new HashMap<>();
-
-  private final Map<String, String> httpHeaders;
 
   public GbfsFeedLoader(String url, Map<String, String> httpHeaders, String languageCode) {
     this.httpHeaders = httpHeaders;
@@ -90,7 +88,8 @@ public class GbfsFeedLoader {
   }
 
   /**
-   * Checks if any of the feeds should be updated base on the TTL and fetches. Returns true, if any feeds were updated.
+   * Checks if any of the feeds should be updated base on the TTL and fetches. Returns true, if any
+   * feeds were updated.
    */
   public boolean update() {
     boolean didUpdate = false;

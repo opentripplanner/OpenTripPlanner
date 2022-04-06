@@ -39,27 +39,28 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     this.wheelchairBoarding = wheelchairBoarding;
   }
 
-  protected abstract int getStreetToStopTime();
+  public Vertex getFromVertex() {
+    return fromv;
+  }
 
-  protected T getTransitEntityVertex() {
-    return transitEntityVertex;
+  public Vertex getToVertex() {
+    return tov;
   }
 
   public String getDirection() {
     return null;
   }
 
-  public double getDistanceMeters() {
-    return 0;
+  public Trip getTrip() {
+    return null;
   }
 
-  public LineString getGeometry() {
-    Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() };
-    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+  public String toString() {
+    return "StreetTransitLink(" + fromv + " -> " + tov + ")";
   }
 
-  public I18NString getName() {
-    return this.transitEntityVertex.getName();
+  public boolean isRoundabout() {
+    return false;
   }
 
   public State traverse(State s0) {
@@ -144,27 +145,26 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return s1.makeState();
   }
 
+  public I18NString getName() {
+    return this.transitEntityVertex.getName();
+  }
+
+  public LineString getGeometry() {
+    Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() };
+    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+  }
+
+  public double getDistanceMeters() {
+    return 0;
+  }
+
+  protected abstract int getStreetToStopTime();
+
+  protected T getTransitEntityVertex() {
+    return transitEntityVertex;
+  }
+
   boolean isLeavingStreetNetwork(RoutingRequest req) {
     return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
-  }
-
-  public Vertex getFromVertex() {
-    return fromv;
-  }
-
-  public Vertex getToVertex() {
-    return tov;
-  }
-
-  public Trip getTrip() {
-    return null;
-  }
-
-  public boolean isRoundabout() {
-    return false;
-  }
-
-  public String toString() {
-    return "StreetTransitLink(" + fromv + " -> " + tov + ")";
   }
 }

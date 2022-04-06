@@ -29,22 +29,23 @@ public class ActuatorAPI {
       .status(Response.Status.OK)
       .entity(
         String.format(
-          "{\n" +
-          "  \"_links\" : {\n" +
-          "    \"self\" : {\n" +
-          "      \"href\" : \"%1$s\",\n" +
-          "      \"templated\" : false\n" +
-          "    },\n" +
-          "    \"health\" : {\n" +
-          "      \"href\" : \"%1$s/health\",\n" +
-          "      \"templated\" : false\n" +
-          "    },\n" +
-          "    \"prometheus\" : {\n" +
-          "      \"href\" : \"%1$s/prometheus\",\n" +
-          "      \"templated\" : false\n" +
-          "    }\n" +
-          "  }\n" +
-          "}",
+          """
+            {
+              "_links" : {
+                "self" : {
+                  "href" : "%1$s",
+                  "templated" : false
+                },
+                "health" : {
+                  "href" : "%1$s/health",
+                  "templated" : false
+                },
+                "prometheus" : {
+                  "href" : "%1$s/prometheus",
+                  "templated" : false
+                }
+              }
+            }""",
           uriInfo.getRequestUri().toString()
         )
       )

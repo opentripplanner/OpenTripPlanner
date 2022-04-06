@@ -145,13 +145,13 @@ public class AccessStopArrivalTest {
       }
 
       @Override
-      public boolean hasOpeningHours() {
-        return true;
+      public int latestArrivalTime(int requestedArrivalTime) {
+        return latestArrivalTime;
       }
 
       @Override
-      public int latestArrivalTime(int requestedArrivalTime) {
-        return latestArrivalTime;
+      public boolean hasOpeningHours() {
+        return true;
       }
     };
   }

@@ -98,21 +98,6 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
     return parks;
   }
 
-  /**
-   * @return true if facilities have not been successfully downloaded before, or
-   * facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful
-   * fetch
-   */
-  private boolean fetchFacilitiesNow() {
-    if (parks == null) {
-      return true;
-    }
-    if (facilitiesFrequencySec <= 0) {
-      return false;
-    }
-    return System.currentTimeMillis() > lastFacilitiesFetchTime + facilitiesFrequencySec * 1000;
-  }
-
   private static VehicleParkingSpaces createVehicleAvailability(List<HslParkPatch> patches) {
     VehicleParkingSpacesBuilder availabilityBuilder = VehicleParkingSpaces.builder();
     boolean hasHandledSpaces = false;
@@ -141,5 +126,20 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
     }
 
     return hasHandledSpaces ? availabilityBuilder.build() : null;
+  }
+
+  /**
+   * @return true if facilities have not been successfully downloaded before, or
+   * facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful
+   * fetch
+   */
+  private boolean fetchFacilitiesNow() {
+    if (parks == null) {
+      return true;
+    }
+    if (facilitiesFrequencySec <= 0) {
+      return false;
+    }
+    return System.currentTimeMillis() > lastFacilitiesFetchTime + facilitiesFrequencySec * 1000;
   }
 }

@@ -21,10 +21,9 @@ public class FlexTripEdge extends Edge {
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
 
   private static final long serialVersionUID = 1L;
-
+  private final FlexTrip trip;
   public StopLocation s1;
   public StopLocation s2;
-  private final FlexTrip trip;
   public FlexAccessEgressTemplate flexTemplate;
   public FlexPath flexPath;
 
@@ -55,6 +54,15 @@ public class FlexTripEdge extends Edge {
       );
   }
 
+  public int getTimeInSeconds() {
+    return flexPath.durationSeconds;
+  }
+
+  @Override
+  public Trip getTrip() {
+    return trip.getTrip();
+  }
+
   @Override
   public State traverse(State s0) {
     if (this.flexPath == null) {
@@ -72,13 +80,9 @@ public class FlexTripEdge extends Edge {
     return editor.makeState();
   }
 
-  public int getTimeInSeconds() {
-    return flexPath.durationSeconds;
-  }
-
   @Override
-  public double getDistanceMeters() {
-    return flexPath.distanceMeters;
+  public I18NString getName() {
+    return null;
   }
 
   @Override
@@ -87,13 +91,8 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
-  public I18NString getName() {
-    return null;
-  }
-
-  @Override
-  public Trip getTrip() {
-    return trip.getTrip();
+  public double getDistanceMeters() {
+    return flexPath.distanceMeters;
   }
 
   public FlexTrip getFlexTrip() {

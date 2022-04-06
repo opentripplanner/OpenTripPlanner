@@ -22,42 +22,75 @@ public class ElevationUtils {
   private static final double ENERGY_SLOPE_FACTOR = 4000;
 
   /**
-   * If the calculated factor is more than this constant, we ignore the calculated factor and use this
-   * constant in stead. See ths table in {@link ToblersHikingFunction} for a mapping between the
-   * factor and angels(degree and percentage). A factor of 3 with take effect for slopes with a
+   * If the calculated factor is more than this constant, we ignore the calculated factor and use
+   * this constant in stead. See ths table in {@link ToblersHikingFunction} for a mapping between
+   * the factor and angels(degree and percentage). A factor of 3 with take effect for slopes with a
    * incline above 31.4% and a decline below 41.4%. The worlds steepest road ia about 35%, and the
-   * steepest climes in Tour De France is usually in the range 8-12%. Some walking paths may be quite
-   * steep, but a penalty of 3 is still a large penalty.
+   * steepest climes in Tour De France is usually in the range 8-12%. Some walking paths may be
+   * quite steep, but a penalty of 3 is still a large penalty.
    */
   private static final double MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR = 3;
 
   private static final ToblersHikingFunction toblerWalkingFunction = new ToblersHikingFunction(
     MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR
   );
-
-  private static double[] getLengthsFromElevation(CoordinateSequence elev) {
-    double trueLength = 0;
-    double flatLength = 0;
-    double lastX = elev.getX(0);
-    double lastY = elev.getY(0);
-    for (int i = 1; i < elev.size(); ++i) {
-      Coordinate c = elev.getCoordinate(i);
-      double x = c.x - lastX;
-      double y = c.y - lastY;
-      trueLength += Math.sqrt(x * x + y * y);
-      flatLength += x;
-      lastX = c.x;
-      lastY = c.y;
-    }
-    return new double[] { trueLength, flatLength };
-  }
+  /** constants for slope computation */
+  static final double[] tx = {
+    0.0000000000000000E+00,
+    0.0000000000000000E+00,
+    0.0000000000000000E+00,
+    2.7987785324442748E+03,
+    5.0000000000000000E+03,
+    5.0000000000000000E+03,
+    5.0000000000000000E+03,
+  };
+  static final double[] ty = {
+    -3.4999999999999998E-01,
+    -3.4999999999999998E-01,
+    -3.4999999999999998E-01,
+    -7.2695627831828688E-02,
+    -2.4945814335295903E-03,
+    5.3500304527448035E-02,
+    1.2191105175593375E-01,
+    3.4999999999999998E-01,
+    3.4999999999999998E-01,
+    3.4999999999999998E-01,
+  };
+  static final double[] coeff = {
+    4.3843513168660255E+00,
+    3.6904323727375652E+00,
+    1.6791850199667697E+00,
+    5.5077866957024113E-01,
+    1.7977766419113900E-01,
+    8.0906832222762959E-02,
+    6.0239305785343762E-02,
+    4.6782343053423814E+00,
+    3.9250580214736304E+00,
+    1.7924585866601270E+00,
+    5.3426170441723031E-01,
+    1.8787442260720733E-01,
+    7.4706427576152687E-02,
+    6.2201805553147201E-02,
+    5.3131908923568787E+00,
+    4.4703901299120750E+00,
+    2.0085381385545351E+00,
+    5.4611063530784010E-01,
+    1.8034042959223889E-01,
+    8.1456939988273691E-02,
+    5.9806795955995307E-02,
+    5.6384893192212662E+00,
+    4.7732222200176633E+00,
+    2.1021485412233019E+00,
+    5.7862890496126462E-01,
+    1.6358571778476885E-01,
+    9.4846184210137130E-02,
+    5.5464612133430242E-02,
+  };
 
   /**
-   *
-   * @param elev The elevation profile, where each (x, y) is (distance along edge, elevation)
+   * @param elev       The elevation profile, where each (x, y) is (distance along edge, elevation)
    * @param slopeLimit Whether the slope should be limited to 0.35, which is the max slope for
-   * streets that take cars.
-   * @return
+   *                   streets that take cars.
    */
   public static SlopeCosts getSlopeCosts(CoordinateSequence elev, boolean slopeLimit) {
     Coordinate[] coordinates = elev.toCoordinateArray();
@@ -132,59 +165,6 @@ public class ElevationUtils {
       effectiveWalkLength / flatLength
     );
   }
-
-  /** constants for slope computation */
-  static final double[] tx = {
-    0.0000000000000000E+00,
-    0.0000000000000000E+00,
-    0.0000000000000000E+00,
-    2.7987785324442748E+03,
-    5.0000000000000000E+03,
-    5.0000000000000000E+03,
-    5.0000000000000000E+03,
-  };
-  static final double[] ty = {
-    -3.4999999999999998E-01,
-    -3.4999999999999998E-01,
-    -3.4999999999999998E-01,
-    -7.2695627831828688E-02,
-    -2.4945814335295903E-03,
-    5.3500304527448035E-02,
-    1.2191105175593375E-01,
-    3.4999999999999998E-01,
-    3.4999999999999998E-01,
-    3.4999999999999998E-01,
-  };
-  static final double[] coeff = {
-    4.3843513168660255E+00,
-    3.6904323727375652E+00,
-    1.6791850199667697E+00,
-    5.5077866957024113E-01,
-    1.7977766419113900E-01,
-    8.0906832222762959E-02,
-    6.0239305785343762E-02,
-    4.6782343053423814E+00,
-    3.9250580214736304E+00,
-    1.7924585866601270E+00,
-    5.3426170441723031E-01,
-    1.8787442260720733E-01,
-    7.4706427576152687E-02,
-    6.2201805553147201E-02,
-    5.3131908923568787E+00,
-    4.4703901299120750E+00,
-    2.0085381385545351E+00,
-    5.4611063530784010E-01,
-    1.8034042959223889E-01,
-    8.1456939988273691E-02,
-    5.9806795955995307E-02,
-    5.6384893192212662E+00,
-    4.7732222200176633E+00,
-    2.1021485412233019E+00,
-    5.7862890496126462E-01,
-    1.6358571778476885E-01,
-    9.4846184210137130E-02,
-    5.5464612133430242E-02,
-  };
 
   public static double slopeSpeedCoefficient(double slope, double altitude) {
     /*
@@ -397,21 +377,6 @@ public class ElevationUtils {
     return temp;
   }
 
-  /**
-   * <p>
-   *     We use the Tobler function {@link ToblersHikingFunction} to calculate this.
-   * </p>
-   * <p>
-   *     When testing this we get good results in general, but for some edges
-   *     the elevation profile is not accurate. A (serpentine) road is usually
-   *     build with a constant slope, but the elevation profile in OTP is not
-   *     as smooth, resulting in an extra penalty for these roads.
-   * </p>
-   */
-  static double calculateEffectiveWalkLength(double run, double rise) {
-    return run * toblerWalkingFunction.calculateHorizontalWalkingDistanceMultiplier(run, rise);
-  }
-
   public static PackedCoordinateSequence getPartialElevationProfile(
     PackedCoordinateSequence elevationProfile,
     double start,
@@ -495,5 +460,36 @@ public class ElevationUtils {
     } catch (NumberFormatException e) {
       return null;
     }
+  }
+
+  /**
+   * <p>
+   * We use the Tobler function {@link ToblersHikingFunction} to calculate this.
+   * </p>
+   * <p>
+   * When testing this we get good results in general, but for some edges the elevation profile is
+   * not accurate. A (serpentine) road is usually build with a constant slope, but the elevation
+   * profile in OTP is not as smooth, resulting in an extra penalty for these roads.
+   * </p>
+   */
+  static double calculateEffectiveWalkLength(double run, double rise) {
+    return run * toblerWalkingFunction.calculateHorizontalWalkingDistanceMultiplier(run, rise);
+  }
+
+  private static double[] getLengthsFromElevation(CoordinateSequence elev) {
+    double trueLength = 0;
+    double flatLength = 0;
+    double lastX = elev.getX(0);
+    double lastY = elev.getY(0);
+    for (int i = 1; i < elev.size(); ++i) {
+      Coordinate c = elev.getCoordinate(i);
+      double x = c.x - lastX;
+      double y = c.y - lastY;
+      trueLength += Math.sqrt(x * x + y * y);
+      flatLength += x;
+      lastX = c.x;
+      lastY = c.y;
+    }
+    return new double[] { trueLength, flatLength };
   }
 }

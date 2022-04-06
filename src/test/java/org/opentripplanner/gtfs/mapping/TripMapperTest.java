@@ -41,6 +41,9 @@ public class TripMapperTest {
   private static final WheelChairBoarding WHEELCHAIR_ACCESSIBLE = WheelChairBoarding.POSSIBLE;
 
   private static final Trip TRIP = new Trip();
+  private final TripMapper subject = new TripMapper(
+    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))
+  );
 
   static {
     ROUTE.setId(AGENCY_AND_ID);
@@ -58,10 +61,6 @@ public class TripMapperTest {
     TRIP.setTripShortName(TRIP_SHORT_NAME);
     TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE.gtfsCode);
   }
-
-  private final TripMapper subject = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))
-  );
 
   @Test
   public void testMapCollection() throws Exception {

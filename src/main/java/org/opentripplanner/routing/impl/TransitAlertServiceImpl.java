@@ -13,10 +13,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
 
 /**
- * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions must be met for
- * the alert to be displayed. This is the case in both the Norwegian interpretation of SIRI, and the GTFS-RT alerts
- * specification.
- *
+ * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions
+ * must be met for the alert to be displayed. This is the case in both the Norwegian interpretation
+ * of SIRI, and the GTFS-RT alerts specification.
  */
 public class TransitAlertServiceImpl implements TransitAlertService {
 
@@ -26,6 +25,18 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   public TransitAlertServiceImpl(Graph graph) {
     this.graph = graph;
+  }
+
+  @Override
+  public void setAlerts(Collection<TransitAlert> alerts) {
+    Multimap<EntitySelector, TransitAlert> newAlerts = HashMultimap.create();
+    for (TransitAlert alert : alerts) {
+      for (EntitySelector entity : alert.getEntities()) {
+        newAlerts.put(entity, alert);
+      }
+    }
+
+    this.alerts = newAlerts;
   }
 
   @Override
@@ -110,17 +121,5 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   @Override
   public Collection<TransitAlert> getDirectionAndRouteAlerts(int directionId, FeedScopedId route) {
     return alerts.get(new EntitySelector.DirectionAndRoute(directionId, route));
-  }
-
-  @Override
-  public void setAlerts(Collection<TransitAlert> alerts) {
-    Multimap<EntitySelector, TransitAlert> newAlerts = HashMultimap.create();
-    for (TransitAlert alert : alerts) {
-      for (EntitySelector entity : alert.getEntities()) {
-        newAlerts.put(entity, alert);
-      }
-    }
-
-    this.alerts = newAlerts;
   }
 }

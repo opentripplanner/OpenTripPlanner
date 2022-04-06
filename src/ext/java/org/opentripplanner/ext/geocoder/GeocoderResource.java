@@ -27,6 +27,8 @@ import org.opentripplanner.standalone.server.Router;
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
+  private final Router router;
+
   /**
    * @deprecated The support for multiple routers are removed from OTP2. See
    * https://github.com/opentripplanner/OpenTripPlanner/issues/2760
@@ -34,8 +36,6 @@ public class GeocoderResource {
   @Deprecated
   @PathParam("ignoreRouterId")
   private String ignoreRouterId;
-
-  private final Router router;
 
   public GeocoderResource(@Context OTPServer otpServer) {
     router = otpServer.getRouter();

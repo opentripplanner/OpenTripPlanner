@@ -17,19 +17,17 @@ import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * The responsibility of this class is to play the {@link Heuristics} role.
- * It wrap the internal state, and transform the internal model to
- * provide the needed functionality.
+ * The responsibility of this class is to play the {@link Heuristics} role. It wrap the internal
+ * state, and transform the internal model to provide the needed functionality.
  */
 public class HeuristicsAdapter implements Heuristics {
 
   private static final int NOT_SET = Integer.MAX_VALUE;
-
-  private int originDepartureTime = -1;
   private final BestTimes times;
   private final BestNumberOfTransfers transfers;
   private final TIntObjectMap<List<RaptorTransfer>> egressPaths;
   private final TransitCalculator<?> calculator;
+  private int originDepartureTime = -1;
   private boolean aggregatedResultsCalculated = false;
 
   private int minJourneyTravelDuration = NOT_SET;
@@ -48,17 +46,6 @@ public class HeuristicsAdapter implements Heuristics {
     this.egressPaths = egressPaths.byStop();
     this.calculator = calculator;
     lifeCycle.onSetupIteration(this::setUpIteration);
-  }
-
-  private void setUpIteration(int departureTime) {
-    if (this.originDepartureTime > 0) {
-      throw new IllegalStateException(
-        "You should only run one iteration to calculate heuristics, this is because " +
-        "we use the origin departure time to calculate the travel duration at the " +
-        "end of the search."
-      );
-    }
-    this.originDepartureTime = departureTime;
   }
 
   @Override
@@ -138,6 +125,17 @@ public class HeuristicsAdapter implements Heuristics {
         20
       )
       .toString();
+  }
+
+  private void setUpIteration(int departureTime) {
+    if (this.originDepartureTime > 0) {
+      throw new IllegalStateException(
+        "You should only run one iteration to calculate heuristics, this is because " +
+        "we use the origin departure time to calculate the travel duration at the " +
+        "end of the search."
+      );
+    }
+    this.originDepartureTime = departureTime;
   }
 
   /**

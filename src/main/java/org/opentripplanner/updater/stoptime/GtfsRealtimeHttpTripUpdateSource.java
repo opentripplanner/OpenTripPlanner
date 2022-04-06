@@ -16,19 +16,16 @@ import org.slf4j.LoggerFactory;
 public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
-
+  /**
+   * Feed id that is used to match trip ids in the TripUpdates
+   */
+  private final String feedId;
+  private final String url;
   /**
    * True iff the last list with updates represent all updates that are active right now, i.e. all
    * previous updates should be disregarded
    */
   private boolean fullDataset = true;
-
-  /**
-   * Feed id that is used to match trip ids in the TripUpdates
-   */
-  private final String feedId;
-
-  private final String url;
 
   public GtfsRealtimeHttpTripUpdateSource(Parameters config) {
     this.feedId = config.getFeedId();
@@ -83,17 +80,18 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     return fullDataset;
   }
 
-  public String toString() {
-    return "GtfsRealtimeHttpUpdateStreamer(" + url + ")";
-  }
-
   @Override
   public String getFeedId() {
     return this.feedId;
   }
 
+  public String toString() {
+    return "GtfsRealtimeHttpUpdateStreamer(" + url + ")";
+  }
+
   interface Parameters {
     String getFeedId();
+
     String getUrl();
   }
 }

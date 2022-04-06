@@ -40,8 +40,8 @@ public class Router {
   public final RaptorConfig<TripSchedule> raptorConfig;
 
   /**
-   *  Separate logger for incoming requests. This should be handled with a Logback logger
-   *  rather than something simple like a PrintStream because requests come in multi-threaded.
+   * Separate logger for incoming requests. This should be handled with a Logback logger rather than
+   * something simple like a PrintStream because requests come in multi-threaded.
    */
   public ch.qos.logback.classic.Logger requestLogger = null;
 
@@ -127,8 +127,7 @@ public class Router {
   }
 
   /**
-   * A RoutingRequest containing default parameters that will be cloned when handling each
-   * request.
+   * A RoutingRequest containing default parameters that will be cloned when handling each request.
    */
   public RoutingRequest copyDefaultRoutingRequest() {
     var copy = this.defaultRoutingRequest.clone();
@@ -149,9 +148,13 @@ public class Router {
     raptorConfig.shutdown();
   }
 
+  public double streetRoutingTimeoutSeconds() {
+    return routerConfig.streetRoutingTimeoutSeconds();
+  }
+
   /**
-   * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this router.
-   * http://stackoverflow.com/a/17215011/778449
+   * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this
+   * router. http://stackoverflow.com/a/17215011/778449
    */
   private static ch.qos.logback.classic.Logger createLogger(String file) {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -171,9 +174,5 @@ public class Router {
     logger.setLevel(Level.INFO);
     logger.setAdditive(false);
     return logger;
-  }
-
-  public double streetRoutingTimeoutSeconds() {
-    return routerConfig.streetRoutingTimeoutSeconds();
   }
 }

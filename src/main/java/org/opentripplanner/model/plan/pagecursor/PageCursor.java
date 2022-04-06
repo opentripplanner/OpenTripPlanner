@@ -7,9 +7,9 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.plan.SortOrder;
 
 /**
- * This class holds all the information needed to page to the next/previous page. It is
- * serialized as base64 when passed on to the client. The base64 encoding is done to prevent the
- * client from using the information inside the cursor.
+ * This class holds all the information needed to page to the next/previous page. It is serialized
+ * as base64 when passed on to the client. The base64 encoding is done to prevent the client from
+ * using the information inside the cursor.
  * <p>
  * The PageCursor class is internal to the router, only the serialized string is passed to/from the
  * clients.
@@ -36,6 +36,11 @@ public class PageCursor {
     this.originalSortOrder = originalSortOrder;
   }
 
+  @Nullable
+  public static PageCursor decode(String cursor) {
+    return PageCursorSerializer.decode(cursor);
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
@@ -51,10 +56,5 @@ public class PageCursor {
   @Nullable
   public String encode() {
     return PageCursorSerializer.encode(this);
-  }
-
-  @Nullable
-  public static PageCursor decode(String cursor) {
-    return PageCursorSerializer.decode(cursor);
   }
 }

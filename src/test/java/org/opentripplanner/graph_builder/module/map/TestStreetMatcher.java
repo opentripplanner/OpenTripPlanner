@@ -172,6 +172,24 @@ public class TestStreetMatcher {
     }
 
     @Override
+    public boolean canTraverse(TraverseModeSet modes) {
+      return true;
+    }
+
+    @Override
+    public PackedCoordinateSequence getElevationProfile() {
+      return null;
+    }
+
+    public boolean isElevationFlattened() {
+      return false;
+    }
+
+    public String toString() {
+      return "SimpleEdge(" + fromv + ", " + tov + ")";
+    }
+
+    @Override
     public State traverse(State s0) {
       double d = getDistanceMeters();
       TraverseMode mode = s0.getNonTransitMode();
@@ -201,12 +219,7 @@ public class TestStreetMatcher {
     }
 
     @Override
-    public PackedCoordinateSequence getElevationProfile() {
-      return null;
-    }
-
-    @Override
-    public boolean canTraverse(TraverseModeSet modes) {
+    public boolean isWheelchairAccessible() {
       return true;
     }
 
@@ -216,25 +229,12 @@ public class TestStreetMatcher {
     }
 
     @Override
-    public boolean isMotorVehicleNoThruTraffic() {
-      return false;
-    }
-
-    public String toString() {
-      return "SimpleEdge(" + fromv + ", " + tov + ")";
-    }
-
-    @Override
     public int getStreetClass() {
       return StreetEdge.CLASS_STREET;
     }
 
     @Override
-    public boolean isWheelchairAccessible() {
-      return true;
-    }
-
-    public boolean isElevationFlattened() {
+    public boolean isMotorVehicleNoThruTraffic() {
       return false;
     }
 
@@ -242,6 +242,9 @@ public class TestStreetMatcher {
     public float getCarSpeed() {
       return 11.2f;
     }
+
+    @Override
+    public void setCarSpeed(float carSpeed) {}
 
     @Override
     public int getInAngle() {
@@ -252,8 +255,5 @@ public class TestStreetMatcher {
     public int getOutAngle() {
       return 0;
     }
-
-    @Override
-    public void setCarSpeed(float carSpeed) {}
   }
 }

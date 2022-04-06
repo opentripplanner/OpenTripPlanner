@@ -64,13 +64,13 @@ public class RouterConfig implements Serializable {
   }
 
   /**
-   * The config-version is a parameter which each OTP deployment may set to be able to
-   * query the OTP server and verify that it uses the correct version of the config. The
-   * version must be injected into the config in the operation deployment pipeline. How this
-   * is done is up to the deployment.
+   * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
+   * server and verify that it uses the correct version of the config. The version must be injected
+   * into the config in the operation deployment pipeline. How this is done is up to the
+   * deployment.
    * <p>
-   * The config-version have no effect on OTP, and is provided as is on the API. There is
-   * not syntax or format check on the version and it can be any string.
+   * The config-version have no effect on OTP, and is provided as is on the API. There is not syntax
+   * or format check on the version and it can be any string.
    * <p>
    * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
    * <p>
@@ -85,10 +85,9 @@ public class RouterConfig implements Serializable {
   }
 
   /**
-   * The preferred way to limit the search is to limit the distance for
-   * each street mode(WALK, BIKE, CAR). So the default timeout for a
-   * street search is set quite high. This is used to abort the search
-   * if the max distance is not reached within the timeout.
+   * The preferred way to limit the search is to limit the distance for each street mode(WALK, BIKE,
+   * CAR). So the default timeout for a street search is set quite high. This is used to abort the
+   * search if the max distance is not reached within the timeout.
    */
   public double streetRoutingTimeoutSeconds() {
     return streetRoutingTimeoutSeconds;

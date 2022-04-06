@@ -23,8 +23,8 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.routing.RoutingService;
 
 /**
- * Provide some of the commonly used "chain" of methods. Like all ids should be created
- * the same wayThis
+ * Provide some of the commonly used "chain" of methods. Like all ids should be created the same
+ * wayThis
  */
 public class GqlUtil {
 

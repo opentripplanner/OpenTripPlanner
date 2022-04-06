@@ -9,13 +9,13 @@ public class LegacyGraphQLTranslatedStringImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLTranslatedString {
 
   @Override
-  public DataFetcher<String> text() {
-    return environment -> getSource(environment).getValue();
+  public DataFetcher<String> language() {
+    return environment -> getSource(environment).getKey();
   }
 
   @Override
-  public DataFetcher<String> language() {
-    return environment -> getSource(environment).getKey();
+  public DataFetcher<String> text() {
+    return environment -> getSource(environment).getValue();
   }
 
   private Map.Entry<String, String> getSource(DataFetchingEnvironment environment) {

@@ -10,10 +10,9 @@ public class SlopeCosts {
   public final double lengthMultiplier; // Multiplier to get true length based on flat (projected) length
 
   /**
-   * The distance adjusted to incorporate the effect of the slope. Let say the
-   * distance is 1000 m and 5% uphill, then we can use e.g. the Tobler function
-   * to calculate the increase of 19% to walk such a distance. We add that
-   * percentage to the 'flat' distance and get 1190m.
+   * The distance adjusted to incorporate the effect of the slope. Let say the distance is 1000 m
+   * and 5% uphill, then we can use e.g. the Tobler function to calculate the increase of 19% to
+   * walk such a distance. We add that percentage to the 'flat' distance and get 1190m.
    */
   public final double effectiveWalkFactor;
 

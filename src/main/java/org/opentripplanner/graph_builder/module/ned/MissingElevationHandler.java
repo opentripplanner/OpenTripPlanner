@@ -18,22 +18,33 @@ import org.slf4j.LoggerFactory;
 /**
  * Assigns elevation to edges which don't yet have elevation set, which may be for example tunnels,
  * bridges or islands.
- *
- * Elevation may be missing from a {@link StreetEdge} for two reasons:
- *   1. the source DEM files contained no data for the whole geometry
- *   2. {@link StreetEdge#isSlopeOverride()} is set
- *
+ * <p>
+ * Elevation may be missing from a {@link StreetEdge} for two reasons: 1. the source DEM files
+ * contained no data for the whole geometry 2. {@link StreetEdge#isSlopeOverride()} is set
+ * <p>
  * The elevation for missing edges is set through its vertices, with the elevation for the from/to
  * vertices being used to set the elevation profile.
- *    0. The source elevations are determined for vertices using edges with an existing elevation
- *       profile, along with values from the {@code ele} tag
- *    1. All vertices within {@code maxElevationPropagationMeters} of vertices with elevation
- *       without elevation are visited
- *    2. Foreach vertex without elevation the first two paths from a vertex with elevation are used
- *       to interpolate elevations
- *    3. If a vertex only had a single path, then the last known elevation is used
- *    4. Once elevations for vertices are interpolated they are used to set the elevation profile
- *       for the incoming / outgoing StreetEdges
+ * <ol>
+ * <li>
+ *   The source elevations are determined for vertices using edges with an existing elevation
+ *   profile, along with values from the {@code ele} tag
+ * </li>
+ * <li>
+ *   All vertices within {@code maxElevationPropagationMeters} of vertices with elevation
+ *   without elevation are visited
+ * </li>
+ * <li>
+ *   Foreach vertex without elevation the first two paths from a vertex with elevation are used
+ *   to interpolate elevations
+ * </li>
+ * <li>
+ *   If a vertex only had a single path, then the last known elevation is used
+ * </li>
+ * </li>
+ *   Once elevations for vertices are interpolated they are used to set the elevation profile
+ *   for the incoming / outgoing StreetEdges
+ * </li>
+ * </ol>
  */
 class MissingElevationHandler {
 
@@ -54,8 +65,8 @@ class MissingElevationHandler {
   }
 
   /**
-   * Assign missing elevations by interpolating from nearby points with known
-   * elevation; also handle osm ele tags
+   * Assign missing elevations by interpolating from nearby points with known elevation; also handle
+   * osm ele tags
    */
   void run() {
     LOG.debug("Assigning missing elevations");

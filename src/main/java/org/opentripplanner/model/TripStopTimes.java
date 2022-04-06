@@ -23,8 +23,8 @@ public class TripStopTimes {
   private final Map<Trip, List<StopTime>> map = new HashMap<>();
 
   /**
-   * Return a unmodifiable, nullsafe list of stop times for the given trip.
-   * An <em>empty</em>empty list is returned if no values exist for a given key.
+   * Return a unmodifiable, nullsafe list of stop times for the given trip. An <em>empty</em>empty
+   * list is returned if no values exist for a given key.
    */
   public List<StopTime> get(Trip key) {
     List<StopTime> list = map.get(key);
@@ -60,8 +60,8 @@ public class TripStopTimes {
   }
 
   /**
-   * Return a copy of the internal map. Changes in the source are not reflected
-   * in the destination (returned Map), and visa versa.
+   * Return a copy of the internal map. Changes in the source are not reflected in the destination
+   * (returned Map), and visa versa.
    * <p>
    * The returned map is immutable.
    */

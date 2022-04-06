@@ -9,8 +9,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.Abs
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 
 /**
- * A wrapper around {@link Heuristics} to cash elements to avoid recalculation
- * of heuristic properties.
+ * A wrapper around {@link Heuristics} to cash elements to avoid recalculation of heuristic
+ * properties.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -43,8 +43,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   }
 
   /**
-   * This is a very effective optimization, enabled by the
-   * {@link org.opentripplanner.transit.raptor.api.request.Optimization#PARETO_CHECK_AGAINST_DESTINATION}.
+   * This is a very effective optimization, enabled by the {@link org.opentripplanner.transit.raptor.api.request.Optimization#PARETO_CHECK_AGAINST_DESTINATION}.
    */
   public boolean rejectDestinationArrivalBasedOnHeuristic(AbstractStopArrival<T> arrival) {
     if (heuristics == null || paths.isEmpty()) {

@@ -146,7 +146,7 @@ public class GeometryUtils {
 
   /**
    * Returns the chunk of the given geometry between the two given coordinates.
-   *
+   * <p>
    * Assumes that "second" is after "first" along the input geometry.
    */
   public static LineString getInteriorSegment(
@@ -160,8 +160,8 @@ public class GeometryUtils {
   }
 
   /**
-   * Adapted from org.locationtech.jts.geom.LineSegment
-   * Combines segmentFraction and projectionFactor methods.
+   * Adapted from org.locationtech.jts.geom.LineSegment Combines segmentFraction and
+   * projectionFactor methods.
    */
   public static double segmentFraction(
     double x0,
@@ -190,11 +190,10 @@ public class GeometryUtils {
   }
 
   /**
-   * Convert a org.geojson.Xxxx geometry to a JTS geometry.
-   * Only support Point, Polygon and MultiPolygon for now.
-   * @param geoJsonGeom
+   * Convert a org.geojson.Xxxx geometry to a JTS geometry. Only support Point, Polygon and
+   * MultiPolygon for now.
+   *
    * @return The equivalent JTS geometry.
-   * @throws UnsupportedGeometryException
    */
   public static Geometry convertGeoJsonToJtsGeometry(GeoJsonObject geoJsonGeom)
     throws UnsupportedGeometryException {

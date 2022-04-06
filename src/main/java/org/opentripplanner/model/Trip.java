@@ -45,7 +45,7 @@ public final class Trip extends TransitEntity {
 
   /**
    * Default alteration for a trip. // TODO Implement alterations for DSJ
-   *
+   * <p>
    * This is planned, by default (e.g. GTFS and if not set explicit).
    */
   private TripAlteration alteration = TripAlteration.PLANNED;
@@ -73,15 +73,18 @@ public final class Trip extends TransitEntity {
   }
 
   /**
-   * Operator running the trip. Returns operator of this trip, if it exist, or else the route operator.
+   * Operator running the trip. Returns operator of this trip, if it exist, or else the route
+   * operator.
    */
   public Operator getOperator() {
     return operator != null ? operator : route.getOperator();
   }
 
   /**
-   * This method return the operator associated with the trip. If the Trip have no Operator set {@code null} is
-   * returned. Note! this method do not consider the {@link Route} that the trip is part of.
+   * This method return the operator associated with the trip. If the Trip have no Operator set
+   * {@code null} is returned. Note! this method do not consider the {@link Route} that the trip is
+   * part of.
+   *
    * @see #getOperator()
    */
   public Operator getTripOperator() {
@@ -160,9 +163,9 @@ public final class Trip extends TransitEntity {
   }
 
   /**
-   * Internal code (non-public identifier) for the journey (e.g. train- or trip number from
-   * the planners' tool). This is kept to ensure compatibility with legacy planning systems.
-   * In NeTEx this maps to privateCode, there is no GTFS equivalent.
+   * Internal code (non-public identifier) for the journey (e.g. train- or trip number from the
+   * planners' tool). This is kept to ensure compatibility with legacy planning systems. In NeTEx
+   * this maps to privateCode, there is no GTFS equivalent.
    */
   public String getInternalPlanningCode() {
     return internalPlanningCode;
@@ -189,6 +192,7 @@ public final class Trip extends TransitEntity {
   }
 
   // TODO Consider moving this to the TripPattern class once we have refactored the transit model
+
   /**
    * The direction for this Trip (and all other Trips in this TripPattern).
    */
@@ -197,15 +201,15 @@ public final class Trip extends TransitEntity {
     return direction;
   }
 
+  public void setDirection(Direction direction) {
+    // Enforce non-null
+    this.direction = direction != null ? direction : Direction.UNKNOWN;
+  }
+
   public String getGtfsDirectionIdAsString(String unknownValue) {
     return direction.equals(Direction.UNKNOWN)
       ? unknownValue
       : Integer.toString(direction.gtfsCode);
-  }
-
-  public void setDirection(Direction direction) {
-    // Enforce non-null
-    this.direction = direction != null ? direction : Direction.UNKNOWN;
   }
 
   public String getBlockId() {
@@ -224,13 +228,13 @@ public final class Trip extends TransitEntity {
     this.shapeId = shapeId;
   }
 
+  public WheelChairBoarding getWheelchairBoarding() {
+    return wheelchairBoarding;
+  }
+
   public void setWheelchairBoarding(WheelChairBoarding boarding) {
     this.wheelchairBoarding =
       Objects.requireNonNullElse(boarding, WheelChairBoarding.NO_INFORMATION);
-  }
-
-  public WheelChairBoarding getWheelchairBoarding() {
-    return wheelchairBoarding;
   }
 
   public BikeAccess getBikesAllowed() {

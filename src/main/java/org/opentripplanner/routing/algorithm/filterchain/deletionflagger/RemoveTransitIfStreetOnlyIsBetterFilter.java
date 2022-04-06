@@ -14,19 +14,14 @@ import org.opentripplanner.model.plan.Itinerary;
 public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
 
   /**
-   *  Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
-   *  to know which filters removed
+   * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
+   * to know which filters removed
    */
   public static final String TAG = "transit-vs-street-filter";
 
   @Override
   public String name() {
     return TAG;
-  }
-
-  @Override
-  public boolean skipAlreadyFlaggedItineraries() {
-    return false;
   }
 
   @Override
@@ -48,5 +43,10 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
       .stream()
       .filter(it -> !it.isOnStreetAllTheWay() && it.generalizedCost >= limit)
       .collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean skipAlreadyFlaggedItineraries() {
+    return false;
   }
 }

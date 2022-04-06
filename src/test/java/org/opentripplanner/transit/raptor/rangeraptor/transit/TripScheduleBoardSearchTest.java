@@ -43,13 +43,10 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
   private static final int TIME_C1 = 2000;
   private static final int TIME_C2 = 2500;
-
-  private final TestTripPattern pattern = TestTripPattern.pattern("R1", STOP_A, STOP_B);
-
   private static final int TRIP_A = 0;
   private static final int TRIP_B = 1;
   private static final int TRIP_C = 2;
-
+  private final TestTripPattern pattern = TestTripPattern.pattern("R1", STOP_A, STOP_B);
   // Route with trip A, B, C.
   private TestRoute route = TestRoute
     .route(pattern)

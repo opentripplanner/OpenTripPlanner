@@ -17,11 +17,11 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
     super(fromv, tov, fromv.getWheelchairBoarding());
   }
 
-  protected int getStreetToStopTime() {
-    return 0;
-  }
-
   public String toString() {
     return "StreetTransitEntranceLink(" + fromv + " -> " + tov + ")";
+  }
+
+  protected int getStreetToStopTime() {
+    return 0;
   }
 }

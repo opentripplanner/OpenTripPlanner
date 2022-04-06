@@ -7,10 +7,10 @@ import java.util.function.IntConsumer;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 /**
- * The responsibility of this class is to collect all life-cycle subscriptions, and
- * implement the {@link WorkerLifeCycle} interface for subscribers to add their
- * subscription. This collection is passed on to the publisher after all subscriptions is
- * collected. This make it possible to decouple the publisher and subscriptions during setup.
+ * The responsibility of this class is to collect all life-cycle subscriptions, and implement the
+ * {@link WorkerLifeCycle} interface for subscribers to add their subscription. This collection is
+ * passed on to the publisher after all subscriptions is collected. This make it possible to
+ * decouple the publisher and subscriptions during setup.
  */
 public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 

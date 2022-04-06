@@ -36,7 +36,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
   /**
    * Json tag name for http headers
    * <p>
-   *   Optional, default value is null
+   * Optional, default value is null
    */
   private final Map<String, String> headers;
 

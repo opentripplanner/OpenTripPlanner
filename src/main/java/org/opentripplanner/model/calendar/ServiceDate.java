@@ -16,9 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A general representation of a year-month-day triple not tied to any locale and
- * used by the GTFS entities {@link ServiceCalendar} and
- * {@link ServiceCalendarDate} to represent service date ranges.
+ * A general representation of a year-month-day triple not tied to any locale and used by the GTFS
+ * entities {@link ServiceCalendar} and {@link ServiceCalendarDate} to represent service date
+ * ranges.
  * <p/>
  * A service date is a particular date when a particular GTFS service id is active.
  * <p/>
@@ -56,22 +56,22 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   private final int day;
 
   /**
-   * A uniq increasing number for any valid day between 0000-01-01 and 9999-12-31.
-   * Holes in the sequence is allowed to simplify the calculation. This is used for
-   * easy and fast caparison and as a hash for this instant.
-   *
+   * A uniq increasing number for any valid day between 0000-01-01 and 9999-12-31. Holes in the
+   * sequence is allowed to simplify the calculation. This is used for easy and fast caparison and
+   * as a hash for this instant.
+   * <p>
    * The value can safely be used for comparison, equals and hashCode.
    */
   private final int sequenceNumber;
 
   /**
    * Construct a new ServiceDate by specifying the numeric year, month, and day.
-   *
+   * <p>
    * The date must be a valid date between year 1900-01-01 and 9999-12-31.
    *
-   * @param year - numeric year (ex. 2010)
+   * @param year  - numeric year (ex. 2010)
    * @param month - numeric month of the year, where Jan = 1, Feb = 2, etc
-   * @param day - numeric day of month between 1 and 31.
+   * @param day   - numeric day of month between 1 and 31.
    */
   public ServiceDate(int year, int month, int day) {
     // Preconditions
@@ -100,11 +100,11 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * Construct a ServiceDate from the specified {@link Date} object, using the
-   * default {@link TimeZone} object for the current VM to localize the date.
+   * Construct a ServiceDate from the specified {@link Date} object, using the default {@link
+   * TimeZone} object for the current VM to localize the date.
    *
-   * @deprecated This is potentially dangerous to use. The TimeZone on the graph
-   *             can be different from the VM/server default.
+   * @deprecated This is potentially dangerous to use. The TimeZone on the graph can be different
+   * from the VM/server default.
    */
   @Deprecated
   public ServiceDate(Date date) {
@@ -112,8 +112,8 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * @deprecated This is potentially dangerous to use. The TimeZone on the graph
-   *             can be different from the server default.
+   * @deprecated This is potentially dangerous to use. The TimeZone on the graph can be different
+   * from the server default.
    */
   @Deprecated
   public ServiceDate() {
@@ -163,10 +163,10 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * Create a ZonedDateTime based on the current service date, time zone and seconds-offset.
-   * This method add the offset seconds to the service date start time, which is defined
-   * to be NOON - 12 hours. This is midnight for most days, except days where the time is
-   * adjusted for daylight saving time.
+   * Create a ZonedDateTime based on the current service date, time zone and seconds-offset. This
+   * method add the offset seconds to the service date start time, which is defined to be NOON - 12
+   * hours. This is midnight for most days, except days where the time is adjusted for daylight
+   * saving time.
    */
   public ZonedDateTime toZonedDateTime(ZoneId zoneId, int secondsOffset) {
     var d = ZonedDateTime.of(year, month, day, 12, 0, 0, 0, zoneId);
@@ -175,18 +175,17 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
   /**
    * Add a given number of seconds to the service date and convert it to a new service date if it
-   * the new time is on another date. The given time-zone is used to account for days which
-   * do not have 24 hours (switching between summer and winter time).
+   * the new time is on another date. The given time-zone is used to account for days which do not
+   * have 24 hours (switching between summer and winter time).
    */
   public ServiceDate plusSeconds(ZoneId zoneId, int seconds) {
     return new ServiceDate(toZonedDateTime(zoneId, seconds).toLocalDate());
   }
 
   /**
-   * @return calls {@link #getAsDate(TimeZone)} with the default timezone for
-   *         this VM
-   * @deprecated This is potentially dangerous to use. The TimeZone on the graph
-   *             can be diffrent from the server default.
+   * @return calls {@link #getAsDate(TimeZone)} with the default timezone for this VM
+   * @deprecated This is potentially dangerous to use. The TimeZone on the graph can be diffrent
+   * from the server default.
    */
   @Deprecated
   public Date getAsDate() {
@@ -198,22 +197,20 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * Constructs a {@link Calendar} object such that the Calendar will be at
-   * "midnight" (12:00am) at the start of the day specified by this service date
-   * and the target timezone. Note that we take the GTFS convention of
-   * calculating midnight by setting the target date to noon (12:00pm) for the
-   * service date and timezone specified and then subtracting twelve hours.
-   * Normally that would be equivalent to midnight, except on Daylight Saving
-   * Time days, in which case it can be an hour ahead or behind. This behavior
-   * ensures correct calculation of {@link org.opentripplanner.model.StopTime}
-   * arrival and departure time when the second offset is added to the localized
-   * service date.
+   * Constructs a {@link Calendar} object such that the Calendar will be at "midnight" (12:00am) at
+   * the start of the day specified by this service date and the target timezone. Note that we take
+   * the GTFS convention of calculating midnight by setting the target date to noon (12:00pm) for
+   * the service date and timezone specified and then subtracting twelve hours. Normally that would
+   * be equivalent to midnight, except on Daylight Saving Time days, in which case it can be an hour
+   * ahead or behind. This behavior ensures correct calculation of {@link
+   * org.opentripplanner.model.StopTime} arrival and departure time when the second offset is added
+   * to the localized service date.
    *
    * @param timeZone the target timezone to localize the service date to
-   * @return a localized date at "midnight" at the start of this service date in
-   *         the specified timezone
-   * @deprecated Replace this method with a method that uses the new {@link java.time}
-   *             library instead of the old {@link Calendar}.
+   * @return a localized date at "midnight" at the start of this service date in the specified
+   * timezone
+   * @deprecated Replace this method with a method that uses the new {@link java.time} library
+   * instead of the old {@link Calendar}.
    */
   @Deprecated
   public Calendar getAsCalendar(TimeZone timeZone) {
@@ -239,8 +236,8 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
    * See {@link #getAsCalendar(TimeZone)} for more details.
    *
    * @param timeZone the target timezone to localize the service date to
-   * @return a localized date at "midnight" at the start of this service date in
-   *         the specified timezone
+   * @return a localized date at "midnight" at the start of this service date in the specified
+   * timezone
    */
   public Date getAsDate(TimeZone timeZone) {
     Calendar c = getAsCalendar(timeZone);
@@ -262,7 +259,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   *
    * @return the service date following the current service date
    */
   public ServiceDate next() {
@@ -270,7 +266,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   *
    * @return the service date preceding the current service date
    */
   public ServiceDate previous() {
@@ -279,10 +274,8 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
   /**
    * @param numberOfDays number of days to shift current value, negative values are accepted.
-   *
-   * @return the service date following the current service date by the
-   *         specified number of days, or preceding if a negative number of days
-   *         is specified
+   * @return the service date following the current service date by the specified number of days, or
+   * preceding if a negative number of days is specified
    */
   public ServiceDate shift(int numberOfDays) {
     if (numberOfDays == 0) {
@@ -292,10 +285,9 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * @return the number of days between this service date and the specified
-   *         argument service date
-   * @deprecated This method uses UTC TimeZone, should be replaced with a method that uses the
-   *             graph TimeZone.
+   * @return the number of days between this service date and the specified argument service date
+   * @deprecated This method uses UTC TimeZone, should be replaced with a method that uses the graph
+   * TimeZone.
    */
   @Deprecated
   public long difference(ServiceDate serviceDate) {
@@ -306,9 +298,9 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * The service date is either the minimum or maximum allowed value.
-   * In practice this means unbounded.
-   * */
+   * The service date is either the minimum or maximum allowed value. In practice this means
+   * unbounded.
+   */
   public boolean isMinMax() {
     return equals(MIN_DATE) || equals(MAX_DATE);
   }
@@ -343,17 +335,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   @Override
-  public String toString() {
-    if (MAX_DATE.equals(this)) {
-      return MAX_TEXT;
-    }
-    if (MIN_DATE.equals(this)) {
-      return MIN_TEXT;
-    }
-    return asISO8601();
-  }
-
-  @Override
   public int hashCode() {
     return sequenceNumber;
   }
@@ -371,6 +352,17 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     }
     ServiceDate other = (ServiceDate) obj;
     return sequenceNumber == other.sequenceNumber;
+  }
+
+  @Override
+  public String toString() {
+    if (MAX_DATE.equals(this)) {
+      return MAX_TEXT;
+    }
+    if (MIN_DATE.equals(this)) {
+      return MIN_TEXT;
+    }
+    return asISO8601();
   }
 
   /* Private Methods */

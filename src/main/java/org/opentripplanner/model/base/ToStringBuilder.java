@@ -52,17 +52,17 @@ public class ToStringBuilder {
   }
 
   /**
-   * Create a ToStringBuilder for a regular POJO type. This builder
-   * will include metadata(class and field names) when building the to string.
+   * Create a ToStringBuilder for a regular POJO type. This builder will include metadata(class and
+   * field names) when building the to string.
    */
   public static ToStringBuilder of(Class<?> clazz) {
     return new ToStringBuilder(clazz.getSimpleName());
   }
 
   /**
-   * Create a ToStringBuilder for a regular POJO type without including the type in the name.
-   * Some classes are always embedded in other classes and the type is given, for these cases
-   * this builder make the toString a bit easier to read.
+   * Create a ToStringBuilder for a regular POJO type without including the type in the name. Some
+   * classes are always embedded in other classes and the type is given, for these cases this
+   * builder make the toString a bit easier to read.
    */
   public static ToStringBuilder of() {
     return new ToStringBuilder("");
@@ -180,8 +180,8 @@ public class ToStringBuilder {
   }
 
   /**
-   * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss.
-   * Note! The DATE is not printed. {@code null} value is ignored.
+   * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
+   * DATE is not printed. {@code null} value is ignored.
    */
   public ToStringBuilder addTimeCal(String name, Calendar time) {
     return addIfNotNull(name, time, t -> formatTime(t.getTime()));
@@ -227,8 +227,8 @@ public class ToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
-   * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
    */
   public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
     return addDurationSec(name, durationSeconds, null);
@@ -236,8 +236,8 @@ public class ToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
-   * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
    */
   public ToStringBuilder addDurationSec(String name, Integer durationSeconds, Integer ignoreValue) {
     return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);

@@ -15,8 +15,9 @@ public final class ApiFeedInfo implements Serializable {
   public String endDate;
   public String version;
 
-  public String toString() {
-    return "<FeedInfo " + id + ">";
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
   @Override
@@ -31,8 +32,7 @@ public final class ApiFeedInfo implements Serializable {
     return id.equals(that.id);
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
+  public String toString() {
+    return "<FeedInfo " + id + ">";
   }
 }

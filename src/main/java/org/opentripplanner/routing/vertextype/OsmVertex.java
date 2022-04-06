@@ -5,10 +5,10 @@ import org.opentripplanner.util.I18NString;
 
 /**
  * A vertex coming from OpenStreetMap.
- *
- * This class marks something that comes from the street network itself. It is used for
- * linking origins in Analyst to ensure that they are linked to the same locations
- * regardless of changes in the transit network between (or eventually within) graphs.
+ * <p>
+ * This class marks something that comes from the street network itself. It is used for linking
+ * origins in Analyst to ensure that they are linked to the same locations regardless of changes in
+ * the transit network between (or eventually within) graphs.
  */
 public class OsmVertex extends IntersectionVertex {
 

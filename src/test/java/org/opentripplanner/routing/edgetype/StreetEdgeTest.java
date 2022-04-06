@@ -20,33 +20,13 @@ import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 
 class StreetEdgeTest extends GraphRoutingTest {
 
-  private StreetVertex V1, V2;
-
-  private StreetEdge streetEdge1, streetEdge2;
-
   private final Graph graph;
-
+  private StreetVertex V1, V2;
+  private StreetEdge streetEdge1, streetEdge2;
   private TurnRestriction originalTurnRestriction;
 
   public StreetEdgeTest() {
     graph = graph();
-  }
-
-  private Graph graph() {
-    return graphOf(
-      new Builder() {
-        @Override
-        public void build() {
-          V1 = intersection("V1", 0.0, 0.0);
-          V2 = intersection("V2", 2.0, 0.0);
-
-          streetEdge1 = street(V2, V1, 100, StreetTraversalPermission.ALL);
-          streetEdge2 = street(V1, V2, 100, StreetTraversalPermission.ALL);
-
-          originalTurnRestriction = disallowTurn(streetEdge1, streetEdge2);
-        }
-      }
-    );
   }
 
   @Test
@@ -202,6 +182,23 @@ class StreetEdgeTest extends GraphRoutingTest {
 
     disposableEdgeCollection.disposeEdges();
     assertOnlyOriginalRestrictionExists();
+  }
+
+  private Graph graph() {
+    return graphOf(
+      new Builder() {
+        @Override
+        public void build() {
+          V1 = intersection("V1", 0.0, 0.0);
+          V2 = intersection("V2", 2.0, 0.0);
+
+          streetEdge1 = street(V2, V1, 100, StreetTraversalPermission.ALL);
+          streetEdge2 = street(V1, V2, 100, StreetTraversalPermission.ALL);
+
+          originalTurnRestriction = disallowTurn(streetEdge1, streetEdge2);
+        }
+      }
+    );
   }
 
   private void assertOriginalRestrictionExists() {

@@ -19,7 +19,7 @@ class ServiceCalendarMapper {
     return MapUtils.mapToList(allServiceCalendars, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   ServiceCalendar map(org.onebusaway.gtfs.model.ServiceCalendar orginal) {
     return orginal == null ? null : mappedCalendars.computeIfAbsent(orginal, this::doMap);
   }

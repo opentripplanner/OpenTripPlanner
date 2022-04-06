@@ -7,24 +7,24 @@ import static org.opentripplanner.util.TableFormatter.Align.Right;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.util.DiffTool;
+import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.util.TableFormatter;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * This class is responsible for creating a test report as a table.
- * The Table is easy to read and can be printed to a terminal window.
+ * This class is responsible for creating a test report as a table. The Table is easy to read and
+ * can be printed to a terminal window.
  */
 public class TableTestReport {
 
-  public static String report(List<DiffTool.Entry<Result>> results) {
+  public static String report(List<DiffEntry<Result>> results) {
     if (results.isEmpty()) {
       return "NO RESULTS FOUND FOR TEST CASE!";
     }
 
     TableFormatter table = newTable();
 
-    for (DiffTool.Entry<Result> it : results) {
+    for (DiffEntry<Result> it : results) {
       addTo(table, it);
     }
     return table.toString();
@@ -51,7 +51,7 @@ public class TableTestReport {
     );
   }
 
-  private static void addTo(TableFormatter table, DiffTool.Entry<Result> e) {
+  private static void addTo(TableFormatter table, DiffEntry<Result> e) {
     Result result = e.element();
     table.addRow(
       e.status(TestStatus.OK.label, TestStatus.FAILED.label, TestStatus.WARN.label),

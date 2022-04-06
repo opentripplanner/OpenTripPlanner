@@ -41,17 +41,15 @@ import org.rutebanken.netex.model.Via_VersionedChildStructure;
 import org.rutebanken.netex.model.Vias_RelStructure;
 
 /**
- * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference
- * to the correct stop. DestinationDisplay is mapped to HeadSign. There is logic to take care of the the fact that
- * DestinationsDisplay is also valid for each subsequent TimeTabledPassingTime, while HeadSign has to be explicitly
- * defined for each StopTime.
+ * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the
+ * StopTime has a reference to the correct stop. DestinationDisplay is mapped to HeadSign. There is
+ * logic to take care of the the fact that DestinationsDisplay is also valid for each subsequent
+ * TimeTabledPassingTime, while HeadSign has to be explicitly defined for each StopTime.
  */
 class StopTimesMapper {
 
-  private final DataImportIssueStore issueStore;
-
   private static final int DAY_IN_SECONDS = 3600 * 24;
-
+  private final DataImportIssueStore issueStore;
   private final FeedScopedIdFactory idFactory;
 
   private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
@@ -94,6 +92,14 @@ class StopTimesMapper {
     this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
     this.flexibleLinesById = flexibleLinesById;
     this.routeByid = routeById;
+  }
+
+  static int calculateOtpTime(LocalTime time, BigInteger dayOffset) {
+    int otpTime = time.toSecondOfDay();
+    if (dayOffset != null) {
+      otpTime += DAY_IN_SECONDS * dayOffset.intValue();
+    }
+    return otpTime;
   }
 
   /**
@@ -158,6 +164,69 @@ class StopTimesMapper {
     }
 
     return result;
+  }
+
+  @Nullable
+  private static StopPointInJourneyPattern findStopPoint(
+    String pointInJourneyPatterRef,
+    JourneyPattern journeyPattern
+  ) {
+    var points = journeyPattern
+      .getPointsInSequence()
+      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
+
+    for (PointInLinkSequence_VersionedChildStructure point : points) {
+      if (point instanceof StopPointInJourneyPattern) {
+        StopPointInJourneyPattern stopPoint = (StopPointInJourneyPattern) point;
+        if (stopPoint.getId().equals(pointInJourneyPatterRef)) {
+          return stopPoint;
+        }
+      }
+    }
+    return null;
+  }
+
+  private static int calculateOtpTime(
+    LocalTime time,
+    BigInteger dayOffset,
+    LocalTime fallbackTime,
+    BigInteger fallbackDayOffset
+  ) {
+    return time != null
+      ? calculateOtpTime(time, dayOffset)
+      : calculateOtpTime(fallbackTime, fallbackDayOffset);
+  }
+
+  private static boolean isFalse(Boolean value) {
+    return value != null && !value;
+  }
+
+  // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
+  //      this should be harmonized between GTFS and NeTEx
+  private static void modifyDataForUnscheduledFlexTrip(StopTimesMapperResult result) {
+    List<StopTime> stopTimes = result.stopTimes;
+    if (
+      stopTimes.size() == 2 &&
+      stopTimes
+        .stream()
+        .allMatch(s ->
+          s.getStop() instanceof FlexStopLocation || s.getStop() instanceof FlexLocationGroup
+        )
+    ) {
+      int departureTime = stopTimes.get(0).getDepartureTime();
+      int arrivalTime = stopTimes.get(1).getArrivalTime();
+
+      for (StopTime stopTime : stopTimes) {
+        if (stopTime.getFlexWindowStart() == StopTime.MISSING_VALUE) {
+          stopTime.clearDepartureTime();
+          stopTime.setFlexWindowStart(departureTime);
+        }
+        if (stopTime.getFlexWindowEnd() == StopTime.MISSING_VALUE) {
+          stopTime.clearArrivalTime();
+          stopTime.setFlexWindowEnd(arrivalTime);
+        }
+      }
+    }
   }
 
   private StopTime mapToStopTime(
@@ -327,77 +396,6 @@ class StopTimesMapper {
     }
 
     return stopLocation;
-  }
-
-  @Nullable
-  private static StopPointInJourneyPattern findStopPoint(
-    String pointInJourneyPatterRef,
-    JourneyPattern journeyPattern
-  ) {
-    var points = journeyPattern
-      .getPointsInSequence()
-      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
-
-    for (PointInLinkSequence_VersionedChildStructure point : points) {
-      if (point instanceof StopPointInJourneyPattern) {
-        StopPointInJourneyPattern stopPoint = (StopPointInJourneyPattern) point;
-        if (stopPoint.getId().equals(pointInJourneyPatterRef)) {
-          return stopPoint;
-        }
-      }
-    }
-    return null;
-  }
-
-  private static int calculateOtpTime(
-    LocalTime time,
-    BigInteger dayOffset,
-    LocalTime fallbackTime,
-    BigInteger fallbackDayOffset
-  ) {
-    return time != null
-      ? calculateOtpTime(time, dayOffset)
-      : calculateOtpTime(fallbackTime, fallbackDayOffset);
-  }
-
-  static int calculateOtpTime(LocalTime time, BigInteger dayOffset) {
-    int otpTime = time.toSecondOfDay();
-    if (dayOffset != null) {
-      otpTime += DAY_IN_SECONDS * dayOffset.intValue();
-    }
-    return otpTime;
-  }
-
-  private static boolean isFalse(Boolean value) {
-    return value != null && !value;
-  }
-
-  // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
-  //      this should be harmonized between GTFS and NeTEx
-  private static void modifyDataForUnscheduledFlexTrip(StopTimesMapperResult result) {
-    List<StopTime> stopTimes = result.stopTimes;
-    if (
-      stopTimes.size() == 2 &&
-      stopTimes
-        .stream()
-        .allMatch(s ->
-          s.getStop() instanceof FlexStopLocation || s.getStop() instanceof FlexLocationGroup
-        )
-    ) {
-      int departureTime = stopTimes.get(0).getDepartureTime();
-      int arrivalTime = stopTimes.get(1).getArrivalTime();
-
-      for (StopTime stopTime : stopTimes) {
-        if (stopTime.getFlexWindowStart() == StopTime.MISSING_VALUE) {
-          stopTime.clearDepartureTime();
-          stopTime.setFlexWindowStart(departureTime);
-        }
-        if (stopTime.getFlexWindowEnd() == StopTime.MISSING_VALUE) {
-          stopTime.clearArrivalTime();
-          stopTime.setFlexWindowEnd(arrivalTime);
-        }
-      }
-    }
   }
 
   private FlexibleLine lookUpFlexibleLine(

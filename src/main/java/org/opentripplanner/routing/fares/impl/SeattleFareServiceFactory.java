@@ -28,11 +28,6 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
   }
 
   @Override
-  public void configure(JsonNode config) {
-    // No config for the moment
-  }
-
-  @Override
   public void processGtfs(OtpTransitService transitService) {
     // Add custom extension: trips may have a fare ID specified in KCM GTFS.
     // Need to ensure that we are scoped to feed when adding trips to FareRuleSet,
@@ -60,5 +55,10 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
       FareRuleSet rule = feedFareRulesById.get(fareId);
       if (rule != null) rule.addTrip(trip.getId());
     }
+  }
+
+  @Override
+  public void configure(JsonNode config) {
+    // No config for the moment
   }
 }

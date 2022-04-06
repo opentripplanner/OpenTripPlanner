@@ -1,6 +1,10 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.csvreader.CsvReader;
 import java.io.IOException;
@@ -30,9 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly, that the optional
- * language paraameter works correctly, and that the different files in a GBFS bundle are all included, with all
- * information in them.
+ * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
+ * that the optional language paraameter works correctly, and that the different files in a GBFS
+ * bundle are all included, with all information in them.
  */
 class GbfsFeedLoaderTest {
 

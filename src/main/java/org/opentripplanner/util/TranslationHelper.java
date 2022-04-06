@@ -15,17 +15,15 @@ import org.onebusaway.gtfs.model.Translation;
 
 /**
  * This helper is util for translating wanted text found in GTFS's translation.txt -file.
- *
+ * <p>
  * If translation not found then it will return given default value.
  */
 
 public final class TranslationHelper {
 
   private static final String TABLE_FEED_INFO = "feed_info";
-
-  private String feedLanguage = null;
-
   private final Map<String, Map<String, List<Translation>>> translationMap = new HashMap<>();
+  private String feedLanguage = null;
 
   public void importTranslations(
     Collection<Translation> allTranslations,

@@ -40,365 +40,6 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
 
   @Override
-  public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> new Relay.ResolvedGlobalId("Stop", stop.getId().toString()),
-        station -> new Relay.ResolvedGlobalId("Stop", station.getId().toString())
-      );
-  }
-
-  @Override
-  public DataFetcher<Iterable<TripTimeOnDate>> stopTimesForPattern() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> {
-          RoutingService routingService = getRoutingService(environment);
-          LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args = new LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs(
-            environment.getArguments()
-          );
-          TripPattern pattern = routingService.getTripPatternForId(
-            FeedScopedId.parseId(args.getLegacyGraphQLId())
-          );
-
-          if (pattern == null) {
-            return null;
-          }
-
-          // TODO: use args.getLegacyGraphQLOmitCanceled()
-
-          return routingService.stopTimesForPatternAtStop(
-            stop,
-            pattern,
-            args.getLegacyGraphQLStartTime(),
-            args.getLegacyGraphQLTimeRange(),
-            args.getLegacyGraphQLNumberOfDepartures(),
-            args.getLegacyGraphQLOmitNonPickups()
-              ? ArrivalDeparture.DEPARTURES
-              : ArrivalDeparture.BOTH
-          );
-        },
-        station -> null
-      );
-  }
-
-  @Override
-  public DataFetcher<String> gtfsId() {
-    return environment ->
-      getValue(environment, stop -> stop.getId().toString(), station -> station.getId().toString());
-  }
-
-  @Override
-  public DataFetcher<String> name() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
-      );
-  }
-
-  @Override
-  public DataFetcher<Double> lat() {
-    return environment -> getValue(environment, StopLocation::getLat, Station::getLat);
-  }
-
-  @Override
-  public DataFetcher<Double> lon() {
-    return environment -> getValue(environment, StopLocation::getLon, Station::getLon);
-  }
-
-  @Override
-  public DataFetcher<String> code() {
-    return environment -> getValue(environment, StopLocation::getCode, Station::getCode);
-  }
-
-  @Override
-  public DataFetcher<String> desc() {
-    return environment ->
-      getValue(environment, StopLocation::getDescription, Station::getDescription);
-  }
-
-  @Override
-  public DataFetcher<String> zoneId() {
-    return environment ->
-      getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
-  }
-
-  @Override
-  public DataFetcher<String> url() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
-      );
-  }
-
-  @Override
-  public DataFetcher<Object> locationType() {
-    return environment -> getValue(environment, stop -> "STOP", station -> "STATION");
-  }
-
-  @Override
-  public DataFetcher<Object> parentStation() {
-    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
-  }
-
-  @Override
-  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
-    return environment -> {
-      var boarding = getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
-      return LegacyGraphQLUtils.toGraphQL(boarding);
-    };
-  }
-
-  // TODO
-  @Override
-  public DataFetcher<String> direction() {
-    return environment -> null;
-  }
-
-  @Override
-  public DataFetcher<Object> geometries() {
-    return environment -> getValue(environment, StopLocation::getGeometry, Station::getGeometry);
-  }
-
-  @Override
-  public DataFetcher<String> timezone() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> stop.getTimeZone().toString(),
-        station -> station.getTimezone().toString()
-      );
-  }
-
-  // TODO
-  @Override
-  public DataFetcher<Integer> vehicleType() {
-    return environment -> null;
-  }
-
-  @Override
-  public DataFetcher<String> vehicleMode() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> {
-          if (stop.getVehicleType() != null) {
-            return stop.getVehicleType().name();
-          }
-          return getRoutingService(environment)
-            .getPatternsForStop(stop)
-            .stream()
-            .map(TripPattern::getMode)
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
-            .map(Enum::toString)
-            .orElse(null);
-        },
-        station -> {
-          RoutingService routingService = getRoutingService(environment);
-          return station
-            .getChildStops()
-            .stream()
-            .flatMap(stop ->
-              routingService.getPatternsForStop(stop).stream().map(TripPattern::getMode)
-            )
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
-            .map(Enum::toString)
-            .orElse(null);
-        }
-      );
-  }
-
-  @Override
-  public DataFetcher<String> platformCode() {
-    return environment -> getValue(environment, StopLocation::getPlatformCode, station -> null);
-  }
-
-  @Override
-  public DataFetcher<Object> cluster() {
-    return environment -> null;
-  }
-
-  @Override
-  public DataFetcher<Iterable<Object>> stops() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> null,
-        station -> new ArrayList<Object>(station.getChildStops())
-      );
-  }
-
-  @Override
-  public DataFetcher<Iterable<Route>> routes() {
-    return this::getRoutes;
-  }
-
-  @Override
-  public DataFetcher<Iterable<TripPattern>> patterns() {
-    return this::getPatterns;
-  }
-
-  @Override
-  public DataFetcher<Iterable<NearbyStop>> transfers() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> {
-          Integer maxDistance = new LegacyGraphQLTypes.LegacyGraphQLStopTransfersArgs(
-            environment.getArguments()
-          )
-            .getLegacyGraphQLMaxDistance();
-
-          return getRoutingService(environment)
-            .getTransfersByStop(stop)
-            .stream()
-            .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
-            .filter(transfer -> transfer.to instanceof Stop)
-            .map(transfer ->
-              new NearbyStop(
-                transfer.to,
-                transfer.getDistanceMeters(),
-                transfer.getEdges(),
-                GeometryUtils.concatenateLineStrings(
-                  transfer.getEdges().stream().map(Edge::getGeometry).collect(Collectors.toList())
-                ),
-                null
-              )
-            )
-            .collect(Collectors.toList());
-        },
-        station -> null
-      );
-  }
-
-  @Override
-  public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate() {
-    return environment -> {
-      RoutingService routingService = getRoutingService(environment);
-      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForServiceDateArgs(
-        environment.getArguments()
-      );
-      ServiceDate date;
-      try {
-        date = ServiceDate.parseString(args.getLegacyGraphQLDate());
-      } catch (ParseException e) {
-        return null;
-      }
-
-      // TODO: use args.getLegacyGraphQLOmitCanceled()
-
-      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
-        routingService.getStopTimesForStop(
-          stop,
-          date,
-          args.getLegacyGraphQLOmitNonPickups()
-            ? ArrivalDeparture.DEPARTURES
-            : ArrivalDeparture.BOTH
-        );
-
-      return getValue(
-        environment,
-        stopTFunction,
-        station ->
-          station
-            .getChildStops()
-            .stream()
-            .map(stopTFunction)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList())
-      );
-    };
-  }
-
-  @Override
-  public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns() {
-    return environment -> {
-      RoutingService routingService = getRoutingService(environment);
-      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
-        environment.getArguments()
-      );
-
-      // TODO: use args.getLegacyGraphQLOmitCanceled()
-
-      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
-        routingService.stopTimesForStop(
-          stop,
-          args.getLegacyGraphQLStartTime(),
-          args.getLegacyGraphQLTimeRange(),
-          args.getLegacyGraphQLNumberOfDepartures(),
-          args.getLegacyGraphQLOmitNonPickups()
-            ? ArrivalDeparture.DEPARTURES
-            : ArrivalDeparture.BOTH,
-          false
-        );
-
-      return getValue(
-        environment,
-        stopTFunction,
-        station ->
-          station
-            .getChildStops()
-            .stream()
-            .map(stopTFunction)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList())
-      );
-    };
-  }
-
-  @Override
-  public DataFetcher<Iterable<TripTimeOnDate>> stoptimesWithoutPatterns() {
-    return environment -> {
-      RoutingService routingService = getRoutingService(environment);
-      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
-        environment.getArguments()
-      );
-
-      // TODO: use args.getLegacyGraphQLOmitCanceled()
-
-      Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
-        routingService
-          .stopTimesForStop(
-            stop,
-            args.getLegacyGraphQLStartTime(),
-            args.getLegacyGraphQLTimeRange(),
-            args.getLegacyGraphQLNumberOfDepartures(),
-            args.getLegacyGraphQLOmitNonPickups()
-              ? ArrivalDeparture.DEPARTURES
-              : ArrivalDeparture.BOTH,
-            false
-          )
-          .stream();
-
-      Stream<StopTimesInPattern> stream = getValue(
-        environment,
-        stopTFunction,
-        station -> station.getChildStops().stream().flatMap(stopTFunction)
-      );
-
-      return stream
-        .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
-        .sorted(Comparator.comparing(t -> t.getServiceDay() + t.getRealtimeDeparture()))
-        .limit(args.getLegacyGraphQLNumberOfDepartures())
-        .collect(Collectors.toList());
-    };
-  }
-
-  @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
@@ -478,6 +119,365 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         return alertService.getStopAlerts(id);
       }
     };
+  }
+
+  @Override
+  public DataFetcher<Object> cluster() {
+    return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<String> code() {
+    return environment -> getValue(environment, StopLocation::getCode, Station::getCode);
+  }
+
+  @Override
+  public DataFetcher<String> desc() {
+    return environment ->
+      getValue(environment, StopLocation::getDescription, Station::getDescription);
+  }
+
+  // TODO
+  @Override
+  public DataFetcher<String> direction() {
+    return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<Object> geometries() {
+    return environment -> getValue(environment, StopLocation::getGeometry, Station::getGeometry);
+  }
+
+  @Override
+  public DataFetcher<String> gtfsId() {
+    return environment ->
+      getValue(environment, stop -> stop.getId().toString(), station -> station.getId().toString());
+  }
+
+  @Override
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> new Relay.ResolvedGlobalId("Stop", stop.getId().toString()),
+        station -> new Relay.ResolvedGlobalId("Stop", station.getId().toString())
+      );
+  }
+
+  @Override
+  public DataFetcher<Double> lat() {
+    return environment -> getValue(environment, StopLocation::getLat, Station::getLat);
+  }
+
+  @Override
+  public DataFetcher<Object> locationType() {
+    return environment -> getValue(environment, stop -> "STOP", station -> "STATION");
+  }
+
+  @Override
+  public DataFetcher<Double> lon() {
+    return environment -> getValue(environment, StopLocation::getLon, Station::getLon);
+  }
+
+  @Override
+  public DataFetcher<String> name() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
+        station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
+      );
+  }
+
+  @Override
+  public DataFetcher<Object> parentStation() {
+    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
+  }
+
+  @Override
+  public DataFetcher<Iterable<TripPattern>> patterns() {
+    return this::getPatterns;
+  }
+
+  @Override
+  public DataFetcher<String> platformCode() {
+    return environment -> getValue(environment, StopLocation::getPlatformCode, station -> null);
+  }
+
+  @Override
+  public DataFetcher<Iterable<Route>> routes() {
+    return this::getRoutes;
+  }
+
+  @Override
+  public DataFetcher<Iterable<TripTimeOnDate>> stopTimesForPattern() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> {
+          RoutingService routingService = getRoutingService(environment);
+          LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args = new LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs(
+            environment.getArguments()
+          );
+          TripPattern pattern = routingService.getTripPatternForId(
+            FeedScopedId.parseId(args.getLegacyGraphQLId())
+          );
+
+          if (pattern == null) {
+            return null;
+          }
+
+          // TODO: use args.getLegacyGraphQLOmitCanceled()
+
+          return routingService.stopTimesForPatternAtStop(
+            stop,
+            pattern,
+            args.getLegacyGraphQLStartTime(),
+            args.getLegacyGraphQLTimeRange(),
+            args.getLegacyGraphQLNumberOfDepartures(),
+            args.getLegacyGraphQLOmitNonPickups()
+              ? ArrivalDeparture.DEPARTURES
+              : ArrivalDeparture.BOTH
+          );
+        },
+        station -> null
+      );
+  }
+
+  @Override
+  public DataFetcher<Iterable<Object>> stops() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> null,
+        station -> new ArrayList<Object>(station.getChildStops())
+      );
+  }
+
+  @Override
+  public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns() {
+    return environment -> {
+      RoutingService routingService = getRoutingService(environment);
+      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
+        environment.getArguments()
+      );
+
+      // TODO: use args.getLegacyGraphQLOmitCanceled()
+
+      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
+        routingService.stopTimesForStop(
+          stop,
+          args.getLegacyGraphQLStartTime(),
+          args.getLegacyGraphQLTimeRange(),
+          args.getLegacyGraphQLNumberOfDepartures(),
+          args.getLegacyGraphQLOmitNonPickups()
+            ? ArrivalDeparture.DEPARTURES
+            : ArrivalDeparture.BOTH,
+          false
+        );
+
+      return getValue(
+        environment,
+        stopTFunction,
+        station ->
+          station
+            .getChildStops()
+            .stream()
+            .map(stopTFunction)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList())
+      );
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate() {
+    return environment -> {
+      RoutingService routingService = getRoutingService(environment);
+      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForServiceDateArgs(
+        environment.getArguments()
+      );
+      ServiceDate date;
+      try {
+        date = ServiceDate.parseString(args.getLegacyGraphQLDate());
+      } catch (ParseException e) {
+        return null;
+      }
+
+      // TODO: use args.getLegacyGraphQLOmitCanceled()
+
+      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
+        routingService.getStopTimesForStop(
+          stop,
+          date,
+          args.getLegacyGraphQLOmitNonPickups()
+            ? ArrivalDeparture.DEPARTURES
+            : ArrivalDeparture.BOTH
+        );
+
+      return getValue(
+        environment,
+        stopTFunction,
+        station ->
+          station
+            .getChildStops()
+            .stream()
+            .map(stopTFunction)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList())
+      );
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<TripTimeOnDate>> stoptimesWithoutPatterns() {
+    return environment -> {
+      RoutingService routingService = getRoutingService(environment);
+      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
+        environment.getArguments()
+      );
+
+      // TODO: use args.getLegacyGraphQLOmitCanceled()
+
+      Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
+        routingService
+          .stopTimesForStop(
+            stop,
+            args.getLegacyGraphQLStartTime(),
+            args.getLegacyGraphQLTimeRange(),
+            args.getLegacyGraphQLNumberOfDepartures(),
+            args.getLegacyGraphQLOmitNonPickups()
+              ? ArrivalDeparture.DEPARTURES
+              : ArrivalDeparture.BOTH,
+            false
+          )
+          .stream();
+
+      Stream<StopTimesInPattern> stream = getValue(
+        environment,
+        stopTFunction,
+        station -> station.getChildStops().stream().flatMap(stopTFunction)
+      );
+
+      return stream
+        .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
+        .sorted(Comparator.comparing(t -> t.getServiceDay() + t.getRealtimeDeparture()))
+        .limit(args.getLegacyGraphQLNumberOfDepartures())
+        .collect(Collectors.toList());
+    };
+  }
+
+  @Override
+  public DataFetcher<String> timezone() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> stop.getTimeZone().toString(),
+        station -> station.getTimezone().toString()
+      );
+  }
+
+  @Override
+  public DataFetcher<Iterable<NearbyStop>> transfers() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> {
+          Integer maxDistance = new LegacyGraphQLTypes.LegacyGraphQLStopTransfersArgs(
+            environment.getArguments()
+          )
+            .getLegacyGraphQLMaxDistance();
+
+          return getRoutingService(environment)
+            .getTransfersByStop(stop)
+            .stream()
+            .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
+            .filter(transfer -> transfer.to instanceof Stop)
+            .map(transfer ->
+              new NearbyStop(
+                transfer.to,
+                transfer.getDistanceMeters(),
+                transfer.getEdges(),
+                GeometryUtils.concatenateLineStrings(
+                  transfer.getEdges().stream().map(Edge::getGeometry).collect(Collectors.toList())
+                ),
+                null
+              )
+            )
+            .collect(Collectors.toList());
+        },
+        station -> null
+      );
+  }
+
+  @Override
+  public DataFetcher<String> url() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
+        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
+      );
+  }
+
+  @Override
+  public DataFetcher<String> vehicleMode() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> {
+          if (stop.getVehicleType() != null) {
+            return stop.getVehicleType().name();
+          }
+          return getRoutingService(environment)
+            .getPatternsForStop(stop)
+            .stream()
+            .map(TripPattern::getMode)
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .map(Enum::toString)
+            .orElse(null);
+        },
+        station -> {
+          RoutingService routingService = getRoutingService(environment);
+          return station
+            .getChildStops()
+            .stream()
+            .flatMap(stop ->
+              routingService.getPatternsForStop(stop).stream().map(TripPattern::getMode)
+            )
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .map(Enum::toString)
+            .orElse(null);
+        }
+      );
+  }
+
+  // TODO
+  @Override
+  public DataFetcher<Integer> vehicleType() {
+    return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
+    return environment -> {
+      var boarding = getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
+      return LegacyGraphQLUtils.toGraphQL(boarding);
+    };
+  }
+
+  @Override
+  public DataFetcher<String> zoneId() {
+    return environment ->
+      getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
   }
 
   private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {

@@ -15,10 +15,6 @@ import org.slf4j.LoggerFactory;
 
 public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
-  public DutchFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
-    addFareRules(FareType.regular, regularFareRules);
-  }
-
   private static final long serialVersionUID = 1L;
 
   @SuppressWarnings("unused")
@@ -26,32 +22,26 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
   public static final int TRANSFER_DURATION =
     60 * 35;/* tranfers within 35 min won't require a new base fare */
-
   final Currency euros = Currency.getInstance("EUR");
 
-  /**
-   * This overridden method completely ignores the Currency object supplied by the caller.
-   * This is because the caller in the superclass assumes the input data uses only one currency.
-   * However, Dutch data contains fares in both Euros and Dutch Railways fare units, with the added complexity
-   * that these pseudo-currency units do not have sub-units in the way Euros have cents, which leads to
-   * incorrect rounding and scaling etc.  While the fare rules consulted by this fare service do have a mix of EUR
-   * and train pseudo-units, this Fare object is accumulating the monetary fare returned to the user and is known
-   * to always be in Euros. See issue #2679 for discussion.
-   */
+  public DutchFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
+    addFareRules(FareType.regular, regularFareRules);
+  }
+
   @Override
-  protected boolean populateFare(
-    Fare fare,
-    Currency currency,
-    FareType fareType,
-    List<Ride> rides,
-    Collection<FareRuleSet> fareRules
-  ) {
-    float lowestCost = getLowestCost(fareType, rides, fareRules);
-    if (lowestCost != Float.POSITIVE_INFINITY) {
-      fare.addFare(fareType, getMoney(euros, lowestCost));
-      return true;
+  public Fare getCost(Itinerary itinerary) {
+    Currency euros = Currency.getInstance("EUR");
+    // Use the usual process from the default fare service, but force the currency to Euros.
+    // The default process assumes there is only one currency per set of fare rules and looks at any old rule to
+    // guess what the currency is. This doesn't work on the Dutch data which has distances mixed in with Euros to
+    // account for distance-derived fares.
+    Fare fare = super.getCost(itinerary);
+    if (fare != null) {
+      for (Money money : fare.fare.values()) {
+        money.setCurrency(euros);
+      }
     }
-    return false;
+    return fare;
   }
 
   /* The Netherlands has an almost uniform system for electronic ticketing using a NFC-card, branded as OV-chipkaart.
@@ -91,151 +81,6 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
    *
    *     (DutchRailwaysPrice(0 + 100) - DutchRailwaysPrice(0)) + (ArrivaPrice(100 + 10) - ArrivaPrice(100))
    */
-
-  private static class UnitsFareZone {
-
-    public int units;
-    public String fareZone;
-
-    public UnitsFareZone(int units, String fareZone) {
-      this.units = units;
-      this.fareZone = fareZone;
-    }
-  }
-
-  private UnitsFareZone getUnitsByZones(
-    FeedScopedId agencyId,
-    String startZone,
-    String endZone,
-    Collection<FareRuleSet> fareRules
-  ) {
-    P2<String> od = new P2<>(startZone, endZone);
-
-    LOG.trace("Search " + startZone + " and " + endZone);
-
-    String fareIdStartsWith = agencyId.getId() + "::";
-
-    for (FareRuleSet ruleSet : fareRules) {
-      if (
-        ruleSet.getFareAttribute().getId().getId().startsWith(fareIdStartsWith) &&
-        ruleSet.getOriginDestinations().contains(od)
-      ) {
-        String fareId = ruleSet.getFareAttribute().getId().getId();
-        String[] parts = fareId.split("::");
-        String fareZone = parts[1];
-
-        LOG.trace(
-          "Between " +
-          startZone +
-          " and " +
-          endZone +
-          ": " +
-          (int) ruleSet.getFareAttribute().getPrice() +
-          " (" +
-          fareZone +
-          ")"
-        );
-        return new UnitsFareZone((int) ruleSet.getFareAttribute().getPrice(), fareZone);
-      }
-    }
-
-    LOG.warn("Can't find units between " + startZone + " and " + endZone);
-
-    /* TODO: Raise Exception */
-
-    return null;
-  }
-
-  private float getCostByUnits(
-    String fareZone,
-    int units,
-    int prevSumUnits,
-    Collection<FareRuleSet> fareRules
-  ) {
-    if (units == 0) {
-      return 0f;
-    }
-
-    /* Train-units cannot exceed 250 units; http://wiki.ovinnederland.nl/wiki/Tariefeenheid#Tarieven_NS */
-    if (units > 250) {
-      units = 250;
-    }
-
-    float cost = 0f;
-
-    String fareId = fareZone + ":" + (units + prevSumUnits);
-    for (FareRuleSet ruleSet : fareRules) {
-      if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
-        cost = ruleSet.getFareAttribute().getPrice();
-        break;
-      }
-    }
-
-    if (cost == 0f) {
-      LOG.warn("Can't find price for " + fareZone + " with " + units + " units");
-    } else if (prevSumUnits > 0) {
-      fareId = fareZone + ":" + prevSumUnits;
-      for (FareRuleSet ruleSet : fareRules) {
-        if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
-          cost -= ruleSet.getFareAttribute().getPrice();
-          return cost;
-        }
-      }
-
-      LOG.warn("Can't find price for " + fareZone + " with " + prevSumUnits + " units");
-
-      return Float.POSITIVE_INFINITY;
-    }
-
-    return cost;
-  }
-
-  private float getEasyTripFareByLineFromTo(
-    String route,
-    String firstStop,
-    String lastStop,
-    boolean entranceFee,
-    Collection<FareRuleSet> fareRules
-  ) {
-    float cost = Float.POSITIVE_INFINITY;
-
-    String fareId = route + ":" + firstStop + "-" + lastStop;
-
-    for (FareRuleSet ruleSet : fareRules) {
-      if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
-        cost = ruleSet.getFareAttribute().getPrice();
-        break;
-      }
-    }
-
-    if (cost == Float.POSITIVE_INFINITY) {
-      LOG.warn("Can't find price for " + firstStop + " to " + lastStop + " operated on " + route);
-
-      return cost;
-    }
-
-    if (entranceFee) {
-      cost += 90f;/* TODO: Configurable? */
-    }
-
-    return cost;
-  }
-
-  @Override
-  public Fare getCost(Itinerary itinerary) {
-    Currency euros = Currency.getInstance("EUR");
-    // Use the usual process from the default fare service, but force the currency to Euros.
-    // The default process assumes there is only one currency per set of fare rules and looks at any old rule to
-    // guess what the currency is. This doesn't work on the Dutch data which has distances mixed in with Euros to
-    // account for distance-derived fares.
-    Fare fare = super.getCost(itinerary);
-    if (fare != null) {
-      for (Money money : fare.fare.values()) {
-        money.setCurrency(euros);
-      }
-    }
-    return fare;
-  }
 
   @Override
   protected float getLowestCost(
@@ -372,5 +217,160 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     return cost / 100f;
+  }
+
+  /**
+   * This overridden method completely ignores the Currency object supplied by the caller. This is
+   * because the caller in the superclass assumes the input data uses only one currency. However,
+   * Dutch data contains fares in both Euros and Dutch Railways fare units, with the added
+   * complexity that these pseudo-currency units do not have sub-units in the way Euros have cents,
+   * which leads to incorrect rounding and scaling etc.  While the fare rules consulted by this fare
+   * service do have a mix of EUR and train pseudo-units, this Fare object is accumulating the
+   * monetary fare returned to the user and is known to always be in Euros. See issue #2679 for
+   * discussion.
+   */
+  @Override
+  protected boolean populateFare(
+    Fare fare,
+    Currency currency,
+    FareType fareType,
+    List<Ride> rides,
+    Collection<FareRuleSet> fareRules
+  ) {
+    float lowestCost = getLowestCost(fareType, rides, fareRules);
+    if (lowestCost != Float.POSITIVE_INFINITY) {
+      fare.addFare(fareType, getMoney(euros, lowestCost));
+      return true;
+    }
+    return false;
+  }
+
+  private UnitsFareZone getUnitsByZones(
+    FeedScopedId agencyId,
+    String startZone,
+    String endZone,
+    Collection<FareRuleSet> fareRules
+  ) {
+    P2<String> od = new P2<>(startZone, endZone);
+
+    LOG.trace("Search " + startZone + " and " + endZone);
+
+    String fareIdStartsWith = agencyId.getId() + "::";
+
+    for (FareRuleSet ruleSet : fareRules) {
+      if (
+        ruleSet.getFareAttribute().getId().getId().startsWith(fareIdStartsWith) &&
+        ruleSet.getOriginDestinations().contains(od)
+      ) {
+        String fareId = ruleSet.getFareAttribute().getId().getId();
+        String[] parts = fareId.split("::");
+        String fareZone = parts[1];
+
+        LOG.trace(
+          "Between " +
+          startZone +
+          " and " +
+          endZone +
+          ": " +
+          (int) ruleSet.getFareAttribute().getPrice() +
+          " (" +
+          fareZone +
+          ")"
+        );
+        return new UnitsFareZone((int) ruleSet.getFareAttribute().getPrice(), fareZone);
+      }
+    }
+
+    LOG.warn("Can't find units between " + startZone + " and " + endZone);
+
+    /* TODO: Raise Exception */
+
+    return null;
+  }
+
+  private float getCostByUnits(
+    String fareZone,
+    int units,
+    int prevSumUnits,
+    Collection<FareRuleSet> fareRules
+  ) {
+    if (units == 0) {
+      return 0f;
+    }
+
+    /* Train-units cannot exceed 250 units; http://wiki.ovinnederland.nl/wiki/Tariefeenheid#Tarieven_NS */
+    if (units > 250) {
+      units = 250;
+    }
+
+    float cost = 0f;
+
+    String fareId = fareZone + ":" + (units + prevSumUnits);
+    for (FareRuleSet ruleSet : fareRules) {
+      if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
+        cost = ruleSet.getFareAttribute().getPrice();
+        break;
+      }
+    }
+
+    if (cost == 0f) {
+      LOG.warn("Can't find price for " + fareZone + " with " + units + " units");
+    } else if (prevSumUnits > 0) {
+      fareId = fareZone + ":" + prevSumUnits;
+      for (FareRuleSet ruleSet : fareRules) {
+        if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
+          cost -= ruleSet.getFareAttribute().getPrice();
+          return cost;
+        }
+      }
+
+      LOG.warn("Can't find price for " + fareZone + " with " + prevSumUnits + " units");
+
+      return Float.POSITIVE_INFINITY;
+    }
+
+    return cost;
+  }
+
+  private float getEasyTripFareByLineFromTo(
+    String route,
+    String firstStop,
+    String lastStop,
+    boolean entranceFee,
+    Collection<FareRuleSet> fareRules
+  ) {
+    float cost = Float.POSITIVE_INFINITY;
+
+    String fareId = route + ":" + firstStop + "-" + lastStop;
+
+    for (FareRuleSet ruleSet : fareRules) {
+      if (ruleSet.getFareAttribute().getId().getId().equals(fareId)) {
+        cost = ruleSet.getFareAttribute().getPrice();
+        break;
+      }
+    }
+
+    if (cost == Float.POSITIVE_INFINITY) {
+      LOG.warn("Can't find price for " + firstStop + " to " + lastStop + " operated on " + route);
+
+      return cost;
+    }
+
+    if (entranceFee) {
+      cost += 90f;/* TODO: Configurable? */
+    }
+
+    return cost;
+  }
+
+  private static class UnitsFareZone {
+
+    public int units;
+    public String fareZone;
+
+    public UnitsFareZone(int units, String fareZone) {
+      this.units = units;
+      this.fareZone = fareZone;
+    }
   }
 }

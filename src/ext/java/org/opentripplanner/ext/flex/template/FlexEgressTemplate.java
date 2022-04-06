@@ -48,20 +48,6 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
     return edge.getToVertex();
   }
 
-  protected boolean isRouteable(Vertex flexVertex) {
-    if (accessEgress.state.getVertex() == flexVertex) {
-      return false;
-    } else return (
-      calculator.calculateFlexPath(
-        flexVertex,
-        accessEgress.state.getVertex(),
-        fromStopIndex,
-        toStopIndex
-      ) !=
-      null
-    );
-  }
-
   protected int[] getFlexTimes(FlexTripEdge flexEdge, State state) {
     int postFlexTime = (int) accessEgress.state.getElapsedTimeSeconds();
     int edgeTimeInSeconds = flexEdge.getTimeInSeconds();
@@ -78,6 +64,20 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
       trip,
       this,
       calculator
+    );
+  }
+
+  protected boolean isRouteable(Vertex flexVertex) {
+    if (accessEgress.state.getVertex() == flexVertex) {
+      return false;
+    } else return (
+      calculator.calculateFlexPath(
+        flexVertex,
+        accessEgress.state.getVertex(),
+        fromStopIndex,
+        toStopIndex
+      ) !=
+      null
     );
   }
 }

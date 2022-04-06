@@ -7,7 +7,6 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
  * The cost of traversing an intersection is constant.
- * @author avi
  */
 public class ConstantIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel {
 

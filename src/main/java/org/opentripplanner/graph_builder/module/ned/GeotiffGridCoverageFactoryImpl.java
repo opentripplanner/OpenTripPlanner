@@ -36,7 +36,8 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
   }
 
   /**
-   * Wraps the underlying grid coverage instance with an interpolator that can be used in a specific thread.
+   * Wraps the underlying grid coverage instance with an interpolator that can be used in a specific
+   * thread.
    */
   @Override
   public GridCoverage getGridCoverage() {
@@ -45,11 +46,25 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
     );
   }
 
+  @Override
+  public void checkInputs() {
+    if (!input.exists()) {
+      throw new RuntimeException("Can't read elevation path: " + input.path());
+    }
+  }
+
   /**
-   * Lazy-creates a GridCoverage2D instance by loading the specific elevation file into memory. During a refactor in
-   * the year 2020, the code at one point was written such that each coverage instance was created and wrapped in the
-   * Interpolator2D interpolator for each thread to use. However, benchmarking showed that this caused longer run
-   * times which is likely due to too much memory competing for a slot in the processor cache.
+   * Nothing to do here. File should already exist on computer.
+   */
+  @Override
+  public void fetchData(Graph graph) {}
+
+  /**
+   * Lazy-creates a GridCoverage2D instance by loading the specific elevation file into memory.
+   * During a refactor in the year 2020, the code at one point was written such that each coverage
+   * instance was created and wrapped in the Interpolator2D interpolator for each thread to use.
+   * However, benchmarking showed that this caused longer run times which is likely due to too much
+   * memory competing for a slot in the processor cache.
    */
   public GridCoverage2D getUninterpolatedGridCoverage() {
     if (coverage == null) {
@@ -73,17 +88,4 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
   private Object getSource() {
     return input.asInputStream();
   }
-
-  @Override
-  public void checkInputs() {
-    if (!input.exists()) {
-      throw new RuntimeException("Can't read elevation path: " + input.path());
-    }
-  }
-
-  /**
-   * Nothing to do here. File should already exist on computer.
-   */
-  @Override
-  public void fetchData(Graph graph) {}
 }

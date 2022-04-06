@@ -5,7 +5,6 @@ import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripStopTime<T extends RaptorTripSchedule> implements StopTime {
@@ -59,17 +58,8 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
   }
 
   @Override
-  public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
-      .addText("[")
-      .addNum(stop())
-      .addText(" ")
-      .addServiceTime(time())
-      .addText(" ")
-      .addObj(trip.pattern().debugInfo())
-      .addText("]")
-      .toString();
+  public int hashCode() {
+    return Objects.hash(trip, stopPosition, departure);
   }
 
   @Override
@@ -88,8 +78,17 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(trip, stopPosition, departure);
+  public String toString() {
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("[")
+      .addNum(stop())
+      .addText(" ")
+      .addServiceTime(time())
+      .addText(" ")
+      .addObj(trip.pattern().debugInfo())
+      .addText("]")
+      .toString();
   }
 
   private void assertStopPositionIsInRange(int stopPosition, T trip) {

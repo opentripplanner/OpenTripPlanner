@@ -8,11 +8,10 @@ import java.util.List;
  * Variable-length integer encoding. This optimize integer storage when most of the values are
  * small, but few of them can be quite large (as in a geometry). Adapted Dlugosz scheme to support
  * signed int whose average are around 0.
- *
+ * <p>
  * See Dlugosz' variable-length integer encoding (http://www.dlugosz.com/ZIP2/VLI.html).
  *
  * @author laurent
- *
  */
 public class DlugoszVarLenIntPacker {
 

@@ -18,12 +18,12 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
 
   private final Graph graph;
 
-  public static DigitransitStopPropertyMapper create(Graph graph) {
-    return new DigitransitStopPropertyMapper(graph);
-  }
-
   private DigitransitStopPropertyMapper(Graph graph) {
     this.graph = graph;
+  }
+
+  public static DigitransitStopPropertyMapper create(Graph graph) {
+    return new DigitransitStopPropertyMapper(graph);
   }
 
   @Override

@@ -23,27 +23,17 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final long RETRY_INTERVAL_MILLIS = 5000;
-
-  private WriteToGraphCallback saveResultOnGraph;
-
-  private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
-
   private final String url;
-
   private final String feedId;
-
-  private TransitAlertService transitAlertService;
-
   private final long earlyStart;
-
-  private SiriAlertsUpdateHandler updateHandler = null;
-
-  private String requestorRef;
-
-  private int timeout;
-
-  private int retryCount = 0;
   private final String originalRequestorRef;
+  private WriteToGraphCallback saveResultOnGraph;
+  private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
+  private TransitAlertService transitAlertService;
+  private SiriAlertsUpdateHandler updateHandler = null;
+  private String requestorRef;
+  private int timeout;
+  private int retryCount = 0;
 
   public SiriSXUpdater(SiriSXUpdaterParameters config) {
     super(config);
@@ -89,6 +79,17 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     updateHandler.setEarlyStart(earlyStart);
     updateHandler.setTransitAlertService(transitAlertService);
     updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
+  }
+
+  @Override
+  public void teardown() {}
+
+  public TransitAlertService getTransitAlertService() {
+    return transitAlertService;
+  }
+
+  public String toString() {
+    return "SiriSXUpdater (" + url + ")";
   }
 
   @Override
@@ -180,16 +181,5 @@ public class SiriSXUpdater extends PollingGraphUpdater {
       );
     }
     return null;
-  }
-
-  @Override
-  public void teardown() {}
-
-  public TransitAlertService getTransitAlertService() {
-    return transitAlertService;
-  }
-
-  public String toString() {
-    return "SiriSXUpdater (" + url + ")";
   }
 }

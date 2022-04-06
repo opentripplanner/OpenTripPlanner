@@ -10,17 +10,17 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
- * Render important information for debugging wheelchair access (street slopes and transit stop accessibility)
+ * Render important information for debugging wheelchair access (street slopes and transit stop
+ * accessibility)
  *
  * @author hannesj
  */
 public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
 
-  private final ScalarColorPalette slopePalette = new DefaultScalarColorPalette(0.0, 0.08, 1.0);
-
   private static final Color NO_WHEELCHAIR_COLOR = Color.RED;
   private static final Color YES_WHEELCHAIR_COLOR = Color.GREEN;
   private static final Color NO_WHEELCHAIR_INFORMATION_COLOR = Color.ORANGE;
+  private final ScalarColorPalette slopePalette = new DefaultScalarColorPalette(0.0, 0.08, 1.0);
 
   public WheelchairEdgeRenderer() {}
 

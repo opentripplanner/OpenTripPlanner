@@ -1,6 +1,6 @@
 package org.opentripplanner.visualizer;
 
-import java.awt.*;
+import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
@@ -57,100 +57,20 @@ import processing.core.PApplet;
 import processing.core.PFont;
 
 /**
- * Processing applet to show a map of the graph. The user can: - Use mouse wheel to zoom (or right drag, or ctrl-drag) - Left drag to pan around the
- * map - Left click to send a list of nearby vertices to the associated VertexSelectionListener.
+ * Processing applet to show a map of the graph. The user can: - Use mouse wheel to zoom (or right
+ * drag, or ctrl-drag) - Left drag to pan around the map - Left click to send a list of nearby
+ * vertices to the associated VertexSelectionListener.
  */
 public class ShowGraph extends PApplet implements MouseWheelListener {
 
-  // how many edges to draw before checking whether we need to move on to the next frame
-  private final int BLOCK_SIZE = 1000;
-  // how many edges to skip over (to ensure a sampling of edges throughout the visible area)
-  private final long DECIMATE = 40;
-  // 800 instead of 1000 msec, leaving 20% of the time for work other than drawing.
-  private final int FRAME_TIME = 800 / FRAME_RATE;
-
   private static final int FRAME_RATE = 30;
-
   private static final long serialVersionUID = -8336165356756970127L;
-
   private static final boolean VIDEO = false;
-
   private static final String VIDEO_PATH = "/home/syncopate/pathimage/";
-
-  private int videoFrameNumber = 0;
-
-  Graph graph;
-
-  STRtree vertexIndex;
-
-  STRtree edgeIndex;
-
-  Envelope modelOuterBounds;
-
-  Envelope modelBounds = new Envelope();
-
-  VertexSelectionListener selector;
-
-  private final ArrayList<VertexSelectionListener> selectors;
-
-  private List<Vertex> visibleVertices;
-
-  private final List<Edge> visibleStreetEdges = new ArrayList<>(1000);
-
-  private final List<Edge> visibleLinkEdges = new ArrayList<>(1000);
-
-  private final List<Edge> visibleTransitEdges = new ArrayList<>(1000);
-
-  private List<Vertex> highlightedVertices = new ArrayList<>(1000);
-
-  private List<Edge> highlightedEdges = new ArrayList<>(1000);
-
-  // these queues are filled by a search in another thread, so must be threadsafe
-  private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<>();
-
-  private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<>();
-
-  private Coordinate highlightedCoordinate;
-
-  private Edge highlightedEdge;
-
-  private GraphPath highlightedGraphPath;
-
-  protected double mouseModelX;
-
-  protected double mouseModelY;
-
-  private Point startDrag = null;
-
-  private int dragX, dragY;
-
-  private boolean ctrlPressed = false;
-
-  boolean drawFast = false;
-
-  boolean drawStreetEdges = true;
-
-  boolean drawTransitEdges = true;
-
-  boolean drawLinkEdges = true;
-
-  boolean drawStreetVertices = true;
-
-  boolean drawTransitStopVertices = true;
-
-  boolean drawExtraVertices = true;
-
-  private static double lastLabelY;
-
   private static final DecimalFormat latFormatter = new DecimalFormat("00.0000°N ; 00.0000°S");
-
   private static final DecimalFormat lonFormatter = new DecimalFormat("000.0000°E ; 000.0000°W");
-
-  private final SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
-
   /* Layer constants */
   static final int DRAW_MINIMAL = 0; // XY coordinates
-
   static final int DRAW_HIGHLIGHTED = 1;
   static final int DRAW_SPT = 2;
   static final int DRAW_VERTICES = 3;
@@ -159,183 +79,58 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   static final int DRAW_STREETS = 6;
   static final int DRAW_ALL = 7;
   static final int DRAW_PARTIAL = 8;
-
+  private static double lastLabelY;
+  // how many edges to draw before checking whether we need to move on to the next frame
+  private final int BLOCK_SIZE = 1000;
+  // how many edges to skip over (to ensure a sampling of edges throughout the visible area)
+  private final long DECIMATE = 40;
+  // 800 instead of 1000 msec, leaving 20% of the time for work other than drawing.
+  private final int FRAME_TIME = 800 / FRAME_RATE;
+  private final ArrayList<VertexSelectionListener> selectors;
+  private final List<Edge> visibleStreetEdges = new ArrayList<>(1000);
+  private final List<Edge> visibleLinkEdges = new ArrayList<>(1000);
+  private final List<Edge> visibleTransitEdges = new ArrayList<>(1000);
+  // these queues are filled by a search in another thread, so must be threadsafe
+  private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<>();
+  private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<>();
+  private final SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
+  private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<>();
+  private final boolean drawEdges = true;
+  private int videoFrameNumber = 0;
+  Graph graph;
+  STRtree vertexIndex;
+  STRtree edgeIndex;
+  Envelope modelOuterBounds;
+  Envelope modelBounds = new Envelope();
+  VertexSelectionListener selector;
+  private List<Vertex> visibleVertices;
+  private List<Vertex> highlightedVertices = new ArrayList<>(1000);
+  private List<Edge> highlightedEdges = new ArrayList<>(1000);
+  private Coordinate highlightedCoordinate;
+  private Edge highlightedEdge;
+  private GraphPath highlightedGraphPath;
+  protected double mouseModelX;
+  protected double mouseModelY;
+  private Point startDrag = null;
+  private int dragX, dragY;
+  private boolean ctrlPressed = false;
+  boolean drawFast = false;
+  boolean drawStreetEdges = true;
+  boolean drawTransitEdges = true;
+  boolean drawLinkEdges = true;
+  boolean drawStreetVertices = true;
+  boolean drawTransitStopVertices = true;
+  boolean drawExtraVertices = true;
   private int drawLevel = DRAW_ALL;
-
   private int drawOffset = 0;
   private boolean drawHighlighted = true;
   public SimpleSPT simpleSPT = new SimpleSPT();
-  private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<>();
-  private final boolean drawEdges = true;
   private LinkedBlockingQueue<SPTNode> sptEdgeQueue;
   private boolean sptVisible = true;
   private float sptFlattening = 0.3f;
   private float sptThickness = 0.1f;
   private boolean drawMultistateVertices = true;
   private ShortestPathTree spt;
-
-  static class Trunk {
-
-    public Edge edge;
-    public Double trunkiness;
-
-    Trunk(Edge edge, Double trunkiness) {
-      this.edge = edge;
-      this.trunkiness = trunkiness;
-    }
-  }
-
-  class SimpleSPT {
-
-    private final HashMap<State, SPTNode> nodes;
-    SPTNode root;
-
-    SimpleSPT() {
-      nodes = new HashMap<>();
-    }
-
-    public void add(State state) {
-      // create simpleSPT entry
-      SPTNode curNode = new SPTNode(state);
-      SPTNode parentNode = this.nodes.get(state.getBackState());
-      if (parentNode != null) {
-        parentNode.children.add(curNode);
-      } else {
-        root = curNode;
-      }
-      curNode.parent = parentNode;
-      this.nodes.put(state, curNode);
-    }
-
-    void setWeights() {
-      if (root == null) {
-        return;
-      }
-      root.setWeight();
-    }
-
-    public void draw() {
-      if (root == null) {
-        return;
-      }
-
-      HashMap<Vertex, Integer> vertexHeight = new HashMap<>();
-
-      root.drawRecursive(0, vertexHeight);
-    }
-
-    public LinkedBlockingQueue<SPTNode> getEdgeQueue() {
-      LinkedBlockingQueue<SPTNode> ret = new LinkedBlockingQueue<>();
-      if (root != null) {
-        root.addToEdgeQueue(ret);
-      }
-      return ret;
-    }
-  }
-
-  class SPTNode {
-
-    // this is a tool for the traverse visitor to build a very simple
-    // shortest path tree, which we can use to come up with the trunkiness
-    // of every SPT edge.
-
-    State state;
-    SPTNode parent;
-    List<SPTNode> children;
-    double weight = 0.0;
-    public Integer height;
-
-    SPTNode(State state) {
-      this.state = state;
-      this.height = null;
-      this.children = new ArrayList<>();
-    }
-
-    public void addToEdgeQueue(LinkedBlockingQueue<SPTNode> ret) {
-      ret.add(this);
-      for (SPTNode child : children) {
-        child.addToEdgeQueue(ret);
-      }
-    }
-
-    public void drawRecursive(int height, HashMap<Vertex, Integer> vertexStatesEncountered) {
-      colorMode(HSB);
-
-      // get the number of states we've already drawn from this vertex
-      Integer vertexHeight = vertexStatesEncountered.get(this.state.getVertex());
-      if (vertexHeight == null) {
-        vertexHeight = 0;
-      }
-
-      // if it's larger than the 'height' of the state we're about to draw, bump the state's visual height
-      // up to the number of states it has to climb over
-      if (vertexHeight > height) {
-        height = vertexHeight;
-      }
-
-      // increment the counter of the number of times we've encountered this vertex
-      vertexStatesEncountered.put(this.state.getVertex(), vertexHeight + 1);
-
-      if (state.getBackEdge() != null) {
-        //stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
-        stroke(color((height * 10) % 255, 255, 255));
-
-        strokeWeight((float) (sptThickness * Math.pow(weight, sptFlattening)));
-        drawEdge(state.getBackEdge());
-      }
-
-      for (SPTNode child : children) {
-        child.drawRecursive(height, vertexStatesEncountered);
-      }
-
-      colorMode(RGB);
-    }
-
-    public void draw(List<Integer> colors) {
-      colorMode(HSB);
-
-      if (state.getBackEdge() != null) {
-        //stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
-        strokeWeight((float) (sptThickness * Math.pow(weight, sptFlattening)));
-
-        stroke(colors.get(this.height));
-
-        drawEdge(state.getBackEdge());
-      }
-
-      colorMode(RGB);
-    }
-
-    private int colorRamp(int aa) {
-      int NHUES = 6;
-      int HUELEN = 256;
-      int RAMPLEN = NHUES * HUELEN;
-      int BRIGHTNESS = 220;
-
-      aa = aa % RAMPLEN; //make sure aa fits within the color ramp
-      int hueIndex = aa / HUELEN; //establish the hue
-      int hue = hueIndex * (HUELEN / NHUES); //convert that to a hue value
-      int saturation = HUELEN - aa % HUELEN;
-
-      return color(hue, saturation, BRIGHTNESS);
-    }
-
-    public void setWeight() {
-      weight = state.getWeight();
-      for (SPTNode child : children) {
-        child.setWeight();
-        weight += child.weight;
-      }
-    }
-
-    void addChild(SPTNode child) {
-      this.children.add(child);
-    }
-
-    public void setHeight(Integer height) {
-      this.height = height;
-    }
-  }
 
   /*
    * Constructor. Call processing constructor, and register the listener to notify when the user selects vertices.
@@ -404,6 +199,73 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     frameRate(FRAME_RATE);
   }
 
+  public synchronized void draw() {
+    smooth();
+    int startMillis = millis();
+    if (drawLevel == DRAW_PARTIAL) {
+      drawPartial(startMillis);
+    } else if (drawLevel == DRAW_ALL) {
+      boolean finished = drawAll(startMillis);
+      if (!finished) {
+        return;
+      }
+    } else if (drawLevel == DRAW_LINKS) {
+      boolean finished = drawLinks(startMillis);
+      if (!finished) {
+        return;
+      }
+    } else if (drawLevel == DRAW_TRANSIT) {
+      boolean finished = drawTransit(startMillis);
+      if (!finished) {
+        return;
+      }
+    } else if (drawLevel == DRAW_VERTICES) {
+      drawVertices();
+    } else if (drawLevel == DRAW_SPT) {
+      boolean finished = drawSPT();
+      if (!finished) {
+        return;
+      }
+    } else if (drawLevel == DRAW_HIGHLIGHTED) {
+      drawHighlighted();
+    } else if (drawLevel == DRAW_MINIMAL) {
+      if (!newHighlightedEdges.isEmpty()) handleNewHighlights();
+      drawNewEdges();
+      drawCoords();
+    }
+    drawOffset = 0;
+    if (drawLevel > DRAW_MINIMAL) drawLevel -= 1; // move to next layer
+  }
+
+  public void redraw() {
+    drawLevel = DRAW_ALL;
+  }
+
+  public void mouseReleased(MouseEvent e) {
+    startDrag = null;
+  }
+
+  public void mouseDragged(MouseEvent e) {
+    Point c = e.getPoint();
+    if (startDrag == null) {
+      startDrag = c;
+      dragX = c.x;
+      dragY = c.y;
+    }
+    double dx = dragX - c.x;
+    double dy = c.y - dragY;
+    if (ctrlPressed || mouseButton == RIGHT) {
+      zoom(dy * 0.01, startDrag);
+    } else {
+      double tx = modelBounds.getWidth() * dx / getWidth();
+      double ty = modelBounds.getHeight() * dy / getHeight();
+      modelBounds.translate(tx, ty);
+    }
+    dragX = c.x;
+    dragY = c.y;
+    drawLevel = DRAW_PARTIAL;
+  }
+
   /*
    * Zoom in/out proportional to the number of clicks of the mouse wheel.
    */
@@ -412,22 +274,28 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     zoom(f, e.getPoint());
   }
 
-  /*
-   * Zoom in/out. Translate the viewing window such that the place under the mouse pointer is a fixed point. If p is null, zoom around the center of
-   * the viewport.
-   */
-  void zoom(double f, Point p) {
-    double ex = modelBounds.getWidth() * f;
-    double ey = modelBounds.getHeight() * f;
-    modelBounds.expandBy(ex / 2, ey / 2);
-    if (p != null) {
-      // Note: Graphics Y coordinates increase down the screen, hence the opposite signs.
-      double tx = ex * -((p.getX() / this.width) - 0.5);
-      double ty = ey * +((p.getY() / this.height) - 0.5);
-      modelBounds.translate(tx, ty);
-    }
-    // update the display
-    drawLevel = DRAW_PARTIAL;
+  @SuppressWarnings("unchecked")
+  public void mouseClicked() {
+    Envelope screenEnv = new Envelope(new Coordinate(mouseX, mouseY));
+    screenEnv.expandBy(4, 4);
+    Envelope env = new Envelope(
+      toModelX(screenEnv.getMinX()),
+      toModelX(screenEnv.getMaxX()),
+      toModelY(screenEnv.getMinY()),
+      toModelY(screenEnv.getMaxY())
+    );
+
+    List<Vertex> nearby = (List<Vertex>) vertexIndex.query(env);
+    selector.verticesSelected(nearby);
+    drawLevel = DRAW_ALL;
+  }
+
+  public void keyPressed() {
+    if (key == CODED && keyCode == CONTROL) ctrlPressed = true;
+  }
+
+  public void keyReleased() {
+    if (key == CODED && keyCode == CONTROL) ctrlPressed = false;
   }
 
   public void zoomToDefault() {
@@ -468,15 +336,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     drawLevel = DRAW_ALL;
   }
 
-  void matchAspect() {
-    /* Basic sinusoidal projection of lat/lon data to square pixels */
-    double yCenter = modelBounds.centre().y;
-    float xScale = cos(radians((float) yCenter));
-    double newX =
-      modelBounds.getHeight() * (1 / xScale) * ((float) this.getWidth() / this.getHeight());
-    modelBounds.expandBy((newX - modelBounds.getWidth()) / 2f, 0);
-  }
-
   /*
    * Iterate through all vertices and their (outgoing) edges. If they are of 'interesting' types,
    * add them to the corresponding spatial index.
@@ -505,6 +364,190 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
     vertexIndex.build();
     edgeIndex.build();
+  }
+
+  /**
+   * Set the Vertex selector to newSelector, and store the old selector on the stack of selectors
+   */
+  public void pushSelector(VertexSelectionListener newSelector) {
+    selectors.add(selector);
+    selector = newSelector;
+  }
+
+  /**
+   * Restore the previous vertexSelector
+   */
+  public void popSelector() {
+    selector = selectors.get(selectors.size() - 1);
+    selectors.remove(selectors.size() - 1);
+  }
+
+  public void highlightCoordinate(Coordinate c) {
+    double xd = 0, yd = 0;
+    while (!modelBounds.contains(c)) {
+      xd = modelBounds.getWidth() / 100;
+      yd = modelBounds.getHeight() / 100;
+      modelBounds.expandBy(xd, yd);
+    }
+    modelBounds.expandBy(xd, yd);
+    highlightedCoordinate = c;
+    drawLevel = DRAW_ALL;
+  }
+
+  public void highlightVertex(Vertex v) {
+    highlightCoordinate(v.getCoordinate());
+  }
+
+  public void enqueueHighlightedEdge(Edge de) {
+    newHighlightedEdges.add(de);
+  }
+
+  public void clearHighlights() {
+    highlightedEdges.clear();
+    highlightedVertices.clear();
+    drawLevel = DRAW_ALL;
+  }
+
+  public void highlightEdge(Edge selected) {
+    highlightedEdge = selected;
+    drawLevel = DRAW_ALL;
+  }
+
+  public void highlightGraphPath(GraphPath gp) {
+    highlightedGraphPath = gp;
+    // drawLevel = DRAW_ALL;
+    drawLevel = DRAW_TRANSIT; // leave streets in grey
+  }
+
+  public void setHighlightedVertices(Set<Vertex> vertices) {
+    highlightedVertices = new ArrayList<>(vertices);
+    drawLevel = DRAW_ALL;
+  }
+
+  public void setHighlightedVertices(List<Vertex> vertices) {
+    highlightedVertices = vertices;
+    drawLevel = DRAW_ALL;
+  }
+
+  public void setHighlightedEdges(List<Edge> edges) {
+    highlightedEdges = edges;
+    drawLevel = DRAW_ALL;
+  }
+
+  public void drawIssue(DataImportIssue anno) {
+    Envelope env = new Envelope();
+
+    Edge e = anno.getReferencedEdge();
+    if (e != null) {
+      this.enqueueHighlightedEdge(e);
+      env.expandToInclude(e.getFromVertex().getCoordinate());
+      env.expandToInclude(e.getToVertex().getCoordinate());
+    }
+
+    ArrayList<Vertex> vertices = new ArrayList<>();
+    Vertex v = anno.getReferencedVertex();
+    if (v != null) {
+      env.expandToInclude(v.getCoordinate());
+      vertices.add(v);
+    }
+
+    if (e == null && v == null) return;
+
+    // make it a little bigger, especially needed for STOP_UNLINKED
+    env.expandBy(0.02);
+
+    // highlight relevant things
+    this.clearHighlights();
+    this.setHighlightedVertices(vertices);
+
+    // zoom the graph display
+    this.zoomToEnvelope(env);
+
+    // and draw
+    this.draw();
+  }
+
+  public void setShowTransit(boolean selected) {
+    drawTransitEdges = selected;
+    drawTransitStopVertices = selected;
+  }
+
+  public void setShowStreets(boolean selected) {
+    drawStreetEdges = selected;
+    drawStreetVertices = selected;
+  }
+
+  public void setShowHightlights(boolean selected) {
+    drawHighlighted = selected;
+  }
+
+  public void addNewSPTEdge(State state) {
+    this.newSPTEdges.add(state);
+    this.simpleSPT.add(state);
+  }
+
+  public void resetSPT() {
+    this.simpleSPT = new SimpleSPT();
+  }
+
+  public void setShowSPT(boolean selected) {
+    sptVisible = selected;
+  }
+
+  public void setSPTFlattening(float sptFlattening) {
+    this.sptFlattening = sptFlattening;
+  }
+
+  public void setSPTThickness(float sptThickness) {
+    this.sptThickness = sptThickness;
+  }
+
+  public void setShowMultistateVertices(boolean selected) {
+    this.drawMultistateVertices = selected;
+  }
+
+  public void setSPT(ShortestPathTree spt) {
+    this.spt = spt;
+  }
+
+  /*
+   * Zoom in/out. Translate the viewing window such that the place under the mouse pointer is a fixed point. If p is null, zoom around the center of
+   * the viewport.
+   */
+  void zoom(double f, Point p) {
+    double ex = modelBounds.getWidth() * f;
+    double ey = modelBounds.getHeight() * f;
+    modelBounds.expandBy(ex / 2, ey / 2);
+    if (p != null) {
+      // Note: Graphics Y coordinates increase down the screen, hence the opposite signs.
+      double tx = ex * -((p.getX() / this.width) - 0.5);
+      double ty = ey * +((p.getY() / this.height) - 0.5);
+      modelBounds.translate(tx, ty);
+    }
+    // update the display
+    drawLevel = DRAW_PARTIAL;
+  }
+
+  void matchAspect() {
+    /* Basic sinusoidal projection of lat/lon data to square pixels */
+    double yCenter = modelBounds.centre().y;
+    float xScale = cos(radians((float) yCenter));
+    double newX =
+      modelBounds.getHeight() * (1 / xScale) * ((float) this.getWidth() / this.getHeight());
+    modelBounds.expandBy((newX - modelBounds.getWidth()) / 2f, 0);
+  }
+
+  private static LineString getOrCreateGeometry(Edge edge) {
+    var edgeGeometry = edge.getGeometry();
+    if (edgeGeometry != null) {
+      return edgeGeometry;
+    }
+
+    Coordinate[] coordinates = new Coordinate[] {
+      edge.getFromVertex().getCoordinate(),
+      edge.getToVertex().getCoordinate(),
+    };
+    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
   }
 
   @SuppressWarnings("unchecked")
@@ -632,44 +675,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
   private void drawVertex(Vertex v, double r) {
     drawCoordinate(v.getCoordinate(), r);
-  }
-
-  public synchronized void draw() {
-    smooth();
-    int startMillis = millis();
-    if (drawLevel == DRAW_PARTIAL) {
-      drawPartial(startMillis);
-    } else if (drawLevel == DRAW_ALL) {
-      boolean finished = drawAll(startMillis);
-      if (!finished) {
-        return;
-      }
-    } else if (drawLevel == DRAW_LINKS) {
-      boolean finished = drawLinks(startMillis);
-      if (!finished) {
-        return;
-      }
-    } else if (drawLevel == DRAW_TRANSIT) {
-      boolean finished = drawTransit(startMillis);
-      if (!finished) {
-        return;
-      }
-    } else if (drawLevel == DRAW_VERTICES) {
-      drawVertices();
-    } else if (drawLevel == DRAW_SPT) {
-      boolean finished = drawSPT();
-      if (!finished) {
-        return;
-      }
-    } else if (drawLevel == DRAW_HIGHLIGHTED) {
-      drawHighlighted();
-    } else if (drawLevel == DRAW_MINIMAL) {
-      if (!newHighlightedEdges.isEmpty()) handleNewHighlights();
-      drawNewEdges();
-      drawCoords();
-    }
-    drawOffset = 0;
-    if (drawLevel > DRAW_MINIMAL) drawLevel -= 1; // move to next layer
   }
 
   private boolean drawSPT() {
@@ -997,55 +1002,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     );
   }
 
-  public void keyPressed() {
-    if (key == CODED && keyCode == CONTROL) ctrlPressed = true;
-  }
-
-  public void keyReleased() {
-    if (key == CODED && keyCode == CONTROL) ctrlPressed = false;
-  }
-
-  @SuppressWarnings("unchecked")
-  public void mouseClicked() {
-    Envelope screenEnv = new Envelope(new Coordinate(mouseX, mouseY));
-    screenEnv.expandBy(4, 4);
-    Envelope env = new Envelope(
-      toModelX(screenEnv.getMinX()),
-      toModelX(screenEnv.getMaxX()),
-      toModelY(screenEnv.getMinY()),
-      toModelY(screenEnv.getMaxY())
-    );
-
-    List<Vertex> nearby = (List<Vertex>) vertexIndex.query(env);
-    selector.verticesSelected(nearby);
-    drawLevel = DRAW_ALL;
-  }
-
-  public void mouseReleased(MouseEvent e) {
-    startDrag = null;
-  }
-
-  public void mouseDragged(MouseEvent e) {
-    Point c = e.getPoint();
-    if (startDrag == null) {
-      startDrag = c;
-      dragX = c.x;
-      dragY = c.y;
-    }
-    double dx = dragX - c.x;
-    double dy = c.y - dragY;
-    if (ctrlPressed || mouseButton == RIGHT) {
-      zoom(dy * 0.01, startDrag);
-    } else {
-      double tx = modelBounds.getWidth() * dx / getWidth();
-      double ty = modelBounds.getHeight() * dy / getHeight();
-      modelBounds.translate(tx, ty);
-    }
-    dragX = c.x;
-    dragY = c.y;
-    drawLevel = DRAW_PARTIAL;
-  }
-
   private double toModelY(double y) {
     return map(
       (float) y,
@@ -1067,177 +1023,173 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   }
 
   /**
-   * A version of ellipse that takes double args, because apparently Java is too stupid to downgrade automatically.
-   *
-   * @param d
-   * @param e
-   * @param f
-   * @param g
+   * A version of ellipse that takes double args, because apparently Java is too stupid to downgrade
+   * automatically.
    */
   private void ellipse(double d, double e, double f, double g) {
     ellipse((float) d, (float) e, (float) f, (float) g);
   }
 
-  /**
-   * Set the Vertex selector to newSelector, and store the old selector on the stack of selectors
-   *
-   * @param newSelector
-   */
-  public void pushSelector(VertexSelectionListener newSelector) {
-    selectors.add(selector);
-    selector = newSelector;
-  }
+  static class Trunk {
 
-  /**
-   * Restore the previous vertexSelector
-   */
-  public void popSelector() {
-    selector = selectors.get(selectors.size() - 1);
-    selectors.remove(selectors.size() - 1);
-  }
+    public Edge edge;
+    public Double trunkiness;
 
-  public void highlightCoordinate(Coordinate c) {
-    double xd = 0, yd = 0;
-    while (!modelBounds.contains(c)) {
-      xd = modelBounds.getWidth() / 100;
-      yd = modelBounds.getHeight() / 100;
-      modelBounds.expandBy(xd, yd);
+    Trunk(Edge edge, Double trunkiness) {
+      this.edge = edge;
+      this.trunkiness = trunkiness;
     }
-    modelBounds.expandBy(xd, yd);
-    highlightedCoordinate = c;
-    drawLevel = DRAW_ALL;
   }
 
-  public void highlightVertex(Vertex v) {
-    highlightCoordinate(v.getCoordinate());
-  }
+  class SimpleSPT {
 
-  public void enqueueHighlightedEdge(Edge de) {
-    newHighlightedEdges.add(de);
-  }
+    private final HashMap<State, SPTNode> nodes;
+    SPTNode root;
 
-  public void clearHighlights() {
-    highlightedEdges.clear();
-    highlightedVertices.clear();
-    drawLevel = DRAW_ALL;
-  }
-
-  public void highlightEdge(Edge selected) {
-    highlightedEdge = selected;
-    drawLevel = DRAW_ALL;
-  }
-
-  public void highlightGraphPath(GraphPath gp) {
-    highlightedGraphPath = gp;
-    // drawLevel = DRAW_ALL;
-    drawLevel = DRAW_TRANSIT; // leave streets in grey
-  }
-
-  public void setHighlightedVertices(Set<Vertex> vertices) {
-    highlightedVertices = new ArrayList<>(vertices);
-    drawLevel = DRAW_ALL;
-  }
-
-  public void setHighlightedVertices(List<Vertex> vertices) {
-    highlightedVertices = vertices;
-    drawLevel = DRAW_ALL;
-  }
-
-  public void setHighlightedEdges(List<Edge> edges) {
-    highlightedEdges = edges;
-    drawLevel = DRAW_ALL;
-  }
-
-  public void drawIssue(DataImportIssue anno) {
-    Envelope env = new Envelope();
-
-    Edge e = anno.getReferencedEdge();
-    if (e != null) {
-      this.enqueueHighlightedEdge(e);
-      env.expandToInclude(e.getFromVertex().getCoordinate());
-      env.expandToInclude(e.getToVertex().getCoordinate());
+    SimpleSPT() {
+      nodes = new HashMap<>();
     }
 
-    ArrayList<Vertex> vertices = new ArrayList<>();
-    Vertex v = anno.getReferencedVertex();
-    if (v != null) {
-      env.expandToInclude(v.getCoordinate());
-      vertices.add(v);
+    public void add(State state) {
+      // create simpleSPT entry
+      SPTNode curNode = new SPTNode(state);
+      SPTNode parentNode = this.nodes.get(state.getBackState());
+      if (parentNode != null) {
+        parentNode.children.add(curNode);
+      } else {
+        root = curNode;
+      }
+      curNode.parent = parentNode;
+      this.nodes.put(state, curNode);
     }
 
-    if (e == null && v == null) return;
+    public void draw() {
+      if (root == null) {
+        return;
+      }
 
-    // make it a little bigger, especially needed for STOP_UNLINKED
-    env.expandBy(0.02);
+      HashMap<Vertex, Integer> vertexHeight = new HashMap<>();
 
-    // highlight relevant things
-    this.clearHighlights();
-    this.setHighlightedVertices(vertices);
-
-    // zoom the graph display
-    this.zoomToEnvelope(env);
-
-    // and draw
-    this.draw();
-  }
-
-  public void setShowTransit(boolean selected) {
-    drawTransitEdges = selected;
-    drawTransitStopVertices = selected;
-  }
-
-  public void setShowStreets(boolean selected) {
-    drawStreetEdges = selected;
-    drawStreetVertices = selected;
-  }
-
-  public void setShowHightlights(boolean selected) {
-    drawHighlighted = selected;
-  }
-
-  public void redraw() {
-    drawLevel = DRAW_ALL;
-  }
-
-  public void addNewSPTEdge(State state) {
-    this.newSPTEdges.add(state);
-    this.simpleSPT.add(state);
-  }
-
-  public void resetSPT() {
-    this.simpleSPT = new SimpleSPT();
-  }
-
-  public void setShowSPT(boolean selected) {
-    sptVisible = selected;
-  }
-
-  public void setSPTFlattening(float sptFlattening) {
-    this.sptFlattening = sptFlattening;
-  }
-
-  public void setSPTThickness(float sptThickness) {
-    this.sptThickness = sptThickness;
-  }
-
-  public void setShowMultistateVertices(boolean selected) {
-    this.drawMultistateVertices = selected;
-  }
-
-  public void setSPT(ShortestPathTree spt) {
-    this.spt = spt;
-  }
-
-  private static LineString getOrCreateGeometry(Edge edge) {
-    var edgeGeometry = edge.getGeometry();
-    if (edgeGeometry != null) {
-      return edgeGeometry;
+      root.drawRecursive(0, vertexHeight);
     }
 
-    Coordinate[] coordinates = new Coordinate[] {
-      edge.getFromVertex().getCoordinate(),
-      edge.getToVertex().getCoordinate(),
-    };
-    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    public LinkedBlockingQueue<SPTNode> getEdgeQueue() {
+      LinkedBlockingQueue<SPTNode> ret = new LinkedBlockingQueue<>();
+      if (root != null) {
+        root.addToEdgeQueue(ret);
+      }
+      return ret;
+    }
+
+    void setWeights() {
+      if (root == null) {
+        return;
+      }
+      root.setWeight();
+    }
+  }
+
+  class SPTNode {
+
+    // this is a tool for the traverse visitor to build a very simple
+    // shortest path tree, which we can use to come up with the trunkiness
+    // of every SPT edge.
+
+    State state;
+    SPTNode parent;
+    List<SPTNode> children;
+    double weight = 0.0;
+    public Integer height;
+
+    SPTNode(State state) {
+      this.state = state;
+      this.height = null;
+      this.children = new ArrayList<>();
+    }
+
+    public void addToEdgeQueue(LinkedBlockingQueue<SPTNode> ret) {
+      ret.add(this);
+      for (SPTNode child : children) {
+        child.addToEdgeQueue(ret);
+      }
+    }
+
+    public void drawRecursive(int height, HashMap<Vertex, Integer> vertexStatesEncountered) {
+      colorMode(HSB);
+
+      // get the number of states we've already drawn from this vertex
+      Integer vertexHeight = vertexStatesEncountered.get(this.state.getVertex());
+      if (vertexHeight == null) {
+        vertexHeight = 0;
+      }
+
+      // if it's larger than the 'height' of the state we're about to draw, bump the state's visual height
+      // up to the number of states it has to climb over
+      if (vertexHeight > height) {
+        height = vertexHeight;
+      }
+
+      // increment the counter of the number of times we've encountered this vertex
+      vertexStatesEncountered.put(this.state.getVertex(), vertexHeight + 1);
+
+      if (state.getBackEdge() != null) {
+        //stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
+        stroke(color((height * 10) % 255, 255, 255));
+
+        strokeWeight((float) (sptThickness * Math.pow(weight, sptFlattening)));
+        drawEdge(state.getBackEdge());
+      }
+
+      for (SPTNode child : children) {
+        child.drawRecursive(height, vertexStatesEncountered);
+      }
+
+      colorMode(RGB);
+    }
+
+    public void draw(List<Integer> colors) {
+      colorMode(HSB);
+
+      if (state.getBackEdge() != null) {
+        //stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
+        strokeWeight((float) (sptThickness * Math.pow(weight, sptFlattening)));
+
+        stroke(colors.get(this.height));
+
+        drawEdge(state.getBackEdge());
+      }
+
+      colorMode(RGB);
+    }
+
+    public void setWeight() {
+      weight = state.getWeight();
+      for (SPTNode child : children) {
+        child.setWeight();
+        weight += child.weight;
+      }
+    }
+
+    public void setHeight(Integer height) {
+      this.height = height;
+    }
+
+    void addChild(SPTNode child) {
+      this.children.add(child);
+    }
+
+    private int colorRamp(int aa) {
+      int NHUES = 6;
+      int HUELEN = 256;
+      int RAMPLEN = NHUES * HUELEN;
+      int BRIGHTNESS = 220;
+
+      aa = aa % RAMPLEN; //make sure aa fits within the color ramp
+      int hueIndex = aa / HUELEN; //establish the hue
+      int hue = hueIndex * (HUELEN / NHUES); //convert that to a hue value
+      int saturation = HUELEN - aa % HUELEN;
+
+      return color(hue, saturation, BRIGHTNESS);
+    }
   }
 }

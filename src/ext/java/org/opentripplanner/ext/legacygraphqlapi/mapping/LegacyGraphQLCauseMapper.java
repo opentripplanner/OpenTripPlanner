@@ -8,8 +8,8 @@ import org.opentripplanner.routing.alertpatch.AlertCause;
 public class LegacyGraphQLCauseMapper {
 
   /**
-   * Returns LegacyGraphQL API string counter part for internal {@link AlertCause} enum. Defaults
-   * to returning UNKNOWN_CAUSE.
+   * Returns LegacyGraphQL API string counter part for internal {@link AlertCause} enum. Defaults to
+   * returning UNKNOWN_CAUSE.
    */
   public static String getLegacyGraphQLCause(AlertCause cause) {
     if (cause == null) {

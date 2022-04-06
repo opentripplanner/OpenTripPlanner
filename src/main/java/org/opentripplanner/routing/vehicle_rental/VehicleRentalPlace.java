@@ -7,8 +7,8 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.util.I18NString;
 
 /**
- * Represents a place where a rental vehicle can be rented from, or dropped off at.
- * Currently, there are two implementing classes, VehicleRentalStation which represents a physical station, and
+ * Represents a place where a rental vehicle can be rented from, or dropped off at. Currently, there
+ * are two implementing classes, VehicleRentalStation which represents a physical station, and
  * VehicleRentalVehicle, which represents a free floating vehicle, which is not bound to a station.
  */
 public interface VehicleRentalPlace {
@@ -31,10 +31,13 @@ public interface VehicleRentalPlace {
   /** How many vehicles are currently available for rental at the station */
   int getVehiclesAvailable();
 
-  /** How many parking spaces are currently available for dropping off a vehicle at the station, 0 for floating vehicles */
+  /**
+   * How many parking spaces are currently available for dropping off a vehicle at the station, 0
+   * for floating vehicles
+   */
   int getSpacesAvailable();
 
-  /** Number of total docking points installed at this station, both available and unavailable.  */
+  /** Number of total docking points installed at this station, both available and unavailable. */
   Integer getCapacity();
 
   /** Does the place allow dropping off vehicles */
@@ -68,8 +71,9 @@ public interface VehicleRentalPlace {
   boolean isKeepingVehicleRentalAtDestinationAllowed();
 
   /**
-   * Whether this station has real-time data available currently. If no real-time data, users should take
-   * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two.
+   * Whether this station has real-time data available currently. If no real-time data, users should
+   * take bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity
+   * divided by two.
    */
   boolean isRealTimeData();
 

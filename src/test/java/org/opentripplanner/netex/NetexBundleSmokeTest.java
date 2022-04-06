@@ -37,18 +37,17 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
 /**
- * Load a small NeTEx file set without failing. This is just a smoke test
- * and should be excluded from line coverage. The focus of this test is
- * to test that the different parts of the NeTEx works together.
+ * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded
+ * from line coverage. The focus of this test is to test that the different parts of the NeTEx works
+ * together.
  */
 public class NetexBundleSmokeTest {
 
   /**
-   * This test load a very simple Netex data set and do assertions on it.
-   * For each type we assert some of the most important fields for one element
-   * and then check the expected number of that type. This is not a replacement
-   * for unit tests on mappers. Try to focus on relation between entities and Netex
-   * import integration.
+   * This test load a very simple Netex data set and do assertions on it. For each type we assert
+   * some of the most important fields for one element and then check the expected number of that
+   * type. This is not a replacement for unit tests on mappers. Try to focus on relation between
+   * entities and Netex import integration.
    */
   @Test
   public void smokeTestOfNetexLoadData() {
@@ -82,6 +81,18 @@ public class NetexBundleSmokeTest {
   }
 
   /* private methods */
+
+  private static <T> List<T> list(Collection<T> collection) {
+    return new ArrayList<>(collection);
+  }
+
+  private static StopTimeKey stId(String id, int stopSequenceNr) {
+    return new StopTimeKey(fId(id), stopSequenceNr);
+  }
+
+  private static FeedScopedId fId(String id) {
+    return new FeedScopedId("RB", id);
+  }
 
   private void assertAgencies(Collection<Agency> agencies) {
     assertEquals(1, agencies.size());
@@ -255,17 +266,5 @@ public class NetexBundleSmokeTest {
     );
     assertEquals(2, cal.getServiceIds().size());
     assertEquals(1, cal.getAgencyIds().size());
-  }
-
-  private static <T> List<T> list(Collection<T> collection) {
-    return new ArrayList<>(collection);
-  }
-
-  private static StopTimeKey stId(String id, int stopSequenceNr) {
-    return new StopTimeKey(fId(id), stopSequenceNr);
-  }
-
-  private static FeedScopedId fId(String id) {
-    return new FeedScopedId("RB", id);
   }
 }

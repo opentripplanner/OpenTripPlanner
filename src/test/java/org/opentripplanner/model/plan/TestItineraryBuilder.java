@@ -41,17 +41,16 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public static final Route RAIL_ROUTE = route(TransitMode.RAIL);
 
   /**
-   * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup
-   * the pattern or trip in the unit tests using this, so the index is fiction. Some of the
-   * Itinerary filters rely on it to make sure to trips overlap.
+   * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup the
+   * pattern or trip in the unit tests using this, so the index is fiction. Some of the Itinerary
+   * filters rely on it to make sure to trips overlap.
    */
   private static final int TRIP_FROM_STOP_INDEX = 5;
   private static final int TRIP_TO_STOP_INDEX = 7;
-
+  private final List<Leg> legs = new ArrayList<>();
   private Place lastPlace;
   private int lastEndTime;
   private int cost = 0;
-  private final List<Leg> legs = new ArrayList<>();
 
   private TestItineraryBuilder(Place origin, int startTime) {
     this.lastPlace = origin;
@@ -73,7 +72,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   /**
+   * The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
+   * library; Hence this method is already changed. To convert into the legacy Calendar use {@link
+   * GregorianCalendar#from(ZonedDateTime)} method.
+   */
+  public static ZonedDateTime newTime(int seconds) {
+    return TimeUtils.zonedDateTime(SERVICE_DAY, seconds, UTC);
+  }
+
+  /**
    * Add a walking leg to the itinerary
+   *
    * @param duration number of seconds to walk
    */
   public TestItineraryBuilder walk(int duration, Place to) {
@@ -165,16 +174,25 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return itinerary;
   }
 
-  /**
-   * The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
-   * library; Hence this method is already changed. To convert into the legacy Calendar use
-   * {@link GregorianCalendar#from(ZonedDateTime)} method.
-   */
-  public static ZonedDateTime newTime(int seconds) {
-    return TimeUtils.zonedDateTime(SERVICE_DAY, seconds, UTC);
+  /* private methods */
+
+  /** Create a dummy trip */
+  private static Trip trip(int id, Route route) {
+    Trip trip = new Trip(new FeedScopedId(FEED_ID, Integer.toString(id)));
+    trip.setRoute(route);
+    return trip;
   }
 
-  /* private methods */
+  /** Create a dummy route */
+  private static Route route(TransitMode mode) {
+    Route route = new Route(new FeedScopedId(FEED_ID, mode.name()));
+    route.setMode(mode);
+    return route;
+  }
+
+  private static Place stop(Place source) {
+    return Place.forStop(source.stop);
+  }
 
   private TestItineraryBuilder transit(
     Route route,
@@ -294,23 +312,5 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   private int lastEndTime(int fallbackTime) {
     return lastEndTime == NOT_SET ? fallbackTime : lastEndTime;
-  }
-
-  /** Create a dummy trip */
-  private static Trip trip(int id, Route route) {
-    Trip trip = new Trip(new FeedScopedId(FEED_ID, Integer.toString(id)));
-    trip.setRoute(route);
-    return trip;
-  }
-
-  /** Create a dummy route */
-  private static Route route(TransitMode mode) {
-    Route route = new Route(new FeedScopedId(FEED_ID, mode.name()));
-    route.setMode(mode);
-    return route;
-  }
-
-  private static Place stop(Place source) {
-    return Place.forStop(source.stop);
   }
 }

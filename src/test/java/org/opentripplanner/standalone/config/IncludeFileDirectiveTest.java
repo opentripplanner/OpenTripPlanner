@@ -16,6 +16,12 @@ class IncludeFileDirectiveTest {
   private static final File CONFIG_DIR = new File(".");
   private static final File PART_FILE = new File(CONFIG_DIR, PART_FILE_NAME);
 
+  @AfterAll
+  static void teardown() {
+    //noinspection ResultOfMethodCallIgnored
+    PART_FILE.delete();
+  }
+
   @Test
   void includeFileWithoutQuotes() throws IOException {
     savePartialFile(quote("value"));
@@ -55,11 +61,5 @@ class IncludeFileDirectiveTest {
 
   private static void savePartialFile(String text) throws IOException {
     FileUtils.write(PART_FILE, text, UTF_8);
-  }
-
-  @AfterAll
-  static void teardown() {
-    //noinspection ResultOfMethodCallIgnored
-    PART_FILE.delete();
   }
 }

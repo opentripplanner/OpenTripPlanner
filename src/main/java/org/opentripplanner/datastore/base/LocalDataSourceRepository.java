@@ -40,7 +40,7 @@ public interface LocalDataSourceRepository extends DataSourceRepository {
    * The source may or may not {@link DataSource#exists()}.
    *
    * @param localFilename the short name including extension like: {@code gtfs.zip}.
-   * @param type the file type to load.
+   * @param type          the file type to load.
    * @return the datasource wrapper that can be used to access the data source.
    */
   CompositeDataSource findCompositeSource(String localFilename, @NotNull FileType type);

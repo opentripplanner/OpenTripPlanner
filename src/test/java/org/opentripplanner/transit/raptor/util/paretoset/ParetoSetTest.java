@@ -389,9 +389,8 @@ public class ParetoSetTest {
   }
 
   /**
-   * Test that both #add and #qualify return the same value - true.
-   * The set should contain the vector, but that is left to the
-   * caller to verify.
+   * Test that both #add and #qualify return the same value - true. The set should contain the
+   * vector, but that is left to the caller to verify.
    */
   private static void addOk(ParetoSet<Vector> set, Vector v) {
     assertTrue(set.qualify(v));
@@ -399,24 +398,12 @@ public class ParetoSetTest {
   }
 
   /**
-   * Test that both #add and #qualify return the same value - false.
-   * The set should not contain the vector, but that is left to the
-   * caller to verify.
+   * Test that both #add and #qualify return the same value - false. The set should not contain the
+   * vector, but that is left to the caller to verify.
    */
   private static void addRejected(ParetoSet<Vector> set, Vector v) {
     assertFalse(set.qualify(v));
     assertFalse(set.add(v));
-  }
-
-  private void test(ParetoSet<Vector> set, String expected, Vector... vectorsToAdd) {
-    set.clear();
-    for (Vector v : vectorsToAdd) {
-      // Copy vector to avoid any identity pitfalls
-      Vector vector = new Vector(v);
-      boolean qualify = set.qualify(vector);
-      assertEquals("Qualify and add should return the same value.", qualify, set.add(vector));
-    }
-    assertEquals(expected, names(set));
   }
 
   private static String names(Iterable<Vector> set) {
@@ -459,6 +446,17 @@ public class ParetoSetTest {
     Vector... expected
   ) {
     new TestCase(v0, v1, description, expected).run(set);
+  }
+
+  private void test(ParetoSet<Vector> set, String expected, Vector... vectorsToAdd) {
+    set.clear();
+    for (Vector v : vectorsToAdd) {
+      // Copy vector to avoid any identity pitfalls
+      Vector vector = new Vector(v);
+      boolean qualify = set.qualify(vector);
+      assertEquals("Qualify and add should return the same value.", qualify, set.add(vector));
+    }
+    assertEquals(expected, names(set));
   }
 
   static class TestCase {

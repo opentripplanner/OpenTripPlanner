@@ -33,8 +33,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 /**
- * The search context is used to hold search scoped instances and to pass these
- * to who ever need them.
+ * The search context is used to hold search scoped instances and to pass these to who ever need
+ * them.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -127,17 +127,17 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create new slack-provider for use in Raptor, handles reverse and forward
-   * search as well as including transfer-slack into board-slack between transits.
+   * Create new slack-provider for use in Raptor, handles reverse and forward search as well as
+   * including transfer-slack into board-slack between transits.
    */
   public SlackProvider slackProvider() {
     return createSlackProvider(request, lifeCycle());
   }
 
   /**
-   * The board-slack (duration time in seconds) to add to the stop arrival time,
-   * before boarding the given trip pattern. THIS DO NOT INCLUDE THE transfer-slack,
-   * and should only be used to time-shift the access-path.
+   * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding the
+   * given trip pattern. THIS DO NOT INCLUDE THE transfer-slack, and should only be used to
+   * time-shift the access-path.
    * <p>
    * Unit: seconds.
    */
@@ -196,6 +196,43 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   /* private methods */
+
+  public RaptorStopNameResolver stopNameResolver() {
+    return transit.stopNameResolver();
+  }
+
+  /**
+   * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
+   * Standard and BestTime states do not. To get a deterministic behaviour we filter the paths and
+   * return the paths with the shortest duration for none multi-criteria search. If two paths have
+   * the same duration the first one is picked. Note! If the access/egress paths contains flex as
+   * well, then we need to look at mode for arriving at tha stop as well. A Flex arrive-on-board can
+   * be used with a transfer even if the time is worse compared with walking.
+   * <p>
+   * This method is static and package local to enable unit-testing.
+   */
+  static Collection<RaptorTransfer> accessOrEgressPaths(
+    boolean getAccess,
+    RaptorProfile profile,
+    SearchParams searchParams
+  ) {
+    var paths = getAccess ? searchParams.accessPaths() : searchParams.egressPaths();
+
+    if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
+      return paths;
+    }
+
+    // For none MC-search we only want the fastest transfer for each stop,
+    // no duplicates are accepted
+    Map<Integer, RaptorTransfer> bestTimePaths = new HashMap<>();
+    for (RaptorTransfer it : paths) {
+      RaptorTransfer existing = bestTimePaths.get(it.stop());
+      if (existing == null || it.durationInSeconds() < existing.durationInSeconds()) {
+        bestTimePaths.put(it.stop(), it);
+      }
+    }
+    return List.copyOf(bestTimePaths.values());
+  }
 
   /**
    * Create a new calculator depending on the desired search direction.
@@ -259,10 +296,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
       );
   }
 
-  public RaptorStopNameResolver stopNameResolver() {
-    return transit.stopNameResolver();
-  }
-
   private static AccessPaths accessPaths(RaptorRequest<?> request) {
     boolean forward = request.searchDirection().isForward();
     var params = request.searchParams();
@@ -275,39 +308,5 @@ public class SearchContext<T extends RaptorTripSchedule> {
     var params = request.searchParams();
     var paths = forward ? params.egressPaths() : params.accessPaths();
     return EgressPaths.create(paths, request.profile());
-  }
-
-  /**
-   * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
-   * Standard and BestTime states do not. To get a deterministic behaviour we filter the paths
-   * and return the paths with the shortest duration for none multi-criteria search. If two
-   * paths have the same duration the first one is picked. Note! If the access/egress paths
-   * contains flex as well, then we need to look at mode for arriving at tha stop as well.
-   * A Flex arrive-on-board can be used with a transfer even if the time is worse compared with
-   * walking.
-   * <p>
-   * This method is static and package local to enable unit-testing.
-   */
-  static Collection<RaptorTransfer> accessOrEgressPaths(
-    boolean getAccess,
-    RaptorProfile profile,
-    SearchParams searchParams
-  ) {
-    var paths = getAccess ? searchParams.accessPaths() : searchParams.egressPaths();
-
-    if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
-      return paths;
-    }
-
-    // For none MC-search we only want the fastest transfer for each stop,
-    // no duplicates are accepted
-    Map<Integer, RaptorTransfer> bestTimePaths = new HashMap<>();
-    for (RaptorTransfer it : paths) {
-      RaptorTransfer existing = bestTimePaths.get(it.stop());
-      if (existing == null || it.durationInSeconds() < existing.durationInSeconds()) {
-        bestTimePaths.put(it.stop(), it);
-      }
-    }
-    return List.copyOf(bestTimePaths.values());
   }
 }

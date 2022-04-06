@@ -17,6 +17,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
   private final RaptorRequestBuilder<T> parent;
+  private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
+  private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
   // Search
   private int earliestDepartureTime;
   private int latestArrivalTime;
@@ -27,8 +29,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private double relaxCostAtDestination;
   private boolean timetableEnabled;
   private boolean constrainedTransfersEnabled;
-  private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
-  private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
     this.parent = parent;
@@ -79,8 +79,8 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Do one RangeRaptor iteration. This disable the dynamic resolved search-window
-   * Alias for calling {@code searchWindow(Duration.ZERO)}.
+   * Do one RangeRaptor iteration. This disable the dynamic resolved search-window Alias for calling
+   * {@code searchWindow(Duration.ZERO)}.
    */
   public SearchParamsBuilder<T> searchOneIterationOnly() {
     return searchWindowInSeconds(0);

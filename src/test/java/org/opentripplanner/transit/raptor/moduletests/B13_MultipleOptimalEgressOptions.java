@@ -25,9 +25,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * This test focuses on on-foot and flex egresses. You are not allowed to have two walk legs
- * after each other, so depending on how you arrived at the stop where the egress starts, the
- * walking option might not be possible.
+ * This test focuses on on-foot and flex egresses. You are not allowed to have two walk legs after
+ * each other, so depending on how you arrived at the stop where the egress starts, the walking
+ * option might not be possible.
  * <p>
  * Test case:
  * <img src="images/B13.svg" width="432" height="212" />
@@ -90,14 +90,6 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
-  private void withFlexEgressAsBestDestinationArrivalTime() {
-    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D7m));
-  }
-
-  private void withWalkingAsBestDestinationArrivalTime() {
-    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D5m));
-  }
-
   @Test
   public void standardFlex() {
     withFlexEgressAsBestDestinationArrivalTime();
@@ -138,6 +130,14 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
     withWalkingAsBestDestinationArrivalTime();
     requestBuilder.profile(MULTI_CRITERIA);
     assertEquals(EXPECTED_MC_WALK_5M, runSearch());
+  }
+
+  private void withFlexEgressAsBestDestinationArrivalTime() {
+    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D7m));
+  }
+
+  private void withWalkingAsBestDestinationArrivalTime() {
+    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D5m));
   }
 
   private String runSearch() {

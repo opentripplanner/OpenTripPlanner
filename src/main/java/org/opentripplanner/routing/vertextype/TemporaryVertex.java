@@ -5,17 +5,15 @@ import org.opentripplanner.routing.graph.Vertex;
 /**
  * Marker interface for temporary vertices.
  * <p>
- * Remember to use the {@link #dispose(Vertex)} to delete the temporary vertex
- * from the main graph after use.
+ * Remember to use the {@link #dispose(Vertex)} to delete the temporary vertex from the main graph
+ * after use.
  * </p>
  */
 public interface TemporaryVertex {
-  boolean isEndVertex();
-
   /**
    * This method traverse the subgraph of temporary vertices, and cuts that subgraph off from the
-   * main graph at each point it encounters a non-temporary vertexes. OTP then holds no
-   * references to the temporary subgraph and it is garbage collected.
+   * main graph at each point it encounters a non-temporary vertexes. OTP then holds no references
+   * to the temporary subgraph and it is garbage collected.
    * <p>
    * Note! If the {@code vertex} is NOT a TemporaryVertex the method returns. No action taken.
    * </p>
@@ -25,4 +23,6 @@ public interface TemporaryVertex {
   static void dispose(Vertex vertex) {
     TemporaryVertexDispose.dispose(vertex);
   }
+
+  boolean isEndVertex();
 }

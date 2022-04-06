@@ -51,37 +51,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
- * geometries. It also does some other postprocessing involving fares and interlined blocks.
+ * Once transit model entities have been loaded into the graph, this post-processes them to extract
+ * and prepare geometries. It also does some other postprocessing involving fares and interlined
+ * blocks.
  *
  * <p>
- * THREAD SAFETY
- * The computation runs in parallel so be careful about threadsafety when modifying the logic here.
+ * THREAD SAFETY The computation runs in parallel so be careful about threadsafety when modifying
+ * the logic here.
  */
 public class GeometryAndBlockProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(GeometryAndBlockProcessor.class);
-
-  private DataImportIssueStore issueStore;
-
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-
   private final OtpTransitService transitService;
-
   // this is threadsafe implementation
   private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
-
   // this is threadsafe implementation
   private final Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
-
   // this is threadsafe implementation
   private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
-
-  private FareServiceFactory fareServiceFactory;
-
   private final double maxStopToShapeSnapDistance;
-
   private final int maxInterlineDistance;
+  private DataImportIssueStore issueStore;
+  private FareServiceFactory fareServiceFactory;
 
   public GeometryAndBlockProcessor(GtfsContext context) {
     this(context.getTransitService(), null, -1, -1);
@@ -114,11 +106,9 @@ public class GeometryAndBlockProcessor {
   /**
    * Generate the edges. Assumes that there are already vertices in the graph for the stops.
    * <p>
-   * THREAD SAFETY
-   * The geometries for the trip patterns are computed in parallel. The collections needed for
-   * this are concurrent implementations and therefore threadsafe but the issue store, the graph,
-   * the OtpTransitService and others are not.
-   *
+   * THREAD SAFETY The geometries for the trip patterns are computed in parallel. The collections
+   * needed for this are concurrent implementations and therefore threadsafe but the issue store,
+   * the graph, the OtpTransitService and others are not.
    */
   @SuppressWarnings("Convert2MethodRef")
   public void run(Graph graph, DataImportIssueStore issueStore) {
@@ -205,9 +195,21 @@ public class GeometryAndBlockProcessor {
     graph.putService(FareService.class, fareServiceFactory.makeFareService());
   }
 
+  public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
+    this.fareServiceFactory = fareServiceFactory;
+  }
+
+  private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
+    return (
+      startIndex.getSegmentIndex() == endIndex.getSegmentIndex() &&
+      startIndex.getSegmentFraction() == endIndex.getSegmentFraction() &&
+      startIndex.getComponentIndex() == endIndex.getComponentIndex()
+    );
+  }
+
   /**
-   * Identify interlined trips (where a physical vehicle continues on to another logical trip)
-   * and update the TripPatterns accordingly.
+   * Identify interlined trips (where a physical vehicle continues on to another logical trip) and
+   * update the TripPatterns accordingly.
    */
   private void interline(Collection<TripPattern> tripPatterns) {
     /* Record which Pattern each interlined TripTimes belongs to. */
@@ -280,13 +282,14 @@ public class GeometryAndBlockProcessor {
   }
 
   /**
-   * Creates a set of geometries for a single trip, considering the GTFS shapes.txt,
-   * The geometry is broken down into one geometry per inter-stop segment ("hop"). We also need a shape for the entire
-   * trip and tripPattern, but given the complexity of the existing code for generating hop geometries, we will create
-   * the full-trip geometry by simply concatenating the hop geometries.
-   *
-   * This geometry will in fact be used for an entire set of trips in a trip pattern. Technically one of the trips
-   * with exactly the same sequence of stops could follow a different route on the streets, but that's very uncommon.
+   * Creates a set of geometries for a single trip, considering the GTFS shapes.txt, The geometry is
+   * broken down into one geometry per inter-stop segment ("hop"). We also need a shape for the
+   * entire trip and tripPattern, but given the complexity of the existing code for generating hop
+   * geometries, we will create the full-trip geometry by simply concatenating the hop geometries.
+   * <p>
+   * This geometry will in fact be used for an entire set of trips in a trip pattern. Technically
+   * one of the trips with exactly the same sequence of stops could follow a different route on the
+   * streets, but that's very uncommon.
    */
   private LineString[] createGeometry(FeedScopedId shapeId, List<StopTime> stopTimes) {
     if (hasShapeDist(shapeId, stopTimes)) {
@@ -473,8 +476,8 @@ public class GeometryAndBlockProcessor {
   }
 
   /**
-   * Find a consistent, increasing list of LinearLocations along a shape for a set of stops.
-   * Handles loops routes.
+   * Find a consistent, increasing list of LinearLocations along a shape for a set of stops. Handles
+   * loops routes.
    */
   private List<LinearLocation> getStopLocations(
     List<List<IndexedLineSegment>> possibleSegmentsForStop,
@@ -558,14 +561,6 @@ public class GeometryAndBlockProcessor {
     }
   }
 
-  private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
-    return (
-      startIndex.getSegmentIndex() == endIndex.getSegmentIndex() &&
-      startIndex.getSegmentFraction() == endIndex.getSegmentFraction() &&
-      startIndex.getComponentIndex() == endIndex.getComponentIndex()
-    );
-  }
-
   /** create a 2-point linestring (a straight line segment) between the two stops */
   private LineString createSimpleGeometry(StopLocation s0, StopLocation s1) {
     Coordinate[] coordinates = new Coordinate[] {
@@ -643,11 +638,10 @@ public class GeometryAndBlockProcessor {
   }
 
   /**
-   * If a shape appears in more than one feed, the shape points will be loaded several
-   * times, and there will be duplicates in the DAO. Filter out duplicates and repeated
-   * coordinates because 1) they are unnecessary, and 2) they define 0-length line segments
-   * which cause JTS location indexed line to return a segment location of NaN,
-   * which we do not want.
+   * If a shape appears in more than one feed, the shape points will be loaded several times, and
+   * there will be duplicates in the DAO. Filter out duplicates and repeated coordinates because 1)
+   * they are unnecessary, and 2) they define 0-length line segments which cause JTS location
+   * indexed line to return a segment location of NaN, which we do not want.
    */
   private List<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
     List<ShapePoint> points = transitService.getShapePointsForShapeId(shapeId);
@@ -731,9 +725,5 @@ public class GeometryAndBlockProcessor {
     }
     double indexPart = (distance - distances[index - 1]) / (distances[index] - prevDistance);
     return new LinearLocation(index - 1, indexPart);
-  }
-
-  public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
-    this.fareServiceFactory = fareServiceFactory;
   }
 }

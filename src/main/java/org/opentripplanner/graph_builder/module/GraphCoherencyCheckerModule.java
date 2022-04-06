@@ -12,12 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Check the every vertex and edge in the graph to make sure the edge lists and from/to
- * members are coherent, and that there are no edgeless vertices. Primarily intended for debugging.
+ * Check the every vertex and edge in the graph to make sure the edge lists and from/to members are
+ * coherent, and that there are no edgeless vertices. Primarily intended for debugging.
  */
 public class GraphCoherencyCheckerModule implements GraphBuilderModule {
 
-  /** An set of ids which identifies what stages this graph builder provides (i.e. streets, elevation, transit) */
+  private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyCheckerModule.class);
+
+  /**
+   * An set of ids which identifies what stages this graph builder provides (i.e. streets,
+   * elevation, transit)
+   */
   public List<String> provides() {
     return Collections.emptyList();
   }
@@ -26,8 +31,6 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
   public List<String> getPrerequisites() {
     return List.of("streets");
   }
-
-  private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyCheckerModule.class);
 
   @Override
   public void buildGraph(

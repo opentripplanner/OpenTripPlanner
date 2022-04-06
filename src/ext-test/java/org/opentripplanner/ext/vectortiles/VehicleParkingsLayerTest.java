@@ -29,22 +29,6 @@ import org.opentripplanner.util.TranslatedString;
 
 public class VehicleParkingsLayerTest {
 
-  private static class VehicleParkingsLayerBuilderWithPublicGeometry
-    extends VehicleParkingsLayerBuilder {
-
-    public VehicleParkingsLayerBuilderWithPublicGeometry(
-      Graph graph,
-      VectorTilesResource.LayerParameters layerParameters
-    ) {
-      super(graph, layerParameters);
-    }
-
-    @Override
-    public List<Geometry> getGeometries(Envelope query) {
-      return super.getGeometries(query);
-    }
-  }
-
   private VehicleParking vehicleParking;
 
   @Before
@@ -132,19 +116,6 @@ public class VehicleParkingsLayerTest {
     );
   }
 
-  private static class VehicleParkingPropertyMapperWithPublicMap
-    extends DigitransitVehicleParkingPropertyMapper {
-
-    public VehicleParkingPropertyMapperWithPublicMap() {
-      super();
-    }
-
-    @Override
-    public Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
-      return super.map(vehicleParking);
-    }
-  }
-
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
     VehicleParkingPropertyMapperWithPublicMap mapper = new VehicleParkingPropertyMapperWithPublicMap();
@@ -184,5 +155,34 @@ public class VehicleParkingsLayerTest {
       "{\"bicyclePlaces\":1,\"carPlaces\":null,\"wheelchairAccessibleCarPlaces\":1}",
       map.get("availability").toString()
     );
+  }
+
+  private static class VehicleParkingsLayerBuilderWithPublicGeometry
+    extends VehicleParkingsLayerBuilder {
+
+    public VehicleParkingsLayerBuilderWithPublicGeometry(
+      Graph graph,
+      VectorTilesResource.LayerParameters layerParameters
+    ) {
+      super(graph, layerParameters);
+    }
+
+    @Override
+    public List<Geometry> getGeometries(Envelope query) {
+      return super.getGeometries(query);
+    }
+  }
+
+  private static class VehicleParkingPropertyMapperWithPublicMap
+    extends DigitransitVehicleParkingPropertyMapper {
+
+    public VehicleParkingPropertyMapperWithPublicMap() {
+      super();
+    }
+
+    @Override
+    public Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
+      return super.map(vehicleParking);
+    }
   }
 }

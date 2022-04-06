@@ -7,7 +7,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class TripToTripTransfer<T extends RaptorTripSchedule> {
@@ -38,8 +37,8 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The time it takes to transfer between the given from and to stop.
-   * For a transfer at the same stop the time is zero.
+   * The time it takes to transfer between the given from and to stop. For a transfer at the same
+   * stop the time is zero.
    */
   public int transferDuration() {
     return sameStop() ? 0 : pathTransfer.durationInSeconds();

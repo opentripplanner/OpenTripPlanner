@@ -84,6 +84,21 @@ public class PlaceMapper {
     return api;
   }
 
+  private static ApiVehicleParkingSpaces mapVehicleParkingSpaces(
+    VehicleParkingSpaces parkingSpaces
+  ) {
+    if (parkingSpaces == null) {
+      return null;
+    }
+
+    return ApiVehicleParkingSpaces
+      .builder()
+      .bicycleSpaces(parkingSpaces.getBicycleSpaces())
+      .carSpaces(parkingSpaces.getCarSpaces())
+      .wheelchairAccessibleCarSpaces(parkingSpaces.getWheelchairAccessibleCarSpaces())
+      .build();
+  }
+
   private ApiVehicleParkingWithEntrance mapVehicleParking(
     VehicleParkingWithEntrance vehicleParkingWithEntrance
   ) {
@@ -107,21 +122,6 @@ public class PlaceMapper {
       .availability(mapVehicleParkingSpaces(vp.getAvailability()))
       .capacity(mapVehicleParkingSpaces(vp.getCapacity()))
       .realtime(vehicleParkingWithEntrance.isRealtime())
-      .build();
-  }
-
-  private static ApiVehicleParkingSpaces mapVehicleParkingSpaces(
-    VehicleParkingSpaces parkingSpaces
-  ) {
-    if (parkingSpaces == null) {
-      return null;
-    }
-
-    return ApiVehicleParkingSpaces
-      .builder()
-      .bicycleSpaces(parkingSpaces.getBicycleSpaces())
-      .carSpaces(parkingSpaces.getCarSpaces())
-      .wheelchairAccessibleCarSpaces(parkingSpaces.getWheelchairAccessibleCarSpaces())
       .build();
   }
 }

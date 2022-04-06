@@ -4,7 +4,8 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.Stop;
 
 /**
- * Represents two stops that are close to each other where no route is found between them using OSM data
+ * Represents two stops that are close to each other where no route is found between them using OSM
+ * data
  */
 public class TransferCouldNotBeRouted implements DataImportIssue {
 

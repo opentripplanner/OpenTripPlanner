@@ -35,6 +35,19 @@ class TripMapper {
     return mappedTrips.values();
   }
 
+  private static int mapDirectionId(org.onebusaway.gtfs.model.Trip trip) {
+    try {
+      String directionId = trip.getDirectionId();
+      if (directionId == null || directionId.isBlank()) {
+        return -1;
+      }
+      return Integer.parseInt(directionId);
+    } catch (NumberFormatException e) {
+      LOG.debug("Trip {} does not have direction id, defaults to -1", trip);
+    }
+    return -1;
+  }
+
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
     Trip lhs = new Trip(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
@@ -51,18 +64,5 @@ class TripMapper {
     lhs.setFareId(rhs.getFareId());
 
     return lhs;
-  }
-
-  private static int mapDirectionId(org.onebusaway.gtfs.model.Trip trip) {
-    try {
-      String directionId = trip.getDirectionId();
-      if (directionId == null || directionId.isBlank()) {
-        return -1;
-      }
-      return Integer.parseInt(directionId);
-    } catch (NumberFormatException e) {
-      LOG.debug("Trip {} does not have direction id, defaults to -1", trip);
-    }
-    return -1;
   }
 }

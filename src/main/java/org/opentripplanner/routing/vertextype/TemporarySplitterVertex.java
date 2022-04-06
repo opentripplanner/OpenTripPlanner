@@ -10,9 +10,8 @@ import org.opentripplanner.routing.graph.Edge;
  */
 public class TemporarySplitterVertex extends SplitterVertex implements TemporaryVertex {
 
-  private boolean wheelchairAccessible;
-
   private final boolean endVertex;
+  private boolean wheelchairAccessible;
 
   public TemporarySplitterVertex(
     String label,
@@ -27,15 +26,15 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
   }
 
   @Override
-  public void addIncoming(Edge edge) {
-    // Removed check for edge being temporary
-    super.addIncoming(edge);
-  }
-
-  @Override
   public void addOutgoing(Edge edge) {
     // Removed check for edge being temporary
     super.addOutgoing(edge);
+  }
+
+  @Override
+  public void addIncoming(Edge edge) {
+    // Removed check for edge being temporary
+    super.addIncoming(edge);
   }
 
   @Override

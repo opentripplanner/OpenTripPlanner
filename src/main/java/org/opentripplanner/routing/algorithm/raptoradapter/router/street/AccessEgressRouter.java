@@ -22,8 +22,7 @@ public class AccessEgressRouter {
   private AccessEgressRouter() {}
 
   /**
-   *
-   * @param rctx the current routing context
+   * @param rctx       the current routing context
    * @param fromTarget whether to route from or towards the point provided in the routing request
    *                   (access or egress)
    * @return Transfer objects by access/egress stop

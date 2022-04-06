@@ -69,12 +69,12 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   }
 
   /**
-   * The next to two tests are an example where departAt and arriveBy searches return different
-   * (but still correct) results.
-   *
-   * It's probably down to the intersection traversal because when you use a constant cost
-   * they become the same route again.
-   *
+   * The next to two tests are an example where departAt and arriveBy searches return different (but
+   * still correct) results.
+   * <p>
+   * It's probably down to the intersection traversal because when you use a constant cost they
+   * become the same route again.
+   * <p>
    * More discussion: https://github.com/opentripplanner/OpenTripPlanner/pull/3574
    */
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with departAt")

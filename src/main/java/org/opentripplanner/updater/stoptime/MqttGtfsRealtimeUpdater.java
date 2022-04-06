@@ -21,10 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class starts an Paho MQTT client which opens a connection to a GTFS-RT data source.
- * A callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
+ * This class starts an Paho MQTT client which opens a connection to a GTFS-RT data source. A
+ * callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
- *
+ * <p>
  * Usage example in the file 'router-config.json', inside the 'updaters' array:
  *
  * <pre>
@@ -37,28 +37,18 @@ import org.slf4j.LoggerFactory;
  *   "fuzzyTripMatching": true
  * }
  * </pre>
- *
  */
 public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(MqttGtfsRealtimeUpdater.class);
-
-  private WriteToGraphCallback saveResultOnGraph;
-
   private final String url;
-
   private final String topic;
-
   private final String feedId;
-
   private final int qos;
-
   private final boolean fuzzyTripMatching;
-
   private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
-
   private final String configRef;
-
+  private WriteToGraphCallback saveResultOnGraph;
   MemoryPersistence persistence = new MemoryPersistence();
 
   private MqttClient client;

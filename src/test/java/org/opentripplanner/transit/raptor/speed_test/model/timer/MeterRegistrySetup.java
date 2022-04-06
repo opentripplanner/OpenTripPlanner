@@ -17,6 +17,16 @@ class MeterRegistrySetup {
 
   public static final String influxPasswordEnvVariable = "PERFORMANCE_INFLUX_DB_PASSWORD";
 
+  public static Optional<MeterRegistry> getRegistry() {
+    return influxPassword()
+      .map(password -> {
+        System.err.println(
+          "Selecting InfluxDB as metrics registry. Sending data at end of speed test."
+        );
+        return MeterRegistrySetup.influxRegistry(password);
+      });
+  }
+
   static Optional<String> influxPassword() {
     return Optional.ofNullable(System.getenv(influxPasswordEnvVariable)).filter(s -> !s.isBlank());
   }
@@ -35,11 +45,6 @@ class MeterRegistrySetup {
       }
 
       @Override
-      public String uri() {
-        return "https://otp-github-actions-runner.leonard.io:8087";
-      }
-
-      @Override
       public String userName() {
         return "performance";
       }
@@ -47,6 +52,11 @@ class MeterRegistrySetup {
       @Override
       public String password() {
         return password;
+      }
+
+      @Override
+      public String uri() {
+        return "https://otp-github-actions-runner.leonard.io:8087";
       }
 
       @Override
@@ -58,21 +68,11 @@ class MeterRegistrySetup {
     return new CustomInfluxRegistry(influxConfig, Clock.SYSTEM);
   }
 
-  public static Optional<MeterRegistry> getRegistry() {
-    return influxPassword()
-      .map(password -> {
-        System.err.println(
-          "Selecting InfluxDB as metrics registry. Sending data at end of speed test."
-        );
-        return MeterRegistrySetup.influxRegistry(password);
-      });
-  }
-
   /**
    * So the regular InfluxDB doesn't compute the mean times when you close the registry at the end
-   * of the test run because it converts every timer into an instance of StepTimer. We actually
-   * want to have a CumulativeTimer which collects the avg as it goes along, not at the end of the
-   * step time.
+   * of the test run because it converts every timer into an instance of StepTimer. We actually want
+   * to have a CumulativeTimer which collects the avg as it goes along, not at the end of the step
+   * time.
    */
   public static class CustomInfluxRegistry extends InfluxMeterRegistry {
 

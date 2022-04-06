@@ -27,16 +27,16 @@ public class RaptorSearchWindowCalculatorTest {
       return 10;
     }
 
-    /** Round search-window to nearest 1 minute (60 seconds) */
-    @Override
-    public int stepMinutes() {
-      return 1;
-    }
-
     /** Set the max search-window length to 30 minutes (1_800 seconds) */
     @Override
     public int maxWinTimeMinutes() {
       return 30;
+    }
+
+    /** Round search-window to nearest 1 minute (60 seconds) */
+    @Override
+    public int stepMinutes() {
+      return 1;
     }
   };
 

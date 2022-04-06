@@ -27,9 +27,8 @@ import org.slf4j.LoggerFactory;
  * the OTP internal transit model.
  * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
- * keeping an index of entities to enable linking. The convention is documented here
- *{@link NetexConfig#sharedFilePattern} and here
- * {@link NetexDataSourceHierarchy}.
+ * keeping an index of entities to enable linking. The convention is documented here {@link
+ * NetexConfig#sharedFilePattern} and here {@link NetexDataSourceHierarchy}.
  * <p>
  * This class is also responsible for logging progress and exception handling.
  */
@@ -42,19 +41,14 @@ public class NetexBundle implements Closeable {
   private final NetexDataSourceHierarchy hierarchy;
 
   private final String netexFeedId;
-
+  private final Set<String> ferryIdsNotAllowedForBicycle;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
-
   /** Report errors to issue store */
   private DataImportIssueStore issueStore;
-
   /** maps the NeTEx XML document to OTP transit model. */
   private NetexMapper mapper;
-
   private NetexXmlParser xmlParser;
-
-  private final Set<String> ferryIdsNotAllowedForBicycle;
 
   public NetexBundle(
     String netexFeedId,
@@ -105,6 +99,11 @@ public class NetexBundle implements Closeable {
 
   /* private methods */
 
+  @Override
+  public void close() throws IOException {
+    source.close();
+  }
+
   /** Load all files entries in the bundle */
   private void loadFileEntries() {
     // Load global shared files
@@ -130,8 +129,8 @@ public class NetexBundle implements Closeable {
   }
 
   /**
-   * make a new index and pushes it on the index stack, before executing the task and
-   * at the end pop of the index.
+   * make a new index and pushes it on the index stack, before executing the task and at the end pop
+   * of the index.
    */
   private void scopeInputData(Runnable task) {
     index = index.push();
@@ -142,10 +141,10 @@ public class NetexBundle implements Closeable {
   }
 
   /**
-   * Load a set of files and map the entries to OTP Transit model after the loading is
-   * complete. It is important to do this in 2 steps to be able to link references.
-   * An attempt to map each entry, when read, would lead to missing references, since
-   * the order entries are read is not enforced in any way.
+   * Load a set of files and map the entries to OTP Transit model after the loading is complete. It
+   * is important to do this in 2 steps to be able to link references. An attempt to map each entry,
+   * when read, would lead to missing references, since the order entries are read is not enforced
+   * in any way.
    */
   private void loadFilesThenMapToOtpTransitModel(
     String fileDescription,
@@ -173,10 +172,5 @@ public class NetexBundle implements Closeable {
     } catch (JAXBException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
-  }
-
-  @Override
-  public void close() throws IOException {
-    source.close();
   }
 }

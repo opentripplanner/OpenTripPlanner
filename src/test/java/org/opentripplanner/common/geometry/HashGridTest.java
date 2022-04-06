@@ -12,21 +12,10 @@ import org.locationtech.jts.index.strtree.STRtree;
 
 public class HashGridTest extends TestCase {
 
-  private static class DummyObject {
-
-    Envelope envelope;
-
-    @Override
-    public String toString() {
-      return envelope.toString();
-    }
-  }
-
   /**
-   * We perform a non-regression random test. We insert many random-envelop objects
-   * into both a hash grid (OTP) and STRtree (JTS) spatial indexes. We check with
-   * many random query that the set of returned objects is the same (after pruning
-   * because both could return false positives).
+   * We perform a non-regression random test. We insert many random-envelop objects into both a hash
+   * grid (OTP) and STRtree (JTS) spatial indexes. We check with many random query that the set of
+   * returned objects is the same (after pruning because both could return false positives).
    */
   @SuppressWarnings("unchecked")
   public void testHashGridRandom() {
@@ -68,6 +57,16 @@ public class HashGridTest extends TestCase {
       }
       boolean equals = hashGridObjs2.equals(strtreeObjs2);
       assertTrue(equals);
+    }
+  }
+
+  private static class DummyObject {
+
+    Envelope envelope;
+
+    @Override
+    public String toString() {
+      return envelope.toString();
     }
   }
 }

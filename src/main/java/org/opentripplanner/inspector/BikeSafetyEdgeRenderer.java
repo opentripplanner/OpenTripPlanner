@@ -16,13 +16,11 @@ import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
  * Render bike safety for each edge using a color palette. Display the bike safety factor as label.
  *
  * @author laurent
- *
  */
 public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
 
-  private final ScalarColorPalette palette = new DefaultScalarColorPalette(1.0, 3.0, 10.0);
-
   private static final Color VEHICLE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
+  private final ScalarColorPalette palette = new DefaultScalarColorPalette(1.0, 3.0, 10.0);
 
   public BikeSafetyEdgeRenderer() {}
 

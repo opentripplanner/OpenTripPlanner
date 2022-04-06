@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.stoptime;
 
-import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
 import com.google.common.base.Preconditions;
@@ -60,58 +59,44 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Maximum time in seconds since midnight for arrivals and departures
    */
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
-
-  public int logFrequency = 2000;
-
-  private int appliedBlockCount = 0;
-
-  /**
-   * If a timetable snapshot is requested less than this number of milliseconds after the previous
-   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
-   * duplicating a TripPattern → Timetable map and indexing the new Timetables.
-   */
-  public int maxSnapshotFrequency = 1000; // msec
-
-  /**
-   * The last committed snapshot that was handed off to a routing thread. This snapshot may be
-   * given to more than one routing thread if the maximum snapshot frequency is exceeded.
-   */
-  private volatile TimetableSnapshot snapshot = null;
-
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
    * might modify this buffer will correctly acquire the lock.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
-
   /**
    * Lock to indicate that buffer is in use
    */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
-
   /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
+   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
+   * messages.
    */
   private final TripPatternCache tripPatternCache = new TripPatternCache();
-
+  private final TimeZone timeZone;
+  private final RoutingService routingService;
+  private final TransitLayer realtimeTransitLayer;
+  private final TransitLayerUpdater transitLayerUpdater;
+  public int logFrequency = 2000;
+  private int appliedBlockCount = 0;
+  /**
+   * If a timetable snapshot is requested less than this number of milliseconds after the previous
+   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
+   * duplicating a TripPattern → Timetable map and indexing the new Timetables.
+   */
+  public int maxSnapshotFrequency = 1000; // msec
+  /**
+   * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
+   * to more than one routing thread if the maximum snapshot frequency is exceeded.
+   */
+  private volatile TimetableSnapshot snapshot = null;
   /** Should expired realtime data be purged from the graph. */
   public boolean purgeExpiredData = true;
-
   protected ServiceDate lastPurgeDate = null;
-
   /** Epoch time in milliseconds at which the last snapshot was generated. */
   protected long lastSnapshotTime = -1;
-
-  private final TimeZone timeZone;
-
-  private final RoutingService routingService;
-
   public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
-
-  private final TransitLayer realtimeTransitLayer;
-
-  private final TransitLayerUpdater transitLayerUpdater;
 
   public TimetableSnapshotSource(final Graph graph) {
     timeZone = graph.getTimeZone();
@@ -122,9 +107,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /**
    * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-   *         timetable objects it references are guaranteed to never change, so the requesting
-   *         thread is provided a consistent view of all TripTimes. The routing thread need only
-   *         release its reference to the snapshot to release resources.
+   * timetable objects it references are guaranteed to never change, so the requesting thread is
+   * provided a consistent view of all TripTimes. The routing thread need only release its reference
+   * to the snapshot to release resources.
    */
   public TimetableSnapshot getTimetableSnapshot() {
     TimetableSnapshot snapshotToReturn;
@@ -146,37 +131,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return snapshotToReturn;
   }
 
-  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
-    final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
-      if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer.toString());
-        snapshot = buffer.commit(transitLayerUpdater, force);
-      } else {
-        LOG.debug("Buffer was unchanged, keeping old snapshot.");
-      }
-      lastSnapshotTime = System.currentTimeMillis();
-    } else {
-      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
-    }
-    return snapshot;
-  }
-
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot. A
    * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
-   *
+   * <p>
    * However, multi-feed support is not completed and we currently assume there is only one static
    * feed when matching IDs.
    *
    * @param calendarService graph's calendar service
-   * @param deduplicator deduplicator for different types
-   * @param graphIndex graph's index
-   * @param serviceCodes graph's service codes
-   * @param fullDataset true iff the list with updates represent all updates that are active right
-   *        now, i.e. all previous updates should be disregarded
-   * @param updates GTFS-RT TripUpdate's that should be applied atomically
-   * @param feedId
+   * @param deduplicator    deduplicator for different types
+   * @param graphIndex      graph's index
+   * @param serviceCodes    graph's service codes
+   * @param fullDataset     true iff the list with updates represent all updates that are active
+   *                        right now, i.e. all previous updates should be disregarded
+   * @param updates         GTFS-RT TripUpdate's that should be applied atomically
    */
   public void applyTripUpdates(
     final CalendarService calendarService,
@@ -310,6 +278,22 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
   }
 
+  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
+    final long now = System.currentTimeMillis();
+    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+      if (force || buffer.isDirty()) {
+        LOG.debug("Committing {}", buffer.toString());
+        snapshot = buffer.commit(transitLayerUpdater, force);
+      } else {
+        LOG.debug("Buffer was unchanged, keeping old snapshot.");
+      }
+      lastSnapshotTime = System.currentTimeMillis();
+    } else {
+      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
+    }
+    return snapshot;
+  }
+
   /**
    * Determine how the trip update should be handled.
    *
@@ -405,13 +389,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Validate and handle GTFS-RT TripUpdate message containing an ADDED trip.
    *
    * @param calendarService graph's calendar service
-   * @param deduplicator deduplicator for different types
-   * @param graphIndex graph's index
-   * @param serviceCodes graph's service codes
-   * @param tripUpdate GTFS-RT TripUpdate message
-   * @param tripDescriptor GTFS-RT TripDescriptor
-   * @param feedId
-   * @param serviceDate
+   * @param deduplicator    deduplicator for different types
+   * @param graphIndex      graph's index
+   * @param serviceCodes    graph's service codes
+   * @param tripUpdate      GTFS-RT TripUpdate message
+   * @param tripDescriptor  GTFS-RT TripDescriptor
    * @return true iff successful
    */
   private boolean validateAndHandleAddedTrip(
@@ -481,10 +463,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Check stop time updates of trip update that results in a new trip (ADDED or MODIFIED) and
-   * find all stops of that trip.
+   * Check stop time updates of trip update that results in a new trip (ADDED or MODIFIED) and find
+   * all stops of that trip.
    *
-   * @param feedId feed id this trip update is intented for
+   * @param feedId     feed id this trip update is intented for
    * @param tripUpdate trip update
    * @return stops when stop time updates are correct; null if there are errors
    */
@@ -573,14 +555,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Handle GTFS-RT TripUpdate message containing an ADDED trip.
    *
    * @param calendarService graph's calendar service
-   * @param deduplicator deduplicator for different types
-   * @param graphIndex graph's index
-   * @param serviceCodes graph's service codes
-   * @param tripUpdate GTFS-RT TripUpdate message
-   * @param tripDescriptor GTFS-RT TripDescriptor
-   * @param stops the stops of each StopTimeUpdate in the TripUpdate message
-   * @param feedId
-   * @param serviceDate service date for added trip
+   * @param deduplicator    deduplicator for different types
+   * @param graphIndex      graph's index
+   * @param serviceCodes    graph's service codes
+   * @param tripUpdate      GTFS-RT TripUpdate message
+   * @param tripDescriptor  GTFS-RT TripDescriptor
+   * @param stops           the stops of each StopTimeUpdate in the TripUpdate message
+   * @param serviceDate     service date for added trip
    * @return true iff successful
    */
   private boolean handleAddedTrip(
@@ -667,13 +648,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Add a (new) trip to the graph and the buffer
    *
-   * @param deduplicator deduplicator for different types
-   * @param graphIndex graph's index
-   * @param serviceCodes graph's service codes
-   * @param trip trip
-   * @param tripUpdate trip update containing stop time updates
-   * @param stops list of stops corresponding to stop time updates
-   * @param serviceDate service date of trip
+   * @param deduplicator  deduplicator for different types
+   * @param graphIndex    graph's index
+   * @param serviceCodes  graph's service codes
+   * @param trip          trip
+   * @param tripUpdate    trip update containing stop time updates
+   * @param stops         list of stops corresponding to stop time updates
+   * @param serviceDate   service date of trip
    * @param realTimeState real-time state of new trip
    * @return true iff successful
    */
@@ -787,7 +768,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Cancel scheduled trip in buffer given trip id (without agency id) on service date
    *
-   * @param tripId trip id without agency id
+   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
@@ -814,13 +795,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Cancel previously added trip from buffer if there is a previously added trip with given trip
-   * id (without agency id) on service date. This does not remove the modified/added trip from the buffer, it just
-   * marks it as canceled. This also does not remove the corresponding vertices and edges from the Graph. Any
-   * TripPattern that was created for the added/modified trip continues to exist, and will be reused if a similar
-   * added/modified trip message is received with the same route and stop sequence.
+   * Cancel previously added trip from buffer if there is a previously added trip with given trip id
+   * (without agency id) on service date. This does not remove the modified/added trip from the
+   * buffer, it just marks it as canceled. This also does not remove the corresponding vertices and
+   * edges from the Graph. Any TripPattern that was created for the added/modified trip continues to
+   * exist, and will be reused if a similar added/modified trip message is received with the same
+   * route and stop sequence.
    *
-   * @param tripId trip id without agency id
+   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if a previously added trip was cancelled
    */
@@ -855,13 +837,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Validate and handle GTFS-RT TripUpdate message containing a MODIFIED trip.
    *
    * @param calendarService graph's calendar service
-   * @param deduplicator deduplicator for different types
-   * @param graphIndex graph's index
-   * @param serviceCodes graph's service codes
-   * @param tripUpdate GTFS-RT TripUpdate message
-   * @param tripDescriptor GTFS-RT TripDescriptor
-   * @param feedId
-   * @param serviceDate
+   * @param deduplicator    deduplicator for different types
+   * @param graphIndex      graph's index
+   * @param serviceCodes    graph's service codes
+   * @param tripUpdate      GTFS-RT TripUpdate message
+   * @param tripDescriptor  GTFS-RT TripDescriptor
    * @return true if successful
    */
   private boolean validateAndHandleModifiedTrip(
@@ -941,13 +921,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Handle GTFS-RT TripUpdate message containing a MODIFIED trip.
    *
    * @param deduplicator deduplicator for different types
-   * @param graphIndex graph's index
+   * @param graphIndex   graph's index
    * @param serviceCodes graph's service codes
-   * @param trip trip that is modified
-   * @param tripUpdate GTFS-RT TripUpdate message
-   * @param stops the stops of each StopTimeUpdate in the TripUpdate message
-   * @param feedId
-   * @param serviceDate service date for modified trip
+   * @param trip         trip that is modified
+   * @param tripUpdate   GTFS-RT TripUpdate message
+   * @param stops        the stops of each StopTimeUpdate in the TripUpdate message
+   * @param serviceDate  service date for modified trip
    * @return true iff successful
    */
   private boolean handleModifiedTrip(
@@ -1043,7 +1022,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Retrieve route given a route id without an agency
    *
-   * @param feedId feed id for the route id
+   * @param feedId  feed id for the route id
    * @param routeId route id without the agency
    * @return route or null if route can't be found in graph index
    */

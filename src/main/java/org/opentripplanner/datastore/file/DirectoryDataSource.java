@@ -10,8 +10,8 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 
 /**
- * This is a adapter to wrap a file directory and all files in it as a
- * composite data source. Sub-directories are ignored.
+ * This is a adapter to wrap a file directory and all files in it as a composite data source.
+ * Sub-directories are ignored.
  */
 public class DirectoryDataSource extends AbstractFileDataSource implements CompositeDataSource {
 

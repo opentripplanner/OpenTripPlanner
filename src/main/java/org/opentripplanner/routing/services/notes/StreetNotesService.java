@@ -18,13 +18,13 @@ import org.slf4j.LoggerFactory;
  * impact on routing*. The last restriction is necessary as the edge do not know which notes it is
  * attached to (this to prevent having to store note lists in the edge, which is memory consuming as
  * only few edges will have notes).
- *
+ * <p>
  * The service owns a list of StreetNotesSource, with a single static one used for graph building.
  * "Dynamic" notes can be returned by classes implementing StreetNoteSource, added to this service
  * during startup.
- *
+ * <p>
  * Typical notes are: Toll (driving), unpaved surface (walk,bike), wheelchair notes...
- *
+ * <p>
  * Each note is attached to a matcher, whose responsibility is to determine if the note is relevant
  * for an edge, based on the itinerary state at this edge (the state after the edge has been
  * traversed, ie "state back edge"). Usually matcher will match note based on the mode (cycling,
@@ -84,10 +84,8 @@ public class StreetNotesService implements Serializable {
   }
 
   /**
-   * Add a new note source. The list is not transient so any source added before the graph is
-   * saved will be serialized!
-   *
-   * @param source
+   * Add a new note source. The list is not transient so any source added before the graph is saved
+   * will be serialized!
    */
   public void addNotesSource(StreetNotesSource source) {
     sources.add(source);
@@ -96,7 +94,6 @@ public class StreetNotesService implements Serializable {
   /**
    * Return the set of notes applicable for this state / backedge pair.
    *
-   * @param state
    * @return The set of notes or null if empty.
    */
   public Set<StreetNote> getNotes(State state) {

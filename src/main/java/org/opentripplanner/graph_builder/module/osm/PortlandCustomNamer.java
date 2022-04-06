@@ -15,7 +15,6 @@ import org.opentripplanner.util.NonLocalizedString;
  * the narrative.
  *
  * @author novalis
- *
  */
 public class PortlandCustomNamer implements CustomNamer {
 
@@ -70,45 +69,6 @@ public class PortlandCustomNamer implements CustomNamer {
     return defaultName;
   }
 
-  private boolean isStreet(String defaultName) {
-    for (String suffix : STREET_SUFFIXES) {
-      if (defaultName.endsWith(suffix)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean isObviouslyPath(String defaultName) {
-    for (String word : PATH_WORDS) {
-      if (defaultName.contains(word)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private String path(String name) {
-    if (!name.toLowerCase().contains("path")) {
-      name = name + " (path)".intern();
-    }
-    return name;
-  }
-
-  private String pedestrianStreet(String name) {
-    if (!name.toLowerCase().contains("pedestrian street")) {
-      name = name + " (pedestrian street)".intern();
-    }
-    return name;
-  }
-
-  private String sidewalk(String name) {
-    if (!name.toLowerCase().contains("sidewalk")) {
-      name = name + " (sidewalk)".intern();
-    }
-    return name;
-  }
-
   @Override
   public void nameWithEdge(OSMWithTags way, StreetEdge edge) {
     if (!edge.hasBogusName()) {
@@ -147,6 +107,45 @@ public class PortlandCustomNamer implements CustomNamer {
   @Override
   public void configure() {
     // No configuration needed.
+  }
+
+  private boolean isStreet(String defaultName) {
+    for (String suffix : STREET_SUFFIXES) {
+      if (defaultName.endsWith(suffix)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isObviouslyPath(String defaultName) {
+    for (String word : PATH_WORDS) {
+      if (defaultName.contains(word)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private String path(String name) {
+    if (!name.toLowerCase().contains("path")) {
+      name = name + " (path)".intern();
+    }
+    return name;
+  }
+
+  private String pedestrianStreet(String name) {
+    if (!name.toLowerCase().contains("pedestrian street")) {
+      name = name + " (pedestrian street)".intern();
+    }
+    return name;
+  }
+
+  private String sidewalk(String name) {
+    if (!name.toLowerCase().contains("sidewalk")) {
+      name = name + " (sidewalk)".intern();
+    }
+    return name;
   }
 
   private String nameAccordingToDestination(Graph graph, StreetEdge e, int maxDepth) {

@@ -2,7 +2,7 @@ package org.opentripplanner.api.resource;
 
 /**
  * Contains elevation-specific metadata to be included in the response
- *
+ * <p>
  * Created by demory on 2/16/17.
  */
 

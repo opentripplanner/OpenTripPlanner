@@ -7,7 +7,10 @@ import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSec
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import org.opentripplanner.ext.interactivelauncher.Model;
 
 class DataSourcesView {
@@ -29,6 +32,23 @@ class DataSourcesView {
 
   public Box panel() {
     return panel;
+  }
+
+  public void onRootDirChange() {
+    model.setDataSource(null);
+    dataSourceSelectionPanel.removeAll();
+    setupDataSources();
+    panel.repaint();
+  }
+
+  public void onDataSourceChange(ActionEvent e) {
+    model.setDataSource(e.getActionCommand());
+  }
+
+  private static JRadioButton newRadioBtn(ButtonGroup group, String name, boolean selected) {
+    JRadioButton radioButton = new JRadioButton(name, selected);
+    group.add(radioButton);
+    return radioButton;
   }
 
   private void setupDataSources() {
@@ -60,22 +80,5 @@ class DataSourcesView {
       radioBtn.addActionListener(this::onDataSourceChange);
       addComp(radioBtn, dataSourceSelectionPanel);
     }
-  }
-
-  public void onRootDirChange() {
-    model.setDataSource(null);
-    dataSourceSelectionPanel.removeAll();
-    setupDataSources();
-    panel.repaint();
-  }
-
-  public void onDataSourceChange(ActionEvent e) {
-    model.setDataSource(e.getActionCommand());
-  }
-
-  private static JRadioButton newRadioBtn(ButtonGroup group, String name, boolean selected) {
-    JRadioButton radioButton = new JRadioButton(name, selected);
-    group.add(radioButton);
-    return radioButton;
   }
 }

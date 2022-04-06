@@ -40,6 +40,10 @@ public class GraphStats {
   @Parameter(names = { "-d", "--debug" }, description = "Debug mode")
   private final boolean debug = false;
 
+  private final CommandEndpoints commandEndpoints = new CommandEndpoints();
+  private final CommandPatternStats commandPatternStats = new CommandPatternStats();
+  private final JCommander jc;
+
   @Parameter(
     names = { "-h", "--help" },
     description = "Print this help message and exit",
@@ -53,24 +57,9 @@ public class GraphStats {
   @Parameter(names = { "-o", "--out" }, description = "output file")
   private String outPath;
 
-  private final CommandEndpoints commandEndpoints = new CommandEndpoints();
-
-  private final CommandPatternStats commandPatternStats = new CommandPatternStats();
-
-  private final JCommander jc;
-
   private Graph graph;
 
   private CsvWriter writer;
-
-  public static void main(String[] args) {
-    GraphStats graphStats = new GraphStats(args);
-    try {
-      graphStats.run();
-    } catch (OtpAppException ignore) {
-      // The error is handled at a lover level
-    }
-  }
 
   private GraphStats(String[] args) {
     jc = new JCommander(this);
@@ -88,6 +77,15 @@ public class GraphStats {
     if (help || jc.getParsedCommand() == null) {
       jc.usage();
       System.exit(0);
+    }
+  }
+
+  public static void main(String[] args) {
+    GraphStats graphStats = new GraphStats(args);
+    try {
+      graphStats.run();
+    } catch (OtpAppException ignore) {
+      // The error is handled at a lover level
     }
   }
 

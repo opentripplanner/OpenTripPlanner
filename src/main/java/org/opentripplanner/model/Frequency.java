@@ -70,6 +70,11 @@ public final class Frequency implements Serializable {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(trip, startTime, endTime, headwaySecs);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -84,11 +89,6 @@ public final class Frequency implements Serializable {
       headwaySecs == frequency.headwaySecs &&
       Objects.equals(trip, frequency.trip)
     );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(trip, startTime, endTime, headwaySecs);
   }
 
   public String toString() {

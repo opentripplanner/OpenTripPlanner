@@ -33,7 +33,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
 /**
  * This class is used to create a journeys with stop arrivals.
  * <p>
- * It creates different data structures representing the same 'basic' trip to be used in unit-tests:
+ * It creates different data structures representing the same 'basic' trip to be used in
+ * unit-tests:
  * <pre>
  *   ~
  *   Origin 10:00:00
@@ -46,8 +47,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
  *   ~ Destination 12:00
  *   Duration: 2h $8184
  * </pre>
- * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends
- * at 12:00, total 2 hours.
+ * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends at
+ * 12:00, total 2 hours.
  */
 public class BasicPathTestCase implements RaptorTestConstants {
 
@@ -237,8 +238,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
   }
 
   /**
-   * Both {@link #basicTripByForwardSearch()} and {@link #basicTripByReverseSearch()} should
-   * return the same trip, here returned as a path.
+   * Both {@link #basicTripByForwardSearch()} and {@link #basicTripByReverseSearch()} should return
+   * the same trip, here returned as a path.
    */
   public static Path<TestTripSchedule> basicTripAsPath() {
     PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(

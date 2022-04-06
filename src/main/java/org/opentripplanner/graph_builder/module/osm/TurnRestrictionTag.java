@@ -8,32 +8,19 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 /**
- * A temporary holder for turn restrictions while we have only way/node ids but not yet edge objects
+ * A temporary holder for turn restrictions while we have only way/node ids but not yet edge
+ * objects
  */
 class TurnRestrictionTag {
 
-  enum Direction {
-    LEFT,
-    RIGHT,
-    U,
-    STRAIGHT,
-  }
-
   long via;
-
   //Used only for issues so that it can be visualized in a map
   long relationOSMID;
-
   TurnRestrictionType type;
-
   Direction direction;
-
   RepeatingTimePeriod time;
-
   public List<StreetEdge> possibleFrom = new ArrayList<>();
-
   public List<StreetEdge> possibleTo = new ArrayList<>();
-
   public TraverseModeSet modes;
 
   TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOSMID) {
@@ -46,5 +33,12 @@ class TurnRestrictionTag {
   @Override
   public String toString() {
     return String.format("%s turn restriction via node %d", direction, via);
+  }
+
+  enum Direction {
+    LEFT,
+    RIGHT,
+    U,
+    STRAIGHT,
   }
 }

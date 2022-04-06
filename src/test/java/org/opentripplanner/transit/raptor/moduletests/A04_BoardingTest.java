@@ -21,10 +21,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
- *
- * This test focus on boarding a trip after a transfer at different pattern stop positions.
- * The routing strategies do not board at the same stop, they should board at the optimal stop
- * for the criterion which they optimize on.
+ * <p>
+ * This test focus on boarding a trip after a transfer at different pattern stop positions. The
+ * routing strategies do not board at the same stop, they should board at the optimal stop for the
+ * criterion which they optimize on.
  * <ul>
  *    <li>The `MinTravelDurationRoutingStrategy` should board at the stop which give the shortest
  *    travel duration. Hence; picking the path with the shortest travel duration at the point of
@@ -45,46 +45,45 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 @SuppressWarnings("FieldCanBeLocal")
 public class A04_BoardingTest implements RaptorTestConstants {
 
-  private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
-
-  /** Board L2 at stop C and alight at stop F */
-  private final String OPTIMAL_PATH =
-    "Walk 1m ~ A " +
-    "~ BUS L1_2 0:14 0:18 ~ C " +
-    "~ BUS L2 0:21 0:31 ~ F " +
-    "~ BUS L3_2 0:35 0:40 ~ H " +
-    "~ Walk 1m [0:13 0:41 28m 2tx";
-
   /** Board L2 at first possible stop B (not C) and arrive at F (the earliest arrival time) */
-  public static final String EXP_PATH_BEST_ARRIVAL_TIME =
+  private static final String EXP_PATH_BEST_ARRIVAL_TIME =
     "Walk 1m ~ A " +
     "~ BUS L1_1 0:10 0:18 ~ B " +
     "~ BUS L2 0:20 0:31 ~ F " +
     "~ BUS L3_2 0:35 0:40 ~ H " +
     "~ Walk 1m [0:09 0:41 32m 2tx]";
-
   /**
    * Searching in REVERSE we will "board" L2 at the first possible stop G and "alight" at the
    * optimal stop C (the best "arrival-time").
    */
-  public static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
+  private static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
     "Walk 1m ~ A " +
     "~ BUS L1_2 0:14 0:18 ~ C " +
     "~ BUS L2 0:21 0:32 ~ G " +
     "~ BUS L3_3 0:35 0:44 ~ H " +
     "~ Walk 1m [0:13 0:45 32m 2tx]";
 
+  /** Board L2 at stop C and alight at stop F */
+  private static final String OPTIMAL_PATH =
+    "Walk 1m ~ A " +
+    "~ BUS L1_2 0:14 0:18 ~ C " +
+    "~ BUS L2 0:21 0:31 ~ F " +
+    "~ BUS L3_2 0:35 0:40 ~ H " +
+    "~ Walk 1m [0:13 0:41 28m 2tx";
+
   /** Expect the optimal path to be found. */
   private final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
 
+  private final TestTransitData data = new TestTransitData();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
+
   /**
    * The multi-criteria search should find the best alternative, because it looks at the
-   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same
-   * path as the min-travel-duration will find.
+   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same path as
+   * the min-travel-duration will find.
    */
   private final String EXP_PATH_MC = OPTIMAL_PATH + " $3600]";
 

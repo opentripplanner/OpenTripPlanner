@@ -19,13 +19,13 @@ import org.slf4j.LoggerFactory;
  *         2.1 Shared group files        -- Shared within the group
  *         2.2 (Individual) Group files  -- Not shared
  * </pre>
- *
- * The files is loaded in the hierarchical order. First the <em>Shared files</em>,
- * then for each group: shared group files are loaded before individual group files.
  * <p>
- * All NeTEx entities are cached in an index made available for reference linking. To save
- * memory shared group files entities are discarded after the group is loaded (and linking is
- * complete). Entities in individual group files are discarded after the file entry is loaded.
+ * The files is loaded in the hierarchical order. First the <em>Shared files</em>, then for each
+ * group: shared group files are loaded before individual group files.
+ * <p>
+ * All NeTEx entities are cached in an index made available for reference linking. To save memory
+ * shared group files entities are discarded after the group is loaded (and linking is complete).
+ * Entities in individual group files are discarded after the file entry is loaded.
  */
 public class NetexDataSourceHierarchy {
 
@@ -68,8 +68,8 @@ public class NetexDataSourceHierarchy {
   }
 
   /**
-   * Process the data source and distribute entries to {@code sharedEntries} and
-   * {@code groupEntries}.
+   * Process the data source and distribute entries to {@code sharedEntries} and {@code
+   * groupEntries}.
    */
   private class DistributeEntries {
 

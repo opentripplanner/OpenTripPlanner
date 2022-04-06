@@ -50,30 +50,6 @@ public class FlexIntegrationTest {
   static RoutingService service;
   static Router router;
 
-  @BeforeAll
-  static void setup() {
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
-    var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
-    var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
-    var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
-
-    graph = ConstantsForTests.buildOsmGraph(osmPath);
-    addGtfsToGraph(graph, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
-    router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
-
-    service = new RoutingService(graph);
-  }
-
-  private static String getAbsolutePath(String cobbOsm) {
-    try {
-      return getFileForResource(cobbOsm).getAbsolutePath();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   @Test
   public void shouldReturnARouteTransferringFromBusToFlex() {
     var from = new GenericLocation(33.84329482265106, -84.583740234375);
@@ -128,21 +104,33 @@ public class FlexIntegrationTest {
     assertTrue(finalFlex.isFlexibleTrip());
   }
 
-  private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
-    RoutingRequest request = new RoutingRequest();
-    request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
-    request.numItineraries = 10;
-    request.searchWindow = Duration.ofHours(2);
-    request.modes.egressMode = FLEXIBLE;
+  @BeforeAll
+  static void setup() {
+    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
+    var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
+    var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
+    var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
+    var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
 
-    var result = service.route(request, router);
-    var itineraries = result.getTripPlan().itineraries;
+    graph = ConstantsForTests.buildOsmGraph(osmPath);
+    addGtfsToGraph(graph, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
+    router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
 
-    assertFalse(itineraries.isEmpty());
+    service = new RoutingService(graph);
+  }
 
-    return itineraries.get(index);
+  @AfterAll
+  static void teardown() {
+    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+  }
+
+  private static String getAbsolutePath(String cobbOsm) {
+    try {
+      return getFileForResource(cobbOsm).getAbsolutePath();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private static void addGtfsToGraph(Graph graph, List<String> gtfsFiles) {
@@ -174,8 +162,20 @@ public class FlexIntegrationTest {
     graph.index();
   }
 
-  @AfterAll
-  static void teardown() {
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+  private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
+    RoutingRequest request = new RoutingRequest();
+    request.setDateTime(dateTime);
+    request.from = from;
+    request.to = to;
+    request.numItineraries = 10;
+    request.searchWindow = Duration.ofHours(2);
+    request.modes.egressMode = FLEXIBLE;
+
+    var result = service.route(request, router);
+    var itineraries = result.getTripPlan().itineraries;
+
+    assertFalse(itineraries.isEmpty());
+
+    return itineraries.get(index);
   }
 }

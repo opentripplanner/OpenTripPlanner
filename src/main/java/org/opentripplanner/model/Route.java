@@ -56,9 +56,8 @@ public final class Route extends TransitEntity {
   }
 
   /**
-   * The 'agency' property represent a GTFS Agency and NeTEx the Authority.
-   * Note that Agency does NOT map 1-1 to Authority, it is rather a mix
-   * between Authority and Operator.
+   * The 'agency' property represent a GTFS Agency and NeTEx the Authority. Note that Agency does
+   * NOT map 1-1 to Authority, it is rather a mix between Authority and Operator.
    */
   public Agency getAgency() {
     return agency;

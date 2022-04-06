@@ -43,12 +43,25 @@ import java.util.TreeSet;
  */
 public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
 
-  @Override
-  public Object read(Kryo kryo, Input input, Class<?> clazz) {
-    int ordinal = input.readInt(true);
-    UnmodifiableCollection unmodifiableCollection = UnmodifiableCollection.values()[ordinal];
-    Object sourceCollection = kryo.readClassAndObject(input);
-    return unmodifiableCollection.create(sourceCollection);
+  /**
+   * Creates a new {@link UnmodifiableCollectionsSerializer} and registers its serializer for the
+   * several unmodifiable Collections that can be created via {@link Collections}, including {@link
+   * Map}s.
+   *
+   * @param kryo the {@link Kryo} instance to set the serializer on.
+   * @see Collections#unmodifiableCollection(Collection)
+   * @see Collections#unmodifiableList(List)
+   * @see Collections#unmodifiableSet(Set)
+   * @see Collections#unmodifiableSortedSet(SortedSet)
+   * @see Collections#unmodifiableMap(Map)
+   * @see Collections#unmodifiableSortedMap(SortedMap)
+   */
+  public static void registerSerializers(Kryo kryo) {
+    UnmodifiableCollectionsSerializer serializer = new UnmodifiableCollectionsSerializer();
+    UnmodifiableCollection.values();
+    for (UnmodifiableCollection item : UnmodifiableCollection.values()) {
+      kryo.register(item.type, serializer);
+    }
   }
 
   @Override
@@ -67,6 +80,14 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public Object read(Kryo kryo, Input input, Class<?> clazz) {
+    int ordinal = input.readInt(true);
+    UnmodifiableCollection unmodifiableCollection = UnmodifiableCollection.values()[ordinal];
+    Object sourceCollection = kryo.readClassAndObject(input);
+    return unmodifiableCollection.create(sourceCollection);
   }
 
   @Override
@@ -148,27 +169,6 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
         }
       }
       throw new IllegalArgumentException("The type " + type + " is not supported.");
-    }
-  }
-
-  /**
-   * Creates a new {@link UnmodifiableCollectionsSerializer} and registers its serializer for the
-   * several unmodifiable Collections that can be created via {@link Collections}, including
-   * {@link Map}s.
-   *
-   * @param kryo the {@link Kryo} instance to set the serializer on.
-   * @see Collections#unmodifiableCollection(Collection)
-   * @see Collections#unmodifiableList(List)
-   * @see Collections#unmodifiableSet(Set)
-   * @see Collections#unmodifiableSortedSet(SortedSet)
-   * @see Collections#unmodifiableMap(Map)
-   * @see Collections#unmodifiableSortedMap(SortedMap)
-   */
-  public static void registerSerializers(Kryo kryo) {
-    UnmodifiableCollectionsSerializer serializer = new UnmodifiableCollectionsSerializer();
-    UnmodifiableCollection.values();
-    for (UnmodifiableCollection item : UnmodifiableCollection.values()) {
-      kryo.register(item.type, serializer);
     }
   }
 }

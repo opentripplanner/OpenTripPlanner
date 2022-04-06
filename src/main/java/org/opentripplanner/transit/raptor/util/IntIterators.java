@@ -15,7 +15,7 @@ public class IntIterators {
    * Create an int iterator incrementing by 1.
    *
    * @param startValue the start value (inclusive)
-   * @param endValue the end value (exclusive)
+   * @param endValue   the end value (exclusive)
    * @return the iterator
    */
   public static IntIterator intIncIterator(final int startValue, final int endValue) {
@@ -38,8 +38,8 @@ public class IntIterators {
    * Create an int iterator incrementing by 1.
    *
    * @param startValue the start value (inclusive)
-   * @param endValue the end value (exclusive)
-   * @param increment the value to add for each iteration
+   * @param endValue   the end value (exclusive)
+   * @param increment  the value to add for each iteration
    * @return the iterator
    */
   public static IntIterator intIncIterator(
@@ -66,7 +66,7 @@ public class IntIterators {
    * Create an int iterator decrementing by 1.
    *
    * @param startValue the start value (exclusive)
-   * @param endValue the end value (inclusive)
+   * @param endValue   the end value (inclusive)
    */
   public static IntIterator intDecIterator(final int startValue, final int endValue) {
     return new IntIterator() {
@@ -88,8 +88,8 @@ public class IntIterators {
    * Create an int iterator decrementing by the given decrement value.
    *
    * @param startValue the start value (exclusive)
-   * @param endValue the end value (inclusive)
-   * @param decrement the value to subtract for each iteration, must be a positive integer.
+   * @param endValue   the end value (inclusive)
+   * @param decrement  the value to subtract for each iteration, must be a positive integer.
    */
   public static IntIterator intDecIterator(
     final int startValue,

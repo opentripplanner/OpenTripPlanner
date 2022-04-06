@@ -35,48 +35,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A graph updater that reads a WFS-interface and updates a DynamicStreetNotesSource.
- * Useful when reading geodata from legacy/external sources, which are not based on OSM
- * and where data has to be matched to the street network.
- *
- * Classes that extend this class should provide getNote which parses the WFS features
- * into notes. Also the implementing classes should be added to the GraphUpdaterConfigurator
- *
- * @see WinkkiPollingGraphUpdater
+ * A graph updater that reads a WFS-interface and updates a DynamicStreetNotesSource. Useful when
+ * reading geodata from legacy/external sources, which are not based on OSM and where data has to be
+ * matched to the street network.
+ * <p>
+ * Classes that extend this class should provide getNote which parses the WFS features into notes.
+ * Also the implementing classes should be added to the GraphUpdaterConfigurator
  *
  * @author hannesj
+ * @see WinkkiPollingGraphUpdater
  */
 public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
-
-  protected Graph graph;
-
-  private WriteToGraphCallback saveResultOnGraph;
-
-  private SetMultimap<Edge, MatcherAndStreetNote> notesForEdge;
-
-  /**
-   * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
-   * are identical).
-   */
-  private Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers;
-
-  private URL url;
-  private String featureType;
-  private Query query;
-
-  private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
-  private final DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
 
   // How much should the geometries be padded with in order to be sure they intersect with graph edges
   private static final double SEARCH_RADIUS_M = 1;
   private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(
     SEARCH_RADIUS_M
   );
-
   // Set the matcher type for the notes, can be overridden in extending classes
   private static final NoteMatcher NOTE_MATCHER = StreetNotesService.ALWAYS_MATCHER;
-
   private static final Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
+  private final DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
+  protected Graph graph;
+  private WriteToGraphCallback saveResultOnGraph;
+  private SetMultimap<Edge, MatcherAndStreetNote> notesForEdge;
+  /**
+   * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
+   * are identical).
+   */
+  private Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers;
+  private URL url;
+  private String featureType;
+  private Query query;
+  private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
   /**
    * The property 'frequencySec' is already read and used by the abstract base class.
@@ -128,9 +119,9 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
   }
 
   /**
-   * The function is run periodically by the update manager.
-   * The extending class should provide the getNote method. It is not implemented here
-   * as the requirements for different updaters can be vastly different dependent on the data source.
+   * The function is run periodically by the update manager. The extending class should provide the
+   * getNote method. It is not implemented here as the requirements for different updaters can be
+   * vastly different dependent on the data source.
    */
   @Override
   protected void runPolling() throws IOException {
@@ -163,20 +154,10 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
   }
 
   /**
-   * Parses a SimpleFeature and returns an StreetNote if the feature should create one.
-   * The street note should be based on the fields specific for the specific WFS feed.
+   * Parses a SimpleFeature and returns an StreetNote if the feature should create one. The street
+   * note should be based on the fields specific for the specific WFS feed.
    */
   protected abstract StreetNote getNote(SimpleFeature feature);
-
-  /**
-   * Changes the note source to use the newly generated notes
-   */
-  private class WFSGraphWriter implements GraphWriterRunnable {
-
-    public void run(Graph graph) {
-      notesSource.setNotes(notesForEdge);
-    }
-  }
 
   /**
    * Methods for writing into notesForEdge
@@ -206,5 +187,15 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     MatcherAndStreetNote ret = new MatcherAndStreetNote(noteMatcher, note);
     uniqueMatchers.put(key, ret);
     return ret;
+  }
+
+  /**
+   * Changes the note source to use the newly generated notes
+   */
+  private class WFSGraphWriter implements GraphWriterRunnable {
+
+    public void run(Graph graph) {
+      notesSource.setNotes(notesForEdge);
+    }
   }
 }

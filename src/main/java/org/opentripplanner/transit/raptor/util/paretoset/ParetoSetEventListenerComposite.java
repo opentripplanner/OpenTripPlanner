@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * The {@link ParetoSet} do only support ONE listener, this class uses the
- * composite pattern to forward all events to a set of listeners, while
- * playing the role of {@link ParetoSetEventListener} towards the set.
+ * The {@link ParetoSet} do only support ONE listener, this class uses the composite pattern to
+ * forward all events to a set of listeners, while playing the role of {@link
+ * ParetoSetEventListener} towards the set.
  *
  * @param <T> the set element type
  */

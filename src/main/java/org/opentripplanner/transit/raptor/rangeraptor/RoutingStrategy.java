@@ -13,14 +13,13 @@ import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
  */
 public interface RoutingStrategy<T extends RaptorTripSchedule> {
   /**
-   * Sets the access time for the departure stop. This method is called for each access path
-   * in every Raptor iteration. The access path can have more than one "leg"; hence the
-   * implementation need to be aware of the round (Walk access in round 0, Flex with one leg
-   * in round 1, ...).
+   * Sets the access time for the departure stop. This method is called for each access path in
+   * every Raptor iteration. The access path can have more than one "leg"; hence the implementation
+   * need to be aware of the round (Walk access in round 0, Flex with one leg in round 1, ...).
    *
-   * @param iterationDepartureTime The current iteration departure time.
-   * @param timeDependentDepartureTime The access might be restricted to a given time window,
-   *                                   if so this is the time shifted to fit the window.
+   * @param iterationDepartureTime     The current iteration departure time.
+   * @param timeDependentDepartureTime The access might be restricted to a given time window, if so
+   *                                   this is the time shifted to fit the window.
    */
   void setAccessToStop(
     RaptorTransfer accessPath,
@@ -44,13 +43,14 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer);
 
   /**
-   * Get the current boarding previous transit arrival. This is used to look up any
-   * guaranteed transfers.
+   * Get the current boarding previous transit arrival. This is used to look up any guaranteed
+   * transfers.
    */
   TransitArrival<T> previousTransit(int boardStopIndex);
 
   /**
    * Board the given trip(event) at the given stop index.
+   *
    * @param earliestBoardTime used to calculate wait-time (if needed)
    */
   void board(
@@ -60,10 +60,9 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   );
 
   /**
-   * The trip search will use this index to search relative to an existing boarding.
-   * This make a subsequent search faster since it must board an earlier trip, and the
-   * trip search can start at the given onTripIndex.
-   * if not the current trip is used.
+   * The trip search will use this index to search relative to an existing boarding. This make a
+   * subsequent search faster since it must board an earlier trip, and the trip search can start at
+   * the given onTripIndex. if not the current trip is used.
    * <p>
    * Return -1 to if the tripIndex is unknown.
    */
@@ -72,12 +71,12 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   }
 
   /**
-   * This method allow the strategy to replace the existing boarding (if it exists) with
-   * a better option. It is left to the implementation to check that a boarding already exist.
+   * This method allow the strategy to replace the existing boarding (if it exists) with a better
+   * option. It is left to the implementation to check that a boarding already exist.
    *
    * @param earliestBoardTime - the earliest possible time a boarding can take place
-   * @param stopPos - the pattern stop position
-   * @param stopIndex - the global stop index
+   * @param stopPos           - the pattern stop position
+   * @param stopIndex         - the global stop index
    */
   default void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
     // Do nothing. For standard and multi-criteria Raptor we do not need to do anything.

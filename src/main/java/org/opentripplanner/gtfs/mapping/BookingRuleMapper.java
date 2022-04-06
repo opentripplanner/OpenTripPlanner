@@ -17,7 +17,7 @@ class BookingRuleMapper {
 
   private final Map<AgencyAndId, BookingInfo> cachedBookingInfos = new HashMap<>();
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   BookingInfo map(BookingRule rule) {
     if (rule == null) {
       return null;

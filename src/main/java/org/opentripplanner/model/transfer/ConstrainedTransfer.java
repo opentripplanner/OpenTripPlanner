@@ -41,10 +41,9 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
   }
 
   /**
-   * In NeTEx an interchange have an id, in GTFS a transfer do not. We include it here to
-   * enable debugging, logging and system integration. Note! OTP do not use this id,
-   * and it is just passed through OTP. There is no service in OTP to look up a transfer by its
-   * id.
+   * In NeTEx an interchange have an id, in GTFS a transfer do not. We include it here to enable
+   * debugging, logging and system integration. Note! OTP do not use this id, and it is just passed
+   * through OTP. There is no service in OTP to look up a transfer by its id.
    */
   @Nullable
   public FeedScopedId getId() {
@@ -72,7 +71,7 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
    * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
    * Specificity of a transfer
    * </a>
-   *
+   * <p>
    * The ranking implemented here is slightly modified:
    * <ul>
    *     <li>

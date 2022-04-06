@@ -101,24 +101,6 @@ public class TurnCostTest {
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));
   }
 
-  private GraphPath checkForwardRouteDuration(RoutingContext context, int expectedDuration) {
-    ShortestPathTree tree = AStarBuilder.oneToOne().setContext(context).getShortestPathTree();
-    GraphPath path = tree.getPath(bottomLeft);
-    assertNotNull(path);
-
-    // Without turn costs, this path costs 2x100 + 2x50 = 300.
-    assertEquals(expectedDuration, path.getDuration());
-
-    // Weight == duration when reluctances == 0.
-    assertEquals(expectedDuration, (int) path.getWeight());
-
-    for (State s : path.states) {
-      assertEquals(s.getElapsedTimeSeconds(), (int) s.getWeight());
-    }
-
-    return path;
-  }
-
   @Test
   public void testForwardDefaultNoTurnCosts() {
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
@@ -205,6 +187,24 @@ public class TurnCostTest {
     assertEquals(380, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
   }
 
+  private GraphPath checkForwardRouteDuration(RoutingContext context, int expectedDuration) {
+    ShortestPathTree tree = AStarBuilder.oneToOne().setContext(context).getShortestPathTree();
+    GraphPath path = tree.getPath(bottomLeft);
+    assertNotNull(path);
+
+    // Without turn costs, this path costs 2x100 + 2x50 = 300.
+    assertEquals(expectedDuration, path.getDuration());
+
+    // Weight == duration when reluctances == 0.
+    assertEquals(expectedDuration, (int) path.getWeight());
+
+    for (State s : path.states) {
+      assertEquals(s.getElapsedTimeSeconds(), (int) s.getWeight());
+    }
+
+    return path;
+  }
+
   /****
    * Private Methods
    ****/
@@ -216,9 +216,6 @@ public class TurnCostTest {
   /**
    * Create an edge. If twoWay, create two edges (back and forth).
    *
-   * @param vA
-   * @param vB
-   * @param length
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {

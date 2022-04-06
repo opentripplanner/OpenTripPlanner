@@ -70,7 +70,8 @@ public class LinkStopToPlatformTest {
   }
 
   /**
-   * Tests that extra edges are added when linking stops to platform areas to prevent detours around the platform.
+   * Tests that extra edges are added when linking stops to platform areas to prevent detours around
+   * the platform.
    */
   @Test
   public void testLinkStopWithoutExtraEdges() {

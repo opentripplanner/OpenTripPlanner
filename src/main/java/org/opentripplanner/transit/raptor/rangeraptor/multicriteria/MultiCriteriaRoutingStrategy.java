@@ -15,8 +15,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.Abs
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
 /**
- * The purpose of this class is to implement the multi-criteria specific functionality of
- * the worker.
+ * The purpose of this class is to implement the multi-criteria specific functionality of the
+ * worker.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -116,9 +116,9 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   /**
    * Calculate a cost for riding a trip. It should include the cost from the beginning of the
-   * journey all the way until a trip is boarded. Any slack at the end of the last leg is not
-   * part of this, because that is already accounted for. If the previous leg is an access leg,
-   * then it is already time-shifted, which is important for this calculation to be correct.
+   * journey all the way until a trip is boarded. Any slack at the end of the last leg is not part
+   * of this, because that is already accounted for. If the previous leg is an access leg, then it
+   * is already time-shifted, which is important for this calculation to be correct.
    *
    * @param prevArrival The stop-arrival where the trip was boarded.
    */
@@ -141,11 +141,10 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
   /**
    * Calculate a cost for riding a trip. It should include the cost from the beginning of the
-   * journey all the way until a trip is boarded. The cost is used to compare trips boarding
-   * the same pattern with the same number of transfers. It is ok for the cost to be relative
-   * to any point in place or time - as long as it can be used to compare to paths that started
-   * at the origin in the same iteration, having used the same number-of-rounds to board the same
-   * trip.
+   * journey all the way until a trip is boarded. The cost is used to compare trips boarding the
+   * same pattern with the same number of transfers. It is ok for the cost to be relative to any
+   * point in place or time - as long as it can be used to compare to paths that started at the
+   * origin in the same iteration, having used the same number-of-rounds to board the same trip.
    */
   private int calculateOnTripRelativeCost(int transitReluctanceIndex, int boardTime) {
     return costCalculator.onTripRelativeRidingCost(boardTime, transitReluctanceIndex);

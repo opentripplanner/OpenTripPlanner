@@ -11,9 +11,9 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 /**
- * This represents a single trip within a TripPattern, but with a time offset in seconds. This is used to represent
- * a trip on a subsequent service day than the first one in the date range used.
- *
+ * This represents a single trip within a TripPattern, but with a time offset in seconds. This is
+ * used to represent a trip on a subsequent service day than the first one in the date range used.
+ * <p>
  * Use flyweight pattern, reusing TripPatternForDates data
  */
 public final class TripScheduleWithOffset implements TripSchedule {
@@ -101,6 +101,15 @@ public final class TripScheduleWithOffset implements TripSchedule {
     return secondsOffset;
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TripScheduleWithOffset.class)
+      .addObj("trip", pattern.debugInfo())
+      .addServiceTime("depart", secondsOffset + tripTimes.getDepartureTime(0))
+      .toString();
+  }
+
   private void findTripTimes() {
     index = tripIndexForDates;
     IntIterator indexIterator = pattern.tripPatternForDatesIndexIterator(true);
@@ -118,14 +127,5 @@ public final class TripScheduleWithOffset implements TripSchedule {
       index -= numSchedules;
     }
     throw new IndexOutOfBoundsException("Index out of bound: " + index);
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(TripScheduleWithOffset.class)
-      .addObj("trip", pattern.debugInfo())
-      .addServiceTime("depart", secondsOffset + tripTimes.getDepartureTime(0))
-      .toString();
   }
 }

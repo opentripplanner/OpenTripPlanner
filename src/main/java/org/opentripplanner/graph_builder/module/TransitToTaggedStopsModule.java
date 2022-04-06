@@ -20,24 +20,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This module takes advantage of the fact that in some cities, an authoritative linking location for GTFS stops is
- * provided by tags in the OSM data.
- *
- * When OSM data is being loaded, certain OSM nodes that represent transit stops are made into TransitStopStreetVertex
- * instances. In some cities, these nodes have a ref=* tag which gives the corresponding GFTS stop ID for the stop.
- * See http://wiki.openstreetmap.org/wiki/Tag:highway%3Dbus_stop
- *
- * This module will attempt to link all transit stops to such nodes in the OSM data, based on the stop ID and ref tag.
- * It is run before the main transit stop linker, and if no linkage was created here, the main linker should create
- * one based on distance or other heuristics.
+ * This module takes advantage of the fact that in some cities, an authoritative linking location
+ * for GTFS stops is provided by tags in the OSM data.
+ * <p>
+ * When OSM data is being loaded, certain OSM nodes that represent transit stops are made into
+ * TransitStopStreetVertex instances. In some cities, these nodes have a ref=* tag which gives the
+ * corresponding GFTS stop ID for the stop. See http://wiki.openstreetmap.org/wiki/Tag:highway%3Dbus_stop
+ * <p>
+ * This module will attempt to link all transit stops to such nodes in the OSM data, based on the
+ * stop ID and ref tag. It is run before the main transit stop linker, and if no linkage was created
+ * here, the main linker should create one based on distance or other heuristics.
  */
 public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
-
-  StreetVertexIndex index;
   private final double searchRadiusM = 250;
   private final double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
+  StreetVertexIndex index;
 
   public List<String> provides() {
     return Arrays.asList("street to transit", "linking");
@@ -84,6 +83,11 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     }
   }
 
+  @Override
+  public void checkInputs() {
+    //no inputs
+  }
+
   private boolean connectVertexToStop(TransitStopVertex ts) {
     String stopCode = ts.getStop().getCode();
     if (stopCode == null) {
@@ -110,10 +114,5 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
       }
     }
     return false;
-  }
-
-  @Override
-  public void checkInputs() {
-    //no inputs
   }
 }

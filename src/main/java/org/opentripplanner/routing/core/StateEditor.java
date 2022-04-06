@@ -89,9 +89,9 @@ public class StateEditor {
   /**
    * Why can a state editor only be used once? If you modify some component of state with and
    * editor, use the editor to create a new state, and then make more modifications, these
-   * modifications will be applied to the previously created state. Reusing the state editor to
-   * make several states would modify an existing state somewhere earlier in the search, messing
-   * up the shortest path tree.
+   * modifications will be applied to the previously created state. Reusing the state editor to make
+   * several states would modify an existing state somewhere earlier in the search, messing up the
+   * shortest path tree.
    */
   public State makeState() {
     // check that this editor has not been used already
@@ -163,8 +163,8 @@ public class StateEditor {
   }
 
   /**
-   * Advance or rewind the time of the new state by the given non-negative amount. Direction of
-   * time is inferred from the direction of traversal. This is the only element of state that runs
+   * Advance or rewind the time of the new state by the given non-negative amount. Direction of time
+   * is inferred from the direction of traversal. This is the only element of state that runs
    * backward when traversing backward.
    */
   public void incrementTimeInSeconds(int seconds) {
@@ -224,10 +224,6 @@ public class StateEditor {
 
     cloneStateDataAsNeeded();
     child.stateData.backWalkingBike = walkingBike;
-  }
-
-  public void setWalkDistance(double walkDistance) {
-    child.walkDistance = walkDistance;
   }
 
   public void beginFloatingVehicleRenting(FormFactor formFactor, String network, boolean reverse) {
@@ -291,17 +287,13 @@ public class StateEditor {
   }
 
   /**
-   * This has two effects: marks the vehicle as parked, and switches the current mode.
-   * Marking the vehicle parked is important for allowing co-dominance of walking and driving states.
+   * This has two effects: marks the vehicle as parked, and switches the current mode. Marking the
+   * vehicle parked is important for allowing co-dominance of walking and driving states.
    */
   public void setVehicleParked(boolean vehicleParked, TraverseMode nonTransitMode) {
     cloneStateDataAsNeeded();
     child.stateData.vehicleParked = vehicleParked;
     child.stateData.currentMode = nonTransitMode;
-  }
-
-  public void setTimeSeconds(long seconds) {
-    child.time = seconds * 1000;
   }
 
   public void setStartTimeSeconds(long seconds) {
@@ -310,10 +302,8 @@ public class StateEditor {
   }
 
   /**
-   * Set non-incremental state values from an existing state.
-   * Incremental values are not currently set.
-   *
-   * @param state
+   * Set non-incremental state values from an existing state. Incremental values are not currently
+   * set.
    */
   public void setFromState(State state) {
     cloneStateDataAsNeeded();
@@ -343,11 +333,15 @@ public class StateEditor {
     }
   }
 
-  /* PUBLIC GETTER METHODS */
-
   public long getTimeSeconds() {
     return child.getTimeSeconds();
   }
+
+  public void setTimeSeconds(long seconds) {
+    child.time = seconds * 1000;
+  }
+
+  /* PUBLIC GETTER METHODS */
 
   public long getElapsedTimeSeconds() {
     return child.getElapsedTimeSeconds();
@@ -361,21 +355,15 @@ public class StateEditor {
     return child.getWalkDistance();
   }
 
+  public void setWalkDistance(double walkDistance) {
+    child.walkDistance = walkDistance;
+  }
+
   public Vertex getVertex() {
     return child.getVertex();
   }
 
   /* PRIVATE METHODS */
-
-  /**
-   * To be called before modifying anything in the child's StateData. Makes sure that changes are
-   * applied to a copy of StateData rather than the same one that is still referenced in existing,
-   * older states.
-   */
-  private void cloneStateDataAsNeeded() {
-    if (child.backState != null && child.stateData == child.backState.stateData) child.stateData =
-      child.stateData.clone();
-  }
 
   public void setOptions(RoutingRequest options) {
     cloneStateDataAsNeeded();
@@ -389,5 +377,15 @@ public class StateEditor {
 
   public State getBackState() {
     return child.getBackState();
+  }
+
+  /**
+   * To be called before modifying anything in the child's StateData. Makes sure that changes are
+   * applied to a copy of StateData rather than the same one that is still referenced in existing,
+   * older states.
+   */
+  private void cloneStateDataAsNeeded() {
+    if (child.backState != null && child.stateData == child.backState.stateData) child.stateData =
+      child.stateData.clone();
   }
 }

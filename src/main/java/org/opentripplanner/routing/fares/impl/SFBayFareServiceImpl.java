@@ -16,10 +16,6 @@ import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
-  public SFBayFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
-    addFareRules(FareType.regular, regularFareRules);
-  }
-
   private static final long serialVersionUID = 20120229L;
 
   @SuppressWarnings("unused")
@@ -36,20 +32,8 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
   );
   public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
 
-  @Override
-  protected boolean populateFare(
-    Fare fare,
-    Currency currency,
-    FareType fareType,
-    List<Ride> rides,
-    Collection<FareRuleSet> fareRules
-  ) {
-    float lowestCost = getLowestCost(fareType, rides, fareRules);
-    if (lowestCost != Float.POSITIVE_INFINITY) {
-      fare.addFare(fareType, getMoney(currency, lowestCost));
-      return true;
-    }
-    return false;
+  public SFBayFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
+    addFareRules(FareType.regular, regularFareRules);
   }
 
   @Override
@@ -116,5 +100,21 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
       cost += calculateCost(fareType, bartBlock, fareRules);
     }
     return cost;
+  }
+
+  @Override
+  protected boolean populateFare(
+    Fare fare,
+    Currency currency,
+    FareType fareType,
+    List<Ride> rides,
+    Collection<FareRuleSet> fareRules
+  ) {
+    float lowestCost = getLowestCost(fareType, rides, fareRules);
+    if (lowestCost != Float.POSITIVE_INFINITY) {
+      fare.addFare(fareType, getMoney(currency, lowestCost));
+      return true;
+    }
+    return false;
   }
 }

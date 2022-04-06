@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 
 /**
- * This filter remove all transit results which have a generalized-cost higher than
- * the max-limit computed by the {@link #costLimitFunction}.
+ * This filter remove all transit results which have a generalized-cost higher than the max-limit
+ * computed by the {@link #costLimitFunction}.
  * <p>
+ *
  * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#transitGeneralizedCostLimit
  */
 public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {

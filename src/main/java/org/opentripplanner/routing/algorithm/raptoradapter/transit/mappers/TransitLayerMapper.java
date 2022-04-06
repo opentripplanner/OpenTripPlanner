@@ -32,14 +32,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maps the TransitLayer object from the OTP Graph object. The ServiceDay hierarchy is reversed,
- * with service days at the top level, which contains TripPatternForDate objects that contain
- * only TripSchedules running on that particular date. This makes it faster to filter out
- * TripSchedules when doing Range Raptor searches.
- *
- * CONCURRENCY: This mapper run part of the mapping in parallel using parallel streams. This
- *              improve startup time on the Norwegian graph by 20 seconds; reducing the this
- *              mapper from 36 seconds to 15 seconds, and the total startup time from 80 seconds
- *              to 60 seconds. (JAN 2020, MacBook Pro, 3.1 GHz i7)
+ * with service days at the top level, which contains TripPatternForDate objects that contain only
+ * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
+ * when doing Range Raptor searches.
+ * <p>
+ * CONCURRENCY: This mapper run part of the mapping in parallel using parallel streams. This improve
+ * startup time on the Norwegian graph by 20 seconds; reducing the this mapper from 36 seconds to 15
+ * seconds, and the total startup time from 80 seconds to 60 seconds. (JAN 2020, MacBook Pro, 3.1
+ * GHz i7)
  */
 public class TransitLayerMapper {
 
@@ -53,6 +53,16 @@ public class TransitLayerMapper {
 
   public static TransitLayer map(TransitTuningParameters tuningParameters, Graph graph) {
     return new TransitLayerMapper(graph).map(tuningParameters);
+  }
+
+  // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
+  //      optimized for sorting nearly sorted list
+  static List<TripTimes> getSortedTripTimes(Timetable timetable) {
+    return timetable
+      .getTripTimes()
+      .stream()
+      .sorted(Comparator.comparing(TripTimes::sortIndex))
+      .collect(Collectors.toList());
   }
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
@@ -146,16 +156,6 @@ public class TransitLayerMapper {
     // END PARALLEL CODE
 
     return keyByRunningPeriodDates(tripPatternForDates);
-  }
-
-  // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
-  //      optimized for sorting nearly sorted list
-  static List<TripTimes> getSortedTripTimes(Timetable timetable) {
-    return timetable
-      .getTripTimes()
-      .stream()
-      .sorted(Comparator.comparing(TripTimes::sortIndex))
-      .collect(Collectors.toList());
   }
 
   /**

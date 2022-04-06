@@ -43,9 +43,9 @@ public class ApiLeg {
   public Boolean isNonExactFrequency = null;
 
   /**
-   * The best estimate of the time between two arriving vehicles. This is particularly important
-   * for non-strict frequency trips, but could become important for real-time trips, strict
-   * frequency trips, and scheduled trips with empirical headways.
+   * The best estimate of the time between two arriving vehicles. This is particularly important for
+   * non-strict frequency trips, but could become important for real-time trips, strict frequency
+   * trips, and scheduled trips with empirical headways.
    */
   public Integer headway = null;
 
@@ -56,9 +56,9 @@ public class ApiLeg {
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
-   * computed by the algorithm for the section this leg account for. This is relevant for anyone
-   * who want to debug an search and tuning the system. The unit should be equivalent to the cost
-   * of "one second of transit".
+   * computed by the algorithm for the section this leg account for. This is relevant for anyone who
+   * want to debug an search and tuning the system. The unit should be equivalent to the cost of
+   * "one second of transit".
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
@@ -97,16 +97,15 @@ public class ApiLeg {
   public String routeColor = null;
 
   /**
-   * For transit legs, the type of the route. Non transit -1
-   * When 0-7: 0 Tram, 1 Subway, 2 Train, 3 Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular
-   * When equal or highter than 100, it is coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard
-   * Also see http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
+   * For transit legs, the type of the route. Non transit -1 When 0-7: 0 Tram, 1 Subway, 2 Train, 3
+   * Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular When equal or highter than 100, it is coded
+   * using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard Also see
+   * http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
    */
   public Integer routeType = null;
 
   /**
-   * For transit legs, the ID of the route.
-   * For non-transit legs, null.
+   * For transit legs, the ID of the route. For non-transit legs, null.
    */
   public String routeId = null;
 
@@ -136,25 +135,23 @@ public class ApiLeg {
   public String headsign = null;
 
   /**
-   * For transit legs, the ID of the transit agency that operates the service used for this leg.
-   * For non-transit legs, null.
+   * For transit legs, the ID of the transit agency that operates the service used for this leg. For
+   * non-transit legs, null.
    */
   public String agencyId = null;
 
   /**
-   * For transit legs, the ID of the trip.
-   * For non-transit legs, null.
+   * For transit legs, the ID of the trip. For non-transit legs, null.
    */
   public String tripId = null;
 
   /**
-   * For transit legs, the service date of the trip.
-   * For non-transit legs, null.
+   * For transit legs, the service date of the trip. For non-transit legs, null.
    * <p>
-   * The trip service date should be used to identify the correct trip schedule and
-   * can not be trusted to display the date for any departures or arrivals. For example,
-   * the first departure for a given trip may happen at service date March 25th and
-   * service time 25:00, which in local time would be Mach 26th 01:00.
+   * The trip service date should be used to identify the correct trip schedule and can not be
+   * trusted to display the date for any departures or arrivals. For example, the first departure
+   * for a given trip may happen at service date March 25th and service time 25:00, which in local
+   * time would be Mach 26th 01:00.
    */
   public String serviceDate = null;
 
@@ -174,9 +171,9 @@ public class ApiLeg {
   public ApiPlace to = null;
 
   /**
-   * For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends.
-   * For non-transit legs, null.
-   * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
+   * For transit legs, intermediate stops between the Place where the leg originates and the Place
+   * where the leg ends. For non-transit legs, null. This field is optional i.e. it is always null
+   * unless "showIntermediateStops" parameter is set to "true" in the planner request.
    */
   public List<ApiPlace> intermediateStops;
 
@@ -186,8 +183,8 @@ public class ApiLeg {
   public EncodedPolylineBean legGeometry;
 
   /**
-   * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the leg, y is the elevation at this
-   * distance.
+   * The elevation profile as a comma-separated list of x,y values. x is the distance from the start
+   * of the leg, y is the elevation at this distance.
    */
   public String legElevation;
 

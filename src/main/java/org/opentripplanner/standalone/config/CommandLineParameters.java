@@ -10,15 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is a JCommander-annotated class that holds parameters for OTP stand-alone mode.
- * These parameters can be parsed from the command line, or provided in a file using Jcommander's
+ * This is a JCommander-annotated class that holds parameters for OTP stand-alone mode. These
+ * parameters can be parsed from the command line, or provided in a file using Jcommander's
  * at-symbol syntax (see http://jcommander.org/#Syntax). When stand-alone OTP is started as a
- * daemon, parameters are loaded from such a file, located by default in '/etc/opentripplanner.cfg'.
- *
+ * daemon, parameters are loaded from such a file, located by default in
+ * '/etc/opentripplanner.cfg'.
+ * <p>
  * Note that JCommander-annotated parameters can be any type that can be constructed from a string.
- * This module also contains classes for validating parameters.
- * See: http://jcommander.org/#Parameter_validation
- *
+ * This module also contains classes for validating parameters. See:
+ * http://jcommander.org/#Parameter_validation
+ * <p>
  * Some parameter fields are not initialized so when inferring other parameters, we can check for
  * null and see whether they were specified on the command line.
  *
@@ -147,18 +148,6 @@ public class CommandLineParameters {
   @Parameter(validateWith = ReadableDirectory.class, description = "/graph/or/inputs/directory")
   public List<File> baseDirectory;
 
-  /**
-   * Set some convenience parameters based on other parameters' values.
-   * Default values are validated even when no command line option is specified, and we will not
-   * bind ports unless a server is started. Therefore we only validate that port parameters are
-   * positive integers, and we check that ports are available only when a server will be started.
-   */
-  public void inferAndValidate() {
-    validateOneDirectorySet();
-    validatePortsAvailable();
-    validateParameterCombinations();
-  }
-
   public static CommandLineParameters createCliForTest(File baseDir) {
     CommandLineParameters params = new CommandLineParameters();
     params.baseDirectory = List.of(baseDir);
@@ -166,8 +155,20 @@ public class CommandLineParameters {
   }
 
   /**
-   * Workaround for bug https://github.com/cbeust/jcommander/pull/390
-   * The main non-switch parameter has to be a list. Return the first one.
+   * Set some convenience parameters based on other parameters' values. Default values are validated
+   * even when no command line option is specified, and we will not bind ports unless a server is
+   * started. Therefore we only validate that port parameters are positive integers, and we check
+   * that ports are available only when a server will be started.
+   */
+  public void inferAndValidate() {
+    validateOneDirectorySet();
+    validatePortsAvailable();
+    validateParameterCombinations();
+  }
+
+  /**
+   * Workaround for bug https://github.com/cbeust/jcommander/pull/390 The main non-switch parameter
+   * has to be a list. Return the first one.
    */
   public File getBaseDirectory() {
     validateOneDirectorySet();
@@ -200,47 +201,6 @@ public class CommandLineParameters {
 
   public boolean doServe() {
     return load || (serve && doBuildTransit());
-  }
-
-  public static class ReadableDirectory implements IParameterValidator {
-
-    @Override
-    public void validate(String name, String value) throws ParameterException {
-      File file = new File(value);
-      if (!file.isDirectory()) {
-        String msg = String.format("%s: '%s' is not a directory.", name, value);
-        throw new ParameterException(msg);
-      }
-      if (!file.canRead()) {
-        String msg = String.format("%s: directory '%s' is not readable.", name, value);
-        throw new ParameterException(msg);
-      }
-    }
-  }
-
-  public static class ReadWriteDirectory implements IParameterValidator {
-
-    @Override
-    public void validate(String name, String value) throws ParameterException {
-      new ReadableDirectory().validate(name, value);
-      File file = new File(value);
-      if (!file.canWrite()) {
-        String msg = String.format("%s: directory '%s' is not writable.", name, value);
-        throw new ParameterException(msg);
-      }
-    }
-  }
-
-  public static class PositiveInteger implements IParameterValidator {
-
-    @Override
-    public void validate(String name, String value) throws ParameterException {
-      Integer i = Integer.parseInt(value);
-      if (i <= 0) {
-        String msg = String.format("%s must be a positive integer.", name);
-        throw new ParameterException(msg);
-      }
-    }
   }
 
   /**
@@ -332,5 +292,46 @@ public class CommandLineParameters {
       }
     }
     return cmds;
+  }
+
+  public static class ReadableDirectory implements IParameterValidator {
+
+    @Override
+    public void validate(String name, String value) throws ParameterException {
+      File file = new File(value);
+      if (!file.isDirectory()) {
+        String msg = String.format("%s: '%s' is not a directory.", name, value);
+        throw new ParameterException(msg);
+      }
+      if (!file.canRead()) {
+        String msg = String.format("%s: directory '%s' is not readable.", name, value);
+        throw new ParameterException(msg);
+      }
+    }
+  }
+
+  public static class ReadWriteDirectory implements IParameterValidator {
+
+    @Override
+    public void validate(String name, String value) throws ParameterException {
+      new ReadableDirectory().validate(name, value);
+      File file = new File(value);
+      if (!file.canWrite()) {
+        String msg = String.format("%s: directory '%s' is not writable.", name, value);
+        throw new ParameterException(msg);
+      }
+    }
+  }
+
+  public static class PositiveInteger implements IParameterValidator {
+
+    @Override
+    public void validate(String name, String value) throws ParameterException {
+      Integer i = Integer.parseInt(value);
+      if (i <= 0) {
+        String msg = String.format("%s must be a positive integer.", name);
+        throw new ParameterException(msg);
+      }
+    }
   }
 }

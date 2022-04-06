@@ -4,9 +4,9 @@ import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
- * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment.
- * This is used to categorize lines based on their particular purposes such as fare harmonization or
- * public presentation. For exempel divide lines into commercial and non-commercial group.
+ * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize
+ * lines based on their particular purposes such as fare harmonization or public presentation. For
+ * exempel divide lines into commercial and non-commercial group.
  */
 public class GroupOfRoutes extends TransitEntity {
 

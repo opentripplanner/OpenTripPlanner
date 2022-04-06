@@ -138,17 +138,16 @@ public interface Leg {
   Calendar getEndTime();
 
   /**
-   * For transit leg, the offset from the scheduled departure-time of the boarding stop in this
-   * leg. "scheduled time of departure at boarding stop" = startTime - departureDelay Unit:
-   * seconds.
+   * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
+   * "scheduled time of departure at boarding stop" = startTime - departureDelay Unit: seconds.
    */
   default int getDepartureDelay() {
     return 0;
   }
 
   /**
-   * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this
-   * leg. "scheduled time of arrival at alighting stop" = endTime - arrivalDelay Unit: seconds.
+   * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
+   * "scheduled time of arrival at alighting stop" = endTime - arrivalDelay Unit: seconds.
    */
   default int getArrivalDelay() {
     return 0;
@@ -178,9 +177,9 @@ public interface Leg {
   }
 
   /**
-   * The best estimate of the time between two arriving vehicles. This is particularly important
-   * for non-strict frequency trips, but could become important for real-time trips, strict
-   * frequency trips, and scheduled trips with empirical headways.
+   * The best estimate of the time between two arriving vehicles. This is particularly important for
+   * non-strict frequency trips, but could become important for real-time trips, strict frequency
+   * trips, and scheduled trips with empirical headways.
    */
   default Integer getHeadway() {
     return null;
@@ -204,10 +203,10 @@ public interface Leg {
   }
 
   /**
-   * For transit legs, the type of the route. Non transit -1 When 0-7: 0 Tram, 1 Subway, 2 Train,
-   * 3 Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular When equal or highter than 100, it is
-   * coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard Also
-   * see http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
+   * For transit legs, the type of the route. Non transit -1 When 0-7: 0 Tram, 1 Subway, 2 Train, 3
+   * Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular When equal or highter than 100, it is coded
+   * using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard Also see
+   * http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
    */
   default Integer getRouteType() {
     return null;
@@ -278,9 +277,9 @@ public interface Leg {
   }
 
   /**
-   * How much elevation is lost, in total, over the course of the leg, in meters. As an example,
-   * a trip that went from the top of Mount Everest straight down to sea level, then back up K2,
-   * then back down again would have an elevationLost of Everest + K2.
+   * How much elevation is lost, in total, over the course of the leg, in meters. As an example, a
+   * trip that went from the top of Mount Everest straight down to sea level, then back up K2, then
+   * back down again would have an elevationLost of Everest + K2.
    */
   default Double getElevationLost() {
     return null;
@@ -358,9 +357,9 @@ public interface Leg {
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
-   * computed by the algorithm for the section this leg account for. This is relevant for anyone
-   * who want to debug a search and tuning the system. The unit should be equivalent to the cost
-   * of "one second of transit".
+   * computed by the algorithm for the section this leg account for. This is relevant for anyone who
+   * want to debug a search and tuning the system. The unit should be equivalent to the cost of "one
+   * second of transit".
    * <p>
    * -1 indicate that the cost is not set/computed.
    */

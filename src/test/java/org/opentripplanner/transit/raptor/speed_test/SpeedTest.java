@@ -31,8 +31,8 @@ import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.util.OtpAppException;
 
 /**
- * Test response times for a large batch of origin/destination points.
- * Also demonstrates how to run basic searches without using the graphQL profile routing API.
+ * Test response times for a large batch of origin/destination points. Also demonstrates how to run
+ * basic searches without using the graphQL profile routing API.
  */
 public class SpeedTest {
 
@@ -45,11 +45,11 @@ public class SpeedTest {
   private final SpeedTestCmdLineOpts opts;
   private final SpeedTestConfig config;
   private final List<TestCaseInput> testCaseInputs;
-  private SpeedTestProfile routeProfile;
   private final Router router;
   private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
   private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
   private final CsvFileIO tcIO;
+  private SpeedTestProfile routeProfile;
 
   private SpeedTest(SpeedTestCmdLineOpts opts) {
     this.opts = opts;
@@ -98,6 +98,28 @@ public class SpeedTest {
     }
     graph.index();
     return graph;
+  }
+
+  /**
+   * Filter test-cases based on ids and tags
+   */
+  private static List<TestCaseInput> filterTestCases(
+    SpeedTestCmdLineOpts opts,
+    List<TestCaseInput> cases
+  ) {
+    // Filter test-cases based on ids
+    var includeIds = opts.testCaseIds();
+
+    if (!includeIds.isEmpty()) {
+      cases = cases.stream().filter(it -> includeIds.contains(it.definition().id())).toList();
+    }
+
+    // Filter test-cases based on tags. Include all test-cases which include ALL listed tags.
+    Collection<String> includeTags = opts.includeTags();
+    if (!includeTags.isEmpty()) {
+      cases = cases.stream().filter(tc -> tc.definition().tags().containsAll(includeTags)).toList();
+    }
+    return cases;
   }
 
   private void runTest() {
@@ -223,27 +245,5 @@ public class SpeedTest {
 
   private List<TestCase> createNewSetOfTestCases() {
     return testCaseInputs.stream().map(in -> in.createTestCase(opts.skipCost())).toList();
-  }
-
-  /**
-   * Filter test-cases based on ids and tags
-   */
-  private static List<TestCaseInput> filterTestCases(
-    SpeedTestCmdLineOpts opts,
-    List<TestCaseInput> cases
-  ) {
-    // Filter test-cases based on ids
-    var includeIds = opts.testCaseIds();
-
-    if (!includeIds.isEmpty()) {
-      cases = cases.stream().filter(it -> includeIds.contains(it.definition().id())).toList();
-    }
-
-    // Filter test-cases based on tags. Include all test-cases which include ALL listed tags.
-    Collection<String> includeTags = opts.includeTags();
-    if (!includeTags.isEmpty()) {
-      cases = cases.stream().filter(tc -> tc.definition().tags().containsAll(includeTags)).toList();
-    }
-    return cases;
   }
 }

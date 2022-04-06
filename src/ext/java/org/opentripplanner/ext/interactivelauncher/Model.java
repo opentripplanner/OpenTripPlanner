@@ -41,19 +41,6 @@ public class Model implements Serializable {
     return MODEL_FILE.exists() ? readFromFile() : new Model();
   }
 
-  private static Model readFromFile() {
-    try {
-      return new ObjectMapper().readValue(MODEL_FILE, Model.class);
-    } catch (IOException e) {
-      System.err.println(
-        "Unable to read the InteractiveOtpMain state cache. If the model changed this " +
-        "is expected, and it will work next time. Cause: " +
-        e.getMessage()
-      );
-      return new Model();
-    }
-  }
-
   public void subscribeCmdLineUpdates(Consumer<String> commandLineChange) {
     this.commandLineChange = commandLineChange;
   }
@@ -221,6 +208,19 @@ public class Model implements Serializable {
     args.add(getDataSourceDirectory());
 
     return args.toArray(new String[0]);
+  }
+
+  private static Model readFromFile() {
+    try {
+      return new ObjectMapper().readValue(MODEL_FILE, Model.class);
+    } catch (IOException e) {
+      System.err.println(
+        "Unable to read the InteractiveOtpMain state cache. If the model changed this " +
+        "is expected, and it will work next time. Cause: " +
+        e.getMessage()
+      );
+      return new Model();
+    }
   }
 
   private void notifyChangeListener() {

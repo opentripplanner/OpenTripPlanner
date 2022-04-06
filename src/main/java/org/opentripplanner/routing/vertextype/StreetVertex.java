@@ -15,9 +15,8 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 
 /**
- * Abstract base class for vertices in the street layer of the graph.
- * This includes both vertices representing intersections or points (IntersectionVertices)
- * and Elevator*Vertices.
+ * Abstract base class for vertices in the street layer of the graph. This includes both vertices
+ * representing intersections or points (IntersectionVertices) and Elevator*Vertices.
  */
 public abstract class StreetVertex extends Vertex {
 
@@ -36,11 +35,10 @@ public abstract class StreetVertex extends Vertex {
 
   /**
    * Creates intersection name out of all outgoing names
-   *
-   * This can be:
-   *  - name of the street if it is only 1
-   *  - unnamedStreed (localized in requested language) if it doesn't have a name
-   *  - corner of 0 and 1 (localized corner of zero and first street in the corner)
+   * <p>
+   * This can be: - name of the street if it is only 1 - unnamedStreed (localized in requested
+   * language) if it doesn't have a name - corner of 0 and 1 (localized corner of zero and first
+   * street in the corner)
    *
    * @return already localized street names and non-localized corner of x and unnamedStreet
    */

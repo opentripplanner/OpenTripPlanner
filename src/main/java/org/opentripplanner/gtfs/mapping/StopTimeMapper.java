@@ -44,7 +44,7 @@ class StopTimeMapper {
     return MapUtils.mapToList(times, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   StopTime map(org.onebusaway.gtfs.model.StopTime orginal) {
     return orginal == null ? null : mappedStopTimes.computeIfAbsent(orginal, this::doMap);
   }

@@ -16,8 +16,8 @@ import org.opentripplanner.routing.graph.Vertex;
 public class PlatformLinkerTest {
 
   /**
-   * Test linking from stairs endpoint to nodes in the ring defining the platform area.
-   * OSM test data is from Skøyen station, Norway
+   * Test linking from stairs endpoint to nodes in the ring defining the platform area. OSM test
+   * data is from Skøyen station, Norway
    */
   @Test
   public void testLinkEntriesToPlatforms() throws Exception {

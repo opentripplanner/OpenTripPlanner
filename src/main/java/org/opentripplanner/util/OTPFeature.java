@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 /**
  * The purpose of this class is to be able to turn features on and off.
  * <p>
- * This configuration is optional and found under "feature" in the top
- * level 'otp-config.json' file.
+ * This configuration is optional and found under "feature" in the top level 'otp-config.json'
+ * file.
  */
 public enum OTPFeature {
   APIBikeRental(true),
@@ -39,21 +39,25 @@ public enum OTPFeature {
   VehicleToStopHeuristics(false);
 
   private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
+  private boolean enabled;
 
   OTPFeature(boolean defaultEnabled) {
     this.enabled = defaultEnabled;
   }
 
-  private boolean enabled;
-
   /**
-   * This method allows the application to initialize each OTP feature. Only use this
-   * method at startup-time.
-   *
+   * This method allows the application to initialize each OTP feature. Only use this method at
+   * startup-time.
+   * <p>
    * THIS METHOD IS NOT THREAD-SAFE!
    */
   public static void enableFeatures(Map<OTPFeature, Boolean> map) {
     map.forEach(OTPFeature::set);
+  }
+
+  public static void logFeatureSetup() {
+    LOG.info("Features turned on: \n\t" + valuesAsString(true));
+    LOG.info("Features turned off: \n\t" + valuesAsString(false));
   }
 
   /**
@@ -71,13 +75,6 @@ public enum OTPFeature {
   }
 
   /**
-   * Allow unit test and this class to enable/disable a feature.
-   */
-  void set(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  /**
    * If feature is turned on, then return supplied object if not return {@code null}.
    */
   public <T> T isOnElseNull(Supplier<T> supplier) {
@@ -86,9 +83,11 @@ public enum OTPFeature {
 
   /* private members */
 
-  public static void logFeatureSetup() {
-    LOG.info("Features turned on: \n\t" + valuesAsString(true));
-    LOG.info("Features turned off: \n\t" + valuesAsString(false));
+  /**
+   * Allow unit test and this class to enable/disable a feature.
+   */
+  void set(boolean enabled) {
+    this.enabled = enabled;
   }
 
   private static String valuesAsString(boolean enabled) {

@@ -20,52 +20,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAgency {
 
   @Override
-  public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("Agency", getSource(environment).getId().toString());
-  }
-
-  @Override
-  public DataFetcher<String> gtfsId() {
-    return environment -> getSource(environment).getId().toString();
-  }
-
-  @Override
-  public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName();
-  }
-
-  @Override
-  public DataFetcher<String> url() {
-    return environment -> getSource(environment).getUrl();
-  }
-
-  @Override
-  public DataFetcher<String> timezone() {
-    return environment -> getSource(environment).getTimezone();
-  }
-
-  @Override
-  public DataFetcher<String> lang() {
-    return environment -> getSource(environment).getLang();
-  }
-
-  @Override
-  public DataFetcher<String> phone() {
-    return environment -> getSource(environment).getPhone();
-  }
-
-  @Override
-  public DataFetcher<String> fareUrl() {
-    return environment -> getSource(environment).getFareUrl();
-  }
-
-  @Override
-  public DataFetcher<Iterable<Route>> routes() {
-    return environment -> getRoutes(environment);
-  }
-
-  @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
@@ -105,6 +59,52 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
         return alertService.getAgencyAlerts(getSource(environment).getId());
       }
     };
+  }
+
+  @Override
+  public DataFetcher<String> fareUrl() {
+    return environment -> getSource(environment).getFareUrl();
+  }
+
+  @Override
+  public DataFetcher<String> gtfsId() {
+    return environment -> getSource(environment).getId().toString();
+  }
+
+  @Override
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment ->
+      new Relay.ResolvedGlobalId("Agency", getSource(environment).getId().toString());
+  }
+
+  @Override
+  public DataFetcher<String> lang() {
+    return environment -> getSource(environment).getLang();
+  }
+
+  @Override
+  public DataFetcher<String> name() {
+    return environment -> getSource(environment).getName();
+  }
+
+  @Override
+  public DataFetcher<String> phone() {
+    return environment -> getSource(environment).getPhone();
+  }
+
+  @Override
+  public DataFetcher<Iterable<Route>> routes() {
+    return environment -> getRoutes(environment);
+  }
+
+  @Override
+  public DataFetcher<String> timezone() {
+    return environment -> getSource(environment).getTimezone();
+  }
+
+  @Override
+  public DataFetcher<String> url() {
+    return environment -> getSource(environment).getUrl();
   }
 
   private List<Route> getRoutes(DataFetchingEnvironment environment) {

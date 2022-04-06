@@ -52,26 +52,20 @@ import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.WorkflowStatusEnumeration;
 
 /**
- * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds.
- * NOTE this cannot handle situations where there are multiple feeds with different IDs (for now it may only work in
- * single-feed regions).
+ * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds. NOTE
+ * this cannot handle situations where there are multiple feeds with different IDs (for now it may
+ * only work in single-feed regions).
  */
 public class SiriAlertsUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
-
+  private final String feedId;
+  private final Graph graph;
+  private final Set<TransitAlert> alerts = new HashSet<>();
   private TransitAlertService transitAlertService;
-
   /** How long before the posted start of an event it should be displayed to users */
   private long earlyStart;
-
   private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
-
-  private final String feedId;
-
-  private final Graph graph;
-
-  private final Set<TransitAlert> alerts = new HashSet<>();
 
   public SiriAlertsUpdateHandler(String feedId, Graph graph) {
     this.feedId = feedId;
@@ -134,6 +128,22 @@ public class SiriAlertsUpdateHandler {
         );
       }
     }
+  }
+
+  public void setTransitAlertService(TransitAlertService transitAlertService) {
+    this.transitAlertService = transitAlertService;
+  }
+
+  public long getEarlyStart() {
+    return earlyStart;
+  }
+
+  public void setEarlyStart(long earlyStart) {
+    this.earlyStart = earlyStart;
+  }
+
+  public void setSiriFuzzyTripMatcher(SiriFuzzyTripMatcher siriFuzzyTripMatcher) {
+    this.siriFuzzyTripMatcher = siriFuzzyTripMatcher;
   }
 
   private TransitAlert handleAlert(PtSituationElement situation) {
@@ -538,8 +548,8 @@ public class SiriAlertsUpdateHandler {
   }
 
   /**
-   * @return True if list have at least one element. {@code false} is returned if the given list
-   * is empty or {@code null}.
+   * @return True if list have at least one element. {@code false} is returned if the given list is
+   * empty or {@code null}.
    */
   private boolean isNotEmpty(List<?> list) {
     return list != null && !list.isEmpty();
@@ -569,21 +579,5 @@ public class SiriAlertsUpdateHandler {
     }
 
     return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
-  }
-
-  public void setTransitAlertService(TransitAlertService transitAlertService) {
-    this.transitAlertService = transitAlertService;
-  }
-
-  public long getEarlyStart() {
-    return earlyStart;
-  }
-
-  public void setEarlyStart(long earlyStart) {
-    this.earlyStart = earlyStart;
-  }
-
-  public void setSiriFuzzyTripMatcher(SiriFuzzyTripMatcher siriFuzzyTripMatcher) {
-    this.siriFuzzyTripMatcher = siriFuzzyTripMatcher;
   }
 }

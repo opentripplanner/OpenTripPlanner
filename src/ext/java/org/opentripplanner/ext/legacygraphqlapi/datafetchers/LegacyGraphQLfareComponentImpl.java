@@ -13,8 +13,8 @@ public class LegacyGraphQLfareComponentImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLFareComponent {
 
   @Override
-  public DataFetcher<String> fareId() {
-    return environment -> getSource(environment).fareId.toString();
+  public DataFetcher<Integer> cents() {
+    return environment -> getSource(environment).price.getCents();
   }
 
   @Override
@@ -23,8 +23,8 @@ public class LegacyGraphQLfareComponentImpl
   }
 
   @Override
-  public DataFetcher<Integer> cents() {
-    return environment -> getSource(environment).price.getCents();
+  public DataFetcher<String> fareId() {
+    return environment -> getSource(environment).fareId.toString();
   }
 
   @Override

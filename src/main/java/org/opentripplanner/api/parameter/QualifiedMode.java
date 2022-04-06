@@ -48,16 +48,6 @@ public class QualifiedMode implements Serializable {
     this.qualifiers = Set.of(qualifiers);
   }
 
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(mode);
-    for (Qualifier qualifier : qualifiers) {
-      sb.append("_");
-      sb.append(qualifier);
-    }
-    return sb.toString();
-  }
-
   @Override
   public int hashCode() {
     return mode.hashCode() * qualifiers.hashCode();
@@ -70,5 +60,15 @@ public class QualifiedMode implements Serializable {
       return qmOther.mode.equals(this.mode) && qmOther.qualifiers.equals(this.qualifiers);
     }
     return false;
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(mode);
+    for (Qualifier qualifier : qualifiers) {
+      sb.append("_");
+      sb.append(qualifier);
+    }
+    return sb.toString();
   }
 }

@@ -8,17 +8,13 @@ import java.util.Collection;
 import org.opentripplanner.common.model.T2;
 
 /**
- * This class is used for adding data for each object in the vector layer from the userData in the geometry.
+ * This class is used for adding data for each object in the vector layer from the userData in the
+ * geometry.
  *
  * @param <T> is type of userData in the geometry.
  * @see UserDataKeyValueMapConverter
  */
 public abstract class PropertyMapper<T> implements IUserDataConverter {
-
-  /**
-   * The return type is to allow null values.
-   */
-  protected abstract Collection<T2<String, Object>> map(T input);
 
   public void addTags(
     Object userData,
@@ -41,4 +37,9 @@ public abstract class PropertyMapper<T> implements IUserDataConverter {
       }
     }
   }
+
+  /**
+   * The return type is to allow null values.
+   */
+  protected abstract Collection<T2<String, Object>> map(T input);
 }

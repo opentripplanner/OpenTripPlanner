@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  * websocket.defaultAgencyId = agency
  * websocket.url = ws://localhost:8088/tripUpdates
  * </pre>
- *
  */
 public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
@@ -41,28 +40,23 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
   private static final int CHECK_CONNECTION_PERIOD_SEC = 1;
 
   private static final Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
-
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  private WriteToGraphCallback saveResultOnGraph;
-
   /**
    * Url of the websocket server
    */
   private final String url;
-
   /**
    * The ID for the static feed to which these TripUpdates are applied
    */
   private final String feedId;
-
   /**
    * The number of seconds to wait before reconnecting after a failed connection.
    */
   private final int reconnectPeriodSec;
-
   private final String configRef;
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  private WriteToGraphCallback saveResultOnGraph;
 
   public WebsocketGtfsRealtimeUpdater(WebsocketGtfsRealtimeUpdaterParameters parameters) {
     this.configRef = parameters.getConfigRef();
@@ -128,10 +122,24 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
   @Override
   public void teardown() {}
 
+  @Override
+  public String getConfigRef() {
+    return configRef;
+  }
+
   /**
    * Auxiliary class to handle incoming messages via the websocket connection
    */
   private class Listener implements WebSocketListener {
+
+    @Override
+    public void onOpen(WebSocket websocket) {}
+
+    @Override
+    public void onClose(WebSocket websocket, int code, String reason) {}
+
+    @Override
+    public void onError(Throwable t) {}
 
     @Override
     public void onBinaryFrame(byte[] message, boolean finalFragment, int rsv) {
@@ -177,19 +185,5 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         saveResultOnGraph.execute(runnable);
       }
     }
-
-    @Override
-    public void onOpen(WebSocket websocket) {}
-
-    @Override
-    public void onClose(WebSocket websocket, int code, String reason) {}
-
-    @Override
-    public void onError(Throwable t) {}
-  }
-
-  @Override
-  public String getConfigRef() {
-    return configRef;
   }
 }

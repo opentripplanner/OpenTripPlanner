@@ -27,11 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit
- * network among themselves. This is necessary for routing in long-distance mode.
- *
- * It will use the street network if OSM data has already been loaded into the graph.
- * Otherwise it will use straight-line distance between stops.
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the
+ * stops of a transit network among themselves. This is necessary for routing in long-distance
+ * mode.
+ * <p>
+ * It will use the street network if OSM data has already been loaded into the graph. Otherwise it
+ * will use straight-line distance between stops.
  */
 public class DirectTransferGenerator implements GraphBuilderModule {
 
@@ -41,17 +42,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private final List<RoutingRequest> transferRequests;
 
+  public DirectTransferGenerator(Duration radiusByDuration, List<RoutingRequest> transferRequests) {
+    this.radiusByDuration = radiusByDuration;
+    this.transferRequests = transferRequests;
+  }
+
   public List<String> provides() {
     return List.of("linking");
   }
 
   public List<String> getPrerequisites() {
     return List.of("street to transit");
-  }
-
-  public DirectTransferGenerator(Duration radiusByDuration, List<RoutingRequest> transferRequests) {
-    this.radiusByDuration = radiusByDuration;
-    this.transferRequests = transferRequests;
   }
 
   @Override
@@ -190,6 +191,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
 
     @Override
+    public int hashCode() {
+      return Objects.hash(source, target, edges);
+    }
+
+    @Override
     public boolean equals(Object o) {
       if (this == o) {
         return true;
@@ -203,11 +209,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         target.equals(that.target) &&
         Objects.equals(edges, that.edges)
       );
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(source, target, edges);
     }
   }
 }

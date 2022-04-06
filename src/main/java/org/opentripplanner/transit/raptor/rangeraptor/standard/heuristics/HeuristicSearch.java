@@ -7,8 +7,8 @@ import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 
 /**
- * Combine Heuristics and Worker into one class to be able to retrieve the
- * heuristics after the worker is invoked.
+ * Combine Heuristics and Worker into one class to be able to retrieve the heuristics after the
+ * worker is invoked.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

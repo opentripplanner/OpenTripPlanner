@@ -10,8 +10,8 @@ public enum RealTimeState {
   SCHEDULED,
 
   /**
-   * The trip information has been updated, but the trip pattern stayed the same as the trip
-   * pattern of the scheduled trip.
+   * The trip information has been updated, but the trip pattern stayed the same as the trip pattern
+   * of the scheduled trip.
    */
   UPDATED,
 
@@ -21,13 +21,14 @@ public enum RealTimeState {
   CANCELED,
 
   /**
-   * The trip has been added using a real-time update, i.e. the trip was not present in the GTFS feed.
+   * The trip has been added using a real-time update, i.e. the trip was not present in the GTFS
+   * feed.
    */
   ADDED,
 
   /**
-   * The trip information has been updated and resulted in a different trip pattern compared to
-   * the trip pattern of the scheduled trip.
+   * The trip information has been updated and resulted in a different trip pattern compared to the
+   * trip pattern of the scheduled trip.
    */
   MODIFIED,
 }

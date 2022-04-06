@@ -4,8 +4,8 @@ import java.util.stream.Stream;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
 
 /**
- * Several implementation are implemented - with different behaviour. Use the one
- * that suites your need best.
+ * Several implementation are implemented - with different behaviour. Use the one that suites your
+ * need best.
  */
 public enum RaptorProfile {
   /**
@@ -14,8 +14,8 @@ public enum RaptorProfile {
   MULTI_CRITERIA("Mc"),
 
   /**
-   * Used by Range Raptor finding the earliest-arrival-time, the shortest travel duration
-   * and the fewest transfers. Generalized-cost is not used.
+   * Used by Range Raptor finding the earliest-arrival-time, the shortest travel duration and the
+   * fewest transfers. Generalized-cost is not used.
    * <p/>
    * Computes result paths.
    */
@@ -27,8 +27,8 @@ public enum RaptorProfile {
   BEST_TIME("StdBestTime"),
 
   /**
-   * Used by Raptor to find the shortest travel duration ignoring wait-time. It also finds
-   * number transfers. This profile can only be used with one Raptor iteration - no {code searchWindow}.
+   * Used by Raptor to find the shortest travel duration ignoring wait-time. It also finds number
+   * transfers. This profile can only be used with one Raptor iteration - no {code searchWindow}.
    */
   MIN_TRAVEL_DURATION("MinTravelDuration"),
 
@@ -56,9 +56,9 @@ public enum RaptorProfile {
   }
 
   /**
-   * The {@link MinTravelDurationRoutingStrategy} will time-shift the arrival-times, so we need
-   * to use the approximate trip-times search in path construction. The BEST_TIME state should
-   * not have path construction, but we include it here anyway.
+   * The {@link MinTravelDurationRoutingStrategy} will time-shift the arrival-times, so we need to
+   * use the approximate trip-times search in path construction. The BEST_TIME state should not have
+   * path construction, but we include it here anyway.
    */
   public boolean useApproximateTripSearch() {
     return isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME);

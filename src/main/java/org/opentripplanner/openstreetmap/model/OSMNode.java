@@ -17,8 +17,6 @@ public class OSMNode extends OSMWithTags {
 
   /**
    * Returns the capacity of this node if defined, or 0.
-   *
-   * @return
    */
   public int getCapacity() throws NumberFormatException {
     String capacity = getTag("capacity");
@@ -30,7 +28,8 @@ public class OSMNode extends OSMWithTags {
   }
 
   /**
-   * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently returns true only for elevators.
+   * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently
+   * returns true only for elevators.
    *
    * @return whether the node is multi-level
    * @author mattwigway
@@ -61,6 +60,7 @@ public class OSMNode extends OSMWithTags {
 
   /**
    * Checks if this node is bollard
+   *
    * @return true if it is
    */
   public boolean isBollard() {
@@ -69,6 +69,7 @@ public class OSMNode extends OSMWithTags {
 
   /**
    * Checks if this node blocks traversal in any way
+   *
    * @return true if it does
    */
   public boolean isBarrier() {

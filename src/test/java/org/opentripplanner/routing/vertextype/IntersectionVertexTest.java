@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.vertextype;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -110,9 +112,6 @@ public class IntersectionVertexTest {
   /**
    * Create an edge. If twoWay, create two edges (back and forth).
    *
-   * @param vA
-   * @param vB
-   * @param length
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {

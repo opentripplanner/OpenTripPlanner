@@ -100,10 +100,28 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule>
   }
 
   @Override
+  public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+    if (timeTable.useCustomizedTripSearch()) {
+      return timeTable.createCustomizedTripSearch(SearchDirection.FORWARD);
+    }
+    return new TripScheduleBoardSearch<>(tripSearchBinarySearchThreshold, timeTable);
+  }
+
+  @Override
+  public RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> pattern) {
+    return new TripScheduleExactMatchSearch<>(createTripSearch(pattern), this, iterationStep);
+  }
+
+  @Override
   public RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(
     RaptorRoute<T> route
   ) {
     return route.transferConstraintsForwardSearch();
+  }
+
+  @Override
+  public boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos) {
+    return pattern.boardingPossibleAt(stopPos);
   }
 
   @Override
@@ -117,23 +135,5 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule>
     int fromStop
   ) {
     return transitDataProvider.getTransfersFromStop(fromStop);
-  }
-
-  @Override
-  public boolean boardingPossibleAt(RaptorTripPattern pattern, int stopPos) {
-    return pattern.boardingPossibleAt(stopPos);
-  }
-
-  @Override
-  public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
-    if (timeTable.useCustomizedTripSearch()) {
-      return timeTable.createCustomizedTripSearch(SearchDirection.FORWARD);
-    }
-    return new TripScheduleBoardSearch<>(tripSearchBinarySearchThreshold, timeTable);
-  }
-
-  @Override
-  public RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> pattern) {
-    return new TripScheduleExactMatchSearch<>(createTripSearch(pattern), this, iterationStep);
   }
 }

@@ -22,8 +22,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return a path if it exists for a basic case with one route with one trip including boarding/alighting
- * restrictions and, an access and an egress path.
+ * Raptor should return a path if it exists for a basic case with one route with one trip including
+ * boarding/alighting restrictions and, an access and an egress path.
  */
 public class A02_SingeRouteRestrictionsTest implements RaptorTestConstants {
 

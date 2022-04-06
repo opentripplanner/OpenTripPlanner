@@ -31,101 +31,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPattern {
 
   @Override
-  public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("Pattern", getSource(environment).getId().toString());
-  }
-
-  @Override
-  public DataFetcher<Route> route() {
-    return this::getRoute;
-  }
-
-  @Override
-  public DataFetcher<Integer> directionId() {
-    return environment -> getSource(environment).getDirection().gtfsCode;
-  }
-
-  @Override
-  public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName();
-  }
-
-  @Override
-  public DataFetcher<String> code() {
-    return environment -> getSource(environment).getId().toString();
-  }
-
-  @Override
-  public DataFetcher<String> headsign() {
-    return environment -> getSource(environment).getTripHeadsign();
-  }
-
-  @Override
-  public DataFetcher<Iterable<Trip>> trips() {
-    return this::getTrips;
-  }
-
-  @Override
-  public DataFetcher<Iterable<Trip>> tripsForDate() {
-    return environment -> {
-      String servicaDate = new LegacyGraphQLTypes.LegacyGraphQLPatternTripsForDateArgs(
-        environment.getArguments()
-      )
-        .getLegacyGraphQLServiceDate();
-
-      try {
-        BitSet services = getRoutingService(environment)
-          .getServicesRunningForDate(ServiceDate.parseString(servicaDate));
-        return getSource(environment)
-          .getScheduledTimetable()
-          .getTripTimes()
-          .stream()
-          .filter(times -> services.get(times.getServiceCode()))
-          .map(times -> times.getTrip())
-          .collect(Collectors.toList());
-      } catch (ParseException e) {
-        return null; // Invalid date format
-      }
-    };
-  }
-
-  @Override
-  public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions() {
-    return environment ->
-      getRoutingService(environment)
-        .getVehiclePositionService()
-        .getVehiclePositions(this.getSource(environment));
-  }
-
-  @Override
-  public DataFetcher<Iterable<Object>> stops() {
-    return this::getStops;
-  }
-
-  @Override
-  public DataFetcher<Iterable<Coordinate>> geometry() {
-    return environment -> {
-      LineString geometry = getSource(environment).getGeometry();
-      if (geometry == null) {
-        return null;
-      } else {
-        return Arrays.asList(geometry.getCoordinates());
-      }
-    };
-  }
-
-  @Override
-  public DataFetcher<Geometry> patternGeometry() {
-    return environment -> getSource(environment).getGeometry();
-  }
-
-  @Override
-  public DataFetcher<String> semanticHash() {
-    return environment -> getSource(environment).semanticHashString(null);
-  }
-
-  @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
@@ -226,6 +131,101 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         );
       }
     };
+  }
+
+  @Override
+  public DataFetcher<String> code() {
+    return environment -> getSource(environment).getId().toString();
+  }
+
+  @Override
+  public DataFetcher<Integer> directionId() {
+    return environment -> getSource(environment).getDirection().gtfsCode;
+  }
+
+  @Override
+  public DataFetcher<Iterable<Coordinate>> geometry() {
+    return environment -> {
+      LineString geometry = getSource(environment).getGeometry();
+      if (geometry == null) {
+        return null;
+      } else {
+        return Arrays.asList(geometry.getCoordinates());
+      }
+    };
+  }
+
+  @Override
+  public DataFetcher<String> headsign() {
+    return environment -> getSource(environment).getTripHeadsign();
+  }
+
+  @Override
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment ->
+      new Relay.ResolvedGlobalId("Pattern", getSource(environment).getId().toString());
+  }
+
+  @Override
+  public DataFetcher<String> name() {
+    return environment -> getSource(environment).getName();
+  }
+
+  @Override
+  public DataFetcher<Geometry> patternGeometry() {
+    return environment -> getSource(environment).getGeometry();
+  }
+
+  @Override
+  public DataFetcher<Route> route() {
+    return this::getRoute;
+  }
+
+  @Override
+  public DataFetcher<String> semanticHash() {
+    return environment -> getSource(environment).semanticHashString(null);
+  }
+
+  @Override
+  public DataFetcher<Iterable<Object>> stops() {
+    return this::getStops;
+  }
+
+  @Override
+  public DataFetcher<Iterable<Trip>> trips() {
+    return this::getTrips;
+  }
+
+  @Override
+  public DataFetcher<Iterable<Trip>> tripsForDate() {
+    return environment -> {
+      String servicaDate = new LegacyGraphQLTypes.LegacyGraphQLPatternTripsForDateArgs(
+        environment.getArguments()
+      )
+        .getLegacyGraphQLServiceDate();
+
+      try {
+        BitSet services = getRoutingService(environment)
+          .getServicesRunningForDate(ServiceDate.parseString(servicaDate));
+        return getSource(environment)
+          .getScheduledTimetable()
+          .getTripTimes()
+          .stream()
+          .filter(times -> services.get(times.getServiceCode()))
+          .map(times -> times.getTrip())
+          .collect(Collectors.toList());
+      } catch (ParseException e) {
+        return null; // Invalid date format
+      }
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions() {
+    return environment ->
+      getRoutingService(environment)
+        .getVehiclePositionService()
+        .getVehiclePositions(this.getSource(environment));
   }
 
   private Agency getAgency(DataFetchingEnvironment environment) {

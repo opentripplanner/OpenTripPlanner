@@ -30,9 +30,8 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Search for board- and alight-times for the trip matching the given stop-arrival
-   * when searching FORWARD. Hence, searching in the same direction as the trip travel
-   * direction.
+   * Search for board- and alight-times for the trip matching the given stop-arrival when searching
+   * FORWARD. Hence, searching in the same direction as the trip travel direction.
    */
   public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripForwardSearch(
     ArrivalView<S> arrival
@@ -43,9 +42,8 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Search for board- and alight-times for the trip matching the given stop-arrival
-   * when searching in REVERSE. Hence, searching in the opposite direction of the trip
-   * travel direction.
+   * Search for board- and alight-times for the trip matching the given stop-arrival when searching
+   * in REVERSE. Hence, searching in the opposite direction of the trip travel direction.
    */
   public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripReverseSearch(
     ArrivalView<S> arrival
@@ -56,12 +54,11 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Search for board- and alight-times for the trip matching the given stop-arrival
-   * when searching FORWARD. Hence, searching in the same direction as the trip travel
-   * direction.
+   * Search for board- and alight-times for the trip matching the given stop-arrival when searching
+   * FORWARD. Hence, searching in the same direction as the trip travel direction.
    * <p>
-   * This uses the approximate-time search,
-   * see {@link #findTripTimes(RaptorTripSchedule, int, int, int)}.
+   * This uses the approximate-time search, see {@link #findTripTimes(RaptorTripSchedule, int, int,
+   * int)}.
    */
   public static <
     S extends RaptorTripSchedule
@@ -71,12 +68,11 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Search for board- and alight-times for the trip matching the given stop-arrival
-   * when searching in REVERSE. Hence, searching in the opposite direction of the trip
-   * travel direction.
+   * Search for board- and alight-times for the trip matching the given stop-arrival when searching
+   * in REVERSE. Hence, searching in the opposite direction of the trip travel direction.
    * <p>
-   * This uses the approximate-time search,
-   * see {@link #findTripTimes(RaptorTripSchedule, int, int, int)}.
+   * This uses the approximate-time search, see {@link #findTripTimes(RaptorTripSchedule, int, int,
+   * int)}.
    */
   public static <
     S extends RaptorTripSchedule
@@ -87,10 +83,10 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
 
   /**
    * Search for board- and alight-times for the trip matching the given {@code approximateTime}.
-   * This is slower than the more specific methods and not as correct - it is possible to
-   * construct cases with looping patterns where this method may find the wrong trip. But, it is
-   * safe - it will always find a trip if it exists. Can be used in tests, logging and debugging,
-   * but avoid using it in path mapping.
+   * This is slower than the more specific methods and not as correct - it is possible to construct
+   * cases with looping patterns where this method may find the wrong trip. But, it is safe - it
+   * will always find a trip if it exists. Can be used in tests, logging and debugging, but avoid
+   * using it in path mapping.
    */
   public static <S extends RaptorTripSchedule> BoardAndAlightTime findTripTimes(
     S trip,
@@ -169,8 +165,8 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
   /**
    * Find the trip that is closest in time to the given {@code approximateTime}.
    * <p>
-   * If the approximate time is closer to the next trip, then the total time will be
-   * larger the 4 times the approximate time:
+   * If the approximate time is closer to the next trip, then the total time will be larger the 4
+   * times the approximate time:
    * <ul>
    *   <li>Let the current trip board and alight times be: {@code a & b}</li>
    *   <li>Let the next trip board and alight times be: {@code c & d}</li>

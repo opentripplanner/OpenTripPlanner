@@ -39,11 +39,11 @@ public class TemplateLibrary {
    * Replace various pattern by the OSM tag values, with I18n support.
    *
    * @param pattern Pattern containing options tags to replace, such as "text" or "note: {note}".
-   *        Tag names between {} are replaced by the OSM tag value, if it is present (or the empty
-   *        string if not).
-   * @param way The way containing the tag values
-   * @return A map language code → text, with at least one entry for the default language, and
-   *         any other language found in OSM tag.
+   *                Tag names between {} are replaced by the OSM tag value, if it is present (or the
+   *                empty string if not).
+   * @param way     The way containing the tag values
+   * @return A map language code → text, with at least one entry for the default language, and any
+   * other language found in OSM tag.
    */
   public static Map<String, String> generateI18N(String pattern, OSMWithTags way) {
     if (pattern == null) {

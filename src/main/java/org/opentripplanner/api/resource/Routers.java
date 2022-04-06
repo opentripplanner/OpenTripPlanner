@@ -22,8 +22,8 @@ import org.opentripplanner.standalone.server.Router;
  * GET - see the registered routerIds(there is just one: default) with the graph.
  * <p>
  * The HTTP request URLs are of the form /otp/routers/{routerId}. The {routerId} is kept to be
- * backward compatible, but the value is ignored. There is only one router, the "default" and
- * that is returned - even if you specify something else.
+ * backward compatible, but the value is ignored. There is only one router, the "default" and that
+ * is returned - even if you specify something else.
  */
 @Path("/routers")
 @PermitAll // exceptions on methods
@@ -46,10 +46,11 @@ public class Routers {
   }
 
   /**
-   * Returns a list of routers and their bounds. A list with one item, the "default" router,
-   * is returned.
-   * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
-   * on the Accept header in the HTTP request.
+   * Returns a list of routers and their bounds. A list with one item, the "default" router, is
+   * returned.
+   *
+   * @return a representation of the graphs and their geographic bounds, in JSON or XML depending on
+   * the Accept header in the HTTP request.
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)

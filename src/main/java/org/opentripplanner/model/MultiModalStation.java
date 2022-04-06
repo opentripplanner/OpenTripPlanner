@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 import org.opentripplanner.util.I18NString;
 
 /**
- * The next level grouping of stops above Station. Equivalent to NeTEx multimodal StopPlace. As
- * a Station (NeTEx StopPlace) only supports a single transit mode, you are required to group
- * several Stations together using a MultiModalStation in order to support several modes. This
- * entity is not part of GTFS.
+ * The next level grouping of stops above Station. Equivalent to NeTEx multimodal StopPlace. As a
+ * Station (NeTEx StopPlace) only supports a single transit mode, you are required to group several
+ * Stations together using a MultiModalStation in order to support several modes. This entity is not
+ * part of GTFS.
  */
 public class MultiModalStation extends TransitEntity implements StopCollection {
 
@@ -42,6 +42,12 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
   public void setName(I18NString name) {
     this.name = name;
+  }
+
+  public Collection<StopLocation> getChildStops() {
+    return this.childStations.stream()
+      .flatMap(s -> s.getChildStops().stream())
+      .collect(Collectors.toUnmodifiableList());
   }
 
   @Override
@@ -84,12 +90,6 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
   public void setUrl(I18NString url) {
     this.url = url;
-  }
-
-  public Collection<StopLocation> getChildStops() {
-    return this.childStations.stream()
-      .flatMap(s -> s.getChildStops().stream())
-      .collect(Collectors.toUnmodifiableList());
   }
 
   public Collection<Station> getChildStations() {

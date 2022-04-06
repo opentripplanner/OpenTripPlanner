@@ -3,9 +3,9 @@ package org.opentripplanner.transit.raptor.api.transit;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
- * Encapsulate information about an access, transfer or egress path. We do not distinguish
- * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to
- * destination), to Raptor - all these are the same thing.
+ * Encapsulate information about an access, transfer or egress path. We do not distinguish between
+ * the access (origin to first stop), transfer (stop to stop) or egress (last stop to destination),
+ * to Raptor - all these are the same thing.
  */
 public interface RaptorTransfer {
   /**
@@ -23,15 +23,15 @@ public interface RaptorTransfer {
   /**
    * The generalized cost of this transfer in centi-seconds. The value is used to compare with
    * riding transit, and will be one component of a full itinerary.
-   *
+   * <p>
    * This methods is called many times, so care needs to be taken that the value is stored, not
    * calculated for each invocation.
    */
   int generalizedCost();
 
   /**
-   * The time duration to walk or travel the path in seconds. This is not the entire duration
-   * from the journey origin, but just:
+   * The time duration to walk or travel the path in seconds. This is not the entire duration from
+   * the journey origin, but just:
    * <ul>
    *     <li>Access: journey origin to first stop.
    *     <li>Transit: stop to stop.
@@ -47,9 +47,9 @@ public interface RaptorTransfer {
 
   /**
    * Returns the earliest possible departure time for the path. Used Eg. in flex routing and TNC
-   * when the access path can't start immediately, but have to wait for a vehicle arriving. Also
-   * DRT systems or bike shares can have operation time limitations.
-   *
+   * when the access path can't start immediately, but have to wait for a vehicle arriving. Also DRT
+   * systems or bike shares can have operation time limitations.
+   * <p>
    * Returns -1 if transfer is not possible after the requested departure time
    */
   default int earliestDepartureTime(int requestedDepartureTime) {
@@ -57,9 +57,9 @@ public interface RaptorTransfer {
   }
 
   /**
-   * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
-   * where they can have operation time limitations.
-   *
+   * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares where
+   * they can have operation time limitations.
+   * <p>
    * Returns -1 if transfer is not possible before the requested arrival time
    */
   default int latestArrivalTime(int requestedArrivalTime) {
@@ -83,16 +83,16 @@ public interface RaptorTransfer {
 
   /**
    * Some services involving multiple legs are not handled by the RAPTOR algorithm and need to be
-   * inserted into the algorithm at a specific place of the algorithm. The number-of-rides must
-   * be accounted for in order to get the number of transfers correct. The number-of-transfers is
-   * part of the criteria used to keep an optimal result.
+   * inserted into the algorithm at a specific place of the algorithm. The number-of-rides must be
+   * accounted for in order to get the number of transfers correct. The number-of-transfers is part
+   * of the criteria used to keep an optimal result.
    * <p>
    * Note! The number returned should include all "rides" in the access leg resulting in an extra
    * transfer, including boarding the first Raptor scheduled trip. There is no need to account for
    * riding your own bicycle or scooter, and a rental bike is debatable. The guideline is that if
    * there is a transfer involved that is equivalent to the "human cost" to a normal transit
-   * transfer, then it should be counted. If not, you should account for it using the cost
-   * function instead.
+   * transfer, then it should be counted. If not, you should account for it using the cost function
+   * instead.
    * <p>
    * Examples/guidelines:
    * <p>
@@ -122,10 +122,10 @@ public interface RaptorTransfer {
   /**
    * Is this {@link RaptorTransfer} is connected to the given {@code stop} directly by
    * <b>transit</b>? For access and egress paths we allow plugging in flexible transit and other
-   * means of transport, which might include one or more legs onboard a vehicle. This method
-   * should return {@code true} if the leg connecting to the given stop arrives `onBoard` a public
+   * means of transport, which might include one or more legs onboard a vehicle. This method should
+   * return {@code true} if the leg connecting to the given stop arrives `onBoard` a public
    * transport or riding another kind of service like a taxi.
-   *
+   * <p>
    * This information is used to generate transfers from that stop to other stops only when this
    * method returns true.
    */

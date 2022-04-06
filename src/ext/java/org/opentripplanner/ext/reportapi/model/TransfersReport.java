@@ -20,10 +20,10 @@ import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.routing.graph.GraphIndex;
 
 /**
- * This class is used to export transfers for human verification to a CSV file. This is useful
- * when trying to debug the rather complicated NeTEx data format or to get the GTFS transfers in a
- * more human-readable form. It can also be used to test transfer functionality, since it is easy
- * to read and find special test-cases when needed.
+ * This class is used to export transfers for human verification to a CSV file. This is useful when
+ * trying to debug the rather complicated NeTEx data format or to get the GTFS transfers in a more
+ * human-readable form. It can also be used to test transfer functionality, since it is easy to read
+ * and find special test-cases when needed.
  */
 public class TransfersReport {
 
@@ -114,6 +114,35 @@ public class TransfersReport {
     return buf.toString();
   }
 
+  private static void addLocation(
+    TxPoint r,
+    TripPattern pattern,
+    StopLocation stop,
+    Trip trip,
+    boolean boarding
+  ) {
+    if (pattern == null) {
+      r.loc += stop.getName() + " [Pattern no found]";
+      return;
+    }
+    int stopPosition = pattern.findStopPosition(stop);
+    r.coordinate = stop.getCoordinate();
+
+    if (stopPosition < 0) {
+      r.loc += "[Stop not found in pattern: " + stop.getName() + "]";
+      return;
+    }
+    r.loc += stop.getName() + " [" + stopPosition + "]";
+
+    if (trip != null) {
+      var tt = pattern.getScheduledTimetable().getTripTimes(trip);
+      r.time =
+        boarding
+          ? tt.getScheduledDepartureTime(stopPosition)
+          : tt.getScheduledArrivalTime(stopPosition);
+    }
+  }
+
   private TxPoint pointInfo(TransferPoint p, boolean boarding) {
     var r = new TxPoint();
 
@@ -166,35 +195,6 @@ public class TransfersReport {
     r.specificity = p.getSpecificityRanking();
     r.coordinate = null;
     return r;
-  }
-
-  private static void addLocation(
-    TxPoint r,
-    TripPattern pattern,
-    StopLocation stop,
-    Trip trip,
-    boolean boarding
-  ) {
-    if (pattern == null) {
-      r.loc += stop.getName() + " [Pattern no found]";
-      return;
-    }
-    int stopPosition = pattern.findStopPosition(stop);
-    r.coordinate = stop.getCoordinate();
-
-    if (stopPosition < 0) {
-      r.loc += "[Stop not found in pattern: " + stop.getName() + "]";
-      return;
-    }
-    r.loc += stop.getName() + " [" + stopPosition + "]";
-
-    if (trip != null) {
-      var tt = pattern.getScheduledTimetable().getTripTimes(trip);
-      r.time =
-        boarding
-          ? tt.getScheduledDepartureTime(stopPosition)
-          : tt.getScheduledArrivalTime(stopPosition);
-    }
   }
 
   static class TxPoint {

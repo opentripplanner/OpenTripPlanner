@@ -276,9 +276,9 @@ public class LegacyGraphQLDataFetchers {
   }
 
   /**
-   * Departure row is a location, which lists departures of a certain pattern from a stop.
-   * Departure rows are identified with the pattern, so querying departure rows will return only
-   * departures from one stop per pattern
+   * Departure row is a location, which lists departures of a certain pattern from a stop. Departure
+   * rows are identified with the pattern, so querying departure rows will return only departures
+   * from one stop per pattern
    */
   public interface LegacyGraphQLDepartureRow {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -441,8 +441,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   /**
-   * Pattern is sequence of stops used by trips on a specific direction and variant of a route.
-   * Most routes have only two patterns: one for outbound trips and one for inbound trips
+   * Pattern is sequence of stops used by trips on a specific direction and variant of a route. Most
+   * routes have only two patterns: one for outbound trips and one for inbound trips
    */
   public interface LegacyGraphQLPattern {
     public DataFetcher<Iterable<TransitAlert>> alerts();
@@ -659,8 +659,8 @@ public class LegacyGraphQLDataFetchers {
   /**
    * Route represents a public transportation service, usually from point A to point B and *back*,
    * shown to customers under a single name, e.g. bus 550. Routes contain patterns (see field
-   * `patterns`), which describe different variants of the route, e.g. outbound pattern from point
-   * A to point B and inbound pattern from point B to point A.
+   * `patterns`), which describe different variants of the route, e.g. outbound pattern from point A
+   * to point B and inbound pattern from point B to point A.
    */
   public interface LegacyGraphQLRoute {
     public DataFetcher<Agency> agency();
@@ -697,8 +697,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   /**
-   * Route type entity which covers all agencies if agency is null, otherwise only relevant for
-   * one agency.
+   * Route type entity which covers all agencies if agency is null, otherwise only relevant for one
+   * agency.
    */
   public interface LegacyGraphQLRouteType {
     public DataFetcher<Agency> agency();
@@ -801,8 +801,7 @@ public class LegacyGraphQLDataFetchers {
   }
 
   /**
-   * Stoptime represents the time when a specific trip arrives to or departs from a specific
-   * stop.
+   * Stoptime represents the time when a specific trip arrives to or departs from a specific stop.
    */
   public interface LegacyGraphQLStoptime {
     public DataFetcher<Integer> arrivalDelay();
@@ -848,9 +847,9 @@ public class LegacyGraphQLDataFetchers {
   /**
    * A system notice is used to tag elements with system information for debugging or other system
    * related purpose. One use-case is to run a routing search with 'debugItineraryFilter: true'.
-   * This will then tag itineraries instead of removing them from the result. This make it
-   * possible to inspect the itinerary-filter-chain. A SystemNotice only has english text, because
-   * the primary user are technical staff, like testers and developers.
+   * This will then tag itineraries instead of removing them from the result. This make it possible
+   * to inspect the itinerary-filter-chain. A SystemNotice only has english text, because the
+   * primary user are technical staff, like testers and developers.
    */
   public interface LegacyGraphQLSystemNotice {
     public DataFetcher<String> tag();
@@ -883,8 +882,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   /**
-   * Trip is a specific occurance of a pattern, usually identified by route, direction on the
-   * route and exact departure time.
+   * Trip is a specific occurance of a pattern, usually identified by route, direction on the route
+   * and exact departure time.
    */
   public interface LegacyGraphQLTrip {
     public DataFetcher<Iterable<String>> activeDates();

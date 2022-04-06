@@ -35,11 +35,11 @@ import org.slf4j.LoggerFactory;
  * Represents a group of trips on a route, with the same direction id that all call at the same
  * sequence of stops. For each stop, there is a list of departure times, running times, arrival
  * times, dwell times, and wheelchair accessibility information (one of each of these per trip per
- * stop).
- * Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a later trip.
- *
- * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
- * thus TripPattern.
+ * stop). Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a
+ * later trip.
+ * <p>
+ * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel
+ * JOURNEY a "trip", thus TripPattern.
  * <p>
  * The {@code id} is a unique identifier for this trip pattern. For GTFS feeds this is generally
  * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For NeTEx the
@@ -50,21 +50,15 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
   private static final long serialVersionUID = 1;
-
-  private String name;
-
   private final Route route;
-
   /**
-   * The stop-pattern help us reuse the same stops in several trip-patterns; Hence
-   * saving memory. The field should not be accessible outside the class, and all access
-   * is done through method delegation, like the {@link #numberOfStops()} and
-   * {@link #canBoard(int)} methods.
+   * The stop-pattern help us reuse the same stops in several trip-patterns; Hence saving memory.
+   * The field should not be accessible outside the class, and all access is done through method
+   * delegation, like the {@link #numberOfStops()} and {@link #canBoard(int)} methods.
    */
   private final StopPattern stopPattern;
-
   private final Timetable scheduledTimetable = new Timetable(this);
-
+  private String name;
   /**
    * Geometries of each inter-stop segment of the tripPattern.
    */
@@ -89,383 +83,31 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     this.stopPattern = stopPattern;
   }
 
-  /** The human-readable, unique name for this trip pattern. */
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  /**
-   * The GTFS Route of all trips in this pattern.
-   */
-  public Route getRoute() {
-    return route;
-  }
-
-  /**
-   * Convenience method to get the route traverse mode, the mode for all trips in this pattern.
-   */
-  public TransitMode getMode() {
-    return route.getMode();
-  }
-
-  public String getNetexSubmode() {
-    return route.getNetexSubmode();
-  }
-
-  public LineString getHopGeometry(int stopPosInPattern) {
-    if (hopGeometries != null) {
-      return CompactLineString.uncompactLineString(hopGeometries[stopPosInPattern], false);
-    } else {
-      return GeometryUtils
-        .getGeometryFactory()
-        .createLineString(
-          new Coordinate[] {
-            coordinate(stopPattern.getStop(stopPosInPattern)),
-            coordinate(stopPattern.getStop(stopPosInPattern + 1)),
-          }
-        );
-    }
-  }
-
-  public StopPattern getStopPattern() {
-    return stopPattern;
-  }
-
-  public void setHopGeometries(LineString[] hopGeometries) {
-    this.hopGeometries = new byte[hopGeometries.length][];
-
-    for (int i = 0; i < hopGeometries.length; i++) {
-      setHopGeometry(i, hopGeometries[i]);
-    }
-  }
-
-  public void setHopGeometry(int i, LineString hopGeometry) {
-    this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry, false);
-  }
-
-  /**
-   * This will copy the geometry from another TripPattern to this one. It checks if each hop is
-   * between the same stops before copying that hop geometry. If the stops are different but lie
-   * within same station, old geometry will be used with overwrite on first and last point
-   * (to match new stop places). Otherwise, it will default to straight lines between hops.
-   *
-   * @param other TripPattern to copy geometry from
-   */
-  public void setHopGeometriesFromPattern(TripPattern other) {
-    this.hopGeometries = new byte[numberOfStops() - 1][];
-
-    // This accounts for the new TripPattern provided by a real-time update and the one that is
-    // being replaced having a different number of stops. In that case the geometry will be
-    // preserved up until the first mismatching stop, and a straight line will be used for
-    // all segments after that.
-    int sizeOfShortestPattern = Math.min(numberOfStops(), other.numberOfStops());
-
-    for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
-      final StopLocation oldOriginStop = this.getStop(i);
-      final StopLocation oldDestinationStop = this.getStop(i + 1);
-      final Station oldOriginStation = this.getStop(i).getParentStation();
-      final Station oldDestinationStation = this.getStop(i + 1).getParentStation();
-
-      final StopLocation newOriginStop = other.getStop(i);
-      final StopLocation newDestinationStop = other.getStop(i + 1);
-      final Station newOriginStation = other.getStop(i).getParentStation();
-      final Station newDestinationStation = other.getStop(i + 1).getParentStation();
-
-      boolean stopsAreSame =
-        oldOriginStop.equals(newOriginStop) && oldDestinationStop.equals(newDestinationStop);
-      boolean parentStationsAreSame =
-        Objects.equals(oldOriginStation, newOriginStation) &&
-        Objects.equals(oldDestinationStation, newDestinationStation);
-
-      LineString hopGeometry = other.getHopGeometry(i);
-
-      if (hopGeometry != null && stopsAreSame) {
-        // Copy hop geometry from previous pattern
-        this.setHopGeometry(i, other.getHopGeometry(i));
-      } else if (hopGeometry != null && parentStationsAreSame) {
-        // Use old geometry but patch first and last point with new stops
-        Coordinate newStart = new Coordinate(
-          other.getStop(i).getCoordinate().longitude(),
-          other.getStop(i).getCoordinate().latitude()
-        );
-
-        Coordinate newEnd = new Coordinate(
-          other.getStop(i + 1).getCoordinate().longitude(),
-          other.getStop(i + 1).getCoordinate().latitude()
-        );
-
-        Coordinate[] coordinates = other.getHopGeometry(i).getCoordinates().clone();
-        coordinates[0].setCoordinate(newStart);
-        coordinates[coordinates.length - 1].setCoordinate(newEnd);
-
-        this.setHopGeometry(i, GeometryUtils.getGeometryFactory().createLineString(coordinates));
-      } else {
-        // Create new straight-line geometry for hop
-        this.setHopGeometry(
-            i,
-            GeometryUtils
-              .getGeometryFactory()
-              .createLineString(
-                new Coordinate[] {
-                  coordinate(stopPattern.getStop(i)),
-                  coordinate(stopPattern.getStop(i + 1)),
-                }
-              )
-          );
-      }
-    }
-  }
-
-  public LineString getGeometry() {
-    if (hopGeometries == null || hopGeometries.length == 0) {
-      return null;
-    }
-
-    List<LineString> lineStrings = new ArrayList<>();
-    for (int i = 0; i < hopGeometries.length; i++) {
-      lineStrings.add(getHopGeometry(i));
-    }
-    return GeometryUtils.concatenateLineStrings(lineStrings);
-  }
-
-  public int numHopGeometries() {
-    return hopGeometries.length;
-  }
-
-  public int numberOfStops() {
-    return stopPattern.getSize();
-  }
-
-  public StopLocation getStop(int stopPosInPattern) {
-    return stopPattern.getStop(stopPosInPattern);
-  }
-
-  public StopLocation firstStop() {
-    return getStop(0);
-  }
-
-  public StopLocation lastStop() {
-    return getStop(stopPattern.getSize() - 1);
-  }
-
-  /** Read only list of stops */
-  public List<StopLocation> getStops() {
-    return stopPattern.getStops();
-  }
-
-  /**
-   * Find the first stop position in pattern matching the given {@code stop}. The search start at
-   * position {@code 0}. Return a negative number if not found. Use {@link
-   * #findAlightStopPositionInPattern(StopLocation)} or {@link #findBoardingStopPositionInPattern(StopLocation)}
-   * if possible.
-   */
-  public int findStopPosition(StopLocation stop) {
-    return stopPattern.findStopPosition(stop);
-  }
-
-  /**
-   * Find the first stop position in pattern matching the given {@code station} where it is
-   * allowed to board. The search start at position {@code 0}. Return a negative number if not
-   * found.
-   */
-  public int findBoardingStopPositionInPattern(Station station) {
-    return stopPattern.findBoardingPosition(station);
-  }
-
-  /**
-   * Find the first stop position in pattern matching the given {@code station} where it is
-   * allowed to alight. The search start at position {@code 1}. Return a negative number if not
-   * found.
-   */
-  public int findAlightStopPositionInPattern(Station station) {
-    return stopPattern.findAlightPosition(station);
-  }
-
-  /**
-   * Find the first stop position in pattern matching the given {@code stop} where it is allowed
-   * to board. The search start at position {@code 0}. Return a negative number if not found.
-   */
-  public int findBoardingStopPositionInPattern(StopLocation stop) {
-    return stopPattern.findBoardingPosition(stop);
-  }
-
-  /**
-   * Find the first stop position in pattern matching the given {@code stop} where it is allowed
-   * to alight. The search start at position {@code 1}. Return a negative number if not found.
-   */
-  public int findAlightStopPositionInPattern(StopLocation stop) {
-    return stopPattern.findAlightPosition(stop);
-  }
-
-  /** Returns whether passengers can alight at a given stop */
-  public boolean canAlight(int stopIndex) {
-    return stopPattern.canAlight(stopIndex);
-  }
-
-  /** Returns whether passengers can board at a given stop */
-  public boolean canBoard(int stopIndex) {
-    return stopPattern.canBoard(stopIndex);
-  }
-
-  /**
-   * Returns whether passengers can board at a given stop.
-   * This is an inefficient method iterating over the stops, do not use it in routing.
-   */
-  public boolean canBoard(StopLocation stop) {
-    return stopPattern.canBoard(stop);
-  }
-
-  /** Returns whether a given stop is wheelchair-accessible. */
-  public boolean wheelchairAccessible(int stopIndex) {
-    return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-  }
-
-  public PickDrop getAlightType(int stopIndex) {
-    return stopPattern.getDropoff(stopIndex);
-  }
-
-  public PickDrop getBoardType(int stopIndex) {
-    return stopPattern.getPickup(stopIndex);
-  }
-
-  public boolean isBoardAndAlightAt(int stopIndex, PickDrop value) {
-    return getBoardType(stopIndex).is(value) && getAlightType(stopIndex).is(value);
-  }
-
-  public boolean stopPatternIsEqual(TripPattern other) {
-    return stopPattern.equals(other.stopPattern);
-  }
-
-  public Trip getTrip(int tripIndex) {
-    return scheduledTimetable.getTripTimes(tripIndex).getTrip();
-  }
-
-  /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
-
-  // TODO: These should probably be deprecated. That would require grabbing the scheduled timetable,
-  // and would avoid mistakes where real-time updates are accidentally not taken into account.
-
-  /**
-   * Add the given tripTimes to this pattern's scheduled timetable, recording the corresponding
-   * trip as one of the scheduled trips on this pattern.
-   */
-  public void add(TripTimes tt) {
-    // Only scheduled trips (added at graph build time, rather than directly to the timetable
-    // via updates) are in this list.
-    scheduledTimetable.addTripTimes(tt);
-
-    // Check that all trips added to this pattern are on the initially declared route.
-    // Identity equality is valid on GTFS entity objects.
-    if (this.route != tt.getTrip().getRoute()) {
-      LOG.warn(
-        "The trip {} is on route {} but its stop pattern is on route {}.",
-        tt.getTrip(),
-        tt.getTrip().getRoute(),
-        route
-      );
-    }
-  }
-
-  /**
-   * Add the given FrequencyEntry to this pattern's scheduled timetable, recording the corresponding
-   * trip as one of the scheduled trips on this pattern.
-   * TODO possible improvements: combine freq entries and TripTimes. Do not keep trips list in TripPattern
-   * since it is redundant.
-   */
-  public void add(FrequencyEntry freq) {
-    scheduledTimetable.addFrequencyEntry(freq);
-    if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
-      LOG.warn(
-        "The trip {} is on a different route than its stop pattern, which is on {}.",
-        freq.tripTimes.getTrip(),
-        route
-      );
-    }
-  }
-
-  /**
-   * Remove all trips matching the given predicate.
-   * @param removeTrip it the predicate returns true
-   */
-  public void removeTrips(Predicate<Trip> removeTrip) {
-    scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
-  }
-
-  public void setOriginalTripPattern(TripPattern originalTripPattern) {
-    this.originalTripPattern = originalTripPattern;
-  }
-
-  /**
-   * The direction for all the trips in this pattern.
-   */
-  public Direction getDirection() {
-    return scheduledTimetable.getDirection();
-  }
-
-  /**
-   * This pattern may have multiple Timetable objects, but they should all contain TripTimes
-   * for the same trips, in the same order (that of the scheduled Timetable). An exception to
-   * this rule may arise if unscheduled trips are added to a Timetable. For that case we need
-   * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
-   */
-  public Stream<Trip> scheduledTripsAsStream() {
-    return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).distinct();
-  }
-
-  /**
-   * This is the "original" timetable holding the scheduled stop times from GTFS, with no
-   * realtime updates applied. If realtime stoptime updates are applied, next/previous departure
-   * searches will be conducted using a different, updated timetable in a snapshot.
-   */
-  public Timetable getScheduledTimetable() {
-    return scheduledTimetable;
-  }
-
-  /**
-   * Has the TripPattern been created by a real-time update.
-   */
-  public boolean isCreatedByRealtimeUpdater() {
-    return createdByRealtimeUpdater;
-  }
-
-  public void setCreatedByRealtimeUpdater() {
-    createdByRealtimeUpdater = true;
-  }
-
-  private static String stopNameAndId(StopLocation stop) {
-    return stop.getName() + " (" + stop.getId().toString() + ")";
-  }
-
   /**
    * Static method that creates unique human-readable names for a collection of TableTripPatterns.
    * Perhaps this should be in TripPattern, and apply to Frequency patterns as well. TODO: resolve
    * this question: can a frequency and table pattern have the same stoppattern? If so should they
    * have the same "unique" name?
-   *
+   * <p>
    * The names should be dataset unique, not just route-unique?
-   *
+   * <p>
    * A TripPattern groups all trips visiting a particular pattern of stops on a particular route.
    * GFTS Route names are intended for very general customer information, but sometimes there is a
-   * need to know where a particular trip actually goes. For example, the New York City N train
-   * has at least four different variants: express (over the Manhattan bridge) and local (via
-   * lower Manhattan and the tunnel), in two directions (to Astoria or to Coney Island). During
+   * need to know where a particular trip actually goes. For example, the New York City N train has
+   * at least four different variants: express (over the Manhattan bridge) and local (via lower
+   * Manhattan and the tunnel), in two directions (to Astoria or to Coney Island). During
    * construction, a fifth variant sometimes appears: trains use the D line to Coney Island after
    * 59th St (or from Coney Island to 59th in the opposite direction).
-   *
+   * <p>
    * TripPattern names are machine-generated on a best-effort basis. They are guaranteed to be
    * unique (among TripPatterns for a single Route) but not stable across graph builds, especially
-   * when different versions of GTFS inputs are used. For instance, if a variant is the only
-   * variant of the N that ends at Coney Island, the name will be "N to Coney Island". But if
-   * multiple variants end at Coney Island (but have different stops elsewhere), that name would
-   * not be chosen. OTP also tries start and intermediate stations ("from Coney Island", or "via
-   * Whitehall", or even combinations ("from Coney Island via Whitehall"). But if there is no way
-   * to create a unique name from start/end/intermediate stops, then the best we can do is to
-   * create a "like [trip id]" name, which at least tells you where in the GTFS you can find a
-   * related trip.
+   * when different versions of GTFS inputs are used. For instance, if a variant is the only variant
+   * of the N that ends at Coney Island, the name will be "N to Coney Island". But if multiple
+   * variants end at Coney Island (but have different stops elsewhere), that name would not be
+   * chosen. OTP also tries start and intermediate stations ("from Coney Island", or "via
+   * Whitehall", or even combinations ("from Coney Island via Whitehall"). But if there is no way to
+   * create a unique name from start/end/intermediate stops, then the best we can do is to create a
+   * "like [trip id]" name, which at least tells you where in the GTFS you can find a related trip.
    */
   // TODO: pass in a transit index that contains a Multimap<Route, TripPattern> and derive all TableTripPatterns
   // TODO: use headsigns before attempting to machine-generate names
@@ -612,10 +254,361 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
   }
 
+  public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {
+    Set<FeedScopedId> seen = new HashSet<>();
+    return tripPatterns.stream().map(TransitEntity::getId).allMatch(t -> t != null && seen.add(t));
+  }
+
+  /** The human-readable, unique name for this trip pattern. */
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
   /**
-   * A bit of a strange place to set service codes all at once when TripTimes are already added,
-   * but we need a reference to the Graph or at least the codes map. This could also be
-   * placed in the hop factory itself.
+   * The GTFS Route of all trips in this pattern.
+   */
+  public Route getRoute() {
+    return route;
+  }
+
+  /**
+   * Convenience method to get the route traverse mode, the mode for all trips in this pattern.
+   */
+  public TransitMode getMode() {
+    return route.getMode();
+  }
+
+  public String getNetexSubmode() {
+    return route.getNetexSubmode();
+  }
+
+  public LineString getHopGeometry(int stopPosInPattern) {
+    if (hopGeometries != null) {
+      return CompactLineString.uncompactLineString(hopGeometries[stopPosInPattern], false);
+    } else {
+      return GeometryUtils
+        .getGeometryFactory()
+        .createLineString(
+          new Coordinate[] {
+            coordinate(stopPattern.getStop(stopPosInPattern)),
+            coordinate(stopPattern.getStop(stopPosInPattern + 1)),
+          }
+        );
+    }
+  }
+
+  public StopPattern getStopPattern() {
+    return stopPattern;
+  }
+
+  public void setHopGeometries(LineString[] hopGeometries) {
+    this.hopGeometries = new byte[hopGeometries.length][];
+
+    for (int i = 0; i < hopGeometries.length; i++) {
+      setHopGeometry(i, hopGeometries[i]);
+    }
+  }
+
+  public void setHopGeometry(int i, LineString hopGeometry) {
+    this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry, false);
+  }
+
+  /**
+   * This will copy the geometry from another TripPattern to this one. It checks if each hop is
+   * between the same stops before copying that hop geometry. If the stops are different but lie
+   * within same station, old geometry will be used with overwrite on first and last point (to match
+   * new stop places). Otherwise, it will default to straight lines between hops.
+   *
+   * @param other TripPattern to copy geometry from
+   */
+  public void setHopGeometriesFromPattern(TripPattern other) {
+    this.hopGeometries = new byte[numberOfStops() - 1][];
+
+    // This accounts for the new TripPattern provided by a real-time update and the one that is
+    // being replaced having a different number of stops. In that case the geometry will be
+    // preserved up until the first mismatching stop, and a straight line will be used for
+    // all segments after that.
+    int sizeOfShortestPattern = Math.min(numberOfStops(), other.numberOfStops());
+
+    for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
+      final StopLocation oldOriginStop = this.getStop(i);
+      final StopLocation oldDestinationStop = this.getStop(i + 1);
+      final Station oldOriginStation = this.getStop(i).getParentStation();
+      final Station oldDestinationStation = this.getStop(i + 1).getParentStation();
+
+      final StopLocation newOriginStop = other.getStop(i);
+      final StopLocation newDestinationStop = other.getStop(i + 1);
+      final Station newOriginStation = other.getStop(i).getParentStation();
+      final Station newDestinationStation = other.getStop(i + 1).getParentStation();
+
+      boolean stopsAreSame =
+        oldOriginStop.equals(newOriginStop) && oldDestinationStop.equals(newDestinationStop);
+      boolean parentStationsAreSame =
+        Objects.equals(oldOriginStation, newOriginStation) &&
+        Objects.equals(oldDestinationStation, newDestinationStation);
+
+      LineString hopGeometry = other.getHopGeometry(i);
+
+      if (hopGeometry != null && stopsAreSame) {
+        // Copy hop geometry from previous pattern
+        this.setHopGeometry(i, other.getHopGeometry(i));
+      } else if (hopGeometry != null && parentStationsAreSame) {
+        // Use old geometry but patch first and last point with new stops
+        Coordinate newStart = new Coordinate(
+          other.getStop(i).getCoordinate().longitude(),
+          other.getStop(i).getCoordinate().latitude()
+        );
+
+        Coordinate newEnd = new Coordinate(
+          other.getStop(i + 1).getCoordinate().longitude(),
+          other.getStop(i + 1).getCoordinate().latitude()
+        );
+
+        Coordinate[] coordinates = other.getHopGeometry(i).getCoordinates().clone();
+        coordinates[0].setCoordinate(newStart);
+        coordinates[coordinates.length - 1].setCoordinate(newEnd);
+
+        this.setHopGeometry(i, GeometryUtils.getGeometryFactory().createLineString(coordinates));
+      } else {
+        // Create new straight-line geometry for hop
+        this.setHopGeometry(
+            i,
+            GeometryUtils
+              .getGeometryFactory()
+              .createLineString(
+                new Coordinate[] {
+                  coordinate(stopPattern.getStop(i)),
+                  coordinate(stopPattern.getStop(i + 1)),
+                }
+              )
+          );
+      }
+    }
+  }
+
+  public LineString getGeometry() {
+    if (hopGeometries == null || hopGeometries.length == 0) {
+      return null;
+    }
+
+    List<LineString> lineStrings = new ArrayList<>();
+    for (int i = 0; i < hopGeometries.length; i++) {
+      lineStrings.add(getHopGeometry(i));
+    }
+    return GeometryUtils.concatenateLineStrings(lineStrings);
+  }
+
+  public int numHopGeometries() {
+    return hopGeometries.length;
+  }
+
+  public int numberOfStops() {
+    return stopPattern.getSize();
+  }
+
+  public StopLocation getStop(int stopPosInPattern) {
+    return stopPattern.getStop(stopPosInPattern);
+  }
+
+  public StopLocation firstStop() {
+    return getStop(0);
+  }
+
+  public StopLocation lastStop() {
+    return getStop(stopPattern.getSize() - 1);
+  }
+
+  /** Read only list of stops */
+  public List<StopLocation> getStops() {
+    return stopPattern.getStops();
+  }
+
+  /**
+   * Find the first stop position in pattern matching the given {@code stop}. The search start at
+   * position {@code 0}. Return a negative number if not found. Use {@link
+   * #findAlightStopPositionInPattern(StopLocation)} or {@link #findBoardingStopPositionInPattern(StopLocation)}
+   * if possible.
+   */
+  public int findStopPosition(StopLocation stop) {
+    return stopPattern.findStopPosition(stop);
+  }
+
+  /**
+   * Find the first stop position in pattern matching the given {@code station} where it is allowed
+   * to board. The search start at position {@code 0}. Return a negative number if not found.
+   */
+  public int findBoardingStopPositionInPattern(Station station) {
+    return stopPattern.findBoardingPosition(station);
+  }
+
+  /**
+   * Find the first stop position in pattern matching the given {@code station} where it is allowed
+   * to alight. The search start at position {@code 1}. Return a negative number if not found.
+   */
+  public int findAlightStopPositionInPattern(Station station) {
+    return stopPattern.findAlightPosition(station);
+  }
+
+  /**
+   * Find the first stop position in pattern matching the given {@code stop} where it is allowed to
+   * board. The search start at position {@code 0}. Return a negative number if not found.
+   */
+  public int findBoardingStopPositionInPattern(StopLocation stop) {
+    return stopPattern.findBoardingPosition(stop);
+  }
+
+  /**
+   * Find the first stop position in pattern matching the given {@code stop} where it is allowed to
+   * alight. The search start at position {@code 1}. Return a negative number if not found.
+   */
+  public int findAlightStopPositionInPattern(StopLocation stop) {
+    return stopPattern.findAlightPosition(stop);
+  }
+
+  /** Returns whether passengers can alight at a given stop */
+  public boolean canAlight(int stopIndex) {
+    return stopPattern.canAlight(stopIndex);
+  }
+
+  /** Returns whether passengers can board at a given stop */
+  public boolean canBoard(int stopIndex) {
+    return stopPattern.canBoard(stopIndex);
+  }
+
+  /**
+   * Returns whether passengers can board at a given stop. This is an inefficient method iterating
+   * over the stops, do not use it in routing.
+   */
+  public boolean canBoard(StopLocation stop) {
+    return stopPattern.canBoard(stop);
+  }
+
+  /** Returns whether a given stop is wheelchair-accessible. */
+  public boolean wheelchairAccessible(int stopIndex) {
+    return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
+  }
+
+  public PickDrop getAlightType(int stopIndex) {
+    return stopPattern.getDropoff(stopIndex);
+  }
+
+  public PickDrop getBoardType(int stopIndex) {
+    return stopPattern.getPickup(stopIndex);
+  }
+
+  public boolean isBoardAndAlightAt(int stopIndex, PickDrop value) {
+    return getBoardType(stopIndex).is(value) && getAlightType(stopIndex).is(value);
+  }
+
+  /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
+
+  // TODO: These should probably be deprecated. That would require grabbing the scheduled timetable,
+  // and would avoid mistakes where real-time updates are accidentally not taken into account.
+
+  public boolean stopPatternIsEqual(TripPattern other) {
+    return stopPattern.equals(other.stopPattern);
+  }
+
+  public Trip getTrip(int tripIndex) {
+    return scheduledTimetable.getTripTimes(tripIndex).getTrip();
+  }
+
+  /**
+   * Add the given tripTimes to this pattern's scheduled timetable, recording the corresponding trip
+   * as one of the scheduled trips on this pattern.
+   */
+  public void add(TripTimes tt) {
+    // Only scheduled trips (added at graph build time, rather than directly to the timetable
+    // via updates) are in this list.
+    scheduledTimetable.addTripTimes(tt);
+
+    // Check that all trips added to this pattern are on the initially declared route.
+    // Identity equality is valid on GTFS entity objects.
+    if (this.route != tt.getTrip().getRoute()) {
+      LOG.warn(
+        "The trip {} is on route {} but its stop pattern is on route {}.",
+        tt.getTrip(),
+        tt.getTrip().getRoute(),
+        route
+      );
+    }
+  }
+
+  /**
+   * Add the given FrequencyEntry to this pattern's scheduled timetable, recording the corresponding
+   * trip as one of the scheduled trips on this pattern.
+   * TODO possible improvements: combine freq entries and TripTimes. Do not keep trips list in TripPattern
+   * since it is redundant.
+   */
+  public void add(FrequencyEntry freq) {
+    scheduledTimetable.addFrequencyEntry(freq);
+    if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
+      LOG.warn(
+        "The trip {} is on a different route than its stop pattern, which is on {}.",
+        freq.tripTimes.getTrip(),
+        route
+      );
+    }
+  }
+
+  /**
+   * Remove all trips matching the given predicate.
+   *
+   * @param removeTrip it the predicate returns true
+   */
+  public void removeTrips(Predicate<Trip> removeTrip) {
+    scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
+  }
+
+  public void setOriginalTripPattern(TripPattern originalTripPattern) {
+    this.originalTripPattern = originalTripPattern;
+  }
+
+  /**
+   * The direction for all the trips in this pattern.
+   */
+  public Direction getDirection() {
+    return scheduledTimetable.getDirection();
+  }
+
+  /**
+   * This pattern may have multiple Timetable objects, but they should all contain TripTimes for the
+   * same trips, in the same order (that of the scheduled Timetable). An exception to this rule may
+   * arise if unscheduled trips are added to a Timetable. For that case we need to search for
+   * trips/TripIds in the Timetable rather than the enclosing TripPattern.
+   */
+  public Stream<Trip> scheduledTripsAsStream() {
+    return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).distinct();
+  }
+
+  /**
+   * This is the "original" timetable holding the scheduled stop times from GTFS, with no realtime
+   * updates applied. If realtime stoptime updates are applied, next/previous departure searches
+   * will be conducted using a different, updated timetable in a snapshot.
+   */
+  public Timetable getScheduledTimetable() {
+    return scheduledTimetable;
+  }
+
+  /**
+   * Has the TripPattern been created by a real-time update.
+   */
+  public boolean isCreatedByRealtimeUpdater() {
+    return createdByRealtimeUpdater;
+  }
+
+  public void setCreatedByRealtimeUpdater() {
+    createdByRealtimeUpdater = true;
+  }
+
+  /**
+   * A bit of a strange place to set service codes all at once when TripTimes are already added, but
+   * we need a reference to the Graph or at least the codes map. This could also be placed in the
+   * hop factory itself.
    */
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
     setServices(new BitSet());
@@ -645,8 +638,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
   }
 
   /**
-   * A set of serviceIds with at least one trip in this pattern.
-   * Trips in a pattern are no longer necessarily running on the same service ID.
+   * A set of serviceIds with at least one trip in this pattern. Trips in a pattern are no longer
+   * necessarily running on the same service ID.
    *
    * @return bitset of service codes
    */
@@ -665,11 +658,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return scheduledTimetable.getTripTimes(0).getTrip().getTripHeadsign();
   }
 
-  public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {
-    Set<FeedScopedId> seen = new HashSet<>();
-    return tripPatterns.stream().map(TransitEntity::getId).allMatch(t -> t != null && seen.add(t));
-  }
-
   public boolean matchesModeOrSubMode(TransitMode mode, String transportSubmode) {
     return (
       getMode().equals(mode) ||
@@ -682,17 +670,18 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
   }
 
   /**
-   * In most cases we want to use identity equality for Trips.
-   * However, in some cases we want a way to consistently identify trips across versions of a GTFS feed, when the
-   * feed publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
-   * Hash collisions are theoretically possible, so these identifiers should only be used to detect when two
-   * trips are the same with a high degree of probability.
-   * An example application is avoiding double-booking of a particular bus trip for school field trips.
-   * Using Murmur hash function. see http://programmers.stackexchange.com/a/145633 for comparison.
+   * In most cases we want to use identity equality for Trips. However, in some cases we want a way
+   * to consistently identify trips across versions of a GTFS feed, when the feed publisher cannot
+   * ensure stable trip IDs. Therefore we define some additional hash functions. Hash collisions are
+   * theoretically possible, so these identifiers should only be used to detect when two trips are
+   * the same with a high degree of probability. An example application is avoiding double-booking
+   * of a particular bus trip for school field trips. Using Murmur hash function. see
+   * http://programmers.stackexchange.com/a/145633 for comparison.
    *
-   * @param trip a trip object within this pattern, or null to hash the pattern itself independent any specific trip.
+   * @param trip a trip object within this pattern, or null to hash the pattern itself independent
+   *             any specific trip.
    * @return the semantic hash of a Trip in this pattern as a printable String.
-   *
+   * <p>
    * TODO deal with frequency-based trips
    */
   public String semanticHashString(Trip trip) {
@@ -730,15 +719,19 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return route.getId().getFeedId();
   }
 
+  private static String stopNameAndId(StopLocation stop) {
+    return stop.getName() + " (" + stop.getId().toString() + ")";
+  }
+
+  private static Coordinate coordinate(StopLocation s) {
+    return new Coordinate(s.getLon(), s.getLat());
+  }
+
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
     // The serialized graph contains cyclic references TripPattern <--> Timetable.
     // The Timetable must be indexed from here (rather than in its own readObject method)
     // to ensure that the stops field it uses in TripPattern is already deserialized.
     scheduledTimetable.finish();
-  }
-
-  private static Coordinate coordinate(StopLocation s) {
-    return new Coordinate(s.getLon(), s.getLat());
   }
 }

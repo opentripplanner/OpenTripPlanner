@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Find the shortest path between graph vertices using A*.
- * A basic Dijkstra search is a special case of AStar where the heuristic is always zero.
+ * Find the shortest path between graph vertices using A*. A basic Dijkstra search is a special case
+ * of AStar where the heuristic is always zero.
  */
 public class AStar {
 

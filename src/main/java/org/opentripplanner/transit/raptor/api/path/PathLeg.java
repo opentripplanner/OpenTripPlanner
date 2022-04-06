@@ -9,11 +9,11 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg},
- * to the last leg {@link EgressPathLeg}. There must be at least one {@link TransitPathLeg}.
- * Transit legs can follow each* other or be connected by one {@link TransferPathLeg}. Note! Access
- * and egress path legs may contain more than one "OTP leg", but inside raptor these are threaded
- * as one leg; hence also just one leg returned by Raptor.
+ * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg}, to
+ * the last leg {@link EgressPathLeg}. There must be at least one {@link TransitPathLeg}. Transit
+ * legs can follow each* other or be connected by one {@link TransferPathLeg}. Note! Access and
+ * egress path legs may contain more than one "OTP leg", but inside raptor these are threaded as one
+ * leg; hence also just one leg returned by Raptor.
  * <p/>
  * This interface contain utility methods to _cast_ a leg into the concrete sub-type:
  * <pre>
@@ -26,13 +26,14 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 public interface PathLeg<T extends RaptorTripSchedule> {
   /**
-   * The time when the leg start/depart from the leg origin. For transit the time do
-   * NOT include boardSlack.
+   * The time when the leg start/depart from the leg origin. For transit the time do NOT include
+   * boardSlack.
    */
   int fromTime();
 
   /**
    * The stop place where the leg start/depart from.
+   *
    * @throws IllegalArgumentException if leg does not start at a stop, like an access leg.
    */
   default int fromStop() {
@@ -40,13 +41,14 @@ public interface PathLeg<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The time when the leg end/arrive at the leg destination. For transit the time do
-   * NOT include alight-slack.
+   * The time when the leg end/arrive at the leg destination. For transit the time do NOT include
+   * alight-slack.
    */
   int toTime();
 
   /**
    * The stop where the leg end/arrive at the leg destination.
+   *
    * @throws IllegalArgumentException if leg does not end at a stop, like an egress leg.
    */
   default int toStop() {
@@ -188,8 +190,8 @@ public interface PathLeg<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Return the next transit leg in the path after this one, if no more
-   * transit exist before reaching the destination {@code null} is returned.
+   * Return the next transit leg in the path after this one, if no more transit exist before
+   * reaching the destination {@code null} is returned.
    */
   @Nullable
   default TransitPathLeg<T> nextTransitLeg() {

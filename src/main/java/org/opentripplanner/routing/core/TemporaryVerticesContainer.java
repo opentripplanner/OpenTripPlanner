@@ -58,9 +58,8 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   /* INSTANCE METHODS */
 
   /**
-   * Tear down this container, removing any temporary edges from
-   * the "permanent" graph objects. This enables all temporary objects
-   * for garbage collection.
+   * Tear down this container, removing any temporary edges from the "permanent" graph objects. This
+   * enables all temporary objects for garbage collection.
    */
   public void close() {
     this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);

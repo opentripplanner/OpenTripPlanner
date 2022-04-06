@@ -14,7 +14,7 @@ import org.locationtech.jts.geom.LineString;
  * from the previous point, and variable length coding (most of the delta coordinates will thus fits
  * in 1 or 2 bytes).</li>
  * </ul>
- *
+ * <p>
  * This trick alone saves around 20% of memory compared to the bulky JTS LineString, which is split
  * on many objects (Coordinates, cached Envelope, Geometry itself). Performance hit should be low as
  * we do not need the geometry during a path search.
@@ -30,9 +30,9 @@ public final class CompactLineString {
   private static final double FIXED_FLOAT_MULT = 1.0e6;
 
   /**
-   * Constant to check that line string end points are sticking to given points. 0.000001 is
-   * around 1 meter at the equator. Do not use a too low value, ShapeFile builder has some
-   * rounding issues and do not ensure perfect equality between endpoints and geometry.
+   * Constant to check that line string end points are sticking to given points. 0.000001 is around
+   * 1 meter at the equator. Do not use a too low value, ShapeFile builder has some rounding issues
+   * and do not ensure perfect equality between endpoints and geometry.
    */
   private static final double EPS = 0.000001;
 
@@ -45,14 +45,13 @@ public final class CompactLineString {
    * Public factory to create a compact line string. Optimize for straight-line only line string
    * (w/o intermediate end-points).
    *
-   * @param xa X coordinate of end point A
-   * @param ya Y coordinate of end point A
-   * @param xb X coordinate of end point B
-   * @param yb Y coordinate of end point B
+   * @param xa         X coordinate of end point A
+   * @param ya         Y coordinate of end point A
+   * @param xb         X coordinate of end point B
+   * @param yb         Y coordinate of end point B
    * @param lineString The geometry to compact. Please be aware that we ignore first and last
-   *        coordinate in the line string, they need to be exactly the same as A and B.
-   * @param reverse True if A and B are inverted (B is start, A is end).
-   * @return
+   *                   coordinate in the line string, they need to be exactly the same as A and B.
+   * @param reverse    True if A and B are inverted (B is start, A is end).
    */
   public static byte[] compactLineString(
     double xa,
@@ -125,12 +124,11 @@ public final class CompactLineString {
   /**
    * Same as the other version, but in a var-len int packed form (Dlugosz coding).
    *
-   * @param xa X coordinate of end point A
-   * @param ya Y coordinate of end point A
-   * @param xb X coordinate of end point B
-   * @param yb Y coordinate of end point B
+   * @param xa           X coordinate of end point A
+   * @param ya           Y coordinate of end point A
+   * @param xb           X coordinate of end point B
+   * @param yb           Y coordinate of end point B
    * @param packedCoords The byte array to uncompact
-   * @return
    */
   public static LineString uncompactLineString(
     double xa,
@@ -171,7 +169,6 @@ public final class CompactLineString {
    * Wrapper for the above method in the case where there are no start/end coordinates provided.
    * 0-coordinates are added and then removed in order for the delta encoding to work correctly.
    * Same as the other version, but in a var-len int packed form (Dlugosz coding).
-   * @return
    */
   public static LineString uncompactLineString(byte[] packedCoords, boolean reverse) {
     LineString lineString = uncompactLineString(0.0, 0.0, 0.0, 0.0, packedCoords, reverse);

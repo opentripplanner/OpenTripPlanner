@@ -7,14 +7,15 @@ import org.opentripplanner.model.GenericLocation;
 
 /**
  * This class is used by the REST API to parse strings representing the from and to places for a
- * search. These strings can contain a user-specified name for the location, as well as a
- * latitude and longitude or a stop ID. We'd rather not be parsing multiple data items out of a
- * single string, and will avoid doing so in OTP2, but this is how the OTP1 REST API works and we're
+ * search. These strings can contain a user-specified name for the location, as well as a latitude
+ * and longitude or a stop ID. We'd rather not be parsing multiple data items out of a single
+ * string, and will avoid doing so in OTP2, but this is how the OTP1 REST API works and we're
  * keeping this parsing logic so we can keep providing that legacy API.
- *
+ * <p>
  * These from/to strings are in the following format: An optional place name followed by two colons,
- * then either a latitude and longitude or a feed-scoped ID for a stop or stop collection (station).
- *
+ * then either a latitude and longitude or a feed-scoped ID for a stop or stop collection
+ * (station).
+ * <p>
  * See LocationStringParserTest for examples of valid strings.
  */
 public class LocationStringParser {
@@ -33,8 +34,8 @@ public class LocationStringParser {
   );
 
   /**
-   * Creates the GenericLocation by parsing a "name::place" string, where "place" is a
-   * geographic coordinate string (latitude,longitude) or a feed scoped ID (feedId:stopId).
+   * Creates the GenericLocation by parsing a "name::place" string, where "place" is a geographic
+   * coordinate string (latitude,longitude) or a feed scoped ID (feedId:stopId).
    */
   public static GenericLocation fromOldStyleString(String input) {
     String name = null;
@@ -48,9 +49,9 @@ public class LocationStringParser {
   }
 
   /**
-   * Construct from two Strings, a label and a place. The label is an arbitrary user specified
-   * name for the location that can pass through to the routing response unchanged.
-   * The place contains latitude and longitude or a stop ID.
+   * Construct from two Strings, a label and a place. The label is an arbitrary user specified name
+   * for the location that can pass through to the routing response unchanged. The place contains
+   * latitude and longitude or a stop ID.
    */
   public static GenericLocation getGenericLocation(String label, String place) {
     if (place == null) {

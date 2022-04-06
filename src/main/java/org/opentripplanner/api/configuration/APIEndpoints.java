@@ -63,11 +63,11 @@ public class APIEndpoints {
   }
 
   /**
-   * List all mandatory and feature enabled endpoints as Jersey resource
-   * classes: define web services, i.e. an HTTP APIs.
+   * List all mandatory and feature enabled endpoints as Jersey resource classes: define web
+   * services, i.e. an HTTP APIs.
    * <p>
-   * Some of the endpoints can be turned on/off using {@link OTPFeature}s, this
-   * method check if an endpoint is enabled before adding it to the list.
+   * Some of the endpoints can be turned on/off using {@link OTPFeature}s, this method check if an
+   * endpoint is enabled before adding it to the list.
    *
    * @return all mandatory and feature enabled endpoints are returned.
    */

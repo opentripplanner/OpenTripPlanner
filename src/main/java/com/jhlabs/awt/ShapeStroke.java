@@ -14,24 +14,18 @@ import java.awt.geom.Rectangle2D;
 
 /**
  * Stroke that draw a shape.
- *
+ * <p>
  * Slightly adapted to OTP from original source.
  *
- * @see <a
- *      href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
- *
+ * @see <a href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
  */
 public class ShapeStroke implements Stroke {
 
-  private final Shape theShape;
-
-  private final float advance;
-
-  private final float phase;
-
-  private final AffineTransform t = new AffineTransform();
-
   private static final float FLATNESS = 1;
+  private final Shape theShape;
+  private final float advance;
+  private final float phase;
+  private final AffineTransform t = new AffineTransform();
 
   public ShapeStroke(Shape shape, float width, float advance, float phase) {
     this.advance = advance;

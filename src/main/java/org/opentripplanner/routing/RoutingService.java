@@ -108,11 +108,11 @@ public class RoutingService {
   }
 
   /**
-   * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop
-   * for the previous, current and next service date. It uses a priority queue to keep track of
-   * the next departures. The queue is shared between all dates, as services from the previous
-   * service date can visit the stop later than the current service date's services. This happens
-   * eg. with sleeper trains.
+   * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop for
+   * the previous, current and next service date. It uses a priority queue to keep track of the next
+   * departures. The queue is shared between all dates, as services from the previous service date
+   * can visit the stop later than the current service date's services. This happens eg. with
+   * sleeper trains.
    * <p>
    * TODO: Add frequency based trips
    *
@@ -159,10 +159,10 @@ public class RoutingService {
   }
 
   /**
-   * Fetch upcoming vehicle departures from a stop for a specific pattern, passing the stop
-   * for the previous, current and next service date. It uses a priority queue to keep track of
-   * the next departures. The queue is shared between all dates, as services from the previous
-   * service date can visit the stop later than the current service date's services.
+   * Fetch upcoming vehicle departures from a stop for a specific pattern, passing the stop for the
+   * previous, current and next service date. It uses a priority queue to keep track of the next
+   * departures. The queue is shared between all dates, as services from the previous service date
+   * can visit the stop later than the current service date's services.
    * <p>
    * TODO: Add frequency based trips
    *
@@ -293,14 +293,14 @@ public class RoutingService {
     return this.graph.getRealtimeTransitLayer();
   }
 
-  /** {@link Graph#hasRealtimeTransitLayer()} */
-  public boolean hasRealtimeTransitLayer() {
-    return this.graph.hasRealtimeTransitLayer();
-  }
-
   /** {@link Graph#setRealtimeTransitLayer(TransitLayer)} */
   public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
     this.graph.setRealtimeTransitLayer(realtimeTransitLayer);
+  }
+
+  /** {@link Graph#hasRealtimeTransitLayer()} */
+  public boolean hasRealtimeTransitLayer() {
+    return this.graph.hasRealtimeTransitLayer();
   }
 
   /** {@link Graph#containsVertex(Vertex)} */
@@ -760,7 +760,10 @@ public class RoutingService {
     return this.graphFinder.findClosestStops(lat, lon, radiusMeters);
   }
 
-  /** {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List, RoutingService)} */
+  /**
+   * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List,
+   * RoutingService)}
+   */
   public List<PlaceAtDistance> findClosestPlaces(
     double lat,
     double lon,
@@ -789,18 +792,6 @@ public class RoutingService {
       );
   }
 
-  /**
-   * Lazy-initialization of TimetableSnapshot
-   *
-   * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
-   */
-  private TimetableSnapshot lazyGetTimeTableSnapShot() {
-    if (this.timetableSnapshot == null) {
-      timetableSnapshot = graph.getTimetableSnapshot();
-    }
-    return this.timetableSnapshot;
-  }
-
   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
     FeedScopedId tripId,
     ServiceDate serviceDate
@@ -818,5 +809,17 @@ public class RoutingService {
 
   public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById() {
     return graphIndex.getTripOnServiceDateById();
+  }
+
+  /**
+   * Lazy-initialization of TimetableSnapshot
+   *
+   * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
+   */
+  private TimetableSnapshot lazyGetTimeTableSnapShot() {
+    if (this.timetableSnapshot == null) {
+      timetableSnapshot = graph.getTimetableSnapshot();
+    }
+    return this.timetableSnapshot;
   }
 }

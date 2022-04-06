@@ -10,13 +10,13 @@ public class LegacyGraphQLBookingTimeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLBookingTime {
 
   @Override
-  public DataFetcher<String> time() {
-    return environment -> getSource(environment).getTime().format(DateTimeFormatter.ISO_LOCAL_TIME);
+  public DataFetcher<Integer> daysPrior() {
+    return environment -> getSource(environment).getDaysPrior();
   }
 
   @Override
-  public DataFetcher<Integer> daysPrior() {
-    return environment -> getSource(environment).getDaysPrior();
+  public DataFetcher<String> time() {
+    return environment -> getSource(environment).getTime().format(DateTimeFormatter.ISO_LOCAL_TIME);
   }
 
   private BookingTime getSource(DataFetchingEnvironment environment) {

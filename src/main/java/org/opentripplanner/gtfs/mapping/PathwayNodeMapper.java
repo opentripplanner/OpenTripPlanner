@@ -26,7 +26,7 @@ class PathwayNodeMapper {
     return MapUtils.mapToList(allNodes, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   PathwayNode map(org.onebusaway.gtfs.model.Stop orginal) {
     return orginal == null ? null : mappedNodes.computeIfAbsent(orginal, this::doMap);
   }

@@ -26,17 +26,16 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstants {
 
-  private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-    RaptorConfig.defaultConfigForTest()
-  );
-
   private static final String EXP_PATH =
     "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B " +
     "~ BUS R3 0:15 0:20 ~ C ~ Walk 30s [0:01:30 0:20:30 19m 1tx";
   private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
   private static final String EXP_PATH_WITH_COST = EXP_PATH + " $2500]";
+  private final TestTransitData data = new TestTransitData();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
 
   /**
    * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10

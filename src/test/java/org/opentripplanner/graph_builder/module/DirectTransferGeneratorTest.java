@@ -43,63 +43,6 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   private TransitStopVertex S0, S11, S12, S21, S22;
   private StreetVertex V0, V11, V12, V21, V22;
 
-  private Graph graph(boolean addPatterns) {
-    return graphOf(
-      new Builder() {
-        @Override
-        public void build() {
-          S0 = stop("S0", 47.495, 19.001);
-          S11 = stop("S11", 47.500, 19.001);
-          S12 = stop("S12", 47.520, 19.001);
-          S21 = stop("S21", 47.500, 19.011);
-          S22 = stop("S22", 47.520, 19.011);
-
-          V0 = intersection("V0", 47.495, 19.000);
-          V11 = intersection("V11", 47.500, 19.000);
-          V12 = intersection("V12", 47.510, 19.000);
-          V21 = intersection("V21", 47.500, 19.010);
-          V22 = intersection("V22", 47.510, 19.010);
-
-          biLink(V0, S0);
-          biLink(V11, S11);
-          biLink(V12, S12);
-          biLink(V21, S21);
-          biLink(V22, S22);
-
-          street(V0, V11, 100, StreetTraversalPermission.ALL);
-          street(V0, V12, 200, StreetTraversalPermission.ALL);
-          street(V0, V21, 100, StreetTraversalPermission.ALL);
-          street(V0, V22, 200, StreetTraversalPermission.ALL);
-
-          street(V11, V12, 100, StreetTraversalPermission.PEDESTRIAN);
-          street(V21, V22, 100, StreetTraversalPermission.PEDESTRIAN);
-          street(V11, V21, 100, StreetTraversalPermission.PEDESTRIAN);
-          street(V11, V22, 110, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-
-          if (addPatterns) {
-            var agency = agency("Agency");
-
-            tripPattern(
-              new TripPattern(
-                new FeedScopedId("Test", "TP1"),
-                route("R1", TransitMode.BUS, agency),
-                new StopPattern(List.of(st(S11), st(S12)))
-              )
-            );
-
-            tripPattern(
-              new TripPattern(
-                new FeedScopedId("Test", "TP2"),
-                route("R2", TransitMode.BUS, agency),
-                new StopPattern(List.of(st(S21), st(S22)))
-              )
-            );
-          }
-        }
-      }
-    );
-  }
-
   @Test
   public void testDirectTransfersWithoutPatterns() {
     var generator = new DirectTransferGenerator(
@@ -216,6 +159,63 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
   }
 
+  private Graph graph(boolean addPatterns) {
+    return graphOf(
+      new Builder() {
+        @Override
+        public void build() {
+          S0 = stop("S0", 47.495, 19.001);
+          S11 = stop("S11", 47.500, 19.001);
+          S12 = stop("S12", 47.520, 19.001);
+          S21 = stop("S21", 47.500, 19.011);
+          S22 = stop("S22", 47.520, 19.011);
+
+          V0 = intersection("V0", 47.495, 19.000);
+          V11 = intersection("V11", 47.500, 19.000);
+          V12 = intersection("V12", 47.510, 19.000);
+          V21 = intersection("V21", 47.500, 19.010);
+          V22 = intersection("V22", 47.510, 19.010);
+
+          biLink(V0, S0);
+          biLink(V11, S11);
+          biLink(V12, S12);
+          biLink(V21, S21);
+          biLink(V22, S22);
+
+          street(V0, V11, 100, StreetTraversalPermission.ALL);
+          street(V0, V12, 200, StreetTraversalPermission.ALL);
+          street(V0, V21, 100, StreetTraversalPermission.ALL);
+          street(V0, V22, 200, StreetTraversalPermission.ALL);
+
+          street(V11, V12, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V21, V22, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V11, V21, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V11, V22, 110, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+
+          if (addPatterns) {
+            var agency = agency("Agency");
+
+            tripPattern(
+              new TripPattern(
+                new FeedScopedId("Test", "TP1"),
+                route("R1", TransitMode.BUS, agency),
+                new StopPattern(List.of(st(S11), st(S12)))
+              )
+            );
+
+            tripPattern(
+              new TripPattern(
+                new FeedScopedId("Test", "TP2"),
+                route("R2", TransitMode.BUS, agency),
+                new StopPattern(List.of(st(S21), st(S22)))
+              )
+            );
+          }
+        }
+      }
+    );
+  }
+
   private void assertTransfers(
     Multimap<StopLocation, PathTransfer> transfersByStop,
     TransferDescriptor... transfers
@@ -280,6 +280,17 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       this.to = to.getStop();
     }
 
+    @Override
+    public String toString() {
+      return ToStringBuilder
+        .of(getClass())
+        .addObj("from", from)
+        .addObj("to", to)
+        .addNum("distanceMeters", distanceMeters)
+        .addCol("vertices", vertices)
+        .toString();
+    }
+
     boolean matches(PathTransfer transfer) {
       if (!Objects.equals(from, transfer.from) || !Objects.equals(to, transfer.to)) {
         return false;
@@ -300,17 +311,6 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
           Objects.equals(vertices, transferVertices)
         );
       }
-    }
-
-    @Override
-    public String toString() {
-      return ToStringBuilder
-        .of(getClass())
-        .addObj("from", from)
-        .addObj("to", to)
-        .addNum("distanceMeters", distanceMeters)
-        .addCol("vertices", vertices)
-        .toString();
     }
 
     private Executable matcher(

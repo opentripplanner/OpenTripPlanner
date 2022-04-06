@@ -60,6 +60,16 @@ public class NoDataGridCoverage implements GridCoverage {
   }
 
   @Override
+  public List<GridCoverage> getSources() {
+    return gridCoverage.getSources();
+  }
+
+  @Override
+  public RenderedImage getRenderedImage() {
+    return gridCoverage.getRenderedImage();
+  }
+
+  @Override
   public CoordinateReferenceSystem getCoordinateReferenceSystem() {
     return gridCoverage.getCoordinateReferenceSystem();
   }
@@ -72,32 +82,6 @@ public class NoDataGridCoverage implements GridCoverage {
   @Override
   public RecordType getRangeType() {
     return gridCoverage.getRangeType();
-  }
-
-  @Override
-  public int getNumSampleDimensions() {
-    return gridCoverage.getNumSampleDimensions();
-  }
-
-  @Override
-  public SampleDimension getSampleDimension(int index) throws IndexOutOfBoundsException {
-    return gridCoverage.getSampleDimension(index);
-  }
-
-  @Override
-  public List<GridCoverage> getSources() {
-    return gridCoverage.getSources();
-  }
-
-  @Override
-  public RenderableImage getRenderableImage(int xAxis, int yAxis)
-    throws UnsupportedOperationException, IndexOutOfBoundsException {
-    return gridCoverage.getRenderableImage(xAxis, yAxis);
-  }
-
-  @Override
-  public RenderedImage getRenderedImage() {
-    return gridCoverage.getRenderedImage();
   }
 
   // Override the evaluate methods, so that a PointOutsideCoverageException is thrown for NO_DATE values
@@ -145,6 +129,22 @@ public class NoDataGridCoverage implements GridCoverage {
       throw new PointOutsideCoverageException("Value is NO_DATA.");
     }
     return dest;
+  }
+
+  @Override
+  public int getNumSampleDimensions() {
+    return gridCoverage.getNumSampleDimensions();
+  }
+
+  @Override
+  public SampleDimension getSampleDimension(int index) throws IndexOutOfBoundsException {
+    return gridCoverage.getSampleDimension(index);
+  }
+
+  @Override
+  public RenderableImage getRenderableImage(int xAxis, int yAxis)
+    throws UnsupportedOperationException, IndexOutOfBoundsException {
+    return gridCoverage.getRenderableImage(xAxis, yAxis);
   }
 
   static GridCoverage create(GridCoverage2D gridCoverage2D) {

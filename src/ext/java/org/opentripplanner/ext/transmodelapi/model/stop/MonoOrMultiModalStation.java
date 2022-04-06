@@ -2,7 +2,10 @@ package org.opentripplanner.ext.transmodelapi.model.stop;
 
 import java.util.Collection;
 import java.util.TimeZone;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.util.I18NString;
 
 public class MonoOrMultiModalStation extends TransitEntity {

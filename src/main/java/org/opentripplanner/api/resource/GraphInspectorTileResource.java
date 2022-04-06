@@ -22,7 +22,7 @@ import org.opentripplanner.standalone.server.Router;
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
  * (bike safety factor, connectivity...).
- *
+ * <p>
  * One can easily add a new layer by adding the following kind of code to a leaflet map:
  *
  * <pre>
@@ -32,15 +32,13 @@ import org.opentripplanner.standalone.server.Router;
  *   var map = L.map(...);
  *   L.control.layers(null, { "Bike safety": bikesafety }).addTo(map);
  * </pre>
- *
+ * <p>
  * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
  * given layer.
  *
+ * @author laurent
  * @see org.opentripplanner.inspector.TileRendererManager
  * @see TileRenderer
- *
- * @author laurent
- *
  */
 @Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource {
@@ -88,9 +86,8 @@ public class GraphInspectorTileResource {
 
   /**
    * Gets all layer names
-   *
+   * <p>
    * Used in fronted to create layer chooser
-   * @return
    */
   @GET
   @Path("layers")

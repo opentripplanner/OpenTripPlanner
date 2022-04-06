@@ -14,12 +14,12 @@ import org.slf4j.LoggerFactory;
 /**
  * The purpose of this class is to hold all parameters and their value in a map. It also contains
  * logic for mapping between the data overlay domain and the API. The purpose is to provide a
- * standardized naming scheme for the parameters. The data overlay can be configured to use any
- * kind of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the
- * {@link ParameterName}, then request your parameter to be added.
+ * standardized naming scheme for the parameters. The data overlay can be configured to use any kind
+ * of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the {@link
+ * ParameterName}, then request your parameter to be added.
  * <p>
- * This class contain helper logic to convert parameters to and from a string representation used
- * by the APIs(the REST API is the only supported API). The parameter string format is:
+ * This class contain helper logic to convert parameters to and from a string representation used by
+ * the APIs(the REST API is the only supported API). The parameter string format is:
  * <p>
  * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)
  * <p>
@@ -39,14 +39,10 @@ public class DataOverlayParameters implements Serializable {
 
   private final Map<T2<ParameterName, ParameterType>, Double> values = new HashMap<>();
 
-  public boolean isEmpty() {
-    return values.isEmpty();
-  }
-
   /**
-   * Parse the input {@code params} and create a new {@link DataOverlayParameters}
-   * instance. All unknown parameters are ignored, so are missing values. This method is
-   * created to receive all input and filter out the data-overlay parameters.
+   * Parse the input {@code params} and create a new {@link DataOverlayParameters} instance. All
+   * unknown parameters are ignored, so are missing values. This method is created to receive all
+   * input and filter out the data-overlay parameters.
    */
   public static DataOverlayParameters parseQueryParams(Map<String, List<String>> params) {
     var result = new DataOverlayParameters();
@@ -72,7 +68,7 @@ public class DataOverlayParameters implements Serializable {
   /**
    * List all parameters supported as stings. The format is:
    * <p>
-   *  [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)  <p>
+   * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)  <p>
    * Example:
    * <pre>
    * carbon_monoxide_threshold
@@ -89,6 +85,14 @@ public class DataOverlayParameters implements Serializable {
     return list;
   }
 
+  public static String toStringKey(ParameterName name, ParameterType type) {
+    return (name + "_" + type).toLowerCase();
+  }
+
+  public boolean isEmpty() {
+    return values.isEmpty();
+  }
+
   public Double get(String param) {
     return get(resolveKey(param));
   }
@@ -97,27 +101,12 @@ public class DataOverlayParameters implements Serializable {
     return values.get(new T2<>(name, type));
   }
 
-  private Double get(T2<ParameterName, ParameterType> param) {
-    return values.get(param);
-  }
-
   public void put(String param, Double value) {
     put(resolveKey(param), value);
   }
 
   public void put(ParameterName name, ParameterType type, Double value) {
     put(new T2<>(name, type), value);
-  }
-
-  private void put(T2<ParameterName, ParameterType> param, Double value) {
-    if (param == null) {
-      return;
-    }
-    values.put(param, value);
-  }
-
-  public static String toStringKey(ParameterName name, ParameterType type) {
-    return (name + "_" + type).toLowerCase();
   }
 
   public Iterable<ParameterName> listParameterNames() {
@@ -146,5 +135,16 @@ public class DataOverlayParameters implements Serializable {
     } catch (NumberFormatException | NullPointerException ignore) {
       return null;
     }
+  }
+
+  private Double get(T2<ParameterName, ParameterType> param) {
+    return values.get(param);
+  }
+
+  private void put(T2<ParameterName, ParameterType> param, Double value) {
+    if (param == null) {
+      return;
+    }
+    values.put(param, value);
   }
 }

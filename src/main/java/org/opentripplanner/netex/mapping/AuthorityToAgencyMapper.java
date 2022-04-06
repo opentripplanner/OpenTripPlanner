@@ -7,9 +7,9 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Authority;
 
 /**
- * NeTEx authority is mapped to OTP agency. An authority is defined as "A company or organisation which is responsible
- * for the establishment of a public transport service." In NeTEx this is not the same as an operator. A dummy
- * authority can be created if input data is missing an authority.
+ * NeTEx authority is mapped to OTP agency. An authority is defined as "A company or organisation
+ * which is responsible for the establishment of a public transport service." In NeTEx this is not
+ * the same as an operator. A dummy authority can be created if input data is missing an authority.
  */
 class AuthorityToAgencyMapper {
 
@@ -49,8 +49,8 @@ class AuthorityToAgencyMapper {
   }
 
   /**
-   * Create a new dummy agency with time zone set. All other values are set to
-   * "N/A" and id set to {@code "Dummy-" + timeZone}.
+   * Create a new dummy agency with time zone set. All other values are set to "N/A" and id set to
+   * {@code "Dummy-" + timeZone}.
    */
   Agency createDummyAgency() {
     Agency agency = new Agency(idFactory.createId(dummyAgencyId), "N/A", timeZone);

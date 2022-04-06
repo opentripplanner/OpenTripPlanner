@@ -9,8 +9,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitEntity;
 
 /**
- * The purpose of this class is to provide a map from id to the corresponding entity.
- * It is simply an index of entities.
+ * The purpose of this class is to provide a map from id to the corresponding entity. It is simply
+ * an index of entities.
  *
  * @param <E> the entity type
  */
@@ -33,8 +33,8 @@ public class EntityById<E extends TransitEntity> {
 
   /**
    * @param id the id whose associated value is to be returned
-   * @return the value to which the specified key is mapped, or
-   *         {@code null} if this map contains no mapping for the key
+   * @return the value to which the specified key is mapped, or {@code null} if this map contains no
+   * mapping for the key
    */
   public E get(FeedScopedId id) {
     return map.get(id);
@@ -73,8 +73,8 @@ public class EntityById<E extends TransitEntity> {
   }
 
   /**
-   * Return a copy of the internal map. Changes in the source are not reflected
-   * in the destination (returned Map), and visa versa.
+   * Return a copy of the internal map. Changes in the source are not reflected in the destination
+   * (returned Map), and visa versa.
    * <p>
    * The returned map is immutable.
    */

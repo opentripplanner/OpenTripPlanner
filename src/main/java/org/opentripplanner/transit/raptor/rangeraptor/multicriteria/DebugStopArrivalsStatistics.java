@@ -10,8 +10,8 @@ import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
  */
 class DebugStopArrivalsStatistics {
 
-  private final DebugLogger debugLogger;
   private static boolean firstTime = true;
+  private final DebugLogger debugLogger;
 
   DebugStopArrivalsStatistics(DebugLogger debugLogger) {
     this.debugLogger = debugLogger;

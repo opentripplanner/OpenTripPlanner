@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parse a Notice and Notice Assigment, used only be the {@link ServiceFrameParser} and
- * {@link TimeTableFrameParser}.
+ * Parse a Notice and Notice Assigment, used only be the {@link ServiceFrameParser} and {@link
+ * TimeTableFrameParser}.
  */
 class NoticeParser {
 

@@ -20,17 +20,9 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 
 public class Ring {
 
-  public static class RingConstructionException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-  }
-
-  public List<OSMNode> nodes;
-
   private final Coordinate[] geometry;
-
   private final List<Ring> holes = new ArrayList<>();
-
+  public List<OSMNode> nodes;
   // equivalent to the ring representation, but used for JTS operations
   public Polygon jtsPolygon;
 
@@ -136,5 +128,10 @@ public class Ring {
     }
     LinearRing[] lrholes = lrholelist.toArray(new LinearRing[lrholelist.size()]);
     return factory.createPolygon(shell, lrholes);
+  }
+
+  public static class RingConstructionException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
   }
 }

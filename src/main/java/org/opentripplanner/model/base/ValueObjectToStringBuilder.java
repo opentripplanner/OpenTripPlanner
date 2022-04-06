@@ -6,10 +6,9 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * Use this to-string-builder to build value objects. A
- * [ValueObject](http://wiki.c2.com/?ValueObject) is usually a small object/class with
- * a few fields. We want the {@code toString()} to be small and easy to read. The
- * text should be short and without class and field name prefixes.
+ * Use this to-string-builder to build value objects. A [ValueObject](http://wiki.c2.com/?ValueObject)
+ * is usually a small object/class with a few fields. We want the {@code toString()} to be small and
+ * easy to read. The text should be short and without class and field name prefixes.
  * <p>
  * Examples:
  * <pre>
@@ -36,8 +35,8 @@ public class ValueObjectToStringBuilder {
   private ValueObjectToStringBuilder() {}
 
   /**
-   * Create a new toString builder for a [ValueObject](http://wiki.c2.com/?ValueObject) type.
-   * The builder will NOT include metadata(class and field names) when building the string.
+   * Create a new toString builder for a [ValueObject](http://wiki.c2.com/?ValueObject) type. The
+   * builder will NOT include metadata(class and field names) when building the string.
    */
   public static ValueObjectToStringBuilder of() {
     return new ValueObjectToStringBuilder();
@@ -46,8 +45,7 @@ public class ValueObjectToStringBuilder {
   /* General purpose formatters */
 
   /**
-   * {@code null} values are skipped after this method is called.
-   * This is the default behavior.
+   * {@code null} values are skipped after this method is called. This is the default behavior.
    */
   public ValueObjectToStringBuilder skipNull() {
     this.skipNull = true;
@@ -55,8 +53,7 @@ public class ValueObjectToStringBuilder {
   }
 
   /**
-   * Use {@link #skipNull()} and {@code skipNull(false)} to turn the skip flag on and off.
-   * Example:
+   * Use {@link #skipNull()} and {@code skipNull(false)} to turn the skip flag on and off. Example:
    *
    * <pre>
    * ValueObjectToStringBuilder.of()
@@ -89,8 +86,8 @@ public class ValueObjectToStringBuilder {
   }
 
   /**
-   * Add plain text without quotes or any pending whitespace separator after it. Include
-   * white space if you need it.
+   * Add plain text without quotes or any pending whitespace separator after it. Include white space
+   * if you need it.
    */
   public ValueObjectToStringBuilder addText(String label) {
     sb.append(label);
@@ -109,10 +106,9 @@ public class ValueObjectToStringBuilder {
   /* Special purpose formatters */
 
   /**
-   * Add a Coordinate location: (longitude, latitude). The coordinate is
-   * printed with a precision of 5 digits after the period. The precision level used
-   * in OTP is 7 digits, so 2 coordinates that appear to be equal (by toString) might not be
-   * exactly equals.
+   * Add a Coordinate location: (longitude, latitude). The coordinate is printed with a precision of
+   * 5 digits after the period. The precision level used in OTP is 7 digits, so 2 coordinates that
+   * appear to be equal (by toString) might not be exactly equals.
    */
   public ValueObjectToStringBuilder addCoordinate(Number lat, Number lon) {
     if (skipNull && lat == null && lon == null) {
@@ -140,8 +136,8 @@ public class ValueObjectToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
-   * {@link Duration#toString()}, but without the 'PT' prefix.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix.
    */
   public ValueObjectToStringBuilder addDuration(Integer durationSeconds) {
     return addIt(durationSeconds, DurationUtils::durationToStr);

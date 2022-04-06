@@ -5,8 +5,10 @@ import org.opentripplanner.model.TransitMode;
 import org.rutebanken.netex.model.StopPlace;
 
 /**
- * This is a best effort at mapping the NeTEx transport modes to the OTP route codes which are identical to the
- * <a href="https://developers.google.com/transit/gtfs/reference/extended-route-types">GTFS extended route types</a>
+ * This is a best effort at mapping the NeTEx transport modes to the OTP route codes which are
+ * identical to the
+ * <a href="https://developers.google.com/transit/gtfs/reference/extended-route-types">GTFS extended
+ * route types</a>
  */
 class StopPlaceTypeMapper {
 

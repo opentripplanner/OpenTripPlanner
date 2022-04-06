@@ -123,8 +123,8 @@ public class OSMDatabase {
   private long virtualNodeId = -100000;
 
   /**
-   * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done
-   * in the United States. This does not affect floor names from level maps.
+   * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in
+   * the United States. This does not affect floor names from level maps.
    */
   public boolean noZeroLevels = true;
 
@@ -356,8 +356,8 @@ public class OSMDatabase {
   }
 
   /**
-   * Called after the third and final phase, when all nodes are loaded.
-   * After all relations, ways, and nodes are loaded, handle areas.
+   * Called after the third and final phase, when all nodes are loaded. After all relations, ways,
+   * and nodes are loaded, handle areas.
    */
   public void doneThirdPhaseNodes() {
     processMultipolygonRelations();
@@ -375,16 +375,18 @@ public class OSMDatabase {
     processUnconnectedAreas();
   }
 
-  // Simple holder for the spatial index
-  static class RingSegment {
+  /**
+   * Check if a point is within an epsilon of a node.
+   */
+  private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
+    return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
+  }
 
-    Area area;
-
-    Ring ring;
-
-    OSMNode nA;
-
-    OSMNode nB;
+  /**
+   * Check if two nodes are within an epsilon.
+   */
+  private static boolean checkDistanceWithin(OSMNode a, OSMNode b, double epsilon) {
+    return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;
   }
 
   /**
@@ -1100,12 +1102,11 @@ public class OSMDatabase {
 
   /**
    * Process an OSM public transport stop area relation.
-   *
-   * This goes through all public_transport=stop_area relations and adds the parent (either an
-   * area or multipolygon relation) as the key and a Set of transit stop nodes that should be
-   * included in the parent area as the value into stopsInAreas. This improves
-   * TransitToTaggedStopsGraphBuilder by enabling us to have unconnected stop nodes within the
-   * areas by creating relations .
+   * <p>
+   * This goes through all public_transport=stop_area relations and adds the parent (either an area
+   * or multipolygon relation) as the key and a Set of transit stop nodes that should be included in
+   * the parent area as the value into stopsInAreas. This improves TransitToTaggedStopsGraphBuilder
+   * by enabling us to have unconnected stop nodes within the areas by creating relations .
    *
    * @author hannesj
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
@@ -1155,17 +1156,15 @@ public class OSMDatabase {
     return routes + ", " + name;
   }
 
-  /**
-   * Check if a point is within an epsilon of a node.
-   */
-  private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
-    return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
-  }
+  // Simple holder for the spatial index
+  static class RingSegment {
 
-  /**
-   * Check if two nodes are within an epsilon.
-   */
-  private static boolean checkDistanceWithin(OSMNode a, OSMNode b, double epsilon) {
-    return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;
+    Area area;
+
+    Ring ring;
+
+    OSMNode nA;
+
+    OSMNode nB;
   }
 }

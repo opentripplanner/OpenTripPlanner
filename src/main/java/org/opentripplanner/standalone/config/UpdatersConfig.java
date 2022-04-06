@@ -39,9 +39,9 @@ import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters
 import org.opentripplanner.util.OtpAppException;
 
 /**
- * This class maps between the JSON array of updaters and the concrete class implementations of
- * each updater parameters. Some updaters use the same parameters, so a map is kept between the
- * JSON updater type strings and the appropriate updater parameter class.
+ * This class maps between the JSON array of updaters and the concrete class implementations of each
+ * updater parameters. Some updaters use the same parameters, so a map is kept between the JSON
+ * updater type strings and the appropriate updater parameter class.
  */
 public class UpdatersConfig implements UpdatersParameters {
 
@@ -61,6 +61,10 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final String SIRI_SX_UPDATER = "siri-sx-updater";
 
   private static final Map<String, BiFunction<String, NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
+  private final Multimap<String, Object> configList = ArrayListMultimap.create();
+
+  @Nullable
+  private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
 
   static {
     CONFIG_CREATORS.put(BIKE_PARK, VehicleParkingUpdaterConfig::create); // TODO: deprecated, remove in next major version
@@ -78,11 +82,6 @@ public class UpdatersConfig implements UpdatersParameters {
     CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::create);
   }
-
-  private final Multimap<String, Object> configList = ArrayListMultimap.create();
-
-  @Nullable
-  private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
 
   public UpdatersConfig(NodeAdapter rootAdapter) {
     this.vehicleRentalServiceDirectoryFetcherParameters =
@@ -106,6 +105,7 @@ public class UpdatersConfig implements UpdatersParameters {
 
   /**
    * This is the endpoint url used for the VehicleRentalServiceDirectory sandbox feature.
+   *
    * @see VehicleRentalServiceDirectoryFetcher
    */
   @Override

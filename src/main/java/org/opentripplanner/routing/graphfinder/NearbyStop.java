@@ -42,6 +42,21 @@ public class NearbyStop implements Comparable<NearbyStop> {
     this(stopVertex.getStop(), distance, edges, null, state);
   }
 
+  /**
+   * Given a State at a StopVertex, bundle the StopVertex together with information about how far
+   * away it is and the geometry of the path leading up to the given State.
+   */
+  public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
+    double effectiveWalkDistance = 0.0;
+    var graphPath = new GraphPath(state);
+    var edges = new ArrayList<Edge>();
+    for (Edge edge : graphPath.edges) {
+      effectiveWalkDistance += edge.getEffectiveWalkDistance();
+      edges.add(edge);
+    }
+    return new NearbyStop(stop, effectiveWalkDistance, edges, null, state);
+  }
+
   @Override
   public int compareTo(NearbyStop that) {
     if ((this.state == null) != (that.state == null)) {
@@ -54,6 +69,11 @@ public class NearbyStop implements Comparable<NearbyStop> {
       return (int) (this.state.getWeight()) - (int) (that.state.getWeight());
     }
     return (int) (this.distance) - (int) (that.distance);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(stop, distance, edges, geometry, state);
   }
 
   @Override
@@ -74,11 +94,6 @@ public class NearbyStop implements Comparable<NearbyStop> {
     );
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(stop, distance, edges, geometry, state);
-  }
-
   public String toString() {
     return String.format(
       Locale.ROOT,
@@ -89,20 +104,5 @@ public class NearbyStop implements Comparable<NearbyStop> {
       geometry != null ? " w/geometry" : "",
       state != null ? " w/state" : ""
     );
-  }
-
-  /**
-   * Given a State at a StopVertex, bundle the StopVertex together with information about how far
-   * away it is and the geometry of the path leading up to the given State.
-   */
-  public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
-    double effectiveWalkDistance = 0.0;
-    var graphPath = new GraphPath(state);
-    var edges = new ArrayList<Edge>();
-    for (Edge edge : graphPath.edges) {
-      effectiveWalkDistance += edge.getEffectiveWalkDistance();
-      edges.add(edge);
-    }
-    return new NearbyStop(stop, effectiveWalkDistance, edges, null, state);
   }
 }

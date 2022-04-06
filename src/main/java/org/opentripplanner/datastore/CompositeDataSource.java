@@ -12,8 +12,8 @@ public interface CompositeDataSource extends DataSource, Closeable {
   /**
    * Open the composite data source and read the content. For a random access data source
    * (local-file system), this does not read each entry, but just the metadata for each of them.
-   * But, for a streamed data source(cloud storage) it will fetch the entire content - this might
-   * be using a lot of memory.
+   * But, for a streamed data source(cloud storage) it will fetch the entire content - this might be
+   * using a lot of memory.
    */
   Collection<DataSource> content();
 

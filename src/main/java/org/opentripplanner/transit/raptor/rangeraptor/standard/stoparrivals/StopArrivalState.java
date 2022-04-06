@@ -4,22 +4,25 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public interface StopArrivalState<T extends RaptorTripSchedule> {
+  static <T extends RaptorTripSchedule> StopArrivalState<T> create() {
+    return new DefaultStopArrivalState<>();
+  }
+
   /** The overall best time to reach this stop */
   int time();
 
   /**
-   * The best time to reach this stop on board a vehicle, it may be by
-   * transit or by flex access.
+   * The best time to reach this stop on board a vehicle, it may be by transit or by flex access.
    */
   int onBoardArrivalTime();
 
   /** Stop arrival reached by transit or on-board access. */
   boolean reachedOnBoard();
 
+  /* Access */
+
   /** Stop arrival reached, at least one time (any round/iteration). */
   boolean reachedOnStreet();
-
-  /* Access */
 
   /**
    * Return true is the best option is an access arrival.
@@ -36,12 +39,12 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
    */
   boolean arrivedByAccessOnBoard();
 
+  /* Transit */
+
   /**
    * Return the access path for the best stop arrival.
    */
   RaptorTransfer accessPathOnBoard();
-
-  /* Transit */
 
   /**
    * A transit arrival exist, but it might be a better transfer arrival as well.
@@ -56,9 +59,9 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
 
   void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip);
 
-  void setBestTimeTransit(int time);
-
   /* Transfer */
+
+  void setBestTimeTransit(int time);
 
   /**
    * The best arrival is by transfer.
@@ -74,8 +77,4 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
    * transfer time
    */
   void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath);
-
-  static <T extends RaptorTripSchedule> StopArrivalState<T> create() {
-    return new DefaultStopArrivalState<>();
-  }
 }

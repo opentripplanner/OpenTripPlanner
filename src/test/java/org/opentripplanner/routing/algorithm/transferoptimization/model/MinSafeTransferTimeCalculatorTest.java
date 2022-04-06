@@ -24,17 +24,14 @@ public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
     ALIGHT_SLACK,
     COST_CALCULATOR
   );
-
+  private final MinSafeTransferTimeCalculator<TestTripSchedule> subject = new MinSafeTransferTimeCalculator<>(
+    SLACK_PROVIDER
+  );
   Path<TestTripSchedule> path_1_bus_leg = PATH_BUILDER
     .access(time("10:00:15"), D2m, STOP_A)
     .bus("L11", time("10:03"), TRANSIT_TIME, STOP_B)
     .egress(D2m);
-
   Path<TestTripSchedule> path_3_bus_legs = BasicPathTestCase.basicTripAsPath();
-
-  private final MinSafeTransferTimeCalculator<TestTripSchedule> subject = new MinSafeTransferTimeCalculator<>(
-    SLACK_PROVIDER
-  );
 
   @Test
   public void testMinSafeTransferTimeOneTransit() {

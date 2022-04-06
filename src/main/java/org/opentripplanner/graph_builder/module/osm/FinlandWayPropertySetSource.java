@@ -7,13 +7,12 @@ import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTra
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * OSM way properties for Finnish roads. FinlandWayPropertySetSource is derived from NorwayPropertySetSource by seime
-
- * The main difference compared to the default property set is that most of the highway=trunk roads also allows walking and biking, 
- * where as some does not. 
- * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
+ * OSM way properties for Finnish roads. FinlandWayPropertySetSource is derived from
+ * NorwayPropertySetSource by seime
+ * <p>
+ * The main difference compared to the default property set is that most of the highway=trunk roads
+ * also allows walking and biking, where as some does not. http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
  * http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
- *
  *
  * @author juusokor
  * @see WayPropertySetSource

@@ -17,12 +17,10 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
- * Test CarPickup:
- * - it may start with (WALK - WALK_TO_PICKUP, CAR - IN_CAR)
- * - it may end with (WALK - WALK_FROM_DROP_OFF, CAR - IN_CAR)
- * - StreetTransitEntityLink require mode changes to WALK
- * - StreetEdges may contain mode changes between CAR / WALK
- *
+ * Test CarPickup: - it may start with (WALK - WALK_TO_PICKUP, CAR - IN_CAR) - it may end with (WALK
+ * - WALK_FROM_DROP_OFF, CAR - IN_CAR) - StreetTransitEntityLink require mode changes to WALK -
+ * StreetEdges may contain mode changes between CAR / WALK
+ * <p>
  * arriveBy and departAt paths should be symmetric.
  */
 public class CarPickupTest extends GraphRoutingTest {
@@ -31,38 +29,6 @@ public class CarPickupTest extends GraphRoutingTest {
   private TransitStopVertex S1;
   private TransitEntranceVertex E1;
   private StreetVertex A, B, C, D, E;
-
-  @BeforeEach
-  protected void setUp() throws Exception {
-    // Generate a very simple graph
-    //
-    //   A <-> B <-> C <-> D <-> E
-    //   TS1 <-^           ^-> TE1
-
-    graph =
-      graphOf(
-        new Builder() {
-          @Override
-          public void build() {
-            S1 = stop("S1", 0, 45);
-            E1 = entrance("E1", 0.004, 45);
-            A = intersection("A", 0.001, 45);
-            B = intersection("B", 0.002, 45);
-            C = intersection("C", 0.003, 45);
-            D = intersection("D", 0.004, 45);
-            E = intersection("E", 0.005, 45);
-
-            biLink(B, S1);
-            biLink(C, E1);
-
-            street(A, B, 87, StreetTraversalPermission.PEDESTRIAN);
-            street(B, C, 87, StreetTraversalPermission.CAR);
-            street(C, D, 87, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-            street(D, E, 87, StreetTraversalPermission.PEDESTRIAN);
-          }
-        }
-      );
-  }
 
   @Test
   public void testCarPickupCarOnly() {
@@ -135,6 +101,38 @@ public class CarPickupTest extends GraphRoutingTest {
       "null - WALK_TO_PICKUP - null, WALK - WALK_TO_PICKUP - AB street",
       "null - WALK_FROM_DROP_OFF - null, WALK - WALK_FROM_DROP_OFF - AB street"
     );
+  }
+
+  @BeforeEach
+  protected void setUp() throws Exception {
+    // Generate a very simple graph
+    //
+    //   A <-> B <-> C <-> D <-> E
+    //   TS1 <-^           ^-> TE1
+
+    graph =
+      graphOf(
+        new Builder() {
+          @Override
+          public void build() {
+            S1 = stop("S1", 0, 45);
+            E1 = entrance("E1", 0.004, 45);
+            A = intersection("A", 0.001, 45);
+            B = intersection("B", 0.002, 45);
+            C = intersection("C", 0.003, 45);
+            D = intersection("D", 0.004, 45);
+            E = intersection("E", 0.005, 45);
+
+            biLink(B, S1);
+            biLink(C, E1);
+
+            street(A, B, 87, StreetTraversalPermission.PEDESTRIAN);
+            street(B, C, 87, StreetTraversalPermission.CAR);
+            street(C, D, 87, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+            street(D, E, 87, StreetTraversalPermission.PEDESTRIAN);
+          }
+        }
+      );
   }
 
   private void assertPath(Vertex fromVertex, Vertex toVertex, String descriptor) {

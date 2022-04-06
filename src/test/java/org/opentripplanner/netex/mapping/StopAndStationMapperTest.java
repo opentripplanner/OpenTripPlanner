@@ -95,39 +95,6 @@ public class StopAndStationMapperTest {
     assertWheelChairBoarding("ST:Quay:4", WheelChairBoarding.POSSIBLE, stops);
   }
 
-  /**
-   * Utility function to assert WheelChairBoarding from Stop.
-   *
-   * @param quayId   ID to find corresponding Stop
-   * @param expected Expected WheelChairBoarding value in assertion
-   * @param stops    Find correct stop from list
-   */
-  private void assertWheelChairBoarding(
-    String quayId,
-    WheelChairBoarding expected,
-    List<Stop> stops
-  ) {
-    var wheelChairBoarding = stops
-      .stream()
-      .filter(s -> s.getId().getId().equals(quayId))
-      .findAny()
-      .map(Stop::getWheelchairBoarding)
-      .orElse(null);
-
-    assertNotNull(wheelChairBoarding, "wheelChairBoarding must not be null");
-    assertEquals(
-      expected,
-      wheelChairBoarding,
-      () ->
-        "wheelChairBoarding should be " +
-        expected +
-        " found " +
-        wheelChairBoarding +
-        " for quayId = " +
-        quayId
-    );
-  }
-
   @Test
   public void mapStopPlaceAndQuays() {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
@@ -262,6 +229,39 @@ public class StopAndStationMapperTest {
       .withLocation(
         new LocationStructure().withLatitude(new BigDecimal(lat)).withLongitude(new BigDecimal(lon))
       );
+  }
+
+  /**
+   * Utility function to assert WheelChairBoarding from Stop.
+   *
+   * @param quayId   ID to find corresponding Stop
+   * @param expected Expected WheelChairBoarding value in assertion
+   * @param stops    Find correct stop from list
+   */
+  private void assertWheelChairBoarding(
+    String quayId,
+    WheelChairBoarding expected,
+    List<Stop> stops
+  ) {
+    var wheelChairBoarding = stops
+      .stream()
+      .filter(s -> s.getId().getId().equals(quayId))
+      .findAny()
+      .map(Stop::getWheelchairBoarding)
+      .orElse(null);
+
+    assertNotNull(wheelChairBoarding, "wheelChairBoarding must not be null");
+    assertEquals(
+      expected,
+      wheelChairBoarding,
+      () ->
+        "wheelChairBoarding should be " +
+        expected +
+        " found " +
+        wheelChairBoarding +
+        " for quayId = " +
+        quayId
+    );
   }
 
   /**

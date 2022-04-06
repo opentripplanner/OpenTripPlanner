@@ -41,6 +41,7 @@ public class BoardingAreaMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
+  private final BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_BOARDING_AREA);
@@ -57,8 +58,6 @@ public class BoardingAreaMapperTest {
     STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING.gtfsCode);
     STOP.setZoneId(ZONE_ID);
   }
-
-  private final BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() {

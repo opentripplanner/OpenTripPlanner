@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
  * organized as USGS organizes them when you ship them a hard drive).
  *
  * @author novalis
- *
  */
 public class DegreeGridNEDTileSource implements NEDTileSource {
 
@@ -43,11 +42,6 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
   public String awsBucketName;
 
   private List<File> nedTiles;
-
-  @Override
-  public List<File> getNEDTiles() {
-    return nedTiles;
-  }
 
   @Override
   public void fetchData(Graph graph, File cacheDirectory) {
@@ -74,6 +68,11 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
       throw new RuntimeException("No elevation tiles were able to be downloaded!");
     }
     nedTiles = paths;
+  }
+
+  @Override
+  public List<File> getNEDTiles() {
+    return nedTiles;
   }
 
   private String formatLatLon(int x, int y) {

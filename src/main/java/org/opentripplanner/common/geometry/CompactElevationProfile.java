@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
  * from the previous point, and variable length coding (most of the delta coordinates will thus fits
  * in 1 or 2 bytes).</li>
  * </ul>
- *
+ * <p>
  * Performance hit should be low as we do not need the elevation profile itself during a path
  * search.
  *
@@ -38,9 +38,9 @@ public final class CompactElevationProfile implements Serializable {
 
   /**
    * Compact an elevation profile onto a var-len int packed form (Dlugosz coding). This method
-   * supposes that only the y-values are to be compacted and the x-values can be reconstructed
-   * at regular intervals according to the distanceBetweenSamplesM field. The last x-value is given
-   * by the length of the geometry.
+   * supposes that only the y-values are to be compacted and the x-values can be reconstructed at
+   * regular intervals according to the distanceBetweenSamplesM field. The last x-value is given by
+   * the length of the geometry.
    *
    * @param elevation The elevation profile to compact
    * @return The compacted format
@@ -68,12 +68,12 @@ public final class CompactElevationProfile implements Serializable {
   /**
    * Uncompact an ElevationProfile from a var-len int packed form (Dlugosz coding). This method
    * supposes that only the y-values have been compacted and x-values will be reconstructed at
-   * regular interval according to the distanceBetweenSamplesM field. The last x-value is given
-   * by the length of the geometry.
+   * regular interval according to the distanceBetweenSamplesM field. The last x-value is given by
+   * the length of the geometry.
    *
    * @param packedCoords Compacted coordinates
-   * @param lengthM The length of the edge in meters. This is used as the x-value of the final
-   *                height sample
+   * @param lengthM      The length of the edge in meters. This is used as the x-value of the final
+   *                     height sample
    * @return The elevation profile
    */
   public static PackedCoordinateSequence uncompactElevationProfileWithRegularSamples(

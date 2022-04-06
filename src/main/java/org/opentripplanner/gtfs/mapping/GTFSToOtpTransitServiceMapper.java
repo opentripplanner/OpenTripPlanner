@@ -13,8 +13,8 @@ import org.opentripplanner.util.TranslationHelper;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
- * General mapping code or reusable bussiness logic should be moved into the Builder; hence
- * reusable for other import modules.
+ * General mapping code or reusable bussiness logic should be moved into the Builder; hence reusable
+ * for other import modules.
  */
 public class GTFSToOtpTransitServiceMapper {
 

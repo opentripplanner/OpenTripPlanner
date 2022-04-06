@@ -27,6 +27,12 @@ class ProgressTrackerOutputStream extends OutputStream {
   }
 
   @Override
+  public void write(int b) throws IOException {
+    progress.step(logger);
+    delegate.write(b);
+  }
+
+  @Override
   public void write(byte[] b) throws IOException {
     progress.steps(b.length, logger);
     delegate.write(b);
@@ -41,12 +47,6 @@ class ProgressTrackerOutputStream extends OutputStream {
   @Override
   public void flush() throws IOException {
     delegate.flush();
-  }
-
-  @Override
-  public void write(int b) throws IOException {
-    progress.step(logger);
-    delegate.write(b);
   }
 
   @Override

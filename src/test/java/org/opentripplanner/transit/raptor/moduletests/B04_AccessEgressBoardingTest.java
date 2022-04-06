@@ -21,19 +21,30 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
- *
- * This test is similar to the {@link A04_BoardingTest}, except that this test focus on boarding
- * after access and alighting before egress, not after/before other transit legs. The setup is a
- * bit simpler since we only need one Route with three access and egress paths.
  * <p>
- * The routing strategies do not board at the same stop, they should board at the optimal stop
- * for the criterion which they optimize on. Read the doc for {@link A04_BoardingTest} which
- * describe the expected behavior with respect to boarding.
+ * This test is similar to the {@link A04_BoardingTest}, except that this test focus on boarding
+ * after access and alighting before egress, not after/before other transit legs. The setup is a bit
+ * simpler since we only need one Route with three access and egress paths.
+ * <p>
+ * The routing strategies do not board at the same stop, they should board at the optimal stop for
+ * the criterion which they optimize on. Read the doc for {@link A04_BoardingTest} which describe
+ * the expected behavior with respect to boarding.
  * <p>
  * Note! This test run one iteration. It does not run RangeRaptor over a time window.
  */
 @SuppressWarnings("FieldCanBeLocal")
 public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
+
+  /** Board R1 at first possible stop A (not B) and arrive at stop E (the earliest arrival time) */
+  private static final String EXP_PATH_BEST_ARRIVAL_TIME =
+    "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s 0tx]";
+
+  /**
+   * Searching in REVERSE we will "board" R1 at the first possible stop F and "alight" at the
+   * optimal stop B (the best "arrival-time").
+   */
+  private static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
+    "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s 0tx]";
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -45,24 +56,13 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
   private final String OPTIMAL_PATH =
     "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s 0tx";
 
-  /** Board R1 at first possible stop A (not B) and arrive at stop E (the earliest arrival time) */
-  public static final String EXP_PATH_BEST_ARRIVAL_TIME =
-    "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s 0tx]";
-
-  /**
-   * Searching in REVERSE we will "board" R1 at the first possible stop F and "alight" at the
-   * optimal stop B (the best "arrival-time").
-   */
-  public static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
-    "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s 0tx]";
-
   /** Expect the optimal path to be found. */
   private final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
 
   /**
    * The multi-criteria search should find the best alternative, because it looks at the
-   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same
-   * path as the min-travel-duration will find.
+   * arrival-time, generalized-cost, and departure-time(travel-time). In this case the same path as
+   * the min-travel-duration will find.
    */
   private final String EXP_PATH_MC = OPTIMAL_PATH + " $1840]";
 

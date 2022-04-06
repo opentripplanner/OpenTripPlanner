@@ -23,16 +23,6 @@ public class ForwardTransitCalculatorTest {
   private int latestAcceptableArrivalTime = hm2time(16, 0);
   private int iterationStep = 60;
 
-  private TransitCalculator<TestTripSchedule> create() {
-    return new ForwardTransitCalculator<>(
-      TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
-      earliestDepartureTime,
-      searchWindowSizeInSeconds,
-      latestAcceptableArrivalTime,
-      iterationStep
-    );
-  }
-
   @Test
   public void exceedsTimeLimit() {
     latestAcceptableArrivalTime = 1200;
@@ -99,6 +89,16 @@ public class ForwardTransitCalculatorTest {
 
     // No transfer for stop B expected
     assertFalse(subject.getTransfers(transitData, STOP_B).hasNext());
+  }
+
+  private TransitCalculator<TestTripSchedule> create() {
+    return new ForwardTransitCalculator<>(
+      TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
+      earliestDepartureTime,
+      searchWindowSizeInSeconds,
+      latestAcceptableArrivalTime,
+      iterationStep
+    );
   }
 
   private void assertIntIterator(IntIterator it, int... values) {

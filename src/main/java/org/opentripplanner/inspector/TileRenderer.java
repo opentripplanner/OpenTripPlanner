@@ -1,6 +1,6 @@
 package org.opentripplanner.inspector;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.opentripplanner.routing.graph.Graph;
@@ -11,9 +11,17 @@ import org.opentripplanner.routing.graph.Graph;
  * @author laurent
  */
 public interface TileRenderer {
+  /** Return the BufferedImage color model the renderer would like to use */
+  int getColorModel();
+
+  /** Implementation of the tile rendering */
+  void renderTile(TileRenderContext context);
+
+  /** Gets descriptive name of this Tile Render */
+  String getName();
+
   /**
    * Context used for rendering a tile.
-   *
    */
   abstract class TileRenderContext {
 
@@ -38,13 +46,4 @@ public interface TileRenderer {
     /** Expand the bounding box to add some margins, in pixel size. */
     public abstract Envelope expandPixels(double marginXPixels, double marginYPixels);
   }
-
-  /** Return the BufferedImage color model the renderer would like to use */
-  int getColorModel();
-
-  /** Implementation of the tile rendering */
-  void renderTile(TileRenderContext context);
-
-  /** Gets descriptive name of this Tile Render */
-  String getName();
 }

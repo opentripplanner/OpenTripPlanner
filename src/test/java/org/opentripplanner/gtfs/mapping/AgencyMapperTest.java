@@ -33,6 +33,7 @@ public class AgencyMapperTest {
   private static final String FARE_URL = "www.url.com/fare";
 
   private static final String BRANDING_URL = "www.url.com/brand";
+  private final AgencyMapper subject = new AgencyMapper(FEED_ID);
 
   static {
     AGENCY.setId(ID);
@@ -44,8 +45,6 @@ public class AgencyMapperTest {
     AGENCY.setFareUrl(FARE_URL);
     AGENCY.setBrandingUrl(BRANDING_URL);
   }
-
-  private final AgencyMapper subject = new AgencyMapper(FEED_ID);
 
   @Test
   public void testMapCollection() throws Exception {

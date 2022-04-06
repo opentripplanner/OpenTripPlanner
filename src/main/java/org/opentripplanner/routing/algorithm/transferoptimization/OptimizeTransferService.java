@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class OptimizeTransferService<T extends RaptorTripSchedule> {

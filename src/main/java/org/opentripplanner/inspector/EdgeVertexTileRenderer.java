@@ -42,72 +42,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
  */
 public class EdgeVertexTileRenderer implements TileRenderer {
 
-  public static class EdgeVisualAttributes {
-
-    public Color color;
-
-    public String label;
-  }
-
-  public static class VertexVisualAttributes {
-
-    public Color color;
-
-    public String label;
-  }
-
-  public interface EdgeVertexRenderer {
-    /**
-     * @param e The edge being rendered.
-     * @param attrs The edge visual attributes to fill-in.
-     * @return True to render this edge, false otherwise.
-     */
-    boolean renderEdge(Edge e, EdgeVisualAttributes attrs);
-
-    /**
-     * @param v The vertex being rendered.
-     * @param attrs The vertex visual attributes to fill-in.
-     * @return True to render this vertex, false otherwise.
-     */
-    boolean renderVertex(Vertex v, VertexVisualAttributes attrs);
-
-    /**
-     * Name of this tile Render which would be shown in frontend
-     *
-     * @return Name of tile render
-     */
-    String getName();
-
-    default boolean hasEdgeSegments(Edge edge) {
-      return false;
-    }
-
-    default Iterable<T2<Double, Color>> edgeSegments(Edge edge) {
-      return List.of();
-    }
-
-    default int vertexSorter(Vertex v1, Vertex v2) {
-      return defaultVertexComparator.compare(v1, v2);
-    }
-
-    default int edgeSorter(Edge e1, Edge e2) {
-      return defaultEdgeComparator.compare(e1, e2);
-    }
-
-    Comparator<Vertex> defaultVertexComparator = Comparator
-      .comparing((Vertex v) -> v instanceof StreetVertex)
-      .reversed();
-
-    Comparator<Edge> defaultEdgeComparator = Comparator
-      .comparing((Edge e) -> e.getGeometry() != null)
-      .thenComparing(e -> e instanceof StreetEdge);
-  }
-
-  @Override
-  public int getColorModel() {
-    return BufferedImage.TYPE_INT_ARGB;
-  }
-
   private final EdgeVertexRenderer evRenderer;
 
   public EdgeVertexTileRenderer(EdgeVertexRenderer evRenderer) {
@@ -115,8 +49,8 @@ public class EdgeVertexTileRenderer implements TileRenderer {
   }
 
   @Override
-  public String getName() {
-    return evRenderer.getName();
+  public int getColorModel() {
+    return BufferedImage.TYPE_INT_ARGB;
   }
 
   @Override
@@ -295,5 +229,70 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         context.graphics.drawString(vvAttrs.label, (float) x, (float) tilePoint.getY());
       }
     }
+  }
+
+  @Override
+  public String getName() {
+    return evRenderer.getName();
+  }
+
+  public interface EdgeVertexRenderer {
+    Comparator<Vertex> defaultVertexComparator = Comparator
+      .comparing((Vertex v) -> v instanceof StreetVertex)
+      .reversed();
+    Comparator<Edge> defaultEdgeComparator = Comparator
+      .comparing((Edge e) -> e.getGeometry() != null)
+      .thenComparing(e -> e instanceof StreetEdge);
+
+    /**
+     * @param e     The edge being rendered.
+     * @param attrs The edge visual attributes to fill-in.
+     * @return True to render this edge, false otherwise.
+     */
+    boolean renderEdge(Edge e, EdgeVisualAttributes attrs);
+
+    /**
+     * @param v     The vertex being rendered.
+     * @param attrs The vertex visual attributes to fill-in.
+     * @return True to render this vertex, false otherwise.
+     */
+    boolean renderVertex(Vertex v, VertexVisualAttributes attrs);
+
+    /**
+     * Name of this tile Render which would be shown in frontend
+     *
+     * @return Name of tile render
+     */
+    String getName();
+
+    default boolean hasEdgeSegments(Edge edge) {
+      return false;
+    }
+
+    default Iterable<T2<Double, Color>> edgeSegments(Edge edge) {
+      return List.of();
+    }
+
+    default int vertexSorter(Vertex v1, Vertex v2) {
+      return defaultVertexComparator.compare(v1, v2);
+    }
+
+    default int edgeSorter(Edge e1, Edge e2) {
+      return defaultEdgeComparator.compare(e1, e2);
+    }
+  }
+
+  public static class EdgeVisualAttributes {
+
+    public Color color;
+
+    public String label;
+  }
+
+  public static class VertexVisualAttributes {
+
+    public Color color;
+
+    public String label;
   }
 }

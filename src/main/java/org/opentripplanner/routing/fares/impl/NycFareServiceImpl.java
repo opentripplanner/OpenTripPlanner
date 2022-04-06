@@ -40,14 +40,12 @@ enum NycRideClassifier {
 }
 
 /**
- * This handles the New York City MTA's baroque fare rules for subways and buses
- * with the following limitations:
- * (1) the two hour limit on transfers is not enforced
- * (2) the b61/b62 special case is not handled
- * (3) MNR, LIRR, and LI Bus are not supported -- only subways and buses
- *
- * I have not yet tested this on NY data since we switched to OTP2 (Raptor). It may need to be fixed.
- * The only thing I've changed is how we produce rides from PathLegs instead of AStar states.
+ * This handles the New York City MTA's baroque fare rules for subways and buses with the following
+ * limitations: (1) the two hour limit on transfers is not enforced (2) the b61/b62 special case is
+ * not handled (3) MNR, LIRR, and LI Bus are not supported -- only subways and buses
+ * <p>
+ * I have not yet tested this on NY data since we switched to OTP2 (Raptor). It may need to be
+ * fixed. The only thing I've changed is how we produce rides from PathLegs instead of AStar states.
  * The actual fare calculation logic remains exactly the same except for one thing: thanks to
  * switching to typesafe enums, I fixed one bug where we were adding the enum value instead of the
  * fare to the total cost.

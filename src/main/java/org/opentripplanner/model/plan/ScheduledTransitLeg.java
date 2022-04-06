@@ -40,22 +40,16 @@ public class ScheduledTransitLeg implements Leg {
 
   private final Calendar startTime;
   private final Calendar endTime;
-
-  private double distanceMeters;
   private final LineString legGeometry;
-
   private final Set<TransitAlert> transitAlerts = new HashSet<>();
-
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
-
   protected final Integer boardStopPosInPattern;
   protected final Integer alightStopPosInPattern;
-
   private final int generalizedCost;
-
   protected final ServiceDate serviceDate;
   protected final ZoneId zoneId;
+  private double distanceMeters;
 
   public ScheduledTransitLeg(
     TripTimes tripTimes,
@@ -96,14 +90,6 @@ public class ScheduledTransitLeg implements Leg {
     this.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
   }
 
-  public boolean isScheduledTransitLeg() {
-    return true;
-  }
-
-  public ScheduledTransitLeg asScheduledTransitLeg() {
-    return this;
-  }
-
   public TripTimes getTripTimes() {
     return tripTimes;
   }
@@ -116,33 +102,17 @@ public class ScheduledTransitLeg implements Leg {
     return serviceDate.toZonedDateTime(zoneId, 0).toInstant();
   }
 
-  private List<Coordinate> extractTransitLegCoordinates(
-    TripPattern tripPattern,
-    int boardStopIndexInPattern,
-    int alightStopIndexInPattern
-  ) {
-    List<Coordinate> transitLegCoordinates = new ArrayList<>();
-
-    for (int i = boardStopIndexInPattern + 1; i <= alightStopIndexInPattern; i++) {
-      transitLegCoordinates.addAll(
-        Arrays.asList(tripPattern.getHopGeometry(i - 1).getCoordinates())
-      );
-    }
-
-    return transitLegCoordinates;
-  }
-
-  private double getDistanceFromCoordinates(List<Coordinate> coordinates) {
-    double distance = 0;
-    for (int i = 1; i < coordinates.size(); i++) {
-      distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
-    }
-    return distance;
-  }
-
   @Override
   public boolean isTransitLeg() {
     return true;
+  }
+
+  public boolean isScheduledTransitLeg() {
+    return true;
+  }
+
+  public ScheduledTransitLeg asScheduledTransitLeg() {
+    return this;
   }
 
   @Override
@@ -151,10 +121,6 @@ public class ScheduledTransitLeg implements Leg {
       return false;
     }
     return transferFromPrevLeg.getTransferConstraint().isStaySeated();
-  }
-
-  public void addAlert(TransitAlert alert) {
-    transitAlerts.add(alert);
   }
 
   @Override
@@ -332,6 +298,10 @@ public class ScheduledTransitLeg implements Leg {
     return generalizedCost;
   }
 
+  public void addAlert(TransitAlert alert) {
+    transitAlerts.add(alert);
+  }
+
   /**
    * Should be used for debug logging only
    */
@@ -359,5 +329,29 @@ public class ScheduledTransitLeg implements Leg {
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
       .toString();
+  }
+
+  private List<Coordinate> extractTransitLegCoordinates(
+    TripPattern tripPattern,
+    int boardStopIndexInPattern,
+    int alightStopIndexInPattern
+  ) {
+    List<Coordinate> transitLegCoordinates = new ArrayList<>();
+
+    for (int i = boardStopIndexInPattern + 1; i <= alightStopIndexInPattern; i++) {
+      transitLegCoordinates.addAll(
+        Arrays.asList(tripPattern.getHopGeometry(i - 1).getCoordinates())
+      );
+    }
+
+    return transitLegCoordinates;
+  }
+
+  private double getDistanceFromCoordinates(List<Coordinate> coordinates) {
+    double distance = 0;
+    for (int i = 1; i < coordinates.size(); i++) {
+      distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
+    }
+    return distance;
   }
 }

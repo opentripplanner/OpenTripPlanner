@@ -21,7 +21,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 /**
  * Tests for SimpleIntersectionTraversalCostModel.
- *
+ * <p>
  * TODO(flamholz): add tests for traversal with traffic lights and without a car.
  *
  * @author avi
@@ -359,9 +359,6 @@ public class SimpleTraversalCostModelTest {
   /**
    * Create an edge. If twoWay, create two edges (back and forth).
    *
-   * @param vA
-   * @param vB
-   * @param length
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {

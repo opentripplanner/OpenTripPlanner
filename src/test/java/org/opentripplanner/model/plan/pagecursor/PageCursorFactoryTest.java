@@ -127,6 +127,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assetPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE);
   }
 
+  private static Instant time(String input) {
+    return TIME_ZERO.plusSeconds(TimeUtils.time(input));
+  }
+
   private void assetPageCursor(
     PageCursor pageCursor,
     Instant expEdt,
@@ -138,9 +142,5 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertEquals(expLat, pageCursor.latestArrivalTime);
     assertEquals(expSearchWindow, pageCursor.searchWindow);
     assertEquals(expPageType, pageCursor.type);
-  }
-
-  private static Instant time(String input) {
-    return TIME_ZERO.plusSeconds(TimeUtils.time(input));
   }
 }

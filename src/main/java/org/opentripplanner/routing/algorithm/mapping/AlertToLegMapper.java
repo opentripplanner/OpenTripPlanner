@@ -103,6 +103,44 @@ public class AlertToLegMapper {
       );
   }
 
+  private static void addTransitAlertPatchesToLeg(
+    Leg leg,
+    Collection<StopCondition> stopConditions,
+    Collection<TransitAlert> alertPatches,
+    Date fromTime,
+    Date toTime
+  ) {
+    if (alertPatches != null) {
+      for (TransitAlert alert : alertPatches) {
+        if (alert.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)) {
+          if (
+            !alert.getStopConditions().isEmpty() && // Skip if stopConditions are not set for alert
+            stopConditions != null &&
+            !stopConditions.isEmpty()
+          ) { // ...or specific stopConditions are not requested
+            for (StopCondition stopCondition : stopConditions) {
+              if (alert.getStopConditions().contains(stopCondition)) {
+                leg.addAlert(alert);
+                break; //Only add alert once
+              }
+            }
+          } else {
+            leg.addAlert(alert);
+          }
+        }
+      }
+    }
+  }
+
+  private static void addTransitAlertPatchesToLeg(
+    Leg leg,
+    Collection<TransitAlert> alertPatches,
+    Date fromTime,
+    Date toTime
+  ) {
+    addTransitAlertPatchesToLeg(leg, null, alertPatches, fromTime, toTime);
+  }
+
   private Collection<TransitAlert> getAlertsForStopAndRoute(Stop stop, FeedScopedId routeId) {
     return getAlertsForStopAndRoute(stop, routeId, true);
   }
@@ -285,43 +323,5 @@ public class AlertToLegMapper {
 
     }
     return alertsForStop;
-  }
-
-  private static void addTransitAlertPatchesToLeg(
-    Leg leg,
-    Collection<StopCondition> stopConditions,
-    Collection<TransitAlert> alertPatches,
-    Date fromTime,
-    Date toTime
-  ) {
-    if (alertPatches != null) {
-      for (TransitAlert alert : alertPatches) {
-        if (alert.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)) {
-          if (
-            !alert.getStopConditions().isEmpty() && // Skip if stopConditions are not set for alert
-            stopConditions != null &&
-            !stopConditions.isEmpty()
-          ) { // ...or specific stopConditions are not requested
-            for (StopCondition stopCondition : stopConditions) {
-              if (alert.getStopConditions().contains(stopCondition)) {
-                leg.addAlert(alert);
-                break; //Only add alert once
-              }
-            }
-          } else {
-            leg.addAlert(alert);
-          }
-        }
-      }
-    }
-  }
-
-  private static void addTransitAlertPatchesToLeg(
-    Leg leg,
-    Collection<TransitAlert> alertPatches,
-    Date fromTime,
-    Date toTime
-  ) {
-    addTransitAlertPatchesToLeg(leg, null, alertPatches, fromTime, toTime);
   }
 }

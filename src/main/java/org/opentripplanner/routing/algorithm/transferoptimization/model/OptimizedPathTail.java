@@ -18,8 +18,8 @@ import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
  * This class is used to decorate a {@link TransitPathLeg} with information about transfers
  * constraints, and also caches transfer-priority-cost and optimized-wait-time-transfer-cost.
  * <p>
- * The class is only used inside the {@code transferoptimization} package to store temporary
- * path "tails", while building new paths with new transfer points.
+ * The class is only used inside the {@code transferoptimization} package to store temporary path
+ * "tails", while building new paths with new transfer points.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -61,21 +61,6 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     this.generalizedCost = other.generalizedCost;
   }
 
-  @Override
-  protected void add(PathBuilderLeg<T> newLeg) {
-    addHead(newLeg);
-    // Keep from- and to- times up to date by time-shifting access, transfer and egress legs.
-    newLeg.timeShiftThisAndNextLeg(slackProvider);
-    addTransferPriorityCost(newLeg);
-    addOptimizedWaitTimeCost(newLeg);
-    updateGeneralizedCost();
-  }
-
-  @Override
-  protected void updateAggregatedFields() {
-    /* Empty, aggregated fields are updated while adding new legs */
-  }
-
   /**
    * Create a deep-copy of this builder.
    */
@@ -105,9 +90,8 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   }
 
   /**
-   * Insert a new transit leg at the head and return the new object. The new tail is returned
-   * with the given transit + transfer leg, earliest-departure-time and the current leg as a
-   * new tail.
+   * Insert a new transit leg at the head and return the new object. The new tail is returned with
+   * the given transit + transfer leg, earliest-departure-time and the current leg as a new tail.
    */
   public OptimizedPathTail<T> addTransitAndTransferLeg(
     TransitPathLeg<T> originalLeg,
@@ -145,48 +129,6 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     );
   }
 
-  /**
-   * Return the generalized cost for the current set of paths.
-   */
-  public int generalizedCost() {
-    return generalizedCost;
-  }
-
-  private void updateGeneralizedCost() {
-    if (skipCostCalc()) {
-      return;
-    }
-    this.generalizedCost =
-      legsAsStream().mapToInt(it -> it.generalizedCost(costCalculator, slackProvider)).sum();
-  }
-
-  /**
-   * The latest possible time to board. We use the first transit leg arrival time
-   * as the limit, you need to board before you alight.
-   */
-  public int latestPossibleBoardingTime() {
-    return head().toTime();
-  }
-
-  @Override
-  public int generalizedCostWaitTimeOptimized() {
-    return generalizedCost + waitTimeOptimizedCost;
-  }
-
-  @Override
-  public int transferPriorityCost() {
-    return transferPriorityCost;
-  }
-
-  @Override
-  public int breakTieCost() {
-    // We add the arrival times together to mimic doing the transfers as early as possible
-    // when more than one transfer point exists between two trips.
-    // We calculate this on the fly, because it is not likely to be done very often and
-    // the calculation is light-weight.
-    return legsAsStream().filter(PathBuilderLeg::isTransit).mapToInt(PathBuilderLeg::toTime).sum();
-  }
-
   @Override
   public String toString() {
     return ValueObjectToStringBuilder
@@ -200,6 +142,63 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       .toString();
   }
 
+  @Override
+  protected void add(PathBuilderLeg<T> newLeg) {
+    addHead(newLeg);
+    // Keep from- and to- times up to date by time-shifting access, transfer and egress legs.
+    newLeg.timeShiftThisAndNextLeg(slackProvider);
+    addTransferPriorityCost(newLeg);
+    addOptimizedWaitTimeCost(newLeg);
+    updateGeneralizedCost();
+  }
+
+  @Override
+  protected void updateAggregatedFields() {
+    /* Empty, aggregated fields are updated while adding new legs */
+  }
+
+  /**
+   * Return the generalized cost for the current set of paths.
+   */
+  public int generalizedCost() {
+    return generalizedCost;
+  }
+
+  /**
+   * The latest possible time to board. We use the first transit leg arrival time as the limit, you
+   * need to board before you alight.
+   */
+  public int latestPossibleBoardingTime() {
+    return head().toTime();
+  }
+
+  @Override
+  public int transferPriorityCost() {
+    return transferPriorityCost;
+  }
+
+  @Override
+  public int generalizedCostWaitTimeOptimized() {
+    return generalizedCost + waitTimeOptimizedCost;
+  }
+
+  @Override
+  public int breakTieCost() {
+    // We add the arrival times together to mimic doing the transfers as early as possible
+    // when more than one transfer point exists between two trips.
+    // We calculate this on the fly, because it is not likely to be done very often and
+    // the calculation is light-weight.
+    return legsAsStream().filter(PathBuilderLeg::isTransit).mapToInt(PathBuilderLeg::toTime).sum();
+  }
+
+  private void updateGeneralizedCost() {
+    if (skipCostCalc()) {
+      return;
+    }
+    this.generalizedCost =
+      legsAsStream().mapToInt(it -> it.generalizedCost(costCalculator, slackProvider)).sum();
+  }
+
   /*private methods */
 
   private void addTransferPriorityCost(PathBuilderLeg<T> pathLeg) {
@@ -209,15 +208,15 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   }
 
   /**
-   * Add cost of wait-time, if the given path leg is a transit leg and it is followed by
-   * another transit leg (with a optional transfer leg in between).
+   * Add cost of wait-time, if the given path leg is a transit leg and it is followed by another
+   * transit leg (with a optional transfer leg in between).
    * <p>
-   *   Guaranteed and stay-seated transfers have zero wait-time cost.
+   * Guaranteed and stay-seated transfers have zero wait-time cost.
    * <p>
-   * We could argue that we should include cost for wait-time after FLEX access,
-   * and wait-time before FLEX egress. But since it can be time-shifted, it become almost
-   * impossible to do a proper cost calculation for it. For example, if the FLEX ride is
-   * pre-booked, then it might wait for the passenger.
+   * We could argue that we should include cost for wait-time after FLEX access, and wait-time
+   * before FLEX egress. But since it can be time-shifted, it become almost impossible to do a
+   * proper cost calculation for it. For example, if the FLEX ride is pre-booked, then it might wait
+   * for the passenger.
    */
   private void addOptimizedWaitTimeCost(PathBuilderLeg<?> pathLeg) {
     if (waitTimeCostCalculator == null) {

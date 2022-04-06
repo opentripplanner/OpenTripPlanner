@@ -13,19 +13,19 @@ public class SlopeOverridePicker {
     this.override = override;
   }
 
-  public void setSpecifier(OSMSpecifier specifier) {
-    this.specifier = specifier;
-  }
-
   public OSMSpecifier getSpecifier() {
     return specifier;
   }
 
-  public void setOverride(boolean override) {
-    this.override = override;
+  public void setSpecifier(OSMSpecifier specifier) {
+    this.specifier = specifier;
   }
 
   public boolean getOverride() {
     return override;
+  }
+
+  public void setOverride(boolean override) {
+    this.override = override;
   }
 }

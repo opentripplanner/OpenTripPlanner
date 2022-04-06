@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * A list of coordinates encoded as a string.
- *
+ * <p>
  * See <a href="http://code.google.com/apis/maps/documentation/polylinealgorithm.html">Encoded
  * polyline algorithm format</a>
  */
@@ -46,6 +46,10 @@ public class EncodedPolylineBean implements Serializable {
     return levels;
   }
 
+  public void setLevels(String levels) {
+    this.levels = levels;
+  }
+
   public String getLevels(int defaultLevel) {
     if (levels == null) {
       StringBuilder b = new StringBuilder();
@@ -54,10 +58,6 @@ public class EncodedPolylineBean implements Serializable {
       return b.toString();
     }
     return levels;
-  }
-
-  public void setLevels(String levels) {
-    this.levels = levels;
   }
 
   /**

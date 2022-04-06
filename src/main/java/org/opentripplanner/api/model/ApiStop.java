@@ -32,8 +32,8 @@ public class ApiStop implements Serializable {
   private String platformCode;
 
   @Override
-  public String toString() {
-    return "<Stop " + this.id + ">";
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
   @Override
@@ -49,7 +49,7 @@ public class ApiStop implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(id);
+  public String toString() {
+    return "<Stop " + this.id + ">";
   }
 }

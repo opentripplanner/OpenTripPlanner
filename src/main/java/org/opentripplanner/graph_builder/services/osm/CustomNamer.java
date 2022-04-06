@@ -10,7 +10,6 @@ import org.opentripplanner.routing.graph.Graph;
  * For when CreativeNamePicker/WayPropertySet is just not powerful enough.
  *
  * @author novalis
- *
  */
 public interface CustomNamer {
   String name(OSMWithTags way, String defaultName);

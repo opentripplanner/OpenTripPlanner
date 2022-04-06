@@ -1,12 +1,15 @@
 package org.opentripplanner.graph_builder.module.map;
 
 import java.util.Iterator;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Lineal;
 import org.locationtech.jts.linearref.LinearLocation;
 
 /**
  * I copied this class from JTS but made a few changes.
- *
+ * <p>
  * The JTS version of this class has several design decisions that don't work for me. In particular,
  * hasNext() in the original should be "isValid", and if we start mid-segment, we should continue at
  * the end of this segment rather than the end of the next segment.
@@ -44,7 +47,7 @@ public class LinearIterator implements Iterable<LinearLocation> {
    * Creates an iterator starting at a {@link LinearLocation} on a linear {@link Geometry}
    *
    * @param linear the linear geometry to iterate over
-   * @param start the location to start at
+   * @param start  the location to start at
    * @throws IllegalArgumentException if linearGeom is not lineal
    */
   public LinearIterator(Geometry linear, LinearLocation start) {
@@ -55,9 +58,9 @@ public class LinearIterator implements Iterable<LinearLocation> {
   /**
    * Creates an iterator starting at a specified component and vertex in a linear {@link Geometry}
    *
-   * @param linearGeom the linear geometry to iterate over
+   * @param linearGeom     the linear geometry to iterate over
    * @param componentIndex the component to start at
-   * @param vertexIndex the vertex to start at
+   * @param vertexIndex    the vertex to start at
    * @throws IllegalArgumentException if linearGeom is not lineal
    */
   public LinearIterator(Geometry linearGeom, int componentIndex, int vertexIndex) {
@@ -71,12 +74,13 @@ public class LinearIterator implements Iterable<LinearLocation> {
     loadCurrentLine();
   }
 
-  private void loadCurrentLine() {
-    if (componentIndex >= numLines) {
-      currentLine = null;
-      return;
-    }
-    currentLine = (LineString) linearGeom.getGeometryN(componentIndex);
+  public static LinearLocation getEndLocation(Geometry linear) {
+    //the version in LinearLocation is broken
+
+    int lastComponentIndex = linear.getNumGeometries() - 1;
+    LineString lastLine = (LineString) linear.getGeometryN(lastComponentIndex);
+    int lastSegmentIndex = lastLine.getNumPoints() - 1;
+    return new LinearLocation(lastComponentIndex, lastSegmentIndex, 0.0);
   }
 
   /**
@@ -174,8 +178,8 @@ public class LinearIterator implements Iterable<LinearLocation> {
   }
 
   /**
-   * Gets the second {@link Coordinate} of the current segment. (the coordinate of the next
-   * vertex). If the iterator is at the end of a line, <code>null</code> is returned.
+   * Gets the second {@link Coordinate} of the current segment. (the coordinate of the next vertex).
+   * If the iterator is at the end of a line, <code>null</code> is returned.
    *
    * @return a {@link Coordinate} or <code>null</code>
    */
@@ -188,6 +192,19 @@ public class LinearIterator implements Iterable<LinearLocation> {
 
   public LinearLocation getLocation() {
     return new LinearLocation(componentIndex, vertexIndex, segmentFraction);
+  }
+
+  @Override
+  public Iterator<LinearLocation> iterator() {
+    return new LinearIteratorIterator();
+  }
+
+  private void loadCurrentLine() {
+    if (componentIndex >= numLines) {
+      currentLine = null;
+      return;
+    }
+    currentLine = (LineString) linearGeom.getGeometryN(componentIndex);
   }
 
   class LinearIteratorIterator implements Iterator<LinearLocation> {
@@ -208,19 +225,5 @@ public class LinearIterator implements Iterable<LinearLocation> {
     public void remove() {
       throw new UnsupportedOperationException();
     }
-  }
-
-  @Override
-  public Iterator<LinearLocation> iterator() {
-    return new LinearIteratorIterator();
-  }
-
-  public static LinearLocation getEndLocation(Geometry linear) {
-    //the version in LinearLocation is broken
-
-    int lastComponentIndex = linear.getNumGeometries() - 1;
-    LineString lastLine = (LineString) linear.getGeometryN(lastComponentIndex);
-    int lastSegmentIndex = lastLine.getNumPoints() - 1;
-    return new LinearLocation(lastComponentIndex, lastSegmentIndex, 0.0);
   }
 }

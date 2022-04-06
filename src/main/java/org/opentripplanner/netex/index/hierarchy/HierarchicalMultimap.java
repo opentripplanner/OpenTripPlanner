@@ -9,8 +9,8 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 /**
  * A concrete multimap implementation of {@link AbstractHierarchicalMap}.
  * <p>
- * Note that the collection retuned by the {@link ReadOnlyHierarchicalMap#lookup(Object)} is
- * not <em>ReadOnly</em>, but should be treated as such. It is just to painful to achieve this with the
+ * Note that the collection retuned by the {@link ReadOnlyHierarchicalMap#lookup(Object)} is not
+ * <em>ReadOnly</em>, but should be treated as such. It is just to painful to achieve this with the
  * current verion of the Java Collection API - without any side-effects.
  *
  * @param <K> the key type
@@ -34,6 +34,26 @@ public class HierarchicalMultimap<K, V> extends AbstractHierarchicalMap<K, Colle
   @Override
   public HierarchicalMultimap<K, V> parent() {
     return (HierarchicalMultimap<K, V>) super.parent();
+  }
+
+  @Override
+  Collection<V> localGet(K key) {
+    return map.get(key);
+  }
+
+  @Override
+  boolean localContainsKey(K key) {
+    return map.containsKey(key);
+  }
+
+  @Override
+  protected int localSize() {
+    return map.size();
+  }
+
+  @Override
+  void localRemove(K key) {
+    map.removeAll(key);
   }
 
   /** Add a new pair of {@code key & value} to the local map value collection. */
@@ -61,25 +81,5 @@ public class HierarchicalMultimap<K, V> extends AbstractHierarchicalMap<K, Colle
   @Override
   public boolean localIsEmpty() {
     return map.isEmpty();
-  }
-
-  @Override
-  Collection<V> localGet(K key) {
-    return map.get(key);
-  }
-
-  @Override
-  boolean localContainsKey(K key) {
-    return map.containsKey(key);
-  }
-
-  @Override
-  protected int localSize() {
-    return map.size();
-  }
-
-  @Override
-  void localRemove(K key) {
-    map.removeAll(key);
   }
 }

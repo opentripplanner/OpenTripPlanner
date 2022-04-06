@@ -27,12 +27,11 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Using this instrumentation we can precisely measure how queries and data fetchers are executed
  * and export the metrics to [micrometer](https://micrometer.io).
- *
+ * <p>
  * There are two types of metrics: one for query execution, and another for resolver timing. The
  * timers are registered to micrometer using graphql.timer.query and graphql.timer.resolver.
- *
- * ### See also:
- * - https://github.com/symbaloo/graphql-micrometer/blob/main/src/main/kotlin/com/symbaloo/graphqlmicrometer/MicrometerInstrumentation.kt
+ * <p>
+ * ### See also: - https://github.com/symbaloo/graphql-micrometer/blob/main/src/main/kotlin/com/symbaloo/graphqlmicrometer/MicrometerInstrumentation.kt
  * - https://github.com/graphql-java-kickstart/graphql-spring-boot/blob/master/graphql-spring-boot-autoconfigure/src/main/java/graphql/kickstart/autoconfigure/web/servlet/metrics/MetricsInstrumentation.java
  * - https://github.com/apollographql/apollo-tracing - [TracingInstrumentation]
  */

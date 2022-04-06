@@ -29,17 +29,17 @@ import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStru
  * ShapePoints contain distance travelled per point, while a NeTEX ServiceLinks only contain a
  * distance for each link. We therefore have to divide the total distance between a pair of stops
  * equally between all the points between them.
- *
+ * <p>
  * Because NeTEx ServiceLinks are defined at the JourneyPattern level, we create ShapePoints with
  * the same ids as their corresponding JourneyPattern (only with "JourneyPattern" switched out with
  * "ServiceLink". In the TripMapper, we then use this id to look up ShapePoint ids.
- *
+ * <p>
  * Combining the ServiceLinks that are defined per hop into a single geometry for the entire pattern
- * seems counterproductive, as they are split apart in the GeometryAndBlockProcessor afterwards.
- * A better approach could be to keep the geometries as per hop throughout the import. The reason
- * we decided not to do this, is that it required a large refactoring of the complicated logic in
- * the GeometryAndBlockProcessor in order to keep the existing validation of the geometries.
- * (2020-02-14 #2952)
+ * seems counterproductive, as they are split apart in the GeometryAndBlockProcessor afterwards. A
+ * better approach could be to keep the geometries as per hop throughout the import. The reason we
+ * decided not to do this, is that it required a large refactoring of the complicated logic in the
+ * GeometryAndBlockProcessor in order to keep the existing validation of the geometries. (2020-02-14
+ * #2952)
  */
 class ServiceLinkMapper {
 

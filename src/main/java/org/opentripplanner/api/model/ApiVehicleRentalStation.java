@@ -20,8 +20,9 @@ public class ApiVehicleRentalStation {
   public List<String> networks = null;
 
   /**
-   * Whether this station has real-time data available currently. If no real-time data, users should take
-   * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two.
+   * Whether this station has real-time data available currently. If no real-time data, users should
+   * take bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity
+   * divided by two.
    */
   public boolean realTimeData = true;
 

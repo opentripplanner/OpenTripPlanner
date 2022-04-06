@@ -11,11 +11,6 @@ public class DatedServiceJourneyHelper {
   /**
    * Gets a TripOnServiceDate from a timetable snapshot if it has realtime updates otherwise from
    * the graph index
-   *
-   * @param routingService
-   * @param tripId
-   * @param serviceDate
-   * @return
    */
   public static TripOnServiceDate getTripOnServiceDate(
     RoutingService routingService,
@@ -42,10 +37,6 @@ public class DatedServiceJourneyHelper {
   /**
    * Gets a TripOnServiceDate from a timetable snapshot if it has realtime updates otherwise from
    * the graph index
-   *
-   * @param routingService
-   * @param datedServiceJourneyId
-   * @return
    */
   public static TripOnServiceDate getTripOnServiceDate(
     RoutingService routingService,

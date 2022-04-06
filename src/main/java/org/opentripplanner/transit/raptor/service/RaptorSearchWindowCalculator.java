@@ -99,8 +99,16 @@ public class RaptorSearchWindowCalculator {
   }
 
   /**
-   * Calculate travel-window using search-window and minTravelTime. The travel-window is defined
-   * by the time between the EDT and LAT. The unit is seconds.
+   * Round values to closest increment of given {@code stepSeconds}. This is used to round of a time
+   * or duration to the closest "step" of like 10 minutes.
+   */
+  int roundStep(double value) {
+    return (int) Math.round(value / stepSeconds) * stepSeconds;
+  }
+
+  /**
+   * Calculate travel-window using search-window and minTravelTime. The travel-window is defined by
+   * the time between the EDT and LAT. The unit is seconds.
    */
   private int calculateSearchWindow() {
     // If both EDT and LAT is set the search window is the time between these, minus the
@@ -122,13 +130,5 @@ public class RaptorSearchWindowCalculator {
       // Set an upper bound to the search window
       return Math.min(maxSearchWinSeconds, v);
     }
-  }
-
-  /**
-   * Round values to closest increment of given {@code stepSeconds}. This is used to round of a
-   * time or duration to the closest "step" of like 10 minutes.
-   */
-  int roundStep(double value) {
-    return (int) Math.round(value / stepSeconds) * stepSeconds;
   }
 }

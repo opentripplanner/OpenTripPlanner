@@ -28,12 +28,12 @@ public final class KryoBuilder {
    * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same
    * configuration. This allows us to use identically configured instances for serialization and
    * deserialization.
-   *
+   * <p>
    * When configuring serializers, there's a difference between kryo.register() and
-   * kryo.addDefaultSerializer(). The latter will set the default for a whole tree of classes.
-   * The former matches only the specified class. By default Kryo will serialize all the
-   * non-transient fields of an instance. If the class has its own overridden Java serialization
-   * methods Kryo will not automatically use those, a JavaSerializer must be registered.
+   * kryo.addDefaultSerializer(). The latter will set the default for a whole tree of classes. The
+   * former matches only the specified class. By default Kryo will serialize all the non-transient
+   * fields of an instance. If the class has its own overridden Java serialization methods Kryo will
+   * not automatically use those, a JavaSerializer must be registered.
    */
   public static Kryo create() {
     // For generating a histogram of serialized classes with associated serializers:

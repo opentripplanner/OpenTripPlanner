@@ -4,8 +4,9 @@ import java.util.Locale;
 import org.opentripplanner.util.ResourceBundleAdaptor;
 
 /**
- * The purpose of Messages is to read supply Message.properties to underlying calling code...
- * The ENUM's enumerated values should be named to reflect the property names inside of Message.properties
+ * The purpose of Messages is to read supply Message.properties to underlying calling code... The
+ * ENUM's enumerated values should be named to reflect the property names inside of
+ * Message.properties
  */
 public enum Message {
   // id field is loosely based on HTTP error codes http://en.wikipedia.org/wiki/List_of_HTTP_status_codes

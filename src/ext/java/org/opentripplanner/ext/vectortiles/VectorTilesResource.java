@@ -36,14 +36,9 @@ import org.opentripplanner.util.WorldEnvelope;
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
 
-  enum LayerType {
-    Stop,
-    Station,
-    VehicleRental,
-    VehicleParking,
-  }
-
   private static final Map<LayerType, BiFunction<Graph, LayerParameters, LayerBuilder>> layers = new HashMap<>();
+  private final OTPServer otpServer;
+  private final String ignoreRouterId;
 
   static {
     layers.put(LayerType.Stop, StopsLayerBuilder::new);
@@ -51,9 +46,6 @@ public class VectorTilesResource {
     layers.put(LayerType.VehicleRental, VehicleRentalLayerBuilder::new);
     layers.put(LayerType.VehicleParking, VehicleParkingsLayerBuilder::new);
   }
-
-  private final OTPServer otpServer;
-  private final String ignoreRouterId;
 
   public VectorTilesResource(
     @Context OTPServer otpServer,
@@ -145,6 +137,33 @@ public class VectorTilesResource {
     return protocol + "://" + host;
   }
 
+  enum LayerType {
+    Stop,
+    Station,
+    VehicleRental,
+    VehicleParking,
+  }
+
+  public interface LayersParameters {
+    List<LayerParameters> layers();
+  }
+
+  public interface LayerParameters {
+    String name();
+
+    String type();
+
+    String mapper();
+
+    int maxZoom();
+
+    int minZoom();
+
+    int cacheMaxSeconds();
+
+    double expansionFactor();
+  }
+
   private class TileJson implements Serializable {
 
     public final String tilejson = "2.2.0";
@@ -195,19 +214,5 @@ public class VectorTilesResource {
           .map(coordinate -> new double[] { coordinate.x, coordinate.y, 9 })
           .orElse(null);
     }
-  }
-
-  public interface LayersParameters {
-    List<LayerParameters> layers();
-  }
-
-  public interface LayerParameters {
-    String name();
-    String type();
-    String mapper();
-    int maxZoom();
-    int minZoom();
-    int cacheMaxSeconds();
-    double expansionFactor();
   }
 }

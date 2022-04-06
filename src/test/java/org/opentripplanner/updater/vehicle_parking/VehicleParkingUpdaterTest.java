@@ -57,69 +57,6 @@ class VehicleParkingUpdaterTest {
     assertVehicleParkingsInGraph(1);
   }
 
-  private void assertVehicleParkingsInGraph(int vehicleParkingNumber) {
-    var parkingVertices = graph.getVerticesOfType(VehicleParkingEntranceVertex.class);
-
-    assertEquals(vehicleParkingNumber, parkingVertices.size());
-
-    for (var parkingVertex : parkingVertices) {
-      assertEquals(2, parkingVertex.getIncoming().size());
-      assertEquals(2, parkingVertex.getOutgoing().size());
-
-      assertEquals(
-        1,
-        parkingVertex
-          .getIncoming()
-          .stream()
-          .filter(StreetVehicleParkingLink.class::isInstance)
-          .count()
-      );
-
-      assertEquals(
-        1,
-        parkingVertex.getIncoming().stream().filter(VehicleParkingEdge.class::isInstance).count()
-      );
-
-      assertEquals(
-        1,
-        parkingVertex
-          .getOutgoing()
-          .stream()
-          .filter(StreetVehicleParkingLink.class::isInstance)
-          .count()
-      );
-
-      assertEquals(
-        1,
-        parkingVertex.getOutgoing().stream().filter(VehicleParkingEdge.class::isInstance).count()
-      );
-    }
-
-    assertEquals(
-      vehicleParkingNumber,
-      graph.getService(VehicleParkingService.class).getVehicleParkings().count()
-    );
-  }
-
-  private void runUpdaterOnce() {
-    class GraphUpdaterMock extends GraphUpdaterManager {
-
-      public GraphUpdaterMock(Graph graph, List<GraphUpdater> updaters) {
-        super(graph, updaters);
-      }
-
-      @Override
-      public Future<?> execute(GraphWriterRunnable runnable) {
-        runnable.run(graph);
-        return Futures.immediateVoidFuture();
-      }
-    }
-
-    var graphUpdaterManager = new GraphUpdaterMock(graph, List.of(vehicleParkingUpdater));
-    graphUpdaterManager.startUpdaters();
-    graphUpdaterManager.stop();
-  }
-
   @Test
   public void updateVehicleParkingTest() {
     var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
@@ -187,12 +124,6 @@ class VehicleParkingUpdaterTest {
     assertVehicleParkingNotLinked();
   }
 
-  private void assertVehicleParkingNotLinked() {
-    assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
-    assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
-    assertEquals(0, graph.getEdgesOfType(VehicleParkingEdge.class).size());
-  }
-
   @Test
   public void updateNotOperatingVehicleParkingTest() {
     var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
@@ -248,5 +179,74 @@ class VehicleParkingUpdaterTest {
     runUpdaterOnce();
 
     assertEquals(0, vehicleParkingService.getVehicleParkings().count());
+  }
+
+  private void assertVehicleParkingsInGraph(int vehicleParkingNumber) {
+    var parkingVertices = graph.getVerticesOfType(VehicleParkingEntranceVertex.class);
+
+    assertEquals(vehicleParkingNumber, parkingVertices.size());
+
+    for (var parkingVertex : parkingVertices) {
+      assertEquals(2, parkingVertex.getIncoming().size());
+      assertEquals(2, parkingVertex.getOutgoing().size());
+
+      assertEquals(
+        1,
+        parkingVertex
+          .getIncoming()
+          .stream()
+          .filter(StreetVehicleParkingLink.class::isInstance)
+          .count()
+      );
+
+      assertEquals(
+        1,
+        parkingVertex.getIncoming().stream().filter(VehicleParkingEdge.class::isInstance).count()
+      );
+
+      assertEquals(
+        1,
+        parkingVertex
+          .getOutgoing()
+          .stream()
+          .filter(StreetVehicleParkingLink.class::isInstance)
+          .count()
+      );
+
+      assertEquals(
+        1,
+        parkingVertex.getOutgoing().stream().filter(VehicleParkingEdge.class::isInstance).count()
+      );
+    }
+
+    assertEquals(
+      vehicleParkingNumber,
+      graph.getService(VehicleParkingService.class).getVehicleParkings().count()
+    );
+  }
+
+  private void runUpdaterOnce() {
+    class GraphUpdaterMock extends GraphUpdaterManager {
+
+      public GraphUpdaterMock(Graph graph, List<GraphUpdater> updaters) {
+        super(graph, updaters);
+      }
+
+      @Override
+      public Future<?> execute(GraphWriterRunnable runnable) {
+        runnable.run(graph);
+        return Futures.immediateVoidFuture();
+      }
+    }
+
+    var graphUpdaterManager = new GraphUpdaterMock(graph, List.of(vehicleParkingUpdater));
+    graphUpdaterManager.startUpdaters();
+    graphUpdaterManager.stop();
+  }
+
+  private void assertVehicleParkingNotLinked() {
+    assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
+    assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
+    assertEquals(0, graph.getEdgesOfType(VehicleParkingEdge.class).size());
   }
 }

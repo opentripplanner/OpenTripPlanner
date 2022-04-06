@@ -29,8 +29,8 @@ public class BicycleRoutingTest {
   Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
 
   /**
-   * https://www.openstreetmap.org/way/22392895 is access=destination which means that both
-   * bicycles and motor vehicles must not pass through.
+   * https://www.openstreetmap.org/way/22392895 is access=destination which means that both bicycles
+   * and motor vehicles must not pass through.
    */
   @Test
   public void shouldRespectGeneralNoThroughTraffic() {

@@ -29,14 +29,6 @@ public class OSMLevel implements Comparable<OSMLevel> {
   public final Source source;
   public final boolean reliable;
 
-  public enum Source {
-    LEVEL_MAP,
-    LEVEL_TAG,
-    LAYER_TAG,
-    ALTITUDE,
-    NONE,
-  }
-
   public OSMLevel(
     int floorNumber,
     double altitudeMeters,
@@ -54,8 +46,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
   }
 
   /**
-   * makes an OSMLevel from one of the semicolon-separated fields in an OSM
-   * level map relation's levels= tag.
+   * makes an OSMLevel from one of the semicolon-separated fields in an OSM level map relation's
+   * levels= tag.
    */
   public static OSMLevel fromString(
     String spec,
@@ -185,6 +177,11 @@ public class OSMLevel implements Comparable<OSMLevel> {
   }
 
   @Override
+  public int hashCode() {
+    return this.floorNumber;
+  }
+
+  @Override
   public boolean equals(Object other) {
     if (other == null) {
       return false;
@@ -195,8 +192,11 @@ public class OSMLevel implements Comparable<OSMLevel> {
     return this.floorNumber == ((OSMLevel) other).floorNumber;
   }
 
-  @Override
-  public int hashCode() {
-    return this.floorNumber;
+  public enum Source {
+    LEVEL_MAP,
+    LEVEL_TAG,
+    LAYER_TAG,
+    ALTITUDE,
+    NONE,
   }
 }

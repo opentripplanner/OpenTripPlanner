@@ -20,9 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
+ * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc.
+ * to edges based on OSM tags.
  * TODO rename so that the connection with OSM tags is obvious
- *
+ * <p>
  * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to ways based on how well
  * their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will win out over all the others based on the
  * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
@@ -40,14 +41,10 @@ public class WayPropertySet {
 
   /** Assign automobile speeds based on OSM tags. */
   private final List<SpeedPicker> speedPickers;
-
+  private final List<NotePicker> notes;
+  private final Pattern maxSpeedPattern;
   /** The automobile speed for street segments that do not match any SpeedPicker. */
   public Float defaultSpeed;
-
-  private final List<NotePicker> notes;
-
-  private final Pattern maxSpeedPattern;
-
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   public WayProperties defaultProperties;
 
@@ -68,8 +65,8 @@ public class WayPropertySet {
   }
 
   /**
-   * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties that are mixins
-   * will have their safety values applied if they match at all.
+   * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties
+   * that are mixins will have their safety values applied if they match at all.
    */
   public WayProperties getDataForWay(OSMWithTags way) {
     WayProperties leftResult = defaultProperties;
@@ -123,37 +120,6 @@ public class WayPropertySet {
       LOG.debug("Used default permissions: " + all_tags);
     }
     return result;
-  }
-
-  private String dumpTags(OSMWithTags way) {
-    /* generate warning message */
-    String all_tags = null;
-    Map<String, String> tags = way.getTags();
-    for (Entry<String, String> entry : tags.entrySet()) {
-      String key = entry.getKey();
-      String value = entry.getValue();
-      String tag = key + "=" + value;
-      if (all_tags == null) {
-        all_tags = tag;
-      } else {
-        all_tags += "; " + tag;
-      }
-    }
-    return all_tags;
-  }
-
-  private void applyMixins(WayProperties result, List<WayProperties> mixins, boolean right) {
-    P2<Double> safetyFeatures = result.getSafetyFeatures();
-    double first = safetyFeatures.first;
-    double second = safetyFeatures.second;
-    for (WayProperties properties : mixins) {
-      if (right) {
-        second *= properties.getSafetyFeatures().second;
-      } else {
-        first *= properties.getSafetyFeatures().first;
-      }
-    }
-    result.setSafetyFeatures(new P2<>(first, second));
   }
 
   public I18NString getCreativeNameForWay(OSMWithTags way) {
@@ -295,6 +261,15 @@ public class WayPropertySet {
     slopeOverrides.add(new SlopeOverridePicker(spec, override));
   }
 
+  public int hashCode() {
+    return (
+      defaultProperties.hashCode() +
+      wayProperties.hashCode() +
+      creativeNamers.hashCode() +
+      slopeOverrides.hashCode()
+    );
+  }
+
   public boolean equals(Object o) {
     if (o instanceof WayPropertySet) {
       WayPropertySet other = (WayPropertySet) o;
@@ -307,15 +282,6 @@ public class WayPropertySet {
       );
     }
     return false;
-  }
-
-  public int hashCode() {
-    return (
-      defaultProperties.hashCode() +
-      wayProperties.hashCode() +
-      creativeNamers.hashCode() +
-      slopeOverrides.hashCode()
-    );
   }
 
   public void addSpeedPicker(SpeedPicker picker) {
@@ -368,8 +334,8 @@ public class WayPropertySet {
   }
 
   /**
-   * Note that the safeties here will be adjusted such that the safest street
-   * has a safety value of 1, with all others scaled proportionately.
+   * Note that the safeties here will be adjusted such that the safest street has a safety value of
+   * 1, with all others scaled proportionately.
    */
   public void setProperties(
     String spec,
@@ -402,5 +368,36 @@ public class WayPropertySet {
 
   public List<WayPropertyPicker> getWayProperties() {
     return Collections.unmodifiableList(wayProperties);
+  }
+
+  private String dumpTags(OSMWithTags way) {
+    /* generate warning message */
+    String all_tags = null;
+    Map<String, String> tags = way.getTags();
+    for (Entry<String, String> entry : tags.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      String tag = key + "=" + value;
+      if (all_tags == null) {
+        all_tags = tag;
+      } else {
+        all_tags += "; " + tag;
+      }
+    }
+    return all_tags;
+  }
+
+  private void applyMixins(WayProperties result, List<WayProperties> mixins, boolean right) {
+    P2<Double> safetyFeatures = result.getSafetyFeatures();
+    double first = safetyFeatures.first;
+    double second = safetyFeatures.second;
+    for (WayProperties properties : mixins) {
+      if (right) {
+        second *= properties.getSafetyFeatures().second;
+      } else {
+        first *= properties.getSafetyFeatures().first;
+      }
+    }
+    result.setSafetyFeatures(new P2<>(first, second));
   }
 }

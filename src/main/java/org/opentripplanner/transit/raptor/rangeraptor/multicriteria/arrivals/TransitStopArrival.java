@@ -5,7 +5,6 @@ import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TransitStopArrival<T extends RaptorTripSchedule>
@@ -32,13 +31,8 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
   }
 
   @Override
-  public boolean arrivedByTransit() {
-    return true;
-  }
-
-  @Override
-  public TransitPathView<T> transitPath() {
-    return this;
+  public int boardStop() {
+    return previousStop();
   }
 
   @Override
@@ -47,12 +41,17 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int boardStop() {
-    return previousStop();
+  public TransitArrival<T> mostRecentTransitArrival() {
+    return this;
   }
 
   @Override
-  public TransitArrival<T> mostRecentTransitArrival() {
+  public boolean arrivedByTransit() {
+    return true;
+  }
+
+  @Override
+  public TransitPathView<T> transitPath() {
     return this;
   }
 }

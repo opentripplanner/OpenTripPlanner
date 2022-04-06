@@ -8,15 +8,15 @@ import java.util.concurrent.ConcurrentHashMap;
 class IssueColors {
 
   /**
-   * We use a concurrent hash map for thread safety. It is not necessary since the report
-   * writer is not writing files in parallel, but it make this class thread-safe in case we
-   * want to speed up the issue report generation.
+   * We use a concurrent hash map for thread safety. It is not necessary since the report writer is
+   * not writing files in parallel, but it make this class thread-safe in case we want to speed up
+   * the issue report generation.
    */
   private static final Map<String, Color> ASSIGNED_COLOR = new ConcurrentHashMap<>();
 
   /**
-   * List of back-ground-colors, should work with black text on top. The order should give
-   * dissent contract for two neighboring pairs.
+   * List of back-ground-colors, should work with black text on top. The order should give dissent
+   * contract for two neighboring pairs.
    */
   private static final Color[] BG_COLORS = {
     new Color(0xFFFF80),
@@ -43,14 +43,14 @@ class IssueColors {
     new Color(0xFFFF40),
   };
 
-  private static Color backgroundColor(String issueType) {
-    return ASSIGNED_COLOR.computeIfAbsent(issueType, key -> nextColor());
-  }
-
-  /** Get and return color a in hex format: {@code "#FF00FF"}*/
+  /** Get and return color a in hex format: {@code "#FF00FF"} */
   static String rgb(String issueType) {
     // The '& 0xFFFFFF' is needed to remove the alpha value
     return String.format("#%06X", backgroundColor(issueType).getRGB() & 0xFFFFFF);
+  }
+
+  private static Color backgroundColor(String issueType) {
+    return ASSIGNED_COLOR.computeIfAbsent(issueType, key -> nextColor());
   }
 
   private static Color nextColor() {

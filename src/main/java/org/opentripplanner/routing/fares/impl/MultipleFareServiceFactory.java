@@ -26,8 +26,6 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
     return makeMultipleFareService(subServices);
   }
 
-  protected abstract FareService makeMultipleFareService(List<FareService> subServices);
-
   @Override
   public void processGtfs(OtpTransitService transitService) {
     for (FareServiceFactory subFactory : subFactories) subFactory.processGtfs(transitService);
@@ -75,6 +73,8 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
       );
     }
   }
+
+  protected abstract FareService makeMultipleFareService(List<FareService> subServices);
 
   public static class AddingMultipleFareServiceFactory extends MultipleFareServiceFactory {
 

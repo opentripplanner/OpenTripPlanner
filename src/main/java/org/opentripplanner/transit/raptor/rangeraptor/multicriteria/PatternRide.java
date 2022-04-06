@@ -7,18 +7,18 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
 /**
  * This class represent the STATE for one possible path up until the point where a given trip is
- * boarded(onboard of a vehicle). It represent the STATE of riding a trip, having boarded at a
- * given stop, but not yet alighted.
+ * boarded(onboard of a vehicle). It represent the STATE of riding a trip, having boarded at a given
+ * stop, but not yet alighted.
  * <p>
  * Instances of this class only exist in the context of a given pattern for a given round. Hence
  * when comparing instances we may assume that they have the same number-of-transfers and the same
  * Pattern. We take advantage of this by excluding all "constant" criteria from the pattern-ride
  * comparator used by the pareto-set of patternRides.
  * <p>
- * This implementation of the multi-criteria Range Raptor keep all pareto-optimal _rides_ for
- * each pattern while possessing each stops down the line. This class keep the needed state for
- * these rides to avoid recalculating each value more than once and to be able put then in a
- * {@link org.opentripplanner.transit.raptor.util.paretoset.ParetoSet}.
+ * This implementation of the multi-criteria Range Raptor keep all pareto-optimal _rides_ for each
+ * pattern while possessing each stops down the line. This class keep the needed state for these
+ * rides to avoid recalculating each value more than once and to be able put then in a {@link
+ * org.opentripplanner.transit.raptor.util.paretoset.ParetoSet}.
  * <p>
  * We do not do this the same way as described in the original Raptor paper. The original McRaptor
  * algorithm keep a bag of labels(stop-arrivals) while traversing the pattern. We keep a "bag" of
@@ -85,8 +85,8 @@ public final class PatternRide<T extends RaptorTripSchedule> {
   /**
    * This is the function used to compare {@link PatternRide}s for a given pattern.
    * <p>
-   * Since Raptor only compare rides for a given pattern and a given Raptor round, only
-   * 2 criteria are needed:
+   * Since Raptor only compare rides for a given pattern and a given Raptor round, only 2 criteria
+   * are needed:
    * <ul>
    *   <li>
    *     {@code tripSortIndex} - different trips should not exclude each other. The id can be

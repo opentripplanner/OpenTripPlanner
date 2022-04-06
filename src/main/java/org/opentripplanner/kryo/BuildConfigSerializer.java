@@ -8,11 +8,10 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
 
 /**
- * This serializer is needed because there is no default constructor on the
- * {@link BuildConfig}. The build config is created passing in a JSON node. It save this
- * internally and this is used to serialize the build config. We serialize the JsonNode to
- * a String and that is serialized instead of the graph builder POJO it self. This make it
- * easy to deserialize it by using the constructor.
+ * This serializer is needed because there is no default constructor on the {@link BuildConfig}. The
+ * build config is created passing in a JSON node. It save this internally and this is used to
+ * serialize the build config. We serialize the JsonNode to a String and that is serialized instead
+ * of the graph builder POJO it self. This make it easy to deserialize it by using the constructor.
  * <p>
  * We serialize the JsonNode, not the original JSON String, because we do not want the environment
  * variables to be resolved twice. They are resolved for the raw JSON string when it is read from

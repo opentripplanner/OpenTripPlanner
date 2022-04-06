@@ -11,7 +11,6 @@ import org.opentripplanner.util.I18NString;
 
 /**
  * This represents the connection between a street vertex and a bike rental station vertex.
- *
  */
 public class StreetVehicleRentalLink extends Edge {
 
@@ -29,21 +28,20 @@ public class StreetVehicleRentalLink extends Edge {
     vehicleRentalStationVertex = fromv;
   }
 
+  public Vertex getFromVertex() {
+    return fromv;
+  }
+
+  public Vertex getToVertex() {
+    return tov;
+  }
+
   public String getDirection() {
     return null;
   }
 
-  public double getDistanceMeters() {
-    return 0;
-  }
-
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
-  public I18NString getName() {
-    return vehicleRentalStationVertex.getName();
+  public String toString() {
+    return "StreetVehicleRentalLink(" + fromv + " -> " + tov + ")";
   }
 
   public State traverse(State s0) {
@@ -65,15 +63,16 @@ public class StreetVehicleRentalLink extends Edge {
     return s1.makeState();
   }
 
-  public Vertex getFromVertex() {
-    return fromv;
+  @Override
+  public I18NString getName() {
+    return vehicleRentalStationVertex.getName();
   }
 
-  public Vertex getToVertex() {
-    return tov;
+  public LineString getGeometry() {
+    return null;
   }
 
-  public String toString() {
-    return "StreetVehicleRentalLink(" + fromv + " -> " + tov + ")";
+  public double getDistanceMeters() {
+    return 0;
   }
 }

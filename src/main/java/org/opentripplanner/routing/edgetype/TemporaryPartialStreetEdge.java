@@ -20,9 +20,9 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   private final LineString geometry;
 
   /**
-   * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'.
-   * If the length is negative, a new length is calculated from the geometry.
-   * The elevation data is calculated using the 'parentEdge' and given 'length'.
+   * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'. If the length
+   * is negative, a new length is calculated from the geometry. The elevation data is calculated
+   * using the 'parentEdge' and given 'length'.
    */
   public TemporaryPartialStreetEdge(
     StreetEdge parentEdge,
@@ -38,9 +38,9 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   }
 
   /**
-   * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'.
-   * The length is calculated using the provided geometry.
-   * The elevation data is calculated using the 'parentEdge' and the calculated 'length'.
+   * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'. The length is
+   * calculated using the provided geometry. The elevation data is calculated using the 'parentEdge'
+   * and the calculated 'length'.
    */
   TemporaryPartialStreetEdge(
     StreetEdge parentEdge,
@@ -55,11 +55,6 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
     this.geometry = super.getGeometry();
   }
 
-  @Override
-  public LineString getGeometry() {
-    return geometry;
-  }
-
   /**
    * Partial edges are always partial.
    */
@@ -69,23 +64,8 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   }
 
   /**
-   * Have the inbound angle of  their parent.
-   */
-  @Override
-  public int getInAngle() {
-    return parentEdge.getInAngle();
-  }
-
-  /**
-   * Have the outbound angle of  their parent.
-   */
-  @Override
-  public int getOutAngle() {
-    return parentEdge.getInAngle();
-  }
-
-  /**
-   * This implementation makes it so that TurnRestrictions on the parent edge are applied to this edge as well.
+   * This implementation makes it so that TurnRestrictions on the parent edge are applied to this
+   * edge as well.
    */
   @Override
   public boolean isEquivalentTo(Edge e) {
@@ -101,11 +81,6 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
 
     // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
     return parentEdge.isReverseOf(other);
-  }
-
-  @Override
-  public boolean isRoundabout() {
-    return parentEdge.isRoundabout();
   }
 
   /**
@@ -138,5 +113,31 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
       parentEdge +
       ")"
     );
+  }
+
+  @Override
+  public boolean isRoundabout() {
+    return parentEdge.isRoundabout();
+  }
+
+  @Override
+  public LineString getGeometry() {
+    return geometry;
+  }
+
+  /**
+   * Have the inbound angle of  their parent.
+   */
+  @Override
+  public int getInAngle() {
+    return parentEdge.getInAngle();
+  }
+
+  /**
+   * Have the outbound angle of  their parent.
+   */
+  @Override
+  public int getOutAngle() {
+    return parentEdge.getInAngle();
   }
 }

@@ -133,15 +133,15 @@ public enum TransmodelTransportSubmode {
     this.value = value;
   }
 
-  public String getValue() {
-    return value;
-  }
-
   public static TransmodelTransportSubmode fromValue(String value) {
     return Arrays
       .stream(TransmodelTransportSubmode.values())
       .filter(tp -> tp.getValue().equals(value))
       .findFirst()
       .orElse(null);
+  }
+
+  public String getValue() {
+    return value;
   }
 }

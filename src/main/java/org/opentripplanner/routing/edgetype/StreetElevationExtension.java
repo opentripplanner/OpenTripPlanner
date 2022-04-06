@@ -56,6 +56,19 @@ public class StreetElevationExtension implements Serializable {
     }
   }
 
+  public static void addToEdge(
+    StreetEdge streetEdge,
+    PackedCoordinateSequence elevationProfile,
+    boolean computed
+  ) {
+    if (elevationProfile != null && elevationProfile.size() >= 2) {
+      if (!streetEdge.isSlopeOverride() || computed) {
+        var extension = calculateForEdge(streetEdge, elevationProfile, computed);
+        streetEdge.setElevationExtension(extension);
+      }
+    }
+  }
+
   public PackedCoordinateSequence getElevationProfile() {
     if (compactedElevationProfile != null) {
       return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
@@ -102,19 +115,6 @@ public class StreetElevationExtension implements Serializable {
       .addNum("effectiveWalkDistance", effectiveWalkDistance)
       .addNum("maxSlope", maxSlope)
       .toString();
-  }
-
-  public static void addToEdge(
-    StreetEdge streetEdge,
-    PackedCoordinateSequence elevationProfile,
-    boolean computed
-  ) {
-    if (elevationProfile != null && elevationProfile.size() >= 2) {
-      if (!streetEdge.isSlopeOverride() || computed) {
-        var extension = calculateForEdge(streetEdge, elevationProfile, computed);
-        streetEdge.setElevationExtension(extension);
-      }
-    }
   }
 
   private static StreetElevationExtension calculateForEdge(

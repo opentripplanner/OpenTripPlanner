@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
  * one Timetable when stop time updates are being applied: one for the scheduled stop times, one for
  * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
- *
+ * <p>
  *  TODO OTP2 - Move this to package: org.opentripplanner.model
  *            - after as Entur NeTEx PRs are merged.
  *            - Also consider moving its dependencies in: org.opentripplanner.routing
@@ -42,7 +42,8 @@ public class Timetable implements Serializable {
   private final ServiceDate serviceDate;
 
   /**
-   * Helps determine whether a particular pattern is worth searching for departures at a given time.
+   * Helps determine whether a particular pattern is worth searching for departures at a given
+   * time.
    */
   private transient int minTime, maxTime;
 
@@ -53,7 +54,8 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified timetable.
+   * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified
+   * timetable.
    */
   Timetable(Timetable tt, ServiceDate serviceDate) {
     tripTimes.addAll(tt.tripTimes);
@@ -62,12 +64,13 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Before performing the relatively expensive iteration over all the trips in this pattern, check whether it's even
-   * possible to board any of them given the time at which we are searching, and whether it's possible that any of
-   * them could improve on the best known time. This is only an optimization, but a significant one. When we search
-   * for departures, we look at three separate days: yesterday, today, and tomorrow. Many patterns do not have
-   * service at all hours of the day or past midnight. This optimization can cut the search time for each pattern
-   * by 66 to 100 percent.
+   * Before performing the relatively expensive iteration over all the trips in this pattern, check
+   * whether it's even possible to board any of them given the time at which we are searching, and
+   * whether it's possible that any of them could improve on the best known time. This is only an
+   * optimization, but a significant one. When we search for departures, we look at three separate
+   * days: yesterday, today, and tomorrow. Many patterns do not have service at all hours of the day
+   * or past midnight. This optimization can cut the search time for each pattern by 66 to 100
+   * percent.
    *
    * @param bestWait -1 means there is not yet any best known time.
    */
@@ -93,9 +96,9 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Finish off a Timetable once all TripTimes have been added to it. This involves caching
-   * lower bounds on the running times and dwell times at each stop, and may perform other
-   * actions to compact the data structure such as trimming and deduplicating arrays.
+   * Finish off a Timetable once all TripTimes have been added to it. This involves caching lower
+   * bounds on the running times and dwell times at each stop, and may perform other actions to
+   * compact the data structure such as trimming and deduplicating arrays.
    */
   public void finish() {
     int nStops = pattern.numberOfStops();
@@ -133,7 +136,10 @@ public class Timetable implements Serializable {
     return -1;
   }
 
-  /** @return the index of TripTimes for this trip ID in this particular Timetable, ignoring AgencyIds. */
+  /**
+   * @return the index of TripTimes for this trip ID in this particular Timetable, ignoring
+   * AgencyIds.
+   */
   public int getTripIndex(String tripId) {
     int ret = 0;
     for (TripTimes tt : tripTimes) {
@@ -162,7 +168,7 @@ public class Timetable implements Serializable {
    * Set new trip times for trip given a trip index
    *
    * @param tripIndex trip index of trip
-   * @param tt new trip times for trip
+   * @param tt        new trip times for trip
    * @return old trip times of trip
    */
   public TripTimes setTripTimes(int tripIndex, TripTimes tt) {
@@ -173,19 +179,18 @@ public class Timetable implements Serializable {
    * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
    * must not be modified directly because they may be shared with the underlying
    * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
-   * protective copying of this Timetable. It is not done in this update method to avoid
-   * repeatedly cloning the same Timetable when several updates are applied to it at once. We
-   * assume here that all trips in a timetable are from the same feed, which should always be the
-   * case.
+   * protective copying of this Timetable. It is not done in this update method to avoid repeatedly
+   * cloning the same Timetable when several updates are applied to it at once. We assume here that
+   * all trips in a timetable are from the same feed, which should always be the case.
    *
-   * @param tripUpdate GTFS-RT trip update
-   * @param timeZone time zone of trip update
+   * @param tripUpdate        GTFS-RT trip update
+   * @param timeZone          time zone of trip update
    * @param updateServiceDate service date of trip update
    * @return {@link TripTimesPatch} that contains a new copy of updated TripTimes after TripUpdate
-   *         has been applied on TripTimes of trip with the id specified in the trip descriptor of
-   *         the TripUpdate and a list of stop indices that have been skipped with the realtime
-   *         update; null if something went wrong
-   *
+   * has been applied on TripTimes of trip with the id specified in the trip descriptor of the
+   * TripUpdate and a list of stop indices that have been skipped with the realtime update; null if
+   * something went wrong
+   * <p>
    * TODO OTP2 - This method depend on GTFS RealTime classes. Refactor this so GTFS RT can do
    *           - its job without sending in GTFS specific classes. A generic update would support
    *           - other RealTime updats, not just from GTFS.
@@ -357,19 +362,19 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed
-   * any time trips are added, but this is not done automatically because it is time consuming
-   * and should only be done once after an entire batch of trips are added.
-   * Note that the trip is not added to the enclosing pattern here, but in the pattern's wrapper function.
-   * Here we don't know if it's a scheduled trip or a realtime-added trip.
+   * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed any time
+   * trips are added, but this is not done automatically because it is time consuming and should
+   * only be done once after an entire batch of trips are added. Note that the trip is not added to
+   * the enclosing pattern here, but in the pattern's wrapper function. Here we don't know if it's a
+   * scheduled trip or a realtime-added trip.
    */
   public void addTripTimes(TripTimes tt) {
     tripTimes.add(tt);
   }
 
   /**
-   * Add a frequency entry to this Timetable. See addTripTimes method. Maybe Frequency Entries should
-   * just be TripTimes for simplicity.
+   * Add a frequency entry to this Timetable. See addTripTimes method. Maybe Frequency Entries
+   * should just be TripTimes for simplicity.
    */
   public void addFrequencyEntry(FrequencyEntry freq) {
     frequencyEntries.add(freq);
@@ -415,7 +420,8 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
+   * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all
+   * dates.
    */
   public ServiceDate getServiceDate() {
     return serviceDate;

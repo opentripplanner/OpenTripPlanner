@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Immutable value object for stop level. This is currently only supported by
- * the GTFS import.
+ * Immutable value object for stop level. This is currently only supported by the GTFS import.
  */
 public class StopLevel implements Serializable {
 
@@ -28,8 +27,8 @@ public class StopLevel implements Serializable {
   }
 
   @Override
-  public String toString() {
-    return name + "(" + index + ")";
+  public int hashCode() {
+    return Objects.hash(name, index);
   }
 
   @Override
@@ -45,7 +44,7 @@ public class StopLevel implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(name, index);
+  public String toString() {
+    return name + "(" + index + ")";
   }
 }

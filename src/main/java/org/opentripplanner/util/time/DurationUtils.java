@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
- * This class extend the Java {@link LocalTime} and with the ability
- * to span multiple days and be negative.
+ * This class extend the Java {@link LocalTime} and with the ability to span multiple days and be
+ * negative.
  * <p>
  * The class is used to track time relative to a {@link ServiceDate}.
  * <p>
- * The RelativeTime can also be used relative to some other time, in which case it is similar
- * to the JAva {@link Duration}.
+ * The RelativeTime can also be used relative to some other time, in which case it is similar to the
+ * JAva {@link Duration}.
  * <p>
- * The primary usage of this class is to convert "number of seconds" into a string
- * in the given context. Here is some examples:
+ * The primary usage of this class is to convert "number of seconds" into a string in the given
+ * context. Here is some examples:
  * <pre>
  *   Service date time:
  *   23:59:59     // One second to midnight
@@ -30,17 +30,15 @@ import org.opentripplanner.model.calendar.ServiceDate;
  *   2d4h12s      // 2 days 4 hours and 12 seconds (relative to time in context)
  *   -3m          // 3 minutes before  (relative to time in context)
  * </pre>
- *
  */
 public class DurationUtils {
 
   private DurationUtils() {}
 
   /**
-   * Convert a duration in seconds to a readable string. This a follows
-   * the ISO-8601 notation for most parts, but make it a bit more readable:
-   * {@code P2DT2H12M40S => 2d2h12m40s}. For negative durations
-   * {@code -P2dT3s => -2d3s, not -2d-3s or -(2d3s)} is used.
+   * Convert a duration in seconds to a readable string. This a follows the ISO-8601 notation for
+   * most parts, but make it a bit more readable: {@code P2DT2H12M40S => 2d2h12m40s}. For negative
+   * durations {@code -P2dT3s => -2d3s, not -2d-3s or -(2d3s)} is used.
    */
   public static String durationToStr(int timeSeconds) {
     StringBuilder buf = new StringBuilder();
@@ -80,9 +78,8 @@ public class DurationUtils {
   }
 
   /**
-   * Parse a sting on format {@code nHnMn.nS} or {@link Duration#parse(CharSequence)}.
-   * The prefix "PT" is added if not present before handed of the
-   * {@link Duration#parse(CharSequence)} method.
+   * Parse a sting on format {@code nHnMn.nS} or {@link Duration#parse(CharSequence)}. The prefix
+   * "PT" is added if not present before handed of the {@link Duration#parse(CharSequence)} method.
    *
    * @return the duration in seconds
    */
@@ -92,8 +89,8 @@ public class DurationUtils {
   }
 
   /**
-   * Same as {@link #durationInSeconds(String)}, but returns the {@link Duration}, not the
-   * {@code int} seconds.
+   * Same as {@link #durationInSeconds(String)}, but returns the {@link Duration}, not the {@code
+   * int} seconds.
    */
   public static Duration duration(String duration) {
     var d = duration.toUpperCase();

@@ -48,6 +48,18 @@ public class VehicleParkingHelper {
     }
   }
 
+  public static void linkToGraph(VehicleParkingEntranceVertex vehicleParkingEntrance) {
+    new StreetVehicleParkingLink(
+      vehicleParkingEntrance,
+      vehicleParkingEntrance.getParkingEntrance().getVertex()
+    );
+    new StreetVehicleParkingLink(
+      vehicleParkingEntrance.getParkingEntrance().getVertex(),
+      vehicleParkingEntrance
+    );
+    vehicleParkingEntrance.getParkingEntrance().clearVertex();
+  }
+
   private static boolean isUsableForParking(
     VehicleParkingEntranceVertex from,
     VehicleParkingEntranceVertex to
@@ -65,17 +77,5 @@ public class VehicleParkingHelper {
       );
 
     return usableForBikeParking || usableForCarParking;
-  }
-
-  public static void linkToGraph(VehicleParkingEntranceVertex vehicleParkingEntrance) {
-    new StreetVehicleParkingLink(
-      vehicleParkingEntrance,
-      vehicleParkingEntrance.getParkingEntrance().getVertex()
-    );
-    new StreetVehicleParkingLink(
-      vehicleParkingEntrance.getParkingEntrance().getVertex(),
-      vehicleParkingEntrance
-    );
-    vehicleParkingEntrance.getParkingEntrance().clearVertex();
   }
 }

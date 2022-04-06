@@ -15,7 +15,7 @@ class ShapePointMapper {
     return MapUtils.mapToList(allShapePoints, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   ShapePoint map(org.onebusaway.gtfs.model.ShapePoint orginal) {
     return orginal == null ? null : mappedShapePoints.computeIfAbsent(orginal, this::doMap);
   }

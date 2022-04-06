@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 /**
- * This calculator is used to give the stop-priority-cost a boost, by multiplying it
- * with a {@code factor}.
+ * This calculator is used to give the stop-priority-cost a boost, by multiplying it with a {@code
+ * factor}.
  */
 public class StopPriorityCostCalculator {
 

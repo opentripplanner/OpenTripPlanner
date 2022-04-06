@@ -45,8 +45,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
@@ -55,7 +53,7 @@ import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * A base class for creating snapshots test of itinerary generation using the Portland graph.
- *
+ * <p>
  * If the snapshots need to be recreated run `mvn clean -Pclean-test-snapshots` to remove the
  * existing snapshots. When the tests are rerun new snapshots will be created.
  */
@@ -183,24 +181,6 @@ public abstract class SnapshotTestBase {
     logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
   }
 
-  private List<Itinerary> retrieveItineraries(RoutingRequest request, Router router) {
-    long startMillis = System.currentTimeMillis();
-    RoutingService routingService = new RoutingService(router.graph);
-    RoutingResponse response = routingService.route(request, router);
-
-    List<Itinerary> itineraries = response.getTripPlan().itineraries;
-
-    if (verbose) {
-      printItineraries(
-        itineraries,
-        startMillis,
-        System.currentTimeMillis(),
-        router.graph.getTimeZone()
-      );
-    }
-    return itineraries;
-  }
-
   protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request) {
     Router router = getRouter();
 
@@ -270,6 +250,28 @@ public abstract class SnapshotTestBase {
       }
     }
     return result;
+  }
+
+  private static String asJsonString(Object object) {
+    return snapshotSerializer.apply(new Object[] { object });
+  }
+
+  private List<Itinerary> retrieveItineraries(RoutingRequest request, Router router) {
+    long startMillis = System.currentTimeMillis();
+    RoutingService routingService = new RoutingService(router.graph);
+    RoutingResponse response = routingService.route(request, router);
+
+    List<Itinerary> itineraries = response.getTripPlan().itineraries;
+
+    if (verbose) {
+      printItineraries(
+        itineraries,
+        startMillis,
+        System.currentTimeMillis(),
+        router.graph.getTimeZone()
+      );
+    }
+    return itineraries;
   }
 
   private String createDebugUrlForRequest(RoutingRequest request) {
@@ -351,10 +353,6 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  private static String asJsonString(Object object) {
-    return snapshotSerializer.apply(new Object[] { object });
-  }
-
   private static class SnapshotItinerarySerializer implements SnapshotSerializer {
 
     private final ObjectMapper objectMapper;
@@ -384,15 +382,15 @@ public abstract class SnapshotTestBase {
       pp =
         new DefaultPrettyPrinter("") {
           @Override
-          public DefaultPrettyPrinter createInstance() {
-            return this;
-          }
-
-          @Override
           public DefaultPrettyPrinter withSeparators(Separators separators) {
             this._separators = separators;
             this._objectFieldValueSeparatorWithSpaces =
               separators.getObjectFieldValueSeparator() + " ";
+            return this;
+          }
+
+          @Override
+          public DefaultPrettyPrinter createInstance() {
             return this;
           }
         };

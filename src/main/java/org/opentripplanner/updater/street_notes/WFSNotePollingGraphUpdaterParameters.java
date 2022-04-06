@@ -33,11 +33,11 @@ public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdater
     return frequencySec;
   }
 
-  public String getFeatureType() {
-    return featureType;
-  }
-
   public String getConfigRef() {
     return configRef;
+  }
+
+  public String getFeatureType() {
+    return featureType;
   }
 }

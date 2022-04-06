@@ -12,7 +12,7 @@ import org.opentripplanner.model.plan.Leg;
 /**
  * This creates a group identifier based on all origin and destination stations, or stops if there
  * is no parent station, of all legs in the itinerary.
- *
+ * <p>
  * This is used to group itineraries that are almost the same, but where one might have e slight
  * time advantage and the other a slight cost advantage eg. due to shorter walking distance inside
  * the station.

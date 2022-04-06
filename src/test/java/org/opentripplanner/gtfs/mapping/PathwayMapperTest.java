@@ -29,6 +29,12 @@ public class PathwayMapperTest {
   private static final Stop FROM_STOP = new Stop();
 
   private static final Stop TO_STOP = new Stop();
+  private final PathwayMapper subject = new PathwayMapper(
+    new StopMapper(TRANSLATION_HELPER),
+    new EntranceMapper(TRANSLATION_HELPER),
+    new PathwayNodeMapper(TRANSLATION_HELPER),
+    new BoardingAreaMapper(TRANSLATION_HELPER)
+  );
 
   static {
     FROM_STOP.setId(AGENCY_AND_ID);
@@ -40,13 +46,6 @@ public class PathwayMapperTest {
     PATHWAY.setPathwayMode(PATHWAY_MODE);
     PATHWAY.setTraversalTime(TRAVERSAL_TIME);
   }
-
-  private final PathwayMapper subject = new PathwayMapper(
-    new StopMapper(TRANSLATION_HELPER),
-    new EntranceMapper(TRANSLATION_HELPER),
-    new PathwayNodeMapper(TRANSLATION_HELPER),
-    new BoardingAreaMapper(TRANSLATION_HELPER)
-  );
 
   @Test
   public void testMapCollection() throws Exception {

@@ -20,18 +20,17 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A spatial index using a 2D fast long hashtable (Trove lib).
- *
+ * <p>
  * Objects to index are placed in all grid bins touching the bounding envelope. We *do not store*
  * any bouding envelope for each object, so this imply that we will return false positive when
  * querying, and it's up to the client to filter them out (with whatever knowledge it has on the
  * location of the object).
- *
+ * <p>
  * Note: For performance reasons, write operation are not synchronized, it must be taken care by the
  * client. Read-only operation are multi-thread-safe though.
  *
- * @author laurent
- *
  * @param <T> Type of objects to be spatial indexed.
+ * @author laurent
  */
 public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
@@ -96,31 +95,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     nObjects++;
   }
 
-  public final void insert(LineString geom, final Object item) {
-    Coordinate[] coord = geom.getCoordinates();
-    final TLongSet keys = new TLongHashSet(coord.length * 8);
-    for (int i = 0; i < coord.length - 1; i++) {
-      // TODO Cut the segment if longer than bin size
-      // to reduce the number of wrong bins
-      Envelope env = new Envelope(coord[i], coord[i + 1]);
-      visit(
-        env,
-        true,
-        (bin, mapKey) -> {
-          keys.add(mapKey);
-          return false;
-        }
-      );
-    }
-    keys.forEach(key -> {
-      // Note: bins have been initialized in the previous visit
-      bins.get(key).add((T) item);
-      nEntries++;
-      return true;
-    });
-    nObjects++;
-  }
-
   @Override
   public final List<T> query(Envelope envelope) {
     final Set<T> ret = new HashSet<>(1024);
@@ -172,12 +146,43 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     }
   }
 
-  private interface BinVisitor<T> {
-    /**
-     * Bin visitor callback.
-     * @return true if something has been removed from the bin.
-     */
-    boolean visit(List<T> bin, long mapKey);
+  public final void insert(LineString geom, final Object item) {
+    Coordinate[] coord = geom.getCoordinates();
+    final TLongSet keys = new TLongHashSet(coord.length * 8);
+    for (int i = 0; i < coord.length - 1; i++) {
+      // TODO Cut the segment if longer than bin size
+      // to reduce the number of wrong bins
+      Envelope env = new Envelope(coord[i], coord[i + 1]);
+      visit(
+        env,
+        true,
+        (bin, mapKey) -> {
+          keys.add(mapKey);
+          return false;
+        }
+      );
+    }
+    keys.forEach(key -> {
+      // Note: bins have been initialized in the previous visit
+      bins.get(key).add((T) item);
+      nEntries++;
+      return true;
+    });
+    nObjects++;
+  }
+
+  public String toString() {
+    return String.format(
+      Locale.ROOT,
+      "HashGridSpatialIndex %f x %f, %d bins allocated, %d objs, %d entries (avg %.2f entries/bin, %.2f entries/object)",
+      this.xBinSize,
+      this.yBinSize,
+      this.nBins,
+      this.nObjects,
+      this.nEntries,
+      this.nEntries * 1.0 / this.nBins,
+      this.nEntries * 1.0 / this.nObjects
+    );
   }
 
   /** Clamp a coordinate to allowable lat/lon values */
@@ -211,9 +216,9 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   /**
    * Visit each bin touching the envelope.
    *
-   * @param envelope Self-descripting.
+   * @param envelope      Self-descripting.
    * @param createIfEmpty Create a new bin if not existing.
-   * @param binVisitor The callback to call for each visited bin.
+   * @param binVisitor    The callback to call for each visited bin.
    */
   private void visit(Envelope envelope, boolean createIfEmpty, final BinVisitor<T> binVisitor) {
     Coordinate min = new Coordinate(envelope.getMinX(), envelope.getMinY());
@@ -253,17 +258,12 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     }
   }
 
-  public String toString() {
-    return String.format(
-      Locale.ROOT,
-      "HashGridSpatialIndex %f x %f, %d bins allocated, %d objs, %d entries (avg %.2f entries/bin, %.2f entries/object)",
-      this.xBinSize,
-      this.yBinSize,
-      this.nBins,
-      this.nObjects,
-      this.nEntries,
-      this.nEntries * 1.0 / this.nBins,
-      this.nEntries * 1.0 / this.nObjects
-    );
+  private interface BinVisitor<T> {
+    /**
+     * Bin visitor callback.
+     *
+     * @return true if something has been removed from the bin.
+     */
+    boolean visit(List<T> bin, long mapKey);
   }
 }

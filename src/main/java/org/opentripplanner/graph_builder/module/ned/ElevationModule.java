@@ -45,15 +45,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * THIS CLASS IS MULTI-THREADED
- * (When configured to do so, it uses parallel streams to distribute elevation calculation tasks for edges.)
- *
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
- * data that has already been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
- * in the Graph. Data sources that could be used include auto-downloaded and cached National Elevation Dataset (NED)
- * raster data or a GeoTIFF file. The elevation profiles are stored as {@link PackedCoordinateSequence} objects, where
- * each (x,y) pair represents one sample, with the x-coord representing the distance along the edge measured from the
- * start, and the y-coord representing the sampled elevation at that point (both in meters).
+ * THIS CLASS IS MULTI-THREADED (When configured to do so, it uses parallel streams to distribute
+ * elevation calculation tasks for edges.)
+ * <p>
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies
+ * elevation data to street data that has already been loaded into a (@link Graph}, creating
+ * elevation profiles for each Street encountered in the Graph. Data sources that could be used
+ * include auto-downloaded and cached National Elevation Dataset (NED) raster data or a GeoTIFF
+ * file. The elevation profiles are stored as {@link PackedCoordinateSequence} objects, where each
+ * (x,y) pair represents one sample, with the x-coord representing the distance along the edge
+ * measured from the start, and the y-coord representing the sampled elevation at that point (both
+ * in meters).
  */
 public class ElevationModule implements GraphBuilderModule {
 
@@ -75,42 +77,32 @@ public class ElevationModule implements GraphBuilderModule {
    * data and machine settings, it might be faster to use a single processor.
    */
   private final boolean multiThreadElevationCalculations;
-
-  private DataImportIssueStore issueStore;
-
-  /**
-   * A map of PackedCoordinateSequence values identified by Strings of encoded polylines.
-   *
-   * Note: Since this map has a key of only the encoded polylines, it is assumed that all other inputs are the same as
-   * those that occurred in the graph build that produced this data.
-   */
-  private HashMap<String, PackedCoordinateSequence> cachedElevations;
-
   // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings. AtomicInteger is
   // used to provide thread-safe updating capabilities.
   private final AtomicInteger nPointsEvaluated = new AtomicInteger(0);
   private final AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
-
-  // the first coordinate in the first StreetWithElevationEdge which is used for initializing coverage instances
-  private Coordinate examplarCoordinate;
-
   private final double distanceBetweenSamplesM;
-
   /**
    * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
-   * are defined in meters in the source data. If, for example, decimetres are used in the source data,
-   * this should be set to 0.1 in build-config.json.
+   * are defined in meters in the source data. If, for example, decimetres are used in the source
+   * data, this should be set to 0.1 in build-config.json.
    */
   private final double elevationUnitMultiplier;
-
   /** A concurrent hashmap used for storing geoid difference values at various coordinates */
   private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
-
+  private final ThreadLocal<Coverage> coverageInterpolatorThreadLocal = new ThreadLocal<>();
+  private DataImportIssueStore issueStore;
+  /**
+   * A map of PackedCoordinateSequence values identified by Strings of encoded polylines.
+   * <p>
+   * Note: Since this map has a key of only the encoded polylines, it is assumed that all other
+   * inputs are the same as those that occurred in the graph build that produced this data.
+   */
+  private HashMap<String, PackedCoordinateSequence> cachedElevations;
+  // the first coordinate in the first StreetWithElevationEdge which is used for initializing coverage instances
+  private Coordinate examplarCoordinate;
   /** Used only when the ElevationModule is requested to be ran with a single thread */
   private Coverage singleThreadedCoverageInterpolator;
-
-  private final ThreadLocal<Coverage> coverageInterpolatorThreadLocal = new ThreadLocal<>();
-
   private double minElevation = Double.MAX_VALUE;
   private double maxElevation = Double.MIN_VALUE;
 
@@ -276,6 +268,26 @@ public class ElevationModule implements GraphBuilderModule {
     );
   }
 
+  @Override
+  public void checkInputs() {
+    gridCoverageFactory.checkInputs();
+
+    // check for the existence of cached elevation data.
+    if (readCachedElevations) {
+      if (Files.exists(cachedElevationsFile.toPath())) {
+        LOG.info("Cached elevations file found!");
+      } else {
+        LOG.warn(
+          "No cached elevations file found at {} or read access not allowed! Unable " +
+          "to load in cached elevations. This could take a while...",
+          cachedElevationsFile.toPath().toAbsolutePath()
+        );
+      }
+    } else {
+      LOG.warn("Not using cached elevations! This could take a while...");
+    }
+  }
+
   private void updateElevationMetadata(Graph graph) {
     if (nPointsOutsideDEM.get() < nPointsEvaluated.get()) {
       graph.hasElevation = true;
@@ -332,7 +344,8 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   /**
-   * Calculate the elevation for a single street edge. After the calculation is complete, update the current progress.
+   * Calculate the elevation for a single street edge. After the calculation is complete, update the
+   * current progress.
    */
   private void processEdgeWithProgress(StreetEdge ee, ProgressTracker progress) {
     processEdge(ee);
@@ -342,7 +355,8 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   /**
-   * Calculate the elevation for a single street edge, creating and assigning the elevation profile.
+   * Calculate the elevation for a single street edge, creating and assigning the elevation
+   * profile.
    *
    * @param ee the street edge
    */
@@ -437,17 +451,19 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   /**
-   * Gets a coverage interpolator instance specific to the current thread. If using multiple threads, get the coverage
-   * interpolator instance associated with the ElevationWorkerThread. Otherwise, use a class field.
-   *
-   * For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly used
-   * Interpolator2D class. Therefore, it is critical to use a dedicated Coverage interpolator instance for each thread
-   * to avoid other threads waiting for a lock to be released on the Coverage interpolator instance.
-   *
-   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since these interpolator
-   * instances take some time to create, they are lazy-created instead of created upfront because it could lock all
-   * other threads even if other threads don't need an interpolator right away if they happen to process a lot of
-   * cached data initially.
+   * Gets a coverage interpolator instance specific to the current thread. If using multiple
+   * threads, get the coverage interpolator instance associated with the ElevationWorkerThread.
+   * Otherwise, use a class field.
+   * <p>
+   * For unknown reasons, the interpolation of heights at coordinates is a synchronized method in
+   * the commonly used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage
+   * interpolator instance for each thread to avoid other threads waiting for a lock to be released
+   * on the Coverage interpolator instance.
+   * <p>
+   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since these
+   * interpolator instances take some time to create, they are lazy-created instead of created
+   * upfront because it could lock all other threads even if other threads don't need an
+   * interpolator right away if they happen to process a lot of cached data initially.
    */
   private Coverage getThreadSpecificCoverageInterpolator() {
     if (multiThreadElevationCalculations) {
@@ -493,8 +509,9 @@ public class ElevationModule implements GraphBuilderModule {
   /**
    * Method for retrieving the elevation at a given Coordinate.
    *
-   * @param coverage the specific Coverage instance to use in order to avoid competition between threads
-   * @param c the coordinate (NAD83)
+   * @param coverage the specific Coverage instance to use in order to avoid competition between
+   *                 threads
+   * @param c        the coordinate (NAD83)
    * @return elevation in meters
    */
   private double getElevation(Coverage coverage, Coordinate c) throws ElevationLookupException {
@@ -513,21 +530,12 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   /**
-   * A custom exception wrapper for all known elevation lookup exceptions
-   */
-  static class ElevationLookupException extends Exception {
-
-    public ElevationLookupException(Exception e) {
-      super(e);
-    }
-  }
-
-  /**
    * Method for retrieving the elevation at a given (x, y) pair.
    *
-   * @param coverage the specific Coverage instance to use in order to avoid competition between threads
-   * @param x the query longitude (NAD83)
-   * @param y the query latitude (NAD83)
+   * @param coverage the specific Coverage instance to use in order to avoid competition between
+   *                 threads
+   * @param x        the query longitude (NAD83)
+   * @param y        the query latitude (NAD83)
    * @return elevation in meters
    */
   private double getElevation(Coverage coverage, double x, double y)
@@ -558,12 +566,12 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   /**
-   * The Calculation of the EllipsoidToGeoidDifference is a very expensive operation, so the resulting values are
-   * cached based on the coordinate values up to 2 significant digits. Two significant digits are often more than enough
-   * for most parts of the world, but is useful for certain areas that have dramatic changes. Since the values are
-   * computed once and cached, it has almost no affect on performance to have this level of detail.
-   * See this image for an approximate mapping of these difference values:
-   * https://earth-info.nga.mil/GandG/images/ww15mgh2.gif
+   * The Calculation of the EllipsoidToGeoidDifference is a very expensive operation, so the
+   * resulting values are cached based on the coordinate values up to 2 significant digits. Two
+   * significant digits are often more than enough for most parts of the world, but is useful for
+   * certain areas that have dramatic changes. Since the values are computed once and cached, it has
+   * almost no affect on performance to have this level of detail. See this image for an approximate
+   * mapping of these difference values: https://earth-info.nga.mil/GandG/images/ww15mgh2.gif
    *
    * @param y latitude
    * @param x longitude
@@ -589,23 +597,13 @@ public class ElevationModule implements GraphBuilderModule {
     return difference;
   }
 
-  @Override
-  public void checkInputs() {
-    gridCoverageFactory.checkInputs();
+  /**
+   * A custom exception wrapper for all known elevation lookup exceptions
+   */
+  static class ElevationLookupException extends Exception {
 
-    // check for the existence of cached elevation data.
-    if (readCachedElevations) {
-      if (Files.exists(cachedElevationsFile.toPath())) {
-        LOG.info("Cached elevations file found!");
-      } else {
-        LOG.warn(
-          "No cached elevations file found at {} or read access not allowed! Unable " +
-          "to load in cached elevations. This could take a while...",
-          cachedElevationsFile.toPath().toAbsolutePath()
-        );
-      }
-    } else {
-      LOG.warn("Not using cached elevations! This could take a while...");
+    public ElevationLookupException(Exception e) {
+      super(e);
     }
   }
 }

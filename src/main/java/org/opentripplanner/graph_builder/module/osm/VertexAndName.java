@@ -23,6 +23,11 @@ class VertexAndName {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(name, vertex);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -32,10 +37,5 @@ class VertexAndName {
     }
     final VertexAndName that = (VertexAndName) o;
     return Objects.equals(name, that.name) && vertex.equals(that.vertex);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(name, vertex);
   }
 }

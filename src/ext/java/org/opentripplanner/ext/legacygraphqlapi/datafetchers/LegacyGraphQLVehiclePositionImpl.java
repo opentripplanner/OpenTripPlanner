@@ -20,6 +20,11 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
   }
 
   @Override
+  public DataFetcher<Long> lastUpdated() {
+    return env -> getSource(env).time().getEpochSecond();
+  }
+
+  @Override
   public DataFetcher<Double> lat() {
     return env -> getSource(env).coordinates().latitude();
   }
@@ -30,18 +35,13 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
   }
 
   @Override
-  public DataFetcher<StopRelationship> stopRelationship() {
-    return env -> getSource(env).stop();
-  }
-
-  @Override
   public DataFetcher<Double> speed() {
     return env -> getSource(env).speed();
   }
 
   @Override
-  public DataFetcher<Long> lastUpdated() {
-    return env -> getSource(env).time().getEpochSecond();
+  public DataFetcher<StopRelationship> stopRelationship() {
+    return env -> getSource(env).stop();
   }
 
   @Override

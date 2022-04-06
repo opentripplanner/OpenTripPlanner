@@ -186,29 +186,6 @@ public class OtpDataStoreTest {
 
   /* private helper methods */
 
-  private List<String> listFilesByRelativeName(OtpDataStore store, File baseDir, File dataDir) {
-    String baseDirPath = baseDir.getPath();
-    String dataDirPath = dataDir.getPath();
-
-    List<String> files = new ArrayList<>();
-    for (FileType type : FileType.values()) {
-      store
-        .listExistingSourcesFor(type)
-        .forEach(s -> {
-          String p = s.path();
-
-          if (p.startsWith(baseDirPath)) {
-            // Add 1 to strip off path separator
-            p = "base:" + p.substring(baseDirPath.length() + 1);
-          } else if (p.startsWith(dataDirPath)) {
-            p = "data:" + p.substring(dataDirPath.length() + 1);
-          }
-          files.add(type.name() + " " + p);
-        });
-    }
-    return files;
-  }
-
   @SuppressWarnings("ResultOfMethodCallIgnored")
   private static void writeToDir(File parentDir, String dir, String oneFile) throws IOException {
     File reportDir = new File(parentDir, dir);
@@ -258,6 +235,29 @@ public class OtpDataStoreTest {
     assertTrue(report.exists());
     assertTrue(report.isWritable());
     assertEquals(report.content().toString(), 1, report.content().size());
+  }
+
+  private List<String> listFilesByRelativeName(OtpDataStore store, File baseDir, File dataDir) {
+    String baseDirPath = baseDir.getPath();
+    String dataDirPath = dataDir.getPath();
+
+    List<String> files = new ArrayList<>();
+    for (FileType type : FileType.values()) {
+      store
+        .listExistingSourcesFor(type)
+        .forEach(s -> {
+          String p = s.path();
+
+          if (p.startsWith(baseDirPath)) {
+            // Add 1 to strip off path separator
+            p = "base:" + p.substring(baseDirPath.length() + 1);
+          } else if (p.startsWith(dataDirPath)) {
+            p = "data:" + p.substring(dataDirPath.length() + 1);
+          }
+          files.add(type.name() + " " + p);
+        });
+    }
+    return files;
   }
 
   private OtpDataStoreConfig config() {

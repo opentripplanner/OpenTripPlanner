@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 /**
  * This is to support strings which can't be localized.
- *
+ * <p>
  * It just returns string it is given in constructor.
  *
  * @author mabu
@@ -50,7 +50,7 @@ public class NonLocalizedString implements I18NString, Serializable {
 
   /**
    * Check if name is non-null and returns an instance of {@link NonLocalizedString},  otherwise
-   *      * returns a {@link I18NString} with the default name.
+   * returns a {@link I18NString} with the default name.
    */
   @Nonnull
   public static I18NString ofNullableOrElse(
@@ -61,15 +61,15 @@ public class NonLocalizedString implements I18NString, Serializable {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(name);
+  }
+
+  @Override
   public boolean equals(Object other) {
     return (
       other instanceof NonLocalizedString && this.name.equals(((NonLocalizedString) other).name)
     );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(name);
   }
 
   @Override

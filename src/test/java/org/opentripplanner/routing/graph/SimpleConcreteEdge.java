@@ -13,9 +13,6 @@ public class SimpleConcreteEdge extends Edge {
 
   /**
    * Constructor without ID.
-   *
-   * @param v1
-   * @param v2
    */
   public SimpleConcreteEdge(Vertex v1, Vertex v2) {
     super(v1, v2);

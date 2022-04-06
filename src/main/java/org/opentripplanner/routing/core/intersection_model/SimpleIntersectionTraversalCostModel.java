@@ -48,12 +48,81 @@ public class SimpleIntersectionTraversalCostModel
     }
   }
 
+  public int getMinRightTurnAngle() {
+    return 45;
+  }
+
+  public int getMaxRightTurnAngle() {
+    return 135;
+  }
+
+  public int getMinLeftTurnAngle() {
+    return 225;
+  }
+
+  public int getMaxLeftTurnAngle() {
+    return 315;
+  }
+
+  /**
+   * Expected time it takes to make a right at a light.
+   */
+  public double getExpectedRightAtLightTimeSec() {
+    return 15.0;
+  }
+
+  /**
+   * Expected time it takes to continue straight at a light.
+   */
+  public double getExpectedStraightAtLightTimeSec() {
+    return 15.0;
+  }
+
+  /**
+   * Expected time it takes to turn left at a light.
+   */
+  public double getExpectedLeftAtLightTimeSec() {
+    return 15.0;
+  }
+
+  /**
+   * Expected time it takes to make a right without a stop light.
+   */
+  public double getExpectedRightNoLightTimeSec() {
+    return 8.0;
+  }
+
+  /**
+   * Expected time it takes to continue straight without a stop light.
+   */
+  public double getExpectedStraightNoLightTimeSec() {
+    return 5.0;
+  }
+
+  /**
+   * Expected time it takes to turn left without a stop light.
+   */
+  public double getExpectedLeftNoLightTimeSec() {
+    return 8.0;
+  }
+
+  public double getSafeBicycleTurnModifier() {
+    return 5;
+  }
+
+  /**
+   * Since doing a left turn on a bike is quite dangerous we add a cost for it
+   **/
+  public double getAcrossTrafficBicyleTurnMultiplier() {
+    return acrossTrafficBicyleTurnMultiplier;
+  }
+
   /**
    * Returns if this angle represents a safe turn were incoming traffic does not have to be
    * crossed.
    * <p>
-   * In right hand traffic countries (US, mainland Europe), this is a right turn.
-   * In left hand traffic countries (UK, Japan) this is a left turn.
+   * In right hand traffic countries (US, mainland Europe), this is a right turn. In left hand
+   * traffic countries (UK, Japan) this is a left turn.
    */
   protected boolean isSafeTurn(int turnAngle) {
     switch (drivingDirection) {
@@ -146,74 +215,5 @@ public class SimpleIntersectionTraversalCostModel
 
   private boolean isRightTurn(int turnAngle) {
     return turnAngle >= getMinRightTurnAngle() && turnAngle < getMaxRightTurnAngle();
-  }
-
-  public int getMinRightTurnAngle() {
-    return 45;
-  }
-
-  public int getMaxRightTurnAngle() {
-    return 135;
-  }
-
-  public int getMinLeftTurnAngle() {
-    return 225;
-  }
-
-  public int getMaxLeftTurnAngle() {
-    return 315;
-  }
-
-  /**
-   * Expected time it takes to make a right at a light.
-   */
-  public double getExpectedRightAtLightTimeSec() {
-    return 15.0;
-  }
-
-  /**
-   * Expected time it takes to continue straight at a light.
-   */
-  public double getExpectedStraightAtLightTimeSec() {
-    return 15.0;
-  }
-
-  /**
-   * Expected time it takes to turn left at a light.
-   */
-  public double getExpectedLeftAtLightTimeSec() {
-    return 15.0;
-  }
-
-  /**
-   * Expected time it takes to make a right without a stop light.
-   */
-  public double getExpectedRightNoLightTimeSec() {
-    return 8.0;
-  }
-
-  /**
-   * Expected time it takes to continue straight without a stop light.
-   */
-  public double getExpectedStraightNoLightTimeSec() {
-    return 5.0;
-  }
-
-  /**
-   * Expected time it takes to turn left without a stop light.
-   */
-  public double getExpectedLeftNoLightTimeSec() {
-    return 8.0;
-  }
-
-  public double getSafeBicycleTurnModifier() {
-    return 5;
-  }
-
-  /**
-   * Since doing a left turn on a bike is quite dangerous we add a cost for it
-   **/
-  public double getAcrossTrafficBicyleTurnMultiplier() {
-    return acrossTrafficBicyleTurnMultiplier;
   }
 }

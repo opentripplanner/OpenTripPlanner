@@ -19,9 +19,9 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
- * Check that the graph index is created, that GTFS elements can be found in the index, and that
- * the indexes are coherent with one another.
- *
+ * Check that the graph index is created, that GTFS elements can be found in the index, and that the
+ * indexes are coherent with one another.
+ * <p>
  * TODO: The old transit index doesn't exist anymore, and the new one needs more tests.
  */
 public class RoutingServiceTest extends GtfsTest {
@@ -60,7 +60,10 @@ public class RoutingServiceTest extends GtfsTest {
     //        graph.index.patternForId;
   }
 
-  /** Check that bidirectional relationships between TripPatterns and Trips, Routes, and Stops are coherent. */
+  /**
+   * Check that bidirectional relationships between TripPatterns and Trips, Routes, and Stops are
+   * coherent.
+   */
   @Test
   public void testPatternsCoherent() {
     for (Trip trip : graph.index.getTripForId().values()) {

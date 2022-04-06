@@ -30,8 +30,8 @@ public class PageCursorFactory {
   }
 
   /**
-   * Set the original search earliest-departure-time({@code edt}), latest-arrival-time
-   * ({@code lat}, optional) and the search-window used.
+   * Set the original search earliest-departure-time({@code edt}), latest-arrival-time ({@code lat},
+   * optional) and the search-window used.
    */
   public PageCursorFactory withOriginalSearch(
     @Nullable PageType pageType,
@@ -48,22 +48,22 @@ public class PageCursorFactory {
   }
 
   /**
-   * Set the start and end time for removed itineraries. The current implementation uses the
-   * FIRST removed itinerary, but this can in some cases lead to missed itineraries in the
-   * next search. So, we will document here what should be done.
+   * Set the start and end time for removed itineraries. The current implementation uses the FIRST
+   * removed itinerary, but this can in some cases lead to missed itineraries in the next search.
+   * So, we will document here what should be done.
    * <p>
-   * For case {@code depart-after-crop-sw} and {@code arrive-by-crop-sw-reversed-filter} the
-   * {@code startTime} should be the EARLIEST departure time for all removed itineraries.
+   * For case {@code depart-after-crop-sw} and {@code arrive-by-crop-sw-reversed-filter} the {@code
+   * startTime} should be the EARLIEST departure time for all removed itineraries.
    * <p>
-   * For case {@code depart-after-crop-sw-reversed-filter} and {@code arrive-by-crop-sw} the
-   * {@code startTime} should be the LATEST departure time for all removed itineraries.
+   * For case {@code depart-after-crop-sw-reversed-filter} and {@code arrive-by-crop-sw} the {@code
+   * startTime} should be the LATEST departure time for all removed itineraries.
    * <p>
-   * The {@code endTime} should be replaced by removing duplicates between the to pages.
-   * This can for example be done by including a hash for each potential itinerary in the
-   * token, and make a filter to remove those in the following page response.
+   * The {@code endTime} should be replaced by removing duplicates between the to pages. This can
+   * for example be done by including a hash for each potential itinerary in the token, and make a
+   * filter to remove those in the following page response.
    *
    * @param startTime is rounded down to the closest minute.
-   * @param endTime is round up to the closest minute.
+   * @param endTime   is round up to the closest minute.
    */
   public PageCursorFactory withRemovedItineraries(Instant startTime, Instant endTime) {
     this.wholeSwUsed = false;
@@ -82,6 +82,32 @@ public class PageCursorFactory {
   public PageCursor nextPageCursor() {
     createPageCursors();
     return nextCursor;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(PageCursorFactory.class)
+      .addEnum("sortOrder", sortOrder)
+      .addEnum("currentPageType", currentPageType)
+      .addObj("current", current)
+      .addDuration("currentSearchWindow", currentSearchWindow)
+      .addDuration("newSearchWindow", newSearchWindow)
+      .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
+      .addTime("removedItineraryStartTime", removedItineraryStartTime)
+      .addTime("removedItineraryEndTime", removedItineraryEndTime)
+      .addObj("nextCursor", nextCursor)
+      .addObj("prevCursor", prevCursor)
+      .toString();
+  }
+
+  /**
+   * For the original/first search we set the page type equals to NEXT if the sort order is
+   * ascending, and to PREVIOUS if descending. We do this because the logic for the first search is
+   * equivalent when creating new cursors.
+   */
+  private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
+    return sortOrder.isSortedByArrivalTimeAcceding() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
   /** Create page cursor pair (next and previous) */
@@ -137,23 +163,6 @@ public class PageCursorFactory {
     nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow);
   }
 
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(PageCursorFactory.class)
-      .addEnum("sortOrder", sortOrder)
-      .addEnum("currentPageType", currentPageType)
-      .addObj("current", current)
-      .addDuration("currentSearchWindow", currentSearchWindow)
-      .addDuration("newSearchWindow", newSearchWindow)
-      .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
-      .addTime("removedItineraryStartTime", removedItineraryStartTime)
-      .addTime("removedItineraryEndTime", removedItineraryEndTime)
-      .addObj("nextCursor", nextCursor)
-      .addObj("prevCursor", prevCursor)
-      .toString();
-  }
-
   /**
    * The search-window start and end is [inclusive, exclusive], so to calculate the start of the
    * search-window from the last time included in the search window we need to include one extra
@@ -169,15 +178,6 @@ public class PageCursorFactory {
 
   private Instant calcNextSwStartRelativeToUsedSw() {
     return current.edt.plus(currentSearchWindow);
-  }
-
-  /**
-   * For the original/first search we set the page type equals to NEXT if the
-   * sort order is ascending, and to PREVIOUS if descending. We do this because the
-   * logic for the first search is equivalent when creating new cursors.
-   */
-  private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
-    return sortOrder.isSortedByArrivalTimeAcceding() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
   /** Temporary data class used to hold a pair of edt and lat */

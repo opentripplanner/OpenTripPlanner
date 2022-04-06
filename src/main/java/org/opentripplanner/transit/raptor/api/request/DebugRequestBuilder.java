@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import io.micrometer.core.instrument.Tag;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +38,7 @@ public class DebugRequestBuilder {
     this.logger = debug.logger();
   }
 
-  /** Read-only view to stops added sorted in ascending order.  */
+  /** Read-only view to stops added sorted in ascending order. */
   public List<Integer> stops() {
     return stops.stream().sorted().collect(Collectors.toList());
   }
@@ -77,7 +76,7 @@ public class DebugRequestBuilder {
   /**
    * Select the stop index where the debugging should start. It is the index of the stops in the
    * path list.
-   * */
+   */
   public DebugRequestBuilder debugPathFromStopIndex(int stopIndex) {
     this.debugPathFromStopIndex = stopIndex;
     return this;

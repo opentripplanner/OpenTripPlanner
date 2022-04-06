@@ -22,7 +22,7 @@ class AgencyMapper {
     return MapUtils.mapToList(agencies, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   Agency map(org.onebusaway.gtfs.model.Agency orginal) {
     return orginal == null ? null : mappedAgencies.computeIfAbsent(orginal, this::doMap);
   }

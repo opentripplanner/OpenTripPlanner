@@ -28,18 +28,13 @@ public abstract class Vertex implements Serializable, Cloneable {
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
 
   /**
-   * Short debugging name. This is a graph mathematical term as in
-   * https://en.wikipedia.org/wiki/Graph_labeling
+   * Short debugging name. This is a graph mathematical term as in https://en.wikipedia.org/wiki/Graph_labeling
    */
   private final String label;
-
+  private final double x;
+  private final double y;
   /* Longer human-readable name for the client */
   private I18NString name;
-
-  private final double x;
-
-  private final double y;
-
   private transient Edge[] incoming = new Edge[0];
 
   private transient Edge[] outgoing = new Edge[0];
@@ -83,51 +78,6 @@ public abstract class Vertex implements Serializable, Cloneable {
 
   /* EDGE UTILITY METHODS (use arrays to eliminate copy-on-write set objects) */
 
-  /**
-   * A static helper method to avoid repeated code for outgoing and incoming lists.
-   * Synchronization must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
-   */
-  private static Edge[] addEdge(Edge[] existing, Edge e) {
-    Edge[] copy = new Edge[existing.length + 1];
-    int i;
-    for (i = 0; i < existing.length; i++) {
-      if (existing[i] == e) {
-        LOG.error("repeatedly added edge {}", e);
-        return existing;
-      }
-      copy[i] = existing[i];
-    }
-    copy[i] = e; // append the new edge to the copy of the existing array
-    return copy;
-  }
-
-  /**
-   * A static helper method to avoid repeated code for outgoing and incoming lists.
-   * Synchronization must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
-   */
-  private static Edge[] removeEdge(Edge[] existing, Edge e) {
-    int nfound = 0;
-    for (int i = 0, j = 0; i < existing.length; i++) {
-      if (existing[i] == e) nfound++;
-    }
-    if (nfound == 0) {
-      LOG.error("Requested removal of an edge which isn't connected to this vertex.");
-      return existing;
-    }
-    if (nfound > 1) {
-      LOG.error("There are multiple copies of the edge to be removed.)");
-    }
-    Edge[] copy = new Edge[existing.length - nfound];
-    for (int i = 0, j = 0; i < existing.length; i++) {
-      if (existing[i] != e) {
-        copy[j++] = existing[i];
-      }
-    }
-    return copy;
-  }
-
-  /* FIELD ACCESSOR METHODS : READ/WRITE */
-
   public void addOutgoing(Edge edge) {
     synchronized (this) {
       outgoing = addEdge(outgoing, edge);
@@ -159,9 +109,9 @@ public abstract class Vertex implements Serializable, Cloneable {
   }
 
   /**
-   * Get a collection containing all the edges leading from this vertex to other vertices.
-   * There is probably some overhead to creating the wrapper ArrayList objects, but this
-   * allows filtering and combining edge lists using stock Collection-based methods.
+   * Get a collection containing all the edges leading from this vertex to other vertices. There is
+   * probably some overhead to creating the wrapper ArrayList objects, but this allows filtering and
+   * combining edge lists using stock Collection-based methods.
    */
   public Collection<Edge> getOutgoing() {
     return Arrays.asList(outgoing);
@@ -205,7 +155,8 @@ public abstract class Vertex implements Serializable, Cloneable {
     return this.name;
   }
 
-  /** If this vertex is located on only one street, get that street's name in default localization
+  /**
+   * If this vertex is located on only one street, get that street's name in default localization
    */
   public String getDefaultName() {
     return this.name.toString();
@@ -215,8 +166,6 @@ public abstract class Vertex implements Serializable, Cloneable {
   public StationElement getStationElement() {
     return null;
   }
-
-  /* FIELD ACCESSOR METHODS : READ ONLY */
 
   /** Every vertex has a label which is globally unique. */
   public String getLabel() {
@@ -236,21 +185,6 @@ public abstract class Vertex implements Serializable, Cloneable {
   public double azimuthTo(Vertex other) {
     return azimuthTo(other.getCoordinate());
   }
-
-  /* SERIALIZATION METHODS */
-
-  private void writeObject(ObjectOutputStream out) throws IOException {
-    // edge lists are transient
-    out.defaultWriteObject();
-  }
-
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    this.incoming = new Edge[0];
-    this.outgoing = new Edge[0];
-  }
-
-  /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
 
   public List<StreetEdge> getIncomingStreetEdges() {
     List<StreetEdge> result = new ArrayList<>();
@@ -272,5 +206,59 @@ public abstract class Vertex implements Serializable, Cloneable {
       result.add((StreetEdge) out);
     }
     return result;
+  }
+
+  /**
+   * A static helper method to avoid repeated code for outgoing and incoming lists. Synchronization
+   * must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
+   */
+  private static Edge[] addEdge(Edge[] existing, Edge e) {
+    Edge[] copy = new Edge[existing.length + 1];
+    int i;
+    for (i = 0; i < existing.length; i++) {
+      if (existing[i] == e) {
+        LOG.error("repeatedly added edge {}", e);
+        return existing;
+      }
+      copy[i] = existing[i];
+    }
+    copy[i] = e; // append the new edge to the copy of the existing array
+    return copy;
+  }
+
+  /**
+   * A static helper method to avoid repeated code for outgoing and incoming lists. Synchronization
+   * must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
+   */
+  private static Edge[] removeEdge(Edge[] existing, Edge e) {
+    int nfound = 0;
+    for (int i = 0, j = 0; i < existing.length; i++) {
+      if (existing[i] == e) nfound++;
+    }
+    if (nfound == 0) {
+      LOG.error("Requested removal of an edge which isn't connected to this vertex.");
+      return existing;
+    }
+    if (nfound > 1) {
+      LOG.error("There are multiple copies of the edge to be removed.)");
+    }
+    Edge[] copy = new Edge[existing.length - nfound];
+    for (int i = 0, j = 0; i < existing.length; i++) {
+      if (existing[i] != e) {
+        copy[j++] = existing[i];
+      }
+    }
+    return copy;
+  }
+
+  private void writeObject(ObjectOutputStream out) throws IOException {
+    // edge lists are transient
+    out.defaultWriteObject();
+  }
+
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    this.incoming = new Edge[0];
+    this.outgoing = new Edge[0];
   }
 }

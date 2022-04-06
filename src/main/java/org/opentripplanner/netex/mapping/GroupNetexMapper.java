@@ -12,8 +12,8 @@ import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
 /**
  * Entities x-referencing entries in more than on independent file must be mapped AFTER all
- * individual files are processed. This class is responsible for the "post-process-mapping",
- * and delegate to mappers for each specific type.
+ * individual files are processed. This class is responsible for the "post-process-mapping", and
+ * delegate to mappers for each specific type.
  */
 class GroupNetexMapper {
 

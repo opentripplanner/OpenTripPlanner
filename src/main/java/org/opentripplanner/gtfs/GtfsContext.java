@@ -6,6 +6,8 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 
 public interface GtfsContext {
   GtfsFeedId getFeedId();
+
   OtpTransitService getTransitService();
+
   CalendarServiceData getCalendarServiceData();
 }

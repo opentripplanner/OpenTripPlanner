@@ -137,16 +137,6 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertTrue(found);
   }
 
-  private List<TransitStopVertex> extractStopVertices(GraphPath path) {
-    List<TransitStopVertex> ret = Lists.newArrayList();
-    for (State state : path.states) {
-      if (state.getVertex() instanceof TransitStopVertex) {
-        ret.add(((TransitStopVertex) state.getVertex()));
-      }
-    }
-    return ret;
-  }
-
   public void testRouting() throws Exception {
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_b = graph.getVertex(feedId + ":B");
@@ -597,5 +587,15 @@ public class TestGeometryAndBlockProcessor extends TestCase {
       TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 34),
       path.getEndTime()
     );
+  }
+
+  private List<TransitStopVertex> extractStopVertices(GraphPath path) {
+    List<TransitStopVertex> ret = Lists.newArrayList();
+    for (State state : path.states) {
+      if (state.getVertex() instanceof TransitStopVertex) {
+        ret.add(((TransitStopVertex) state.getVertex()));
+      }
+    }
+    return ret;
   }
 }
