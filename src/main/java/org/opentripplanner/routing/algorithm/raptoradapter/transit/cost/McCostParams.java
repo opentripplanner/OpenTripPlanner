@@ -39,7 +39,7 @@ public class McCostParams {
         this.transferCost = builder.transferCost();
         this.transitReluctanceFactors = builder.transitReluctanceFactors();
         this.waitReluctanceFactor = builder.waitReluctanceFactor();
-        this.accessibilityRequest = builder.accessibilityMode();
+        this.accessibilityRequest = builder.wheelchairAccessibility();
     }
 
     public int boardCost() {

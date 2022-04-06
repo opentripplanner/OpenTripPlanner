@@ -73,7 +73,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transferService = transferService;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
-    var accessibilityMode = routingContext.opt.accessibilityRequest;
+    var accessibility = routingContext.opt.accessibilityRequest;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
@@ -95,7 +95,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
             transitLayer.getStopIndex().stopBoardAlightCosts
     );
 
-      if (accessibilityMode.enabled()) {
+    if (accessibility.enabled()) {
       this.generalizedCostCalculator = new WheelchairCostCalculator(
               defaultCostCalculator,
               mcCostParams.accessibilityRequirements()

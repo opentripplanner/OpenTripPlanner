@@ -62,11 +62,11 @@ public class McCostParamsBuilder {
         return this;
     }
 
-    public WheelchairAccessibilityRequest accessibilityMode() {
+    public WheelchairAccessibilityRequest wheelchairAccessibility() {
         return accessibilityRequest;
     }
 
-    public McCostParamsBuilder accessibilityMode(WheelchairAccessibilityRequest mode) {
+    public McCostParamsBuilder wheelchairAccessibility(WheelchairAccessibilityRequest mode) {
         accessibilityRequest = mode;
         return this;
     }
