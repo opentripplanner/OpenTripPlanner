@@ -418,7 +418,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
   ) {
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      false,
+      WheelchairAccessibilityRequest.makeDefault(false),
       false,
       allowedModes,
       Set.of(),
