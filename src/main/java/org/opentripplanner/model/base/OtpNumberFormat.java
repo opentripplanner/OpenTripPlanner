@@ -9,13 +9,12 @@ public class OtpNumberFormat {
 
   private static final String NULL_VALUE = "null";
   private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(
-      Locale.US
+    Locale.US
   );
 
   private DecimalFormat integerFormat;
   private DecimalFormat decimalFormat;
   private DecimalFormat coordinateFormat;
-
 
   String formatCoordinate(Number value) {
     if (coordinateFormat == null) {
@@ -30,9 +29,10 @@ public class OtpNumberFormat {
     return formatNumber(value) + unit;
   }
 
-
   String formatNumber(Number value) {
-    if (value == null) { return NULL_VALUE; }
+    if (value == null) {
+      return NULL_VALUE;
+    }
 
     if (value instanceof Integer || value instanceof Long || value instanceof BigInteger) {
       if (integerFormat == null) {
@@ -49,8 +49,10 @@ public class OtpNumberFormat {
 
   /** Used to format integer cost types like generalized-cost used by Raptor. */
   public static String formatCost(int cost) {
-    if(Math.abs(cost) >= 1_000_000 || cost % 100 == 0) { return "$" + cost/100; }
-    return String.format(Locale.ROOT, "$%.2f",  cost / 100.0);
+    if (Math.abs(cost) >= 1_000_000 || cost % 100 == 0) {
+      return "$" + cost / 100;
+    }
+    return String.format(Locale.ROOT, "$%.2f", cost / 100.0);
   }
 
   /** Used to format integer cost types with a given unit. */

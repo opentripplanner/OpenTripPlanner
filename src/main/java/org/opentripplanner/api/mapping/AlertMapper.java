@@ -1,12 +1,11 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.ApiAlert;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 public class AlertMapper {
 

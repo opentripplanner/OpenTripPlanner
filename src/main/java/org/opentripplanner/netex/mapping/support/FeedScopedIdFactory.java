@@ -12,14 +12,13 @@ import org.opentripplanner.model.FeedScopedId;
  */
 public class FeedScopedIdFactory {
 
-    private final String feedId;
+  private final String feedId;
 
-    public FeedScopedIdFactory(String feedId) {
-        this.feedId = feedId;
-    }
+  public FeedScopedIdFactory(String feedId) {
+    this.feedId = feedId;
+  }
 
-    public FeedScopedId createId(String netexId) {
-        return new FeedScopedId(feedId, netexId);
-    }
-
+  public FeedScopedId createId(String netexId) {
+    return new FeedScopedId(feedId, netexId);
+  }
 }

@@ -31,99 +31,129 @@ import org.slf4j.LoggerFactory;
  */
 class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
 
-    private final String url;
+  private final String url;
 
-    private final String language;
+  private final String language;
 
-    private final Map<String, String> httpHeaders;
+  private final Map<String, String> httpHeaders;
 
-    /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
-    private final boolean allowKeepingRentedVehicleAtDestination;
+  /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
+  private final boolean allowKeepingRentedVehicleAtDestination;
 
-    private GbfsFeedLoader loader;
+  private GbfsFeedLoader loader;
 
-    public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
-        url = parameters.getUrl();
-        language = parameters.language();
-        httpHeaders = parameters.getHttpHeaders();
-        allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
+  public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
+    url = parameters.getUrl();
+    language = parameters.language();
+    httpHeaders = parameters.getHttpHeaders();
+    allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
+  }
+
+  @Override
+  public void setup() {
+    loader = new GbfsFeedLoader(url, httpHeaders, language);
+  }
+
+  @Override
+  public boolean update() {
+    if (loader == null) {
+      return false;
+    }
+    return loader.update();
+  }
+
+  @Override
+  public List<VehicleRentalPlace> getUpdates() {
+    // Get system information
+    GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);
+    GbfsSystemInformationMapper systemInformationMapper = new GbfsSystemInformationMapper();
+    VehicleRentalSystem system = systemInformationMapper.mapSystemInformation(
+      systemInformation.getData()
+    );
+
+    // Get vehicle types
+    Map<String, RentalVehicleType> vehicleTypes = null;
+    GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
+    if (rawVehicleTypes != null) {
+      GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId);
+      vehicleTypes =
+        rawVehicleTypes
+          .getData()
+          .getVehicleTypes()
+          .stream()
+          .map(vehicleTypeMapper::mapRentalVehicleType)
+          .collect(Collectors.toMap(v -> v.id.getId(), Function.identity()));
     }
 
-    @Override
-    public void setup() {
-        loader = new GbfsFeedLoader(url, httpHeaders, language);
+    List<VehicleRentalPlace> stations = new LinkedList<>();
+
+    // Both station information and status are required for all systems using stations
+    GBFSStationInformation stationInformation = loader.getFeed(GBFSStationInformation.class);
+    GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
+    if (stationInformation != null && stationStatus != null) {
+      // Index all the station status entries on their station ID.
+      Map<String, GBFSStation> statusLookup = stationStatus
+        .getData()
+        .getStations()
+        .stream()
+        .collect(Collectors.toMap(GBFSStation::getStationId, Function.identity()));
+      GbfsStationStatusMapper stationStatusMapper = new GbfsStationStatusMapper(
+        statusLookup,
+        vehicleTypes
+      );
+      GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(
+        system,
+        vehicleTypes,
+        allowKeepingRentedVehicleAtDestination
+      );
+
+      // Iterate over all known stations, and if we have any status information add it to those station objects.
+      stations.addAll(
+        stationInformation
+          .getData()
+          .getStations()
+          .stream()
+          .map(stationInformationMapper::mapStationInformation)
+          .peek(stationStatusMapper::fillStationStatus)
+          .collect(Collectors.toList())
+      );
     }
 
-    @Override
-    public boolean update() {
-        if (loader == null) {
-            return false;
-        }
-        return loader.update();
+    // Append the floating bike stations.
+    if (OTPFeature.FloatingBike.isOn()) {
+      GBFSFreeBikeStatus freeBikeStatus = loader.getFeed(GBFSFreeBikeStatus.class);
+      if (freeBikeStatus != null) {
+        GbfsFreeVehicleStatusMapper freeVehicleStatusMapper = new GbfsFreeVehicleStatusMapper(
+          system,
+          vehicleTypes
+        );
+        stations.addAll(
+          freeBikeStatus
+            .getData()
+            .getBikes()
+            .stream()
+            .map(freeVehicleStatusMapper::mapFreeVehicleStatus)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList())
+        );
+      }
     }
 
-    @Override
-    public List<VehicleRentalPlace> getUpdates() {
+    return stations;
+  }
 
-        // Get system information
-        GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);
-        GbfsSystemInformationMapper systemInformationMapper = new GbfsSystemInformationMapper();
-        VehicleRentalSystem system = systemInformationMapper.mapSystemInformation(systemInformation.getData());
-
-        // Get vehicle types
-        Map<String, RentalVehicleType> vehicleTypes = null;
-        GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
-        if (rawVehicleTypes != null) {
-            GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId);
-            vehicleTypes = rawVehicleTypes.getData().getVehicleTypes().stream()
-                    .map(vehicleTypeMapper::mapRentalVehicleType)
-                    .collect(Collectors.toMap(v -> v.id.getId(), Function.identity()));
-        }
-
-        List<VehicleRentalPlace> stations = new LinkedList<>();
-
-        // Both station information and status are required for all systems using stations
-        GBFSStationInformation stationInformation = loader.getFeed(GBFSStationInformation.class);
-        GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
-        if (stationInformation != null && stationStatus != null) {
-            // Index all the station status entries on their station ID.
-            Map<String, GBFSStation> statusLookup = stationStatus.getData().getStations().stream()
-                    .collect(Collectors.toMap(GBFSStation::getStationId, Function.identity()));
-            GbfsStationStatusMapper stationStatusMapper = new GbfsStationStatusMapper(statusLookup, vehicleTypes);
-            GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(system, vehicleTypes, allowKeepingRentedVehicleAtDestination);
-
-            // Iterate over all known stations, and if we have any status information add it to those station objects.
-            stations.addAll(stationInformation.getData().getStations().stream()
-                    .map(stationInformationMapper::mapStationInformation)
-                    .peek(stationStatusMapper::fillStationStatus)
-                    .collect(Collectors.toList())
-            );
-        }
-
-        // Append the floating bike stations.
-        if (OTPFeature.FloatingBike.isOn()) {
-            GBFSFreeBikeStatus freeBikeStatus = loader.getFeed(GBFSFreeBikeStatus.class);
-            if (freeBikeStatus != null) {
-                GbfsFreeVehicleStatusMapper freeVehicleStatusMapper = new GbfsFreeVehicleStatusMapper(system, vehicleTypes);
-                stations.addAll(freeBikeStatus.getData().getBikes().stream()
-                        .map(freeVehicleStatusMapper::mapFreeVehicleStatus)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList())
-                );
-            }
-        }
-
-        return stations;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(GbfsVehicleRentalDataSource.class)
-                .addStr("url", url)
-                .addStr("language", language)
-                .addBoolIfTrue("allowKeepingRentedVehicleAtDestination", allowKeepingRentedVehicleAtDestination)
-                .toString();
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(GbfsVehicleRentalDataSource.class)
+      .addStr("url", url)
+      .addStr("language", language)
+      .addBoolIfTrue(
+        "allowKeepingRentedVehicleAtDestination",
+        allowKeepingRentedVehicleAtDestination
+      )
+      .toString();
+  }
 }

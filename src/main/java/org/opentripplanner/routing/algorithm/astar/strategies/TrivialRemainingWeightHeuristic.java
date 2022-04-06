@@ -10,13 +10,13 @@ import org.opentripplanner.routing.core.State;
  */
 public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Override
-    public void initialize(RoutingContext rctx) {}
+  @Override
+  public void initialize(RoutingContext rctx) {}
 
-    @Override
-    public double estimateRemainingWeight (State s) {
-        return 0;
-    }
+  @Override
+  public double estimateRemainingWeight(State s) {
+    return 0;
+  }
 }

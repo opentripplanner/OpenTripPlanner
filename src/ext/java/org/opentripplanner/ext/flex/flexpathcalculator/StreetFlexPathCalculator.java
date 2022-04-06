@@ -42,7 +42,6 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   @Override
   public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
-
     // These are the origin and destination vertices from the perspective of the one-to-many search,
     // which may be reversed
     Vertex originVertex = reverseDirection ? tov : fromv;
@@ -82,8 +81,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
 
     return AStarBuilder
-            .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
-            .setContext(rctx)
-            .getShortestPathTree();
+      .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
+      .setContext(rctx)
+      .getShortestPathTree();
   }
 }

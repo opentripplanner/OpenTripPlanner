@@ -1,9 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
-import org.opentripplanner.model.*;
-
 import java.util.Collection;
 import java.util.TimeZone;
+import org.opentripplanner.model.*;
 import org.opentripplanner.util.I18NString;
 
 public class MonoOrMultiModalStation extends TransitEntity {
@@ -36,20 +35,16 @@ public class MonoOrMultiModalStation extends TransitEntity {
   private final MonoOrMultiModalStation parentStation;
 
   public MonoOrMultiModalStation(Station station, MultiModalStation parentStation) {
-      super(station.getId());
-
-      this.name = station.getName();
-      this.lat = station.getLat();
-      this.lon = station.getLon();
-      this.code = station.getCode();
-      this.description = station.getDescription();
-      this.url = station.getUrl();
-      this.timezone = station.getTimezone();
-      this.childStops = station.getChildStops();
-      this.parentStation =
-          parentStation != null
-              ? new MonoOrMultiModalStation(parentStation)
-              : null;
+    super(station.getId());
+    this.name = station.getName();
+    this.lat = station.getLat();
+    this.lon = station.getLon();
+    this.code = station.getCode();
+    this.description = station.getDescription();
+    this.url = station.getUrl();
+    this.timezone = station.getTimezone();
+    this.childStops = station.getChildStops();
+    this.parentStation = parentStation != null ? new MonoOrMultiModalStation(parentStation) : null;
   }
 
   public MonoOrMultiModalStation(MultiModalStation multiModalStation) {

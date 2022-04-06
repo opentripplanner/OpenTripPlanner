@@ -1,5 +1,10 @@
 package org.opentripplanner.graph_builder.module;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -13,12 +18,6 @@ import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * This module takes advantage of the fact that in some cities, an authoritative linking location for GTFS stops is
@@ -34,86 +33,87 @@ import java.util.List;
  */
 public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
 
-    StreetVertexIndex index;
-    private final double searchRadiusM = 250;
-    private final double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
+  StreetVertexIndex index;
+  private final double searchRadiusM = 250;
+  private final double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
 
-    public List<String> provides() {
-        return Arrays.asList("street to transit", "linking");
-    }
+  public List<String> provides() {
+    return Arrays.asList("street to transit", "linking");
+  }
 
-    public List<String> getPrerequisites() {
-        return Arrays.asList("streets"); // why not "transit" ?
-    }
+  public List<String> getPrerequisites() {
+    return Arrays.asList("streets"); // why not "transit" ?
+  }
 
-    @Override
-    public void buildGraph(
-            Graph graph,
-            HashMap<Class<?>, Object> extra,
-            DataImportIssueStore issueStore
-    ) {
-        LOG.info("Linking transit stops to tagged bus stops...");
+  @Override
+  public void buildGraph(
+    Graph graph,
+    HashMap<Class<?>, Object> extra,
+    DataImportIssueStore issueStore
+  ) {
+    LOG.info("Linking transit stops to tagged bus stops...");
 
-        index = graph.getStreetIndex();
+    index = graph.getStreetIndex();
 
-        // iterate over a copy of vertex list because it will be modified
-        ArrayList<Vertex> vertices = new ArrayList<>();
+    // iterate over a copy of vertex list because it will be modified
+    ArrayList<Vertex> vertices = new ArrayList<>();
 
-        for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
-            // if the street is already linked there is no need to linked it again,
-            // could happened if using the prune isolated island
-            boolean alreadyLinked = false;
-            for(Edge e:ts.getOutgoing()){
-                if(e instanceof StreetTransitStopLink) {
-                    alreadyLinked = true;
-                    break;
-                }
-            }
-            if(alreadyLinked) continue;
-            // only connect transit stops that are not part of a pathway network
-            if (!ts.hasPathways()) {
-                if (!connectVertexToStop(ts)) {
-                    LOG.debug("Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString());
-
-                    // TODO OTP2 - Why is this commented out? Is it not a problem or is it to nosey?
-                    //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
-                }
-            }
+    for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
+      // if the street is already linked there is no need to linked it again,
+      // could happened if using the prune isolated island
+      boolean alreadyLinked = false;
+      for (Edge e : ts.getOutgoing()) {
+        if (e instanceof StreetTransitStopLink) {
+          alreadyLinked = true;
+          break;
         }
-    }
-
-    private boolean connectVertexToStop(TransitStopVertex ts) {
-        String stopCode = ts.getStop().getCode();
-        if (stopCode == null){
-            return false;
+      }
+      if (alreadyLinked) continue;
+      // only connect transit stops that are not part of a pathway network
+      if (!ts.hasPathways()) {
+        if (!connectVertexToStop(ts)) {
+          LOG.debug(
+            "Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString()
+          );
+          // TODO OTP2 - Why is this commented out? Is it not a problem or is it to nosey?
+          //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
         }
-        Envelope envelope = new Envelope(ts.getCoordinate());
-        double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
-        envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
-        Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
-        // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
-        // in their ref= tag that matches the GTFS stop code of this StopVertex.
-        for (Vertex v : vertices){
-            if (!(v instanceof TransitStopStreetVertex)){
-                continue;
-            }
-            TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
-
-            // Only use stop codes for linking TODO: find better method to connect stops without stop code
-            if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
-                new StreetTransitStopLink(ts, tsv);
-                new StreetTransitStopLink(tsv, ts);
-                LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
-                return true;
-            }
-        }
-        return false;
+      }
     }
+  }
 
-    @Override
-    public void checkInputs() {
-        //no inputs
+  private boolean connectVertexToStop(TransitStopVertex ts) {
+    String stopCode = ts.getStop().getCode();
+    if (stopCode == null) {
+      return false;
     }
+    Envelope envelope = new Envelope(ts.getCoordinate());
+    double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
+    envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
+    Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
+    // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
+    // in their ref= tag that matches the GTFS stop code of this StopVertex.
+    for (Vertex v : vertices) {
+      if (!(v instanceof TransitStopStreetVertex)) {
+        continue;
+      }
+      TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
+
+      // Only use stop codes for linking TODO: find better method to connect stops without stop code
+      if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
+        new StreetTransitStopLink(ts, tsv);
+        new StreetTransitStopLink(tsv, ts);
+        LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public void checkInputs() {
+    //no inputs
+  }
 }

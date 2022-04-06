@@ -9,8 +9,8 @@ import org.opentripplanner.routing.core.Fare;
  * as part of the Graph; Hence it should be {@link Serializable}.
  */
 public interface FareService extends Serializable {
-	/**
-	 * @param itinerary the OTP2 Itinerary for which we want to compute a fare
-	 */
-	Fare getCost(Itinerary itinerary);
+  /**
+   * @param itinerary the OTP2 Itinerary for which we want to compute a fare
+   */
+  Fare getCost(Itinerary itinerary);
 }

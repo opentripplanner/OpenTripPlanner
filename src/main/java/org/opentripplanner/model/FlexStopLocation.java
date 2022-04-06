@@ -10,6 +10,7 @@ import org.opentripplanner.util.I18NString;
  */
 
 public class FlexStopLocation extends TransitEntity implements StopLocation {
+
   private static final long serialVersionUID = 1L;
 
   private I18NString name;

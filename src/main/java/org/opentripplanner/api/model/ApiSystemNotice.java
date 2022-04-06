@@ -1,6 +1,5 @@
 package org.opentripplanner.api.model;
 
-
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
@@ -17,20 +16,20 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
  */
 public class ApiSystemNotice {
 
-    /**
-     * An id or code identifying the notice. Use a descriptive tag like:
-     * 'transit-walking-filter'.
-     */
-    public final String tag;
+  /**
+   * An id or code identifying the notice. Use a descriptive tag like:
+   * 'transit-walking-filter'.
+   */
+  public final String tag;
 
-    /**
-     * An english text explaining why the element is tagged, and/or what the
-     * tag means.
-     */
-    public final String text;
+  /**
+   * An english text explaining why the element is tagged, and/or what the
+   * tag means.
+   */
+  public final String text;
 
-    public ApiSystemNotice(String tag, String text) {
-        this.tag = tag;
-        this.text = text;
-    }
+  public ApiSystemNotice(String tag, String text) {
+    this.tag = tag;
+    this.text = text;
+  }
 }

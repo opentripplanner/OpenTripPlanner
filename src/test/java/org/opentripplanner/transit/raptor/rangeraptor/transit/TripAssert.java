@@ -6,60 +6,57 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 class TripAssert {
-    private final RaptorTripScheduleSearch<TestTripSchedule> subject;
-    private RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> result;
-    private int stopPosition;
 
+  private final RaptorTripScheduleSearch<TestTripSchedule> subject;
+  private RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> result;
+  private int stopPosition;
 
-    TripAssert(RaptorTripScheduleSearch<TestTripSchedule> subject) {
-        this.subject = subject;
-    }
+  TripAssert(RaptorTripScheduleSearch<TestTripSchedule> subject) {
+    this.subject = subject;
+  }
 
-    /**
-     * @param arrivalTime  The search add the boardSlack, so we use 'arrivalTime' as input to the search
-     * @param stopPosition The stop position to board
-     */
-    TripAssert search(int arrivalTime, int stopPosition) {
-        this.stopPosition = stopPosition;
-        result = subject.search(arrivalTime, stopPosition);
-        return this;
-    }
+  /**
+   * @param arrivalTime  The search add the boardSlack, so we use 'arrivalTime' as input to the search
+   * @param stopPosition The stop position to board
+   */
+  TripAssert search(int arrivalTime, int stopPosition) {
+    this.stopPosition = stopPosition;
+    result = subject.search(arrivalTime, stopPosition);
+    return this;
+  }
 
-    /**
-     * @param arrivalTime    The search add the boardSlack, so we use 'arrivalTime' as input to the search
-     * @param stopPosition   The stop position to board
-     * @param tripIndexLimit the index of a previous tripSchedule found, used to search for a better trip. (exclusive)
-     */
-    TripAssert search(int arrivalTime, int stopPosition, int tripIndexLimit) {
-        this.stopPosition = stopPosition;
-        result = subject.search(arrivalTime, stopPosition, tripIndexLimit);
-        return this;
-    }
+  /**
+   * @param arrivalTime    The search add the boardSlack, so we use 'arrivalTime' as input to the search
+   * @param stopPosition   The stop position to board
+   * @param tripIndexLimit the index of a previous tripSchedule found, used to search for a better trip. (exclusive)
+   */
+  TripAssert search(int arrivalTime, int stopPosition, int tripIndexLimit) {
+    this.stopPosition = stopPosition;
+    result = subject.search(arrivalTime, stopPosition, tripIndexLimit);
+    return this;
+  }
 
-    void assertNoTripFound() {
-        Assert.assertNull(
-                "No trip expected, but trip found with index: " + result,
-                result
-        );
-    }
+  void assertNoTripFound() {
+    Assert.assertNull("No trip expected, but trip found with index: " + result, result);
+  }
 
-    TripAssert assertTripFound() {
-        Assert.assertNotNull("Trip expected, but trip found", result);
-        return this;
-    }
+  TripAssert assertTripFound() {
+    Assert.assertNotNull("Trip expected, but trip found", result);
+    return this;
+  }
 
-    TripAssert withIndex(int expectedTripIndex) {
-        Assert.assertEquals("Trip index", expectedTripIndex, result.getTripIndex());
-        return this;
-    }
+  TripAssert withIndex(int expectedTripIndex) {
+    Assert.assertEquals("Trip index", expectedTripIndex, result.getTripIndex());
+    return this;
+  }
 
-    TripAssert withBoardTime(int expectedBoardTime) {
-        Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().departure(stopPosition));
-        return this;
-    }
+  TripAssert withBoardTime(int expectedBoardTime) {
+    Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().departure(stopPosition));
+    return this;
+  }
 
-    TripAssert withAlightTime(int expectedBoardTime) {
-        Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().arrival(stopPosition));
-        return this;
-    }
+  TripAssert withAlightTime(int expectedBoardTime) {
+    Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().arrival(stopPosition));
+    return this;
+  }
 }

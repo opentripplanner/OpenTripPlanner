@@ -8,7 +8,7 @@ package org.opentripplanner.api.resource;
 
 public class ElevationMetadata {
 
-    public Double ellipsoidToGeoidDifference;
+  public Double ellipsoidToGeoidDifference;
 
-    public Boolean geoidElevation;
+  public Boolean geoidElevation;
 }

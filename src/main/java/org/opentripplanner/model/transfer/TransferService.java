@@ -21,57 +21,59 @@ import org.opentripplanner.model.Trip;
  */
 public class TransferService implements Serializable {
 
-    private final List<ConstrainedTransfer> transfersList;
+  private final List<ConstrainedTransfer> transfersList;
 
-    /**
-     * A map of map may seem a bit odd, but the first map have the FROM-transfer-point
-     * as its key, while the second map have the TO-transfer-point as its key. This allows us to
-     * support all combination of (Trip, Route, Stop and Station) in total 16 possible combination
-     * of keys to the ConstrainedTransfer.
-     */
-    private final TransferPointMap<TransferPointMap<ConstrainedTransfer>> transfersMap;
+  /**
+   * A map of map may seem a bit odd, but the first map have the FROM-transfer-point
+   * as its key, while the second map have the TO-transfer-point as its key. This allows us to
+   * support all combination of (Trip, Route, Stop and Station) in total 16 possible combination
+   * of keys to the ConstrainedTransfer.
+   */
+  private final TransferPointMap<TransferPointMap<ConstrainedTransfer>> transfersMap;
 
-    public TransferService() {
-        this.transfersList = new ArrayList<>();
-        this.transfersMap = new TransferPointMap<>();
+  public TransferService() {
+    this.transfersList = new ArrayList<>();
+    this.transfersMap = new TransferPointMap<>();
+  }
+
+  public void addAll(Collection<ConstrainedTransfer> transfers) {
+    Set<ConstrainedTransfer> set = new HashSet<>(transfersList);
+
+    for (ConstrainedTransfer transfer : transfers) {
+      if (!set.contains(transfer)) {
+        add(transfer);
+        set.add(transfer);
+      }
     }
+  }
 
-    public void addAll(Collection<ConstrainedTransfer> transfers) {
-        Set<ConstrainedTransfer> set = new HashSet<>(transfersList);
+  public List<ConstrainedTransfer> listAll() {
+    return transfersList;
+  }
 
-        for (ConstrainedTransfer transfer : transfers) {
-            if(!set.contains(transfer)) {
-                add(transfer);
-                set.add(transfer);
-            }
-        }
-    }
+  @Nullable
+  public ConstrainedTransfer findTransfer(
+    Trip fromTrip,
+    int fromStopPosition,
+    StopLocation fromStop,
+    Trip toTrip,
+    int toStopPosition,
+    StopLocation toStop
+  ) {
+    return transfersMap
+      .get(fromTrip, fromStop, fromStopPosition)
+      .stream()
+      .map(map2 -> map2.get(toTrip, toStop, toStopPosition))
+      .flatMap(Collection::stream)
+      .max(comparingInt(ConstrainedTransfer::getSpecificityRanking))
+      .orElse(null);
+  }
 
-    public List<ConstrainedTransfer> listAll() {
-        return transfersList;
-    }
+  private void add(ConstrainedTransfer transfer) {
+    var from = transfer.getFrom();
+    var to = transfer.getTo();
 
-    @Nullable
-    public ConstrainedTransfer findTransfer(
-            Trip fromTrip,
-            int fromStopPosition,
-            StopLocation fromStop,
-            Trip toTrip,
-            int toStopPosition,
-            StopLocation toStop
-    ) {
-        return transfersMap.get(fromTrip, fromStop, fromStopPosition).stream()
-                .map(map2 -> map2.get(toTrip, toStop, toStopPosition))
-                .flatMap(Collection::stream)
-                .max(comparingInt(ConstrainedTransfer::getSpecificityRanking))
-                .orElse(null);
-    }
-
-    private void add(ConstrainedTransfer transfer) {
-        var from = transfer.getFrom();
-        var to = transfer.getTo();
-
-        transfersMap.computeIfAbsent(from, TransferPointMap::new).put(to, transfer);
-        transfersList.add(transfer);
-    }
+    transfersMap.computeIfAbsent(from, TransferPointMap::new).put(to, transfer);
+    transfersList.add(transfer);
+  }
 }

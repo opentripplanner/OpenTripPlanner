@@ -29,7 +29,7 @@ public class VehicleParkingDataSourceFactory {
         return new BicycleParkAPIUpdater((ParkAPIUpdaterParameters) parameters);
     }
     throw new IllegalArgumentException(
-            "Unknown vehicle parking source type: " + parameters.getSourceType()
+      "Unknown vehicle parking source type: " + parameters.getSourceType()
     );
   }
 }

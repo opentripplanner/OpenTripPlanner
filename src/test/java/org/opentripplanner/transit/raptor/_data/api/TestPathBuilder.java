@@ -12,7 +12,6 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
-
 /**
  * Utility to help build paths for testing. The path builder is "reusable",
  * every time the {@code access(...)} methods are called the builder reset it self.
@@ -20,6 +19,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
  * If the {@code costCalculator} is null, paths will not include cost.
  */
 public class TestPathBuilder {
+
   private static final int BOARD_ALIGHT_OFFSET = 30;
 
   @Nullable
@@ -80,10 +80,10 @@ public class TestPathBuilder {
     int fromStop = currentStop();
 
     TestTripSchedule trip = TestTripSchedule
-        .schedule(TestTripPattern.pattern(patternName, fromStop, toStop))
-        .arrDepOffset(BOARD_ALIGHT_OFFSET)
-        .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
-        .build();
+      .schedule(TestTripPattern.pattern(patternName, fromStop, toStop))
+      .arrDepOffset(BOARD_ALIGHT_OFFSET)
+      .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
+      .build();
 
     return bus(trip, toStop);
   }
@@ -97,7 +97,6 @@ public class TestPathBuilder {
     return builder.build(startTime);
   }
 
-
   /* private methods */
 
   int currentStop() {
@@ -106,11 +105,12 @@ public class TestPathBuilder {
 
   private void reset(int startTime) {
     this.startTime = startTime;
-    this.builder = PathBuilder.tailPathBuilder(
-            null,
-            RaptorSlackProvider.defaultSlackProvider(0, 0, alightSlack),
-            costCalculator,
-            RaptorStopNameResolver.nullSafe(null)
-    );
+    this.builder =
+      PathBuilder.tailPathBuilder(
+        null,
+        RaptorSlackProvider.defaultSlackProvider(0, 0, alightSlack),
+        costCalculator,
+        RaptorStopNameResolver.nullSafe(null)
+      );
   }
 }

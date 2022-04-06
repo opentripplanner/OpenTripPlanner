@@ -15,44 +15,46 @@ import org.opentripplanner.model.plan.SortOrder;
  * clients.
  */
 public class PageCursor {
-    public final PageType type;
-    public final SortOrder originalSortOrder;
-    public final Instant earliestDepartureTime;
-    public final Instant latestArrivalTime;
-    public final Duration searchWindow;
 
-    PageCursor(
-            PageType type,
-            SortOrder originalSortOrder,
-            Instant earliestDepartureTime,
-            Instant latestArrivalTime,
-            Duration searchWindow
-    ) {
-        this.type = type;
-        this.searchWindow = searchWindow;
-        this.earliestDepartureTime = earliestDepartureTime;
-        this.latestArrivalTime = latestArrivalTime;
-        this.originalSortOrder = originalSortOrder;
-    }
+  public final PageType type;
+  public final SortOrder originalSortOrder;
+  public final Instant earliestDepartureTime;
+  public final Instant latestArrivalTime;
+  public final Duration searchWindow;
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(PageCursor.class)
-                .addEnum("type", type)
-                .addEnum("sortOrder", originalSortOrder)
-                .addTime("edt", earliestDepartureTime)
-                .addTime("lat", latestArrivalTime)
-                .addDuration("searchWindow", searchWindow)
-                .toString();
-    }
+  PageCursor(
+    PageType type,
+    SortOrder originalSortOrder,
+    Instant earliestDepartureTime,
+    Instant latestArrivalTime,
+    Duration searchWindow
+  ) {
+    this.type = type;
+    this.searchWindow = searchWindow;
+    this.earliestDepartureTime = earliestDepartureTime;
+    this.latestArrivalTime = latestArrivalTime;
+    this.originalSortOrder = originalSortOrder;
+  }
 
-    @Nullable
-    public String encode() {
-        return PageCursorSerializer.encode(this);
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(PageCursor.class)
+      .addEnum("type", type)
+      .addEnum("sortOrder", originalSortOrder)
+      .addTime("edt", earliestDepartureTime)
+      .addTime("lat", latestArrivalTime)
+      .addDuration("searchWindow", searchWindow)
+      .toString();
+  }
 
-    @Nullable
-    public static PageCursor decode(String cursor) {
-        return PageCursorSerializer.decode(cursor);
-    }
+  @Nullable
+  public String encode() {
+    return PageCursorSerializer.encode(this);
+  }
+
+  @Nullable
+  public static PageCursor decode(String cursor) {
+    return PageCursorSerializer.decode(cursor);
+  }
 }

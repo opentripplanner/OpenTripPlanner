@@ -18,5 +18,5 @@ public enum VehicleRentalState {
   /**
    * After dropping off a vehicle, this state is entered.
    */
-  HAVE_RENTED
+  HAVE_RENTED,
 }

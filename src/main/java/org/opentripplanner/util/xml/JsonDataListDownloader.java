@@ -25,7 +25,10 @@ public class JsonDataListDownloader<T> {
   private final Function<JsonNode, T> elementParser;
 
   public JsonDataListDownloader(
-      String url, String jsonParsePath, Function<JsonNode, T> elementParser, Map<String, String> headers
+    String url,
+    String jsonParsePath,
+    Function<JsonNode, T> elementParser,
+    Map<String, String> headers
   ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
@@ -56,7 +59,6 @@ public class JsonDataListDownloader<T> {
   }
 
   private List<T> parseJSON(InputStream dataStream) throws IllegalArgumentException, IOException {
-
     ArrayList<T> out = new ArrayList<>();
 
     String rentalString = convertStreamToString(dataStream);

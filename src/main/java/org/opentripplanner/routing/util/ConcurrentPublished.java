@@ -15,8 +15,8 @@ package org.opentripplanner.routing.util;
  * This class encapsulates the simple mechanism giving us the desired effect, revealing its
  * semantics through the type name, and providing an object to lock on (to avoid cluttering
  * compound types with lock fields, or locking on the entire compound type instance just to publish
- * one of its fields). Using private fields, it also prevents the containing object from bypassing 
- * the synchronized block and accessing the reference directly, and prevents other code from 
+ * one of its fields). Using private fields, it also prevents the containing object from bypassing
+ * the synchronized block and accessing the reference directly, and prevents other code from
  * interfering with (locking on) the lock object.
  */
 public class ConcurrentPublished<T> {
@@ -30,16 +30,15 @@ public class ConcurrentPublished<T> {
    * referenced objects should be complete before this method is called, and no readers should
    * ever modify its fields or referenced objects.
    */
-  public void publish (T value) {
+  public void publish(T value) {
     synchronized (lock) {
       this.value = value;
     }
   }
 
-  public T get () {
+  public T get() {
     synchronized (lock) {
       return value;
     }
   }
-
 }

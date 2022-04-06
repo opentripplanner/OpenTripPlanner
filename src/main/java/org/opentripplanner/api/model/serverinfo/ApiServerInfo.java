@@ -3,6 +3,7 @@ package org.opentripplanner.api.model.serverinfo;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 
 public class ApiServerInfo {
+
   public final String cpuName;
   public final int nCores;
   public final ApiProjectVersion version;
@@ -18,5 +19,4 @@ public class ApiServerInfo {
     this.config = new ApiConfigInfo(projectInfo);
     this.otpSerializationVersionId = projectInfo.getOtpSerializationVersionId();
   }
-
 }

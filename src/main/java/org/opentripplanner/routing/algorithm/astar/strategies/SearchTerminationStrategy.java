@@ -9,10 +9,9 @@ import org.opentripplanner.routing.core.State;
  * has been met.
  */
 public interface SearchTerminationStrategy {
-
-    /**
-     * @param current the current shortest path tree vertex
-     * @return true if the specified search should be terminated
-     */
-    boolean shouldSearchTerminate(State current);
+  /**
+   * @param current the current shortest path tree vertex
+   * @return true if the specified search should be terminated
+   */
+  boolean shouldSearchTerminate(State current);
 }

@@ -18,21 +18,22 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class BarrierVertex extends OsmVertex {
 
-    private StreetTraversalPermission barrierPermissions;
+  private StreetTraversalPermission barrierPermissions;
 
-    //According to OSM default permissions are access=no, foot=yes, bicycle=yes
-    public static final StreetTraversalPermission defaultBarrierPermissions = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+  //According to OSM default permissions are access=no, foot=yes, bicycle=yes
+  public static final StreetTraversalPermission defaultBarrierPermissions =
+    StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-    public BarrierVertex(Graph g, String label, double x, double y, long nodeId) {
-        super(g, label, x, y, nodeId);
-        barrierPermissions = defaultBarrierPermissions;
-    }
+  public BarrierVertex(Graph g, String label, double x, double y, long nodeId) {
+    super(g, label, x, y, nodeId);
+    barrierPermissions = defaultBarrierPermissions;
+  }
 
-    public StreetTraversalPermission getBarrierPermissions() {
-        return barrierPermissions;
-    }
+  public StreetTraversalPermission getBarrierPermissions() {
+    return barrierPermissions;
+  }
 
-    public void setBarrierPermissions(StreetTraversalPermission barrierPermissions) {
-        this.barrierPermissions = barrierPermissions;
-    }
+  public void setBarrierPermissions(StreetTraversalPermission barrierPermissions) {
+    this.barrierPermissions = barrierPermissions;
+  }
 }

@@ -5,19 +5,19 @@ import org.opengis.coverage.Coverage;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
- * Factory interface specifying the ability to generate GeoTools {@link GridCoverage2D} objects 
- * representing National Elevation Dataset (NED) raster data. 
- * 
+ * Factory interface specifying the ability to generate GeoTools {@link GridCoverage2D} objects
+ * representing National Elevation Dataset (NED) raster data.
+ *
  * @author demory
  *
  */
 
 public interface ElevationGridCoverageFactory {
-    /** Creates a new coverage instance from files already fetched */
-    Coverage getGridCoverage();
+  /** Creates a new coverage instance from files already fetched */
+  Coverage getGridCoverage();
 
-    void checkInputs();
+  void checkInputs();
 
-    /** Sets the graph of the factory and initiates the fetching of data that is not present in the cache */
-    void fetchData(Graph graph);
+  /** Sets the graph of the factory and initiates the fetching of data that is not present in the cache */
+  void fetchData(Graph graph);
 }

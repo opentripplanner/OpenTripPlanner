@@ -56,26 +56,26 @@ public class TransitLayer {
    */
   public TransitLayer(TransitLayer transitLayer) {
     this(
-        transitLayer.tripPatternsRunningOnDate,
-        transitLayer.transfersByStopIndex,
-        transitLayer.transferService,
-        transitLayer.stopIndex,
-        transitLayer.transitDataZoneId,
-        transitLayer.transferCache,
-        transitLayer.tripPatternMapper,
-        transitLayer.transferIndexGenerator
+      transitLayer.tripPatternsRunningOnDate,
+      transitLayer.transfersByStopIndex,
+      transitLayer.transferService,
+      transitLayer.stopIndex,
+      transitLayer.transitDataZoneId,
+      transitLayer.transferCache,
+      transitLayer.tripPatternMapper,
+      transitLayer.transferIndexGenerator
     );
   }
 
   public TransitLayer(
-      Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
-      List<List<Transfer>> transfersByStopIndex,
-      TransferService transferService,
-      StopIndexForRaptor stopIndex,
-      ZoneId transitDataZoneId,
-      RaptorRequestTransferCache transferCache,
-      TripPatternMapper tripPatternMapper,
-      TransferIndexGenerator transferIndexGenerator
+    Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
+    List<List<Transfer>> transfersByStopIndex,
+    TransferService transferService,
+    StopIndexForRaptor stopIndex,
+    ZoneId transitDataZoneId,
+    RaptorRequestTransferCache transferCache,
+    TripPatternMapper tripPatternMapper,
+    TransferIndexGenerator transferIndexGenerator
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -128,10 +128,12 @@ public class TransitLayer {
   @Nullable
   public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {
     List<TripPatternForDate> tripPatternsRunningOnDate = getTripPatternsRunningOnDateCopy(date);
-    return tripPatternsRunningOnDate != null ? tripPatternsRunningOnDate
+    return tripPatternsRunningOnDate != null
+      ? tripPatternsRunningOnDate
         .stream()
         .filter(t -> t.getLocalDate().equals(date))
-        .collect(Collectors.toList()) : null;
+        .collect(Collectors.toList())
+      : null;
   }
 
   public TransferService getTransferService() {
@@ -154,14 +156,13 @@ public class TransitLayer {
     return transferIndexGenerator;
   }
 
-
   /**
    * Replaces all the TripPatternForDates for a single date. This is an atomic operation according
    * to the HashMap implementation.
    */
   public void replaceTripPatternsForDate(
-      LocalDate date,
-      List<TripPatternForDate> tripPatternForDates
+    LocalDate date,
+    List<TripPatternForDate> tripPatternForDates
   ) {
     this.tripPatternsRunningOnDate.replace(date, tripPatternForDates);
   }

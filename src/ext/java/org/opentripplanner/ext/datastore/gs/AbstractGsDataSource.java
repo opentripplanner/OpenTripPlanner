@@ -5,39 +5,40 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 
 abstract class AbstractGsDataSource implements DataSource {
-    private final BlobId blobId;
-    private final FileType type;
 
-     AbstractGsDataSource(BlobId blobId, FileType type) {
-        this.blobId = blobId;
-        this.type = type;
-    }
+  private final BlobId blobId;
+  private final FileType type;
 
-    BlobId blobId() {
-        return blobId;
-    }
+  AbstractGsDataSource(BlobId blobId, FileType type) {
+    this.blobId = blobId;
+    this.type = type;
+  }
 
-    String bucketName() {
-        return blobId.getBucket();
-    }
+  BlobId blobId() {
+    return blobId;
+  }
 
-    @Override
-    public final String name() {
-        return blobId.getName();
-    }
+  String bucketName() {
+    return blobId.getBucket();
+  }
 
-    @Override
-    public final String path() {
-        return GsHelper.toUriString(blobId);
-    }
+  @Override
+  public final String name() {
+    return blobId.getName();
+  }
 
-    @Override
-    public final FileType type() {
-        return type;
-    }
+  @Override
+  public final String path() {
+    return GsHelper.toUriString(blobId);
+  }
 
-    @Override
-    public final String toString() {
-        return type + " " + path();
-    }
+  @Override
+  public final FileType type() {
+    return type;
+  }
+
+  @Override
+  public final String toString() {
+    return type + " " + path();
+  }
 }

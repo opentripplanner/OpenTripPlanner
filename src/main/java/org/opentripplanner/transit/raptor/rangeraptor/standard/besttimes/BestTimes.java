@@ -8,7 +8,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
-
 /**
  * This class is responsible for keeping track of the overall best times and
  * the best "on-board" times. In addition, it keeps track of times updated
@@ -28,179 +27,178 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
  */
 public final class BestTimes {
 
-    /** The best times to reach a stop, across rounds and iterations. */
-    private final int[] times;
+  /** The best times to reach a stop, across rounds and iterations. */
+  private final int[] times;
 
-    /**
-     * The best "on-board" arrival times to reach a stop, across rounds and iterations.
-     * It includes both transit arrivals and access-on-board arrivals.
-     */
-    private final int[] onBoardTimes;
+  /**
+   * The best "on-board" arrival times to reach a stop, across rounds and iterations.
+   * It includes both transit arrivals and access-on-board arrivals.
+   */
+  private final int[] onBoardTimes;
 
-    /** Stops touched in the CURRENT round. */
-    private BitSet reachedCurrentRound;
-    private final BitSet onBoardReachedCurrentRound;
+  /** Stops touched in the CURRENT round. */
+  private BitSet reachedCurrentRound;
+  private final BitSet onBoardReachedCurrentRound;
 
-    /** Stops touched by in LAST round. */
-    private BitSet reachedLastRound;
+  /** Stops touched by in LAST round. */
+  private BitSet reachedLastRound;
 
-    private final TransitCalculator<?> calculator;
+  private final TransitCalculator<?> calculator;
 
+  public BestTimes(int nStops, TransitCalculator<?> calculator, WorkerLifeCycle lifeCycle) {
+    this.calculator = calculator;
+    this.times = intArray(nStops, calculator.unreachedTime());
+    this.reachedCurrentRound = new BitSet(nStops);
+    this.reachedLastRound = new BitSet(nStops);
 
-    public BestTimes(int nStops, TransitCalculator<?> calculator, WorkerLifeCycle lifeCycle) {
-        this.calculator = calculator;
-        this.times = intArray(nStops, calculator.unreachedTime());
-        this.reachedCurrentRound = new BitSet(nStops);
-        this.reachedLastRound = new BitSet(nStops);
+    this.onBoardTimes = intArray(nStops, calculator.unreachedTime());
+    this.onBoardReachedCurrentRound = new BitSet(nStops);
 
-        this.onBoardTimes = intArray(nStops, calculator.unreachedTime());
-        this.onBoardReachedCurrentRound = new BitSet(nStops);
+    // Attach to Worker life cycle
+    lifeCycle.onSetupIteration(ignore -> setupIteration());
+    lifeCycle.onPrepareForNextRound(round -> prepareForNextRound());
+  }
 
-        // Attach to Worker life cycle
-        lifeCycle.onSetupIteration((ignore) -> setupIteration());
-        lifeCycle.onPrepareForNextRound(round -> prepareForNextRound());
+  public int time(int stop) {
+    return times[stop];
+  }
+
+  public int onBoardTime(int stop) {
+    return onBoardTimes[stop];
+  }
+
+  /**
+   * Clear all reached flags before we start a new iteration.
+   * This is important so stops visited in the previous
+   * iteration in the last round does not "overflow" into
+   * the next iteration.
+   */
+  private void setupIteration() {
+    // clear all touched stops to avoid constant reëxploration
+    reachedCurrentRound.clear();
+    onBoardReachedCurrentRound.clear();
+  }
+
+  /**
+   * @return true if at least one stop arrival was reached last round (best overall).
+   */
+  public boolean isCurrentRoundUpdated() {
+    return !reachedCurrentRound.isEmpty();
+  }
+
+  /**
+   * Prepare this class for the next round updating reached flags.
+   */
+  private void prepareForNextRound() {
+    swapReachedCurrentAndLastRound();
+    reachedCurrentRound.clear();
+    onBoardReachedCurrentRound.clear();
+  }
+
+  /**
+   * @return an iterator for all stops reached (overall best) in the last round.
+   */
+  public BitSetIterator stopsReachedLastRound() {
+    return new BitSetIterator(reachedLastRound);
+  }
+
+  /**
+   * @return an iterator of all stops reached on-board in the current round.
+   */
+  public BitSetIterator onBoardStopArrivalsReachedCurrentRound() {
+    return new BitSetIterator(onBoardReachedCurrentRound);
+  }
+
+  /**
+   * @return true if the given stop was reached by on-board in the current round.
+   */
+  boolean isStopReachedOnBoardInCurrentRound(int stop) {
+    return onBoardReachedCurrentRound.get(stop);
+  }
+
+  /**
+   * @return true if the given stop was reached in the previous/last round.
+   */
+  public boolean isStopReachedLastRound(int stop) {
+    return reachedLastRound.get(stop);
+  }
+
+  /**
+   * @return return true if stop is reached.
+   */
+  public boolean isStopReached(int stop) {
+    return time(stop) != calculator.unreachedTime();
+  }
+
+  /**
+   * @return return true if stop is reached.
+   */
+  public boolean isStopReachedOnBoard(int stop) {
+    return onBoardTime(stop) != calculator.unreachedTime();
+  }
+
+  /**
+   * @return true iff new best time is updated
+   */
+  public boolean updateOnBoardBestTime(int stop, int time) {
+    if (isBestOnBoardTime(stop, time)) {
+      setBestTime(stop, time);
+      return true;
     }
+    return false;
+  }
 
-    public int time(int stop) {
-        return times[stop];
+  /**
+   * @return true iff new best time is updated
+   */
+  public boolean updateNewBestTime(int stop, int time) {
+    if (isBestTime(stop, time)) {
+      setTime(stop, time);
+      return true;
     }
+    return false;
+  }
 
-    public int onBoardTime(int stop) {
-        return onBoardTimes[stop];
-    }
+  public int size() {
+    return times.length;
+  }
 
-    /**
-     * Clear all reached flags before we start a new iteration.
-     * This is important so stops visited in the previous
-     * iteration in the last round does not "overflow" into
-     * the next iteration.
-     */
-    private void setupIteration() {
-        // clear all touched stops to avoid constant reëxploration
-        reachedCurrentRound.clear();
-        onBoardReachedCurrentRound.clear();
-    }
+  @Override
+  public String toString() {
+    final int unreachedTime = calculator.unreachedTime();
+    return ToStringBuilder
+      .of(BestTimes.class)
+      .addIntArraySize("times", times, unreachedTime)
+      .addIntArraySize("onBoardTimes", onBoardTimes, unreachedTime)
+      .addNum("reachedCurrentRound", reachedCurrentRound.size())
+      .addBitSetSize("onBoardReachedCurrentRound", onBoardReachedCurrentRound)
+      .addBitSetSize("reachedLastRound", reachedLastRound)
+      .toString();
+  }
 
-    /**
-     * @return true if at least one stop arrival was reached last round (best overall).
-     */
-    public boolean isCurrentRoundUpdated() {
-        return !reachedCurrentRound.isEmpty();
-    }
+  /* private methods */
 
-    /**
-     * Prepare this class for the next round updating reached flags.
-     */
-    private void prepareForNextRound() {
-        swapReachedCurrentAndLastRound();
-        reachedCurrentRound.clear();
-        onBoardReachedCurrentRound.clear();
-    }
+  private void setTime(final int stop, final int time) {
+    times[stop] = time;
+    reachedCurrentRound.set(stop);
+  }
 
-    /**
-     * @return an iterator for all stops reached (overall best) in the last round.
-     */
-    public BitSetIterator stopsReachedLastRound() {
-        return new BitSetIterator(reachedLastRound);
-    }
+  private boolean isBestTime(int stop, int time) {
+    return calculator.isBefore(time, times[stop]);
+  }
 
-    /**
-     * @return an iterator of all stops reached on-board in the current round.
-     */
-    public BitSetIterator onBoardStopArrivalsReachedCurrentRound() {
-        return new BitSetIterator(onBoardReachedCurrentRound);
-    }
+  private boolean isBestOnBoardTime(int stop, int time) {
+    return calculator.isBefore(time, onBoardTimes[stop]);
+  }
 
-    /**
-     * @return true if the given stop was reached by on-board in the current round.
-     */
-    boolean isStopReachedOnBoardInCurrentRound(int stop) {
-        return onBoardReachedCurrentRound.get(stop);
-    }
+  private void setBestTime(int stop, int time) {
+    onBoardTimes[stop] = time;
+    onBoardReachedCurrentRound.set(stop);
+  }
 
-    /**
-     * @return true if the given stop was reached in the previous/last round.
-     */
-    public boolean isStopReachedLastRound(int stop) {
-        return reachedLastRound.get(stop);
-    }
-
-
-    /**
-     * @return return true if stop is reached.
-     */
-    public boolean isStopReached(int stop) {
-        return time(stop) != calculator.unreachedTime();
-    }
-
-    /**
-     * @return return true if stop is reached.
-     */
-    public boolean isStopReachedOnBoard(int stop) {
-        return onBoardTime(stop) != calculator.unreachedTime();
-    }
-
-    /**
-     * @return true iff new best time is updated
-     */
-    public boolean updateOnBoardBestTime(int stop, int time) {
-        if(isBestOnBoardTime(stop, time)) {
-            setBestTime(stop, time);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @return true iff new best time is updated
-     */
-    public boolean updateNewBestTime(int stop, int time) {
-        if(isBestTime(stop, time)) {
-            setTime(stop, time);
-            return true;
-        }
-        return false;
-    }
-
-    public int size() {
-        return times.length;
-    }
-
-    @Override
-    public String toString() {
-        final int unreachedTime = calculator.unreachedTime();
-        return ToStringBuilder.of(BestTimes.class)
-            .addIntArraySize("times", times, unreachedTime)
-            .addIntArraySize("onBoardTimes", onBoardTimes, unreachedTime)
-            .addNum("reachedCurrentRound", reachedCurrentRound.size())
-            .addBitSetSize("onBoardReachedCurrentRound", onBoardReachedCurrentRound)
-            .addBitSetSize("reachedLastRound", reachedLastRound)
-            .toString();
-    }
-
-    /* private methods */
-
-    private void setTime(final int stop, final int time) {
-        times[stop] = time;
-        reachedCurrentRound.set(stop);
-    }
-
-    private boolean isBestTime(int stop, int time) {
-        return calculator.isBefore(time, times[stop]);
-    }
-
-    private boolean isBestOnBoardTime(int stop, int time) {
-        return calculator.isBefore(time, onBoardTimes[stop]);
-    }
-
-    private void setBestTime(int stop, int time) {
-        onBoardTimes[stop] = time;
-        onBoardReachedCurrentRound.set(stop);
-    }
-
-    private void swapReachedCurrentAndLastRound() {
-        BitSet tmp = reachedLastRound;
-        reachedLastRound = reachedCurrentRound;
-        reachedCurrentRound = tmp;
-    }
+  private void swapReachedCurrentAndLastRound() {
+    BitSet tmp = reachedLastRound;
+    reachedLastRound = reachedCurrentRound;
+    reachedCurrentRound = tmp;
+  }
 }

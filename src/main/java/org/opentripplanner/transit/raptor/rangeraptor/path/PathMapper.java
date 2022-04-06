@@ -13,9 +13,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 @FunctionalInterface
 public interface PathMapper<T extends RaptorTripSchedule> {
-    /**
-     * Build a path from a destination arrival - this maps between the domain of routing
-     * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
-     */
-     Path<T> mapToPath(final DestinationArrival<T> destinationArrival);
+  /**
+   * Build a path from a destination arrival - this maps between the domain of routing
+   * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
+   */
+  Path<T> mapToPath(final DestinationArrival<T> destinationArrival);
 }

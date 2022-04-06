@@ -13,7 +13,10 @@ public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdater
   private final int frequencySec;
 
   public WFSNotePollingGraphUpdaterParameters(
-      String configRef, String url, String featureType, int frequencySec
+    String configRef,
+    String url,
+    String featureType,
+    int frequencySec
   ) {
     this.configRef = configRef;
     this.url = url;
@@ -21,13 +24,20 @@ public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdater
     this.frequencySec = frequencySec;
   }
 
-  public String getUrl() { return url; }
+  public String getUrl() {
+    return url;
+  }
 
   @Override
-  public int getFrequencySec() { return frequencySec; }
+  public int getFrequencySec() {
+    return frequencySec;
+  }
 
-  public String getFeatureType() { return featureType; }
+  public String getFeatureType() {
+    return featureType;
+  }
 
-  public String getConfigRef() { return configRef; }
-
+  public String getConfigRef() {
+    return configRef;
+  }
 }

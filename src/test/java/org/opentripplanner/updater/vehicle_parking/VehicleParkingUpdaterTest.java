@@ -3,9 +3,9 @@ package org.opentripplanner.updater.vehicle_parking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.Futures;
 import java.util.List;
 import java.util.concurrent.Future;
-import com.google.common.util.concurrent.Futures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,8 +16,8 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphUpdater;
@@ -48,7 +48,7 @@ class VehicleParkingUpdaterTest {
   @Test
   public void addVehicleParkingTest() {
     var vehicleParkings = List.of(
-            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0)
+      VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0)
     );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
@@ -67,35 +67,44 @@ class VehicleParkingUpdaterTest {
       assertEquals(2, parkingVertex.getOutgoing().size());
 
       assertEquals(
-          1,
-          parkingVertex.getIncoming().stream().filter(StreetVehicleParkingLink.class::isInstance).count()
+        1,
+        parkingVertex
+          .getIncoming()
+          .stream()
+          .filter(StreetVehicleParkingLink.class::isInstance)
+          .count()
       );
 
       assertEquals(
-          1,
-          parkingVertex.getIncoming().stream().filter(VehicleParkingEdge.class::isInstance).count()
+        1,
+        parkingVertex.getIncoming().stream().filter(VehicleParkingEdge.class::isInstance).count()
       );
 
       assertEquals(
-          1,
-          parkingVertex.getOutgoing().stream().filter(StreetVehicleParkingLink.class::isInstance).count()
+        1,
+        parkingVertex
+          .getOutgoing()
+          .stream()
+          .filter(StreetVehicleParkingLink.class::isInstance)
+          .count()
       );
 
       assertEquals(
-          1,
-          parkingVertex.getOutgoing().stream().filter(VehicleParkingEdge.class::isInstance).count()
+        1,
+        parkingVertex.getOutgoing().stream().filter(VehicleParkingEdge.class::isInstance).count()
       );
     }
 
-    assertEquals(vehicleParkingNumber, graph.getService(VehicleParkingService.class).getVehicleParkings().count());
+    assertEquals(
+      vehicleParkingNumber,
+      graph.getService(VehicleParkingService.class).getVehicleParkings().count()
+    );
   }
 
   private void runUpdaterOnce() {
     class GraphUpdaterMock extends GraphUpdaterManager {
 
-      public GraphUpdaterMock(
-          Graph graph, List<GraphUpdater> updaters
-      ) {
+      public GraphUpdaterMock(Graph graph, List<GraphUpdater> updaters) {
         super(graph, updaters);
       }
 
@@ -113,12 +122,10 @@ class VehicleParkingUpdaterTest {
 
   @Test
   public void updateVehicleParkingTest() {
-    var vehiclePlaces = VehicleParkingSpaces.builder()
-        .bicycleSpaces(1)
-        .build();
+    var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
 
     var vehicleParkings = List.of(
-            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
+      VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
     );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
@@ -126,23 +133,25 @@ class VehicleParkingUpdaterTest {
 
     assertVehicleParkingsInGraph(1);
 
-    var vehicleParkingInGraph = graph.getService(VehicleParkingService.class).getVehicleParkings().findFirst().orElseThrow();
+    var vehicleParkingInGraph = graph
+      .getService(VehicleParkingService.class)
+      .getVehicleParkings()
+      .findFirst()
+      .orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
 
-    vehiclePlaces = VehicleParkingSpaces.builder()
-        .bicycleSpaces(2)
-        .build();
-    vehicleParkings = List.of(
-            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
-    );
+    vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(2).build();
+    vehicleParkings =
+      List.of(VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces));
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
     runUpdaterOnce();
 
     assertVehicleParkingsInGraph(1);
 
-    vehicleParkingInGraph = graph.getService(VehicleParkingService.class).getVehicleParkings().findFirst().orElseThrow();
+    vehicleParkingInGraph =
+      graph.getService(VehicleParkingService.class).getVehicleParkings().findFirst().orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
   }
@@ -150,8 +159,8 @@ class VehicleParkingUpdaterTest {
   @Test
   public void deleteVehicleParkingTest() {
     var vehicleParkings = List.of(
-            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0),
-            VehicleParkingTestUtil.createParkingWithEntrances("2", -0.0001, 0)
+      VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0),
+      VehicleParkingTestUtil.createParkingWithEntrances("2", -0.0001, 0)
     );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
@@ -169,9 +178,7 @@ class VehicleParkingUpdaterTest {
 
   @Test
   public void addNotOperatingVehicleParkingTest() {
-    var vehicleParking = VehicleParking.builder()
-        .state(VehicleParkingState.CLOSED)
-        .build();
+    var vehicleParking = VehicleParking.builder().state(VehicleParkingState.CLOSED).build();
 
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
@@ -188,28 +195,30 @@ class VehicleParkingUpdaterTest {
 
   @Test
   public void updateNotOperatingVehicleParkingTest() {
-    var vehiclePlaces = VehicleParkingSpaces.builder()
-        .bicycleSpaces(1)
-        .build();
+    var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
 
-    var vehicleParking = VehicleParking.builder()
-        .availability(vehiclePlaces)
-        .state(VehicleParkingState.CLOSED)
-        .build();
+    var vehicleParking = VehicleParking
+      .builder()
+      .availability(vehiclePlaces)
+      .state(VehicleParkingState.CLOSED)
+      .build();
 
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    var vehicleParkingService =  graph.getService(VehicleParkingService.class);
+    var vehicleParkingService = graph.getService(VehicleParkingService.class);
     assertEquals(1, vehicleParkingService.getVehicleParkings().count());
-    assertEquals(vehiclePlaces, vehicleParkingService.getVehicleParkings().findFirst().orElseThrow().getAvailability());
+    assertEquals(
+      vehiclePlaces,
+      vehicleParkingService.getVehicleParkings().findFirst().orElseThrow().getAvailability()
+    );
     assertVehicleParkingNotLinked();
 
-    vehiclePlaces = VehicleParkingSpaces.builder()
-        .bicycleSpaces(2)
-        .build();
+    vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(2).build();
 
-    vehicleParking = VehicleParking.builder()
+    vehicleParking =
+      VehicleParking
+        .builder()
         .availability(vehiclePlaces)
         .state(VehicleParkingState.CLOSED)
         .build();
@@ -218,20 +227,21 @@ class VehicleParkingUpdaterTest {
     runUpdaterOnce();
 
     assertEquals(1, vehicleParkingService.getVehicleParkings().count());
-    assertEquals(vehiclePlaces, vehicleParkingService.getVehicleParkings().findFirst().orElseThrow().getAvailability());
+    assertEquals(
+      vehiclePlaces,
+      vehicleParkingService.getVehicleParkings().findFirst().orElseThrow().getAvailability()
+    );
     assertVehicleParkingNotLinked();
   }
 
   @Test
   public void deleteNotOperatingVehicleParkingTest() {
-    var vehicleParking = VehicleParking.builder()
-        .state(VehicleParkingState.CLOSED)
-        .build();
+    var vehicleParking = VehicleParking.builder().state(VehicleParkingState.CLOSED).build();
 
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    var vehicleParkingService =  graph.getService(VehicleParkingService.class);
+    var vehicleParkingService = graph.getService(VehicleParkingService.class);
     assertEquals(1, vehicleParkingService.getVehicleParkings().count());
 
     when(dataSource.getUpdates()).thenReturn(List.of());
@@ -239,5 +249,4 @@ class VehicleParkingUpdaterTest {
 
     assertEquals(0, vehicleParkingService.getVehicleParkings().count());
   }
-
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.model;
 
-
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
@@ -17,28 +16,29 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
  */
 public class SystemNotice {
 
-    /**
-     * An id or code identifying the notice. Use a descriptive tag like:
-     * 'transit-walking-filter'.
-     */
-    public final String tag;
+  /**
+   * An id or code identifying the notice. Use a descriptive tag like:
+   * 'transit-walking-filter'.
+   */
+  public final String tag;
 
-    /**
-     * An english text explaining why the element is tagged, and/or what the
-     * tag means.
-     */
-    public final String text;
+  /**
+   * An english text explaining why the element is tagged, and/or what the
+   * tag means.
+   */
+  public final String text;
 
-    public SystemNotice(String tag, String text) {
-        this.tag = tag;
-        this.text = text;
-    }
+  public SystemNotice(String tag, String text) {
+    this.tag = tag;
+    this.text = text;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(SystemNotice.class)
-                .addStr("tag", tag)
-                .addStr("text", text)
-                .toString();
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(SystemNotice.class)
+      .addStr("tag", tag)
+      .addStr("text", text)
+      .toString();
+  }
 }

@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import javax.annotation.Nullable;
 
-
 /**
  * This class provide a method for comparing to lists and create a diff
  * between them.
@@ -15,12 +14,14 @@ import javax.annotation.Nullable;
 public final class DiffTool {
 
   public static class Diff<T> extends ArrayList<Entry<T>> {
+
     /* All elements exist in both collections, hence no differences. */
-    public boolean isEqual() { return stream().allMatch(Entry::isEqual); }
+    public boolean isEqual() {
+      return stream().allMatch(Entry::isEqual);
+    }
   }
 
   public record Entry<T>(T left, T right) {
-
     static <T> Entry<T> ofLeft(T left) {
       return new Entry<T>(left, null);
     }
@@ -75,15 +76,15 @@ public final class DiffTool {
   }
 
   /** This utility class have a private constructor to prevent instantiation. */
-  private DiffTool() { }
+  private DiffTool() {}
 
   /**
    * Compare to collections(left and right) and return a list of differences.
    */
   public static <T> Diff<T> diff(
-      Collection<T> left,
-      Collection<T> right,
-      Comparator<T> comparator
+    Collection<T> left,
+    Collection<T> right,
+    Comparator<T> comparator
   ) {
     Diff<T> result = new Diff<>();
 
@@ -95,11 +96,10 @@ public final class DiffTool {
 
     while (l != null && r != null) {
       int c = comparator.compare(l, r);
-      if(c < 0) {
+      if (c < 0) {
         result.add(Entry.ofLeft(l));
         l = next(leftIterator);
-      }
-      else if(c > 0) {
+      } else if (c > 0) {
         result.add(Entry.ofRight(r));
         r = next(rightIterator);
       }
@@ -124,5 +124,7 @@ public final class DiffTool {
   }
 
   @Nullable
-  private static <T> T next(Iterator<T> it) { return it.hasNext() ? it.next() : null; }
+  private static <T> T next(Iterator<T> it) {
+    return it.hasNext() ? it.next() : null;
+  }
 }

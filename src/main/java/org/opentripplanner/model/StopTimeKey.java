@@ -8,13 +8,12 @@ package org.opentripplanner.model;
  */
 public class StopTimeKey extends TransitEntity {
 
-    public StopTimeKey(FeedScopedId tripId, int stopSequenceNumber) {
-        super(new FeedScopedId(tripId.getFeedId(), tripId.getId() + "_#" + stopSequenceNumber));
-    }
+  public StopTimeKey(FeedScopedId tripId, int stopSequenceNumber) {
+    super(new FeedScopedId(tripId.getFeedId(), tripId.getId() + "_#" + stopSequenceNumber));
+  }
 
-    @Override
-    public String toString() {
-        return "StopTimeKey<" + getId() + ">";
-    }
-
+  @Override
+  public String toString() {
+    return "StopTimeKey<" + getId() + ">";
+  }
 }

@@ -35,317 +35,329 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  */
 public class ScheduledTransitLeg implements Leg {
 
-    protected final TripTimes tripTimes;
-    protected final TripPattern tripPattern;
+  protected final TripTimes tripTimes;
+  protected final TripPattern tripPattern;
 
-    private final Calendar startTime;
-    private final Calendar endTime;
+  private final Calendar startTime;
+  private final Calendar endTime;
 
-    private double distanceMeters;
-    private final LineString legGeometry;
+  private double distanceMeters;
+  private final LineString legGeometry;
 
-    private final Set<TransitAlert> transitAlerts = new HashSet<>();
+  private final Set<TransitAlert> transitAlerts = new HashSet<>();
 
-    private final ConstrainedTransfer transferFromPrevLeg;
-    private final ConstrainedTransfer transferToNextLeg;
+  private final ConstrainedTransfer transferFromPrevLeg;
+  private final ConstrainedTransfer transferToNextLeg;
 
-    protected final Integer boardStopPosInPattern;
-    protected final Integer alightStopPosInPattern;
+  protected final Integer boardStopPosInPattern;
+  protected final Integer alightStopPosInPattern;
 
-    private final int generalizedCost;
+  private final int generalizedCost;
 
-    protected final ServiceDate serviceDate;
-    protected final ZoneId zoneId;
+  protected final ServiceDate serviceDate;
+  protected final ZoneId zoneId;
 
-    public ScheduledTransitLeg(
-            TripTimes tripTimes,
-            TripPattern tripPattern,
-            int boardStopIndexInPattern,
-            int alightStopIndexInPattern,
-            Calendar startTime,
-            Calendar endTime,
-            LocalDate serviceDate,
-            ZoneId zoneId,
-            ConstrainedTransfer transferFromPreviousLeg,
-            ConstrainedTransfer transferToNextLeg,
-            int generalizedCost
-    ) {
-        this.tripTimes = tripTimes;
-        this.tripPattern = tripPattern;
+  public ScheduledTransitLeg(
+    TripTimes tripTimes,
+    TripPattern tripPattern,
+    int boardStopIndexInPattern,
+    int alightStopIndexInPattern,
+    Calendar startTime,
+    Calendar endTime,
+    LocalDate serviceDate,
+    ZoneId zoneId,
+    ConstrainedTransfer transferFromPreviousLeg,
+    ConstrainedTransfer transferToNextLeg,
+    int generalizedCost
+  ) {
+    this.tripTimes = tripTimes;
+    this.tripPattern = tripPattern;
 
-        this.boardStopPosInPattern = boardStopIndexInPattern;
-        this.alightStopPosInPattern = alightStopIndexInPattern;
+    this.boardStopPosInPattern = boardStopIndexInPattern;
+    this.alightStopPosInPattern = alightStopIndexInPattern;
 
-        this.startTime = startTime;
-        this.endTime = endTime;
+    this.startTime = startTime;
+    this.endTime = endTime;
 
-        this.serviceDate = new ServiceDate(serviceDate);
-        this.zoneId = zoneId;
+    this.serviceDate = new ServiceDate(serviceDate);
+    this.zoneId = zoneId;
 
-        this.transferFromPrevLeg = transferFromPreviousLeg;
-        this.transferToNextLeg = transferToNextLeg;
+    this.transferFromPrevLeg = transferFromPreviousLeg;
+    this.transferToNextLeg = transferToNextLeg;
 
-        this.generalizedCost = generalizedCost;
+    this.generalizedCost = generalizedCost;
 
-        List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(tripPattern, boardStopIndexInPattern, alightStopIndexInPattern);
-        this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
-        this.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
+    List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(
+      tripPattern,
+      boardStopIndexInPattern,
+      alightStopIndexInPattern
+    );
+    this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
+    this.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
+  }
+
+  public boolean isScheduledTransitLeg() {
+    return true;
+  }
+
+  public ScheduledTransitLeg asScheduledTransitLeg() {
+    return this;
+  }
+
+  public TripTimes getTripTimes() {
+    return tripTimes;
+  }
+
+  public TripPattern getTripPattern() {
+    return tripPattern;
+  }
+
+  public Instant getServiceDateMidnight() {
+    return serviceDate.toZonedDateTime(zoneId, 0).toInstant();
+  }
+
+  private List<Coordinate> extractTransitLegCoordinates(
+    TripPattern tripPattern,
+    int boardStopIndexInPattern,
+    int alightStopIndexInPattern
+  ) {
+    List<Coordinate> transitLegCoordinates = new ArrayList<>();
+
+    for (int i = boardStopIndexInPattern + 1; i <= alightStopIndexInPattern; i++) {
+      transitLegCoordinates.addAll(
+        Arrays.asList(tripPattern.getHopGeometry(i - 1).getCoordinates())
+      );
     }
 
-    public boolean isScheduledTransitLeg() {
-        return true;
+    return transitLegCoordinates;
+  }
+
+  private double getDistanceFromCoordinates(List<Coordinate> coordinates) {
+    double distance = 0;
+    for (int i = 1; i < coordinates.size(); i++) {
+      distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
     }
+    return distance;
+  }
 
-    public ScheduledTransitLeg asScheduledTransitLeg() {
-        return this;
+  @Override
+  public boolean isTransitLeg() {
+    return true;
+  }
+
+  @Override
+  public Boolean isInterlinedWithPreviousLeg() {
+    if (transferFromPrevLeg == null) {
+      return false;
     }
+    return transferFromPrevLeg.getTransferConstraint().isStaySeated();
+  }
 
-    public TripTimes getTripTimes() {
-        return tripTimes;
+  public void addAlert(TransitAlert alert) {
+    transitAlerts.add(alert);
+  }
+
+  @Override
+  public Agency getAgency() {
+    return getTrip().getRoute().getAgency();
+  }
+
+  @Override
+  public Operator getOperator() {
+    return getTrip().getOperator();
+  }
+
+  @Override
+  public Route getRoute() {
+    return getTrip().getRoute();
+  }
+
+  @Override
+  public Trip getTrip() {
+    return tripTimes.getTrip();
+  }
+
+  @Override
+  public TraverseMode getMode() {
+    return TraverseMode.fromTransitMode(getTrip().getMode());
+  }
+
+  @Override
+  public Calendar getStartTime() {
+    return startTime;
+  }
+
+  @Override
+  public Calendar getEndTime() {
+    return endTime;
+  }
+
+  @Override
+  public int getDepartureDelay() {
+    return tripTimes.getDepartureDelay(boardStopPosInPattern);
+  }
+
+  @Override
+  public int getArrivalDelay() {
+    return tripTimes.getArrivalDelay(alightStopPosInPattern);
+  }
+
+  @Override
+  public boolean getRealTime() {
+    return !tripTimes.isScheduled();
+  }
+
+  @Override
+  public double getDistanceMeters() {
+    return distanceMeters;
+  }
+
+  /** Only for testing purposes */
+  protected void setDistanceMeters(double distanceMeters) {
+    this.distanceMeters = distanceMeters;
+  }
+
+  @Override
+  public Integer getRouteType() {
+    return getTrip().getRoute().getGtfsType();
+  }
+
+  @Override
+  public String getHeadsign() {
+    return tripTimes.getHeadsign(boardStopPosInPattern);
+  }
+
+  @Override
+  public ServiceDate getServiceDate() {
+    return serviceDate;
+  }
+
+  @Override
+  public Place getFrom() {
+    return Place.forStop(tripPattern.getStop(boardStopPosInPattern));
+  }
+
+  @Override
+  public Place getTo() {
+    return Place.forStop(tripPattern.getStop(alightStopPosInPattern));
+  }
+
+  @Override
+  public List<StopArrival> getIntermediateStops() {
+    List<StopArrival> visits = new ArrayList<>();
+
+    for (int i = boardStopPosInPattern + 1; i < alightStopPosInPattern; i++) {
+      StopLocation stop = tripPattern.getStop(i);
+
+      StopArrival visit = new StopArrival(
+        Place.forStop(stop),
+        GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, tripTimes.getArrivalTime(i))),
+        GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, tripTimes.getDepartureTime(i))),
+        i,
+        tripTimes.getOriginalGtfsStopSequence(i)
+      );
+      visits.add(visit);
     }
+    return visits;
+  }
 
-    public TripPattern getTripPattern() {
-        return tripPattern;
+  @Override
+  public LineString getLegGeometry() {
+    return legGeometry;
+  }
+
+  @Override
+  public Set<TransitAlert> getTransitAlerts() {
+    return transitAlerts;
+  }
+
+  @Override
+  public PickDrop getBoardRule() {
+    if (transferFromPrevLeg != null && transferFromPrevLeg.getTransferConstraint().isStaySeated()) {
+      return null;
     }
+    return tripPattern.getBoardType(boardStopPosInPattern);
+  }
 
-    public Instant getServiceDateMidnight() {
-        return serviceDate.toZonedDateTime(zoneId, 0).toInstant();
+  @Override
+  public PickDrop getAlightRule() {
+    if (transferToNextLeg != null && transferToNextLeg.getTransferConstraint().isStaySeated()) {
+      return null;
     }
+    return tripPattern.getAlightType(alightStopPosInPattern);
+  }
 
-    private List<Coordinate> extractTransitLegCoordinates(TripPattern tripPattern, int boardStopIndexInPattern, int alightStopIndexInPattern) {
-        List<Coordinate> transitLegCoordinates = new ArrayList<>();
+  @Override
+  public BookingInfo getDropOffBookingInfo() {
+    return tripTimes.getDropOffBookingInfo(alightStopPosInPattern);
+  }
 
-        for (int i = boardStopIndexInPattern + 1; i <= alightStopIndexInPattern; i++) {
-            transitLegCoordinates.addAll(Arrays.asList(tripPattern.getHopGeometry(i - 1).getCoordinates()));
-        }
+  @Override
+  public BookingInfo getPickupBookingInfo() {
+    return tripTimes.getPickupBookingInfo(boardStopPosInPattern);
+  }
 
-        return transitLegCoordinates;
-    }
+  @Override
+  public ConstrainedTransfer getTransferFromPrevLeg() {
+    return transferFromPrevLeg;
+  }
 
-    private double getDistanceFromCoordinates(List<Coordinate> coordinates) {
-        double distance = 0;
-        for (int i = 1; i < coordinates.size(); i++) {
-            distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
-        }
-        return distance;
-    }
+  @Override
+  public ConstrainedTransfer getTransferToNextLeg() {
+    return transferToNextLeg;
+  }
 
-    @Override
-    public boolean isTransitLeg() {
-        return true;
-    }
+  @Override
+  public Integer getBoardStopPosInPattern() {
+    return boardStopPosInPattern;
+  }
 
-    @Override
-    public Boolean isInterlinedWithPreviousLeg() {
-        if (transferFromPrevLeg == null) {return false;}
-        return transferFromPrevLeg.getTransferConstraint().isStaySeated();
-    }
+  @Override
+  public Integer getAlightStopPosInPattern() {
+    return alightStopPosInPattern;
+  }
 
-    public void addAlert(TransitAlert alert) {
-        transitAlerts.add(alert);
-    }
+  @Override
+  public Integer getBoardingGtfsStopSequence() {
+    return tripTimes.getOriginalGtfsStopSequence(boardStopPosInPattern);
+  }
 
-    @Override
-    public Agency getAgency() {
-        return getTrip().getRoute().getAgency();
-    }
+  @Override
+  public Integer getAlightGtfsStopSequence() {
+    return tripTimes.getOriginalGtfsStopSequence(alightStopPosInPattern);
+  }
 
-    @Override
-    public Operator getOperator() {
-        return getTrip().getOperator();
-    }
+  @Override
+  public int getGeneralizedCost() {
+    return generalizedCost;
+  }
 
-    @Override
-    public Route getRoute() {
-        return getTrip().getRoute();
-    }
-
-    @Override
-    public Trip getTrip() {
-        return tripTimes.getTrip();
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return TraverseMode.fromTransitMode(getTrip().getMode());
-    }
-
-    @Override
-    public Calendar getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public Calendar getEndTime() {
-        return endTime;
-    }
-
-    @Override
-    public int getDepartureDelay() {
-        return tripTimes.getDepartureDelay(boardStopPosInPattern);
-    }
-
-    @Override
-    public int getArrivalDelay() {
-        return tripTimes.getArrivalDelay(alightStopPosInPattern);
-    }
-
-    @Override
-    public boolean getRealTime() {
-        return !tripTimes.isScheduled();
-    }
-
-    @Override
-    public double getDistanceMeters() {
-        return distanceMeters;
-    }
-
-    /** Only for testing purposes */
-    protected void setDistanceMeters(double distanceMeters) {
-        this.distanceMeters = distanceMeters;
-    }
-
-    @Override
-    public Integer getRouteType() {
-        return getTrip().getRoute().getGtfsType();
-    }
-
-    @Override
-    public String getHeadsign() {
-        return tripTimes.getHeadsign(boardStopPosInPattern);
-    }
-
-    @Override
-    public ServiceDate getServiceDate() {
-        return serviceDate;
-    }
-
-    @Override
-    public Place getFrom() {
-        return Place.forStop(tripPattern.getStop(boardStopPosInPattern));
-    }
-
-    @Override
-    public Place getTo() {
-        return Place.forStop(tripPattern.getStop(alightStopPosInPattern));
-    }
-
-    @Override
-    public List<StopArrival> getIntermediateStops() {
-        List<StopArrival> visits = new ArrayList<>();
-
-        for (int i = boardStopPosInPattern + 1; i < alightStopPosInPattern; i++) {
-            StopLocation stop = tripPattern.getStop(i);
-
-            StopArrival visit = new StopArrival(
-                    Place.forStop(stop),
-                    GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, tripTimes.getArrivalTime(i))),
-                    GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, tripTimes.getDepartureTime(i))),
-                    i,
-                    tripTimes.getOriginalGtfsStopSequence(i)
-            );
-            visits.add(visit);
-        }
-        return visits;
-    }
-
-    @Override
-    public LineString getLegGeometry() {
-        return legGeometry;
-    }
-
-    @Override
-    public Set<TransitAlert> getTransitAlerts() {
-        return transitAlerts;
-    }
-
-    @Override
-    public PickDrop getBoardRule() {
-        if (transferFromPrevLeg != null && transferFromPrevLeg.getTransferConstraint().isStaySeated()) {
-            return null;
-        }
-        return tripPattern.getBoardType(boardStopPosInPattern);
-    }
-
-    @Override
-    public PickDrop getAlightRule() {
-        if (transferToNextLeg != null && transferToNextLeg.getTransferConstraint().isStaySeated()) {
-            return null;
-        }
-        return tripPattern.getAlightType(alightStopPosInPattern);
-    }
-
-    @Override
-    public BookingInfo getDropOffBookingInfo() {
-        return tripTimes.getDropOffBookingInfo(alightStopPosInPattern);
-    }
-
-    @Override
-    public BookingInfo getPickupBookingInfo() {
-        return tripTimes.getPickupBookingInfo(boardStopPosInPattern);
-    }
-
-    @Override
-    public ConstrainedTransfer getTransferFromPrevLeg() {
-        return transferFromPrevLeg;
-    }
-
-    @Override
-    public ConstrainedTransfer getTransferToNextLeg() {
-        return transferToNextLeg;
-    }
-
-    @Override
-    public Integer getBoardStopPosInPattern() {
-        return boardStopPosInPattern;
-    }
-
-    @Override
-    public Integer getAlightStopPosInPattern() {
-        return alightStopPosInPattern;
-    }
-
-    @Override
-    public Integer getBoardingGtfsStopSequence() {
-        return tripTimes.getOriginalGtfsStopSequence(boardStopPosInPattern);
-    }
-
-    @Override
-    public Integer getAlightGtfsStopSequence() {
-        return tripTimes.getOriginalGtfsStopSequence(alightStopPosInPattern);
-    }
-
-    @Override
-    public int getGeneralizedCost() {
-        return generalizedCost;
-    }
-
-    /**
-     * Should be used for debug logging only
-     */
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(ScheduledTransitLeg.class)
-                .addObj("from", getFrom())
-                .addObj("to", getTo())
-                .addTimeCal("startTime", startTime)
-                .addTimeCal("endTime", endTime)
-                .addBool("realTime", getRealTime())
-                .addNum("distance", distanceMeters, "m")
-                .addNum("cost", generalizedCost)
-                .addNum("routeType", getRouteType())
-                .addEntityId("agencyId", getAgency())
-                .addEntityId("routeId", getRoute())
-                .addEntityId("tripId", getTrip())
-                .addStr("headsign", getHeadsign())
-                .addObj("serviceDate", serviceDate)
-                .addObj("legGeometry", legGeometry)
-                .addCol("transitAlerts", transitAlerts)
-                .addEnum("boardRule", getBoardRule())
-                .addEnum("alightRule", getAlightRule())
-                .addObj("transferFromPrevLeg", transferFromPrevLeg)
-                .addObj("transferToNextLeg", transferToNextLeg)
-                .toString();
-    }
-
+  /**
+   * Should be used for debug logging only
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(ScheduledTransitLeg.class)
+      .addObj("from", getFrom())
+      .addObj("to", getTo())
+      .addTimeCal("startTime", startTime)
+      .addTimeCal("endTime", endTime)
+      .addBool("realTime", getRealTime())
+      .addNum("distance", distanceMeters, "m")
+      .addNum("cost", generalizedCost)
+      .addNum("routeType", getRouteType())
+      .addEntityId("agencyId", getAgency())
+      .addEntityId("routeId", getRoute())
+      .addEntityId("tripId", getTrip())
+      .addStr("headsign", getHeadsign())
+      .addObj("serviceDate", serviceDate)
+      .addObj("legGeometry", legGeometry)
+      .addCol("transitAlerts", transitAlerts)
+      .addEnum("boardRule", getBoardRule())
+      .addEnum("alightRule", getAlightRule())
+      .addObj("transferFromPrevLeg", transferFromPrevLeg)
+      .addObj("transferToNextLeg", transferToNextLeg)
+      .toString();
+  }
 }

@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * This class computes the days that should be searched in addition to the search date time.
@@ -23,71 +23,73 @@ import java.util.Optional;
  */
 public class AdditionalSearchDays {
 
-    private final boolean arriveBy;
-    private final ZonedDateTime searchDateTime;
-    @Nullable
-    private final Duration searchWindow;
-    private final Duration maxSearchWindow;
-    private final Duration maxJourneyDuration;
+  private final boolean arriveBy;
+  private final ZonedDateTime searchDateTime;
 
-    public AdditionalSearchDays(
-            boolean arriveBy,
-            ZonedDateTime searchDateTime,
-            @Nullable Duration searchWindow,
-            Duration maxSearchWindow,
-            Duration maxJourneyDuration
-    ) {
-        this.arriveBy = arriveBy;
-        this.searchDateTime = searchDateTime;
-        this.searchWindow = searchWindow;
-        this.maxSearchWindow = maxSearchWindow;
-        this.maxJourneyDuration = maxJourneyDuration;
+  @Nullable
+  private final Duration searchWindow;
+
+  private final Duration maxSearchWindow;
+  private final Duration maxJourneyDuration;
+
+  public AdditionalSearchDays(
+    boolean arriveBy,
+    ZonedDateTime searchDateTime,
+    @Nullable Duration searchWindow,
+    Duration maxSearchWindow,
+    Duration maxJourneyDuration
+  ) {
+    this.arriveBy = arriveBy;
+    this.searchDateTime = searchDateTime;
+    this.searchWindow = searchWindow;
+    this.maxSearchWindow = maxSearchWindow;
+    this.maxJourneyDuration = maxJourneyDuration;
+  }
+
+  /**
+   * How many days that are prior to the search date time should be searched for transit.
+   */
+  public int additionalSearchDaysInPast() {
+    if (arriveBy) {
+      var sw = getMaximumSearchWindow();
+      var earliestStart = searchDateTime.minus(maxJourneyDuration.plus(sw));
+      return daysInBetween(searchDateTime, earliestStart);
+    } else {
+      return 0;
     }
+  }
 
-
-    /**
-     * How many days that are prior to the search date time should be searched for transit.
-     */
-    public int additionalSearchDaysInPast() {
-        if(arriveBy) {
-            var sw = getMaximumSearchWindow();
-            var earliestStart= searchDateTime.minus(maxJourneyDuration.plus(sw));
-            return daysInBetween(searchDateTime, earliestStart);
-        } else {
-            return 0;
-        }
+  /**
+   * How many days that are after to the search date time should be searched for transit.
+   */
+  public int additionalSearchDaysInFuture() {
+    if (arriveBy) {
+      return 0;
+    } else {
+      var sw = getMaximumSearchWindow();
+      var requestTime = searchDateTime;
+      var lastArrival = requestTime.plus(maxJourneyDuration.plus(sw));
+      return daysInBetween(requestTime, lastArrival);
     }
+  }
 
-    /**
-     * How many days that are after to the search date time should be searched for transit.
-     */
-    public int additionalSearchDaysInFuture() {
-        if(arriveBy) {
-            return 0;
-        } else {
-            var sw = getMaximumSearchWindow();
-            var requestTime = searchDateTime;
-            var lastArrival = requestTime.plus(maxJourneyDuration.plus(sw));
-            return daysInBetween(requestTime, lastArrival);
-        }
-    }
+  private Duration getMaximumSearchWindow() {
+    return searchWindow != null ? searchWindow : maxSearchWindow;
+  }
 
-    private Duration getMaximumSearchWindow() {
-        return searchWindow != null ? searchWindow : maxSearchWindow;
-    }
+  private int daysInBetween(ZonedDateTime requestTime, ZonedDateTime earliestStart) {
+    return Math.abs(
+      Period.between(requestTime.toLocalDate(), earliestStart.toLocalDate()).getDays()
+    );
+  }
 
-    private int daysInBetween(ZonedDateTime requestTime, ZonedDateTime earliestStart) {
-        return Math.abs(Period.between(requestTime.toLocalDate(), earliestStart.toLocalDate()).getDays());
-    }
-
-    public static AdditionalSearchDays defaults(ZonedDateTime time) {
-        return new AdditionalSearchDays(
-                false,
-                time,
-                Duration.ofHours(6),
-                Duration.ofDays(1),
-                Duration.ofDays(1)
-        );
-    }
-
+  public static AdditionalSearchDays defaults(ZonedDateTime time) {
+    return new AdditionalSearchDays(
+      false,
+      time,
+      Duration.ofHours(6),
+      Duration.ofDays(1),
+      Duration.ofDays(1)
+    );
+  }
 }

@@ -7,33 +7,34 @@ package org.opentripplanner.model;
  */
 public class Notice extends TransitEntity {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private String text;
+  private String text;
 
-    private String publicCode;
+  private String publicCode;
 
+  public Notice(FeedScopedId id) {
+    super(id);
+  }
 
-    public Notice(FeedScopedId id) {
-        super(id);
-    }
+  public String getText() {
+    return text;
+  }
 
-    public String getText() {
-        return text;
-    }
+  public void setText(String text) {
+    this.text = text;
+  }
 
-    public void setText(String text) {
-        this.text = text;
-    }
+  public String getPublicCode() {
+    return publicCode;
+  }
 
-    public String getPublicCode() {
-        return publicCode;
-    }
+  public void setPublicCode(String publicCode) {
+    this.publicCode = publicCode;
+  }
 
-    public void setPublicCode(String publicCode) {
-        this.publicCode = publicCode;
-    }
-
-    @Override
-    public String toString() { return "<Notice " + getId() + ">"; }
+  @Override
+  public String toString() {
+    return "<Notice " + getId() + ">";
+  }
 }

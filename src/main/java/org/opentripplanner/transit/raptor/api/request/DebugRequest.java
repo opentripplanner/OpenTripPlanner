@@ -11,7 +11,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 
-
 /**
  * This class configure the amount of debugging you want for your request.
  * Debugging is supported by an event model and event listeners must be provided to
@@ -42,56 +41,69 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
  * the particular trip.
  */
 public record DebugRequest(
-        /** List of stops to debug, unordered. */
-        List<Integer> stops,
-        /** List of stops in a particular path to debug. Only one path can be debugged per request. */
-        List<Integer> path,
-        /**
-         * The first stop to start recording debug information in the path specified in this request.
-         * This will filter away all events in the beginning of the path reducing the number of events
-         * significantly; Hence make it easier to inspect events towards the end of the trip.
-         */
-        int debugPathFromStopIndex,
-        Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener,
-        Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener,
-        Consumer<DebugEvent<Path<?>>> pathFilteringListener,
-        DebugLogger logger
+  /** List of stops to debug, unordered. */
+  List<Integer> stops,
+  /** List of stops in a particular path to debug. Only one path can be debugged per request. */
+  List<Integer> path,
+  /**
+   * The first stop to start recording debug information in the path specified in this request.
+   * This will filter away all events in the beginning of the path reducing the number of events
+   * significantly; Hence make it easier to inspect events towards the end of the trip.
+   */
+  int debugPathFromStopIndex,
+  Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener,
+  Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener,
+  Consumer<DebugEvent<Path<?>>> pathFilteringListener,
+  DebugLogger logger
 ) {
-    private static final DebugRequest DEFAULT_DEBUG_REQUEST = new DebugRequest(
-            List.of(), List.of(), 0, null, null, null, DebugLogger.noop()
+  private static final DebugRequest DEFAULT_DEBUG_REQUEST = new DebugRequest(
+    List.of(),
+    List.of(),
+    0,
+    null,
+    null,
+    null,
+    DebugLogger.noop()
+  );
+
+  /**
+   * Return a debug request with defaults values.
+   */
+  static DebugRequest defaults() {
+    return DEFAULT_DEBUG_REQUEST;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(DebugRequest.class)
+      .addCol("stops", stops)
+      .addCol("path", path)
+      .addNum("startAtStopIndex", debugPathFromStopIndex, 0)
+      .addBoolIfTrue("stopArrivalListener", stopArrivalListener != null)
+      .addBoolIfTrue("pathFilteringListener", pathFilteringListener != null)
+      .addBoolIfTrue("logger", logger != DEFAULT_DEBUG_REQUEST.logger())
+      .toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DebugRequest that = (DebugRequest) o;
+    return (
+      debugPathFromStopIndex == that.debugPathFromStopIndex &&
+      Objects.equals(stops, that.stops) &&
+      Objects.equals(path, that.path)
     );
+  }
 
-    /**
-     * Return a debug request with defaults values.
-     */
-    static DebugRequest defaults() {
-        return DEFAULT_DEBUG_REQUEST;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(DebugRequest.class)
-                .addCol("stops", stops)
-                .addCol("path", path)
-                .addNum("startAtStopIndex", debugPathFromStopIndex, 0)
-                .addBoolIfTrue("stopArrivalListener", stopArrivalListener != null)
-                .addBoolIfTrue("pathFilteringListener", pathFilteringListener != null)
-                .addBoolIfTrue("logger", logger != DEFAULT_DEBUG_REQUEST.logger())
-                .toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        DebugRequest that = (DebugRequest) o;
-        return debugPathFromStopIndex == that.debugPathFromStopIndex &&
-                Objects.equals(stops, that.stops) &&
-                Objects.equals(path, that.path);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(stops, path, debugPathFromStopIndex);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(stops, path, debugPathFromStopIndex);
+  }
 }

@@ -1,5 +1,9 @@
 package org.opentripplanner.routing.graphfinder;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
@@ -7,11 +11,6 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * A reference to a pattern at a specific stop.
@@ -36,8 +35,11 @@ public class PatternAtStop {
    */
   private static String toId(StopLocation stop, TripPattern pattern) {
     Base64.Encoder encoder = Base64.getEncoder();
-    return encoder.encodeToString(stop.getId().toString().getBytes(StandardCharsets.UTF_8)) + ";" +
-        encoder.encodeToString(pattern.getId().toString().getBytes(StandardCharsets.UTF_8));
+    return (
+      encoder.encodeToString(stop.getId().toString().getBytes(StandardCharsets.UTF_8)) +
+      ";" +
+      encoder.encodeToString(pattern.getId().toString().getBytes(StandardCharsets.UTF_8))
+    );
   }
 
   /**
@@ -49,10 +51,15 @@ public class PatternAtStop {
   public static PatternAtStop fromId(RoutingService routingService, String id) {
     String[] parts = id.split(";", 2);
     Base64.Decoder decoder = Base64.getDecoder();
-    FeedScopedId stopId = FeedScopedId.parseId(new String(decoder.decode(parts[0]), StandardCharsets.UTF_8));
-    FeedScopedId patternId = FeedScopedId.parseId(new String(decoder.decode(parts[1]), StandardCharsets.UTF_8));
-    return new PatternAtStop(routingService.getStopForId(stopId),
-        routingService.getTripPatternForId(patternId)
+    FeedScopedId stopId = FeedScopedId.parseId(
+      new String(decoder.decode(parts[0]), StandardCharsets.UTF_8)
+    );
+    FeedScopedId patternId = FeedScopedId.parseId(
+      new String(decoder.decode(parts[1]), StandardCharsets.UTF_8)
+    );
+    return new PatternAtStop(
+      routingService.getStopForId(stopId),
+      routingService.getTripPatternForId(patternId)
     );
   }
 
@@ -67,27 +74,36 @@ public class PatternAtStop {
    * @return                   A list of stop times
    */
   public List<TripTimeOnDate> getStoptimes(
-    RoutingService routingService, long startTime, int timeRange, int numberOfDepartures,
+    RoutingService routingService,
+    long startTime,
+    int timeRange,
+    int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
     return routingService.stopTimesForPatternAtStop(
-        stop,
-        pattern,
-        startTime,
-        timeRange,
-        numberOfDepartures,
-        arrivalDeparture
+      stop,
+      pattern,
+      startTime,
+      timeRange,
+      numberOfDepartures,
+      arrivalDeparture
     );
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (o == null || getClass() != o.getClass()) { return false; }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     final PatternAtStop that = (PatternAtStop) o;
-    return Objects.equals(id, that.id)
-            && Objects.equals(stop, that.stop)
-            && Objects.equals(pattern, that.pattern);
+    return (
+      Objects.equals(id, that.id) &&
+      Objects.equals(stop, that.stop) &&
+      Objects.equals(pattern, that.pattern)
+    );
   }
 
   @Override
@@ -97,10 +113,11 @@ public class PatternAtStop {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(getClass())
-            .addStr("id", id)
-            .addObj("stop", stop)
-            .addObj("pattern", pattern)
-            .toString();
+    return ToStringBuilder
+      .of(getClass())
+      .addStr("id", id)
+      .addObj("stop", stop)
+      .addObj("pattern", pattern)
+      .toString();
   }
 }

@@ -31,33 +31,33 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
 
   @BeforeEach
   public void setup() {
     data.withRoute(
-        route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H)
-            .withTimetable(
-                schedule("0:10, 0:14, 0:18, 0:22, 0:28, 0:32, 0:36, 0:40")
-            )
+      route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H)
+        .withTimetable(schedule("0:10, 0:14, 0:18, 0:22, 0:28, 0:32, 0:36, 0:40"))
     );
 
-    requestBuilder.searchParams()
-        .addAccessPaths(
-            walk(STOP_A, D1s),  // Lowest cost
-            walk(STOP_B, D4m),  // Best compromise of cost and time
-            walk(STOP_C, D7m),  // Latest departure time: 0:16 - 5m = 0:11
-            walk(STOP_D, D20m)   // Not optimal
-        )
-        .addEgressPaths(
-            walk(STOP_E, D20m),  // Not optimal
-            walk(STOP_F, D7m),  // Earliest arrival time: 0:18 + 3m = 0:21
-            walk(STOP_G, D4m),  // Best compromise of cost and time
-            walk(STOP_H, D1s)   // Lowest cost
-        )
-        .earliestDepartureTime(T00_00)
-        .latestArrivalTime(T01_00)
-    ;
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(
+        walk(STOP_A, D1s), // Lowest cost
+        walk(STOP_B, D4m), // Best compromise of cost and time
+        walk(STOP_C, D7m), // Latest departure time: 0:16 - 5m = 0:11
+        walk(STOP_D, D20m) // Not optimal
+      )
+      .addEgressPaths(
+        walk(STOP_E, D20m), // Not optimal
+        walk(STOP_F, D7m), // Earliest arrival time: 0:18 + 3m = 0:21
+        walk(STOP_G, D4m), // Best compromise of cost and time
+        walk(STOP_H, D1s) // Lowest cost
+      )
+      .earliestDepartureTime(T00_00)
+      .latestArrivalTime(T01_00);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
@@ -70,49 +70,46 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
     // expect: The latest departure combined with the earliest arrival is expected
     assertEquals(
-        "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]",
-        PathUtils.pathsToString(response)
+      "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]",
+      PathUtils.pathsToString(response)
     );
   }
 
   @Test
   public void standardReverse() {
-    requestBuilder
-        .profile(STANDARD)
-        .searchDirection(REVERSE);
+    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
 
     var response = raptorService.route(requestBuilder.build(), data);
 
     // expect: The latest departure combined with the earliest arrival is expected - same as
     //         the forward search above
     assertEquals(
-        "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]",
-        PathUtils.pathsToString(response)
+      "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx]",
+      PathUtils.pathsToString(response)
     );
   }
 
   @Test
   public void multiCriteriaWithTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA)
-        .searchParams().timetableEnabled(true);
+    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(true);
 
     var response = raptorService.route(requestBuilder.build(), data);
 
     // expect: With 3 optimal solutions for both access and egress we get 3 x 3 = 9 optimal
     //         alternatives then timetable is enabled.
     assertEquals(
-        join(
-            "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
-            "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
-            "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
-            "Walk 7m ~ C ~ BUS R1 0:18 0:36 ~ G ~ Walk 4m [0:11 0:40 29m 0tx $3000]",
-            "Walk 4m ~ B ~ BUS R1 0:14 0:36 ~ G ~ Walk 4m [0:10 0:40 30m 0tx $2880]",
-            "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]",
-            "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx $2762]",
-            "Walk 4m ~ B ~ BUS R1 0:14 0:40 ~ H ~ Walk 1s [0:10 0:40:01 30m1s 0tx $2642]",
-            "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
-        ),
-        PathUtils.pathsToString(response)
+      join(
+        "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
+        "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
+        "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
+        "Walk 7m ~ C ~ BUS R1 0:18 0:36 ~ G ~ Walk 4m [0:11 0:40 29m 0tx $3000]",
+        "Walk 4m ~ B ~ BUS R1 0:14 0:36 ~ G ~ Walk 4m [0:10 0:40 30m 0tx $2880]",
+        "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]",
+        "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx $2762]",
+        "Walk 4m ~ B ~ BUS R1 0:14 0:40 ~ H ~ Walk 1s [0:10 0:40:01 30m1s 0tx $2642]",
+        "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
+      ),
+      PathUtils.pathsToString(response)
     );
   }
 
@@ -123,22 +120,21 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
    */
   @Test
   public void multiCriteriaWithoutTimetable() {
-    requestBuilder.profile(MULTI_CRITERIA)
-        .searchParams().timetableEnabled(false);
+    requestBuilder.profile(MULTI_CRITERIA).searchParams().timetableEnabled(false);
 
     var response = raptorService.route(requestBuilder.build(), data);
 
     // expect: Expect pareto optimal results with earliest-arrival-time and cost as the criteria,
     //         but not departure-time.
     assertEquals(
-        join(
-            "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
-            "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
-            "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
-            "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]",
-            "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
-        ),
-        PathUtils.pathsToString(response)
+      join(
+        "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
+        "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
+        "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
+        "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]",
+        "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
+      ),
+      PathUtils.pathsToString(response)
     );
   }
 }

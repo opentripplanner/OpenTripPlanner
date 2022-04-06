@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-
 import java.io.Serializable;
 import java.util.function.DoubleFunction;
 import java.util.regex.Matcher;
@@ -18,14 +17,18 @@ import java.util.regex.Pattern;
  * </ul>
  */
 public class RequestFunctions {
+
   private static final String SEP = "\\s*";
   private static final String NUM = "([\\d.,]+)";
   public static final String PLUS = Pattern.quote("+");
-  private static final Pattern LINEAR_FUNCTION_PATTERN = Pattern.compile(NUM + SEP + PLUS + SEP + NUM + SEP + "[Xx]");
-
+  private static final Pattern LINEAR_FUNCTION_PATTERN = Pattern.compile(
+    NUM + SEP + PLUS + SEP + NUM + SEP + "[Xx]"
+  );
 
   /** This is private to prevent this utility class from instantiation. */
-  private RequestFunctions() { /* empty */ }
+  private RequestFunctions() {
+    /* empty */
+  }
 
   /**
    * Parse an input string representing a linear function on the format:
@@ -37,22 +40,20 @@ public class RequestFunctions {
    * @throws RuntimeException if the input is not parsable.
    */
   public static DoubleFunction<Double> parse(String text) {
-    if(text == null || text.isBlank()) { return null; }
+    if (text == null || text.isBlank()) {
+      return null;
+    }
 
     // Try to match to a linear function
     Matcher m = LINEAR_FUNCTION_PATTERN.matcher(text);
 
-    if(m.find()) {
-      return createLinearFunction(
-          Double.parseDouble(m.group(1)),
-          Double.parseDouble(m.group(2))
-      );
+    if (m.find()) {
+      return createLinearFunction(Double.parseDouble(m.group(1)), Double.parseDouble(m.group(2)));
     }
 
     // No function matched
     throw new IllegalArgumentException("Unable to parse function: '" + text + "'");
   }
-
 
   /**
    * Create a linear function of the form: {@code y = f(x) = a + b * x}. It allows setting both a
@@ -64,12 +65,17 @@ public class RequestFunctions {
   }
 
   public static String serialize(Object function) {
-    if(function == null) { return null; }
-    if(function instanceof LinearFunction) { return ((LinearFunction)function).serialize(); }
+    if (function == null) {
+      return null;
+    }
+    if (function instanceof LinearFunction) {
+      return ((LinearFunction) function).serialize();
+    }
     throw new IllegalArgumentException("Function type is not valid: " + function.getClass());
   }
 
   private static class LinearFunction implements DoubleFunction<Double>, Serializable {
+
     // This class is package local to be unit testable.
 
     /** The constant part of the function. */

@@ -13,23 +13,15 @@ public final class BoardingArea extends StationElement {
   private Stop parentStop;
 
   public BoardingArea(
-          FeedScopedId id,
-          I18NString name,
-          String code,
-          String description,
-          WgsCoordinate coordinate,
-          WheelChairBoarding wheelchairBoarding,
-          StopLevel level
+    FeedScopedId id,
+    I18NString name,
+    String code,
+    String description,
+    WgsCoordinate coordinate,
+    WheelChairBoarding wheelchairBoarding,
+    StopLevel level
   ) {
-    super(
-            id,
-            name,
-            code,
-            description,
-            coordinate,
-            wheelchairBoarding,
-            level
-    );
+    super(id, name, code, description, coordinate, wheelchairBoarding, level);
   }
 
   /**

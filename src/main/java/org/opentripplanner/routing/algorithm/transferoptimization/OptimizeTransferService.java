@@ -26,9 +26,9 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
   private final TransferWaitTimeCostCalculator transferWaitTimeCostCalculator;
 
   public OptimizeTransferService(
-          OptimizePathDomainService<T> optimizePathDomainService,
-          MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator,
-          TransferWaitTimeCostCalculator transferWaitTimeCostCalculator
+    OptimizePathDomainService<T> optimizePathDomainService,
+    MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator,
+    TransferWaitTimeCostCalculator transferWaitTimeCostCalculator
   ) {
     this.optimizePathDomainService = optimizePathDomainService;
     this.minSafeTransferTimeCalculator = minSafeTransferTimeCalculator;
@@ -52,7 +52,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
       results.addAll(optimize(path));
     }
 
-    if(LOG.isDebugEnabled()) {
+    if (LOG.isDebugEnabled()) {
       LOG.debug("Optimized transfers done in {} ms.", System.currentTimeMillis() - start);
       PathDiff.logDiff("RAPTOR", paths, "OPT", results, false, false, LOG::debug);
     }
@@ -66,7 +66,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
   private void setup(Collection<Path<T>> paths) {
     if (transferWaitTimeCostCalculator != null) {
       transferWaitTimeCostCalculator.setMinSafeTransferTime(
-              minSafeTransferTimeCalculator.minSafeTransferTime(paths)
+        minSafeTransferTimeCalculator.minSafeTransferTime(paths)
       );
     }
   }

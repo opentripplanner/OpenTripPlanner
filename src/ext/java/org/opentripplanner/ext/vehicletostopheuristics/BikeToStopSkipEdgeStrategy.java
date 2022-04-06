@@ -15,40 +15,44 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  * number of accesses to those stops which actually have trips where you can take the bike on.
  * Once we have reached enough of trips we skip all further edges.
  */
-public class BikeToStopSkipEdgeStrategy
-        implements SkipEdgeStrategy {
+public class BikeToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
-    private static final int LIMIT = 100;
-    private static final double MAX_FACTOR = 1.2;
+  private static final int LIMIT = 100;
+  private static final double MAX_FACTOR = 1.2;
 
-    private final Function<Stop, Collection<Trip>> getTripsForStop;
+  private final Function<Stop, Collection<Trip>> getTripsForStop;
 
-    int numberOfBikeableTripsReached = 0;
-    double distanceLimit = Double.MAX_VALUE;
+  int numberOfBikeableTripsReached = 0;
+  double distanceLimit = Double.MAX_VALUE;
 
-    public BikeToStopSkipEdgeStrategy(Function<Stop, Collection<Trip>> getTripsForStop) {
-        this.getTripsForStop = getTripsForStop;
+  public BikeToStopSkipEdgeStrategy(Function<Stop, Collection<Trip>> getTripsForStop) {
+    this.getTripsForStop = getTripsForStop;
+  }
+
+  @Override
+  public boolean shouldSkipEdge(State current, Edge edge) {
+    if (
+      current.getVertex() instanceof TransitStopVertex stopVertex &&
+      distanceLimit == Double.MAX_VALUE
+    ) {
+      numberOfBikeableTripsReached +=
+        getTripsForStop
+          .apply(stopVertex.getStop())
+          .stream()
+          .filter(BikeToStopSkipEdgeStrategy::bikeAccessForTrip)
+          .count();
+      if (numberOfBikeableTripsReached >= LIMIT) {
+        distanceLimit = current.getWalkDistance() * MAX_FACTOR;
+      }
+    }
+    return current.getWalkDistance() > distanceLimit;
+  }
+
+  public static boolean bikeAccessForTrip(Trip trip) {
+    if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
+      return trip.getBikesAllowed() == BikeAccess.ALLOWED;
     }
 
-    @Override
-    public boolean shouldSkipEdge(State current, Edge edge) {
-        if (current.getVertex() instanceof TransitStopVertex stopVertex && distanceLimit == Double.MAX_VALUE) {
-            numberOfBikeableTripsReached += getTripsForStop.apply(stopVertex.getStop()).stream()
-                    .filter(BikeToStopSkipEdgeStrategy::bikeAccessForTrip)
-                    .count();
-            if (numberOfBikeableTripsReached >= LIMIT) {
-                distanceLimit = current.getWalkDistance() * MAX_FACTOR;
-            }
-        }
-        return current.getWalkDistance() > distanceLimit;
-    }
-
-
-    public static boolean bikeAccessForTrip(Trip trip) {
-        if (trip.getBikesAllowed() != BikeAccess.UNKNOWN) {
-            return trip.getBikesAllowed() == BikeAccess.ALLOWED;
-        }
-
-        return trip.getRoute().getBikesAllowed() == BikeAccess.ALLOWED;
-    }
+    return trip.getRoute().getBikesAllowed() == BikeAccess.ALLOWED;
+  }
 }

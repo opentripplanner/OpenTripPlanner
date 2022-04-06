@@ -33,18 +33,20 @@ class StreetEdgeTest extends GraphRoutingTest {
   }
 
   private Graph graph() {
-    return graphOf(new Builder() {
-      @Override
-      public void build() {
-        V1 = intersection("V1", 0.0, 0.0);
-        V2 = intersection("V2", 2.0, 0.0);
+    return graphOf(
+      new Builder() {
+        @Override
+        public void build() {
+          V1 = intersection("V1", 0.0, 0.0);
+          V2 = intersection("V2", 2.0, 0.0);
 
-        streetEdge1 = street(V2, V1, 100, StreetTraversalPermission.ALL);
-        streetEdge2 = street(V1, V2, 100, StreetTraversalPermission.ALL);
+          streetEdge1 = street(V2, V1, 100, StreetTraversalPermission.ALL);
+          streetEdge2 = street(V1, V2, 100, StreetTraversalPermission.ALL);
 
-        originalTurnRestriction = disallowTurn(streetEdge1, streetEdge2);
+          originalTurnRestriction = disallowTurn(streetEdge1, streetEdge2);
+        }
       }
-    });
+    );
   }
 
   @Test
@@ -88,7 +90,11 @@ class StreetEdgeTest extends GraphRoutingTest {
     var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, true);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
-    var splitResult = streetEdge1.splitNonDestructively(splitVtx, disposableEdgeCollection, LinkingDirection.BOTH_WAYS);
+    var splitResult = streetEdge1.splitNonDestructively(
+      splitVtx,
+      disposableEdgeCollection,
+      LinkingDirection.BOTH_WAYS
+    );
     assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
     assertFalse(splitResult.second.getTurnRestrictions().isEmpty());
     assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
@@ -105,7 +111,11 @@ class StreetEdgeTest extends GraphRoutingTest {
     var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, false);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
-    var splitResult = streetEdge2.splitNonDestructively(splitVtx, disposableEdgeCollection, LinkingDirection.BOTH_WAYS);
+    var splitResult = streetEdge2.splitNonDestructively(
+      splitVtx,
+      disposableEdgeCollection,
+      LinkingDirection.BOTH_WAYS
+    );
     assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
     assertOriginalRestrictionExists();
 
@@ -120,7 +130,11 @@ class StreetEdgeTest extends GraphRoutingTest {
     var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, true);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
-    var splitResult = streetEdge1.splitNonDestructively(splitVtx, disposableEdgeCollection, LinkingDirection.OUTGOING);
+    var splitResult = streetEdge1.splitNonDestructively(
+      splitVtx,
+      disposableEdgeCollection,
+      LinkingDirection.OUTGOING
+    );
 
     assertOnlyOriginalRestrictionExists();
     assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
@@ -135,7 +149,11 @@ class StreetEdgeTest extends GraphRoutingTest {
     var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, true);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
-    var splitResult = streetEdge2.splitNonDestructively(splitVtx, disposableEdgeCollection, LinkingDirection.OUTGOING);
+    var splitResult = streetEdge2.splitNonDestructively(
+      splitVtx,
+      disposableEdgeCollection,
+      LinkingDirection.OUTGOING
+    );
 
     var turnRestrictions = streetEdge1.getTurnRestrictions();
     assertEquals(2, turnRestrictions.size());
@@ -152,7 +170,11 @@ class StreetEdgeTest extends GraphRoutingTest {
     var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, false);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
-    var splitResult = streetEdge1.splitNonDestructively(splitVtx, disposableEdgeCollection, LinkingDirection.INCOMING);
+    var splitResult = streetEdge1.splitNonDestructively(
+      splitVtx,
+      disposableEdgeCollection,
+      LinkingDirection.INCOMING
+    );
 
     assertOnlyOriginalRestrictionExists();
 
@@ -169,7 +191,11 @@ class StreetEdgeTest extends GraphRoutingTest {
     var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, false);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
-    var splitResult = streetEdge2.splitNonDestructively(splitVtx, disposableEdgeCollection, LinkingDirection.INCOMING);
+    var splitResult = streetEdge2.splitNonDestructively(
+      splitVtx,
+      disposableEdgeCollection,
+      LinkingDirection.INCOMING
+    );
 
     assertOnlyOriginalRestrictionExists();
     assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
@@ -195,17 +221,24 @@ class StreetEdgeTest extends GraphRoutingTest {
   }
 
   private TurnRestriction addedRestriction(StreetEdge streetEdge) {
-    return streetEdge.getTurnRestrictions()
-            .stream()
-            .filter(tr -> tr != originalTurnRestriction)
-            .findFirst()
-            .orElseThrow();
+    return streetEdge
+      .getTurnRestrictions()
+      .stream()
+      .filter(tr -> tr != originalTurnRestriction)
+      .findFirst()
+      .orElseThrow();
   }
 
   private TurnRestriction disallowTurn(StreetEdge from, StreetEdge to) {
     TurnRestrictionType restrictionType = TurnRestrictionType.NO_TURN;
     TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
-    TurnRestriction restrict = new TurnRestriction(from, to, restrictionType, restrictedModes, null);
+    TurnRestriction restrict = new TurnRestriction(
+      from,
+      to,
+      restrictionType,
+      restrictedModes,
+      null
+    );
     from.addTurnRestriction(restrict);
     return restrict;
   }

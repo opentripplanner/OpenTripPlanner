@@ -6,16 +6,18 @@ import org.opentripplanner.ext.flex.FlexAccessEgress;
  * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg AccessEgress.
  */
 public class FlexAccessEgressAdapter extends AccessEgress {
+
   private final FlexAccessEgress flexAccessEgress;
 
   public FlexAccessEgressAdapter(
-          FlexAccessEgress flexAccessEgress, boolean isEgress, StopIndexForRaptor stopIndex
+    FlexAccessEgress flexAccessEgress,
+    boolean isEgress,
+    StopIndexForRaptor stopIndex
   ) {
     super(
-        stopIndex.indexOf(flexAccessEgress.stop),
-        isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState
+      stopIndex.indexOf(flexAccessEgress.stop),
+      isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState
     );
-
     this.flexAccessEgress = flexAccessEgress;
   }
 

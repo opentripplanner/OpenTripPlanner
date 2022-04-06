@@ -26,80 +26,85 @@ import org.opentripplanner.standalone.server.Router;
 @Path("/routers/{ignoreRouterId}/park_and_ride")
 public class ParkAndRideResource {
 
-    private final OTPServer otpServer;
+  private final OTPServer otpServer;
 
-    public ParkAndRideResource(
-            @Context OTPServer otpServer,
-            /**
-             * @deprecated The support for multiple routers are removed from OTP2.
-             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-             */
-            @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
-    ) {
-        this.otpServer = otpServer;
+  public ParkAndRideResource(
+    @Context OTPServer otpServer,
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+  ) {
+    this.otpServer = otpServer;
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getParkAndRide(
+    @QueryParam("lowerLeft") String lowerLeft,
+    @QueryParam("upperRight") String upperRight,
+    @QueryParam("maxTransitDistance") Double maxTransitDistance
+  ) {
+    Router router = otpServer.getRouter();
+
+    Envelope envelope;
+    if (lowerLeft != null) {
+      envelope = getEnvelope(lowerLeft, upperRight);
+    } else {
+      envelope = new Envelope(-180, 180, -90, 90);
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getParkAndRide(
-        @QueryParam("lowerLeft") String lowerLeft,
-        @QueryParam("upperRight") String upperRight,
-        @QueryParam("maxTransitDistance") Double maxTransitDistance
-    ) {
+    List<ParkAndRideInfo> prs = new ArrayList<>();
+    for (Vertex v : router.graph.getVertices()) {
+      // Check if vertex is a ParkAndRideVertex
+      if (!(v instanceof VehicleParkingEntranceVertex)) continue;
 
-        Router router = otpServer.getRouter();
+      // Check if cars are allowed
+      if (!((VehicleParkingEntranceVertex) v).getVehicleParking().hasAnyCarPlaces()) continue;
 
-        Envelope envelope;
-        if (lowerLeft != null) {
-            envelope = getEnvelope(lowerLeft, upperRight);
-        } else {
-            envelope = new Envelope(-180, 180, -90, 90);
+      // Check if vertex is within envelope
+      if (!envelope.contains(v.getX(), v.getY())) continue;
+
+      // Check if vertex is within maxTransitDistance of a stop (if specified)
+      if (maxTransitDistance != null) {
+        List<TransitStopVertex> stops = router.graph
+          .getStreetIndex()
+          .getNearbyTransitStops(new Coordinate(v.getX(), v.getY()), maxTransitDistance);
+        if (stops.isEmpty()) {
+          continue;
         }
+      }
 
-        List<ParkAndRideInfo> prs = new ArrayList<>();
-        for (Vertex v : router.graph.getVertices()) {
-            // Check if vertex is a ParkAndRideVertex
-            if (!(v instanceof VehicleParkingEntranceVertex)) continue;
-
-            // Check if cars are allowed
-            if (!((VehicleParkingEntranceVertex) v).getVehicleParking().hasAnyCarPlaces()) continue;
-
-            // Check if vertex is within envelope
-            if (!envelope.contains(v.getX(), v.getY())) continue;
-
-            // Check if vertex is within maxTransitDistance of a stop (if specified)
-            if (maxTransitDistance != null) {
-                List<TransitStopVertex> stops = router.graph.getStreetIndex().getNearbyTransitStops(
-                    new Coordinate(v.getX(), v.getY()), maxTransitDistance);
-                if (stops.isEmpty()) { continue; }
-            }
-
-            prs.add(new ParkAndRideInfo((VehicleParkingEntranceVertex) v));
-        }
-
-        return Response.status(Status.OK).entity(prs).build();
+      prs.add(new ParkAndRideInfo((VehicleParkingEntranceVertex) v));
     }
 
-    /** Envelopes are in latitude, longitude format */
-    public static Envelope getEnvelope(String lowerLeft, String upperRight) {
-        String[] lowerLeftParts = lowerLeft.split(",");
-        String[] upperRightParts = upperRight.split(",");
+    return Response.status(Status.OK).entity(prs).build();
+  }
 
-        return new Envelope(Double.parseDouble(lowerLeftParts[1]),
-            Double.parseDouble(upperRightParts[1]), Double.parseDouble(lowerLeftParts[0]),
-            Double.parseDouble(upperRightParts[0]));
+  /** Envelopes are in latitude, longitude format */
+  public static Envelope getEnvelope(String lowerLeft, String upperRight) {
+    String[] lowerLeftParts = lowerLeft.split(",");
+    String[] upperRightParts = upperRight.split(",");
+
+    return new Envelope(
+      Double.parseDouble(lowerLeftParts[1]),
+      Double.parseDouble(upperRightParts[1]),
+      Double.parseDouble(lowerLeftParts[0]),
+      Double.parseDouble(upperRightParts[0])
+    );
+  }
+
+  public static class ParkAndRideInfo {
+
+    public String name;
+
+    public Double x, y;
+
+    public ParkAndRideInfo(VehicleParkingEntranceVertex vertex) {
+      this.name = vertex.getDefaultName();
+      this.x = vertex.getX();
+      this.y = vertex.getY();
     }
-
-    public static class ParkAndRideInfo {
-
-        public String name;
-
-        public Double x, y;
-
-        public ParkAndRideInfo(VehicleParkingEntranceVertex vertex) {
-            this.name = vertex.getDefaultName();
-            this.x = vertex.getX();
-            this.y = vertex.getY();
-        }
-    }
+  }
 }

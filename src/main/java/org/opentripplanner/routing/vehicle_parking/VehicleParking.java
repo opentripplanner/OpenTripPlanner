@@ -92,20 +92,20 @@ public class VehicleParking implements Serializable {
   private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
 
   VehicleParking(
-          FeedScopedId id,
-          I18NString name,
-          double x,
-          double y,
-          String detailsUrl,
-          String imageUrl,
-          Set<String> tags,
-          I18NString note,
-          VehicleParkingState state,
-          boolean bicyclePlaces,
-          boolean carPlaces,
-          boolean wheelchairAccessibleCarPlaces,
-          VehicleParkingSpaces capacity,
-          VehicleParkingSpaces availability
+    FeedScopedId id,
+    I18NString name,
+    double x,
+    double y,
+    String detailsUrl,
+    String imageUrl,
+    Set<String> tags,
+    I18NString note,
+    VehicleParkingState state,
+    boolean bicyclePlaces,
+    boolean carPlaces,
+    boolean wheelchairAccessibleCarPlaces,
+    VehicleParkingSpaces capacity,
+    VehicleParkingSpaces availability
   ) {
     this.id = id;
     this.name = name;
@@ -191,7 +191,11 @@ public class VehicleParking implements Serializable {
     return availability != null;
   }
 
-  public boolean hasSpacesAvailable(TraverseMode traverseMode, boolean wheelchairAccessible, boolean useAvailability) {
+  public boolean hasSpacesAvailable(
+    TraverseMode traverseMode,
+    boolean wheelchairAccessible,
+    boolean useAvailability
+  ) {
     switch (traverseMode) {
       case BICYCLE:
         if (useAvailability && hasRealTimeDataForMode(TraverseMode.BICYCLE, false)) {
@@ -218,7 +222,10 @@ public class VehicleParking implements Serializable {
     }
   }
 
-  public boolean hasRealTimeDataForMode(TraverseMode traverseMode, boolean wheelchairAccessibleCarPlaces) {
+  public boolean hasRealTimeDataForMode(
+    TraverseMode traverseMode,
+    boolean wheelchairAccessibleCarPlaces
+  ) {
     if (availability == null) {
       return false;
     }
@@ -228,8 +235,8 @@ public class VehicleParking implements Serializable {
         return availability.getBicycleSpaces() != null;
       case CAR:
         var places = wheelchairAccessibleCarPlaces
-                ? availability.getWheelchairAccessibleCarSpaces()
-                : availability.getCarSpaces();
+          ? availability.getWheelchairAccessibleCarSpaces()
+          : availability.getCarSpaces();
         return places != null;
       default:
         return false;
@@ -241,9 +248,9 @@ public class VehicleParking implements Serializable {
   }
 
   private void addEntrance(VehicleParkingEntranceCreator creator) {
-    var entrance = creator.updateValues(VehicleParkingEntrance.builder()
-            .vehicleParking(this))
-            .build();
+    var entrance = creator
+      .updateValues(VehicleParkingEntrance.builder().vehicleParking(this))
+      .build();
 
     entrances.add(entrance);
   }
@@ -254,30 +261,48 @@ public class VehicleParking implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {return true;}
-    if (o == null || getClass() != o.getClass()) {return false;}
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     final VehicleParking that = (VehicleParking) o;
-    return Double.compare(that.x, x) == 0
-            && Double.compare(that.y, y) == 0
-            && bicyclePlaces == that.bicyclePlaces
-            && carPlaces == that.carPlaces
-            && wheelchairAccessibleCarPlaces == that.wheelchairAccessibleCarPlaces
-            && state == that.state
-            && Objects.equals(id, that.id)
-            && Objects.equals(name, that.name)
-            && Objects.equals(detailsUrl, that.detailsUrl)
-            && Objects.equals(imageUrl, that.imageUrl)
-            && Objects.equals(tags, that.tags)
-            && Objects.equals(note, that.note)
-            && Objects.equals(capacity, that.capacity)
-            && Objects.equals(entrances, that.entrances);
+    return (
+      Double.compare(that.x, x) == 0 &&
+      Double.compare(that.y, y) == 0 &&
+      bicyclePlaces == that.bicyclePlaces &&
+      carPlaces == that.carPlaces &&
+      wheelchairAccessibleCarPlaces == that.wheelchairAccessibleCarPlaces &&
+      state == that.state &&
+      Objects.equals(id, that.id) &&
+      Objects.equals(name, that.name) &&
+      Objects.equals(detailsUrl, that.detailsUrl) &&
+      Objects.equals(imageUrl, that.imageUrl) &&
+      Objects.equals(tags, that.tags) &&
+      Objects.equals(note, that.note) &&
+      Objects.equals(capacity, that.capacity) &&
+      Objects.equals(entrances, that.entrances)
+    );
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-            id, name, x, y, detailsUrl, imageUrl, tags, note, state, bicyclePlaces,
-            carPlaces, wheelchairAccessibleCarPlaces, capacity, entrances
+      id,
+      name,
+      x,
+      y,
+      detailsUrl,
+      imageUrl,
+      tags,
+      note,
+      state,
+      bicyclePlaces,
+      carPlaces,
+      wheelchairAccessibleCarPlaces,
+      capacity,
+      entrances
     );
   }
 
@@ -287,11 +312,14 @@ public class VehicleParking implements Serializable {
 
   @FunctionalInterface
   public interface VehicleParkingEntranceCreator {
-    VehicleParkingEntrance.VehicleParkingEntranceBuilder updateValues(VehicleParkingEntrance.VehicleParkingEntranceBuilder builder);
+    VehicleParkingEntrance.VehicleParkingEntranceBuilder updateValues(
+      VehicleParkingEntrance.VehicleParkingEntranceBuilder builder
+    );
   }
 
   @SuppressWarnings("unused")
   public static class VehicleParkingBuilder {
+
     private Set<String> tags = Set.of();
     private final List<VehicleParkingEntranceCreator> entranceCreators = new ArrayList<>();
     private FeedScopedId id;
@@ -317,13 +345,13 @@ public class VehicleParking implements Serializable {
     }
 
     public VehicleParkingBuilder entrances(Collection<VehicleParkingEntranceCreator> creators) {
-        this.entranceCreators.addAll(creators);
-        return this;
+      this.entranceCreators.addAll(creators);
+      return this;
     }
 
     public VehicleParkingBuilder entrance(VehicleParkingEntranceCreator creator) {
-        this.entranceCreators.add(creator);
-        return this;
+      this.entranceCreators.add(creator);
+      return this;
     }
 
     public VehicleParkingBuilder id(FeedScopedId id) {
@@ -377,7 +405,9 @@ public class VehicleParking implements Serializable {
       return this;
     }
 
-    public VehicleParkingBuilder wheelchairAccessibleCarPlaces(boolean wheelchairAccessibleCarPlaces) {
+    public VehicleParkingBuilder wheelchairAccessibleCarPlaces(
+      boolean wheelchairAccessibleCarPlaces
+    ) {
       this.wheelchairAccessibleCarPlaces = wheelchairAccessibleCarPlaces;
       return this;
     }
@@ -399,8 +429,20 @@ public class VehicleParking implements Serializable {
       }
 
       var vehicleParking = new VehicleParking(
-              id, name, x, y, detailsUrl, imageUrl, tags, note, state$value,
-              bicyclePlaces, carPlaces, wheelchairAccessibleCarPlaces, capacity, availability
+        id,
+        name,
+        x,
+        y,
+        detailsUrl,
+        imageUrl,
+        tags,
+        note,
+        state$value,
+        bicyclePlaces,
+        carPlaces,
+        wheelchairAccessibleCarPlaces,
+        capacity,
+        availability
       );
       this.entranceCreators.forEach(vehicleParking::addEntrance);
       return vehicleParking;

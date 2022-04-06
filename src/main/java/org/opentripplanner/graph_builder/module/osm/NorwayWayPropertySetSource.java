@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.*;
 
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTraversalCostModel;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.*;
 
 /**
  * OSM way properties for Norwegian roads. The main difference compared to the default property set
@@ -51,645 +51,733 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     /* "highway=trunk" roads ("Riksveier") are often single carriageway, and not only legal for bicycles,
     but assumed to be  much safer than the  default profile (Except when the speedlimt exceeds 90). */
-    props.setProperties(
-            "highway=trunk", ALL,
-            high_traffic, high_traffic
-    );
-    props.setProperties(
-            "highway=trunk_link", ALL,
-            high_traffic, high_traffic
-    );
+    props.setProperties("highway=trunk", ALL, high_traffic, high_traffic);
+    props.setProperties("highway=trunk_link", ALL, high_traffic, high_traffic);
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
-            "highway=trunk;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
+      "highway=trunk;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
     );
     props.setProperties(
-            "highway=trunk_link;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
+      "highway=trunk_link;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
     );
     // Discourage cycling on trunk road tunnels
+    props.setProperties("highway=trunk;tunnel=yes", CAR, very_high_traffic, very_high_traffic);
+    props.setProperties("highway=trunk_link;tunnel=yes", CAR, very_high_traffic, very_high_traffic);
+    props.setProperties("highway=trunk;maxspeed=90", ALL, very_high_traffic, very_high_traffic);
     props.setProperties(
-            "highway=trunk;tunnel=yes", CAR,
-            very_high_traffic, very_high_traffic
+      "highway=trunk_link;maxspeed=90",
+      ALL,
+      very_high_traffic,
+      very_high_traffic
     );
+    props.setProperties("highway=trunk;maxspeed=60", ALL, medium_high_traffic, medium_high_traffic);
     props.setProperties(
-            "highway=trunk_link;tunnel=yes", CAR,
-            very_high_traffic, very_high_traffic
+      "highway=trunk_link;maxspeed=60",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
-    props.setProperties(
-            "highway=trunk;maxspeed=90", ALL,
-            very_high_traffic, very_high_traffic
-    );
-    props.setProperties(
-            "highway=trunk_link;maxspeed=90", ALL,
-            very_high_traffic, very_high_traffic
-    );
-    props.setProperties(
-            "highway=trunk;maxspeed=60", ALL,
-            medium_high_traffic, medium_high_traffic
-    );
-    props.setProperties(
-            "highway=trunk_link;maxspeed=60", ALL,
-            medium_high_traffic, medium_high_traffic
-    );
-    props.setProperties(
-            "highway=trunk;maxspeed=50", ALL,
-            medium_traffic, medium_traffic
-    );
-    props.setProperties(
-            "highway=trunk_link;maxspeed=50", ALL,
-            medium_traffic, medium_traffic
-    );
-    props.setProperties(
-            "highway=trunk;maxspeed=40", ALL,
-            medium_traffic, medium_traffic
-    );
-    props.setProperties(
-            "highway=trunk_link;maxspeed=40", ALL,
-            medium_traffic, medium_traffic
-    );
+    props.setProperties("highway=trunk;maxspeed=50", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=trunk_link;maxspeed=50", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=trunk;maxspeed=40", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=trunk_link;maxspeed=40", ALL, medium_traffic, medium_traffic);
 
-    props.setProperties(
-            "highway=primary", ALL,
-            high_traffic, high_traffic
-    );
-    props.setProperties(
-            "highway=primary_link", ALL,
-            high_traffic, high_traffic
-    );
+    props.setProperties("highway=primary", ALL, high_traffic, high_traffic);
+    props.setProperties("highway=primary_link", ALL, high_traffic, high_traffic);
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
-            "highway=primary;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
+      "highway=primary;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
     );
     props.setProperties(
-            "highway=primary_link;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic)
-    ;
+      "highway=primary_link;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
+    );
+    props.setProperties("highway=primary;maxspeed=90", ALL, very_high_traffic, very_high_traffic);
     props.setProperties(
-            "highway=primary;maxspeed=90", ALL,
-            very_high_traffic, very_high_traffic
+      "highway=primary_link;maxspeed=90",
+      ALL,
+      very_high_traffic,
+      very_high_traffic
     );
     props.setProperties(
-            "highway=primary_link;maxspeed=90", ALL,
-            very_high_traffic, very_high_traffic
+      "highway=primary;maxspeed=60",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
     props.setProperties(
-            "highway=primary;maxspeed=60", ALL,
-            medium_high_traffic, medium_high_traffic
+      "highway=primary_link;maxspeed=60",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
-    props.setProperties(
-            "highway=primary_link;maxspeed=60", ALL,
-            medium_high_traffic, medium_high_traffic
-    );
-    props.setProperties(
-            "highway=primary;maxspeed=50", ALL,
-            medium_traffic, medium_traffic
-    );
-    props.setProperties(
-            "highway=primary_link;maxspeed=50", ALL,
-            medium_traffic, medium_traffic
-    );
-    props.setProperties(
-            "highway=primary;maxspeed=40", ALL,
-            medium_traffic, medium_traffic
-    );
-    props.setProperties(
-            "highway=primary_link;maxspeed=40", ALL,
-            medium_traffic, medium_traffic
-    );
-    props.setProperties(
-            "highway=primary;maxspeed=30", ALL,
-            low_traffic, low_traffic
-    );
-    props.setProperties(
-            "highway=primary_link;maxspeed=30", ALL,
-            low_traffic, low_traffic
-    );
+    props.setProperties("highway=primary;maxspeed=50", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=primary_link;maxspeed=50", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=primary;maxspeed=40", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=primary_link;maxspeed=40", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=primary;maxspeed=30", ALL, low_traffic, low_traffic);
+    props.setProperties("highway=primary_link;maxspeed=30", ALL, low_traffic, low_traffic);
 
-    props.setProperties(
-            "highway=secondary", ALL,
-            medium_high_traffic, medium_high_traffic
-    );
-    props.setProperties(
-            "highway=secondary_link", ALL,
-            medium_high_traffic, medium_high_traffic
-    );
+    props.setProperties("highway=secondary", ALL, medium_high_traffic, medium_high_traffic);
+    props.setProperties("highway=secondary_link", ALL, medium_high_traffic, medium_high_traffic);
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
-            "highway=secondary;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
+      "highway=secondary;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
     );
     props.setProperties(
-            "highway=secondary_link;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
+      "highway=secondary_link;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
+    );
+    props.setProperties("highway=secondary;maxspeed=60", ALL, medium_traffic, medium_traffic);
+    props.setProperties("highway=secondary_link;maxspeed=60", ALL, medium_traffic, medium_traffic);
+    props.setProperties(
+      "highway=secondary;maxspeed=50",
+      ALL,
+      medium_low_traffic,
+      medium_low_traffic
     );
     props.setProperties(
-            "highway=secondary;maxspeed=60", ALL,
-            medium_traffic, medium_traffic
+      "highway=secondary_link;maxspeed=50",
+      ALL,
+      medium_low_traffic,
+      medium_low_traffic
     );
     props.setProperties(
-            "highway=secondary_link;maxspeed=60", ALL,
-            medium_traffic, medium_traffic
+      "highway=secondary;maxspeed=40",
+      ALL,
+      medium_low_traffic,
+      medium_low_traffic
     );
     props.setProperties(
-            "highway=secondary;maxspeed=50", ALL,
-            medium_low_traffic, medium_low_traffic
+      "highway=secondary_link;maxspeed=40",
+      ALL,
+      medium_low_traffic,
+      medium_low_traffic
     );
-    props.setProperties(
-            "highway=secondary_link;maxspeed=50", ALL,
-            medium_low_traffic, medium_low_traffic
-    );
-    props.setProperties(
-            "highway=secondary;maxspeed=40", ALL,
-            medium_low_traffic, medium_low_traffic
-    );
-    props.setProperties(
-            "highway=secondary_link;maxspeed=40", ALL,
-            medium_low_traffic, medium_low_traffic
-    );
-    props.setProperties(
-            "highway=secondary;maxspeed=30", ALL,
-            low_traffic, low_traffic
-    );
-    props.setProperties(
-            "highway=secondary_link;maxspeed=30", ALL,
-            low_traffic, low_traffic
-    );
+    props.setProperties("highway=secondary;maxspeed=30", ALL, low_traffic, low_traffic);
+    props.setProperties("highway=secondary_link;maxspeed=30", ALL, low_traffic, low_traffic);
 
-    props.setProperties(
-            "highway=tertiary", ALL,
-            medium_low_traffic, medium_low_traffic
-    );
-    props.setProperties(
-            "highway=tertiary_link", ALL,
-            medium_low_traffic, medium_low_traffic
-    );
+    props.setProperties("highway=tertiary", ALL, medium_low_traffic, medium_low_traffic);
+    props.setProperties("highway=tertiary_link", ALL, medium_low_traffic, medium_low_traffic);
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
-            "highway=tertiary;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
+      "highway=tertiary;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;foot=no", BICYCLE_AND_CAR,
-            very_high_traffic, very_high_traffic
+      "highway=tertiary_link;foot=no",
+      BICYCLE_AND_CAR,
+      very_high_traffic,
+      very_high_traffic
     );
     props.setProperties(
-            "highway=tertiary;maxspeed=80", ALL,
-            medium_high_traffic, medium_high_traffic
+      "highway=tertiary;maxspeed=80",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;maxspeed=80", ALL,
-            medium_high_traffic, medium_high_traffic
+      "highway=tertiary_link;maxspeed=80",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
     props.setProperties(
-            "highway=tertiary;maxspeed=70", ALL,
-            medium_high_traffic, medium_high_traffic
+      "highway=tertiary;maxspeed=70",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;maxspeed=70", ALL,
-            medium_high_traffic, medium_high_traffic
+      "highway=tertiary_link;maxspeed=70",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
-    props.setProperties(
-            "highway=tertiary;maxspeed=40", ALL,
-            low_traffic, low_traffic
-    );
-    props.setProperties(
-            "highway=tertiary_link;maxspeed=40", ALL,
-            low_traffic, low_traffic
-    );
-    props.setProperties(
-            "highway=tertiary;maxspeed=30", ALL,
-            low_traffic, low_traffic
-    );
-    props.setProperties(
-            "highway=tertiary_link;maxspeed=30", ALL,
-            low_traffic, low_traffic
-    );
+    props.setProperties("highway=tertiary;maxspeed=40", ALL, low_traffic, low_traffic);
+    props.setProperties("highway=tertiary_link;maxspeed=40", ALL, low_traffic, low_traffic);
+    props.setProperties("highway=tertiary;maxspeed=30", ALL, low_traffic, low_traffic);
+    props.setProperties("highway=tertiary_link;maxspeed=30", ALL, low_traffic, low_traffic);
 
-    props.setProperties(
-            "highway=unclassified", ALL,
-            low_traffic, low_traffic
-    );
+    props.setProperties("highway=unclassified", ALL, low_traffic, low_traffic);
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
     props.setProperties(
-            "highway=unclassified;foot=no", BICYCLE_AND_CAR,
-            medium_traffic, medium_traffic
+      "highway=unclassified;foot=no",
+      BICYCLE_AND_CAR,
+      medium_traffic,
+      medium_traffic
     );
     // These access tags indicates low traffic
     props.setProperties(
-            "highway=unclassified;motor_vehicle=no", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=unclassified;motor_vehicle=no",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=unclassified;motor_vehicle=private", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=unclassified;motor_vehicle=private",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=unclassified;motor_vehicle=permit", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=unclassified;motor_vehicle=permit",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=unclassified;motor_vehicle=destination", ALL,
-            very_low_traffic, very_low_traffic
+      "highway=unclassified;motor_vehicle=destination",
+      ALL,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=unclassified;maxspeed=70", ALL,
-            medium_high_traffic, medium_high_traffic
+      "highway=unclassified;maxspeed=70",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
     props.setProperties(
-            "highway=unclassified;maxspeed=80", ALL,
-            medium_high_traffic, medium_high_traffic
+      "highway=unclassified;maxspeed=80",
+      ALL,
+      medium_high_traffic,
+      medium_high_traffic
     );
 
-    props.setProperties(
-            "highway=residential", ALL,
-            low_traffic, low_traffic
-    );
+    props.setProperties("highway=residential", ALL, low_traffic, low_traffic);
     // These access tags indicates low traffic
     props.setProperties(
-            "highway=residential;motor_vehicle=no", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=residential;motor_vehicle=no",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=residential;motor_vehicle=private", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=residential;motor_vehicle=private",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=residential;motor_vehicle=permit", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=residential;motor_vehicle=permit",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=residential;motor_vehicle=destination", ALL,
-            very_low_traffic, very_low_traffic
+      "highway=residential;motor_vehicle=destination",
+      ALL,
+      very_low_traffic,
+      very_low_traffic
     );
 
-    props.setProperties(
-            "highway=service", ALL,
-            low_traffic, low_traffic
-    );
+    props.setProperties("highway=service", ALL, low_traffic, low_traffic);
     // Discourage cycling on roads with no infrastructure for neither walking nor cycling
-    props.setProperties(
-            "highway=service;foot=no", BICYCLE_AND_CAR,
-            medium_traffic, medium_traffic
-    );
+    props.setProperties("highway=service;foot=no", BICYCLE_AND_CAR, medium_traffic, medium_traffic);
     // These access tags indicates low traffic
     props.setProperties(
-            "highway=service;motor_vehicle=no", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=service;motor_vehicle=no",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=service;motor_vehicle=private", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=service;motor_vehicle=private",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=service;motor_vehicle=permit", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=service;motor_vehicle=permit",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=service;motor_vehicle=destination", ALL,
-            very_low_traffic, very_low_traffic
+      "highway=service;motor_vehicle=destination",
+      ALL,
+      very_low_traffic,
+      very_low_traffic
     );
     // Cycling around reversing cars on a parking lot feels unsafe
     props.setProperties(
-            "highway=service;service=parking_aisle", ALL,
-            medium_traffic, medium_traffic
+      "highway=service;service=parking_aisle",
+      ALL,
+      medium_traffic,
+      medium_traffic
     );
     props.setProperties(
-            "highway=service;service=drive-through", ALL,
-            medium_traffic, medium_traffic
+      "highway=service;service=drive-through",
+      ALL,
+      medium_traffic,
+      medium_traffic
     );
 
     /* bicycle infrastructure */
     props.setProperties(
-            "highway=trunk;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=trunk;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=trunk_link;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=trunk_link;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=primary;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=primary;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=primary_link;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=primary_link;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=secondary;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=secondary;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=secondary_link;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=secondary_link;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=tertiary;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=tertiary;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=tertiary_link;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=tertiary_link;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=unclassified;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=unclassified;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=residential;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=residential;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=living_street;cycleway=track;maxspeed=*", ALL,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=living_street;cycleway=track;maxspeed=*",
+      ALL,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
 
     props.setProperties(
-            "highway=trunk;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=trunk;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=trunk_link;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=trunk_link;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=primary;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=primary;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=primary_link;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=primary_link;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=secondary;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=secondary;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=secondary_link;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=secondary_link;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=secondary;cycleway=lane;maxspeed=40", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=secondary;cycleway=lane;maxspeed=40",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=secondary_link;cycleway=lane;maxspeed=40", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=secondary_link;cycleway=lane;maxspeed=40",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=secondary;cycleway=lane;maxspeed=30", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=secondary;cycleway=lane;maxspeed=30",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=secondary_link;cycleway=lane;maxspeed=30", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=secondary_link;cycleway=lane;maxspeed=30",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=tertiary;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=tertiary;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=tertiary_link;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=tertiary;cycleway=lane;maxspeed=40", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=tertiary;cycleway=lane;maxspeed=40",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;cycleway=lane;maxspeed=40", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=tertiary_link;cycleway=lane;maxspeed=40",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=tertiary;cycleway=lane;maxspeed=30", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=tertiary;cycleway=lane;maxspeed=30",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;cycleway=lane;maxspeed=30", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=tertiary_link;cycleway=lane;maxspeed=30",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=unclassified;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_medium_traffic, cycle_lane_medium_traffic
+      "highway=unclassified;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_medium_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=residential;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=residential;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=living_street;cycleway=lane;maxspeed=*", ALL,
-            cycle_lane_low_traffic, cycle_lane_low_traffic
+      "highway=living_street;cycleway=lane;maxspeed=*",
+      ALL,
+      cycle_lane_low_traffic,
+      cycle_lane_low_traffic
     );
 
     /* opposite */
     props.setProperties(
-            "highway=trunk;cycleway=opposite_track;maxspeed=*", ALL,
-            high_traffic, dual_lane_or_oneway_cycleway
+      "highway=trunk;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      high_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=trunk_link;cycleway=opposite_track;maxspeed=*", ALL,
-            high_traffic, dual_lane_or_oneway_cycleway
+      "highway=trunk_link;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      high_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=primary;cycleway=opposite_track;maxspeed=*", ALL,
-            high_traffic, dual_lane_or_oneway_cycleway
+      "highway=primary;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      high_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=primary_link;cycleway=opposite_track;maxspeed=*", ALL,
-            high_traffic, dual_lane_or_oneway_cycleway
+      "highway=primary_link;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      high_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=secondary;cycleway=opposite_track;maxspeed=*", ALL,
-            medium_high_traffic, dual_lane_or_oneway_cycleway
+      "highway=secondary;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      medium_high_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=secondary_link;cycleway=opposite_track;maxspeed=*", ALL,
-            medium_high_traffic, dual_lane_or_oneway_cycleway
+      "highway=secondary_link;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      medium_high_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=tertiary;cycleway=opposite_track;maxspeed=*", ALL,
-            low_traffic, dual_lane_or_oneway_cycleway
+      "highway=tertiary;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      low_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=tertiary_link;cycleway=opposite_track;maxspeed=*", ALL,
-            low_traffic, dual_lane_or_oneway_cycleway
+      "highway=tertiary_link;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      low_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=unclassified;cycleway=opposite_track;maxspeed=*", ALL,
-            low_traffic, dual_lane_or_oneway_cycleway
+      "highway=unclassified;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      low_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=residential;cycleway=opposite_track;maxspeed=*", ALL,
-            low_traffic, dual_lane_or_oneway_cycleway
+      "highway=residential;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      low_traffic,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=living_street;cycleway=opposite_track;maxspeed=*", ALL,
-            low_traffic, dual_lane_or_oneway_cycleway
+      "highway=living_street;cycleway=opposite_track;maxspeed=*",
+      ALL,
+      low_traffic,
+      dual_lane_or_oneway_cycleway
     );
 
     props.setProperties(
-            "highway=trunk;cycleway=opposite_lane;maxspeed=*", ALL,
-            high_traffic, cycle_lane_medium_traffic
+      "highway=trunk;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      high_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=trunk_link;cycleway=opposite_lane;maxspeed=*", ALL,
-            high_traffic, cycle_lane_medium_traffic
+      "highway=trunk_link;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      high_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=primary;cycleway=opposite_lane;maxspeed=*", ALL,
-            high_traffic, cycle_lane_medium_traffic
+      "highway=primary;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      high_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=primary_link;cycleway=opposite_lane;maxspeed=*", ALL,
-            high_traffic, cycle_lane_medium_traffic
+      "highway=primary_link;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      high_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=secondary;cycleway=opposite_lane;maxspeed=*", ALL,
-            medium_high_traffic, cycle_lane_medium_traffic
+      "highway=secondary;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      medium_high_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=secondary_link;cycleway=opposite_lane;maxspeed=*", ALL,
-            medium_high_traffic, cycle_lane_medium_traffic
+      "highway=secondary_link;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      medium_high_traffic,
+      cycle_lane_medium_traffic
     );
     props.setProperties(
-            "highway=tertiary;cycleway=opposite_lane;maxspeed=*", ALL,
-            low_traffic, cycle_lane_low_traffic
+      "highway=tertiary;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=tertiary_link;cycleway=opposite_lane;maxspeed=*", ALL,
-            low_traffic, cycle_lane_low_traffic
+      "highway=tertiary_link;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=unclassified;cycleway=opposite_lane;maxspeed=*", ALL,
-            low_traffic, cycle_lane_low_traffic
+      "highway=unclassified;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=residential;cycleway=opposite_lane;maxspeed=*", ALL,
-            low_traffic, cycle_lane_low_traffic
+      "highway=residential;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      low_traffic,
+      cycle_lane_low_traffic
     );
     props.setProperties(
-            "highway=living_street;cycleway=opposite_lane;maxspeed=*", ALL,
-            low_traffic, cycle_lane_low_traffic
+      "highway=living_street;cycleway=opposite_lane;maxspeed=*",
+      ALL,
+      low_traffic,
+      cycle_lane_low_traffic
     );
 
     /* Pedestrian, living and cyclestreet */
+    props.setProperties("highway=living_street", ALL, low_traffic, low_traffic);
+    props.setProperties("highway=pedestrian", PEDESTRIAN_AND_BICYCLE, 1.2, 1.2);
     props.setProperties(
-            "highway=living_street",
-            ALL,
-            low_traffic, low_traffic
-    );
-    props.setProperties(
-            "highway=pedestrian",
-            PEDESTRIAN_AND_BICYCLE,
-            1.2, 1.2
-    );
-    props.setProperties(
-            "highway=residential;cyclestreet=yes;motor_vehicle=*",
-            PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=residential;cyclestreet=yes;motor_vehicle=*",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
 
     props.setProperties(
-            "highway=footway",
-            PEDESTRIAN_AND_BICYCLE,
-            dedicated_footway, dedicated_footway
+      "highway=footway",
+      PEDESTRIAN_AND_BICYCLE,
+      dedicated_footway,
+      dedicated_footway
     );
     // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
     props.setProperties(
-            "highway=footway;motor_vehicle=destination",
-            PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=footway;motor_vehicle=destination",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
 
     props.setProperties(
-            "highway=footway;footway=sidewalk",
-            PEDESTRIAN_AND_BICYCLE,
-            sidewalk, sidewalk
+      "highway=footway;footway=sidewalk",
+      PEDESTRIAN_AND_BICYCLE,
+      sidewalk,
+      sidewalk
     );
     props.setProperties(
-            "highway=footway;footway=crossing",
-            PEDESTRIAN_AND_BICYCLE,
-            footway_crossing, footway_crossing
+      "highway=footway;footway=crossing",
+      PEDESTRIAN_AND_BICYCLE,
+      footway_crossing,
+      footway_crossing
     );
     props.setProperties(
-            "highway=cycleway;footway=sidewalk",
-            PEDESTRIAN_AND_BICYCLE,
-            dedicated_footway, dedicated_footway
+      "highway=cycleway;footway=sidewalk",
+      PEDESTRIAN_AND_BICYCLE,
+      dedicated_footway,
+      dedicated_footway
     );
     props.setProperties(
-            "highway=cycleway;footway=crossing",
-            PEDESTRIAN_AND_BICYCLE,
-            footway_crossing, footway_crossing
+      "highway=cycleway;footway=crossing",
+      PEDESTRIAN_AND_BICYCLE,
+      footway_crossing,
+      footway_crossing
     );
     props.setProperties(
-            "highway=cycleway;cycleway=crossing",
-            PEDESTRIAN_AND_BICYCLE,
-            footway_crossing, footway_crossing
+      "highway=cycleway;cycleway=crossing",
+      PEDESTRIAN_AND_BICYCLE,
+      footway_crossing,
+      footway_crossing
     );
 
     props.setProperties(
-            "highway=cycleway", PEDESTRIAN_AND_BICYCLE,
-            dedicated_cycleway, dedicated_cycleway
+      "highway=cycleway",
+      PEDESTRIAN_AND_BICYCLE,
+      dedicated_cycleway,
+      dedicated_cycleway
     );
     props.setProperties(
-            "highway=cycleway;lanes=2", BICYCLE,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=cycleway;lanes=2",
+      BICYCLE,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=cycleway;oneway=yes", BICYCLE,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=cycleway;oneway=yes",
+      BICYCLE,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
     props.setProperties(
-            "highway=cycleway;motor_vehicle=destination", PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=cycleway;motor_vehicle=destination",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
 
     // segregated=no takes' precedence if there is no "segregated" key. There is no penalty for a tag mismatch
     props.setProperties(
-            "highway=cycleway;foot=designated;segregated=no",
-            PEDESTRIAN_AND_BICYCLE,
-            mixed_cycleway, mixed_cycleway
+      "highway=cycleway;foot=designated;segregated=no",
+      PEDESTRIAN_AND_BICYCLE,
+      mixed_cycleway,
+      mixed_cycleway
     );
     props.setProperties(
-            "highway=cycleway;foot=designated;segregated=yes",
-            PEDESTRIAN_AND_BICYCLE,
-            dedicated_cycleway, dedicated_cycleway
+      "highway=cycleway;foot=designated;segregated=yes",
+      PEDESTRIAN_AND_BICYCLE,
+      dedicated_cycleway,
+      dedicated_cycleway
     );
     props.setProperties(
-            "highway=cycleway;foot=designated;segregated=yes;lanes=2",
-            BICYCLE,
-            dual_lane_or_oneway_cycleway, dual_lane_or_oneway_cycleway
+      "highway=cycleway;foot=designated;segregated=yes;lanes=2",
+      BICYCLE,
+      dual_lane_or_oneway_cycleway,
+      dual_lane_or_oneway_cycleway
     );
     props.setProperties(
-            "highway=path;foot=designated;bicycle=designated;segregated=no",
-            PEDESTRIAN_AND_BICYCLE,
-            mixed_cycleway, mixed_cycleway
+      "highway=path;foot=designated;bicycle=designated;segregated=no",
+      PEDESTRIAN_AND_BICYCLE,
+      mixed_cycleway,
+      mixed_cycleway
     );
     props.setProperties(
-            "highway=path;foot=designated;bicycle=designated;segregated=yes",
-            PEDESTRIAN_AND_BICYCLE,
-            dedicated_cycleway, dedicated_cycleway
+      "highway=path;foot=designated;bicycle=designated;segregated=yes",
+      PEDESTRIAN_AND_BICYCLE,
+      dedicated_cycleway,
+      dedicated_cycleway
     );
     // "motor_vehicle=destination" indicates unwanted car traffic, signposted "Kjøring til eiendommene tillatt"
     props.setProperties(
-            "highway=cycleway;foot=designated;segregated=*;motor_vehicle=destination",
-            PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=cycleway;foot=designated;segregated=*;motor_vehicle=destination",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
     props.setProperties(
-            "highway=path;foot=designated;bicycle=designated;segregated=*;motor_vehicle=destination",
-            PEDESTRIAN_AND_BICYCLE,
-            very_low_traffic, very_low_traffic
+      "highway=path;foot=designated;bicycle=designated;segregated=*;motor_vehicle=destination",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
     );
 
     //relation properties are copied over to ways
-    props.setProperties(
-            "lcn=yes|rcn=yes|ncn=yes", ALL, 0.8, 0.8, true
-    );
+    props.setProperties("lcn=yes|rcn=yes|ncn=yes", ALL, 0.8, 0.8, true);
 
     props.setProperties("highway=busway", PEDESTRIAN_AND_BICYCLE, low_traffic, low_traffic);
     props.setProperties("highway=track", PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
@@ -715,7 +803,12 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=*;mtb:scale=5", NONE);
     props.setProperties("highway=*;mtb:scale=6", NONE);
 
-    props.setProperties("highway=track;tracktype=grade1", PEDESTRIAN_AND_BICYCLE, very_low_traffic, very_low_traffic);
+    props.setProperties(
+      "highway=track;tracktype=grade1",
+      PEDESTRIAN_AND_BICYCLE,
+      very_low_traffic,
+      very_low_traffic
+    );
     props.setProperties("highway=track;tracktype=grade2", PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
     props.setProperties("highway=track;tracktype=grade3", PEDESTRIAN_AND_BICYCLE, 1.5, 1.5);
     props.setProperties("highway=track;tracktype=grade4", PEDESTRIAN);

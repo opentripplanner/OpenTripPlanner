@@ -4,12 +4,11 @@ import static org.opentripplanner.updater.DataSourceType.GBFS;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 import org.opentripplanner.util.OtpAppException;
 
 /**
@@ -41,29 +40,24 @@ public class VehicleRentalSourceFactory {
     return new VehicleRentalSourceFactory(type, c).create();
   }
 
-
   public VehicleRentalDataSourceParameters create() {
     switch (type) {
       case GBFS:
         return new GbfsVehicleRentalDataSourceParameters(
-            url(),
-            language(),
-            allowKeepingRentedVehicleAtDestination(),
-            headers()
+          url(),
+          language(),
+          allowKeepingRentedVehicleAtDestination(),
+          headers()
         );
       case SMOOVE:
         return new SmooveBikeRentalDataSourceParameters(
-            url(),
-            network(),
-            allowOverloading(),
-            headers()
+          url(),
+          network(),
+          allowOverloading(),
+          headers()
         );
       default:
-        return new VehicleRentalDataSourceParameters(
-            type,
-            url(),
-            headers()
-        );
+        return new VehicleRentalDataSourceParameters(type, url(), headers());
     }
   }
 

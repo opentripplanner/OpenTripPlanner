@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 import javax.annotation.Nullable;
 
-
 /**
  * The purpose of the TripScheduleSearch is to optimize the search for a trip schedule
  * for a given pattern. Normally the search scan trips sequentially, aborting when a
@@ -22,40 +21,43 @@ import javax.annotation.Nullable;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
-    /** Used in a trip search to indicate that all trips should be included in the search. */
-    int UNBOUNDED_TRIP_INDEX = -1;
-
-    /**
-     * Find the best trip matching the given {@code timeLimit}. This is the same as calling
-     * {@link #search(int, int, int)} with {@code tripIndexLimit: -1}.
-     *
-     * @see #search(int, int, int)
-     */
-    @Nullable
-    default RaptorTripScheduleBoardOrAlightEvent<T> search(int earliestBoardTime, int stopPositionInPattern) {
-        return search(earliestBoardTime, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
-    }
+  /** Used in a trip search to indicate that all trips should be included in the search. */
+  int UNBOUNDED_TRIP_INDEX = -1;
 
   /**
-     * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}. This
-     * method returns {@code null} if no trip is found.
-     * <p>
-     * Note! The implementation may use a "fly-weight" pattern to implement this, which mean no
-     * objects are created for the result, but the result object will instead be reused for the
-     * next search. So, the caller MUST copy values over and NOT store references to the result
-     * object. As soon as a new call the search is done, the result object is invalid.
-     *
-     * @param earliestBoardTime  The time of arrival(departure for reverse search) at the given stop.
-     * @param stopPositionInPattern The stop to board
-     * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
-     *                              {@code -1} for an unbounded search. This is an optimization
-     *                              which allow us to search faster, and it exclude results which
-     *                              is less favorable than trips already processed.
-     */
-    @Nullable
-    RaptorTripScheduleBoardOrAlightEvent<T> search(
-            int earliestBoardTime,
-            int stopPositionInPattern,
-            int tripIndexLimit
-    );
+   * Find the best trip matching the given {@code timeLimit}. This is the same as calling
+   * {@link #search(int, int, int)} with {@code tripIndexLimit: -1}.
+   *
+   * @see #search(int, int, int)
+   */
+  @Nullable
+  default RaptorTripScheduleBoardOrAlightEvent<T> search(
+    int earliestBoardTime,
+    int stopPositionInPattern
+  ) {
+    return search(earliestBoardTime, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
+  }
+
+  /**
+   * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}. This
+   * method returns {@code null} if no trip is found.
+   * <p>
+   * Note! The implementation may use a "fly-weight" pattern to implement this, which mean no
+   * objects are created for the result, but the result object will instead be reused for the
+   * next search. So, the caller MUST copy values over and NOT store references to the result
+   * object. As soon as a new call the search is done, the result object is invalid.
+   *
+   * @param earliestBoardTime  The time of arrival(departure for reverse search) at the given stop.
+   * @param stopPositionInPattern The stop to board
+   * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
+   *                              {@code -1} for an unbounded search. This is an optimization
+   *                              which allow us to search faster, and it exclude results which
+   *                              is less favorable than trips already processed.
+   */
+  @Nullable
+  RaptorTripScheduleBoardOrAlightEvent<T> search(
+    int earliestBoardTime,
+    int stopPositionInPattern,
+    int tripIndexLimit
+  );
 }

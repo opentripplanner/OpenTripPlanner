@@ -10,40 +10,41 @@ import org.opentripplanner.util.NonLocalizedString;
  * that start or end between two intersections. Also for situating bus stops in the middle of street segments.
  */
 public class StreetLocation extends StreetVertex {
-    private boolean wheelchairAccessible;
 
-    // maybe name should just be pulled from street being split
-    public StreetLocation(String id, Coordinate nearestPoint, I18NString name) {
-        // calling constructor with null graph means this vertex is temporary
-        super(null, id, nearestPoint.x, nearestPoint.y, name);
+  private boolean wheelchairAccessible;
+
+  // maybe name should just be pulled from street being split
+  public StreetLocation(String id, Coordinate nearestPoint, I18NString name) {
+    // calling constructor with null graph means this vertex is temporary
+    super(null, id, nearestPoint.x, nearestPoint.y, name);
+  }
+
+  //For tests only
+  public StreetLocation(String id, Coordinate nearestPoint, String name) {
+    // calling constructor with null graph means this vertex is temporary
+    super(null, id, nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
+  }
+
+  private static final long serialVersionUID = 1L;
+
+  public void setWheelchairAccessible(boolean wheelchairAccessible) {
+    this.wheelchairAccessible = wheelchairAccessible;
+  }
+
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
+  }
+
+  public boolean equals(Object o) {
+    if (o instanceof StreetLocation) {
+      StreetLocation other = (StreetLocation) o;
+      return other.getCoordinate().equals(getCoordinate());
     }
+    return false;
+  }
 
-    //For tests only
-    public StreetLocation(String id, Coordinate nearestPoint, String name) {
-        // calling constructor with null graph means this vertex is temporary
-        super(null, id, nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
-    }
-
-    private static final long serialVersionUID = 1L;
-
-    public void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
-
-    public boolean isWheelchairAccessible() {
-        return wheelchairAccessible;
-    }
-
-    public boolean equals(Object o) {
-        if (o instanceof StreetLocation) {
-            StreetLocation other = (StreetLocation) o;
-            return other.getCoordinate().equals(getCoordinate());
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return getCoordinate().hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return getCoordinate().hashCode();
+  }
 }

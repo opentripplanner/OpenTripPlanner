@@ -17,10 +17,10 @@ public class BookingMethodMapper {
    *                  entity in the log, in case of a problem with the mapping.
    */
   public static BookingMethod map(
-          String sourceRef,
-          BookingMethodEnumeration bookingMethodEnumeration
+    String sourceRef,
+    BookingMethodEnumeration bookingMethodEnumeration
   ) {
-    if(bookingMethodEnumeration == null) {
+    if (bookingMethodEnumeration == null) {
       return null;
     }
 
@@ -37,9 +37,9 @@ public class BookingMethodMapper {
         return BookingMethod.TEXT_MESSAGE;
       default:
         LOG.warn(
-                "Booking method unknown/not supported will be ignored: {}. Entity: {}",
-                bookingMethodEnumeration,
-                sourceRef
+          "Booking method unknown/not supported will be ignored: {}. Entity: {}",
+          bookingMethodEnumeration,
+          sourceRef
         );
         return null;
     }

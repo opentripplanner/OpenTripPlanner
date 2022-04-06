@@ -14,123 +14,145 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class AccessStopArrivalTest {
 
-    private static final int ALIGHT_STOP = 100;
-    private static final int DEPARTURE_TIME = 8 * 60 * 60;
-    private static final int ACCESS_DURATION = 10 * 60;
-    private static final int ALIGHT_TIME = DEPARTURE_TIME + ACCESS_DURATION;
-    private static final TestTransfer WALK = walk(ALIGHT_STOP, ACCESS_DURATION);
-    private static final int COST = WALK.generalizedCost();
+  private static final int ALIGHT_STOP = 100;
+  private static final int DEPARTURE_TIME = 8 * 60 * 60;
+  private static final int ACCESS_DURATION = 10 * 60;
+  private static final int ALIGHT_TIME = DEPARTURE_TIME + ACCESS_DURATION;
+  private static final TestTransfer WALK = walk(ALIGHT_STOP, ACCESS_DURATION);
+  private static final int COST = WALK.generalizedCost();
 
-    private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
-        DEPARTURE_TIME, WALK
+  private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
+    DEPARTURE_TIME,
+    WALK
+  );
+
+  @Test
+  public void arrivedByAccessLeg() {
+    assertTrue(subject.arrivedByAccess());
+    assertFalse(subject.arrivedByTransit());
+    assertFalse(subject.arrivedByTransfer());
+  }
+
+  @Test
+  public void stop() {
+    assertEquals(ALIGHT_STOP, subject.stop());
+  }
+
+  @Test
+  public void arrivalTime() {
+    assertEquals(ALIGHT_TIME, subject.arrivalTime());
+  }
+
+  @Test
+  public void cost() {
+    assertEquals(COST, subject.cost());
+  }
+
+  @Test
+  public void round() {
+    assertEquals(0, subject.round());
+  }
+
+  @Test
+  public void travelDuration() {
+    assertEquals(ACCESS_DURATION, subject.travelDuration());
+  }
+
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  @Test
+  public void equalsThrowsExceptionByDesign() {
+    assertThrows(IllegalStateException.class, () -> subject.equals(null));
+  }
+
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  @Test
+  public void hashCodeThrowsExceptionByDesign() {
+    assertThrows(IllegalStateException.class, subject::hashCode);
+  }
+
+  @Test
+  public void testToString() {
+    assertEquals(
+      "Access { stop: 100, duration: 10m, arrival-time: 8:10 $1200 }",
+      subject.toString()
+    );
+  }
+
+  @Test
+  public void timeShiftDefaultBehaviour() {
+    final int dTime = 60;
+    AbstractStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(
+      ALIGHT_TIME + dTime
     );
 
-    @Test
-    public void arrivedByAccessLeg() {
-        assertTrue(subject.arrivedByAccess());
-        assertFalse(subject.arrivedByTransit());
-        assertFalse(subject.arrivedByTransfer());
-    }
+    assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
+    assertEquals(subject.cost(), result.cost());
+    assertEquals(subject.travelDuration(), result.travelDuration());
+    assertEquals(subject.round(), result.round());
+    assertEquals(subject.stop(), result.stop());
+    assertSame(subject.accessPath().access(), result.accessPath().access());
+    assertEquals(subject.arrivedByAccess(), result.arrivedByAccess());
+  }
 
-    @Test
-    public void stop() {
-        assertEquals(ALIGHT_STOP, subject.stop());
-    }
+  @Test
+  public void timeShiftNotAllowed() {
+    AbstractStopArrival<RaptorTripSchedule> original, result;
+    RaptorTransfer access = transfer(-1);
 
-    @Test
-    public void arrivalTime() {
-        assertEquals(ALIGHT_TIME, subject.arrivalTime());
-    }
+    original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 
-    @Test
-    public void cost() {
-        assertEquals(COST, subject.cost());
-    }
+    final int dTime = 60;
+    result = original.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
 
-    @Test
-    public void round() {
-        assertEquals(0, subject.round());
-    }
+    assertSame(original, result);
+  }
 
-    @Test
-    public void travelDuration() {
-        assertEquals(ACCESS_DURATION, subject.travelDuration());
-    }
+  @Test
+  public void timeShiftPartiallyAllowed() {
+    final int dTime = 60;
+    AbstractStopArrival<RaptorTripSchedule> original, result;
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test
-    public void equalsThrowsExceptionByDesign() {
-        assertThrows(IllegalStateException.class, () ->  subject.equals(null));
-    }
+    // Allow time-shift, but only by dTime
+    RaptorTransfer access = transfer(ALIGHT_TIME + dTime);
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Test
-    public void hashCodeThrowsExceptionByDesign() {
-        assertThrows(IllegalStateException.class, subject::hashCode);
-    }
+    original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 
-    @Test
-    public void testToString() {
-        assertEquals(
-                "Access { stop: 100, duration: 10m, arrival-time: 8:10 $1200 }",
-                subject.toString()
-        );
-    }
+    result = original.timeShiftNewArrivalTime(ALIGHT_TIME + 7200);
 
-    @Test
-    public void timeShiftDefaultBehaviour() {
-        final int dTime = 60;
-        AbstractStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
+    assertEquals(ALIGHT_TIME + dTime, result.arrivalTime());
+  }
 
-        assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
-        assertEquals(subject.cost(), result.cost());
-        assertEquals(subject.travelDuration(), result.travelDuration());
-        assertEquals(subject.round(), result.round());
-        assertEquals(subject.stop(), result.stop());
-        assertSame(subject.accessPath().access(), result.accessPath().access());
-        assertEquals(subject.arrivedByAccess(), result.arrivedByAccess());
-    }
+  private static RaptorTransfer transfer(final int latestArrivalTime) {
+    return new RaptorTransfer() {
+      @Override
+      public int stop() {
+        return 0;
+      }
 
-    @Test
-    public void timeShiftNotAllowed() {
-        AbstractStopArrival<RaptorTripSchedule> original, result;
-        RaptorTransfer access = transfer(-1);
+      @Override
+      public int generalizedCost() {
+        return 0;
+      }
 
-        original = new AccessStopArrival<>(DEPARTURE_TIME,  access);
+      @Override
+      public int durationInSeconds() {
+        return 0;
+      }
 
-        final int dTime = 60;
-        result = original.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
+      @Override
+      public int earliestDepartureTime(int t) {
+        return t;
+      }
 
-        assertSame(original, result);
-    }
+      @Override
+      public boolean hasOpeningHours() {
+        return true;
+      }
 
-    @Test
-    public void timeShiftPartiallyAllowed() {
-        final int dTime = 60;
-        AbstractStopArrival<RaptorTripSchedule> original, result;
-
-        // Allow time-shift, but only by dTime
-        RaptorTransfer access = transfer(ALIGHT_TIME + dTime);
-
-        original = new AccessStopArrival<>(DEPARTURE_TIME, access);
-
-        result = original.timeShiftNewArrivalTime(ALIGHT_TIME + 7200);
-
-        assertEquals(ALIGHT_TIME + dTime, result.arrivalTime());
-    }
-
-    private static RaptorTransfer transfer(final int latestArrivalTime) {
-        return new RaptorTransfer() {
-            @Override public int stop() { return 0; }
-            @Override public int generalizedCost() { return 0; }
-            @Override public int durationInSeconds() { return 0; }
-            @Override public int earliestDepartureTime(int t) { return t; }
-            @Override public boolean hasOpeningHours() { return true; }
-
-            @Override
-            public int latestArrivalTime(int requestedArrivalTime) {
-                return latestArrivalTime;
-            }
-        };
-    }
+      @Override
+      public int latestArrivalTime(int requestedArrivalTime) {
+        return latestArrivalTime;
+      }
+    };
+  }
 }

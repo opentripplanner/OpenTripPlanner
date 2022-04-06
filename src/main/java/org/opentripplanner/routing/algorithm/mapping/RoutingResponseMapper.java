@@ -21,127 +21,123 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RoutingResponseMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(RoutingResponseMapper.class);
 
-    public static RoutingResponse map(
-            RoutingRequest request,
-            ZonedDateTime transitSearchTimeZero,
-            SearchParams searchParams,
-            Duration searchWindowForNextSearch,
-            Itinerary firstRemovedItinerary,
-            List<Itinerary> itineraries,
-            Set<RoutingError> routingErrors,
-            DebugTimingAggregator debugTimingAggregator
-    ) {
-        // Create response
-        var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
+  private static final Logger LOG = LoggerFactory.getLogger(RoutingResponseMapper.class);
 
-        var factory= mapIntoPageCursorFactory(
-                request.getItinerariesSortOrder(),
-                transitSearchTimeZero,
-                searchParams,
-                searchWindowForNextSearch,
-                firstRemovedItinerary,
-                request.pageCursor == null ? null : request.pageCursor.type
-        );
+  public static RoutingResponse map(
+    RoutingRequest request,
+    ZonedDateTime transitSearchTimeZero,
+    SearchParams searchParams,
+    Duration searchWindowForNextSearch,
+    Itinerary firstRemovedItinerary,
+    List<Itinerary> itineraries,
+    Set<RoutingError> routingErrors,
+    DebugTimingAggregator debugTimingAggregator
+  ) {
+    // Create response
+    var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
-        PageCursor nextPageCursor = factory.nextPageCursor();
-        PageCursor prevPageCursor = factory.previousPageCursor();
+    var factory = mapIntoPageCursorFactory(
+      request.getItinerariesSortOrder(),
+      transitSearchTimeZero,
+      searchParams,
+      searchWindowForNextSearch,
+      firstRemovedItinerary,
+      request.pageCursor == null ? null : request.pageCursor.type
+    );
 
-        if(LOG.isDebugEnabled()) {
-            logPagingInformation(request.pageCursor, prevPageCursor, nextPageCursor, routingErrors);
-        }
+    PageCursor nextPageCursor = factory.nextPageCursor();
+    PageCursor prevPageCursor = factory.previousPageCursor();
 
-        var metadata = createTripSearchMetadata(
-                request, searchParams, firstRemovedItinerary
-        );
-
-        return new RoutingResponse(
-                tripPlan,
-                prevPageCursor,
-                nextPageCursor,
-                metadata,
-                List.copyOf(routingErrors),
-                debugTimingAggregator
-        );
+    if (LOG.isDebugEnabled()) {
+      logPagingInformation(request.pageCursor, prevPageCursor, nextPageCursor, routingErrors);
     }
 
-    @Nullable
-    private static TripSearchMetadata createTripSearchMetadata(
-            RoutingRequest request,
-            SearchParams searchParams,
-            Itinerary firstRemovedItinerary
-    ) {
-        if(searchParams == null) { return null; }
+    var metadata = createTripSearchMetadata(request, searchParams, firstRemovedItinerary);
 
-        Instant reqTime = request.getDateTime();
+    return new RoutingResponse(
+      tripPlan,
+      prevPageCursor,
+      nextPageCursor,
+      metadata,
+      List.copyOf(routingErrors),
+      debugTimingAggregator
+    );
+  }
 
-        if (request.arriveBy) {
-            return TripSearchMetadata.createForArriveBy(
-                    reqTime,
-                    searchParams.searchWindowInSeconds(),
-                    firstRemovedItinerary == null
-                            ? null
-                            : firstRemovedItinerary.endTime().toInstant()
-            );
-        }
-        else {
-            return TripSearchMetadata.createForDepartAfter(
-                    reqTime,
-                    searchParams.searchWindowInSeconds(),
-                    firstRemovedItinerary == null
-                            ? null
-                            : firstRemovedItinerary.startTime().toInstant()
-            );
-        }
+  @Nullable
+  private static TripSearchMetadata createTripSearchMetadata(
+    RoutingRequest request,
+    SearchParams searchParams,
+    Itinerary firstRemovedItinerary
+  ) {
+    if (searchParams == null) {
+      return null;
     }
 
-    public static PageCursorFactory mapIntoPageCursorFactory(
-            SortOrder sortOrder,
-            ZonedDateTime transitSearchTimeZero,
-            SearchParams searchParams,
-            Duration searchWindowNextSearch,
-            Itinerary firstRemovedItinerary,
-            @Nullable PageType currentPageType
-    ) {
-        var factory = new PageCursorFactory(sortOrder, searchWindowNextSearch);
+    Instant reqTime = request.getDateTime();
 
-        if(searchParams != null) {
-            if(!searchParams.isSearchWindowSet()) {
-                throw new IllegalArgumentException("SearchWindow not set");
-            }
-            if(!searchParams.isEarliestDepartureTimeSet()) {
-                throw new IllegalArgumentException("Earliest departure time not set");
-            }
+    if (request.arriveBy) {
+      return TripSearchMetadata.createForArriveBy(
+        reqTime,
+        searchParams.searchWindowInSeconds(),
+        firstRemovedItinerary == null ? null : firstRemovedItinerary.endTime().toInstant()
+      );
+    } else {
+      return TripSearchMetadata.createForDepartAfter(
+        reqTime,
+        searchParams.searchWindowInSeconds(),
+        firstRemovedItinerary == null ? null : firstRemovedItinerary.startTime().toInstant()
+      );
+    }
+  }
 
-            long t0 = transitSearchTimeZero.toEpochSecond();
-            var edt = Instant.ofEpochSecond(t0 + searchParams.earliestDepartureTime());
-            var lat = searchParams.isLatestArrivalTimeSet()
-                    ? Instant.ofEpochSecond(t0 + searchParams.latestArrivalTime())
-                    : null;
-            var searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
-            factory.withOriginalSearch(currentPageType, edt, lat, searchWindow);
-        }
+  public static PageCursorFactory mapIntoPageCursorFactory(
+    SortOrder sortOrder,
+    ZonedDateTime transitSearchTimeZero,
+    SearchParams searchParams,
+    Duration searchWindowNextSearch,
+    Itinerary firstRemovedItinerary,
+    @Nullable PageType currentPageType
+  ) {
+    var factory = new PageCursorFactory(sortOrder, searchWindowNextSearch);
 
-        if(firstRemovedItinerary != null) {
-            factory.withRemovedItineraries(
-                    firstRemovedItinerary.startTime().toInstant(),
-                    firstRemovedItinerary.endTime().toInstant()
-            );
-        }
+    if (searchParams != null) {
+      if (!searchParams.isSearchWindowSet()) {
+        throw new IllegalArgumentException("SearchWindow not set");
+      }
+      if (!searchParams.isEarliestDepartureTimeSet()) {
+        throw new IllegalArgumentException("Earliest departure time not set");
+      }
 
-        return factory;
+      long t0 = transitSearchTimeZero.toEpochSecond();
+      var edt = Instant.ofEpochSecond(t0 + searchParams.earliestDepartureTime());
+      var lat = searchParams.isLatestArrivalTimeSet()
+        ? Instant.ofEpochSecond(t0 + searchParams.latestArrivalTime())
+        : null;
+      var searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
+      factory.withOriginalSearch(currentPageType, edt, lat, searchWindow);
     }
 
-    private static void logPagingInformation(
-            PageCursor currentPageCursor,
-            PageCursor prevPageCursor,
-            PageCursor nextPageCursor,
-            Set<RoutingError> errors
-    ) {
-        LOG.debug("PageCursor current  : " + currentPageCursor);
-        LOG.debug("PageCursor previous : " + prevPageCursor);
-        LOG.debug("PageCursor next ... : " + nextPageCursor);
-        LOG.debug("Errors ............ : " + errors);
+    if (firstRemovedItinerary != null) {
+      factory.withRemovedItineraries(
+        firstRemovedItinerary.startTime().toInstant(),
+        firstRemovedItinerary.endTime().toInstant()
+      );
     }
+
+    return factory;
+  }
+
+  private static void logPagingInformation(
+    PageCursor currentPageCursor,
+    PageCursor prevPageCursor,
+    PageCursor nextPageCursor,
+    Set<RoutingError> errors
+  ) {
+    LOG.debug("PageCursor current  : " + currentPageCursor);
+    LOG.debug("PageCursor previous : " + prevPageCursor);
+    LOG.debug("PageCursor next ... : " + nextPageCursor);
+    LOG.debug("Errors ............ : " + errors);
+  }
 }

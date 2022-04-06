@@ -5,45 +5,51 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class ApiStop implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    public String id;
-    public String name;
-    public Double lat;
-    public Double lon;
-    public String code;
-    public String desc;
-    public String zoneId;
-    public String url;
-    public Integer locationType;
+  private static final long serialVersionUID = 1L;
 
-    /** The fully qualified parent station id including the feedId. */
-    public String stationId;
+  public String id;
+  public String name;
+  public Double lat;
+  public Double lon;
+  public String code;
+  public String desc;
+  public String zoneId;
+  public String url;
+  public Integer locationType;
 
-    /** @deprecated Use "stationId" instead */
-    @Deprecated
-    public String parentStation;
-    public Integer wheelchairBoarding;
-    public String direction;
-    private String timezone;
-    private Integer vehicleType;
-    private String platformCode;
+  /** The fully qualified parent station id including the feedId. */
+  public String stationId;
 
-    @Override
-    public String toString() {
-        return "<Stop " + this.id + ">";
+  /** @deprecated Use "stationId" instead */
+  @Deprecated
+  public String parentStation;
+
+  public Integer wheelchairBoarding;
+  public String direction;
+  private String timezone;
+  private Integer vehicleType;
+  private String platformCode;
+
+  @Override
+  public String toString() {
+    return "<Stop " + this.id + ">";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        ApiStop apiStop = (ApiStop) o;
-        return id.equals(apiStop.id);
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    ApiStop apiStop = (ApiStop) o;
+    return id.equals(apiStop.id);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

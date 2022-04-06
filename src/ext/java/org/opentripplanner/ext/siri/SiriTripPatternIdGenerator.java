@@ -1,11 +1,10 @@
 package org.opentripplanner.ext.siri;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class generate a new id for new TripPatterns created real-time by the
@@ -15,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The id generation is thread-safe, even if that is probably not needed.
  */
 class SiriTripPatternIdGenerator {
+
   private final AtomicInteger counter = new AtomicInteger(0);
 
   /**
@@ -29,7 +29,12 @@ class SiriTripPatternIdGenerator {
     String directionId = trip.getGtfsDirectionIdAsString("");
 
     // OBA library uses underscore as separator, we're moving toward colon.
-    String id = String.format("%s:%s:%03d:RT", routeId.getId(), directionId, counter.incrementAndGet());
+    String id = String.format(
+      "%s:%s:%03d:RT",
+      routeId.getId(),
+      directionId,
+      counter.incrementAndGet()
+    );
 
     return new FeedScopedId(routeId.getFeedId(), id);
   }

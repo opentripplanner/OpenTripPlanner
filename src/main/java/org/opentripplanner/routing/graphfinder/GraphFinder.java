@@ -1,18 +1,16 @@
 package org.opentripplanner.routing.graphfinder;
 
+import java.util.List;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-
-import java.util.List;
 
 /**
  * Common interface between different types of GraphFinders, currently two types exist, one which
  * traverses the street network, and one which doesn't.
  */
 public interface GraphFinder {
-
   /**
    * Search closest stops from a given coordinate, extending up to a specified max radius.
    *
@@ -37,9 +35,15 @@ public interface GraphFinder {
    * @param routingService A RoutingService used in finding information about the various places.
    */
   List<PlaceAtDistance> findClosestPlaces(
-    double lat, double lon, double radiusMeters, int maxResults, List<TransitMode> filterByModes,
-    List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-    List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
+    double lat,
+    double lon,
+    double radiusMeters,
+    int maxResults,
+    List<TransitMode> filterByModes,
+    List<PlaceType> filterByPlaceTypes,
+    List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByRoutes,
+    List<String> filterByBikeRentalStations,
     RoutingService routingService
   );
 

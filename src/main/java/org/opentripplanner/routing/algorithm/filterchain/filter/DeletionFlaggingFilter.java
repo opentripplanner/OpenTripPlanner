@@ -1,13 +1,12 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
-
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * This class is responsible for flagging itineraries for deletion based on a
@@ -15,36 +14,39 @@ import java.util.stream.Collectors;
  * at this point, just flagged. They are typically deleted later if debug mode is disabled.
  */
 public class DeletionFlaggingFilter implements ItineraryListFilter {
-    private final ItineraryDeletionFlagger flagger;
 
-    public DeletionFlaggingFilter(ItineraryDeletionFlagger flagger) {
-        this.flagger = flagger;
+  private final ItineraryDeletionFlagger flagger;
+
+  public DeletionFlaggingFilter(ItineraryDeletionFlagger flagger) {
+    this.flagger = flagger;
+  }
+
+  public String name() {
+    return flagger.name();
+  }
+
+  @Override
+  public List<Itinerary> filter(List<Itinerary> itineraries) {
+    List<Itinerary> filterInput;
+    if (flagger.skipAlreadyFlaggedItineraries()) {
+      filterInput =
+        itineraries
+          .stream()
+          .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
+          .collect(Collectors.toList());
+    } else {
+      filterInput = itineraries;
     }
 
-    public String name() {
-        return flagger.name();
+    for (Itinerary it : flagger.getFlaggedItineraries(filterInput)) {
+      it.flagForDeletion(
+        new SystemNotice(
+          flagger.name(),
+          "This itinerary is marked as deleted by the " + flagger.name() + " filter."
+        )
+      );
     }
 
-    @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
-        List<Itinerary> filterInput;
-        if (flagger.skipAlreadyFlaggedItineraries()) {
-            filterInput = itineraries.stream()
-                    .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
-                    .collect(Collectors.toList());
-        } else {
-            filterInput = itineraries;
-        }
-
-        for(Itinerary it : flagger.getFlaggedItineraries(filterInput)) {
-            it.flagForDeletion(
-                new SystemNotice(
-                    flagger.name(),
-                    "This itinerary is marked as deleted by the " + flagger.name() + " filter."
-                )
-            );
-        }
-
-        return itineraries;
-    }
+    return itineraries;
+  }
 }

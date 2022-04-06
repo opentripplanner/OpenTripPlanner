@@ -8,36 +8,38 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
  */
 public class ForwardTimeCalculator implements TimeCalculator {
 
-    @Override
-    public final boolean searchForward() { return true; }
+  @Override
+  public final boolean searchForward() {
+    return true;
+  }
 
-    @Override
-    public final int plusDuration(final int time, final int delta) {
-        return time + delta;
-    }
+  @Override
+  public final int plusDuration(final int time, final int delta) {
+    return time + delta;
+  }
 
-    @Override
-    public final int minusDuration(final int time, final int delta) {
-        return time - delta;
-    }
+  @Override
+  public final int minusDuration(final int time, final int delta) {
+    return time - delta;
+  }
 
-    @Override
-    public final int duration(final int timeA, final int timeB) {
-        return timeB - timeA;
-    }
+  @Override
+  public final int duration(final int timeA, final int timeB) {
+    return timeB - timeA;
+  }
 
-    @Override
-    public final boolean isBefore(final int subject, final int candidate) {
-        return subject < candidate;
-    }
+  @Override
+  public final boolean isBefore(final int subject, final int candidate) {
+    return subject < candidate;
+  }
 
-    @Override
-    public final boolean isAfter(int subject, int candidate) {
-        return subject > candidate;
-    }
+  @Override
+  public final boolean isAfter(int subject, int candidate) {
+    return subject > candidate;
+  }
 
-    @Override
-    public final int unreachedTime() {
-        return Integer.MAX_VALUE;
-    }
+  @Override
+  public final int unreachedTime() {
+    return Integer.MAX_VALUE;
+  }
 }

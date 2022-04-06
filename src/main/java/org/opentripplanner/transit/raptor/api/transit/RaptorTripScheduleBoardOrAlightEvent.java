@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-
 import javax.validation.constraints.NotNull;
 
 /**
@@ -19,49 +18,48 @@ import javax.validation.constraints.NotNull;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedule> {
+  /**
+   * The trip timetable index for the trip  found.
+   */
+  int getTripIndex();
 
-    /**
-     * The trip timetable index for the trip  found.
-     */
-    int getTripIndex();
+  /**
+   * This i a reference to the trip found.
+   */
+  T getTrip();
 
-    /**
-     * This i a reference to the trip found.
-     */
-    T getTrip();
+  /**
+   * Return the stop-position-in-pattern for the current trip board search.
+   */
+  int getStopPositionInPattern();
 
-    /**
-     * Return the stop-position-in-pattern for the current trip board search.
-     */
-    int getStopPositionInPattern();
+  /**
+   * Return the stop index for the boarding position.
+   */
+  default int getBoardStopIndex() {
+    return getTrip().pattern().stopIndex(getStopPositionInPattern());
+  }
 
-    /**
-     * Return the stop index for the boarding position.
-     */
-    default int getBoardStopIndex() {
-        return getTrip().pattern().stopIndex(getStopPositionInPattern());
-    }
+  /**
+   * Get the board/alight time for the trip found.
+   * For a forward search the boarding time should be returned,
+   * and for the reverse search the alight time should be returned.
+   */
+  int getTime();
 
-    /**
-     * Get the board/alight time for the trip found.
-     * For a forward search the boarding time should be returned,
-     * and for the reverse search the alight time should be returned.
-     */
-    int getTime();
+  /**
+   * For constrained transfer the trip search must calculate an earliest-board-time,
+   * because it depends on the constraints. For the regular trip search this method is not used.
+   */
+  default int getEarliestBoardTimeForConstrainedTransfer() {
+    throw new IllegalStateException("The getEarliestBoardTime() method is not implemented!");
+  }
 
-    /**
-     * For constrained transfer the trip search must calculate an earliest-board-time,
-     * because it depends on the constraints. For the regular trip search this method is not used.
-     */
-    default int getEarliestBoardTimeForConstrainedTransfer() {
-        throw new IllegalStateException("The getEarliestBoardTime() method is not implemented!");
-    }
-
-    /**
-     * Return the transfer constrains for the transfer before this boarding.
-     * If there are no transfer constraints assisiated with the boarding the
-     * {@link RaptorTransferConstraint#isRegularTransfer()} is {@code true}.
-     */
-    @NotNull
-    RaptorTransferConstraint getTransferConstraint();
+  /**
+   * Return the transfer constrains for the transfer before this boarding.
+   * If there are no transfer constraints assisiated with the boarding the
+   * {@link RaptorTransferConstraint#isRegularTransfer()} is {@code true}.
+   */
+  @NotNull
+  RaptorTransferConstraint getTransferConstraint();
 }

@@ -10,5 +10,5 @@ package org.opentripplanner.model;
  * handling both GTFS-RT and SIRI has led to two different providers.
  */
 public interface TimetableSnapshotProvider {
-    TimetableSnapshot getTimetableSnapshot();
+  TimetableSnapshot getTimetableSnapshot();
 }

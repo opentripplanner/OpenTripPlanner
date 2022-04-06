@@ -2,18 +2,17 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class LegacyGraphQLItineraryImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {
 
   @Override
   public DataFetcher<Long> startTime() {
@@ -62,13 +61,17 @@ public class LegacyGraphQLItineraryImpl
       if (fare == null) {
         return null;
       }
-      return fare.fare.keySet().stream().map(fareKey -> {
-        Map<String, Object> result = new HashMap<>();
-        result.put("name", fareKey.name());
-        result.put("fare", fare.getFare(fareKey));
-        result.put("details", fare.getDetails(fareKey));
-        return result;
-      }).collect(Collectors.toList());
+      return fare.fare
+        .keySet()
+        .stream()
+        .map(fareKey -> {
+          Map<String, Object> result = new HashMap<>();
+          result.put("name", fareKey.name());
+          result.put("fare", fare.getFare(fareKey));
+          result.put("details", fare.getDetails(fareKey));
+          return result;
+        })
+        .collect(Collectors.toList());
     };
   }
 

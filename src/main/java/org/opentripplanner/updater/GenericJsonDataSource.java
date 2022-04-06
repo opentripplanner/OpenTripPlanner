@@ -18,7 +18,8 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
 
   public GenericJsonDataSource(String url, String jsonParsePath, Map<String, String> headers) {
     this.url = url;
-    jsonDataListDownloader = new JsonDataListDownloader<>(url, jsonParsePath, this::parseElement, headers);
+    jsonDataListDownloader =
+      new JsonDataListDownloader<>(url, jsonParsePath, this::parseElement, headers);
   }
 
   public GenericJsonDataSource(String url, String jsonParsePath) {
@@ -31,7 +32,7 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
   public boolean update() {
     List<T> updates = jsonDataListDownloader.download();
     if (updates != null) {
-      synchronized(this) {
+      synchronized (this) {
         this.updates = updates;
       }
       return true;

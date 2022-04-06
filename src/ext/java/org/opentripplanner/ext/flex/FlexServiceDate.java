@@ -23,16 +23,16 @@ public class FlexServiceDate {
   /** Which services are running on the date.*/
   public final TIntSet servicesRunning;
 
-  FlexServiceDate(
-      ServiceDate serviceDate, int secondsFromStartOfTime, TIntSet servicesRunning
-  ) {
+  FlexServiceDate(ServiceDate serviceDate, int secondsFromStartOfTime, TIntSet servicesRunning) {
     this.serviceDate = serviceDate;
     this.secondsFromStartOfTime = secondsFromStartOfTime;
     this.servicesRunning = servicesRunning;
   }
 
   boolean isFlexTripRunning(FlexTrip flexTrip, Graph graph) {
-    return servicesRunning != null
-        && servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()));
+    return (
+      servicesRunning != null &&
+      servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()))
+    );
   }
 }

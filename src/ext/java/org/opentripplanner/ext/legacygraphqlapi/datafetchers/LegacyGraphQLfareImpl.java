@@ -2,11 +2,10 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Map;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
-
-import java.util.Map;
 
 public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFare {
 
@@ -17,7 +16,8 @@ public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> currency() {
-    return environment -> ((Money) getSource(environment).get("fare")).getCurrency().getCurrencyCode();
+    return environment ->
+      ((Money) getSource(environment).get("fare")).getCurrency().getCurrencyCode();
   }
 
   @Override

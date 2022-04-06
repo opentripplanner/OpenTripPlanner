@@ -29,95 +29,101 @@ import org.slf4j.LoggerFactory;
  * </pre>
  */
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
-    private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 
-    private WriteToGraphCallback saveResultOnGraph;
+  private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 
-    private Long lastTimestamp = Long.MIN_VALUE;
+  private WriteToGraphCallback saveResultOnGraph;
 
-    private final String url;
+  private Long lastTimestamp = Long.MIN_VALUE;
 
-    private final String feedId;
+  private final String url;
 
-    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private final String feedId;
 
-    private final long earlyStart;
+  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    private AlertsUpdateHandler updateHandler = null;
+  private final long earlyStart;
 
-    private final boolean fuzzyTripMatching;
+  private AlertsUpdateHandler updateHandler = null;
 
-    private TransitAlertService transitAlertService;
+  private final boolean fuzzyTripMatching;
 
-    @Override
-    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-        this.saveResultOnGraph = saveResultOnGraph;
+  private TransitAlertService transitAlertService;
+
+  @Override
+  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+    this.saveResultOnGraph = saveResultOnGraph;
+  }
+
+  public GtfsRealtimeAlertsUpdater(GtfsRealtimeAlertsUpdaterParameters config) {
+    super(config);
+    this.url = config.getUrl();
+    this.earlyStart = config.getEarlyStartSec();
+    this.feedId = config.getFeedId();
+    this.fuzzyTripMatching = config.fuzzyTripMatching();
+
+    LOG.info(
+      "Creating real-time alert updater running every {} seconds : {}",
+      pollingPeriodSeconds,
+      url
+    );
+  }
+
+  @Override
+  public void setup(Graph graph) {
+    TransitAlertService transitAlertService = new TransitAlertServiceImpl(graph);
+    if (fuzzyTripMatching) {
+      this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
     }
-
-    public GtfsRealtimeAlertsUpdater(GtfsRealtimeAlertsUpdaterParameters config) {
-        super(config);
-        this.url = config.getUrl();
-        this.earlyStart = config.getEarlyStartSec();
-        this.feedId = config.getFeedId();
-        this.fuzzyTripMatching = config.fuzzyTripMatching();
-
-        LOG.info("Creating real-time alert updater running every {} seconds : {}", pollingPeriodSeconds, url);
+    this.transitAlertService = transitAlertService;
+    if (updateHandler == null) {
+      updateHandler = new AlertsUpdateHandler();
     }
+    updateHandler.setEarlyStart(earlyStart);
+    updateHandler.setFeedId(feedId);
+    updateHandler.setTransitAlertService(transitAlertService);
+    updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
+  }
 
-    @Override
-    public void setup(Graph graph) {
-        TransitAlertService transitAlertService = new TransitAlertServiceImpl(graph);
-        if (fuzzyTripMatching) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
-        }
-        this.transitAlertService = transitAlertService;
-        if (updateHandler == null) {
-            updateHandler = new AlertsUpdateHandler();
-        }
-        updateHandler.setEarlyStart(earlyStart);
-        updateHandler.setFeedId(feedId);
-        updateHandler.setTransitAlertService(transitAlertService);
-        updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
+  @Override
+  protected void runPolling() {
+    try {
+      InputStream data = HttpUtils.getData(
+        URI.create(url),
+        Map.of(
+          "Accept",
+          "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+        )
+      );
+      if (data == null) {
+        throw new RuntimeException("Failed to get data from url " + url);
+      }
+
+      final FeedMessage feed = FeedMessage.PARSER.parseFrom(data);
+
+      long feedTimestamp = feed.getHeader().getTimestamp();
+      if (feedTimestamp <= lastTimestamp) {
+        LOG.info("Ignoring feed with an old timestamp.");
+        return;
+      }
+
+      // Handle update in graph writer runnable
+      saveResultOnGraph.execute(graph -> updateHandler.update(feed));
+
+      lastTimestamp = feedTimestamp;
+    } catch (Exception e) {
+      LOG.error("Error reading gtfs-realtime feed from " + url, e);
     }
+  }
 
-    @Override
-    protected void runPolling() {
-        try {
-            InputStream data = HttpUtils.getData(URI.create(url), Map.of(
-                "Accept",
-                "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-            ));
-            if (data == null) {
-                throw new RuntimeException("Failed to get data from url " + url);
-            }
+  @Override
+  public void teardown() {}
 
-            final FeedMessage feed = FeedMessage.PARSER.parseFrom(data);
+  public TransitAlertService getTransitAlertService() {
+    return transitAlertService;
+  }
 
-            long feedTimestamp = feed.getHeader().getTimestamp();
-            if (feedTimestamp <= lastTimestamp) {
-                LOG.info("Ignoring feed with an old timestamp.");
-                return;
-            }
-
-            // Handle update in graph writer runnable
-            saveResultOnGraph.execute(graph -> updateHandler.update(feed));
-
-            lastTimestamp = feedTimestamp;
-        } catch (Exception e) {
-            LOG.error("Error reading gtfs-realtime feed from " + url, e);
-        }
-    }
-
-    @Override
-    public void teardown() {
-    }
-
-    public TransitAlertService getTransitAlertService() {
-        return transitAlertService;
-    }
-
-    public String toString() {
-        return "GtfsRealtimeUpdater(" + url + ")";
-    }
-
+  public String toString() {
+    return "GtfsRealtimeUpdater(" + url + ")";
+  }
 }

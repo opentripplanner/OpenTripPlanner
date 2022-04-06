@@ -1,18 +1,16 @@
 package org.opentripplanner.netex.mapping.calendar;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
+import javax.annotation.Nullable;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 
 /**
  * This class is responsible for creating a service calendar and generating service ids for each
@@ -21,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * THIS CLASS IS THREAD SAFE!
  */
 public class CalendarServiceBuilder {
+
   static final FeedScopedId EMPTY_SERVICE_ID = new FeedScopedId("CAL-SERVICE", "EMPTY");
 
   private final FeedScopedIdFactory scopedIdFactory;
@@ -42,7 +41,7 @@ public class CalendarServiceBuilder {
    */
   @Nullable
   public FeedScopedId registerDatesAndGetServiceId(Set<ServiceDate> dates) {
-    if(dates.isEmpty()) {
+    if (dates.isEmpty()) {
       return EMPTY_SERVICE_ID;
     }
     // The injected lambda is run inside the synchronized block

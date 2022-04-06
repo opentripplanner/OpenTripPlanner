@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 /**
@@ -115,6 +114,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
  * </ol>
  */
 public class TransferWaitTimeCostCalculator {
+
   public static final int ZERO_COST = 0;
 
   /**
@@ -133,7 +133,6 @@ public class TransferWaitTimeCostCalculator {
   private int t0 = -1;
   private double a = Double.NaN;
 
-
   /**
    * Set the scale factor N, so:
    * <pre>
@@ -145,8 +144,8 @@ public class TransferWaitTimeCostCalculator {
    *                                 the wait time against extra transit time and less walking.
    */
   public TransferWaitTimeCostCalculator(
-      double backTravelWaitTimeFactor,
-      double minSafeWaitTimeFactor
+    double backTravelWaitTimeFactor,
+    double minSafeWaitTimeFactor
   ) {
     this.backTravelWaitTimeFactor = backTravelWaitTimeFactor;
     this.n = minSafeWaitTimeFactor;
@@ -159,7 +158,6 @@ public class TransferWaitTimeCostCalculator {
     this.t0 = minSafeTransferTime;
     this.a = (Math.E - 1.0) / minSafeTransferTime;
   }
-
 
   double avoidShortWaitTimeCost(int waitTime) {
     return n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime));
@@ -209,12 +207,12 @@ public class TransferWaitTimeCostCalculator {
   }
 
   int calculateOptimizedWaitCost(int waitTime) {
-    if(waitTime < 0 ) { return ZERO_COST; }
+    if (waitTime < 0) {
+      return ZERO_COST;
+    }
     assertMinSafeTransferTimeSet();
 
-    return toRaptorCost(
-        avoidShortWaitTimeCost(waitTime) + avoidBackTravelCost(waitTime)
-    );
+    return toRaptorCost(avoidShortWaitTimeCost(waitTime) + avoidBackTravelCost(waitTime));
   }
 
   private void assertMinSafeTransferTimeSet() {

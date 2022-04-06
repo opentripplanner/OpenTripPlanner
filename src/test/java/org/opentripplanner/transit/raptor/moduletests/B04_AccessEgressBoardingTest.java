@@ -37,22 +37,24 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
 
   /** Board R1 at stop B and alight at stop E */
   private final String OPTIMAL_PATH =
-          "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s 0tx";
+    "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s 0tx";
 
   /** Board R1 at first possible stop A (not B) and arrive at stop E (the earliest arrival time) */
   public static final String EXP_PATH_BEST_ARRIVAL_TIME =
-          "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s 0tx]";
+    "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s 0tx]";
 
   /**
    * Searching in REVERSE we will "board" R1 at the first possible stop F and "alight" at the
    * optimal stop B (the best "arrival-time").
    */
   public static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
-          "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s 0tx]";
+    "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s 0tx]";
 
   /** Expect the optimal path to be found. */
   private final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
@@ -67,25 +69,25 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     data.withRoute(
-        route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-            .withTimetable(schedule("0:10 0:14 0:18 0:30 0:34 0:38"))
+      route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
+        .withTimetable(schedule("0:10 0:14 0:18 0:30 0:34 0:38"))
     );
 
-    requestBuilder.searchParams()
-        .addAccessPaths(
-            walk(STOP_A, D1s),
-            walk(STOP_B, D10s), // Best option
-            walk(STOP_C, D5m)
-        )
-        .addEgressPaths(
-            walk(STOP_D, D5m),
-            walk(STOP_E, D10s), // Best option
-            walk(STOP_F, D1s)
-        )
-        .earliestDepartureTime(T00_00)
-        .latestArrivalTime(T01_00)
-        .searchOneIterationOnly()
-    ;
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(
+        walk(STOP_A, D1s),
+        walk(STOP_B, D10s), // Best option
+        walk(STOP_C, D5m)
+      )
+      .addEgressPaths(
+        walk(STOP_D, D5m),
+        walk(STOP_E, D10s), // Best option
+        walk(STOP_F, D1s)
+      )
+      .earliestDepartureTime(T00_00)
+      .latestArrivalTime(T01_00)
+      .searchOneIterationOnly();
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 

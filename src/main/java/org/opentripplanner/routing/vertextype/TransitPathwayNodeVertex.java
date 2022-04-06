@@ -23,11 +23,11 @@ public class TransitPathwayNodeVertex extends Vertex {
    */
   public TransitPathwayNodeVertex(Graph graph, PathwayNode node) {
     super(
-        graph,
-        node.getId().toString(),
-        node.getCoordinate().longitude(),
-        node.getCoordinate().latitude(),
-        node.getName()
+      graph,
+      node.getId().toString(),
+      node.getCoordinate().longitude(),
+      node.getCoordinate().latitude(),
+      node.getName()
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

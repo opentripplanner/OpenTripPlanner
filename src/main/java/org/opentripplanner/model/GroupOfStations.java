@@ -12,82 +12,81 @@ import org.opentripplanner.util.I18NString;
  * of stops that naturally belong together.
  */
 public class GroupOfStations extends TransitEntity implements StopCollection {
-    private static final long serialVersionUID = 1L;
 
-    private I18NString name;
+  private static final long serialVersionUID = 1L;
 
-    // TODO Map from NeTEx
-    private PurposeOfGrouping purposeOfGrouping;
+  private I18NString name;
 
-    private WgsCoordinate coordinate;
+  // TODO Map from NeTEx
+  private PurposeOfGrouping purposeOfGrouping;
 
-    private final Set<StopCollection> childStations = new HashSet<>();
+  private WgsCoordinate coordinate;
 
+  private final Set<StopCollection> childStations = new HashSet<>();
 
-    public GroupOfStations(FeedScopedId id) {
-        super(id);
-    }
+  public GroupOfStations(FeedScopedId id) {
+    super(id);
+  }
 
+  public I18NString getName() {
+    return name;
+  }
 
-    public I18NString getName() {
-        return name;
-    }
+  public void setName(I18NString name) {
+    this.name = name;
+  }
 
-    public void setName(I18NString name) {
-        this.name = name;
-    }
+  @Override
+  public WgsCoordinate getCoordinate() {
+    return coordinate;
+  }
 
-    @Override
-    public WgsCoordinate getCoordinate() {
-        return coordinate;
-    }
+  public void setCoordinate(WgsCoordinate coordinate) {
+    this.coordinate = coordinate;
+  }
 
-    public void setCoordinate(WgsCoordinate coordinate) {
-        this.coordinate = coordinate;
-    }
+  public Collection<StopLocation> getChildStops() {
+    return this.childStations.stream()
+      .flatMap(s -> s.getChildStops().stream())
+      .collect(Collectors.toUnmodifiableList());
+  }
 
-    public Collection<StopLocation> getChildStops() {
-        return this.childStations.stream()
-                .flatMap(s -> s.getChildStops().stream())
-                .collect(Collectors.toUnmodifiableList());
-    }
+  public Collection<StopCollection> getChildStations() {
+    return this.childStations;
+  }
 
-    public Collection<StopCollection> getChildStations() {
-        return this.childStations;
-    }
+  public void addChildStation(StopCollection station) {
+    this.childStations.add(station);
+  }
 
-    public void addChildStation(StopCollection station) {
-        this.childStations.add(station);
-    }
+  /**
+   * Categorization for the grouping
+   */
+  public PurposeOfGrouping getPurposeOfGrouping() {
+    return purposeOfGrouping;
+  }
 
+  public void setPurposeOfGrouping(PurposeOfGrouping purposeOfGrouping) {
+    this.purposeOfGrouping = purposeOfGrouping;
+  }
+
+  @Override
+  public String toString() {
+    return "<GroupOfStations " + getId() + ">";
+  }
+
+  /**
+   * Categorization for the grouping
+   */
+  public enum PurposeOfGrouping {
     /**
-     * Categorization for the grouping
+     * Group of prominent stop places within a town or city(centre)
      */
-    public PurposeOfGrouping getPurposeOfGrouping() {
-        return purposeOfGrouping;
-    }
-
-    public void setPurposeOfGrouping(PurposeOfGrouping purposeOfGrouping) {
-        this.purposeOfGrouping = purposeOfGrouping;
-    }
-
-    @Override
-    public String toString() {
-        return "<GroupOfStations " + getId() + ">";
-    }
-
+    GENERALIZATION,
     /**
-     * Categorization for the grouping
+     * Stop places in proximity to each other which have a natural geospatial- or
+     * public transport related relationship.
      */
-    public enum PurposeOfGrouping {
-        /**
-         * Group of prominent stop places within a town or city(centre)
-         */
-        GENERALIZATION,
-        /**
-         * Stop places in proximity to each other which have a natural geospatial- or
-         * public transport related relationship.
-         */
-        CLUSTER
-    }
+    CLUSTER,
+  }
 }

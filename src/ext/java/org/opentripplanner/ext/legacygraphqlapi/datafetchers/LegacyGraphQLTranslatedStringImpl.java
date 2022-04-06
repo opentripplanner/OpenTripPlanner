@@ -2,12 +2,11 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Map;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
-import java.util.Map;
-
 public class LegacyGraphQLTranslatedStringImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLTranslatedString {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLTranslatedString {
 
   @Override
   public DataFetcher<String> text() {

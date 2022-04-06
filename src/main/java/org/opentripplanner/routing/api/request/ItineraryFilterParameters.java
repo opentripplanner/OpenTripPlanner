@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-
 import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 
@@ -86,7 +85,6 @@ public class ItineraryFilterParameters {
    */
   public DoubleFunction<Double> nonTransitGeneralizedCostLimit;
 
-
   private ItineraryFilterParameters() {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
@@ -94,10 +92,8 @@ public class ItineraryFilterParameters {
     this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
     this.bikeRentalDistanceRatio = 0.0;
     this.parkAndRideDurationRatio = 0.0;
-    this.transitGeneralizedCostLimit =
-        RequestFunctions.createLinearFunction(3600, 2);
-    this.nonTransitGeneralizedCostLimit =
-        RequestFunctions.createLinearFunction(3600, 2);
+    this.transitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
+    this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
   }
 
   public static ItineraryFilterParameters createDefault() {
@@ -105,14 +101,14 @@ public class ItineraryFilterParameters {
   }
 
   public ItineraryFilterParameters(
-      boolean debug,
-      double groupSimilarityKeepOne,
-      double groupSimilarityKeepThree,
-      double groupedOtherThanSameLegsMaxCostMultiplier,
-      DoubleFunction<Double> transitGeneralizedCostLimit,
-      DoubleFunction<Double> nonTransitGeneralizedCostLimit,
-      double bikeRentalDistanceRatio,
-      double parkAndRideDurationRatio
+    boolean debug,
+    double groupSimilarityKeepOne,
+    double groupSimilarityKeepThree,
+    double groupedOtherThanSameLegsMaxCostMultiplier,
+    DoubleFunction<Double> transitGeneralizedCostLimit,
+    DoubleFunction<Double> nonTransitGeneralizedCostLimit,
+    double bikeRentalDistanceRatio,
+    double parkAndRideDurationRatio
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;

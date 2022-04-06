@@ -4,6 +4,7 @@ import java.util.Objects;
 import org.opentripplanner.model.base.ToStringBuilder;
 
 public class RoutingError {
+
   public final RoutingErrorCode code;
   public final InputField inputField;
 
@@ -14,8 +15,12 @@ public class RoutingError {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (o == null || getClass() != o.getClass()) { return false; }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     RoutingError that = (RoutingError) o;
     return code == that.code && inputField == that.inputField;
   }
@@ -27,9 +32,10 @@ public class RoutingError {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(RoutingError.class)
-            .addEnum("code", code)
-            .addEnum("inputField", inputField)
-            .toString();
+    return ToStringBuilder
+      .of(RoutingError.class)
+      .addEnum("code", code)
+      .addEnum("inputField", inputField)
+      .toString();
   }
 }

@@ -9,10 +9,7 @@ import org.opentripplanner.util.CompositeComparator;
  */
 public class SortOnGeneralizedCost extends CompositeComparator<Itinerary> {
 
-    public SortOnGeneralizedCost() {
-        super(
-            SortOrderComparator.GENERALIZED_COST_COMP,
-            SortOrderComparator.NUM_OF_TRANSFERS_COMP
-        );
-    }
+  public SortOnGeneralizedCost() {
+    super(SortOrderComparator.GENERALIZED_COST_COMP, SortOrderComparator.NUM_OF_TRANSFERS_COMP);
+  }
 }

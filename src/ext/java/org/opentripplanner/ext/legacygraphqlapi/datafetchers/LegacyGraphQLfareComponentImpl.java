@@ -2,16 +2,15 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.FareComponent;
 
-import java.util.stream.Collectors;
-
 public class LegacyGraphQLfareComponentImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLFareComponent {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLFareComponent {
 
   @Override
   public DataFetcher<String> fareId() {
@@ -32,10 +31,10 @@ public class LegacyGraphQLfareComponentImpl
   public DataFetcher<Iterable<Route>> routes() {
     return environment -> {
       RoutingService routingService = getRoutingService(environment);
-      return getSource(environment).routes
-          .stream()
-          .map(routingService::getRouteForId)
-          .collect(Collectors.toList());
+      return getSource(environment)
+        .routes.stream()
+        .map(routingService::getRouteForId)
+        .collect(Collectors.toList());
     };
   }
 

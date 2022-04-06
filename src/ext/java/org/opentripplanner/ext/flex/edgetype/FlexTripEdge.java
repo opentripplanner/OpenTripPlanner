@@ -29,8 +29,13 @@ public class FlexTripEdge extends Edge {
   public FlexPath flexPath;
 
   public FlexTripEdge(
-      Vertex v1, Vertex v2, StopLocation s1, StopLocation s2, FlexTrip trip,
-      FlexAccessEgressTemplate flexTemplate, FlexPathCalculator calculator
+    Vertex v1,
+    Vertex v2,
+    StopLocation s1,
+    StopLocation s2,
+    FlexTrip trip,
+    FlexAccessEgressTemplate flexTemplate,
+    FlexPathCalculator calculator
   ) {
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
     // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.
@@ -41,14 +46,20 @@ public class FlexTripEdge extends Edge {
     this.flexTemplate = flexTemplate;
     this.fromv = v1;
     this.tov = v2;
-    this.flexPath = calculator.calculateFlexPath(fromv, tov, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
+    this.flexPath =
+      calculator.calculateFlexPath(
+        fromv,
+        tov,
+        flexTemplate.fromStopIndex,
+        flexTemplate.toStopIndex
+      );
   }
 
   @Override
   public State traverse(State s0) {
-    if(this.flexPath == null) {
-       // not routable
-       return null;
+    if (this.flexPath == null) {
+      // not routable
+      return null;
     }
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.BUS);

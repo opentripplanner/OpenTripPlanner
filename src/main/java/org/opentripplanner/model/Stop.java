@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -45,19 +45,19 @@ public final class Stop extends StationElement implements StopLocation {
   private HashSet<BoardingArea> boardingAreas;
 
   public Stop(
-      FeedScopedId id,
-      I18NString name,
-      String code,
-      String description,
-      WgsCoordinate coordinate,
-      WheelChairBoarding wheelchairBoarding,
-      StopLevel level,
-      String platformCode,
-      Collection<FareZone> fareZones,
-      I18NString url,
-      TimeZone timeZone,
-      TransitMode vehicleType,
-      String netexSubmode
+    FeedScopedId id,
+    I18NString name,
+    String code,
+    String description,
+    WgsCoordinate coordinate,
+    WheelChairBoarding wheelchairBoarding,
+    StopLevel level,
+    String platformCode,
+    Collection<FareZone> fareZones,
+    I18NString url,
+    TimeZone timeZone,
+    TransitMode vehicleType,
+    String netexSubmode
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
     this.platformCode = platformCode;
@@ -91,26 +91,26 @@ public final class Stop extends StationElement implements StopLocation {
    * description and coordinate. The feedId is static set to "F"
    */
   public static Stop stopForTest(
-          String idAndName,
-          String desc,
-          double lat,
-          double lon,
-          Station parent
+    String idAndName,
+    String desc,
+    double lat,
+    double lon,
+    Station parent
   ) {
     var stop = new Stop(
-        new FeedScopedId("F", idAndName),
-        new NonLocalizedString(idAndName),
-        idAndName,
-        desc,
-        new WgsCoordinate(lat, lon),
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+      new FeedScopedId("F", idAndName),
+      new NonLocalizedString(idAndName),
+      idAndName,
+      desc,
+      new WgsCoordinate(lat, lon),
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
     stop.setParentStation(parent);
     return stop;

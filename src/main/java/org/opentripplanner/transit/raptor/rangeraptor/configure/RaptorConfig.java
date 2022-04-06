@@ -22,7 +22,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor.service.RequestAlias;
 
-
 /**
  * This class is responsible for creating a new search and holding
  * application scoped Raptor state.
@@ -33,98 +32,102 @@ import org.opentripplanner.transit.raptor.service.RequestAlias;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class RaptorConfig<T extends RaptorTripSchedule> {
-    private final ExecutorService threadPool;
-    private final RaptorTuningParameters tuningParameters;
-    private final MeterRegistry registry;
 
+  private final ExecutorService threadPool;
+  private final RaptorTuningParameters tuningParameters;
+  private final MeterRegistry registry;
 
-    public RaptorConfig(
-            RaptorTuningParameters tuningParameters,
-            MeterRegistry registry
-    ) {
-        this.tuningParameters = tuningParameters;
-        this.threadPool = createNewThreadPool(tuningParameters.searchThreadPoolSize());
-        this.registry = registry;
+  public RaptorConfig(RaptorTuningParameters tuningParameters, MeterRegistry registry) {
+    this.tuningParameters = tuningParameters;
+    this.threadPool = createNewThreadPool(tuningParameters.searchThreadPoolSize());
+    this.registry = registry;
+  }
+
+  public static <T extends RaptorTripSchedule> RaptorConfig<T> defaultConfigForTest() {
+    return new RaptorConfig<>(new RaptorTuningParameters() {}, Metrics.globalRegistry);
+  }
+
+  public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
+    return new SearchContext<>(
+      request,
+      tuningParameters,
+      transit,
+      new WorkerPerformanceTimers(
+        RequestAlias.alias(request, isMultiThreaded()),
+        request.timingTags(),
+        registry
+      )
+    );
+  }
+
+  public Worker<T> createStdWorker(
+    RaptorTransitDataProvider<T> transitData,
+    RaptorRequest<T> request
+  ) {
+    SearchContext<T> context = context(transitData, request);
+    return new StdRangeRaptorConfig<>(context).createSearch((s, w) -> createWorker(context, s, w));
+  }
+
+  public Worker<T> createMcWorker(
+    RaptorTransitDataProvider<T> transitData,
+    RaptorRequest<T> request,
+    Heuristics heuristics
+  ) {
+    final SearchContext<T> context = context(transitData, request);
+    return new McRangeRaptorConfig<>(context)
+      .createWorker(heuristics, (s, w) -> createWorker(context, s, w));
+  }
+
+  public HeuristicSearch<T> createHeuristicSearch(
+    RaptorTransitDataProvider<T> transitData,
+    RaptorRequest<T> request
+  ) {
+    SearchContext<T> context = context(transitData, request);
+    return new StdRangeRaptorConfig<>(context)
+      .createHeuristicSearch((s, w) -> createWorker(context, s, w));
+  }
+
+  public boolean isMultiThreaded() {
+    return threadPool != null;
+  }
+
+  public ExecutorService threadPool() {
+    return threadPool;
+  }
+
+  public void shutdown() {
+    if (threadPool != null) {
+      threadPool.shutdown();
     }
+  }
 
-    public static <T extends RaptorTripSchedule> RaptorConfig<T> defaultConfigForTest() {
-        return new RaptorConfig<>(new RaptorTuningParameters() {}, Metrics.globalRegistry);
-    }
+  public RaptorSearchWindowCalculator searchWindowCalculator() {
+    return new RaptorSearchWindowCalculator(tuningParameters.dynamicSearchWindowCoefficients());
+  }
 
-    public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
-        return new SearchContext<>(
-            request,
-            tuningParameters,
-            transit,
-            new WorkerPerformanceTimers(
-                    RequestAlias.alias(request, isMultiThreaded()),
-                    request.timingTags(),
-                    registry
-            )
-        );
-    }
+  /* private factory methods */
 
-    public Worker<T> createStdWorker(RaptorTransitDataProvider<T> transitData, RaptorRequest<T> request) {
-        SearchContext<T> context = context(transitData, request);
-        return new StdRangeRaptorConfig<>(context).createSearch((s, w) -> createWorker(context, s, w));
-    }
+  private Worker<T> createWorker(
+    SearchContext<T> ctx,
+    WorkerState<T> workerState,
+    RoutingStrategy<T> routingStrategy
+  ) {
+    return new RangeRaptorWorker<>(
+      workerState,
+      routingStrategy,
+      ctx.transit(),
+      ctx.slackProvider(),
+      ctx.accessPaths(),
+      ctx.roundProvider(),
+      ctx.calculator(),
+      ctx.createLifeCyclePublisher(),
+      ctx.timers(),
+      ctx.enableConstrainedTransfers()
+    );
+  }
 
-    public Worker<T> createMcWorker(RaptorTransitDataProvider<T> transitData, RaptorRequest<T> request, Heuristics heuristics) {
-        final SearchContext<T> context = context(transitData, request);
-        return new McRangeRaptorConfig<>(context).createWorker(heuristics, (s, w) -> createWorker(context, s, w));
-    }
-
-    public HeuristicSearch<T> createHeuristicSearch(
-            RaptorTransitDataProvider<T> transitData,
-            RaptorRequest<T> request
-    ) {
-        SearchContext<T> context = context(transitData, request);
-        return new StdRangeRaptorConfig<>(context)
-                .createHeuristicSearch((s, w) -> createWorker(context, s, w));
-    }
-
-    public boolean isMultiThreaded() {
-        return threadPool != null;
-    }
-
-    public ExecutorService threadPool() {
-        return threadPool;
-    }
-
-    public void shutdown() {
-        if (threadPool != null) {
-            threadPool.shutdown();
-        }
-    }
-
-    public RaptorSearchWindowCalculator searchWindowCalculator() {
-        return new RaptorSearchWindowCalculator(tuningParameters.dynamicSearchWindowCoefficients());
-    }
-
-    /* private factory methods */
-
-    private Worker<T> createWorker(
-            SearchContext<T> ctx,
-            WorkerState<T> workerState,
-            RoutingStrategy<T> routingStrategy
-    ) {
-        return new RangeRaptorWorker<>(
-                workerState,
-                routingStrategy,
-                ctx.transit(),
-                ctx.slackProvider(),
-                ctx.accessPaths(),
-                ctx.roundProvider(),
-                ctx.calculator(),
-                ctx.createLifeCyclePublisher(),
-                ctx.timers(),
-                ctx.enableConstrainedTransfers()
-        );
-    }
-
-    @Nullable
-    private ExecutorService createNewThreadPool(int size) {
-        return size > 0 ? Executors.newFixedThreadPool(size) : null;
-    }
-
+  @Nullable
+  private ExecutorService createNewThreadPool(int size) {
+    return size > 0 ? Executors.newFixedThreadPool(size) : null;
+  }
 }

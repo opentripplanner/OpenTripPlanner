@@ -35,9 +35,9 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
  *
  * Expect: The highest priority should be picked
  *
- * Module under test: We are testing the Optimized Transfer Service, not Routing it self. So, the 
- *     path will always include two trips with one transfer selected even where single trip might 
- *     be found by the router. 
+ * Module under test: We are testing the Optimized Transfer Service, not Routing it self. So, the
+ *     path will always include two trips with one transfer selected even where single trip might
+ *     be found by the router.
  *
  * Note! This test uses some of the constants and utility methods of {@link
  *     OptimizePathDomainServiceTest}
@@ -45,125 +45,132 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 @SuppressWarnings("SameParameterValue")
 public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConstants {
 
-    /**
-     * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
-     */
-    private final int START_TIME_T1 = time("10:00:20");
+  /**
+   * The exact start time to walk to stop A to catch Trip_1 with 40s board slack
+   */
+  private final int START_TIME_T1 = time("10:00:20");
 
+  // Given
+  TestTripSchedule trip1 = TestTripSchedule
+    .schedule()
+    .pattern("T1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
+    .times("10:02 10:10 10:15 10:20 10:25 10:30")
+    .build();
 
-    // Given
-    TestTripSchedule trip1 = TestTripSchedule.schedule()
-            .pattern("T1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-            .times("10:02 10:10 10:15 10:20 10:25 10:30").build();
+  TestTripSchedule trip2 = TestTripSchedule
+    .schedule()
+    .pattern("T2", STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H)
+    .times("10:13 10:18 10:24 10:30 10:36 10:40")
+    .build();
 
-    TestTripSchedule trip2 = TestTripSchedule.schedule()
-            .pattern("T2", STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H)
-            .times("10:13 10:18 10:24 10:30 10:36 10:40").build();
+  TransferGenerator<TestTripSchedule> transfers = dummyTransferGenerator(
+    List.of(
+      tx(txConstrained(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED), D1m),
+      tx(txConstrained(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED), D2m),
+      tx(txConstrained(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED), D3m),
+      tx(txConstrained(trip1, STOP_E, trip2, STOP_F).guaranteed(), D4m),
+      tx(txConstrained(trip1, STOP_F, trip2, STOP_G).staySeated(), D5m),
+      tx(txConstrained(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED)),
+      tx(txConstrained(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED)),
+      tx(txConstrained(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED)),
+      tx(txConstrained(trip1, STOP_F, trip2, STOP_F).priority(NOT_ALLOWED))
+    )
+  );
 
-    TransferGenerator<TestTripSchedule> transfers = dummyTransferGenerator(
-            List.of(
-                    tx(txConstrained(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED), D1m),
-                    tx(txConstrained(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED), D2m),
-                    tx(txConstrained(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED), D3m),
-                    tx(txConstrained(trip1, STOP_E, trip2, STOP_F).guaranteed(), D4m),
-                    tx(txConstrained(trip1, STOP_F, trip2, STOP_G).staySeated(), D5m),
-                    tx(txConstrained(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED)),
-                    tx(txConstrained(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED)),
-                    tx(txConstrained(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED)),
-                    tx(txConstrained(trip1, STOP_F, trip2, STOP_F).priority(NOT_ALLOWED))
-            )
+  @Test
+  public void testTransferPriorityAllowed() {
+    testPriority(
+      STOP_D,
+      ALLOWED,
+      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:00:20 10:18:20 18m 1tx $1180 $33pri]"
     );
+  }
 
-    @Test
-    public void testTransferPriorityAllowed() {
-        testPriority(
-                STOP_D, ALLOWED,
-                "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:00:20 10:18:20 18m 1tx $1180 $33pri]"
-        );
+  @Test
+  public void testTransferPriorityRecommended() {
+    testPriority(
+      STOP_E,
+      RECOMMENDED,
+      "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:00:20 10:24:20 24m 1tx $1600 $32pri]"
+    );
+  }
+
+  @Test
+  public void testTransferPriorityPreferred() {
+    testPriority(
+      STOP_F,
+      PREFERRED,
+      "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:00:20 10:30:20 30m 1tx $2020 $31pri]"
+    );
+  }
+
+  @Test
+  public void testTransferGuaranteed() {
+    testGuaranteed(
+      STOP_G,
+      "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:00:20 10:36:20 36m 1tx $2410 $23pri]"
+    );
+  }
+
+  @Test
+  public void testTransferStaySeated() {
+    testStaySeated(
+      STOP_H,
+      "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:00:20 10:40:20 40m 0tx $2710 $13pri]"
+    );
+  }
+
+  /* private methods */
+
+  private void testStaySeated(int egressStop, String expItinerary) {
+    doTest(egressStop, true, false, ALLOWED, expItinerary);
+  }
+
+  private void testGuaranteed(int egressStop, String expItinerary) {
+    doTest(egressStop, false, true, ALLOWED, expItinerary);
+  }
+
+  private void testPriority(int egressStop, TransferPriority expPriority, String expItinerary) {
+    doTest(egressStop, false, false, expPriority, expItinerary);
+  }
+
+  private void doTest(
+    int egressStop,
+    boolean expStaySeated,
+    boolean expGuaranteed,
+    TransferPriority expPriority,
+    String expItinerary
+  ) {
+    var original = OptimizePathDomainServiceTest
+      .pathBuilder()
+      .access(START_TIME_T1, 0, STOP_A)
+      .bus(trip1, STOP_B)
+      .walk(D1m, STOP_C)
+      .bus(trip2, egressStop)
+      .egress(D0s);
+
+    var subject = OptimizePathDomainServiceTest.subject(transfers, null);
+
+    // Find the path with the lowest cost
+    var result = subject.findBestTransitPath(original);
+
+    assertEquals(expItinerary, PathUtils.pathsToString(result));
+
+    // Verify the attached Transfer is exist and is valid
+    var firstTransitLeg = result.iterator().next().accessLeg().nextTransitLeg();
+    assertNotNull(firstTransitLeg);
+
+    var txConstraints = (ConstrainedTransfer) firstTransitLeg.getConstrainedTransferAfterLeg();
+
+    if (expPriority != null) {
+      assertNotNull(txConstraints);
     }
 
-    @Test
-    public void testTransferPriorityRecommended() {
-        testPriority(
-                STOP_E, RECOMMENDED,
-                "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:00:20 10:24:20 24m 1tx $1600 $32pri]"
-        );
+    if (txConstraints != null) {
+      var c = txConstraints.getTransferConstraint();
+      assertEquals(expPriority, c.getPriority(), txConstraints.toString());
+      assertEquals(expStaySeated, c.isStaySeated(), txConstraints.toString());
+      assertEquals(expGuaranteed, c.isGuaranteed(), txConstraints.toString());
     }
-
-    @Test
-    public void testTransferPriorityPreferred() {
-        testPriority(
-                STOP_F, PREFERRED,
-                "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:00:20 10:30:20 30m 1tx $2020 $31pri]"
-        );
-    }
-
-    @Test
-    public void testTransferGuaranteed() {
-        testGuaranteed(
-                STOP_G,
-                "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:00:20 10:36:20 36m 1tx $2410 $23pri]"
-        );
-    }
-    @Test
-    public void testTransferStaySeated() {
-        testStaySeated(
-                STOP_H,
-                "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:00:20 10:40:20 40m 0tx $2710 $13pri]"
-        );
-    }
-
-
-    /* private methods */
-
-    private void testStaySeated(int egressStop, String expItinerary) {
-        doTest(egressStop, true, false, ALLOWED, expItinerary);
-    }
-
-    private void testGuaranteed(int egressStop, String expItinerary) {
-        doTest(egressStop, false, true, ALLOWED, expItinerary);
-    }
-
-    private void testPriority(int egressStop, TransferPriority expPriority, String expItinerary) {
-        doTest(egressStop, false, false, expPriority, expItinerary);
-    }
-
-    private void doTest(
-            int egressStop,
-            boolean expStaySeated,
-            boolean expGuaranteed,
-            TransferPriority expPriority,
-            String expItinerary
-    ) {
-        var original = OptimizePathDomainServiceTest.pathBuilder()
-                .access(START_TIME_T1, 0, STOP_A)
-                .bus(trip1, STOP_B)
-                .walk(D1m, STOP_C)
-                .bus(trip2, egressStop)
-                .egress(D0s);
-
-        var subject = OptimizePathDomainServiceTest.subject(transfers, null);
-
-        // Find the path with the lowest cost
-        var result = subject.findBestTransitPath(original);
-
-
-
-        assertEquals(expItinerary, PathUtils.pathsToString(result));
-
-        // Verify the attached Transfer is exist and is valid
-        var firstTransitLeg = result.iterator().next().accessLeg().nextTransitLeg();
-        assertNotNull(firstTransitLeg);
-
-        var txConstraints = (ConstrainedTransfer)firstTransitLeg.getConstrainedTransferAfterLeg();
-
-        if (expPriority != null) { assertNotNull(txConstraints); }
-
-        if(txConstraints != null) {
-            var c = txConstraints.getTransferConstraint();
-            assertEquals(expPriority, c.getPriority(), txConstraints.toString());
-            assertEquals(expStaySeated, c.isStaySeated(), txConstraints.toString());
-            assertEquals(expGuaranteed, c.isGuaranteed(), txConstraints.toString());
-        }
-    }
+  }
 }

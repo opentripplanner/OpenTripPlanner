@@ -15,16 +15,15 @@ import org.junit.jupiter.api.Test;
  */
 public class SandboxExtensionResourceTest {
 
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void verifyTestResourcesIsAvailableOnClasspath() throws IOException {
+  @Test
+  @SuppressWarnings("ConstantConditions")
+  public void verifyTestResourcesIsAvailableOnClasspath() throws IOException {
+    InputStream resource = ClassLoader.getSystemResourceAsStream("test.txt");
 
-        InputStream resource = ClassLoader.getSystemResourceAsStream("test.txt");
+    LineNumberReader in = new LineNumberReader(new InputStreamReader(resource));
 
-        LineNumberReader in = new LineNumberReader(new InputStreamReader(resource));
+    String text = in.readLine();
 
-        String text = in.readLine();
-
-        assertTrue(text.length() > 2, text);
-    }
+    assertTrue(text.length() > 2, text);
+  }
 }

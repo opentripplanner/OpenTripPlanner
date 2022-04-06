@@ -4,9 +4,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.BuildConfig;
-
+import org.opentripplanner.standalone.config.ConfigLoader;
 
 /**
  * This serializer is needed because there is no default constructor on the
@@ -21,19 +20,16 @@ import org.opentripplanner.standalone.config.BuildConfig;
  * is normalized without comments, and extra whitespace.
  */
 public class BuildConfigSerializer extends Serializer<BuildConfig> {
-    public static final String SOURCE = "SerializedGraph";
 
-    @Override
-    public void write(Kryo kryo, Output output, BuildConfig object) {
-        output.writeString(object.toJson());
-    }
+  public static final String SOURCE = "SerializedGraph";
 
-    @Override
-    public BuildConfig read(Kryo kryo, Input input, Class<? extends BuildConfig> type) {
-        return new BuildConfig(
-                ConfigLoader.nodeFromString(input.readString(), SOURCE),
-                SOURCE,
-                false
-        );
-    }
+  @Override
+  public void write(Kryo kryo, Output output, BuildConfig object) {
+    output.writeString(object.toJson());
+  }
+
+  @Override
+  public BuildConfig read(Kryo kryo, Input input, Class<? extends BuildConfig> type) {
+    return new BuildConfig(ConfigLoader.nodeFromString(input.readString(), SOURCE), SOURCE, false);
+  }
 }

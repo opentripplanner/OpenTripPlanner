@@ -33,63 +33,73 @@ import org.slf4j.LoggerFactory;
  */
 public class RoutingContext {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
 
-    /* FINAL FIELDS */
+  /* FINAL FIELDS */
 
-    public final RoutingRequest opt;
+  public final RoutingRequest opt;
 
-    public final Graph graph;
+  public final Graph graph;
 
-    public final Set<Vertex> fromVertices;
+  public final Set<Vertex> fromVertices;
 
-    public final Set<Vertex> toVertices;
+  public final Set<Vertex> toVertices;
 
-    /** Indicates that the search timed out or was otherwise aborted. */
-    public boolean aborted;
+  /** Indicates that the search timed out or was otherwise aborted. */
+  public boolean aborted;
 
-    /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
-    public boolean slopeRestrictionRemoved = false;
+  /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
+  public boolean slopeRestrictionRemoved = false;
 
-    /**
-     * DataOverlay Sandbox module context.
-     */
-    public DataOverlayContext dataOverlayContext;
+  /**
+   * DataOverlay Sandbox module context.
+   */
+  public DataOverlayContext dataOverlayContext;
 
-    /* CONSTRUCTORS */
+  /* CONSTRUCTORS */
 
-    /**
-     * Constructor that automatically computes origin/target from TemporaryVerticesContainer.
-     */
-    public RoutingContext(RoutingRequest routingRequest, Graph graph, TemporaryVerticesContainer temporaryVertices) {
-        this(routingRequest, graph, temporaryVertices.getFromVertices(), temporaryVertices.getToVertices());
+  /**
+   * Constructor that automatically computes origin/target from TemporaryVerticesContainer.
+   */
+  public RoutingContext(
+    RoutingRequest routingRequest,
+    Graph graph,
+    TemporaryVerticesContainer temporaryVertices
+  ) {
+    this(
+      routingRequest,
+      graph,
+      temporaryVertices.getFromVertices(),
+      temporaryVertices.getToVertices()
+    );
+  }
+
+  /**
+   * Constructor that takes to/from vertices as input.
+   */
+  public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
+    this(routingRequest, graph, Collections.singleton(from), Collections.singleton(to));
+  }
+
+  /**
+   * Constructor that takes sets of to/from vertices as input.
+   */
+  public RoutingContext(
+    RoutingRequest routingRequest,
+    Graph graph,
+    Set<Vertex> from,
+    Set<Vertex> to
+  ) {
+    if (graph == null) {
+      throw new GraphNotFoundException();
     }
-
-    /**
-     * Constructor that takes to/from vertices as input.
-     */
-    public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
-        this(routingRequest, graph, Collections.singleton(from), Collections.singleton(to));
-    }
-
-    /**
-     * Constructor that takes sets of to/from vertices as input.
-     */
-    public RoutingContext(
-            RoutingRequest routingRequest,
-            Graph graph,
-            Set<Vertex> from,
-            Set<Vertex> to
-    ) {
-        if (graph == null) {
-            throw new GraphNotFoundException();
-        }
-        this.opt = routingRequest;
-        this.graph = graph;
-        this.fromVertices = routingRequest.arriveBy ? to : from;
-        this.toVertices = routingRequest.arriveBy ? from : to;
-        this.dataOverlayContext = OTPFeature.DataOverlay.isOnElseNull(() ->
-            new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)
-        );
-    }
+    this.opt = routingRequest;
+    this.graph = graph;
+    this.fromVertices = routingRequest.arriveBy ? to : from;
+    this.toVertices = routingRequest.arriveBy ? from : to;
+    this.dataOverlayContext =
+      OTPFeature.DataOverlay.isOnElseNull(() ->
+        new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)
+      );
+  }
 }

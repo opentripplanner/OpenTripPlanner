@@ -59,20 +59,26 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<String> realtimeState() {
-    return environment -> getSource(environment).isCanceledEffectively()
-            ? RealTimeState.CANCELED.name()
-            : getSource(environment).getRealtimeState().name();
+    return environment ->
+      getSource(environment).isCanceledEffectively()
+        ? RealTimeState.CANCELED.name()
+        : getSource(environment).getRealtimeState().name();
   }
 
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
       switch (getSource(environment).getPickupType().getGtfsCode()) {
-        case 0: return "SCHEDULED";
-        case 1: return "NONE";
-        case 2: return "CALL_AGENCY";
-        case 3: return "COORDINATE_WITH_DRIVER";
-        default: return null;
+        case 0:
+          return "SCHEDULED";
+        case 1:
+          return "NONE";
+        case 2:
+          return "CALL_AGENCY";
+        case 3:
+          return "COORDINATE_WITH_DRIVER";
+        default:
+          return null;
       }
     };
   }
@@ -81,11 +87,16 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   public DataFetcher<String> dropoffType() {
     return environment -> {
       switch (getSource(environment).getDropoffType().getGtfsCode()) {
-        case 0: return "SCHEDULED";
-        case 1: return "NONE";
-        case 2: return "CALL_AGENCY";
-        case 3: return "COORDINATE_WITH_DRIVER";
-        default: return null;
+        case 0:
+          return "SCHEDULED";
+        case 1:
+          return "NONE";
+        case 2:
+          return "CALL_AGENCY";
+        case 3:
+          return "COORDINATE_WITH_DRIVER";
+        default:
+          return null;
       }
     };
   }
@@ -118,11 +129,10 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
    * trips they are not and have to be converted to null here.
    */
   private Integer missingValueToNull(int value) {
-      if(value == StopTime.MISSING_VALUE) {
-        return null;
-      }
-      else {
-        return value;
-      }
+    if (value == StopTime.MISSING_VALUE) {
+      return null;
+    } else {
+      return value;
+    }
   }
 }

@@ -27,78 +27,82 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  * stored in the {@link TransitLayer}.
  */
 public final class StopIndexForRaptor {
-    private final List<StopLocation> stopsByIndex;
-    private final Map<StopLocation, Integer> indexByStop = new HashMap<>();
-    public final int[] stopBoardAlightCosts;
 
-    public StopIndexForRaptor(Collection<StopLocation> stops, TransitTuningParameters tuningParameters) {
-        this.stopsByIndex = List.copyOf(stops);
-        initializeIndexByStop();
-        this.stopBoardAlightCosts = createStopBoardAlightCosts(stopsByIndex, tuningParameters);
+  private final List<StopLocation> stopsByIndex;
+  private final Map<StopLocation, Integer> indexByStop = new HashMap<>();
+  public final int[] stopBoardAlightCosts;
+
+  public StopIndexForRaptor(
+    Collection<StopLocation> stops,
+    TransitTuningParameters tuningParameters
+  ) {
+    this.stopsByIndex = List.copyOf(stops);
+    initializeIndexByStop();
+    this.stopBoardAlightCosts = createStopBoardAlightCosts(stopsByIndex, tuningParameters);
+  }
+
+  public StopLocation stopByIndex(int index) {
+    return stopsByIndex.get(index);
+  }
+
+  public int indexOf(StopLocation stop) {
+    return indexByStop.get(stop);
+  }
+
+  public int size() {
+    return stopsByIndex.size();
+  }
+
+  /**
+   * Create a list of stop indexes for a given list of stops.
+   */
+  public int[] listStopIndexesForStops(List<StopLocation> stops) {
+    int[] stopIndex = new int[stops.size()];
+
+    for (int i = 0; i < stops.size(); i++) {
+      stopIndex[i] = indexByStop.get(stops.get(i));
     }
+    return stopIndex;
+  }
 
-    public StopLocation stopByIndex(int index) {
-        return stopsByIndex.get(index);
+  /**
+   * Create a list of stop indexes for a given list of stops.
+   */
+  public int[] listStopIndexesForPattern(TripPattern pattern) {
+    int[] stopIndex = new int[pattern.numberOfStops()];
+
+    for (int i = 0; i < pattern.numberOfStops(); i++) {
+      stopIndex[i] = indexByStop.get(pattern.getStop(i));
     }
+    return stopIndex;
+  }
 
-    public int indexOf(StopLocation stop) {
-        return indexByStop.get(stop);
+  /**
+   * Create map between stop and index used by Raptor to stop objects in original graph
+   */
+  private void initializeIndexByStop() {
+    for (int i = 0; i < stopsByIndex.size(); ++i) {
+      indexByStop.put(stopsByIndex.get(i), i);
     }
+  }
 
-    public int size() {
-        return stopsByIndex.size();
+  /**
+   * Create static board/alight cost for Raptor to include for each stop.
+   */
+  private static int[] createStopBoardAlightCosts(
+    List<StopLocation> stops,
+    TransitTuningParameters tuningParams
+  ) {
+    if (!tuningParams.enableStopTransferPriority()) {
+      return null;
     }
+    int[] stopVisitCosts = new int[stops.size()];
 
-    /**
-     * Create a list of stop indexes for a given list of stops.
-     */
-    public int[] listStopIndexesForStops(List<StopLocation> stops) {
-        int[] stopIndex = new int[stops.size()];
-
-        for (int i = 0; i < stops.size(); i++) {
-            stopIndex[i] = indexByStop.get(stops.get(i));
-        }
-        return stopIndex;
+    for (int i = 0; i < stops.size(); ++i) {
+      StopTransferPriority priority = stops.get(i).getPriority();
+      int domainCost = tuningParams.stopTransferCost(priority);
+      stopVisitCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
     }
-
-    /**
-     * Create a list of stop indexes for a given list of stops.
-     */
-    public int[] listStopIndexesForPattern(TripPattern pattern) {
-        int[] stopIndex = new int[pattern.numberOfStops()];
-
-        for (int i = 0; i < pattern.numberOfStops(); i++) {
-            stopIndex[i] = indexByStop.get(pattern.getStop(i));
-        }
-        return stopIndex;
-    }
-
-    /**
-     * Create map between stop and index used by Raptor to stop objects in original graph
-     */
-    private void initializeIndexByStop() {
-        for(int i = 0; i< stopsByIndex.size(); ++i) {
-            indexByStop.put(stopsByIndex.get(i), i);
-        }
-    }
-
-    /**
-     * Create static board/alight cost for Raptor to include for each stop.
-     */
-    private static int[] createStopBoardAlightCosts(
-        List<StopLocation> stops,
-        TransitTuningParameters tuningParams
-    ) {
-        if(!tuningParams.enableStopTransferPriority()) {
-            return null;
-        }
-        int[] stopVisitCosts = new int[stops.size()];
-
-        for (int i=0; i<stops.size(); ++i) {
-            StopTransferPriority priority = stops.get(i).getPriority();
-            int domainCost = tuningParams.stopTransferCost(priority);
-            stopVisitCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
-        }
-        return stopVisitCosts;
-    }
+    return stopVisitCosts;
+  }
 }

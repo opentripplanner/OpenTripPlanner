@@ -10,105 +10,105 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
-
 /**
  * An OptimizedPath decorates a path returned from Raptor with a transfer-priority-cost and
  * a wait-time-optimized-cost.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
-        implements TransferOptimized
-{
-    private final int transferPriorityCost;
-    private final int waitTimeOptimizedCost;
-    private final int breakTieCost;
+public class OptimizedPath<T extends RaptorTripSchedule>
+  extends Path<T>
+  implements TransferOptimized {
 
-    public OptimizedPath(Path<T> originalPath) {
-        this(
-                originalPath.accessLeg(),
-                originalPath.rangeRaptorIterationDepartureTime(),
-                originalPath.generalizedCost(),
-                priorityCost(originalPath),
-                NEUTRAL_COST,
-                NEUTRAL_COST
-        );
-    }
+  private final int transferPriorityCost;
+  private final int waitTimeOptimizedCost;
+  private final int breakTieCost;
 
-    public OptimizedPath(
-            AccessPathLeg<T> accessPathLeg,
-            int iterationStartTime,
-            int generalizedCost,
-            int transferPriorityCost,
-            int waitTimeOptimizedCost,
-            int breakTieCost
-    ) {
-        super(iterationStartTime, accessPathLeg, generalizedCost);
-        this.transferPriorityCost = transferPriorityCost;
-        this.waitTimeOptimizedCost = waitTimeOptimizedCost;
-        this.breakTieCost = breakTieCost;
-    }
+  public OptimizedPath(Path<T> originalPath) {
+    this(
+      originalPath.accessLeg(),
+      originalPath.rangeRaptorIterationDepartureTime(),
+      originalPath.generalizedCost(),
+      priorityCost(originalPath),
+      NEUTRAL_COST,
+      NEUTRAL_COST
+    );
+  }
 
-    @Override
-    public int transferPriorityCost() {
-        return transferPriorityCost;
-    }
+  public OptimizedPath(
+    AccessPathLeg<T> accessPathLeg,
+    int iterationStartTime,
+    int generalizedCost,
+    int transferPriorityCost,
+    int waitTimeOptimizedCost,
+    int breakTieCost
+  ) {
+    super(iterationStartTime, accessPathLeg, generalizedCost);
+    this.transferPriorityCost = transferPriorityCost;
+    this.waitTimeOptimizedCost = waitTimeOptimizedCost;
+    this.breakTieCost = breakTieCost;
+  }
 
-    /**
-     * A utility function for calculating the priority cost for a transfer.
-     * If the {@code transfer exist}, the given supplier is used to get the constrained transfer
-     * (can be null) and the cost is calculated. If a transfer does not exist, zero cost is returned.
-     */
-    public static int priorityCost(boolean transferExist, Supplier<RaptorConstrainedTransfer> txGet) {
-        if(transferExist) {
-            var tx = txGet.get();
-            var c = tx == null ? null : (TransferConstraint) tx.getTransferConstraint();
-            return TransferConstraint.cost(c);
-        }
-        // Return no zero cost if a transfer do not exist
-        return TransferConstraint.ZERO_COST;
-    }
+  @Override
+  public int transferPriorityCost() {
+    return transferPriorityCost;
+  }
 
-    @Override
-    public int generalizedCostWaitTimeOptimized() {
-        return generalizedCost() + waitTimeOptimizedCost;
+  /**
+   * A utility function for calculating the priority cost for a transfer.
+   * If the {@code transfer exist}, the given supplier is used to get the constrained transfer
+   * (can be null) and the cost is calculated. If a transfer does not exist, zero cost is returned.
+   */
+  public static int priorityCost(boolean transferExist, Supplier<RaptorConstrainedTransfer> txGet) {
+    if (transferExist) {
+      var tx = txGet.get();
+      var c = tx == null ? null : (TransferConstraint) tx.getTransferConstraint();
+      return TransferConstraint.cost(c);
     }
+    // Return no zero cost if a transfer do not exist
+    return TransferConstraint.ZERO_COST;
+  }
 
-    @Override
-    public int breakTieCost() {
-        return breakTieCost;
-    }
+  @Override
+  public int generalizedCostWaitTimeOptimized() {
+    return generalizedCost() + waitTimeOptimizedCost;
+  }
 
-    @Override
-    public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
-        return buildString(true, stopNameResolver, this::appendSummary);
-    }
+  @Override
+  public int breakTieCost() {
+    return breakTieCost;
+  }
 
-    @Override
-    public String toString(RaptorStopNameResolver stopNameResolver) {
-        return buildString(false, stopNameResolver, this::appendSummary);
-    }
+  @Override
+  public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
+    return buildString(true, stopNameResolver, this::appendSummary);
+  }
 
-    @Override
-    public String toString() {
-        return toString(null);
-    }
+  @Override
+  public String toString(RaptorStopNameResolver stopNameResolver) {
+    return buildString(false, stopNameResolver, this::appendSummary);
+  }
 
-    private void appendSummary(PathStringBuilder buf) {
-        buf.costCentiSec(transferPriorityCost, TransferConstraint.ZERO_COST, "pri");
-        buf.costCentiSec(generalizedCostWaitTimeOptimized(), generalizedCost(), "wtc");
-    }
+  @Override
+  public String toString() {
+    return toString(null);
+  }
 
-    private static int priorityCost(Path<?> path) {
-        return path.legStream().mapToInt(OptimizedPath::priorityCost).sum();
-    }
+  private void appendSummary(PathStringBuilder buf) {
+    buf.costCentiSec(transferPriorityCost, TransferConstraint.ZERO_COST, "pri");
+    buf.costCentiSec(generalizedCostWaitTimeOptimized(), generalizedCost(), "wtc");
+  }
 
-    private static int priorityCost(PathLeg<?> leg) {
-        // Only calculate priority cost for transit legs which are followed by at least one
-        // other transit leg.
-        return priorityCost(
-                leg.isTransitLeg() && leg.nextTransitLeg() != null,
-                () -> leg.asTransitLeg().getConstrainedTransferAfterLeg()
-        );
-    }
+  private static int priorityCost(Path<?> path) {
+    return path.legStream().mapToInt(OptimizedPath::priorityCost).sum();
+  }
+
+  private static int priorityCost(PathLeg<?> leg) {
+    // Only calculate priority cost for transit legs which are followed by at least one
+    // other transit leg.
+    return priorityCost(
+      leg.isTransitLeg() && leg.nextTransitLeg() != null,
+      () -> leg.asTransitLeg().getConstrainedTransferAfterLeg()
+    );
+  }
 }

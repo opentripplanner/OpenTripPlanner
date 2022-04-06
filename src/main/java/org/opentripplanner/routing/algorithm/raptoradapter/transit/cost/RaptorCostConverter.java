@@ -13,9 +13,10 @@ import org.opentripplanner.model.base.OtpNumberFormat;
  * to win over a cost factor of {@code 1.00}.
  */
 public final class RaptorCostConverter {
+
   private static final int NOT_SET = -1;
   private static final int PRECISION = 100;
-  private static final int HALF = PRECISION/2;
+  private static final int HALF = PRECISION / 2;
 
   /* private constructor to prevent instantiation of utility class. */
   private RaptorCostConverter() {}
@@ -24,7 +25,9 @@ public final class RaptorCostConverter {
    * Convert Raptor internal cost to OTP domain model cost.
    */
   public static int toOtpDomainCost(int raptorCost) {
-    if(raptorCost == NOT_SET) { return NOT_SET; }
+    if (raptorCost == NOT_SET) {
+      return NOT_SET;
+    }
     return (raptorCost + HALF) / PRECISION;
   }
 
@@ -32,7 +35,7 @@ public final class RaptorCostConverter {
    * Convert Raptor internal cost to a string with format $###.## (in seconds)
    */
   public static String toString(int raptorCost) {
-      return OtpNumberFormat.formatCost(raptorCost);
+    return OtpNumberFormat.formatCost(raptorCost);
   }
 
   /**

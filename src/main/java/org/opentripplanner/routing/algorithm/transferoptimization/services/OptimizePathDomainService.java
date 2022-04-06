@@ -19,7 +19,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
-
 /**
  * This class is responsible for generating all possible permutations of a path with respect to
  * where the transfer happens and picking the best possible path. To improve performance, the paths
@@ -75,19 +74,21 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
   @Nullable
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
+
   @Nullable
   private final int[] stopBoardAlightCosts;
+
   private final double extraStopBoardAlightCostsFactor;
 
   public OptimizePathDomainService(
-      TransferGenerator<T> transferGenerator,
-      CostCalculator costCalculator,
-      RaptorSlackProvider slackProvider,
-      @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
-      int[] stopBoardAlightCosts,
-      double extraStopBoardAlightCostsFactor,
-      MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain,
-      RaptorStopNameResolver stopNameTranslator
+    TransferGenerator<T> transferGenerator,
+    CostCalculator costCalculator,
+    RaptorSlackProvider slackProvider,
+    @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
+    int[] stopBoardAlightCosts,
+    double extraStopBoardAlightCostsFactor,
+    MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain,
+    RaptorStopNameResolver stopNameTranslator
   ) {
     this.transferGenerator = transferGenerator;
     this.costCalculator = costCalculator;
@@ -104,57 +105,52 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
     // Find all possible transfers between each pair of transit legs, and sort on arrival time
     var possibleTransfers = sortTransfersOnArrivalTimeInDecOrder(
-            transferGenerator.findAllPossibleTransfers(transitLegs)
+      transferGenerator.findAllPossibleTransfers(transitLegs)
     );
 
     // Combine transit legs and transfers
-    var tails = findBestTransferOption(
-            originalPath, transitLegs, possibleTransfers
-    );
+    var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers);
 
     final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
 
-    return tails.stream()
-            .map(it -> it.build(iterationDepartureTime))
-            .collect(Collectors.toSet());
+    return tails.stream().map(it -> it.build(iterationDepartureTime)).collect(Collectors.toSet());
   }
 
   private Set<OptimizedPathTail<T>> findBestTransferOption(
-          Path<T> originalPath,
-          List<TransitPathLeg<T>> originalTransitLegs,
-          List<List<TripToTripTransfer<T>>> possibleTransfers
+    Path<T> originalPath,
+    List<TransitPathLeg<T>> originalTransitLegs,
+    List<List<TripToTripTransfer<T>>> possibleTransfers
   ) {
     // Create a set of tails with the last transit leg in it (one element)
     Set<OptimizedPathTail<T>> tails = Set.of(
-        new OptimizedPathTail<T>(
-                slackProvider,
-                costCalculator,
-                waitTimeCostCalculator,
-                stopBoardAlightCosts,
-                extraStopBoardAlightCostsFactor,
-                stopNameTranslator
-        )
-              .addTransitTail(last(originalTransitLegs))
+      new OptimizedPathTail<T>(
+        slackProvider,
+        costCalculator,
+        waitTimeCostCalculator,
+        stopBoardAlightCosts,
+        extraStopBoardAlightCostsFactor,
+        stopNameTranslator
+      )
+        .addTransitTail(last(originalTransitLegs))
     );
 
     // Cache accessArrivalTime, any event before the access-arrival-time is safe to ignore
     int accessArrivalTime = originalPath.accessLeg().toTime();
 
-    for (int i = possibleTransfers.size()-1; i >=0; --i) {
-
+    for (int i = possibleTransfers.size() - 1; i >= 0; --i) {
       // Get the list of transfers for the current index
       List<TripToTripTransfer<T>> transfers = possibleTransfers.get(i);
       TransitPathLeg<T> originalFromTransitLeg = originalTransitLegs.get(i);
 
       // Find the earliest possible time we can arrive and still find a matching transfer in the
       // next iteration (looking at the boarding of the current transit leg)
-      int earliestDepartureTimeFromLeg = i==0
-              ? accessArrivalTime
-              // The transfer with the earliest-arrival-time BEFORE the transit-leg is used to
-              // prune the transfers AFTER the transit-leg. The transfers are sorted on
-              // arrival-time in descending order, so the earliest-arrival-time is the
-              // last element of the list of transfers.
-              : last(possibleTransfers.get(i-1)).to().time();
+      int earliestDepartureTimeFromLeg = i == 0
+        ? accessArrivalTime
+        // The transfer with the earliest-arrival-time BEFORE the transit-leg is used to
+        // prune the transfers AFTER the transit-leg. The transfers are sorted on
+        // arrival-time in descending order, so the earliest-arrival-time is the
+        // last element of the list of transfers.
+        : last(possibleTransfers.get(i - 1)).to().time();
 
       // create a tailSelector for the tails produced in the last round and use it to filter them
       // based on the transfer-arrival-time and given filter
@@ -163,11 +159,9 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
       // Reset the result set to an empty set
       tails = new HashSet<>();
 
-
       for (TripToTripTransfer<T> tx : transfers) {
-
         // Skip transfers happening before earliest possible board time
-        if(tx.from().time() <= earliestDepartureTimeFromLeg) {
+        if (tx.from().time() <= earliestDepartureTimeFromLeg) {
           continue;
         }
 
@@ -177,17 +171,16 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
         for (OptimizedPathTail<T> tail : candidateTails) {
           // Tail can be used with current transfer
           if (tail != null) {
-            tails.add(
-                createNewTransitLegTail(originalFromTransitLeg, tx, tail)
-            );
+            tails.add(createNewTransitLegTail(originalFromTransitLeg, tx, tail));
           }
         }
       }
     }
 
     // Filter tails one final time
-    tails = new TransitPathLegSelector<>(minCostFilterChain, tails)
-            .next(originalPath.accessLeg().toTime());
+    tails =
+      new TransitPathLegSelector<>(minCostFilterChain, tails)
+        .next(originalPath.accessLeg().toTime());
 
     // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);
@@ -199,28 +192,24 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
    * Insert the access leg and the following transfer.
    * The transfer can only exist if the access has rides (is FLEX).
    */
-  private void insertAccess(
-          Path<T> originalPath,
-          Set<OptimizedPathTail<T>> tails
-  ) {
+  private void insertAccess(Path<T> originalPath, Set<OptimizedPathTail<T>> tails) {
     var accessLeg = originalPath.accessLeg();
     var nextLeg = accessLeg.nextLeg();
     TransferPathLeg<T> nextTransferLeg = null;
     TransitPathLeg<T> nextTransitLeg;
 
-    if(nextLeg.isTransferLeg()) {
+    if (nextLeg.isTransferLeg()) {
       nextTransferLeg = nextLeg.asTransferLeg();
       nextTransitLeg = nextTransferLeg.nextLeg().asTransitLeg();
-    }
-    else {
+    } else {
       nextTransitLeg = accessLeg.nextLeg().asTransitLeg();
     }
 
     int boardPos = nextTransitLeg.getFromStopPosition();
 
-    for(OptimizedPathTail<T> path : tails) {
+    for (OptimizedPathTail<T> path : tails) {
       path.head().changeBoardingPosition(boardPos);
-      if(nextTransferLeg != null) {
+      if (nextTransferLeg != null) {
         path.transfer(nextTransferLeg.transfer(), nextTransferLeg.toStop());
       }
       path.access(accessLeg.access());
@@ -237,24 +226,28 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
    * before the first possible boarding.
    */
   private OptimizedPathTail<T> createNewTransitLegTail(
-          TransitPathLeg<T> originalLeg,
-          TripToTripTransfer<T> tx,
-          OptimizedPathTail<T> tail
+    TransitPathLeg<T> originalLeg,
+    TripToTripTransfer<T> tx,
+    OptimizedPathTail<T> tail
   ) {
     return tail.mutate().addTransitAndTransferLeg(originalLeg, tx);
   }
 
   private List<List<TripToTripTransfer<T>>> sortTransfersOnArrivalTimeInDecOrder(
-          List<List<TripToTripTransfer<T>>> transfers
+    List<List<TripToTripTransfer<T>>> transfers
   ) {
-    return transfers.stream()
-        .map(it ->
-            it.stream()
-                .sorted(Comparator.comparingInt(l -> -l.to().time()))
-                .collect(Collectors.toList())
-        )
-        .collect(Collectors.toList());
+    return transfers
+      .stream()
+      .map(it ->
+        it
+          .stream()
+          .sorted(Comparator.comparingInt(l -> -l.to().time()))
+          .collect(Collectors.toList())
+      )
+      .collect(Collectors.toList());
   }
 
-  private static <T> T last(List<T> list) { return list.get(list.size()-1);}
+  private static <T> T last(List<T> list) {
+    return list.get(list.size() - 1);
+  }
 }

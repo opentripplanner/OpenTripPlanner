@@ -10,31 +10,32 @@ import org.opentripplanner.model.base.ToStringBuilder;
  */
 public class TripPlan {
 
-    /**  The time and date of travel */
-    public final Date date;
+  /**  The time and date of travel */
+  public final Date date;
 
-    /** The origin */
-    public final Place from;
+  /** The origin */
+  public final Place from;
 
-    /** The destination */
-    public final Place to;
+  /** The destination */
+  public final Place to;
 
-    public final List<Itinerary> itineraries;
+  public final List<Itinerary> itineraries;
 
-    public TripPlan(Place from, Place to, Date date, Collection<Itinerary> itineraries) {
-        this.from = from;
-        this.to = to;
-        this.date = date;
-        this.itineraries = List.copyOf(itineraries);
-    }
+  public TripPlan(Place from, Place to, Date date, Collection<Itinerary> itineraries) {
+    this.from = from;
+    this.to = to;
+    this.date = date;
+    this.itineraries = List.copyOf(itineraries);
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(TripPlan.class)
-                .addObj("date", date)
-                .addObj("from", from)
-                .addObj("to", to)
-                .addObj("itineraries", itineraries)
-                .toString();
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TripPlan.class)
+      .addObj("date", date)
+      .addObj("from", from)
+      .addObj("to", to)
+      .addObj("itineraries", itineraries)
+      .toString();
+  }
 }

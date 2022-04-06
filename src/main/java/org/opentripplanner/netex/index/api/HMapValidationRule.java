@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.index.api;
 
-
 import org.opentripplanner.graph_builder.DataImportIssue;
 
 /**
@@ -27,7 +26,7 @@ public interface HMapValidationRule<K, V> {
     /** Log warning */
     WARN,
     /** Log warning and remove element from HierarchicalMap. */
-    DISCARD
+    DISCARD,
   }
 
   /**

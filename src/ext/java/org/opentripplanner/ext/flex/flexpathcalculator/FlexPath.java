@@ -29,7 +29,7 @@ public class FlexPath {
   }
 
   public LineString getGeometry() {
-    if(geometry == null) {
+    if (geometry == null) {
       geometry = geometrySupplier.get();
     }
     return geometry;

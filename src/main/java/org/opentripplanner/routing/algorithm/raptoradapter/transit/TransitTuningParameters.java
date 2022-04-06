@@ -6,7 +6,6 @@ import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.util.time.DurationUtils;
 
 public interface TransitTuningParameters {
-
   List<Duration> PAGING_SEARCH_WINDOW_ADJUSTMENTS = DurationUtils.durations("4h 2h 1h 30m 20m 10m");
 
   /**
@@ -23,21 +22,29 @@ public interface TransitTuningParameters {
    */
   TransitTuningParameters FOR_TEST = new TransitTuningParameters() {
     @Override
-    public boolean enableStopTransferPriority() { return true; }
+    public boolean enableStopTransferPriority() {
+      return true;
+    }
 
     @Override
     public Integer stopTransferCost(StopTransferPriority key) {
       switch (key) {
-        case DISCOURAGED: return 3600;
-        case ALLOWED:     return 60;
-        case RECOMMENDED: return 20;
-        case PREFERRED:   return 0;
+        case DISCOURAGED:
+          return 3600;
+        case ALLOWED:
+          return 60;
+        case RECOMMENDED:
+          return 20;
+        case PREFERRED:
+          return 0;
       }
       throw new IllegalArgumentException("Unknown key: " + key);
     }
 
     @Override
-    public int transferCacheMaxSize() {return 5;}
+    public int transferCacheMaxSize() {
+      return 5;
+    }
 
     @Override
     public List<Duration> pagingSearchWindowAdjustments() {

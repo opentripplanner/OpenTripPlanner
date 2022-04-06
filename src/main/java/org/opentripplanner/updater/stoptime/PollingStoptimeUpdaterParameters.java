@@ -4,6 +4,7 @@ import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
 public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterParameters {
+
   private final String configRef;
   private final int frequencySec;
   private final int logFrequency;
@@ -18,16 +19,16 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   private final String fileSource;
 
   public PollingStoptimeUpdaterParameters(
-      String configRef,
-      int frequencySec,
-      int logFrequency,
-      int maxSnapshotFrequencyMs,
-      boolean purgeExpiredData,
-      boolean fuzzyTripMatching,
-      DataSourceType sourceType,
-      String feedId,
-      String httpSourceUrl,
-      String fileSource
+    String configRef,
+    int frequencySec,
+    int logFrequency,
+    int maxSnapshotFrequencyMs,
+    boolean purgeExpiredData,
+    boolean fuzzyTripMatching,
+    DataSourceType sourceType,
+    String feedId,
+    String httpSourceUrl,
+    String fileSource
   ) {
     this.configRef = configRef;
     this.frequencySec = frequencySec;
@@ -77,15 +78,29 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
 
   GtfsRealtimeFileTripUpdateSource.Parameters fileSourceParameters() {
     return new GtfsRealtimeFileTripUpdateSource.Parameters() {
-      @Override public String getFeedId() { return feedId; }
-      @Override public String getFile() { return fileSource; }
+      @Override
+      public String getFeedId() {
+        return feedId;
+      }
+
+      @Override
+      public String getFile() {
+        return fileSource;
+      }
     };
   }
 
   GtfsRealtimeHttpTripUpdateSource.Parameters httpSourceParameters() {
     return new GtfsRealtimeHttpTripUpdateSource.Parameters() {
-      @Override public String getFeedId() { return feedId; }
-      @Override public String getUrl() { return httpSourceUrl; }
+      @Override
+      public String getFeedId() {
+        return feedId;
+      }
+
+      @Override
+      public String getUrl() {
+        return httpSourceUrl;
+      }
     };
   }
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
@@ -48,114 +47,104 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
 
-    private static final String EXPECTED_FLEX =
-            "Flex 11m 1x ~ C ~ Walk 2m ~ D ~ BUS L3 0:16 0:22 ~ F [0:02 0:22 20m 1tx";
-    private static final String EXPECTED_FLEX_STD = EXPECTED_FLEX +"]";
-    private static final String EXPECTED_FLEX_MC = EXPECTED_FLEX +" $2580]";
+  private static final String EXPECTED_FLEX =
+    "Flex 11m 1x ~ C ~ Walk 2m ~ D ~ BUS L3 0:16 0:22 ~ F [0:02 0:22 20m 1tx";
+  private static final String EXPECTED_FLEX_STD = EXPECTED_FLEX + "]";
+  private static final String EXPECTED_FLEX_MC = EXPECTED_FLEX + " $2580]";
 
-    private static final String EXPECTED_WALK =
-            "A ~ BUS L1 0:02 0:10 ~ B ~ Walk 2m ~ C ~ BUS L2 0:15 0:20 ~ E ~ Walk 1m [0:02 0:21 19m 1tx";
-    private static final String EXPECTED_WALK_STD = EXPECTED_WALK +"]";
-    private static final String EXPECTED_WALK_MC = EXPECTED_WALK +" $2460]";
+  private static final String EXPECTED_WALK =
+    "A ~ BUS L1 0:02 0:10 ~ B ~ Walk 2m ~ C ~ BUS L2 0:15 0:20 ~ E ~ Walk 1m [0:02 0:21 19m 1tx";
+  private static final String EXPECTED_WALK_STD = EXPECTED_WALK + "]";
+  private static final String EXPECTED_WALK_MC = EXPECTED_WALK + " $2460]";
 
-    private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-            RaptorConfig.defaultConfigForTest()
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
+  private final TestTransitData data = new TestTransitData();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+
+  @BeforeEach
+  public void setup() {
+    data.withRoutes(
+      route("L1", STOP_A, STOP_B).withTimetable(schedule("0:02 0:10")),
+      route("L2", STOP_C, STOP_E).withTimetable(schedule("0:15 0:20")),
+      route("L3", STOP_D, STOP_F).withTimetable(schedule("0:16 0:22"))
     );
-    private final TestTransitData data = new TestTransitData();
-    private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+    requestBuilder
+      .searchParams()
+      .earliestDepartureTime(T00_02)
+      .latestArrivalTime(T00_30)
+      .searchOneIterationOnly();
 
-    @BeforeEach
-    public void setup() {
-        data.withRoutes(
-                route("L1", STOP_A, STOP_B).withTimetable(schedule("0:02 0:10")),
-                route("L2", STOP_C, STOP_E).withTimetable(schedule("0:15 0:20")),
-                route("L3", STOP_D, STOP_F).withTimetable(schedule("0:16 0:22"))
-        );
-        requestBuilder.searchParams()
-                .earliestDepartureTime(T00_02)
-                .latestArrivalTime(T00_30)
-                .searchOneIterationOnly();
+    // We will test board- and alight-slack in a separate test
+    requestBuilder.slackProvider(defaultSlackProvider(D1m, D0s, D0s));
 
-        // We will test board- and alight-slack in a separate test
-        requestBuilder.slackProvider(defaultSlackProvider(D1m, D0s, D0s));
+    requestBuilder.searchParams().addAccessPaths(walk(STOP_A, D0s), flex(STOP_C, D11m));
 
-        requestBuilder.searchParams().addAccessPaths(
-                walk(STOP_A, D0s),
-                flex(STOP_C, D11m)
-        );
+    data.withTransfer(STOP_B, walk(STOP_C, D2m)).withTransfer(STOP_C, walk(STOP_D, D2m));
 
-        data.withTransfer(STOP_B, walk(STOP_C, D2m))
-                .withTransfer(STOP_C, walk(STOP_D, D2m));
+    // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+  }
 
-        // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
-        ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
-    }
+  /**
+   * This set the egress-paths, so the flex access become optimal. The Egress from
+   * Stop E to Stop F is set to 3 minutes.
+   */
+  private void withFlexAccessAsBestOption() {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D3m));
+  }
 
-    /**
-     * This set the egress-paths, so the flex access become optimal. The Egress from
-     * Stop E to Stop F is set to 3 minutes.
-     */
-    private void withFlexAccessAsBestOption() {
-        requestBuilder.searchParams().addEgressPaths(
-                walk(STOP_F, D0s),
-                walk(STOP_E, D3m)
-        );
-    }
+  /**
+   * This set the egress-paths, so trip L1 is the best way to begin the journey. The Egress from
+   * Stop E to Stop F is set to 1 minute.
+   */
+  private void withTripL1AsBestStartOption() {
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D1m));
+  }
 
-    /**
-     * This set the egress-paths, so trip L1 is the best way to begin the journey. The Egress from
-     * Stop E to Stop F is set to 1 minute.
-     */
-    private void withTripL1AsBestStartOption() {
-        requestBuilder.searchParams().addEgressPaths(
-                walk(STOP_F, D0s),
-                walk(STOP_E, D1m)
-        );
-    }
+  @Test
+  public void standardExpectFlex() {
+    requestBuilder.profile(STANDARD);
+    withFlexAccessAsBestOption();
 
-    @Test
-    public void standardExpectFlex() {
-        requestBuilder.profile(STANDARD);
-        withFlexAccessAsBestOption();
+    assertEquals(EXPECTED_FLEX_STD, runSearch());
+  }
 
-        assertEquals(EXPECTED_FLEX_STD, runSearch());
-    }
+  @Test
+  public void standardExpectTripL1() {
+    requestBuilder.profile(STANDARD);
+    withTripL1AsBestStartOption();
 
-    @Test
-    public void standardExpectTripL1() {
-        requestBuilder.profile(STANDARD);
-        withTripL1AsBestStartOption();
+    assertEquals(EXPECTED_WALK_STD, runSearch());
+  }
 
-        assertEquals(EXPECTED_WALK_STD, runSearch());
-    }
+  @Test
+  public void standardReverseExpectFlex() {
+    requestBuilder.profile(STANDARD).searchDirection(REVERSE);
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s));
 
-    @Test
-    public void standardReverseExpectFlex() {
-        requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-        requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s));
+    assertEquals(EXPECTED_FLEX_STD, runSearch());
+  }
 
-        assertEquals(EXPECTED_FLEX_STD, runSearch());
-    }
+  @Test
+  @Disabled(
+    "This test so not work due to an error in the onBoard mc-pareto function, " +
+    "witch do not account for departure time. The flex access dominate the " +
+    "L1+walk even the L1 leaves one minute after the access."
+  )
+  public void multiCriteria() {
+    requestBuilder.profile(MULTI_CRITERIA);
+    requestBuilder.searchParams().searchWindowInSeconds(D5m);
+    requestBuilder.searchParams().earliestDepartureTime(T00_00);
+    requestBuilder.searchParams().addEgressPaths(walk(STOP_E, D3m), walk(STOP_F, D0s));
 
-    @Test
-    @Disabled("This test so not work due to an error in the onBoard mc-pareto function, "
-            + "witch do not account for departure time. The flex access dominate the "
-            + "L1+walk even the L1 leaves one minute after the access.")
-    public void multiCriteria() {
-        requestBuilder.profile(MULTI_CRITERIA);
-        requestBuilder.searchParams().searchWindowInSeconds(D5m);
-        requestBuilder.searchParams().earliestDepartureTime(T00_00);
-        requestBuilder.searchParams().addEgressPaths(
-                walk(STOP_E, D3m),
-                walk(STOP_F, D0s)
-        );
+    String actual = runSearch();
 
-        String actual = runSearch();
+    assertEquals(join(EXPECTED_FLEX_MC, EXPECTED_WALK_MC), actual);
+  }
 
-        assertEquals(join(EXPECTED_FLEX_MC, EXPECTED_WALK_MC), actual);
-    }
-
-    private String runSearch() {
-        return pathsToString(raptorService.route(requestBuilder.build(), data));
-    }
+  private String runSearch() {
+    return pathsToString(raptorService.route(requestBuilder.build(), data));
+  }
 }

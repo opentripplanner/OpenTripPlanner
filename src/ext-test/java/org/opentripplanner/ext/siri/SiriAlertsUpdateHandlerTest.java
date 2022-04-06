@@ -6,6 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigInteger;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.FeedScopedId;
@@ -41,14 +47,8 @@ import uk.org.siri.siri20.StopPointRef;
 import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.WorkflowStatusEnumeration;
 
-import java.math.BigInteger;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 public class SiriAlertsUpdateHandlerTest extends GtfsTest {
+
   private static final String FEED_ID = "FEED";
 
   SiriAlertsUpdateHandler alertsUpdateHandler;
@@ -65,17 +65,18 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final String situationNumber = "TST:SituationNumber:1234";
     final FeedScopedId stopId = new FeedScopedId(FEED_ID, "stop0");
     List<RoutePointTypeEnumeration> stopConditions = Arrays.asList(
-        RoutePointTypeEnumeration.DESTINATION,
-        RoutePointTypeEnumeration.NOT_STOPPING,
-        RoutePointTypeEnumeration.REQUEST_STOP,
-        RoutePointTypeEnumeration.EXCEPTIONAL_STOP,
-        RoutePointTypeEnumeration.START_POINT
+      RoutePointTypeEnumeration.DESTINATION,
+      RoutePointTypeEnumeration.NOT_STOPPING,
+      RoutePointTypeEnumeration.REQUEST_STOP,
+      RoutePointTypeEnumeration.EXCEPTIONAL_STOP,
+      RoutePointTypeEnumeration.START_POINT
     );
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-        ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-        createAffectsStop(stopConditions, stopId.getId())
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      createAffectsStop(stopConditions, stopId.getId())
     );
 
     Integer priorityValue = 3;
@@ -125,16 +126,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     AlertUrl alertUrl = alertUrlList.get(0);
     assertEquals(infoLinkUri, alertUrl.uri);
     assertEquals(infoLinkLabel, alertUrl.label);
-
   }
 
   public void init() {
     if (routingService == null) {
       routingService = new RoutingService(graph);
       graph.updaterManager = new GraphUpdaterManager(graph, List.of());
-
-    }
-    else {
+    } else {
       transitAlertService.getAllAlerts().clear();
     }
     if (alertsUpdateHandler == null) {
@@ -148,8 +146,10 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   }
 
   private PtSituationElement createPtSituationElement(
-      String situationNumber, ZonedDateTime startTime, ZonedDateTime endTime,
-      AffectsScopeStructure affects
+    String situationNumber,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
+    AffectsScopeStructure affects
   ) {
     PtSituationElement element = new PtSituationElement();
     element.setCreationTime(ZonedDateTime.now());
@@ -180,9 +180,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   }
 
   private AffectsScopeStructure createAffectsStop(
-      List<RoutePointTypeEnumeration> stopConditions, String... stopIds
+    List<RoutePointTypeEnumeration> stopConditions,
+    String... stopIds
   ) {
-
     AffectsScopeStructure affects = new AffectsScopeStructure();
 
     AffectsScopeStructure.StopPoints stopPoints = new AffectsScopeStructure.StopPoints();
@@ -215,10 +215,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   private boolean containsOnlyEntitiesOfClass(TransitAlert transitAlert, Class<?> cls) {
     long totalEntityCount = transitAlert.getEntities().size();
-    long clsEntityCount = transitAlert.getEntities()
-            .stream()
-            .filter(cls::isInstance)
-            .count();
+    long clsEntityCount = transitAlert.getEntities().stream().filter(cls::isInstance).count();
     return clsEntityCount > 0 && clsEntityCount == totalEntityCount;
   }
 
@@ -228,11 +225,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       if (!foundMatch) {
         if (entity instanceof EntitySelector.Stop) {
           foundMatch = ((EntitySelector.Stop) entity).stopId.equals(feedScopedEntityId);
-        }
-        else if (entity instanceof EntitySelector.Trip) {
+        } else if (entity instanceof EntitySelector.Trip) {
           foundMatch = ((EntitySelector.Trip) entity).tripId.equals(feedScopedEntityId);
-        }
-        else if (entity instanceof EntitySelector.Route) {
+        } else if (entity instanceof EntitySelector.Route) {
           foundMatch = ((EntitySelector.Route) entity).routeId.equals(feedScopedEntityId);
         }
       }
@@ -261,15 +256,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final FeedScopedId stopId = new FeedScopedId(FEED_ID, "stop0");
 
     List<RoutePointTypeEnumeration> stopConditions = Arrays.asList(
-        RoutePointTypeEnumeration.DESTINATION,
-        RoutePointTypeEnumeration.NOT_STOPPING,
-        RoutePointTypeEnumeration.REQUEST_STOP
+      RoutePointTypeEnumeration.DESTINATION,
+      RoutePointTypeEnumeration.NOT_STOPPING,
+      RoutePointTypeEnumeration.REQUEST_STOP
     );
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        null,
-        null,
-        createAffectsStop(stopConditions, stopId.getId())
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      null,
+      null,
+      createAffectsStop(stopConditions, stopId.getId())
     );
 
     final ZonedDateTime startTimePeriod_1 = ZonedDateTime.parse("2014-01-01T10:00:00+01:00");
@@ -307,56 +303,57 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertValidity("period 1", transitAlert, startTimePeriod_1, endTimePeriod_1);
 
     assertValidity("period 2", transitAlert, startTimePeriod_2, endTimePeriod_2);
-
   }
 
   private void assertValidity(
-      String label, TransitAlert transitAlert, ZonedDateTime startTimePeriod_1,
-      ZonedDateTime endTimePeriod_1
+    String label,
+    TransitAlert transitAlert,
+    ZonedDateTime startTimePeriod_1,
+    ZonedDateTime endTimePeriod_1
   ) {
     // TimePeriod ends BEFORE first validityPeriod starts
     assertFalse(
-            transitAlert.displayDuring(
-                    startTimePeriod_1.toEpochSecond() - 200,
-                    startTimePeriod_1.toEpochSecond() - 100
-            ),
-            "TimePeriod ends BEFORE first validityPeriod starts: " + label
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() - 200,
+        startTimePeriod_1.toEpochSecond() - 100
+      ),
+      "TimePeriod ends BEFORE first validityPeriod starts: " + label
     );
 
     // TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends
     assertTrue(
-            transitAlert.displayDuring(
-                    startTimePeriod_1.toEpochSecond() - 1000,
-                    endTimePeriod_1.toEpochSecond() - 100
-            ),
-            "TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends: " + label
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() - 1000,
+        endTimePeriod_1.toEpochSecond() - 100
+      ),
+      "TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends: " + label
     );
 
     // TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends
     assertTrue(
-            transitAlert.displayDuring(
-                    startTimePeriod_1.toEpochSecond() + 100,
-                    endTimePeriod_1.toEpochSecond() - 100
-            ),
-            "TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends: " + label
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() + 100,
+        endTimePeriod_1.toEpochSecond() - 100
+      ),
+      "TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends: " + label
     );
 
     // TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends
     assertTrue(
-            transitAlert.displayDuring(
-                    startTimePeriod_1.toEpochSecond() + 100,
-                    endTimePeriod_1.toEpochSecond() + 100
-            ),
-            "TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends: " + label
+      transitAlert.displayDuring(
+        startTimePeriod_1.toEpochSecond() + 100,
+        endTimePeriod_1.toEpochSecond() + 100
+      ),
+      "TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends: " + label
     );
 
     // TimePeriod starts AFTER first validityPeriod ends
     assertFalse(
-            transitAlert.displayDuring(
-                    endTimePeriod_1.toEpochSecond() + 100,
-                    endTimePeriod_1.toEpochSecond() + 200
-            ),
-            "TimePeriod starts AFTER first validityPeriod ends: " + label
+      transitAlert.displayDuring(
+        endTimePeriod_1.toEpochSecond() + 100,
+        endTimePeriod_1.toEpochSecond() + 200
+      ),
+      "TimePeriod starts AFTER first validityPeriod ends: " + label
     );
   }
 
@@ -370,10 +367,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final FeedScopedId stopId0 = new FeedScopedId(FEED_ID, "stop0");
     final FeedScopedId stopId1 = new FeedScopedId(FEED_ID, "stop1");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-        ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-        createAffectsStop(null, stopId0.getId(), stopId1.getId())
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      createAffectsStop(null, stopId0.getId(), stopId1.getId())
     );
 
     final String reportType = "incident";
@@ -396,12 +394,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, stopId0));
 
     assertTrue(
-            transitAlert.getStopConditions().contains(StopCondition.START_POINT),
-            "Alert does not contain default condition START_POINT"
+      transitAlert.getStopConditions().contains(StopCondition.START_POINT),
+      "Alert does not contain default condition START_POINT"
     );
     assertTrue(
-            transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
-            "Alert does not contain default condition DESTINATION"
+      transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
+      "Alert does not contain default condition DESTINATION"
     );
 
     stopPatches = transitAlertService.getStopAlerts(stopId1);
@@ -414,12 +412,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, stopId1));
 
     assertTrue(
-            transitAlert.getStopConditions().contains(StopCondition.START_POINT),
-            "Alert does not contain default condition START_POINT"
+      transitAlert.getStopConditions().contains(StopCondition.START_POINT),
+      "Alert does not contain default condition START_POINT"
     );
     assertTrue(
-            transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
-            "Alert does not contain default condition DESTINATION"
+      transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
+      "Alert does not contain default condition DESTINATION"
     );
   }
 
@@ -434,10 +432,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
     final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        startTime,
-        endTime,
-        createAffectsFramedVehicleJourney(tripId.getId(), "2014-01-01", null)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsFramedVehicleJourney(tripId.getId(), "2014-01-01", null)
     );
 
     alertsUpdateHandler.update(createServiceDelivery(ptSituation));
@@ -445,7 +444,10 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
     ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
-    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
+    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
+      tripId,
+      serviceDate
+    );
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -457,16 +459,17 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
 
     // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
-    final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(transitAlert
-        .getEffectiveStartDate()
-        .toInstant(), startTime.getZone());
-    final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(transitAlert
-        .getEffectiveEndDate()
-        .toInstant(), endTime.getZone());
+    final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
+      transitAlert.getEffectiveStartDate().toInstant(),
+      startTime.getZone()
+    );
+    final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(
+      transitAlert.getEffectiveEndDate().toInstant(),
+      endTime.getZone()
+    );
 
     assertEquals(effectiveStartDate, startTime);
     assertEquals(effectiveEndDate, endTime);
-
   }
 
   @Test
@@ -480,10 +483,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
     final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        startTime,
-        endTime,
-        createAffectsFramedVehicleJourney(tripId.getId(), null, null)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsFramedVehicleJourney(tripId.getId(), null, null)
     );
 
     alertsUpdateHandler.update(createServiceDelivery(ptSituation));
@@ -516,20 +520,23 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
 
     // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
-    final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(transitAlert
-        .getEffectiveStartDate()
-        .toInstant(), startTime.getZone());
-    final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(transitAlert
-        .getEffectiveEndDate()
-        .toInstant(), endTime.getZone());
+    final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
+      transitAlert.getEffectiveStartDate().toInstant(),
+      startTime.getZone()
+    );
+    final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(
+      transitAlert.getEffectiveEndDate().toInstant(),
+      endTime.getZone()
+    );
 
     assertEquals(effectiveStartDate, startTime);
     assertEquals(effectiveEndDate, endTime);
-
   }
 
   private AffectsScopeStructure createAffectsFramedVehicleJourney(
-      String datedVehicleJourney, String dataFrameValue, String... stopIds
+    String datedVehicleJourney,
+    String dataFrameValue,
+    String... stopIds
   ) {
     AffectsScopeStructure affects = new AffectsScopeStructure();
     AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
@@ -564,7 +571,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       stopPointRef.setValue(stopId);
       affectedStopPoint.setStopPointRef(stopPointRef);
       stopPoints.getAffectedStopPointsAndLinkProjectionToNextStopPoints().add(affectedStopPoint);
-
     }
     return stopPoints;
   }
@@ -580,10 +586,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
     final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        startTime,
-        endTime,
-        createAffectsVehicleJourney(tripId.getId(), startTime, null)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsVehicleJourney(tripId.getId(), startTime, null)
     );
 
     alertsUpdateHandler.update(createServiceDelivery(ptSituation));
@@ -591,7 +598,10 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
     ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
-    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
+    final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
+      tripId,
+      serviceDate
+    );
 
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
@@ -603,7 +613,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   }
 
   private AffectsScopeStructure createAffectsVehicleJourney(
-      String vehicleJourneyRef, ZonedDateTime originAimedDepartureTime, String... stopIds
+    String vehicleJourneyRef,
+    ZonedDateTime originAimedDepartureTime,
+    String... stopIds
   ) {
     AffectsScopeStructure affects = new AffectsScopeStructure();
     AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
@@ -641,10 +653,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
     final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        startTime,
-        endTime,
-        createAffectsVehicleJourney(tripId.getId(), startTime, stopId0.getId(), stopId1.getId())
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsVehicleJourney(tripId.getId(), startTime, stopId0.getId(), stopId1.getId())
     );
 
     alertsUpdateHandler.update(createServiceDelivery(ptSituation));
@@ -654,9 +667,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
 
     Collection<TransitAlert> tripPatches = transitAlertService.getStopAndTripAlerts(
-        stopId0,
-        tripId,
-        serviceDate
+      stopId0,
+      tripId,
+      serviceDate
     );
 
     assertNotNull(tripPatches);
@@ -673,37 +686,36 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndTrip.class));
     assertTrue(matchesEntity(transitAlert, stopId1, tripId, serviceDate));
-
   }
 
   private boolean matchesEntity(
-      TransitAlert transitAlert, FeedScopedId stopId, FeedScopedId routeOrTripId
+    TransitAlert transitAlert,
+    FeedScopedId stopId,
+    FeedScopedId routeOrTripId
   ) {
     return matchesEntity(transitAlert, stopId, routeOrTripId, null);
   }
+
   private boolean matchesEntity(
-      TransitAlert transitAlert, FeedScopedId stopId, FeedScopedId routeOrTripId, ServiceDate serviceDate
+    TransitAlert transitAlert,
+    FeedScopedId stopId,
+    FeedScopedId routeOrTripId,
+    ServiceDate serviceDate
   ) {
     boolean foundMatch = false;
     for (EntitySelector entity : transitAlert.getEntities()) {
       if (!foundMatch) {
         if (entity instanceof EntitySelector.StopAndRoute) {
-          foundMatch = ((EntitySelector.StopAndRoute) entity).stopAndRoute.equals((
-              new EntitySelector.StopAndRouteOrTripKey(
-                  stopId,
-                  routeOrTripId,
-                  serviceDate
-              )
-          ));
+          foundMatch =
+            ((EntitySelector.StopAndRoute) entity).stopAndRoute.equals(
+                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
+              );
         }
         if (entity instanceof EntitySelector.StopAndTrip) {
-          foundMatch = ((EntitySelector.StopAndTrip) entity).stopAndTrip.equals((
-              new EntitySelector.StopAndRouteOrTripKey(
-                  stopId,
-                  routeOrTripId,
-                  serviceDate
-              )
-          ));
+          foundMatch =
+            ((EntitySelector.StopAndTrip) entity).stopAndTrip.equals(
+                (new EntitySelector.StopAndRouteOrTripKey(stopId, routeOrTripId, serviceDate))
+              );
         }
       }
     }
@@ -721,10 +733,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
     final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        startTime,
-        endTime,
-        createAffectsLine(lineRef.getId(), null)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsLine(lineRef.getId(), null)
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -743,20 +756,20 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
 
     // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
-    final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(transitAlert
-        .getEffectiveStartDate()
-        .toInstant(), startTime.getZone());
-    final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(transitAlert
-        .getEffectiveEndDate()
-        .toInstant(), endTime.getZone());
+    final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
+      transitAlert.getEffectiveStartDate().toInstant(),
+      startTime.getZone()
+    );
+    final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(
+      transitAlert.getEffectiveEndDate().toInstant(),
+      endTime.getZone()
+    );
 
     assertEquals(startTime, effectiveStartDate);
     assertEquals(endTime, effectiveEndDate);
-
   }
 
   private AffectsScopeStructure createAffectsLine(String line, String... stopIds) {
-
     AffectsScopeStructure affects = new AffectsScopeStructure();
 
     AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
@@ -795,10 +808,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final ZonedDateTime startTime = ZonedDateTime.parse("2014-01-01T00:00:00+01:00");
     final ZonedDateTime endTime = ZonedDateTime.parse("2014-01-01T23:59:59+01:00");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        startTime,
-        endTime,
-        createAffectsLine(lineRef.getId(), null)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsLine(lineRef.getId(), null)
     );
 
     alertsUpdateHandler.update(createServiceDelivery(ptSituation));
@@ -814,11 +828,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, lineRef));
     assertEquals(situationNumber, transitAlert.getId());
 
-    ptSituation = createPtSituationElement(situationNumber,
+    ptSituation =
+      createPtSituationElement(
+        situationNumber,
         startTime,
         endTime,
         createAffectsLine(lineRef.getId(), null)
-    );
+      );
 
     ptSituation.setProgress(WorkflowStatusEnumeration.CLOSED);
 
@@ -841,14 +857,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final FeedScopedId stopId0 = new FeedScopedId(FEED_ID, "stop0");
     final FeedScopedId stopId1 = new FeedScopedId(FEED_ID, "stop1");
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-        ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-        createAffectsFramedVehicleJourney(tripId.getId(),
-            "2014-01-01",
-            stopId0.getId(),
-            stopId1.getId()
-        )
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      createAffectsFramedVehicleJourney(
+        tripId.getId(),
+        "2014-01-01",
+        stopId0.getId(),
+        stopId1.getId()
+      )
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -862,9 +880,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
     Collection<TransitAlert> tripPatches = transitAlertService.getStopAndTripAlerts(
-        stopId0,
-        tripId,
-        serviceDate
+      stopId0,
+      tripId,
+      serviceDate
     );
 
     assertNotNull(tripPatches);
@@ -883,7 +901,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndTrip.class));
     assertTrue(matchesEntity(transitAlert, stopId1, tripId, serviceDate));
-
   }
 
   @Test
@@ -896,10 +913,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
     final String stopId1 = "stop1";
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-        ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-        createAffectsLine(routeId, stopId0, stopId1)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      createAffectsLine(routeId, stopId0, stopId1)
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -915,7 +933,10 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   }
 
   private void assertLineAndStopAlerts(
-      String situationNumber, String routeId, String stopId0, String stopId1
+    String situationNumber,
+    String routeId,
+    String stopId0,
+    String stopId1
   ) {
     /*
      * Line and stop-alerts should result in several TransitAlertes. One for each routeId/stop combination
@@ -924,8 +945,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final FeedScopedId feedRouteId = new FeedScopedId(FEED_ID, routeId);
     final FeedScopedId feedStop_0_id = new FeedScopedId(FEED_ID, stopId0);
     Collection<TransitAlert> tripPatches = transitAlertService.getStopAndRouteAlerts(
-        feedStop_0_id,
-        feedRouteId
+      feedStop_0_id,
+      feedRouteId
     );
 
     assertNotNull(tripPatches);
@@ -948,7 +969,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndRoute.class));
     assertTrue(matchesEntity(transitAlert, feedStop_1_id, feedRouteId));
-
   }
 
   @Test
@@ -961,10 +981,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
     final String stopId1 = "stop1";
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-        ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-        createAffectsLineWithExternallyDefinedStopPoints(routeId, stopId0, stopId1)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      createAffectsLineWithExternallyDefinedStopPoints(routeId, stopId0, stopId1)
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -975,8 +996,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
   }
 
-
-
   @Test
   public void testSiriSxWithOpenEndedValidity() {
     init();
@@ -986,10 +1005,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
 
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        null,
-        null,
-        createAffectsStop(new ArrayList<>(), stopId0)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      null,
+      null,
+      createAffectsStop(new ArrayList<>(), stopId0)
     );
 
     // Add period with start- and endtime
@@ -997,7 +1017,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     period_1.setStartTime(ZonedDateTime.parse("2020-01-01T10:00:00+01:00"));
     period_1.setEndTime(ZonedDateTime.parse("2020-02-01T11:00:00+01:00"));
     ptSituation.getValidityPeriods().add(period_1);
-
 
     // Add period with start-, but NO endtime - i.e. open-ended
     HalfOpenTimestampOutputRangeStructure period_2 = new HalfOpenTimestampOutputRangeStructure();
@@ -1022,17 +1041,17 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertNotNull(transitAlert.getEffectiveStartDate());
 
     assertEquals(
-            period_1.getStartTime().toEpochSecond(),
-            (transitAlert.getEffectiveStartDate().getTime() / 1000)
+      period_1.getStartTime().toEpochSecond(),
+      (transitAlert.getEffectiveStartDate().getTime() / 1000)
     );
 
     assertNull(transitAlert.getEffectiveEndDate());
   }
 
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPoints(
-      String line, String... stopIds
+    String line,
+    String... stopIds
   ) {
-
     AffectsScopeStructure affects = new AffectsScopeStructure();
 
     AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
@@ -1055,14 +1074,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         stopPoints.getAffectedStopPoints().add(affectedStopPoint);
       }
       affects.setStopPoints(stopPoints);
-
     }
 
     return affects;
   }
 
   private void assertSeparateLineAndStopAlerts(
-      String situationNumber, String routeId, String stopId0, String stopId1
+    String situationNumber,
+    String routeId,
+    String stopId0,
+    String stopId1
   ) {
     /*
      * Line and external stop-alerts should result in several AlertPatches. One for each routeId AND for each stop
@@ -1106,10 +1127,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final String situationNumber = "TST:SituationNumber:1234";
     final String stopId0 = "stop0";
     final String stopId1 = "stop1";
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-        ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-        ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-        createAffectsLineWithExternallyDefinedStopPlaces(routeId, stopId0, stopId1)
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      createAffectsLineWithExternallyDefinedStopPlaces(routeId, stopId0, stopId1)
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -1117,7 +1139,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
     assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
-
   }
 
   @Test
@@ -1126,10 +1147,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
     final String situationNumber = "TST:SituationNumber:1234";
-    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
-            ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
-            ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
-            null
+    PtSituationElement ptSituation = createPtSituationElement(
+      situationNumber,
+      ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+      ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+      null
     );
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -1142,9 +1164,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   }
 
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPlaces(
-      String line, String... stopIds
+    String line,
+    String... stopIds
   ) {
-
     AffectsScopeStructure affects = new AffectsScopeStructure();
 
     AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
@@ -1167,7 +1189,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         stopPlaces.getAffectedStopPlaces().add(affectedStopPlaceStructure);
       }
       affects.setStopPlaces(stopPlaces);
-
     }
 
     return affects;
@@ -1178,4 +1199,3 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     return "gtfs/interlining";
   }
 }
-

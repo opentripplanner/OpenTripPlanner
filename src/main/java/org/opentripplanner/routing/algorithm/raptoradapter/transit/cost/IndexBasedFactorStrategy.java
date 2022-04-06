@@ -8,30 +8,30 @@ import java.util.Arrays;
  */
 final class IndexBasedFactorStrategy implements FactorStrategy {
 
-    private final int[] factors;
-    private final int minFactor;
+  private final int[] factors;
+  private final int minFactor;
 
-    private IndexBasedFactorStrategy(int[] factors) {
-        this.factors = factors;
-        this.minFactor = findMinimumFactor(factors);
-    }
+  private IndexBasedFactorStrategy(int[] factors) {
+    this.factors = factors;
+    this.minFactor = findMinimumFactor(factors);
+  }
 
-    /** Convert OTP domain reluctance array to Raptor factors. */
-    IndexBasedFactorStrategy(double[] reluctanceByIndex) {
-        this(RaptorCostConverter.toRaptorCosts(reluctanceByIndex));
-    }
+  /** Convert OTP domain reluctance array to Raptor factors. */
+  IndexBasedFactorStrategy(double[] reluctanceByIndex) {
+    this(RaptorCostConverter.toRaptorCosts(reluctanceByIndex));
+  }
 
-    @Override
-    public int factor(int index) {
-        return factors[index];
-    }
+  @Override
+  public int factor(int index) {
+    return factors[index];
+  }
 
-    @Override
-    public int minFactor() {
-        return minFactor;
-    }
+  @Override
+  public int minFactor() {
+    return minFactor;
+  }
 
-    static private int findMinimumFactor(int[] factors) {
-        return Arrays.stream(factors).min().orElseThrow();
-    }
+  private static int findMinimumFactor(int[] factors) {
+    return Arrays.stream(factors).min().orElseThrow();
+  }
 }

@@ -43,15 +43,15 @@ public class BookingInfo implements Serializable {
   private final String dropOffMessage;
 
   public BookingInfo(
-      ContactInfo contactInfo,
-      EnumSet<BookingMethod> bookingMethods,
-      BookingTime earliestBookingTime,
-      BookingTime latestBookingTime,
-      Duration minimumBookingNotice,
-      Duration maximumBookingNotice,
-      String message,
-      String pickupMessage,
-      String dropOffMessage
+    ContactInfo contactInfo,
+    EnumSet<BookingMethod> bookingMethods,
+    BookingTime earliestBookingTime,
+    BookingTime latestBookingTime,
+    Duration minimumBookingNotice,
+    Duration maximumBookingNotice,
+    String message,
+    String pickupMessage,
+    String dropOffMessage
   ) {
     this.contactInfo = contactInfo;
     this.bookingMethods = bookingMethods;

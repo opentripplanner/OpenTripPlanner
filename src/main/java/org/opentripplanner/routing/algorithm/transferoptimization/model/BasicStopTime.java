@@ -5,6 +5,7 @@ import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
 /** Basic stop and time value object. */
 final class BasicStopTime implements StopTime {
+
   private final int stop;
   private final int time;
 
@@ -14,25 +15,34 @@ final class BasicStopTime implements StopTime {
   }
 
   @Override
-  public int stop() { return stop; }
+  public int stop() {
+    return stop;
+  }
 
   @Override
-  public int time() { return time; }
+  public int time() {
+    return time;
+  }
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder.of()
-        .addText("[")
-        .addNum(stop)
-        .addServiceTime(time)
-        .addText("]")
-        .toString();
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("[")
+      .addNum(stop)
+      .addServiceTime(time)
+      .addText("]")
+      .toString();
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (o == null || getClass() != o.getClass()) { return false; }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     BasicStopTime that = (BasicStopTime) o;
     return stop == that.stop && time == that.time;
   }

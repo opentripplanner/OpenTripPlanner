@@ -28,94 +28,90 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
-    private final TestTransitData data = new TestTransitData();
-    private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-            new RaptorRequestBuilder<>();
-    private final RaptorService<TestTripSchedule> raptorService =
-            new RaptorService<>(RaptorConfig.defaultConfigForTest());
+  private final TestTransitData data = new TestTransitData();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
 
-    private static final String EXP_PATH = "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B "
-            + "~ BUS R2 0:05 0:10 ~ C ~ Walk 30s [0:01:10 0:10:40 9m30s 1tx";
-    private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
-    private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1230]";
+  private static final String EXP_PATH =
+    "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B " +
+    "~ BUS R2 0:05 0:10 ~ C ~ Walk 30s [0:01:10 0:10:40 9m30s 1tx";
+  private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
+  private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1230]";
 
-    /**
-     * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
-     * <p>
-     * Access(stop 1) and egress(stop 3) is 30s.
-     */
-    @BeforeEach
-    public void setup() {
-        var r1 = route("R1", STOP_A, STOP_B)
-                .withTimetable(schedule("0:02 0:05"));
-        var r2 = route("R2", STOP_B, STOP_C)
-                .withTimetable(schedule("0:05 0:10"));
+  /**
+   * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
+   * <p>
+   * Access(stop 1) and egress(stop 3) is 30s.
+   */
+  @BeforeEach
+  public void setup() {
+    var r1 = route("R1", STOP_A, STOP_B).withTimetable(schedule("0:02 0:05"));
+    var r2 = route("R2", STOP_B, STOP_C).withTimetable(schedule("0:05 0:10"));
 
-        var tripA = r1.timetable().getTripSchedule(0);
-        var tripB = r2.timetable().getTripSchedule(0);
+    var tripA = r1.timetable().getTripSchedule(0);
+    var tripB = r2.timetable().getTripSchedule(0);
 
-        data.withRoutes(r1, r2);
-        data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_B);
-        data.mcCostParamsBuilder().transferCost(100);
+    data.withRoutes(r1, r2);
+    data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_B);
+    data.mcCostParamsBuilder().transferCost(100);
 
-        requestBuilder.searchParams()
-                .constrainedTransfersEnabled(true)
-                .addAccessPaths(walk(STOP_A, D30s))
-                .addEgressPaths(walk(STOP_C, D30s))
-                .earliestDepartureTime(T00_00)
-                .latestArrivalTime(T00_30)
-                .timetableEnabled(true);
+    requestBuilder
+      .searchParams()
+      .constrainedTransfersEnabled(true)
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addEgressPaths(walk(STOP_C, D30s))
+      .earliestDepartureTime(T00_00)
+      .latestArrivalTime(T00_30)
+      .timetableEnabled(true);
 
-        // Make sure the slack have values which prevent the normal from happening transfer.
-        // The test scenario have zero seconds to transfer, so any slack will do.
-        requestBuilder.slackProvider(
-                RaptorSlackProvider.defaultSlackProvider(30, 20, 10)
-        );
+    // Make sure the slack have values which prevent the normal from happening transfer.
+    // The test scenario have zero seconds to transfer, so any slack will do.
+    requestBuilder.slackProvider(RaptorSlackProvider.defaultSlackProvider(30, 20, 10));
 
-        ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
-    }
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+  }
 
-    @Test
-    public void standardOneIteration() {
-        var request = requestBuilder
-                .profile(RaptorProfile.STANDARD)
-                .searchParams().searchOneIterationOnly()
-                .build();
-        var response = raptorService.route(request, data);
-        assertEquals(EXP_PATH_NO_COST, pathsToString(response));
-    }
+  @Test
+  public void standardOneIteration() {
+    var request = requestBuilder
+      .profile(RaptorProfile.STANDARD)
+      .searchParams()
+      .searchOneIterationOnly()
+      .build();
+    var response = raptorService.route(request, data);
+    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
+  }
 
-    @Test
-    public void standardDynamicSearchWindow() {
-        var request = requestBuilder
-                .profile(RaptorProfile.STANDARD)
-                .build();
-        var response = raptorService.route(request, data);
-        assertEquals(EXP_PATH_NO_COST, pathsToString(response));
-    }
+  @Test
+  public void standardDynamicSearchWindow() {
+    var request = requestBuilder.profile(RaptorProfile.STANDARD).build();
+    var response = raptorService.route(request, data);
+    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
+  }
 
-    @Test
-    public void standardReverseOneIteration() {
-        var request = requestBuilder
-                .searchDirection(SearchDirection.REVERSE)
-                .profile(RaptorProfile.STANDARD)
-                .searchParams().searchOneIterationOnly()
-                .build();
+  @Test
+  public void standardReverseOneIteration() {
+    var request = requestBuilder
+      .searchDirection(SearchDirection.REVERSE)
+      .profile(RaptorProfile.STANDARD)
+      .searchParams()
+      .searchOneIterationOnly()
+      .build();
 
-        var response = raptorService.route(request, data);
+    var response = raptorService.route(request, data);
 
-        assertEquals(EXP_PATH_NO_COST, pathsToString(response));
-    }
+    assertEquals(EXP_PATH_NO_COST, pathsToString(response));
+  }
 
-    @Test
-    public void multiCriteria() {
-        requestBuilder.optimizations().add(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
-        var request = requestBuilder
-                .profile(RaptorProfile.MULTI_CRITERIA)
-                .build();
+  @Test
+  public void multiCriteria() {
+    requestBuilder.optimizations().add(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
+    var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
 
-        var response = raptorService.route(request, data);
+    var response = raptorService.route(request, data);
 
-        assertEquals(EXP_PATH_WITH_COST, pathsToString(response));
-    }
+    assertEquals(EXP_PATH_WITH_COST, pathsToString(response));
+  }
 }

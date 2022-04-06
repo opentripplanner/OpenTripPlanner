@@ -13,7 +13,7 @@ import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 public class LegacyGraphQLDepartureRowImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLDepartureRow {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLDepartureRow {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
@@ -43,14 +43,19 @@ public class LegacyGraphQLDepartureRowImpl
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment -> {
-      LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs args = new LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs(environment.getArguments());
-      return getSource(environment).getStoptimes(
+      LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs args = new LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs(
+        environment.getArguments()
+      );
+      return getSource(environment)
+        .getStoptimes(
           getRoutingService(environment),
           args.getLegacyGraphQLStartTime(),
           args.getLegacyGraphQLTimeRange(),
           args.getLegacyGraphQLNumberOfDepartures(),
-          args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
-      );
+          args.getLegacyGraphQLOmitNonPickups()
+            ? ArrivalDeparture.DEPARTURES
+            : ArrivalDeparture.BOTH
+        );
     };
   }
 

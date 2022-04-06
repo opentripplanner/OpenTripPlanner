@@ -11,12 +11,19 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 public class TransitStopStreetVertex extends OsmVertex {
 
-    public String stopCode;
+  public String stopCode;
 
-    public TransitStopStreetVertex(Graph g, String label, double x, double y, long nodeId, @Nullable String name, String stopCode) {
-        //Stop code is always non localized
-        super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
-        this.stopCode = stopCode;
-    }
-
+  public TransitStopStreetVertex(
+    Graph g,
+    String label,
+    double x,
+    double y,
+    long nodeId,
+    @Nullable String name,
+    String stopCode
+  ) {
+    //Stop code is always non localized
+    super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
+    this.stopCode = stopCode;
+  }
 }

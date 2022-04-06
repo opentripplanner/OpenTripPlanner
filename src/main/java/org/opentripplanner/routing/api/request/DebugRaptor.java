@@ -37,99 +37,107 @@ import org.slf4j.LoggerFactory;
  */
 public class DebugRaptor implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(DebugRaptor.class);
-    private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
-    private static final int FIRST_STOP_INDEX = 0;
+  private static final Logger LOG = LoggerFactory.getLogger(DebugRaptor.class);
+  private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
+  private static final int FIRST_STOP_INDEX = 0;
 
-    private List<Integer> stops = List.of();
-    private List<Integer> path = List.of();
-    private int debugPathFromStopIndex = 0;
+  private List<Integer> stops = List.of();
+  private List<Integer> path = List.of();
+  private int debugPathFromStopIndex = 0;
 
+  public DebugRaptor() {}
 
-    public DebugRaptor() { }
+  /** Avoid using clone(), use copy-constructor instead(Josh Bloch). */
+  public DebugRaptor(DebugRaptor other) {
+    this.stops = List.copyOf(other.stops);
+    this.path = List.copyOf(other.path);
+    this.debugPathFromStopIndex = other.debugPathFromStopIndex;
+  }
 
-    /** Avoid using clone(), use copy-constructor instead(Josh Bloch). */
-    public DebugRaptor(DebugRaptor other) {
-        this.stops = List.copyOf(other.stops);
-        this.path = List.copyOf(other.path);
-        this.debugPathFromStopIndex = other.debugPathFromStopIndex;
+  public boolean isEnabled() {
+    return !stops.isEmpty() || !path.isEmpty();
+  }
+
+  public List<Integer> stops() {
+    return stops;
+  }
+
+  public DebugRaptor withStops(String stops) {
+    if (stops == null) {
+      return this;
+    }
+    this.stops = split(stops);
+    return this;
+  }
+
+  public List<Integer> path() {
+    return path;
+  }
+
+  public DebugRaptor withPath(String path) {
+    if (path == null) {
+      return this;
     }
 
-    public boolean isEnabled() {
-        return !stops.isEmpty() || !path.isEmpty();
+    this.path = split(path);
+    this.debugPathFromStopIndex = firstStopIndexToDebug(this.path, path);
+    return this;
+  }
+
+  public int debugPathFromStopIndex() {
+    return debugPathFromStopIndex;
+  }
+
+  private static List<Integer> split(String stops) {
+    try {
+      if (stops == null) {
+        return List.of();
+      }
+
+      return Arrays.stream(stops.split("[\\s,;_*]+")).map(Integer::parseInt).toList();
+    } catch (NumberFormatException e) {
+      LOG.error(e.getMessage(), e);
+      // Keep going, we do not want to abort a
+      // request because the debug info is wrong.
+      return List.of();
+    }
+  }
+
+  private static int firstStopIndexToDebug(List<Integer> stops, String text) {
+    if (text == null) {
+      return FIRST_STOP_INDEX;
     }
 
-    public List<Integer> stops() {
-        return stops;
+    var m = FIRST_STOP_PATTERN.matcher(text);
+    Integer stop = m.find() ? Integer.parseInt(m.group(1)) : null;
+    return stop == null ? FIRST_STOP_INDEX : stops.indexOf(stop);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(DebugRaptor.class)
+      .addObj("stops", toString(stops, FIRST_STOP_INDEX))
+      .addObj("path", toString(path, debugPathFromStopIndex))
+      .toString();
+  }
+
+  private static String toString(List<Integer> stops, int fromStopIndex) {
+    if (stops == null || stops.isEmpty()) {
+      return null;
     }
 
-    public DebugRaptor withStops(String stops) {
-        if(stops == null) { return this; }
-        this.stops = split(stops);
-        return this;
+    var buf = new StringBuilder();
+    for (int i = 0; i < stops.size(); ++i) {
+      buf.append(stops.get(i));
+      if (i > FIRST_STOP_INDEX && i == fromStopIndex) {
+        buf.append("*");
+      }
+      buf.append(", ");
     }
-
-    public List<Integer> path() {
-        return path;
-    }
-
-    public DebugRaptor withPath(String path) {
-        if(path == null) { return this; }
-
-        this.path = split(path);
-        this.debugPathFromStopIndex = firstStopIndexToDebug(this.path, path);
-        return this;
-    }
-
-    public int debugPathFromStopIndex() {
-        return debugPathFromStopIndex;
-    }
-
-    private static List<Integer> split(String stops) {
-        try {
-            if(stops == null) { return List.of(); }
-
-            return Arrays.stream(stops.split("[\\s,;_*]+"))
-                    .map(Integer::parseInt).toList();
-        }
-        catch (NumberFormatException e) {
-            LOG.error(e.getMessage(), e);
-            // Keep going, we do not want to abort a
-            // request because the debug info is wrong.
-            return List.of();
-        }
-    }
-
-    private static int firstStopIndexToDebug(List<Integer> stops, String text) {
-        if(text == null) { return FIRST_STOP_INDEX; }
-
-        var m = FIRST_STOP_PATTERN.matcher(text);
-        Integer stop = m.find() ? Integer.parseInt(m.group(1)) : null;
-        return stop == null ? FIRST_STOP_INDEX : stops.indexOf(stop);
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(DebugRaptor.class)
-                .addObj("stops", toString(stops, FIRST_STOP_INDEX))
-                .addObj("path", toString(path, debugPathFromStopIndex))
-                .toString();
-    }
-
-    private static String toString(List<Integer> stops, int fromStopIndex) {
-        if(stops == null || stops.isEmpty()) { return null; }
-
-        var buf = new StringBuilder();
-        for (int i=0; i<stops.size(); ++i) {
-            buf.append(stops.get(i));
-            if(i > FIRST_STOP_INDEX && i == fromStopIndex) {
-                buf.append("*");
-            }
-            buf.append(", ");
-        }
-        return buf.substring(0, buf.length()-2);
-    }
+    return buf.substring(0, buf.length() - 2);
+  }
 }

@@ -30,9 +30,7 @@ public class AllowedTransitMode {
    * Check if this filter allows the provided TransitMode
    */
   public boolean allows(TransitMode transitMode, String netexSubMode) {
-    return mainMode == transitMode && (
-        subMode == null || subMode.equals(netexSubMode)
-    );
+    return mainMode == transitMode && (subMode == null || subMode.equals(netexSubMode));
   }
 
   public TransitMode getMainMode() {
@@ -51,17 +49,19 @@ public class AllowedTransitMode {
    */
   public static Set<AllowedTransitMode> getAllTransitModes() {
     return Arrays
-        .stream(TransitMode.values())
-        .map(m -> new AllowedTransitMode(m, null))
-        .collect(Collectors.toSet());
+      .stream(TransitMode.values())
+      .map(m -> new AllowedTransitMode(m, null))
+      .collect(Collectors.toSet());
   }
 
   /**
    * Returns a set of AllowedModes that will cover all available TransitModes except airplane.
    */
   public static Set<AllowedTransitMode> getAllTransitModesExceptAirplane() {
-    return TransitMode.transitModesExceptAirplane().stream()
-        .map(m -> new AllowedTransitMode(m, null))
-        .collect(Collectors.toSet());
+    return TransitMode
+      .transitModesExceptAirplane()
+      .stream()
+      .map(m -> new AllowedTransitMode(m, null))
+      .collect(Collectors.toSet());
   }
 }

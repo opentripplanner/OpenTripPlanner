@@ -6,7 +6,7 @@ import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
 public class LegacyGraphQLdebugOutputImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLDebugOutput {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLDebugOutput {
 
   private static final long nanosToMillis = 1000000;
 

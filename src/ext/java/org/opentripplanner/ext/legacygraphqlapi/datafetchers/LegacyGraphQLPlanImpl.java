@@ -21,24 +21,14 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<StopArrival> from() {
-    return environment -> new StopArrival(
-            getSource(environment).getTripPlan().from,
-            null,
-            null,
-            null,
-            null
-    );
+    return environment ->
+      new StopArrival(getSource(environment).getTripPlan().from, null, null, null, null);
   }
 
   @Override
   public DataFetcher<StopArrival> to() {
-    return environment -> new StopArrival(
-            getSource(environment).getTripPlan().to,
-            null,
-            null,
-            null,
-            null
-    );
+    return environment ->
+      new StopArrival(getSource(environment).getTripPlan().to, null, null, null, null);
   }
 
   @Override
@@ -48,7 +38,8 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Iterable<String>> messageEnums() {
-    return environment -> getSource(environment)
+    return environment ->
+      getSource(environment)
         .getRoutingErrors()
         .stream()
         .map(routingError -> routingError.code)
@@ -58,7 +49,8 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Iterable<String>> messageStrings() {
-    return environment -> getSource(environment)
+    return environment ->
+      getSource(environment)
         .getRoutingErrors()
         .stream()
         .map(PlannerErrorMapper::mapMessage)
@@ -70,7 +62,9 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<Long> prevDateTime() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();
-      if ( metadata == null || metadata.prevDateTime == null ) { return null; }
+      if (metadata == null || metadata.prevDateTime == null) {
+        return null;
+      }
       return metadata.prevDateTime.getEpochSecond() * 1000;
     };
   }
@@ -79,7 +73,9 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<Long> nextDateTime() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();
-      if ( metadata == null || metadata.nextDateTime == null ) { return null; }
+      if (metadata == null || metadata.nextDateTime == null) {
+        return null;
+      }
       return metadata.nextDateTime.getEpochSecond() * 1000;
     };
   }
@@ -104,7 +100,9 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<Long> searchWindowUsed() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();
-      if ( metadata == null || metadata.searchWindowUsed == null ) { return null; }
+      if (metadata == null || metadata.searchWindowUsed == null) {
+        return null;
+      }
       return metadata.searchWindowUsed.toSeconds();
     };
   }

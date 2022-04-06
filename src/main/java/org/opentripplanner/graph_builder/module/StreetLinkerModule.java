@@ -53,7 +53,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph(
-      Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore
+    Graph graph,
+    HashMap<Class<?>, Object> extra,
+    DataImportIssueStore issueStore
   ) {
     graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
 
@@ -67,14 +69,12 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.calculateConvexHull();
   }
 
-
   public void linkTransitStops(Graph graph) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
 
     for (TransitStopVertex tStop : vertices) {
-
       // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
       if (tStop.hasPathways()) {
         continue;
@@ -93,15 +93,18 @@ public class StreetLinkerModule implements GraphBuilderModule {
         }
       }
 
-      graph.getLinker().linkVertexPermanently(
+      graph
+        .getLinker()
+        .linkVertexPermanently(
           tStop,
           modes,
           LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) -> List.of(
+          (vertex, streetVertex) ->
+            List.of(
               new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
               new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
-          )
-      );
+            )
+        );
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
@@ -111,15 +114,18 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
-      graph.getLinker().linkVertexPermanently(
+      graph
+        .getLinker()
+        .linkVertexPermanently(
           tEntrance,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) -> List.of(
+          (vertex, streetVertex) ->
+            List.of(
               new StreetTransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
               new StreetTransitEntranceLink(streetVertex, (TransitEntranceVertex) vertex)
-          )
-      );
+            )
+        );
     }
   }
 
@@ -130,8 +136,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
     LOG.info("Linking vehicle parks to graph...");
     for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
-        VehicleParkingEntranceVertex.class)) {
-
+      VehicleParkingEntranceVertex.class
+    )) {
       if (vehicleParkingEntranceHasLinks(vehicleParkingEntranceVertex)) {
         continue;
       }
@@ -146,61 +152,87 @@ public class StreetLinkerModule implements GraphBuilderModule {
         continue;
       }
 
-      issueStore.add(new ParkAndRideEntranceRemoved(vehicleParkingEntranceVertex.getParkingEntrance()));
+      issueStore.add(
+        new ParkAndRideEntranceRemoved(vehicleParkingEntranceVertex.getParkingEntrance())
+      );
       removeVehicleParkingEntranceVertexFromGraph(vehicleParkingEntranceVertex, graph);
-
     }
     graph.hasLinkedBikeParks = true;
   }
 
-  private boolean vehicleParkingEntranceHasLinks(VehicleParkingEntranceVertex vehicleParkingEntranceVertex) {
-    return !(vehicleParkingEntranceVertex.getIncoming().stream().allMatch(VehicleParkingEdge.class::isInstance)
-            && vehicleParkingEntranceVertex.getOutgoing().stream().allMatch(VehicleParkingEdge.class::isInstance));
+  private boolean vehicleParkingEntranceHasLinks(
+    VehicleParkingEntranceVertex vehicleParkingEntranceVertex
+  ) {
+    return !(
+      vehicleParkingEntranceVertex
+        .getIncoming()
+        .stream()
+        .allMatch(VehicleParkingEdge.class::isInstance) &&
+      vehicleParkingEntranceVertex
+        .getOutgoing()
+        .stream()
+        .allMatch(VehicleParkingEdge.class::isInstance)
+    );
   }
 
-  private static void linkVehicleParkingWithLinker(Graph graph, VehicleParkingEntranceVertex vehicleParkingVertex) {
+  private static void linkVehicleParkingWithLinker(
+    Graph graph,
+    VehicleParkingEntranceVertex vehicleParkingVertex
+  ) {
     if (vehicleParkingVertex.isWalkAccessible()) {
-      graph.getLinker().linkVertexPermanently(
-              vehicleParkingVertex,
-              new TraverseModeSet(TraverseMode.WALK),
-              LinkingDirection.BOTH_WAYS, (vertex, streetVertex) -> List.of(
-                      new StreetVehicleParkingLink(
-                              (VehicleParkingEntranceVertex) vertex, streetVertex),
-                      new StreetVehicleParkingLink(
-                              streetVertex, (VehicleParkingEntranceVertex) vertex)
-              )
-      );
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          vehicleParkingVertex,
+          new TraverseModeSet(TraverseMode.WALK),
+          LinkingDirection.BOTH_WAYS,
+          (vertex, streetVertex) ->
+            List.of(
+              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
+              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+            )
+        );
     }
 
     if (vehicleParkingVertex.isCarAccessible()) {
-      graph.getLinker().linkVertexPermanently(
-              vehicleParkingVertex,
-              new TraverseModeSet(TraverseMode.CAR),
-              LinkingDirection.BOTH_WAYS,
-              (vertex, streetVertex) -> List.of(
-                      new StreetVehicleParkingLink(
-                              (VehicleParkingEntranceVertex) vertex, streetVertex),
-                      new StreetVehicleParkingLink(
-                              streetVertex, (VehicleParkingEntranceVertex) vertex)
-              )
-      );
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          vehicleParkingVertex,
+          new TraverseModeSet(TraverseMode.CAR),
+          LinkingDirection.BOTH_WAYS,
+          (vertex, streetVertex) ->
+            List.of(
+              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
+              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+            )
+        );
     }
   }
 
-  private void removeVehicleParkingEntranceVertexFromGraph(VehicleParkingEntranceVertex vehicleParkingEntranceVertex, Graph graph) {
-    var vehicleParkingEdge =
-        vehicleParkingEntranceVertex.getOutgoing().stream()
-            .filter(VehicleParkingEdge.class::isInstance)
-            .map(VehicleParkingEdge.class::cast)
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("VehicleParkingEdge missing from vertex: " + vehicleParkingEntranceVertex));
+  private void removeVehicleParkingEntranceVertexFromGraph(
+    VehicleParkingEntranceVertex vehicleParkingEntranceVertex,
+    Graph graph
+  ) {
+    var vehicleParkingEdge = vehicleParkingEntranceVertex
+      .getOutgoing()
+      .stream()
+      .filter(VehicleParkingEdge.class::isInstance)
+      .map(VehicleParkingEdge.class::cast)
+      .findFirst()
+      .orElseThrow(() ->
+        new IllegalStateException(
+          "VehicleParkingEdge missing from vertex: " + vehicleParkingEntranceVertex
+        )
+      );
 
     var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
 
     var vehicleParking = vehicleParkingEdge.getVehicleParking();
 
-    boolean removeVehicleParking = vehicleParking.getEntrances().size() == 1
-        && vehicleParking.getEntrances().get(0).equals(entrance);
+    boolean removeVehicleParking =
+      vehicleParking.getEntrances().size() == 1 &&
+      vehicleParking.getEntrances().get(0).equals(entrance);
 
     vehicleParkingEntranceVertex.getIncoming().forEach(graph::removeEdge);
     vehicleParkingEntranceVertex.getOutgoing().forEach(graph::removeEdge);

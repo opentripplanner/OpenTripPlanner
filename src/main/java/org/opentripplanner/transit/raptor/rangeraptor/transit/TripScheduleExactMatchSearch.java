@@ -6,7 +6,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
-
 /**
  * This trip search will only match trips that is within the given slack of the timeLimit.
  * <p/>
@@ -21,44 +20,47 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
-        implements RaptorTripScheduleSearch<T> {
+  implements RaptorTripScheduleSearch<T> {
 
-    private final int slack;
-    private final RaptorTripScheduleSearch<T> delegate;
-    private final TransitCalculator<T> calculator;
+  private final int slack;
+  private final RaptorTripScheduleSearch<T> delegate;
+  private final TransitCalculator<T> calculator;
 
-    TripScheduleExactMatchSearch(
-            RaptorTripScheduleSearch<T> delegate,
-            TransitCalculator<T> calculator,
-            int slack
-    ) {
-        this.delegate = delegate;
-        this.slack = slack;
-        this.calculator = calculator;
-    }
+  TripScheduleExactMatchSearch(
+    RaptorTripScheduleSearch<T> delegate,
+    TransitCalculator<T> calculator,
+    int slack
+  ) {
+    this.delegate = delegate;
+    this.slack = slack;
+    this.calculator = calculator;
+  }
 
-    @Override
-    @Nullable
-    public RaptorTripScheduleBoardOrAlightEvent<T> search(
-            int timeLimit,
-            int stopPositionInPattern,
-            int tripIndexLimit
-    ) {
-        RaptorTripScheduleBoardOrAlightEvent<T> result = delegate.search(
-                timeLimit, stopPositionInPattern, tripIndexLimit
-        );
-        return result != null && isWithinSlack(timeLimit, result.getTime()) ? result : null;
-    }
+  @Override
+  @Nullable
+  public RaptorTripScheduleBoardOrAlightEvent<T> search(
+    int timeLimit,
+    int stopPositionInPattern,
+    int tripIndexLimit
+  ) {
+    RaptorTripScheduleBoardOrAlightEvent<T> result = delegate.search(
+      timeLimit,
+      stopPositionInPattern,
+      tripIndexLimit
+    );
+    return result != null && isWithinSlack(timeLimit, result.getTime()) ? result : null;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(TripScheduleExactMatchSearch.class)
-                .addNum("slack", slack)
-                .addObj("delegate", delegate)
-                .toString();
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TripScheduleExactMatchSearch.class)
+      .addNum("slack", slack)
+      .addObj("delegate", delegate)
+      .toString();
+  }
 
-    private boolean isWithinSlack(int timeLimit, int time) {
-        return calculator.isBefore(time, timeLimit + slack);
-    }
+  private boolean isWithinSlack(int timeLimit, int time) {
+    return calculator.isBefore(time, timeLimit + slack);
+  }
 }

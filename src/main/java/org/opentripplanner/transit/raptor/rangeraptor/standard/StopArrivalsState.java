@@ -23,25 +23,39 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
  * </ul>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
-*/
+ */
 public interface StopArrivalsState<T extends RaptorTripSchedule> {
+  void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime);
 
-    void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime);
+  default void rejectAccessTime(int arrivalTime, RaptorTransfer access) {}
 
-    default void rejectAccessTime(int arrivalTime, RaptorTransfer access) { }
+  int bestTimePreviousRound(int stop);
 
-    int bestTimePreviousRound(int stop);
+  void setNewBestTransitTime(
+    int alightStop,
+    int alightTime,
+    T trip,
+    int boardStop,
+    int boardTime,
+    boolean newBestOverall
+  );
 
-    void setNewBestTransitTime(int alightStop, int alightTime, T trip, int boardStop, int boardTime, boolean newBestOverall);
+  default void rejectNewBestTransitTime(
+    int alightStop,
+    int alightTime,
+    T trip,
+    int boardStop,
+    int boardTime
+  ) {}
 
-    default void rejectNewBestTransitTime(int alightStop, int alightTime, T trip, int boardStop, int boardTime) {}
+  void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer);
 
-    void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer);
+  default void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {}
 
-    default void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {}
+  @Nullable
+  TransitArrival<T> previousTransit(int boardStopIndex);
 
-    @Nullable
-    TransitArrival<T> previousTransit(int boardStopIndex);
-
-    default Collection<Path<T>> extractPaths() { return List.of(); }
+  default Collection<Path<T>> extractPaths() {
+    return List.of();
+  }
 }

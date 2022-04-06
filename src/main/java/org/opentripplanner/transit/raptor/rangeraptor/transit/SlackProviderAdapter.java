@@ -17,81 +17,85 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
  */
 public final class SlackProviderAdapter {
 
-    private SlackProviderAdapter() { /* empty */ }
+  private SlackProviderAdapter() {
+    /* empty */
+  }
 
-    public static SlackProvider forwardSlackProvider(
-        RaptorSlackProvider source,
-        WorkerLifeCycle lifeCycle
-    ) {
-        var slackProvider = new ForwardSlackProvider(source);
-        lifeCycle.onPrepareForNextRound(slackProvider::notifyNewRound);
-        return slackProvider;
+  public static SlackProvider forwardSlackProvider(
+    RaptorSlackProvider source,
+    WorkerLifeCycle lifeCycle
+  ) {
+    var slackProvider = new ForwardSlackProvider(source);
+    lifeCycle.onPrepareForNextRound(slackProvider::notifyNewRound);
+    return slackProvider;
+  }
+
+  public static SlackProvider reverseSlackProvider(
+    RaptorSlackProvider source,
+    WorkerLifeCycle lifeCycle
+  ) {
+    var slackProvider = new ReverseSlackProvider(source);
+    lifeCycle.onPrepareForNextRound(slackProvider::notifyNewRound);
+    return slackProvider;
+  }
+
+  private static final class ForwardSlackProvider implements SlackProvider {
+
+    private final RaptorSlackProvider source;
+    private int transferSlack;
+
+    private ForwardSlackProvider(RaptorSlackProvider source) {
+      this.source = source;
+      this.transferSlack = 0;
     }
 
-    public static SlackProvider reverseSlackProvider(
-        RaptorSlackProvider source,
-        WorkerLifeCycle lifeCycle
-    ) {
-        var slackProvider = new ReverseSlackProvider(source);
-        lifeCycle.onPrepareForNextRound(slackProvider::notifyNewRound);
-        return slackProvider;
+    public void notifyNewRound(int round) {
+      transferSlack = round < 2 ? 0 : source.transferSlack();
     }
 
-    private static final class ForwardSlackProvider implements SlackProvider {
-        private final RaptorSlackProvider source;
-        private int transferSlack;
-
-        private ForwardSlackProvider(RaptorSlackProvider source) {
-            this.source = source;
-            this.transferSlack = 0;
-        }
-
-        public void notifyNewRound(int round) {
-            transferSlack = round < 2 ? 0 : source.transferSlack();
-        }
-
-        @Override
-        public int boardSlack(RaptorTripPattern pattern) {
-            return source.boardSlack(pattern) + transferSlack;
-        }
-
-        @Override
-        public int alightSlack(RaptorTripPattern pattern) {
-            return source.alightSlack(pattern);
-        }
-
-        @Override
-        public int accessEgressWithRidesTransferSlack() {
-            return source.transferSlack();
-        }
+    @Override
+    public int boardSlack(RaptorTripPattern pattern) {
+      return source.boardSlack(pattern) + transferSlack;
     }
 
-    private static final class ReverseSlackProvider implements SlackProvider {
-        private final RaptorSlackProvider source;
-        private int transferSlack;
-
-        private ReverseSlackProvider(RaptorSlackProvider source) {
-            this.source = source;
-            this.transferSlack = 0;
-        }
-
-        public void notifyNewRound(int round) {
-            transferSlack = round < 2 ? 0 : source.transferSlack();
-        }
-
-        @Override
-        public int boardSlack(RaptorTripPattern pattern) {
-            return source.alightSlack(pattern) + transferSlack;
-        }
-
-        @Override
-        public int alightSlack(RaptorTripPattern pattern) {
-            return source.boardSlack(pattern);
-        }
-
-        @Override
-        public int accessEgressWithRidesTransferSlack() {
-            return source.transferSlack();
-        }
+    @Override
+    public int alightSlack(RaptorTripPattern pattern) {
+      return source.alightSlack(pattern);
     }
+
+    @Override
+    public int accessEgressWithRidesTransferSlack() {
+      return source.transferSlack();
+    }
+  }
+
+  private static final class ReverseSlackProvider implements SlackProvider {
+
+    private final RaptorSlackProvider source;
+    private int transferSlack;
+
+    private ReverseSlackProvider(RaptorSlackProvider source) {
+      this.source = source;
+      this.transferSlack = 0;
+    }
+
+    public void notifyNewRound(int round) {
+      transferSlack = round < 2 ? 0 : source.transferSlack();
+    }
+
+    @Override
+    public int boardSlack(RaptorTripPattern pattern) {
+      return source.alightSlack(pattern) + transferSlack;
+    }
+
+    @Override
+    public int alightSlack(RaptorTripPattern pattern) {
+      return source.boardSlack(pattern);
+    }
+
+    @Override
+    public int accessEgressWithRidesTransferSlack() {
+      return source.transferSlack();
+    }
+  }
 }

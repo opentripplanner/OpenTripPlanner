@@ -35,105 +35,102 @@ import org.slf4j.LoggerFactory;
  */
 public class OTPConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OTPConfiguration.class);
-    /**
-     * The command line parameters provide the directory for loading config files, and
-     * in some cases may have parameters used to parse/override the file configs.
-     */
-    private final CommandLineParameters cli;
-    private final OtpConfig otpConfig;
+  private static final Logger LOG = LoggerFactory.getLogger(OTPConfiguration.class);
+  /**
+   * The command line parameters provide the directory for loading config files, and
+   * in some cases may have parameters used to parse/override the file configs.
+   */
+  private final CommandLineParameters cli;
+  private final OtpConfig otpConfig;
 
-    /**
-     * The build-config in NOT final because it can be set from the embedded
-     * graph.obj build-config after the graph is loaded.
-     */
-    private BuildConfig buildConfig;
+  /**
+   * The build-config in NOT final because it can be set from the embedded
+   * graph.obj build-config after the graph is loaded.
+   */
+  private BuildConfig buildConfig;
 
-    /**
-     * The router-config in NOT final because it can be set from the embedded
-     * graph.obj router-config after the graph is loaded.
-     */
-    private RouterConfig routerConfig;
+  /**
+   * The router-config in NOT final because it can be set from the embedded
+   * graph.obj router-config after the graph is loaded.
+   */
+  private RouterConfig routerConfig;
 
-    private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
-        this.cli = cli;
-        this.otpConfig = configLoader.loadOtpConfig();
-        this.buildConfig = configLoader.loadBuildConfig();
-        this.routerConfig = configLoader.loadRouterConfig();
+  private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
+    this.cli = cli;
+    this.otpConfig = configLoader.loadOtpConfig();
+    this.buildConfig = configLoader.loadBuildConfig();
+    this.routerConfig = configLoader.loadRouterConfig();
+  }
+
+  /**
+   * Create a new OTP configuration instance for a given directory. OTP can load
+   * multiple graphs with its own configuration.
+   */
+  public OTPConfiguration(CommandLineParameters cli) {
+    this(cli, new ConfigLoader(cli.getBaseDirectory()));
+  }
+
+  /**
+   * Create a new config for test using the given JSON config. The config is used to initiate
+   * the OTP config, build config and the router config.
+   */
+  public static OTPConfiguration createForTest(String configJson) {
+    return new OTPConfiguration(new CommandLineParameters(), ConfigLoader.fromString(configJson));
+  }
+
+  public void updateConfigFromSerializedGraph(BuildConfig buildConfig, RouterConfig routerConfig) {
+    if (this.buildConfig.isDefault()) {
+      LOG.info("Using the graph embedded JSON build configuration.");
+      this.buildConfig = buildConfig;
     }
-
-    /**
-     * Create a new OTP configuration instance for a given directory. OTP can load
-     * multiple graphs with its own configuration.
-     */
-    public OTPConfiguration(CommandLineParameters cli) {
-        this(cli, new ConfigLoader(cli.getBaseDirectory()));
+    if (this.routerConfig.isDefault()) {
+      LOG.info("Using the graph embedded JSON router configuration.");
+      this.routerConfig = routerConfig;
     }
+    ConfigLoader.logConfigVersion(
+      this.otpConfig.configVersion,
+      this.buildConfig.configVersion,
+      this.routerConfig.getConfigVersion()
+    );
+  }
 
-    /**
-     * Create a new config for test using the given JSON config. The config is used to initiate
-     * the OTP config, build config and the router config.
-     */
-    public static OTPConfiguration createForTest(String configJson) {
-        return new OTPConfiguration(
-                new CommandLineParameters(),
-                ConfigLoader.fromString(configJson)
-        );
-    }
+  /**
+   * TODO OTP2 - Remove this, and inject config using interfaces into the necessary
+   *           - components, decompiling them from the OTP application parameters.
+   * @return the command line parameters
+   */
+  public CommandLineParameters getCli() {
+    return cli;
+  }
 
-    public void updateConfigFromSerializedGraph(BuildConfig buildConfig, RouterConfig routerConfig) {
-        if(this.buildConfig.isDefault()) {
-            LOG.info("Using the graph embedded JSON build configuration.");
-            this.buildConfig = buildConfig;
-        }
-        if(this.routerConfig.isDefault()) {
-            LOG.info("Using the graph embedded JSON router configuration.");
-            this.routerConfig = routerConfig;
-        }
-        ConfigLoader.logConfigVersion(
-            this.otpConfig.configVersion,
-            this.buildConfig.configVersion,
-            this.routerConfig.getConfigVersion()
-        );
-    }
+  /**
+   * Get the otp config as a type safe java bean.
+   */
+  public OtpConfig otpConfig() {
+    return otpConfig;
+  }
 
-    /**
-     * TODO OTP2 - Remove this, and inject config using interfaces into the necessary
-     *           - components, decompiling them from the OTP application parameters.
-     * @return the command line parameters
-     */
-    public CommandLineParameters getCli() {
-        return cli;
-    }
+  /**
+   * Get the graph build config as a java bean - type safe.
+   */
+  public BuildConfig buildConfig() {
+    return buildConfig;
+  }
 
-    /**
-     * Get the otp config as a type safe java bean.
-     */
-    public OtpConfig otpConfig() {
-        return otpConfig;
-    }
+  /**
+   * Get the {@code router-config.json} as JsonNode.
+   * <p>
+   * Returns a {@link MissingNode} if base directory is {@code null} or the file does not exist.
+   * @throws RuntimeException if the file contains syntax errors or cannot be parsed.
+   */
+  public RouterConfig routerConfig() {
+    return routerConfig;
+  }
 
-    /**
-     * Get the graph build config as a java bean - type safe.
-     */
-    public BuildConfig buildConfig() {
-        return buildConfig;
-    }
-
-    /**
-     * Get the {@code router-config.json} as JsonNode.
-     * <p>
-     * Returns a {@link MissingNode} if base directory is {@code null} or the file does not exist.
-     * @throws RuntimeException if the file contains syntax errors or cannot be parsed.
-     */
-    public RouterConfig routerConfig() {
-        return routerConfig;
-    }
-
-    /**
-     * Create plug in config to the data store.
-     */
-    public OtpDataStoreConfig createDataStoreConfig() {
-        return new OtpDataStoreConfigAdapter(cli.getBaseDirectory(), buildConfig().storage);
-    }
+  /**
+   * Create plug in config to the data store.
+   */
+  public OtpDataStoreConfig createDataStoreConfig() {
+    return new OtpDataStoreConfigAdapter(cli.getBaseDirectory(), buildConfig().storage);
+  }
 }

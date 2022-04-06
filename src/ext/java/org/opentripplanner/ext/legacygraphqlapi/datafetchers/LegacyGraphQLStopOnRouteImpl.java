@@ -7,19 +7,19 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteMo
 import org.opentripplanner.model.Route;
 
 public class LegacyGraphQLStopOnRouteImpl
-        implements LegacyGraphQLDataFetchers.LegacyGraphQLStopOnRoute {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLStopOnRoute {
 
-    @Override
-    public DataFetcher<Object> stop() {
-        return environment -> getSource(environment).getStop();
-    }
+  @Override
+  public DataFetcher<Object> stop() {
+    return environment -> getSource(environment).getStop();
+  }
 
-    @Override
-    public DataFetcher<Route> route() {
-        return environment -> getSource(environment).getRoute();
-    }
+  @Override
+  public DataFetcher<Route> route() {
+    return environment -> getSource(environment).getRoute();
+  }
 
-    private LegacyGraphQLStopOnRouteModel getSource(DataFetchingEnvironment environment) {
-        return environment.getSource();
-    }
+  private LegacyGraphQLStopOnRouteModel getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
+  }
 }

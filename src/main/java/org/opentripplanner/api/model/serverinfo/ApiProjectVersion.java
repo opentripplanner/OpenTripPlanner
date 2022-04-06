@@ -10,13 +10,23 @@ public class ApiProjectVersion {
     this.projectVersion = version;
   }
 
-  public String getVersion() { return projectVersion.version; }
+  public String getVersion() {
+    return projectVersion.version;
+  }
 
-  public int getMajor() { return projectVersion.major; }
+  public int getMajor() {
+    return projectVersion.major;
+  }
 
-  public int getMinor() { return projectVersion.minor; }
+  public int getMinor() {
+    return projectVersion.minor;
+  }
 
-  public int getPatch() { return projectVersion.patch; }
+  public int getPatch() {
+    return projectVersion.patch;
+  }
 
-  public String getQualifier() { return projectVersion.qualifier; }
+  public String getQualifier() {
+    return projectVersion.qualifier;
+  }
 }

@@ -13,7 +13,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 
 public class LegacyGraphQLplaceAtDistanceImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLPlaceAtDistance {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLPlaceAtDistance {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
@@ -22,29 +22,37 @@ public class LegacyGraphQLplaceAtDistanceImpl
       Object place = placeAtDistance.place;
       TypeResolver typeResolver = new LegacyGraphQLPlaceInterfaceTypeResolver();
 
-      GraphQLInterfaceType placeInterface = (GraphQLInterfaceType) environment.getGraphQLSchema().getType("PlaceInterface");
+      GraphQLInterfaceType placeInterface = (GraphQLInterfaceType) environment
+        .getGraphQLSchema()
+        .getType("PlaceInterface");
 
-      GraphQLObjectType placeType = typeResolver.getType(new TypeResolutionEnvironment(
+      GraphQLObjectType placeType = typeResolver.getType(
+        new TypeResolutionEnvironment(
           place,
           environment.getArguments(),
           environment.getMergedField(),
           placeInterface,
           environment.getGraphQLSchema(),
           environment.getContext()
-      ));
+        )
+      );
 
       Relay.ResolvedGlobalId globalId = (Relay.ResolvedGlobalId) environment
-          .getGraphQLSchema()
-          .getCodeRegistry()
-          .getDataFetcher(
+        .getGraphQLSchema()
+        .getCodeRegistry()
+        .getDataFetcher(
           FieldCoordinates.coordinates(placeType.getName(), "id"),
           placeInterface.getFieldDefinition("id")
-      ).get(
-          DataFetchingEnvironmentImpl.newDataFetchingEnvironment(environment).source(place).build());
+        )
+        .get(
+          DataFetchingEnvironmentImpl.newDataFetchingEnvironment(environment).source(place).build()
+        );
 
       return new Relay.ResolvedGlobalId(
-          "placeAtDistance",
-          placeAtDistance.distance + ";" + new Relay().toGlobalId(globalId.getType(), globalId.getId())
+        "placeAtDistance",
+        placeAtDistance.distance +
+        ";" +
+        new Relay().toGlobalId(globalId.getType(), globalId.getId())
       );
     };
   }

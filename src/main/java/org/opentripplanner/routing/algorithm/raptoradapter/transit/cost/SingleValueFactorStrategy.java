@@ -8,23 +8,23 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
  */
 final class SingleValueFactorStrategy implements FactorStrategy {
 
-    private final int factor;
+  private final int factor;
 
-    SingleValueFactorStrategy(int factor) {
-        this.factor = factor;
-    }
+  SingleValueFactorStrategy(int factor) {
+    this.factor = factor;
+  }
 
-    SingleValueFactorStrategy(double reluctance) {
-        this(RaptorCostConverter.toRaptorCost(reluctance));
-    }
+  SingleValueFactorStrategy(double reluctance) {
+    this(RaptorCostConverter.toRaptorCost(reluctance));
+  }
 
-    @Override
-    public int factor(int index) {
-        return factor;
-    }
+  @Override
+  public int factor(int index) {
+    return factor;
+  }
 
-    @Override
-    public int minFactor() {
-        return factor;
-    }
+  @Override
+  public int minFactor() {
+    return factor;
+  }
 }

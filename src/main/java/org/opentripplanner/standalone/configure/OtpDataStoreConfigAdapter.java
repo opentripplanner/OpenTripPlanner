@@ -1,12 +1,11 @@
 package org.opentripplanner.standalone.configure;
 
-import org.opentripplanner.datastore.OtpDataStoreConfig;
-import org.opentripplanner.standalone.config.StorageConfig;
-
 import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.opentripplanner.datastore.OtpDataStoreConfig;
+import org.opentripplanner.standalone.config.StorageConfig;
 
 /**
  * This class is a thin wrapper around the OTP configuration to provide a
@@ -18,78 +17,77 @@ import java.util.regex.Pattern;
  * into the data storage in ONE place.
  */
 class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
-    private final File baseDirectory;
-    private final StorageConfig config;
 
-    OtpDataStoreConfigAdapter(
-            File baseDirectory, StorageConfig config
-    ) {
-        this.baseDirectory = baseDirectory;
-        this.config = config;
-    }
+  private final File baseDirectory;
+  private final StorageConfig config;
 
-    @Override
-    public File baseDirectory() {
-        return baseDirectory;
-    }
+  OtpDataStoreConfigAdapter(File baseDirectory, StorageConfig config) {
+    this.baseDirectory = baseDirectory;
+    this.config = config;
+  }
 
-    @Override
-    public URI reportDirectory() {
-        return config.buildReportDir;
-    }
+  @Override
+  public File baseDirectory() {
+    return baseDirectory;
+  }
 
-    @Override
-    public String gsCredentials() {
-        return config.gsCredentials;
-    }
+  @Override
+  public URI reportDirectory() {
+    return config.buildReportDir;
+  }
 
-    @Override
-    public List<URI> osmFiles() {
-        return config.osm;
-    }
+  @Override
+  public String gsCredentials() {
+    return config.gsCredentials;
+  }
 
-    @Override
-    public List<URI> demFiles() {
-        return config.dem;
-    }
+  @Override
+  public List<URI> osmFiles() {
+    return config.osm;
+  }
 
-    @Override
-    public List<URI> gtfsFiles() {
-        return config.gtfs;
-    }
+  @Override
+  public List<URI> demFiles() {
+    return config.dem;
+  }
 
-    @Override
-    public List<URI> netexFiles() {
-        return config.netex;
-    }
+  @Override
+  public List<URI> gtfsFiles() {
+    return config.gtfs;
+  }
 
-    @Override
-    public URI graph() {
-        return config.graph;
-    }
+  @Override
+  public List<URI> netexFiles() {
+    return config.netex;
+  }
 
-    @Override
-    public URI streetGraph() {
-        return config.streetGraph;
-    }
+  @Override
+  public URI graph() {
+    return config.graph;
+  }
 
-    @Override
-    public Pattern gtfsLocalFilePattern() {
-        return config.localFileNamePatterns.gtfs;
-    }
+  @Override
+  public URI streetGraph() {
+    return config.streetGraph;
+  }
 
-    @Override
-    public Pattern netexLocalFilePattern() {
-        return config.localFileNamePatterns.netex;
-    }
+  @Override
+  public Pattern gtfsLocalFilePattern() {
+    return config.localFileNamePatterns.gtfs;
+  }
 
-    @Override
-    public Pattern osmLocalFilePattern() {
-        return config.localFileNamePatterns.osm;
-    }
+  @Override
+  public Pattern netexLocalFilePattern() {
+    return config.localFileNamePatterns.netex;
+  }
 
-    @Override
-    public Pattern demLocalFilePattern() {
-        return config.localFileNamePatterns.dem;
-    }
+  @Override
+  public Pattern osmLocalFilePattern() {
+    return config.localFileNamePatterns.osm;
+  }
+
+  @Override
+  public Pattern demLocalFilePattern() {
+    return config.localFileNamePatterns.dem;
+  }
 }

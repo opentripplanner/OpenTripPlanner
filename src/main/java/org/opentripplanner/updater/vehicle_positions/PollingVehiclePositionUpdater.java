@@ -24,79 +24,79 @@ import org.slf4j.LoggerFactory;
  */
 public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
 
-    /**
-     * Parent update manager. Is used to execute graph writer runnables.
-     */
-    private WriteToGraphCallback saveResultOnGraph;
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  private WriteToGraphCallback saveResultOnGraph;
 
-    /**
-     * Update streamer
-     */
-    private final VehiclePositionSource vehiclePositionSource;
-    private VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
+  /**
+   * Update streamer
+   */
+  private final VehiclePositionSource vehiclePositionSource;
+  private VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
 
-    private final String feedId;
+  private final String feedId;
 
-    @Override
-    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-        this.saveResultOnGraph = saveResultOnGraph;
+  @Override
+  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+    this.saveResultOnGraph = saveResultOnGraph;
+  }
+
+  public PollingVehiclePositionUpdater(VehiclePositionsUpdaterParameters params) {
+    super(params);
+    var p = (VehiclePositionsUpdaterParameters) params;
+    vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url());
+
+    LOG.info(
+      "Creating vehicle position updater running every {} seconds : {}",
+      pollingPeriodSeconds,
+      vehiclePositionSource
+    );
+    feedId = params.feedId();
+  }
+
+  @Override
+  public void setup(Graph graph) {
+    var index = graph.index;
+    vehiclePositionPatternMatcher =
+      new VehiclePositionPatternMatcher(
+        feedId,
+        tripId -> index.getTripForId().get(tripId),
+        (trip, date) -> getPatternIncludingRealtime(graph, trip, date),
+        graph.getVehiclePositionService()
+      );
+  }
+
+  private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, ServiceDate sd) {
+    return Optional
+      .ofNullable(graph.getTimetableSnapshot())
+      .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
+      .orElseGet(() -> graph.index.getPatternForTrip().get(trip));
+  }
+
+  /**
+   * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
+   * applies those updates to the graph.
+   */
+  @Override
+  public void runPolling() {
+    // Get update lists from update source
+    List<VehiclePosition> updates = vehiclePositionSource.getPositions();
+
+    if (updates != null) {
+      // Handle updating trip positions via graph writer runnable
+      var runnable = new VehiclePositionUpdaterRunnable(updates, vehiclePositionPatternMatcher);
+      saveResultOnGraph.execute(runnable);
     }
+  }
 
-    public PollingVehiclePositionUpdater(VehiclePositionsUpdaterParameters params) {
-        super(params);
-        var p = (VehiclePositionsUpdaterParameters) params;
-        vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url());
+  @Override
+  public void teardown() {}
 
-        LOG.info(
-                "Creating vehicle position updater running every {} seconds : {}",
-                pollingPeriodSeconds, vehiclePositionSource
-        );
-        feedId = params.feedId();
-    }
-
-    @Override
-    public void setup(Graph graph) {
-        var index = graph.index;
-        vehiclePositionPatternMatcher =
-                new VehiclePositionPatternMatcher(
-                        feedId,
-                        tripId -> index.getTripForId().get(tripId),
-                        (trip, date) -> getPatternIncludingRealtime(graph, trip, date),
-                        graph.getVehiclePositionService()
-                );
-    }
-
-    private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, ServiceDate sd) {
-        return Optional.ofNullable(graph.getTimetableSnapshot())
-                .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
-                .orElseGet(() -> graph.index.getPatternForTrip().get(trip));
-    }
-
-    /**
-     * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
-     * applies those updates to the graph.
-     */
-    @Override
-    public void runPolling() {
-        // Get update lists from update source
-        List<VehiclePosition> updates = vehiclePositionSource.getPositions();
-
-        if (updates != null) {
-            // Handle updating trip positions via graph writer runnable
-            var runnable =
-                    new VehiclePositionUpdaterRunnable(updates, vehiclePositionPatternMatcher);
-            saveResultOnGraph.execute(runnable);
-        }
-    }
-
-    @Override
-    public void teardown() {
-    }
-
-    public String toString() {
-        String s = (vehiclePositionSource == null) ? "NONE" : vehiclePositionSource.toString();
-        return "Streaming vehicle position updater with update source = " + s;
-    }
+  public String toString() {
+    String s = (vehiclePositionSource == null) ? "NONE" : vehiclePositionSource.toString();
+    return "Streaming vehicle position updater with update source = " + s;
+  }
 }

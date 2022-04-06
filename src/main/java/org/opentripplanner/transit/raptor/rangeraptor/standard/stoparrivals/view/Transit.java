@@ -6,49 +6,49 @@ import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 
 final class Transit<T extends RaptorTripSchedule>
-    extends StopArrivalViewAdapter<T>
-    implements TransitPathView<T>
-{
-    private final StopArrivalState<T> arrival;
-    private final StopsCursor<T> cursor;
+  extends StopArrivalViewAdapter<T>
+  implements TransitPathView<T> {
 
-    Transit(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
-        super(round, stop);
-        this.arrival = arrival;
-        this.cursor = cursor;
-    }
+  private final StopArrivalState<T> arrival;
+  private final StopsCursor<T> cursor;
 
-    @Override
-    public int arrivalTime() {
-        return arrival.onBoardArrivalTime();
-    }
+  Transit(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
+    super(round, stop);
+    this.arrival = arrival;
+    this.cursor = cursor;
+  }
 
-    @Override
-    public boolean arrivedByTransit() {
-        return true;
-    }
+  @Override
+  public int arrivalTime() {
+    return arrival.onBoardArrivalTime();
+  }
 
-    @Override
-    public TransitPathView<T> transitPath() {
-        return this;
-    }
+  @Override
+  public boolean arrivedByTransit() {
+    return true;
+  }
 
-    @Override
-    public int boardStop() {
-        return arrival.boardStop();
-    }
+  @Override
+  public TransitPathView<T> transitPath() {
+    return this;
+  }
 
-    @Override
-    public T trip() {
-        return arrival.trip();
-    }
+  @Override
+  public int boardStop() {
+    return arrival.boardStop();
+  }
 
-    @Override
-    public ArrivalView<T> previous() {
-        return cursor.stop(round()-1, boardStop(), this);
-    }
+  @Override
+  public T trip() {
+    return arrival.trip();
+  }
 
-    public int boardTime() {
-        return arrival.boardTime();
-    }
+  @Override
+  public ArrivalView<T> previous() {
+    return cursor.stop(round() - 1, boardStop(), this);
+  }
+
+  public int boardTime() {
+    return arrival.boardTime();
+  }
 }

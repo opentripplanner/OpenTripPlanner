@@ -15,127 +15,128 @@ import org.opentripplanner.util.WorldEnvelope;
 
 public class ApiRouterInfo {
 
-    public String routerId;
-    
-    public Geometry polygon;
+  public String routerId;
 
-    public Date buildTime;
+  public Geometry polygon;
 
-    public long transitServiceStarts;
+  public Date buildTime;
 
-    public long transitServiceEnds;
+  public long transitServiceStarts;
 
-    public List<String> transitModes;
+  public long transitServiceEnds;
 
-    private final WorldEnvelope envelope;
+  public List<String> transitModes;
 
-    public double centerLatitude;
+  private final WorldEnvelope envelope;
 
-    public double centerLongitude;
+  public double centerLatitude;
 
-    public boolean hasParkRide;
+  public double centerLongitude;
 
-    public boolean hasBikeSharing;
+  public boolean hasParkRide;
 
-    public final boolean hasBikePark;
+  public boolean hasBikeSharing;
 
-    public final boolean hasCarPark;
+  public final boolean hasBikePark;
 
-    public final boolean hasVehicleParking;
+  public final boolean hasCarPark;
 
-    public List<TravelOption> travelOptions;
+  public final boolean hasVehicleParking;
 
+  public List<TravelOption> travelOptions;
 
-    /** TODO: Do not pass in the graph here, do this in a mapper instead. */
-    public ApiRouterInfo(String routerId, Graph graph) {
-        VehicleRentalStationService vehicleRentalService = graph.getService(
-                VehicleRentalStationService.class, false
-        );
-        VehicleParkingService vehicleParkingService = graph.getService(
-            VehicleParkingService.class, false
-        );
+  /** TODO: Do not pass in the graph here, do this in a mapper instead. */
+  public ApiRouterInfo(String routerId, Graph graph) {
+    VehicleRentalStationService vehicleRentalService = graph.getService(
+      VehicleRentalStationService.class,
+      false
+    );
+    VehicleParkingService vehicleParkingService = graph.getService(
+      VehicleParkingService.class,
+      false
+    );
 
-        this.routerId = routerId;
-        this.polygon = graph.getConvexHull();
-        this.buildTime = graph.buildTime;
-        this.transitServiceStarts = graph.getTransitServiceStarts();
-        this.transitServiceEnds = graph.getTransitServiceEnds();
-        this.transitModes = TraverseModeMapper.mapToApi(graph.getTransitModes());
-        this.envelope = graph.getEnvelope();
-        this.hasParkRide = graph.hasParkRide;
-        this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
-        this.hasBikePark = mapHasBikePark(vehicleParkingService);
-        this.hasCarPark = mapHasCarPark(vehicleParkingService);
-        this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
-        this.travelOptions = TravelOptionsMaker.makeOptions(graph);
-        graph.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
+    this.routerId = routerId;
+    this.polygon = graph.getConvexHull();
+    this.buildTime = graph.buildTime;
+    this.transitServiceStarts = graph.getTransitServiceStarts();
+    this.transitServiceEnds = graph.getTransitServiceEnds();
+    this.transitModes = TraverseModeMapper.mapToApi(graph.getTransitModes());
+    this.envelope = graph.getEnvelope();
+    this.hasParkRide = graph.hasParkRide;
+    this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
+    this.hasBikePark = mapHasBikePark(vehicleParkingService);
+    this.hasCarPark = mapHasCarPark(vehicleParkingService);
+    this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
+    this.travelOptions = TravelOptionsMaker.makeOptions(graph);
+    graph.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
+  }
+
+  public boolean mapHasBikeSharing(VehicleRentalStationService service) {
+    if (service == null) {
+      return false;
     }
 
-    public boolean mapHasBikeSharing(VehicleRentalStationService service) {
-        if (service == null) {
-            return false;
-        }
+    //at least 2 bike sharing stations are needed for useful bike sharing
+    return service.getVehicleRentalPlaces().size() > 1;
+  }
 
-        //at least 2 bike sharing stations are needed for useful bike sharing
-        return service.getVehicleRentalPlaces().size() > 1;
+  public boolean mapHasBikePark(VehicleParkingService service) {
+    if (service == null) {
+      return false;
     }
+    return service.getBikeParks().findAny().isPresent();
+  }
 
-    public boolean mapHasBikePark(VehicleParkingService service) {
-        if (service == null) {
-            return false;
-        }
-        return service.getBikeParks().findAny().isPresent();
+  public boolean mapHasCarPark(VehicleParkingService service) {
+    if (service == null) {
+      return false;
     }
+    return service.getCarParks().findAny().isPresent();
+  }
 
-    public boolean mapHasCarPark(VehicleParkingService service) {
-        if (service == null) {
-            return false;
-        }
-        return service.getCarParks().findAny().isPresent();
+  public boolean mapHasVehicleParking(VehicleParkingService service) {
+    if (service == null) {
+      return false;
     }
+    return service.getVehicleParkings().findAny().isPresent();
+  }
 
-    public boolean mapHasVehicleParking(VehicleParkingService service) {
-        if (service == null) {
-            return false;
-        }
-        return service.getVehicleParkings().findAny().isPresent();
-    }
+  /**
+   * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used.
+   *
+   * It is first called when OSM is loaded. Then after transit data is loaded.
+   * So that center is set in all combinations of street and transit loading.
+   */
+  public void setCenter(Coordinate center) {
+    //Transit data was loaded and center was calculated with calculateTransitCenter
+    centerLongitude = center.x;
+    centerLatitude = center.y;
+  }
 
-    /**
-     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used.
-     *
-     * It is first called when OSM is loaded. Then after transit data is loaded.
-     * So that center is set in all combinations of street and transit loading.
-     */
-    public void setCenter(Coordinate center) {
-        //Transit data was loaded and center was calculated with calculateTransitCenter
-        centerLongitude = center.x;
-        centerLatitude = center.y;
-    }
+  /**
+   * Set center coordinate from mean coordinates of bounding box.
+   * @see #setCenter(Coordinate)
+   */
+  public void calculateCenter() {
+    // Does not work around 180th parallel.
+    centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
+    centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
+  }
 
-    /**
-     * Set center coordinate from mean coordinates of bounding box.
-     * @see #setCenter(Coordinate)
-     */
-    public void calculateCenter() {
-        // Does not work around 180th parallel.
-        centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
-        centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
-    }
+  public double getLowerLeftLatitude() {
+    return envelope.getLowerLeftLatitude();
+  }
 
-    public double getLowerLeftLatitude() {
-        return envelope.getLowerLeftLatitude();
-    }
+  public double getLowerLeftLongitude() {
+    return envelope.getLowerLeftLongitude();
+  }
 
-    public double getLowerLeftLongitude() {
-        return envelope.getLowerLeftLongitude();
-    }
+  public double getUpperRightLatitude() {
+    return envelope.getUpperRightLatitude();
+  }
 
-    public double getUpperRightLatitude() {
-        return envelope.getUpperRightLatitude();
-    }
-
-    public double getUpperRightLongitude() {
-        return envelope.getUpperRightLongitude();
-    }
+  public double getUpperRightLongitude() {
+    return envelope.getUpperRightLongitude();
+  }
 }

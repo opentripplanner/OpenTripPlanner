@@ -22,19 +22,18 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 
 public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPattern {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment -> new Relay.ResolvedGlobalId("Pattern",
-        getSource(environment).getId().toString()
-    );
+    return environment ->
+      new Relay.ResolvedGlobalId("Pattern", getSource(environment).getId().toString());
   }
 
   @Override
@@ -70,17 +69,21 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   @Override
   public DataFetcher<Iterable<Trip>> tripsForDate() {
     return environment -> {
-      String servicaDate = new LegacyGraphQLTypes.LegacyGraphQLPatternTripsForDateArgs(environment.getArguments()).getLegacyGraphQLServiceDate();
+      String servicaDate = new LegacyGraphQLTypes.LegacyGraphQLPatternTripsForDateArgs(
+        environment.getArguments()
+      )
+        .getLegacyGraphQLServiceDate();
 
       try {
-        BitSet services = getRoutingService(environment).getServicesRunningForDate(
-            ServiceDate.parseString(servicaDate)
-        );
-        return getSource(environment).getScheduledTimetable().getTripTimes()
-            .stream()
-            .filter(times -> services.get(times.getServiceCode()))
-            .map(times -> times.getTrip())
-            .collect(Collectors.toList());
+        BitSet services = getRoutingService(environment)
+          .getServicesRunningForDate(ServiceDate.parseString(servicaDate));
+        return getSource(environment)
+          .getScheduledTimetable()
+          .getTripTimes()
+          .stream()
+          .filter(times -> services.get(times.getServiceCode()))
+          .map(times -> times.getTrip())
+          .collect(Collectors.toList());
       } catch (ParseException e) {
         return null; // Invalid date format
       }
@@ -89,8 +92,10 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
   @Override
   public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions() {
-    return environment -> getRoutingService(environment).getVehiclePositionService()
-            .getVehiclePositions(this.getSource(environment));
+    return environment ->
+      getRoutingService(environment)
+        .getVehiclePositionService()
+        .getVehiclePositions(this.getSource(environment));
   }
 
   @Override
@@ -124,19 +129,19 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
-      var args = new LegacyGraphQLTypes.LegacyGraphQLPatternAlertsArgs(
-              environment.getArguments());
-      Iterable<LegacyGraphQLTypes.LegacyGraphQLPatternAlertType> types =
-              args.getLegacyGraphQLTypes();
+      var args = new LegacyGraphQLTypes.LegacyGraphQLPatternAlertsArgs(environment.getArguments());
+      Iterable<LegacyGraphQLTypes.LegacyGraphQLPatternAlertType> types = args.getLegacyGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
             case PATTERN:
-              alerts.addAll(alertService.getDirectionAndRouteAlerts(
-                      getSource(environment).getDirection().gtfsCode,
-                      getRoute(environment).getId()
-              ));
+              alerts.addAll(
+                alertService.getDirectionAndRouteAlerts(
+                  getSource(environment).getDirection().gtfsCode,
+                  getRoute(environment).getId()
+                )
+              );
               break;
             case AGENCY:
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
@@ -146,56 +151,78 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
               break;
             case ROUTE_TYPE:
               int routeType = getRoute(environment).getGtfsType();
-              alerts.addAll(alertService.getRouteTypeAlerts(
-                      routeType,
-                      getSource(environment).getId().getFeedId()
-              ));
-              alerts.addAll(alertService.getRouteTypeAndAgencyAlerts(
-                      routeType,
-                      getAgency(environment).getId()
-              ));
+              alerts.addAll(
+                alertService.getRouteTypeAlerts(
+                  routeType,
+                  getSource(environment).getId().getFeedId()
+                )
+              );
+              alerts.addAll(
+                alertService.getRouteTypeAndAgencyAlerts(routeType, getAgency(environment).getId())
+              );
               break;
             case TRIPS:
-              getTrips(environment).forEach(
-                      trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
+              getTrips(environment)
+                .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
               break;
             case STOPS_ON_PATTERN:
-              alerts.addAll(alertService.getAllAlerts()
+              alerts.addAll(
+                alertService
+                  .getAllAlerts()
+                  .stream()
+                  .filter(alert ->
+                    alert
+                      .getEntities()
                       .stream()
-                      .filter(alert -> alert.getEntities()
-                              .stream()
-                              .anyMatch(entity -> (
-                                      entity instanceof EntitySelector.StopAndRoute
-                                              && ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
-                                              getRoute(environment).getId())
-                              )))
-                      .collect(Collectors.toList()));
-              getSource(environment).getStops().forEach(stop -> {
-                FeedScopedId stopId = stop.getId();
-                alerts.addAll(alertService.getStopAlerts(stopId));
-              });
+                      .anyMatch(entity ->
+                        (
+                          entity instanceof EntitySelector.StopAndRoute &&
+                          ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
+                              getRoute(environment).getId()
+                            )
+                        )
+                      )
+                  )
+                  .collect(Collectors.toList())
+              );
+              getSource(environment)
+                .getStops()
+                .forEach(stop -> {
+                  FeedScopedId stopId = stop.getId();
+                  alerts.addAll(alertService.getStopAlerts(stopId));
+                });
               break;
             case STOPS_ON_TRIPS:
               Iterable<Trip> trips = getTrips(environment);
-              trips.forEach(trip -> alerts.addAll(alertService.getAllAlerts()
-                      .stream()
-                      .filter(alert -> alert.getEntities()
-                              .stream()
-                              .anyMatch(entity -> (
-                                      entity instanceof EntitySelector.StopAndTrip
-                                              && ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
-                                              getSource(environment).getId())
-                              )))
-                      .collect(Collectors.toList())));
+              trips.forEach(trip ->
+                alerts.addAll(
+                  alertService
+                    .getAllAlerts()
+                    .stream()
+                    .filter(alert ->
+                      alert
+                        .getEntities()
+                        .stream()
+                        .anyMatch(entity ->
+                          (
+                            entity instanceof EntitySelector.StopAndTrip &&
+                            ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
+                                getSource(environment).getId()
+                              )
+                          )
+                        )
+                    )
+                    .collect(Collectors.toList())
+                )
+              );
               break;
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
-      }
-      else {
+      } else {
         return alertService.getDirectionAndRouteAlerts(
-                getSource(environment).getDirection().gtfsCode,
-                getRoute(environment).getId()
+          getSource(environment).getDirection().gtfsCode,
+          getRoute(environment).getId()
         );
       }
     };
@@ -209,11 +236,12 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
     return getSource(environment).getRoute();
   }
 
-
   private List<Object> getStops(DataFetchingEnvironment environment) {
-    return getSource(environment).getStops().stream()
-            .map(Object.class::cast)
-            .collect(Collectors.toList());
+    return getSource(environment)
+      .getStops()
+      .stream()
+      .map(Object.class::cast)
+      .collect(Collectors.toList());
   }
 
   private List<Trip> getTrips(DataFetchingEnvironment environment) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SetupResult {
+
   private final File configDataDir;
   private final boolean buildStreet;
   private final boolean buildTransit;
@@ -12,8 +13,11 @@ public class SetupResult {
   private final boolean serveGraph;
 
   public SetupResult(
-      File configDataDir, boolean buildStreet, boolean buildTransit, boolean saveGraph,
-      boolean serveGraph
+    File configDataDir,
+    boolean buildStreet,
+    boolean buildTransit,
+    boolean saveGraph,
+    boolean serveGraph
   ) {
     this.configDataDir = configDataDir;
     this.buildStreet = buildStreet;
@@ -52,33 +56,37 @@ public class SetupResult {
 
   @Override
   public String toString() {
-    return "SetupResult{"
-        + "configDataDir=" + configDataDir.getAbsolutePath()
-        + (buildStreet ? ", buildStreet" : "")
-        + (buildTransit ? ", buildTransit" : "")
-        + (saveGraph ? ", saveGraph" : "")
-        + (serveGraph ? ", serveGraph" : "")
-        + '}';
+    return (
+      "SetupResult{" +
+      "configDataDir=" +
+      configDataDir.getAbsolutePath() +
+      (buildStreet ? ", buildStreet" : "") +
+      (buildTransit ? ", buildTransit" : "") +
+      (saveGraph ? ", saveGraph" : "") +
+      (serveGraph ? ", serveGraph" : "") +
+      '}'
+    );
   }
 
   String[] asOtpArgs() {
     List<String> args = new ArrayList<>();
 
-    if(buildAll()) {
+    if (buildAll()) {
       args.add("--build");
-    }
-    else if(buildStreet) {
+    } else if (buildStreet) {
       args.add("--buildStreet");
-    }
-    else if(buildTransit) {
+    } else if (buildTransit) {
       args.add("--loadStreet");
-    }
-    else {
+    } else {
       args.add("--load");
     }
 
-    if(saveGraph && (buildTransit||buildStreet)) { args.add("--save"); }
-    if(serveGraph && !buildStreetOnly()) { args.add("--serve"); }
+    if (saveGraph && (buildTransit || buildStreet)) {
+      args.add("--save");
+    }
+    if (serveGraph && !buildStreetOnly()) {
+      args.add("--serve");
+    }
 
     args.add(configDataDir.getAbsolutePath());
 

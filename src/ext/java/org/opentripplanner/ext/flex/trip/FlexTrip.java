@@ -33,16 +33,32 @@ public abstract class FlexTrip extends TransitEntity {
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
+    NearbyStop access,
+    FlexServiceDate date,
+    FlexPathCalculator calculator,
+    FlexParameters params
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
+    NearbyStop egress,
+    FlexServiceDate date,
+    FlexPathCalculator calculator,
+    FlexParameters params
   );
 
-  public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);
+  public abstract int earliestDepartureTime(
+    int departureTime,
+    int fromStopIndex,
+    int toStopIndex,
+    int flexTime
+  );
 
-  public abstract int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime);
+  public abstract int latestArrivalTime(
+    int arrivalTime,
+    int fromStopIndex,
+    int toStopIndex,
+    int flexTime
+  );
 
   /**
    * Returns all the stops that are in this trip.
@@ -77,5 +93,4 @@ public abstract class FlexTrip extends TransitEntity {
   public static boolean isFlexStop(StopLocation stop) {
     return stop instanceof FlexLocationGroup || stop instanceof FlexStopLocation;
   }
-
 }

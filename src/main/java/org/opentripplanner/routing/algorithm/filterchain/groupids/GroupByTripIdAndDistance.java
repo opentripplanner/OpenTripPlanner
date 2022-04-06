@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
 import java.util.Comparator;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 
 /**
  * This class create a group identifier for an itinerary based on the set of the longest
@@ -24,103 +23,110 @@ import java.util.stream.Collectors;
  * visiting the same stops more than once.
  */
 public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistance> {
-    private final List<Leg> keySet;
 
-    /**
-     * @param p 'p' must be between 0.50 (50%) and 0.99 (99%).
-     */
-    public GroupByTripIdAndDistance(Itinerary itinerary, double p) {
-        assertPIsValid(p);
-        List<Leg> transitLegs = itinerary.legs
-            .stream()
-            .filter(Leg::isTransitLeg)
-            .collect(Collectors.toList());
+  private final List<Leg> keySet;
 
-        if(transitLegs.isEmpty()) {
-            keySet = List.of();
-        }
-        else {
-            double limit = p * calculateTotalDistance(itinerary.legs);
-            keySet = getKeySetOfLegsByLimit(transitLegs, limit);
-        }
+  /**
+   * @param p 'p' must be between 0.50 (50%) and 0.99 (99%).
+   */
+  public GroupByTripIdAndDistance(Itinerary itinerary, double p) {
+    assertPIsValid(p);
+    List<Leg> transitLegs = itinerary.legs
+      .stream()
+      .filter(Leg::isTransitLeg)
+      .collect(Collectors.toList());
+
+    if (transitLegs.isEmpty()) {
+      keySet = List.of();
+    } else {
+      double limit = p * calculateTotalDistance(itinerary.legs);
+      keySet = getKeySetOfLegsByLimit(transitLegs, limit);
+    }
+  }
+
+  @Override
+  public GroupByTripIdAndDistance merge(GroupByTripIdAndDistance other) {
+    return keySet.size() <= other.keySet.size() ? this : other;
+  }
+
+  @Override
+  public boolean match(GroupByTripIdAndDistance other) {
+    if (this == other) {
+      return true;
     }
 
-    @Override
-    public GroupByTripIdAndDistance merge(GroupByTripIdAndDistance other) {
-        return keySet.size() <= other.keySet.size() ? this : other;
+    // Itineraries without transit is not filtered - they are considered different
+    if (this.keySet.isEmpty() || other.keySet.isEmpty()) {
+      return false;
     }
 
-    @Override
-    public boolean match(GroupByTripIdAndDistance other) {
-        if (this == other) { return true; }
+    return isTheSame(this.keySet, other.keySet);
+  }
 
-        // Itineraries without transit is not filtered - they are considered different
-        if(this.keySet.isEmpty() || other.keySet.isEmpty()) { return false; }
+  /** package local to be unit-testable */
+  static double calculateTotalDistance(List<Leg> transitLegs) {
+    return transitLegs.stream().mapToDouble(Leg::getDistanceMeters).sum();
+  }
 
-        return isTheSame(this.keySet, other.keySet);
+  /** package local to be unit-testable */
+  static List<Leg> getKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
+    // Sort legs descending on distance
+    legs =
+      legs
+        .stream()
+        .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
+        .collect(Collectors.toList());
+    double sum = 0.0;
+    int i = 0;
+    while (sum < distanceLimitMeters) {
+      // If the transit legs is not long enough, threat the itinerary as non-transit
+      if (i == legs.size()) {
+        return List.of();
+      }
+      sum += legs.get(i).getDistanceMeters();
+      ++i;
+    }
+    return legs.stream().limit(i).collect(Collectors.toList());
+  }
+
+  /** Read-only access to key-set to allow unit-tests access. */
+  List<Leg> getKeySet() {
+    return List.copyOf(keySet);
+  }
+
+  @Override
+  public String toString() {
+    return keySet.toString();
+  }
+
+  /* private methods */
+
+  private void assertPIsValid(double p) {
+    if (p > 0.99 || p < 0.50) {
+      throw new IllegalArgumentException("'p' is not between 0.01 and 0.99: " + p);
+    }
+  }
+
+  /**
+   * Compare to set of legs and return {@code true} if the two sets contains the same
+   * set. If the sets are different in size any extra elements are ignored.
+   */
+  private static boolean isTheSame(List<Leg> a, List<Leg> b) {
+    // If a and b is different in length, than we want to use the shortest list and
+    // make sure all elements in it also exist in the other. We ignore the extra legs in
+    // the longer list og legs. We do this by making sure 'a' is the shortest list, if not
+    // we swap a and b.
+    if (a.size() > b.size()) {
+      List<Leg> temp = a;
+      a = b;
+      b = temp;
     }
 
-    /** package local to be unit-testable */
-    static double calculateTotalDistance(List<Leg> transitLegs) {
-        return transitLegs.stream().mapToDouble(Leg::getDistanceMeters).sum();
+    for (final Leg aLeg : a) {
+      if (b.stream().noneMatch(aLeg::isPartiallySameTransitLeg)) {
+        return false;
+      }
     }
-
-    /** package local to be unit-testable */
-    static List<Leg> getKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
-        // Sort legs descending on distance
-        legs = legs.stream()
-                .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
-                .collect(Collectors.toList());
-        double sum = 0.0;
-        int i=0;
-        while (sum < distanceLimitMeters) {
-            // If the transit legs is not long enough, threat the itinerary as non-transit
-            if(i == legs.size()) { return List.of(); }
-            sum += legs.get(i).getDistanceMeters();
-            ++i;
-        }
-        return legs.stream()
-                .limit(i)
-                .collect(Collectors.toList());
-    }
-
-    /** Read-only access to key-set to allow unit-tests access. */
-    List<Leg> getKeySet() {
-        return List.copyOf(keySet);
-    }
-
-    @Override
-    public String toString() { return keySet.toString(); }
-
-
-    /* private methods */
-
-    private void assertPIsValid(double p) {
-        if(p > 0.99 || p < 0.50) {
-            throw new IllegalArgumentException("'p' is not between 0.01 and 0.99: " +  p);
-        }
-    }
-
-    /**
-     * Compare to set of legs and return {@code true} if the two sets contains the same
-     * set. If the sets are different in size any extra elements are ignored.
-     */
-    private static boolean isTheSame(List<Leg> a, List<Leg> b) {
-        // If a and b is different in length, than we want to use the shortest list and
-        // make sure all elements in it also exist in the other. We ignore the extra legs in
-        // the longer list og legs. We do this by making sure 'a' is the shortest list, if not
-        // we swap a and b.
-        if(a.size() > b.size()) {
-            List<Leg> temp = a;
-            a = b;
-            b = temp;
-        }
-
-        for (final Leg aLeg : a) {
-            if (b.stream().noneMatch(aLeg::isPartiallySameTransitLeg)) {
-                return false;
-            }
-        }
-        return true;
-    }
+    return true;
+  }
 }

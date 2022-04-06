@@ -7,6 +7,4 @@ import org.rutebanken.netex.model.EntityStructure;
  *
  * @param <V> the value type
  */
-public interface ReadOnlyHierarchicalMapById<V> extends ReadOnlyHierarchicalMap<String, V>{
-
-}
+public interface ReadOnlyHierarchicalMapById<V> extends ReadOnlyHierarchicalMap<String, V> {}

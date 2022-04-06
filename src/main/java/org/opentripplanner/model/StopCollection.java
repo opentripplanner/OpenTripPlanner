@@ -8,28 +8,27 @@ import org.opentripplanner.util.I18NString;
  * point, but rather at its underlying childStops.
  */
 public interface StopCollection {
+  FeedScopedId getId();
 
-        FeedScopedId getId();
+  I18NString getName();
 
-        I18NString getName();
+  /**
+   * Implementations should go down the hierarchy and return all the underlying stops
+   * recursively.
+   */
+  Collection<StopLocation> getChildStops();
 
-        /**
-         * Implementations should go down the hierarchy and return all the underlying stops
-         * recursively.
-         */
-        Collection<StopLocation> getChildStops();
+  default double getLat() {
+    return getCoordinate().latitude();
+  }
 
-        default double getLat() {
-                return getCoordinate().latitude();
-        }
+  default double getLon() {
+    return getCoordinate().longitude();
+  }
 
-        default double getLon() {
-                return getCoordinate().longitude();
-        }
-
-        /**
-         * Representative location for the StopLocation. Can either be the actual location of the stop, or
-         * the centroid of an area or line.
-         */
-        WgsCoordinate getCoordinate();
+  /**
+   * Representative location for the StopLocation. Can either be the actual location of the stop, or
+   * the centroid of an area or line.
+   */
+  WgsCoordinate getCoordinate();
 }

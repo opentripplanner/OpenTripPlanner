@@ -13,5 +13,5 @@ public enum LinkingDirection {
    * From the main graph towards the new vertex
    */
   OUTGOING,
-  BOTH_WAYS
+  BOTH_WAYS,
 }

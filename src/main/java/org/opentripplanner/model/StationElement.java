@@ -25,13 +25,13 @@ public abstract class StationElement extends TransitEntity {
   private Station parentStation;
 
   public StationElement(
-      FeedScopedId id,
-      I18NString name,
-      String code,
-      String description,
-      WgsCoordinate coordinate,
-      WheelChairBoarding wheelchairBoarding,
-      StopLevel level
+    FeedScopedId id,
+    I18NString name,
+    String code,
+    String description,
+    WgsCoordinate coordinate,
+    WheelChairBoarding wheelchairBoarding,
+    StopLevel level
   ) {
     super(id);
     this.name = name;

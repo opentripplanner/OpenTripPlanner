@@ -53,7 +53,6 @@ public enum TransferPriority {
    */
   PREFERRED(1_00);
 
-
   private final int cost;
 
   TransferPriority(int cost) {

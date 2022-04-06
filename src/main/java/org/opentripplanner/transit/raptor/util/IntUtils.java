@@ -9,35 +9,33 @@ import java.util.List;
  * A utility class for integer functions.
  */
 public final class IntUtils {
-    /** The constructor is private to protect this class from being instantiated. */
-    private IntUtils() {}
 
+  /** The constructor is private to protect this class from being instantiated. */
+  private IntUtils() {}
 
   /**
-     * Convert an integer to a String, if the value equals the {@code notSetValue} parameter
-     * an empty string is returned.
-     */
-    public static String intToString(int value, int notSetValue) {
-        return value == notSetValue ? "" : Integer.toString(value);
-    }
+   * Convert an integer to a String, if the value equals the {@code notSetValue} parameter
+   * an empty string is returned.
+   */
+  public static String intToString(int value, int notSetValue) {
+    return value == notSetValue ? "" : Integer.toString(value);
+  }
 
+  /**
+   * Create a new int array and initialize all values with the given {@code initialValue}.
+   */
+  public static int[] intArray(int size, int initialValue) {
+    int[] array = new int[size];
+    Arrays.fill(array, initialValue);
+    return array;
+  }
 
-    /**
-     * Create a new int array and initialize all values with the given {@code initialValue}.
-     */
-    public static int[] intArray(int size, int initialValue) {
-        int [] array = new int[size];
-        Arrays.fill(array, initialValue);
-        return array;
-    }
-
-    /**
-     * Concatenate list a and b and convert them to int arrays.
-     */
-    public static int[] concat(Collection<Integer> a, Collection<Integer> b) {
-        List<Integer> all = new ArrayList<>(a);
-        all.addAll(b);
-        return all.stream().mapToInt(it -> it).toArray();
-    }
-
+  /**
+   * Concatenate list a and b and convert them to int arrays.
+   */
+  public static int[] concat(Collection<Integer> a, Collection<Integer> b) {
+    List<Integer> all = new ArrayList<>(a);
+    all.addAll(b);
+    return all.stream().mapToInt(it -> it).toArray();
+  }
 }

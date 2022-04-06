@@ -6,9 +6,9 @@ package org.opentripplanner.routing.algorithm.filterchain;
  * refere to on or more elements.
  */
 public enum ListSection {
-    /** The beginning of the list. */
-    HEAD,
+  /** The beginning of the list. */
+  HEAD,
 
-    /** The end of the list */
-    TAIL
+  /** The end of the list */
+  TAIL,
 }

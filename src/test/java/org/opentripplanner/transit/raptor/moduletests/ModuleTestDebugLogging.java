@@ -28,14 +28,15 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
  * Enable debugging by setting the DEBUG to true.
  */
 public final class ModuleTestDebugLogging {
-    private static final boolean DEBUG = false;
 
-    static void setupDebugLogging(
-            TestTransitData data,
-            RaptorRequestBuilder<TestTripSchedule> requestBuilder
-    ) {
-        if(DEBUG) {
-            data.debugToStdErr(requestBuilder);
-        }
+  private static final boolean DEBUG = false;
+
+  static void setupDebugLogging(
+    TestTransitData data,
+    RaptorRequestBuilder<TestTripSchedule> requestBuilder
+  ) {
+    if (DEBUG) {
+      data.debugToStdErr(requestBuilder);
     }
+  }
 }

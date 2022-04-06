@@ -38,38 +38,37 @@ import org.opentripplanner.model.BikeAccess;
  */
 class BikeAccessMapper {
 
-    public static BikeAccess mapForTrip(Trip rhs) {
-        //noinspection deprecation
-        return mapValues(rhs.getBikesAllowed(), rhs.getTripBikesAllowed());
+  public static BikeAccess mapForTrip(Trip rhs) {
+    //noinspection deprecation
+    return mapValues(rhs.getBikesAllowed(), rhs.getTripBikesAllowed());
+  }
+
+  public static BikeAccess mapForRoute(Route rhs) {
+    //noinspection deprecation
+    return mapValues(rhs.getBikesAllowed(), rhs.getRouteBikesAllowed());
+  }
+
+  private static BikeAccess mapValues(int bikesAllowed, int legacyBikesAllowed) {
+    if (bikesAllowed != 0) {
+      switch (bikesAllowed) {
+        case 1:
+          return BikeAccess.ALLOWED;
+        case 2:
+          return BikeAccess.NOT_ALLOWED;
+        default:
+          return BikeAccess.UNKNOWN;
+      }
+    } else if (legacyBikesAllowed != 0) {
+      switch (legacyBikesAllowed) {
+        case 1:
+          return BikeAccess.NOT_ALLOWED;
+        case 2:
+          return BikeAccess.ALLOWED;
+        default:
+          return BikeAccess.UNKNOWN;
+      }
     }
 
-    public static BikeAccess mapForRoute(Route rhs) {
-        //noinspection deprecation
-        return mapValues(rhs.getBikesAllowed(), rhs.getRouteBikesAllowed());
-    }
-
-    private static BikeAccess mapValues(int bikesAllowed, int legacyBikesAllowed) {
-        if (bikesAllowed != 0) {
-            switch (bikesAllowed) {
-                case 1:
-                    return BikeAccess.ALLOWED;
-                case 2:
-                    return BikeAccess.NOT_ALLOWED;
-                default:
-                    return BikeAccess.UNKNOWN;
-            }
-        }
-        else if (legacyBikesAllowed != 0) {
-            switch (legacyBikesAllowed) {
-                case 1:
-                    return BikeAccess.NOT_ALLOWED;
-                case 2:
-                    return BikeAccess.ALLOWED;
-                default:
-                    return BikeAccess.UNKNOWN;
-            }
-        }
-
-        return BikeAccess.UNKNOWN;
-    }
+    return BikeAccess.UNKNOWN;
+  }
 }

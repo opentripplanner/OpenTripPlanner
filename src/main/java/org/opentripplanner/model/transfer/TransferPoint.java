@@ -51,7 +51,6 @@ import org.opentripplanner.model.Trip;
  * <p>
  */
 public interface TransferPoint {
-
   /** Return {@code true} if this transfer point apply to all trips in pattern */
   boolean appliesToAllTrips();
 
@@ -63,34 +62,49 @@ public interface TransferPoint {
   int getSpecificityRanking();
 
   /** is a Trip specific transfer point */
-  default boolean isTripTransferPoint() { return false; }
+  default boolean isTripTransferPoint() {
+    return false;
+  }
 
-  default TripTransferPoint asTripTransferPoint() { return (TripTransferPoint) this; }
+  default TripTransferPoint asTripTransferPoint() {
+    return (TripTransferPoint) this;
+  }
 
   /** is a Route specific transfer point */
-  default boolean isRouteStationTransferPoint() { return false; }
+  default boolean isRouteStationTransferPoint() {
+    return false;
+  }
 
   default RouteStationTransferPoint asRouteStationTransferPoint() {
     return (RouteStationTransferPoint) this;
   }
 
   /** is a Route specific transfer point */
-  default boolean isRouteStopTransferPoint() { return false; }
+  default boolean isRouteStopTransferPoint() {
+    return false;
+  }
 
   default RouteStopTransferPoint asRouteStopTransferPoint() {
     return (RouteStopTransferPoint) this;
   }
 
   /** is a Stop specific transfer point (no Trip or Route) */
-  default boolean isStopTransferPoint() { return false; }
+  default boolean isStopTransferPoint() {
+    return false;
+  }
 
-  default StopTransferPoint asStopTransferPoint() { return (StopTransferPoint) this; }
+  default StopTransferPoint asStopTransferPoint() {
+    return (StopTransferPoint) this;
+  }
 
   /** is a Station specific transfer point (no Trip or Route) */
-  default boolean isStationTransferPoint() { return false; }
+  default boolean isStationTransferPoint() {
+    return false;
+  }
 
-  default StationTransferPoint asStationTransferPoint() { return (StationTransferPoint) this; }
-
+  default StationTransferPoint asStationTransferPoint() {
+    return (StationTransferPoint) this;
+  }
 
   /**
    * Utility method witch can be used in APIs to get the trip, if it exists, from a transfer point.
@@ -105,13 +119,13 @@ public interface TransferPoint {
    */
   @Nullable
   static Route getRoute(TransferPoint point) {
-    if(point.isTripTransferPoint()) {
+    if (point.isTripTransferPoint()) {
       return point.asTripTransferPoint().getTrip().getRoute();
     }
-    if(point.isRouteStopTransferPoint()) {
+    if (point.isRouteStopTransferPoint()) {
       return point.asRouteStopTransferPoint().getRoute();
     }
-    if(point.isRouteStationTransferPoint()) {
+    if (point.isRouteStationTransferPoint()) {
       return point.asRouteStationTransferPoint().getRoute();
     }
     return null;

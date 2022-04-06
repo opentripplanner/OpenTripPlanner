@@ -18,10 +18,10 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
   private final ConstrainedTransfer constrainedTransfer;
 
   public TripToTripTransfer(
-      TripStopTime<T> from,
-      TripStopTime<T> to,
-      RaptorTransfer pathTransfer,
-      @Nullable ConstrainedTransfer constrainedTransfer
+    TripStopTime<T> from,
+    TripStopTime<T> to,
+    RaptorTransfer pathTransfer,
+    @Nullable ConstrainedTransfer constrainedTransfer
   ) {
     this.from = from;
     this.to = to;
@@ -65,10 +65,11 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(TripToTripTransfer.class)
-            .addObj("from", from)
-            .addObj("to", to)
-            .addObj("transfer", pathTransfer)
-            .toString();
+    return ToStringBuilder
+      .of(TripToTripTransfer.class)
+      .addObj("from", from)
+      .addObj("to", to)
+      .addObj("transfer", pathTransfer)
+      .toString();
   }
 }

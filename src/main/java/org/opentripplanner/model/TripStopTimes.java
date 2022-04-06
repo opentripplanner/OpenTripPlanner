@@ -17,74 +17,74 @@ import java.util.stream.Collectors;
  * The list of stop times  for a given trip is guarantied to be sorted.
  */
 public class TripStopTimes {
-    private static final List<StopTime> EMPTY_LIST = Collections.emptyList();
 
-    private final Map<Trip, List<StopTime>> map = new HashMap<>();
+  private static final List<StopTime> EMPTY_LIST = Collections.emptyList();
 
-    /**
-     * Return a unmodifiable, nullsafe list of stop times for the given trip.
-     * An <em>empty</em>empty list is returned if no values exist for a given key.
-     */
-    public List<StopTime> get(Trip key) {
-        List<StopTime> list = map.get(key);
-        return list == null ? EMPTY_LIST : Collections.unmodifiableList(list);
+  private final Map<Trip, List<StopTime>> map = new HashMap<>();
+
+  /**
+   * Return a unmodifiable, nullsafe list of stop times for the given trip.
+   * An <em>empty</em>empty list is returned if no values exist for a given key.
+   */
+  public List<StopTime> get(Trip key) {
+    List<StopTime> list = map.get(key);
+    return list == null ? EMPTY_LIST : Collections.unmodifiableList(list);
+  }
+
+  public void addAll(Collection<StopTime> values) {
+    Set<Trip> keysUpdated = new HashSet<>();
+    for (StopTime value : values) {
+      Trip key = value.getTrip();
+      keysUpdated.add(key);
+      map.computeIfAbsent(key, trip -> new ArrayList<>()).add(value);
     }
-
-    public void addAll(Collection<StopTime> values) {
-        Set<Trip> keysUpdated = new HashSet<>();
-        for (StopTime value : values) {
-            Trip key = value.getTrip();
-            keysUpdated.add(key);
-            map.computeIfAbsent(key, trip -> new ArrayList<>()).add(value);
-        }
-        // Sort and updated stops for all keys touched.
-        for (Trip key : keysUpdated) {
-            Collections.sort(map.get(key));
-        }
+    // Sort and updated stops for all keys touched.
+    for (Trip key : keysUpdated) {
+      Collections.sort(map.get(key));
     }
+  }
 
-    public void replace(Trip key, Collection<StopTime> list) {
-        map.replace(key, sort(list));
+  public void replace(Trip key, Collection<StopTime> list) {
+    map.replace(key, sort(list));
+  }
+
+  public void put(Trip key, Collection<StopTime> list) {
+    map.put(key, sort(list));
+  }
+
+  public void removeIf(Predicate<Trip> test) {
+    List<Trip> removeKeys = map.keySet().stream().filter(test).collect(Collectors.toList());
+    for (Trip removeKey : removeKeys) {
+      map.remove(removeKey);
     }
+  }
 
-    public void put(Trip key, Collection<StopTime> list) {
-        map.put(key, sort(list));
-    }
+  /**
+   * Return a copy of the internal map. Changes in the source are not reflected
+   * in the destination (returned Map), and visa versa.
+   * <p>
+   * The returned map is immutable.
+   */
+  public Map<Trip, List<StopTime>> asImmutableMap() {
+    return Map.copyOf(map);
+  }
 
-    public void removeIf(Predicate<Trip> test) {
-        List<Trip> removeKeys = map.keySet().stream().filter(test).collect(Collectors.toList());
-        for (Trip removeKey : removeKeys) {
-            map.remove(removeKey);
-        }
-    }
+  public int size() {
+    return map.size();
+  }
 
-    /**
-     * Return a copy of the internal map. Changes in the source are not reflected
-     * in the destination (returned Map), and visa versa.
-     * <p>
-     * The returned map is immutable.
-     */
-    public Map<Trip, List<StopTime>> asImmutableMap() {
-        return Map.copyOf(map);
-    }
+  /**
+   * Return a iterable set of keys. Please do not remove keys the effect is undefined.
+   */
+  public Iterable<Trip> keys() {
+    return map.keySet();
+  }
 
-    public int size() {
-        return map.size();
-    }
+  /* private methods */
 
-    /**
-     * Return a iterable set of keys. Please do not remove keys the effect is undefined.
-     */
-    public Iterable<Trip> keys() {
-        return map.keySet();
-    }
-
-
-    /* private methods */
-
-    private static List<StopTime> sort(Collection<StopTime> list) {
-        List<StopTime> values = new ArrayList<>(list);
-        Collections.sort(values);
-        return values;
-    }
+  private static List<StopTime> sort(Collection<StopTime> list) {
+    List<StopTime> values = new ArrayList<>(list);
+    Collections.sort(values);
+    return values;
+  }
 }

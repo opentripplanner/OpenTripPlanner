@@ -102,11 +102,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     return environment -> {
       Leg source = getSource(environment);
       return new StopArrival(
-              source.getFrom(),
-              source.getStartTime(),
-              source.getStartTime(),
-              source.getBoardStopPosInPattern(),
-              source.getBoardingGtfsStopSequence()
+        source.getFrom(),
+        source.getStartTime(),
+        source.getStartTime(),
+        source.getBoardStopPosInPattern(),
+        source.getBoardingGtfsStopSequence()
       );
     };
   }
@@ -116,11 +116,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     return environment -> {
       Leg source = getSource(environment);
       return new StopArrival(
-              source.getTo(),
-              source.getEndTime(),
-              source.getEndTime(),
-              source.getAlightStopPosInPattern(),
-              source.getAlightGtfsStopSequence()
+        source.getTo(),
+        source.getEndTime(),
+        source.getEndTime(),
+        source.getAlightStopPosInPattern(),
+        source.getAlightGtfsStopSequence()
       );
     };
   }
@@ -144,11 +144,14 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<Iterable<Object>> intermediateStops() {
     return environment -> {
       List<StopArrival> intermediateStops = getSource(environment).getIntermediateStops();
-      if (intermediateStops == null) { return null; }
-      return intermediateStops.stream()
-          .map(intermediateStop -> intermediateStop.place.stop)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
+      if (intermediateStops == null) {
+        return null;
+      }
+      return intermediateStops
+        .stream()
+        .map(intermediateStop -> intermediateStop.place.stop)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
     };
   }
 
@@ -171,7 +174,9 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      if (getSource(environment).getBoardRule() == null) { return PickDrop.SCHEDULED.name(); }
+      if (getSource(environment).getBoardRule() == null) {
+        return PickDrop.SCHEDULED.name();
+      }
       return getSource(environment).getBoardRule().name();
     };
   }
@@ -179,7 +184,9 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      if (getSource(environment).getAlightRule() == null) { return PickDrop.SCHEDULED.name(); }
+      if (getSource(environment).getAlightRule() == null) {
+        return PickDrop.SCHEDULED.name();
+      }
       return getSource(environment).getAlightRule().name();
     };
   }

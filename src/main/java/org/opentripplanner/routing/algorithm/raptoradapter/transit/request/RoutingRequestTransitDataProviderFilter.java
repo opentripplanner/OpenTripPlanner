@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -32,48 +32,48 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   private final Set<FeedScopedId> bannedTrips;
 
   public RoutingRequestTransitDataProviderFilter(
-      boolean requireBikesAllowed,
-      boolean requireWheelchairAccessible,
-      boolean includePlannedCancellations,
-      Set<AllowedTransitMode> allowedTransitModes,
-      Set<FeedScopedId> bannedRoutes,
-      Set<FeedScopedId> bannedTrips
+    boolean requireBikesAllowed,
+    boolean requireWheelchairAccessible,
+    boolean includePlannedCancellations,
+    Set<AllowedTransitMode> allowedTransitModes,
+    Set<FeedScopedId> bannedRoutes,
+    Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
     this.requireWheelchairAccessible = requireWheelchairAccessible;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
-    boolean hasOnlyMainModeFilters = allowedTransitModes.stream()
-            .noneMatch(AllowedTransitMode::hasSubMode);
+    boolean hasOnlyMainModeFilters = allowedTransitModes
+      .stream()
+      .noneMatch(AllowedTransitMode::hasSubMode);
 
     // It is much faster to do a lookup in an EnumSet, so we use it if we don't want to filter
     // using submodes
     if (hasOnlyMainModeFilters) {
-      EnumSet<TransitMode> allowedMainModes = allowedTransitModes.stream()
-              .map(AllowedTransitMode::getMainMode)
-              .collect(Collectors.toCollection(() -> EnumSet.noneOf(TransitMode.class)));
+      EnumSet<TransitMode> allowedMainModes = allowedTransitModes
+        .stream()
+        .map(AllowedTransitMode::getMainMode)
+        .collect(Collectors.toCollection(() -> EnumSet.noneOf(TransitMode.class)));
       transitModeIsAllowed = (Trip trip) -> allowedMainModes.contains(trip.getMode());
     } else {
-      transitModeIsAllowed = (Trip trip) -> {
-        TransitMode transitMode = trip.getMode();
-        String netexSubmode = trip.getNetexSubmode();
-        return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
-      };
+      transitModeIsAllowed =
+        (Trip trip) -> {
+          TransitMode transitMode = trip.getMode();
+          String netexSubmode = trip.getNetexSubmode();
+          return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
+        };
     }
   }
 
-  public RoutingRequestTransitDataProviderFilter(
-          RoutingRequest request,
-          GraphIndex graphIndex
-  ) {
+  public RoutingRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {
     this(
-        request.modes.transferMode == StreetMode.BIKE,
-        request.wheelchairAccessible,
-        request.includePlannedCancellations,
-        request.modes.transitModes,
-        request.getBannedRoutes(graphIndex.getAllRoutes()),
-        request.bannedTrips
+      request.modes.transferMode == StreetMode.BIKE,
+      request.wheelchairAccessible,
+      request.includePlannedCancellations,
+      request.modes.transitModes,
+      request.getBannedRoutes(graphIndex.getAllRoutes()),
+      request.bannedTrips
     );
   }
 
@@ -89,7 +89,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (bannedTrips.contains(trip.getId()) ) {
+    if (bannedTrips.contains(trip.getId())) {
       return false;
     }
 
@@ -97,7 +97,9 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (requireWheelchairAccessible && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
+    if (
+      requireWheelchairAccessible && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE
+    ) {
       return false;
     }
 

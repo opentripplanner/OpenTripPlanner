@@ -26,8 +26,7 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
   @Override
   public void populateProperties(WayPropertySet props) {
     // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
-    props.setProperties("highway=trunk_link", StreetTraversalPermission.ALL, 2.06,
-        2.06);
+    props.setProperties("highway=trunk_link", StreetTraversalPermission.ALL, 2.06, 2.06);
     props.setProperties("highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47);
 
     // Don't recommend walking in trunk road tunnels
@@ -45,12 +44,24 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=footway", StreetTraversalPermission.PEDESTRIAN);
 
     // Prefer designated cycleways
-    props.setProperties("highway=cycleway;bicycle=designated",
-                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.6, 0.6);
+    props.setProperties(
+      "highway=cycleway;bicycle=designated",
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      0.6,
+      0.6
+    );
 
     // Remove Helsinki city center service tunnel network from graph
-    props.setProperties("highway=service;tunnel=yes;access=destination", StreetTraversalPermission.NONE);
-    props.setProperties("highway=service;access=destination", StreetTraversalPermission.ALL, 1.1, 1.1);
+    props.setProperties(
+      "highway=service;tunnel=yes;access=destination",
+      StreetTraversalPermission.NONE
+    );
+    props.setProperties(
+      "highway=service;access=destination",
+      StreetTraversalPermission.ALL,
+      1.1,
+      1.1
+    );
 
     /*
      * Automobile speeds in Finland. General speed limit is 80kph unless signs says otherwise.

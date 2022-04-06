@@ -9,37 +9,38 @@ import org.opentripplanner.transit.raptor.api.view.TransferPathView;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class TransferStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
+public final class TransferStopArrival<T extends RaptorTripSchedule>
+  extends AbstractStopArrival<T> {
 
-    private final RaptorTransfer transfer;
+  private final RaptorTransfer transfer;
 
-    public TransferStopArrival(
-        AbstractStopArrival<T> previousState,
-        RaptorTransfer transferPath,
-        int arrivalTime
-    ) {
-        super(
-                previousState,
-                1,
-                transferPath.stop(),
-                arrivalTime,
-                previousState.cost() + transferPath.generalizedCost()
-        );
-        this.transfer = transferPath;
-    }
+  public TransferStopArrival(
+    AbstractStopArrival<T> previousState,
+    RaptorTransfer transferPath,
+    int arrivalTime
+  ) {
+    super(
+      previousState,
+      1,
+      transferPath.stop(),
+      arrivalTime,
+      previousState.cost() + transferPath.generalizedCost()
+    );
+    this.transfer = transferPath;
+  }
 
-    @Override
-    public boolean arrivedByTransfer() {
-        return true;
-    }
+  @Override
+  public boolean arrivedByTransfer() {
+    return true;
+  }
 
-    @Override
-    public TransferPathView transferPath() {
-        return () -> transfer;
-    }
+  @Override
+  public TransferPathView transferPath() {
+    return () -> transfer;
+  }
 
-    @Override
-    public TransitArrival<T> mostRecentTransitArrival() {
-        return previous().mostRecentTransitArrival();
-    }
+  @Override
+  public TransitArrival<T> mostRecentTransitArrival() {
+    return previous().mostRecentTransitArrival();
+  }
 }

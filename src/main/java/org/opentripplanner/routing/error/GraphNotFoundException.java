@@ -5,7 +5,6 @@ package org.opentripplanner.routing.error;
  * This might be thrown if a new graph is registered and the old one is evicted before registering.
  */
 public class GraphNotFoundException extends RuntimeException {
-    
-    private static final long serialVersionUID = 1L;
 
+  private static final long serialVersionUID = 1L;
 }

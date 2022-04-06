@@ -1,6 +1,22 @@
 package org.opentripplanner.netex.mapping;
 
+import static java.lang.Boolean.TRUE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
+import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
+import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeRefList;
+import static org.opentripplanner.netex.NetexTestDataSupport.jaxbElement;
+
 import com.google.common.collect.ArrayListMultimap;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
@@ -19,23 +35,6 @@ import org.rutebanken.netex.model.OperatingDayRefStructure;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.ServiceJourney;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.lang.Boolean.TRUE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeRefList;
-import static org.opentripplanner.netex.NetexTestDataSupport.jaxbElement;
-
 public class TripCalendarBuilderTest {
 
   private static final String FEED_ID = "F";
@@ -45,7 +44,6 @@ public class TripCalendarBuilderTest {
 
   private static final LocalTime ANY_TIME = LocalTime.of(12, 0);
 
-
   private static final String DAY_TYPE_1 = "DT-1";
 
   private static final Boolean AVAILABLE = TRUE;
@@ -54,26 +52,28 @@ public class TripCalendarBuilderTest {
   private static final String SJ_2 = "SJ-2";
   private static final String SJ_3 = "SJ-3";
 
-
   private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
   private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
   public static final String OD_1 = "OD-1";
 
   private final DataImportIssueStore issueStore = new DataImportIssueStore(true);
   private final CalendarServiceBuilder calendarServiceBuilder = new CalendarServiceBuilder(
-      new FeedScopedIdFactory(FEED_ID)
+    new FeedScopedIdFactory(FEED_ID)
   );
 
   private final TripCalendarBuilder subject = new TripCalendarBuilder(
-      calendarServiceBuilder,
-      issueStore
+    calendarServiceBuilder,
+    issueStore
   );
 
   @Test
   public void mapDayTypesToLocalDatesForAGivenDate() {
     // GIVEN a calendar
     subject.addDayTypeAssignments(
-        dayType1(), dayType1Assignment_2020_11_01(), EMPTY_OPERATING_DAYS, EMPTY_PERIODS
+      dayType1(),
+      dayType1Assignment_2020_11_01(),
+      EMPTY_OPERATING_DAYS,
+      EMPTY_PERIODS
     );
     subject.addDatedServiceJourneys(operatingDays_2020_11_02(), dsj_2020_11_02(SJ_2));
     subject.addDatedServiceJourneys(operatingDays_2020_11_02(), dsj_2020_11_02(SJ_3));
@@ -83,15 +83,11 @@ public class TripCalendarBuilderTest {
     subject.push();
 
     var result = subject.createTripCalendar(
-        List.of(
-            new ServiceJourney()
-                .withId(SJ_1)
-                .withDayTypes(createDayTypeRefList(DAY_TYPE_1)),
-            new ServiceJourney()
-                .withId(SJ_2)
-                .withDayTypes(createDayTypeRefList(DAY_TYPE_1)),
-            new ServiceJourney().withId(SJ_3)
-        )
+      List.of(
+        new ServiceJourney().withId(SJ_1).withDayTypes(createDayTypeRefList(DAY_TYPE_1)),
+        new ServiceJourney().withId(SJ_2).withDayTypes(createDayTypeRefList(DAY_TYPE_1)),
+        new ServiceJourney().withId(SJ_3)
+      )
     );
 
     // Pop calendar data before creating ServiceCalendarDates to verify no data is lost in the
@@ -115,23 +111,27 @@ public class TripCalendarBuilderTest {
     assertEquals("[2020-11-02]", listDates(calendar, serviceId3));
   }
 
-
   /* private helper methods */
 
-  private static String listDates(Collection<ServiceCalendarDate> calendar, FeedScopedId serviceId) {
+  private static String listDates(
+    Collection<ServiceCalendarDate> calendar,
+    FeedScopedId serviceId
+  ) {
     return calendar
-        .stream()
-        .filter(it -> serviceId.equals(it.getServiceId()))
-        .map(ServiceCalendarDate::getDate)
-        .sorted()
-        .collect(Collectors.toList())
-        .toString();
+      .stream()
+      .filter(it -> serviceId.equals(it.getServiceId()))
+      .map(ServiceCalendarDate::getDate)
+      .sorted()
+      .collect(Collectors.toList())
+      .toString();
   }
 
   private ArrayListMultimap<String, DatedServiceJourney> dsj_2020_11_02(String sjId) {
     var dsj = new DatedServiceJourney();
     dsj.withOperatingDayRef(new OperatingDayRefStructure().withRef(OD_1));
-    dsj.getJourneyRef().add(jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class));
+    dsj
+      .getJourneyRef()
+      .add(jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class));
     ArrayListMultimap<String, DatedServiceJourney> map = ArrayListMultimap.create();
     map.put(sjId, dsj);
     return map;
@@ -139,7 +139,9 @@ public class TripCalendarBuilderTest {
 
   private static HierarchicalMapById<OperatingDay> operatingDays_2020_11_02() {
     HierarchicalMapById<OperatingDay> opDays = new HierarchicalMapById<>();
-    opDays.add(new OperatingDay().withId(OD_1).withCalendarDate(LocalDateTime.of(D2020_11_02, ANY_TIME)));
+    opDays.add(
+      new OperatingDay().withId(OD_1).withCalendarDate(LocalDateTime.of(D2020_11_02, ANY_TIME))
+    );
     return opDays;
   }
 

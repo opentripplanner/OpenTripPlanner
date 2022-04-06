@@ -1,12 +1,12 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import javax.swing.*;
-
-import java.awt.event.ActionListener;
-
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.adjustSize;
 
+import java.awt.event.ActionListener;
+import javax.swing.*;
+
 class StartOtpButtonView {
+
   private static final int BUTTON_D_WIDTH = 160;
   private static final int BUTTON_D_HEIGHT = 4;
 
@@ -25,5 +25,7 @@ class StartOtpButtonView {
     startOtpBtn.addActionListener(l);
   }
 
-  Box panel() { return panel; }
+  Box panel() {
+    return panel;
+  }
 }

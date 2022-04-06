@@ -8,18 +8,16 @@ import java.util.Locale;
  * @author mabu
  */
 public interface I18NString {
+  /**
+   * Returns default translation (english)
+   * @return
+   */
+  String toString();
 
-    /**
-     * Returns default translation (english)
-     * @return 
-     */
-    String toString();
-    
-    /**
-     * Returns wanted translation
-     * @param locale Wanted locale
-     * @return 
-     */
-    String toString(Locale locale);
-    
+  /**
+   * Returns wanted translation
+   * @param locale Wanted locale
+   * @return
+   */
+  String toString(Locale locale);
 }

@@ -8,14 +8,14 @@ import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
  */
 public class VehicleRentalStationInfo {
 
-    public String id;
-    public String name;
-    public Double lat, lon;
-    
-    public VehicleRentalStationInfo(VehicleRentalStationVertex vertex) {
-        id = vertex.getStation().getStationId();
-        name = vertex.getDefaultName();
-        lat = vertex.getLat();
-        lon = vertex.getLon();
-    }
+  public String id;
+  public String name;
+  public Double lat, lon;
+
+  public VehicleRentalStationInfo(VehicleRentalStationVertex vertex) {
+    id = vertex.getStation().getStationId();
+    name = vertex.getDefaultName();
+    lat = vertex.getLat();
+    lon = vertex.getLon();
+  }
 }

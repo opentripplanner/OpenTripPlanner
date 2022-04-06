@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-
 import javax.annotation.Nullable;
-
 
 /**
  * This interface is used by Raptor to create a path from the Raptor state. We do not
@@ -11,12 +9,11 @@ import javax.annotation.Nullable;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorPathConstrainedTransferSearch<T extends RaptorTripSchedule> {
-
-    @Nullable
-    RaptorConstrainedTransfer findConstrainedTransfer(
-            T fromTrip,
-            int fromStopPosition,
-            T toTrip,
-            int toStopPosition
-    );
+  @Nullable
+  RaptorConstrainedTransfer findConstrainedTransfer(
+    T fromTrip,
+    int fromStopPosition,
+    T toTrip,
+    int toStopPosition
+  );
 }

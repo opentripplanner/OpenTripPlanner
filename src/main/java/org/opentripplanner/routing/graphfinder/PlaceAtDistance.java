@@ -20,11 +20,14 @@ public class PlaceAtDistance {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (o == null || getClass() != o.getClass()) { return false; }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     final PlaceAtDistance that = (PlaceAtDistance) o;
-    return Double.compare(that.distance, distance) == 0
-            && Objects.equals(place, that.place);
+    return Double.compare(that.distance, distance) == 0 && Objects.equals(place, that.place);
   }
 
   @Override
@@ -34,9 +37,10 @@ public class PlaceAtDistance {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(getClass())
-            .addObj("place", place)
-            .addNum("distance", distance)
-            .toString();
+    return ToStringBuilder
+      .of(getClass())
+      .addObj("place", place)
+      .addNum("distance", distance)
+      .toString();
   }
 }

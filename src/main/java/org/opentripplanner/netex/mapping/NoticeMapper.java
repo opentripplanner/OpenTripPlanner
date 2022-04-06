@@ -14,25 +14,25 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
  */
 class NoticeMapper {
 
-    private final FeedScopedIdFactory idFactory;
+  private final FeedScopedIdFactory idFactory;
 
-    private final EntityById<Notice> cache = new EntityById<>();
+  private final EntityById<Notice> cache = new EntityById<>();
 
-    NoticeMapper(FeedScopedIdFactory idFactory) {
-        this.idFactory = idFactory;
+  NoticeMapper(FeedScopedIdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
+
+  Notice map(org.rutebanken.netex.model.Notice netexNotice) {
+    FeedScopedId id = idFactory.createId(netexNotice.getId());
+    Notice otpNotice = cache.get(id);
+
+    if (otpNotice == null) {
+      otpNotice = new Notice(id);
+
+      otpNotice.setText(netexNotice.getText().getValue());
+      otpNotice.setPublicCode(netexNotice.getPublicCode());
+      cache.add(otpNotice);
     }
-
-    Notice map(org.rutebanken.netex.model.Notice netexNotice) {
-            FeedScopedId id = idFactory.createId(netexNotice.getId());
-            Notice otpNotice = cache.get(id);
-
-            if(otpNotice == null) {
-                otpNotice = new Notice(id);
-
-                otpNotice.setText(netexNotice.getText().getValue());
-                otpNotice.setPublicCode(netexNotice.getPublicCode());
-                cache.add(otpNotice);
-            }
-            return otpNotice;
-    }
+    return otpNotice;
+  }
 }

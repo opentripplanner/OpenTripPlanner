@@ -12,12 +12,13 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
  */
 public class RemoveDeletionFlagForLeastTransfersItinerary implements ItineraryListFilter {
 
-    @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
-        itineraries.stream()
-                .min(numberOfTransfersComparator())
-                .ifPresent(itinerary -> itinerary.systemNotices.clear());
+  @Override
+  public List<Itinerary> filter(List<Itinerary> itineraries) {
+    itineraries
+      .stream()
+      .min(numberOfTransfersComparator())
+      .ifPresent(itinerary -> itinerary.systemNotices.clear());
 
-        return itineraries;
-    }
+    return itineraries;
+  }
 }

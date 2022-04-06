@@ -35,51 +35,60 @@ class StopMapper {
   private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
     if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(
-          "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP + ", but got "
-              + gtfsStop.getLocationType());
+        "Expected type " +
+        org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP +
+        ", but got " +
+        gtfsStop.getLocationType()
+      );
     }
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
     // Map single GTFS ZoneId to OTP TariffZone collection
-    Collection<FareZone> fareZones = getTariffZones(gtfsStop.getZoneId(),
-        gtfsStop.getId().getAgencyId()
+    Collection<FareZone> fareZones = getTariffZones(
+      gtfsStop.getZoneId(),
+      gtfsStop.getId().getAgencyId()
     );
 
     final I18NString name = translationHelper.getTranslation(
       org.onebusaway.gtfs.model.Stop.class,
       "name",
       base.getId().getId(),
-      base.getName());
+      base.getName()
+    );
 
     I18NString url = null;
 
     if (gtfsStop.getUrl() != null) {
-        url = translationHelper.getTranslation(
-              org.onebusaway.gtfs.model.Stop.class,
-              "url",
-              base.getId().getId(),
-              gtfsStop.getUrl());
+      url =
+        translationHelper.getTranslation(
+          org.onebusaway.gtfs.model.Stop.class,
+          "url",
+          base.getId().getId(),
+          gtfsStop.getUrl()
+        );
     }
 
-    return new Stop(base.getId(),
-        name,
-        base.getCode(),
-        base.getDescription(),
-        base.getCoordinate(),
-        base.getWheelchairBoarding(),
-        base.getLevel(),
-        gtfsStop.getPlatformCode(), fareZones,
-        url,
-        gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-        TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
-        null
+    return new Stop(
+      base.getId(),
+      name,
+      base.getCode(),
+      base.getDescription(),
+      base.getCoordinate(),
+      base.getWheelchairBoarding(),
+      base.getLevel(),
+      gtfsStop.getPlatformCode(),
+      fareZones,
+      url,
+      gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
+      TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
+      null
     );
   }
 
   private Collection<FareZone> getTariffZones(String zoneId, String agencyId) {
     return zoneId != null
-        ? Collections.singletonList(new FareZone(new FeedScopedId(agencyId, zoneId), null))
-        : Collections.emptyList();
+      ? Collections.singletonList(new FareZone(new FeedScopedId(agencyId, zoneId), null))
+      : Collections.emptyList();
   }
 }

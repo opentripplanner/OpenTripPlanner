@@ -9,15 +9,15 @@ import java.util.List;
  */
 public class ApiTripPlan {
 
-    /**  The time and date of travel */
-    public Date date;
-    
-    /** The origin */
-    public ApiPlace from;
-    
-    /** The destination */
-    public ApiPlace to;
+  /**  The time and date of travel */
+  public Date date;
 
-    /** List of itineraries. */
-    public List<ApiItinerary> itineraries = new ArrayList<>();
+  /** The origin */
+  public ApiPlace from;
+
+  /** The destination */
+  public ApiPlace to;
+
+  /** List of itineraries. */
+  public List<ApiItinerary> itineraries = new ArrayList<>();
 }

@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
  */
 public class GraphQLIndexTest {
 
-    @Test
-    public void testGraphQLIndex() {
-        var schema = LegacyGraphQLIndex.buildSchema();
-        assertNotNull(schema);
-    }
+  @Test
+  public void testGraphQLIndex() {
+    var schema = LegacyGraphQLIndex.buildSchema();
+    assertNotNull(schema);
+  }
 }

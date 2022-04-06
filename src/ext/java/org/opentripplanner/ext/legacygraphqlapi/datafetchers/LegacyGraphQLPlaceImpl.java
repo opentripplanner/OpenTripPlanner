@@ -75,7 +75,9 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> {
       Place place = getSource(environment).place;
 
-      if (!place.vertexType.equals(VertexType.VEHICLERENTAL)) { return null; }
+      if (!place.vertexType.equals(VertexType.VEHICLERENTAL)) {
+        return null;
+      }
 
       return place.vehicleRentalPlace;
     };
@@ -86,8 +88,10 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> {
       Place place = getSource(environment).place;
 
-      if (!place.vertexType.equals(VertexType.VEHICLERENTAL)
-              || !(place.vehicleRentalPlace instanceof VehicleRentalStation)) {
+      if (
+        !place.vertexType.equals(VertexType.VEHICLERENTAL) ||
+        !(place.vehicleRentalPlace instanceof VehicleRentalStation)
+      ) {
         return null;
       }
 
@@ -100,8 +104,10 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> {
       Place place = getSource(environment).place;
 
-      if (!place.vertexType.equals(VertexType.VEHICLERENTAL)
-              || !(place.vehicleRentalPlace instanceof VehicleRentalVehicle)) {
+      if (
+        !place.vertexType.equals(VertexType.VEHICLERENTAL) ||
+        !(place.vehicleRentalPlace instanceof VehicleRentalVehicle)
+      ) {
         return null;
       }
 

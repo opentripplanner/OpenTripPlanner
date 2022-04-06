@@ -1,13 +1,11 @@
 package org.opentripplanner.util.time;
 
-import org.opentripplanner.model.calendar.ServiceDate;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
-
+import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
  * This class extend the Java {@link LocalTime} and with the ability
@@ -27,6 +25,7 @@ import java.util.Calendar;
  *
  */
 class RelativeTime {
+
   private final int days;
   private final LocalTime time;
 
@@ -48,21 +47,20 @@ class RelativeTime {
     int days = secondsPastMidnight / DateConstants.ONE_DAY_SECONDS;
     int secondsOfDay = secondsPastMidnight % DateConstants.ONE_DAY_SECONDS;
 
-    if(negative) {
+    if (negative) {
       // The days and secondsOfDay are both negative numbers
-      return new RelativeTime(days-1, LocalTime.MIDNIGHT.plusSeconds(secondsOfDay));
-    }
-    else {
+      return new RelativeTime(days - 1, LocalTime.MIDNIGHT.plusSeconds(secondsOfDay));
+    } else {
       return new RelativeTime(days, LocalTime.ofSecondOfDay(secondsOfDay));
     }
   }
 
   static RelativeTime from(Calendar time) {
     return new RelativeTime(
-        0,
-        time.get(Calendar.HOUR_OF_DAY),
-        time.get(Calendar.MINUTE),
-        time.get(Calendar.SECOND)
+      0,
+      time.get(Calendar.HOUR_OF_DAY),
+      time.get(Calendar.MINUTE),
+      time.get(Calendar.SECOND)
     );
   }
 
@@ -72,10 +70,11 @@ class RelativeTime {
    * for most days are midnight, but in when time is adjusted for day-light-saving it is not.
    */
   public ZonedDateTime toZonedDateTime(LocalDate date, ZoneId zoneId) {
-    return ZonedDateTime.of(date, LocalTime.NOON, zoneId)
-        .minusHours(12)
-        .plusDays(days)
-        .plusSeconds(time.toSecondOfDay());
+    return ZonedDateTime
+      .of(date, LocalTime.NOON, zoneId)
+      .minusHours(12)
+      .plusDays(days)
+      .plusSeconds(time.toSecondOfDay());
   }
 
   String toLongStr() {
@@ -88,8 +87,8 @@ class RelativeTime {
 
   private String timeStrCompact() {
     return time.getSecond() == 0
-        ? String.format("%d:%02d", time.getHour(), time.getMinute())
-        : String.format("%d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
+      ? String.format("%d:%02d", time.getHour(), time.getMinute())
+      : String.format("%d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
   }
 
   private String timeStrLong() {

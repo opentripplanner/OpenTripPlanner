@@ -1,67 +1,67 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
-
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.util.I18NString;
 
 /**
  * A named area is a subset of an area with a certain set of properties
- * (name, safety, etc). Its originalEdges may include some edges which are 
+ * (name, safety, etc). Its originalEdges may include some edges which are
  * crossable (because they separate it from another contiguous and
  * routeable area).
- * 
+ *
  */
 public class NamedArea implements Serializable {
-    private static final long serialVersionUID = 3570078249065754760L;
 
-    private Geometry originalEdges;
+  private static final long serialVersionUID = 3570078249065754760L;
 
-    private I18NString name;
+  private Geometry originalEdges;
 
-    private double bicycleSafetyMultiplier;
+  private I18NString name;
 
-    private int streetClass;
+  private double bicycleSafetyMultiplier;
 
-    private StreetTraversalPermission permission;
+  private int streetClass;
 
-    public I18NString getName() {
-        return name;
-    }
+  private StreetTraversalPermission permission;
 
-    public void setName(I18NString name) {
-        this.name = name;
-    }
+  public I18NString getName() {
+    return name;
+  }
 
-    public Geometry getPolygon() {
-        return originalEdges;
-    }
+  public void setName(I18NString name) {
+    this.name = name;
+  }
 
-    public void setOriginalEdges(Geometry originalEdges) {
-        this.originalEdges = originalEdges;
-    }
+  public Geometry getPolygon() {
+    return originalEdges;
+  }
 
-    public double getBicycleSafetyMultiplier() {
-        return bicycleSafetyMultiplier;
-    }
+  public void setOriginalEdges(Geometry originalEdges) {
+    this.originalEdges = originalEdges;
+  }
 
-    public void setBicycleSafetyMultiplier(double bicycleSafetyMultiplier) {
-        this.bicycleSafetyMultiplier = bicycleSafetyMultiplier;
-    }
+  public double getBicycleSafetyMultiplier() {
+    return bicycleSafetyMultiplier;
+  }
 
-    public StreetTraversalPermission getPermission() {
-        return permission;
-    }
+  public void setBicycleSafetyMultiplier(double bicycleSafetyMultiplier) {
+    this.bicycleSafetyMultiplier = bicycleSafetyMultiplier;
+  }
 
-    public int getStreetClass() {
-        return streetClass;
-    }
+  public StreetTraversalPermission getPermission() {
+    return permission;
+  }
 
-    public void setStreetClass(int streetClass) {
-        this.streetClass = streetClass;
-    }
+  public int getStreetClass() {
+    return streetClass;
+  }
 
-    public void setPermission(StreetTraversalPermission permission) {
-        this.permission = permission;
-    }
+  public void setStreetClass(int streetClass) {
+    this.streetClass = streetClass;
+  }
+
+  public void setPermission(StreetTraversalPermission permission) {
+    this.permission = permission;
+  }
 }

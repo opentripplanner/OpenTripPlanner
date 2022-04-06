@@ -1,5 +1,11 @@
 package org.opentripplanner.graph_builder.linking;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -22,13 +28,6 @@ import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -77,55 +76,37 @@ public class VertexLinker {
    * NOTE: Only one VertexLinker should be active on a graph at any given time.
    */
   public VertexLinker(Graph graph) {
-    for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class) ) {
+    for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class)) {
       streetSpatialIndex.insert(se.getGeometry(), se, Scope.PERMANENT);
     }
     this.graph = graph;
   }
 
   public void linkVertexPermanently(
-      Vertex vertex,
-      TraverseModeSet traverseModes,
-      LinkingDirection direction,
-      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    Vertex vertex,
+    TraverseModeSet traverseModes,
+    LinkingDirection direction,
+    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    link(
-      vertex,
-      traverseModes,
-      direction,
-      Scope.PERMANENT,
-      edgeFunction
-    );
+    link(vertex, traverseModes, direction, Scope.PERMANENT, edgeFunction);
   }
 
   public DisposableEdgeCollection linkVertexForRealTime(
-      Vertex vertex,
-      TraverseModeSet traverseModes,
-      LinkingDirection direction,
-      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    Vertex vertex,
+    TraverseModeSet traverseModes,
+    LinkingDirection direction,
+    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    return link(
-        vertex,
-        traverseModes,
-        direction,
-        Scope.REALTIME,
-        edgeFunction
-    );
+    return link(vertex, traverseModes, direction, Scope.REALTIME, edgeFunction);
   }
 
   public DisposableEdgeCollection linkVertexForRequest(
-      Vertex vertex,
-      TraverseModeSet traverseModes,
-      LinkingDirection direction,
-      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    Vertex vertex,
+    TraverseModeSet traverseModes,
+    LinkingDirection direction,
+    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    return link(
-        vertex,
-        traverseModes,
-        direction,
-        Scope.REQUEST,
-        edgeFunction
-    );
+    return link(vertex, traverseModes, direction, Scope.REQUEST, edgeFunction);
   }
 
   public void removeEdgeFromIndex(Edge edge, Scope scope) {
@@ -158,32 +139,35 @@ public class VertexLinker {
    * responsibility to call the dispose method on this object when the edges are no longer needed.
    */
   private DisposableEdgeCollection link(
-      Vertex vertex,
-      TraverseModeSet traverseModes,
-      LinkingDirection direction,
-      Scope scope,
-      BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    Vertex vertex,
+    TraverseModeSet traverseModes,
+    LinkingDirection direction,
+    Scope scope,
+    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
     DisposableEdgeCollection tempEdges = (scope != Scope.PERMANENT)
-        ? new DisposableEdgeCollection(graph, scope)
-        : null;
+      ? new DisposableEdgeCollection(graph, scope)
+      : null;
 
     try {
-      Set<StreetVertex> streetVertices = linkToStreetEdges(vertex,
-          traverseModes,
-          direction,
-          scope,
-          INITIAL_SEARCH_RADIUS_METERS,
-          tempEdges
+      Set<StreetVertex> streetVertices = linkToStreetEdges(
+        vertex,
+        traverseModes,
+        direction,
+        scope,
+        INITIAL_SEARCH_RADIUS_METERS,
+        tempEdges
       );
       if (streetVertices.isEmpty()) {
-        streetVertices = linkToStreetEdges(vertex,
+        streetVertices =
+          linkToStreetEdges(
+            vertex,
             traverseModes,
             direction,
             scope,
             MAX_SEARCH_RADIUS_METERS,
             tempEdges
-        );
+          );
       }
 
       for (StreetVertex streetVertex : streetVertices) {
@@ -194,7 +178,7 @@ public class VertexLinker {
           }
         }
       }
-    } catch (Exception e){
+    } catch (Exception e) {
       if (tempEdges != null) {
         tempEdges.disposeEdges();
       }
@@ -205,14 +189,13 @@ public class VertexLinker {
   }
 
   private Set<StreetVertex> linkToStreetEdges(
-      Vertex vertex,
-      TraverseModeSet traverseModes,
-      LinkingDirection direction,
-      Scope scope,
-      int radiusMeters,
-      DisposableEdgeCollection tempEdges
+    Vertex vertex,
+    TraverseModeSet traverseModes,
+    LinkingDirection direction,
+    Scope scope,
+    int radiusMeters,
+    DisposableEdgeCollection tempEdges
   ) {
-
     final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(radiusMeters);
 
     Envelope env = new Envelope(vertex.getCoordinate());
@@ -228,24 +211,24 @@ public class VertexLinker {
     // graph. Calculate a distance to each of those edges, and keep only the ones within the search
     // radius.
     List<DistanceTo<StreetEdge>> candidateEdges = streetSpatialIndex
-        .query(env, scope)
-        .filter(StreetEdge.class::isInstance)
-        .map(StreetEdge.class::cast)
-        .filter(e -> e.canTraverse(traverseModes) && edgeReachableFromGraph(e))
-        .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
-        .filter(ead -> ead.distanceDegreesLat < radiusDeg)
-        .collect(Collectors.toList());
+      .query(env, scope)
+      .filter(StreetEdge.class::isInstance)
+      .map(StreetEdge.class::cast)
+      .filter(e -> e.canTraverse(traverseModes) && edgeReachableFromGraph(e))
+      .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
+      .filter(ead -> ead.distanceDegreesLat < radiusDeg)
+      .collect(Collectors.toList());
 
-    if (candidateEdges.isEmpty()) { return Set.of(); }
+    if (candidateEdges.isEmpty()) {
+      return Set.of();
+    }
 
-    Set<DistanceTo<StreetEdge>> closesEdges = getClosestEdgesPerMode(
-        traverseModes,
-        candidateEdges
-    );
+    Set<DistanceTo<StreetEdge>> closesEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
 
-    return closesEdges.stream()
-            .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges))
-            .collect(Collectors.toSet());
+    return closesEdges
+      .stream()
+      .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges))
+      .collect(Collectors.toSet());
   }
 
   /**
@@ -254,11 +237,11 @@ public class VertexLinker {
    * are traversable by more than one of the modes specified.
    */
   private Set<DistanceTo<StreetEdge>> getClosestEdgesPerMode(
-      TraverseModeSet traverseModeSet,
-      List<DistanceTo<StreetEdge>> candidateEdges
+    TraverseModeSet traverseModeSet,
+    List<DistanceTo<StreetEdge>> candidateEdges
   ) {
     final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(
-        DUPLICATE_WAY_EPSILON_METERS
+      DUPLICATE_WAY_EPSILON_METERS
     );
 
     // The following logic has gone through several different versions using different approaches.
@@ -277,21 +260,28 @@ public class VertexLinker {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
 
-      var candidateEdgesForMode =
-          candidateEdges.stream().filter(e -> e.item.canTraverse(modeSet)).collect(Collectors.toList());
+      var candidateEdgesForMode = candidateEdges
+        .stream()
+        .filter(e -> e.item.canTraverse(modeSet))
+        .collect(Collectors.toList());
 
-      if (candidateEdgesForMode.isEmpty()) { continue; }
+      if (candidateEdgesForMode.isEmpty()) {
+        continue;
+      }
 
-      double closestDistance = candidateEdgesForMode.stream()
-          .mapToDouble(ce -> ce.distanceDegreesLat)
-          .min()
-          .getAsDouble();
+      double closestDistance = candidateEdgesForMode
+        .stream()
+        .mapToDouble(ce -> ce.distanceDegreesLat)
+        .min()
+        .getAsDouble();
 
       // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
-      closesEdges.addAll(candidateEdges
+      closesEdges.addAll(
+        candidateEdges
           .stream()
           .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
-          .collect(Collectors.toSet()));
+          .collect(Collectors.toSet())
+      );
     }
     return closesEdges;
   }
@@ -314,19 +304,20 @@ public class VertexLinker {
     boolean edgeReachableFromGraph = edge.getToVertex().getIncoming().contains(edge);
     if (!edgeReachableFromGraph) {
       LOG.error(
-          "Edge returned from spatial index is no longer reachable from graph. That is not expected.");
+        "Edge returned from spatial index is no longer reachable from graph. That is not expected."
+      );
     }
     return edgeReachableFromGraph;
   }
 
   /** Split the edge if necessary return the closest vertex */
   private StreetVertex link(
-      Vertex vertex,
-      StreetEdge edge,
-      double xScale,
-      Scope scope,
-      LinkingDirection direction,
-      DisposableEdgeCollection tempEdges
+    Vertex vertex,
+    StreetEdge edge,
+    double xScale,
+    Scope scope,
+    LinkingDirection direction,
+    DisposableEdgeCollection tempEdges
   ) {
     // TODO: we've already built this line string, we should save it
     LineString orig = edge.getGeometry();
@@ -339,7 +330,10 @@ public class VertexLinker {
     // cut to the chase and link directly
     // We use a really tiny epsilon here because we only want points that actually snap to exactly the same location on the
     // street to use the same vertices. Otherwise the order the stops are loaded in will affect where they are snapped.
-    if (ll.getSegmentIndex() == 0 && (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)) {
+    if (
+      ll.getSegmentIndex() == 0 &&
+      (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)
+    ) {
       return (StreetVertex) edge.getFromVertex();
     }
     // -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
@@ -347,15 +341,13 @@ public class VertexLinker {
     else if (ll.getSegmentIndex() == orig.getNumPoints() - 1) {
       return (StreetVertex) edge.getToVertex();
     }
-
     // nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
-    else if (ll.getSegmentIndex() == orig.getNumPoints() - 2 && (
-      ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
+    else if (
+      ll.getSegmentIndex() == orig.getNumPoints() - 2 &&
+      (ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
     ) {
       return (StreetVertex) edge.getToVertex();
-    }
-
-    else {
+    } else {
       // split the edge, get the split vertex
       SplitterVertex v0 = split(edge, ll, scope, direction, tempEdges);
 
@@ -380,9 +372,9 @@ public class VertexLinker {
     // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
     // for the actual distance calculations.
     LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
-    return transformed.distance(GEOMETRY_FACTORY.createPoint(new Coordinate(tstop.getLon() * xscale,
-        tstop.getLat()
-    )));
+    return transformed.distance(
+      GEOMETRY_FACTORY.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat()))
+    );
   }
 
   /** project this linestring to an equirectangular projection */
@@ -410,11 +402,11 @@ public class VertexLinker {
    * @return Splitter vertex with added new edges
    */
   private SplitterVertex split(
-      StreetEdge originalEdge,
-      LinearLocation ll,
-      Scope scope,
-      LinkingDirection direction,
-      DisposableEdgeCollection tempEdges
+    StreetEdge originalEdge,
+    LinearLocation ll,
+    Scope scope,
+    LinkingDirection direction,
+    DisposableEdgeCollection tempEdges
   ) {
     LineString geometry = originalEdge.getGeometry();
 
@@ -425,24 +417,24 @@ public class VertexLinker {
     String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
 
     if (scope != Scope.PERMANENT) {
-      TemporarySplitterVertex tsv = new TemporarySplitterVertex(uniqueSplitLabel,
-          splitPoint.x,
-          splitPoint.y,
-          originalEdge,
-          direction == LinkingDirection.OUTGOING
+      TemporarySplitterVertex tsv = new TemporarySplitterVertex(
+        uniqueSplitLabel,
+        splitPoint.x,
+        splitPoint.y,
+        originalEdge,
+        direction == LinkingDirection.OUTGOING
       );
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
-    }
-    else {
+    } else {
       v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y);
     }
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
     P2<StreetEdge> newEdges = scope == Scope.PERMANENT
-        ? originalEdge.splitDestructively(v)
-        : originalEdge.splitNonDestructively(v, tempEdges, direction);
+      ? originalEdge.splitDestructively(v)
+      : originalEdge.splitNonDestructively(v, tempEdges, direction);
 
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
@@ -486,8 +478,12 @@ public class VertexLinker {
 
     @Override
     public boolean equals(Object o) {
-      if (this == o) { return true; }
-      if (o == null || getClass() != o.getClass()) { return false; }
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
       DistanceTo<?> that = (DistanceTo<?>) o;
       return Objects.equals(item, that.item);
     }

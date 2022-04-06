@@ -29,43 +29,42 @@ import org.opentripplanner.standalone.server.Router;
 @PermitAll // exceptions on methods
 public class Routers {
 
-    private final OTPServer otpServer;
+  private final OTPServer otpServer;
 
-    public Routers(@Context OTPServer otpServer) {
-        this.otpServer = otpServer;
-    }
+  public Routers(@Context OTPServer otpServer) {
+    this.otpServer = otpServer;
+  }
 
-    /**
-     * Return the "default" router information.
-     */
-    @GET
-    @Path("{ignoreRouterId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ApiRouterInfo getGraphId(@PathParam("ignoreRouterId") String ignore) {
-        return getRouterInfo();
-    }
+  /**
+   * Return the "default" router information.
+   */
+  @GET
+  @Path("{ignoreRouterId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public ApiRouterInfo getGraphId(@PathParam("ignoreRouterId") String ignore) {
+    return getRouterInfo();
+  }
 
-    /**
-     * Returns a list of routers and their bounds. A list with one item, the "default" router,
-     * is returned.
-     * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
-     * on the Accept header in the HTTP request.
-     */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public ApiRouterList getRouterIds() {
-        ApiRouterList routerList = new ApiRouterList();
-        routerList.routerInfo.add(getRouterInfo());
-        return routerList;
-    }
+  /**
+   * Returns a list of routers and their bounds. A list with one item, the "default" router,
+   * is returned.
+   * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
+   * on the Accept header in the HTTP request.
+   */
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public ApiRouterList getRouterIds() {
+    ApiRouterList routerList = new ApiRouterList();
+    routerList.routerInfo.add(getRouterInfo());
+    return routerList;
+  }
 
-    private ApiRouterInfo getRouterInfo() {
-        try {
-            Router router = otpServer.getRouter();
-            return new ApiRouterInfo("default", router.graph);
-        }
-        catch (GraphNotFoundException e) {
-            return null;
-        }
+  private ApiRouterInfo getRouterInfo() {
+    try {
+      Router router = otpServer.getRouter();
+      return new ApiRouterInfo("default", router.graph);
+    } catch (GraphNotFoundException e) {
+      return null;
     }
+  }
 }

@@ -1,17 +1,17 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import org.opentripplanner.ext.interactivelauncher.Model;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import org.opentripplanner.ext.interactivelauncher.Model;
+
 class OptionsView {
+
   private final Box panel = Box.createVerticalBox();
   private final JCheckBox buildStreetGraphChk;
   private final JCheckBox buildTransitGraphChk;
@@ -65,7 +65,7 @@ class OptionsView {
     var entries = model.getDebugLogging();
     List<String> keys = entries.keySet().stream().sorted().collect(Collectors.toList());
     for (String name : keys) {
-      JCheckBox box =  new JCheckBox(name, entries.get(name));
+      JCheckBox box = new JCheckBox(name, entries.get(name));
       box.addActionListener(l -> model.getDebugLogging().put(name, box.isSelected()));
       addComp(box, panel);
     }
@@ -98,6 +98,8 @@ class OptionsView {
   }
 
   private void onStartOptServerChkChanged() {
-    startOptVisualizerChk.setEnabled(startOptServerChk.isEnabled() && startOptServerChk.isSelected());
+    startOptVisualizerChk.setEnabled(
+      startOptServerChk.isEnabled() && startOptServerChk.isSelected()
+    );
   }
 }

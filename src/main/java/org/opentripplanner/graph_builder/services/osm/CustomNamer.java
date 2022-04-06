@@ -8,53 +8,51 @@ import org.opentripplanner.routing.graph.Graph;
 
 /**
  * For when CreativeNamePicker/WayPropertySet is just not powerful enough.
- * 
+ *
  * @author novalis
- * 
+ *
  */
 public interface CustomNamer {
+  String name(OSMWithTags way, String defaultName);
 
-    String name(OSMWithTags way, String defaultName);
+  void nameWithEdge(OSMWithTags way, StreetEdge edge);
 
-    void nameWithEdge(OSMWithTags way, StreetEdge edge);
+  void postprocess(Graph graph);
 
-    void postprocess(Graph graph);
+  void configure();
 
-    void configure();
+  class CustomNamerFactory {
 
-    class CustomNamerFactory {
+    /**
+     * Create a custom namer if needed, return null if not found / by default.
+     */
+    public static CustomNamer fromConfig(JsonNode config) {
+      String type = null;
+      if (config == null) {
+        /* Empty block, fallback to default */
+        return null;
+      } else if (config.isTextual()) {
+        /* Simplest form: { osmNaming : "portland" } */
+        type = config.asText();
+      } else if (config.has("type")) {
+        /* Custom namer with a type: { osmNaming : { type : "foobar", param1 : 42 } } */
+        type = config.path("type").asText(null);
+      }
+      if (type == null) {
+        return null;
+      }
 
-        /**
-         * Create a custom namer if needed, return null if not found / by default.
-         */
-        public static CustomNamer fromConfig(JsonNode config) {
-            String type = null;
-            if (config == null) {
-                /* Empty block, fallback to default */
-                return null;
-            } else if (config.isTextual()) {
-                /* Simplest form: { osmNaming : "portland" } */
-                type = config.asText();
-            } else if (config.has("type")) {
-                /* Custom namer with a type: { osmNaming : { type : "foobar", param1 : 42 } } */
-                type = config.path("type").asText(null);
-            }
-            if (type == null) {
-                return null;
-            }
-
-            CustomNamer retval;
-            switch (type) {
-            case "portland":
-                retval = new PortlandCustomNamer();
-                break;
-            default:
-                throw new IllegalArgumentException(String.format("Unknown osmNaming type: '%s'",
-                        type));
-            }
-            // Configure the namer
-            retval.configure();
-            return retval;
-        }
+      CustomNamer retval;
+      switch (type) {
+        case "portland":
+          retval = new PortlandCustomNamer();
+          break;
+        default:
+          throw new IllegalArgumentException(String.format("Unknown osmNaming type: '%s'", type));
+      }
+      // Configure the namer
+      retval.configure();
+      return retval;
     }
+  }
 }

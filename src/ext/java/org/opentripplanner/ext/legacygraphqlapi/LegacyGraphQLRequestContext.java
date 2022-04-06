@@ -4,6 +4,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
 
 public class LegacyGraphQLRequestContext {
+
   private final Router router;
   private final RoutingService routingService;
 

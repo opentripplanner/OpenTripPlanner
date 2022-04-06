@@ -4,15 +4,14 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 
 public class Graphwide implements DataImportIssue {
 
-    String message;
-    
-    public Graphwide(String message){
-    	this.message = message;
-    }
+  String message;
 
-    @Override
-    public String getMessage() {
-        return "graph-wide: " + message;
-    }
-    
+  public Graphwide(String message) {
+    this.message = message;
+  }
+
+  @Override
+  public String getMessage() {
+    return "graph-wide: " + message;
+  }
 }

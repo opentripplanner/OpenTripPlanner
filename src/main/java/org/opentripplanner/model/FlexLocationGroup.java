@@ -1,13 +1,12 @@
 package org.opentripplanner.model;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
-
-import java.util.HashSet;
-import java.util.Set;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -21,7 +20,10 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
   private final Set<StopLocation> stopLocations = new HashSet<>();
 
-  private GeometryCollection geometry = new GeometryCollection(null, GeometryUtils.getGeometryFactory());
+  private GeometryCollection geometry = new GeometryCollection(
+    null,
+    GeometryUtils.getGeometryFactory()
+  );
 
   private Point centroid;
 

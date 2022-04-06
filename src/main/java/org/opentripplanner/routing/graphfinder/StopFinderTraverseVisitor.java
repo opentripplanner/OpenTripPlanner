@@ -1,14 +1,13 @@
 package org.opentripplanner.routing.graphfinder;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // TODO Seems like this should be merged with the PlaceFinderTraverseVisitor
 /**
@@ -26,10 +25,10 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
   public final List<NearbyStop> stopsFound = new ArrayList<>();
 
   @Override
-  public void visitEdge(Edge edge) { }
+  public void visitEdge(Edge edge) {}
 
   @Override
-  public void visitEnqueue() { }
+  public void visitEnqueue() {}
 
   // Accumulate stops into ret as the search runs.
   @Override

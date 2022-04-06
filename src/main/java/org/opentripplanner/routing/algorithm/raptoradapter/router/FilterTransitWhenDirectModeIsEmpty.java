@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
-
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 
@@ -52,6 +51,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
  * NOT: {@code Origin ~ Walk 120m ~ Destination }
  */
 public class FilterTransitWhenDirectModeIsEmpty {
+
   private final StreetMode originalDirectMode;
 
   public FilterTransitWhenDirectModeIsEmpty(RequestModes modes) {

@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.service;
 
-
 /**
  * This exception is used to abort a multi-criteria search. A multi-criteria search may perform
  * one or 2 simple raptor searches before is start. If the simple raptor search do not find

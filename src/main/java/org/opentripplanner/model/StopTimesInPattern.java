@@ -9,11 +9,10 @@ import java.util.List;
  */
 public class StopTimesInPattern {
 
-    public TripPattern pattern;
-    public List<TripTimeOnDate> times = new ArrayList<>();
+  public TripPattern pattern;
+  public List<TripTimeOnDate> times = new ArrayList<>();
 
-    public StopTimesInPattern(TripPattern pattern) {
-        this.pattern = pattern;
-    }
-
+  public StopTimesInPattern(TripPattern pattern) {
+    this.pattern = pattern;
+  }
 }

@@ -1,11 +1,10 @@
 package org.opentripplanner.graph_builder.linking;
 
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.graph.Edge;
-
-import java.util.stream.Stream;
 
 /**
  * Manages street spatial indexes by scope. When linking vertices, visibility is as follows:
@@ -27,7 +26,7 @@ import java.util.stream.Stream;
  * is so that the origin/destination coordinates of a search can connect directly to the edges
  * being split by a realtime update. This is so that we would not have to walk all the way to the
  * end of the edge then back again to where the realtime element was connected.
- * 
+ *
  * See #3351
  */
 class StreetSpatialIndex {
@@ -68,11 +67,10 @@ class StreetSpatialIndex {
       case REALTIME:
         return permanentIndex.query(envelope).stream();
       case REQUEST:
-        return Stream
-            .concat(
-                permanentIndex.query(envelope).stream(),
-                realTimeIndex.query(envelope).stream()
-            );
+        return Stream.concat(
+          permanentIndex.query(envelope).stream(),
+          realTimeIndex.query(envelope).stream()
+        );
       default:
         throw new IllegalArgumentException();
     }

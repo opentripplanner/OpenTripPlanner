@@ -24,12 +24,12 @@ public enum StreetMode {
    * Walk to a bike rental point, bike to a bike rental drop-off point, and walk the rest of the
    * way. This can include bike rental at fixed locations or free-floating services.
    */
-  BIKE_RENTAL(true, true, true, true, true,false),
+  BIKE_RENTAL(true, true, true, true, true, false),
   /**
    * Walk to a scooter rental point, ride a scooter to a scooter rental drop-off point, and walk the
    * rest of the way. This can include scooter rental at fixed locations or free-floating services.
    */
-  SCOOTER_RENTAL(true, true, true, true, true,false),
+  SCOOTER_RENTAL(true, true, true, true, true, false),
   /**
    * Car only
    *
@@ -71,12 +71,12 @@ public enum StreetMode {
   final boolean includesDriving;
 
   StreetMode(
-      boolean access,
-      boolean transfer,
-      boolean egress,
-      boolean includesWalking,
-      boolean includesBiking,
-      boolean includesDriving
+    boolean access,
+    boolean transfer,
+    boolean egress,
+    boolean includesWalking,
+    boolean includesBiking,
+    boolean includesDriving
   ) {
     this.access = access;
     this.transfer = transfer;

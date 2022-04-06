@@ -1,17 +1,17 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import java.util.stream.Collectors;
-import org.opentripplanner.ext.interactivelauncher.Model;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.swing.*;
+import org.opentripplanner.ext.interactivelauncher.Model;
+
 class DataSourcesView {
+
   private final Box panel = Box.createVerticalBox();
   private final Box dataSourceSelectionPanel = Box.createVerticalBox();
   private final Model model;
@@ -34,7 +34,7 @@ class DataSourcesView {
   private void setupDataSources() {
     final List<String> values = model.getDataSourceOptions();
 
-    if(values.isEmpty()) {
+    if (values.isEmpty()) {
       model.setDataSource(null);
       JLabel label = new JLabel("<No otp configuration files found>");
       label.setBackground(ViewUtils.BG_STATUS_BAR);
@@ -45,7 +45,7 @@ class DataSourcesView {
 
     String selectedValue = model.getDataSource();
 
-    if(selectedValue == null) {
+    if (selectedValue == null) {
       selectedValue = values.get(0);
       model.setDataSource(selectedValue);
     }

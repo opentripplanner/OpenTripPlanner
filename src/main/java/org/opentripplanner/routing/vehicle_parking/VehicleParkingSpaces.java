@@ -8,89 +8,95 @@ import java.util.Objects;
  */
 public class VehicleParkingSpaces implements Serializable {
 
-    /**
-     * The number of bicycle spaces.
-     */
-    private final Integer bicycleSpaces;
+  /**
+   * The number of bicycle spaces.
+   */
+  private final Integer bicycleSpaces;
 
-    /**
-     * The number of car spaces.
-     */
-    private final Integer carSpaces;
+  /**
+   * The number of car spaces.
+   */
+  private final Integer carSpaces;
 
-    /**
-     * The number of wheelchair accessible (disabled) car spaces.
-     */
-    private final Integer wheelchairAccessibleCarSpaces;
+  /**
+   * The number of wheelchair accessible (disabled) car spaces.
+   */
+  private final Integer wheelchairAccessibleCarSpaces;
 
-    VehicleParkingSpaces(
-            Integer bicycleSpaces,
-            Integer carSpaces,
-            Integer wheelchairAccessibleCarSpaces
+  VehicleParkingSpaces(
+    Integer bicycleSpaces,
+    Integer carSpaces,
+    Integer wheelchairAccessibleCarSpaces
+  ) {
+    this.bicycleSpaces = bicycleSpaces;
+    this.carSpaces = carSpaces;
+    this.wheelchairAccessibleCarSpaces = wheelchairAccessibleCarSpaces;
+  }
+
+  public Integer getBicycleSpaces() {
+    return bicycleSpaces;
+  }
+
+  public Integer getCarSpaces() {
+    return carSpaces;
+  }
+
+  public Integer getWheelchairAccessibleCarSpaces() {
+    return wheelchairAccessibleCarSpaces;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final VehicleParkingSpaces that = (VehicleParkingSpaces) o;
+    return (
+      Objects.equals(bicycleSpaces, that.bicycleSpaces) &&
+      Objects.equals(carSpaces, that.carSpaces) &&
+      Objects.equals(wheelchairAccessibleCarSpaces, that.wheelchairAccessibleCarSpaces)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(bicycleSpaces, carSpaces, wheelchairAccessibleCarSpaces);
+  }
+
+  public static VehicleParkingSpacesBuilder builder() {
+    return new VehicleParkingSpacesBuilder();
+  }
+
+  public static class VehicleParkingSpacesBuilder {
+
+    private Integer bicycleSpaces;
+    private Integer carSpaces;
+    private Integer wheelchairAccessibleCarSpaces;
+
+    VehicleParkingSpacesBuilder() {}
+
+    public VehicleParkingSpacesBuilder bicycleSpaces(Integer bicycleSpaces) {
+      this.bicycleSpaces = bicycleSpaces;
+      return this;
+    }
+
+    public VehicleParkingSpacesBuilder carSpaces(Integer carSpaces) {
+      this.carSpaces = carSpaces;
+      return this;
+    }
+
+    public VehicleParkingSpacesBuilder wheelchairAccessibleCarSpaces(
+      Integer wheelchairAccessibleCarSpaces
     ) {
-        this.bicycleSpaces = bicycleSpaces;
-        this.carSpaces = carSpaces;
-        this.wheelchairAccessibleCarSpaces = wheelchairAccessibleCarSpaces;
+      this.wheelchairAccessibleCarSpaces = wheelchairAccessibleCarSpaces;
+      return this;
     }
 
-    public Integer getBicycleSpaces() {
-        return bicycleSpaces;
+    public VehicleParkingSpaces build() {
+      return new VehicleParkingSpaces(bicycleSpaces, carSpaces, wheelchairAccessibleCarSpaces);
     }
-
-    public Integer getCarSpaces() {
-        return carSpaces;
-    }
-
-    public Integer getWheelchairAccessibleCarSpaces() {
-        return wheelchairAccessibleCarSpaces;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {return true;}
-        if (o == null || getClass() != o.getClass()) {return false;}
-        final VehicleParkingSpaces that = (VehicleParkingSpaces) o;
-        return Objects.equals(bicycleSpaces, that.bicycleSpaces)
-                && Objects.equals(carSpaces, that.carSpaces)
-                && Objects.equals(wheelchairAccessibleCarSpaces, that.wheelchairAccessibleCarSpaces);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(bicycleSpaces, carSpaces, wheelchairAccessibleCarSpaces);
-    }
-
-    public static VehicleParkingSpacesBuilder builder() {
-        return new VehicleParkingSpacesBuilder();
-    }
-
-    public static class VehicleParkingSpacesBuilder {
-
-        private Integer bicycleSpaces;
-        private Integer carSpaces;
-        private Integer wheelchairAccessibleCarSpaces;
-
-        VehicleParkingSpacesBuilder() {}
-
-        public VehicleParkingSpacesBuilder bicycleSpaces(Integer bicycleSpaces) {
-            this.bicycleSpaces = bicycleSpaces;
-            return this;
-        }
-
-        public VehicleParkingSpacesBuilder carSpaces(Integer carSpaces) {
-            this.carSpaces = carSpaces;
-            return this;
-        }
-
-        public VehicleParkingSpacesBuilder wheelchairAccessibleCarSpaces(Integer wheelchairAccessibleCarSpaces) {
-            this.wheelchairAccessibleCarSpaces = wheelchairAccessibleCarSpaces;
-            return this;
-        }
-
-        public VehicleParkingSpaces build() {
-            return new VehicleParkingSpaces(
-                    bicycleSpaces, carSpaces, wheelchairAccessibleCarSpaces
-            );
-        }
-    }
+  }
 }

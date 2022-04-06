@@ -7,5 +7,8 @@ package org.opentripplanner.model.plan;
  * @author mabu
  */
 public enum VertexType {
-    NORMAL, VEHICLERENTAL, VEHICLEPARKING, TRANSIT
+  NORMAL,
+  VEHICLERENTAL,
+  VEHICLEPARKING,
+  TRANSIT,
 }

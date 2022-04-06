@@ -17,22 +17,21 @@ package org.opentripplanner.transit.raptor.api.request;
  * is {@link #FORWARD}.
  */
 public enum SearchDirection {
+  /**
+   * Search from origin to destination, forward in time.
+   */
+  FORWARD,
 
-    /**
-     * Search from origin to destination, forward in time.
-     */
-    FORWARD,
+  /**
+   * Search from destination to origin, backward in time.
+   */
+  REVERSE;
 
-    /**
-     * Search from destination to origin, backward in time.
-      */
-    REVERSE;
+  public boolean isForward() {
+    return this == FORWARD;
+  }
 
-    public boolean isForward() {
-        return this == FORWARD;
-    }
-
-    public boolean isInReverse() {
-        return this == REVERSE;
-    }
+  public boolean isInReverse() {
+    return this == REVERSE;
+  }
 }

@@ -8,13 +8,13 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
-import org.opentripplanner.util.I18NString;
 import java.util.stream.Collectors;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
-import org.opentripplanner.util.NonLocalizedString;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -50,14 +50,14 @@ public class Station extends TransitEntity implements StopCollection {
   private final Set<StopLocation> childStops = new HashSet<>();
 
   public Station(
-          FeedScopedId id,
-          I18NString name,
-          WgsCoordinate coordinate,
-          String code,
-          String description,
-          I18NString url,
-          TimeZone timezone,
-          StopTransferPriority priority
+    FeedScopedId id,
+    I18NString name,
+    WgsCoordinate coordinate,
+    String code,
+    String description,
+    I18NString url,
+    TimeZone timezone,
+    StopTransferPriority priority
   ) {
     super(id);
     this.name = name;
@@ -77,17 +77,16 @@ public class Station extends TransitEntity implements StopCollection {
    */
   public static Station stationForTest(String idAndName, double lat, double lon) {
     return new Station(
-            new FeedScopedId("F", idAndName),
-            new NonLocalizedString(idAndName),
-            new WgsCoordinate(lat, lon),
-            idAndName,
-            "Station " + idAndName,
-            null,
-            null,
-            StopTransferPriority.ALLOWED
+      new FeedScopedId("F", idAndName),
+      new NonLocalizedString(idAndName),
+      new WgsCoordinate(lat, lon),
+      idAndName,
+      "Station " + idAndName,
+      null,
+      null,
+      StopTransferPriority.ALLOWED
     );
   }
-
 
   public void addChildStop(Stop stop) {
     this.childStops.add(stop);
@@ -162,17 +161,27 @@ public class Station extends TransitEntity implements StopCollection {
     return geometry;
   }
 
-  private static GeometryCollection computeGeometry(WgsCoordinate coordinate, Set<StopLocation> childStops) {
+  private static GeometryCollection computeGeometry(
+    WgsCoordinate coordinate,
+    Set<StopLocation> childStops
+  ) {
     Point stationPoint = null;
-    var childGeometries = childStops.stream().map(StopLocation::getGeometry).filter(Objects::nonNull).collect(Collectors.toList());
-    if(coordinate != null) {
+    var childGeometries = childStops
+      .stream()
+      .map(StopLocation::getGeometry)
+      .filter(Objects::nonNull)
+      .collect(Collectors.toList());
+    if (coordinate != null) {
       stationPoint = getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
       childGeometries.add(stationPoint);
     }
-    var geometryCollection = getGeometryFactory().createGeometryCollection(childGeometries.toArray(new Geometry[]{}));
+    var geometryCollection = getGeometryFactory()
+      .createGeometryCollection(childGeometries.toArray(new Geometry[] {}));
     var convexHull = new ConvexHull(geometryCollection).getConvexHull();
 
-    var geometries = stationPoint != null ? new Geometry[]{stationPoint, convexHull} : new Geometry[]{convexHull};
+    var geometries = stationPoint != null
+      ? new Geometry[] { stationPoint, convexHull }
+      : new Geometry[] { convexHull };
     return getGeometryFactory().createGeometryCollection(geometries);
   }
 }

@@ -9,52 +9,52 @@ import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRe
 
 public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePosition {
 
-    @Override
-    public DataFetcher<Double> heading() {
-        return env -> getSource(env).heading();
-    }
+  @Override
+  public DataFetcher<Double> heading() {
+    return env -> getSource(env).heading();
+  }
 
-    @Override
-    public DataFetcher<String> label() {
-        return env -> getSource(env).label();
-    }
+  @Override
+  public DataFetcher<String> label() {
+    return env -> getSource(env).label();
+  }
 
-    @Override
-    public DataFetcher<Double> lat() {
-        return env -> getSource(env).coordinates().latitude();
-    }
+  @Override
+  public DataFetcher<Double> lat() {
+    return env -> getSource(env).coordinates().latitude();
+  }
 
-    @Override
-    public DataFetcher<Double> lon() {
-        return env -> getSource(env).coordinates().longitude();
-    }
+  @Override
+  public DataFetcher<Double> lon() {
+    return env -> getSource(env).coordinates().longitude();
+  }
 
-    @Override
-    public DataFetcher<StopRelationship> stopRelationship() {
-        return env -> getSource(env).stop();
-    }
+  @Override
+  public DataFetcher<StopRelationship> stopRelationship() {
+    return env -> getSource(env).stop();
+  }
 
-    @Override
-    public DataFetcher<Double> speed() {
-        return env -> getSource(env).speed();
-    }
+  @Override
+  public DataFetcher<Double> speed() {
+    return env -> getSource(env).speed();
+  }
 
-    @Override
-    public DataFetcher<Long> lastUpdated() {
-        return env -> getSource(env).time().getEpochSecond();
-    }
+  @Override
+  public DataFetcher<Long> lastUpdated() {
+    return env -> getSource(env).time().getEpochSecond();
+  }
 
-    @Override
-    public DataFetcher<Trip> trip() {
-        return env -> getSource(env).trip();
-    }
+  @Override
+  public DataFetcher<Trip> trip() {
+    return env -> getSource(env).trip();
+  }
 
-    @Override
-    public DataFetcher<String> vehicleId() {
-        return env -> getSource(env).vehicleId().toString();
-    }
+  @Override
+  public DataFetcher<String> vehicleId() {
+    return env -> getSource(env).vehicleId().toString();
+  }
 
-    private RealtimeVehiclePosition getSource(DataFetchingEnvironment environment) {
-        return environment.getSource();
-    }
+  private RealtimeVehiclePosition getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
+  }
 }

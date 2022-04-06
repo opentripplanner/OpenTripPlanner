@@ -9,17 +9,17 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
  */
 public class BicycleParkAPIUpdater extends ParkAPIUpdater {
 
-    public BicycleParkAPIUpdater(ParkAPIUpdaterParameters parameters) {
-        super(parameters);
-    }
+  public BicycleParkAPIUpdater(ParkAPIUpdaterParameters parameters) {
+    super(parameters);
+  }
 
-    @Override
-    protected VehicleParkingSpaces parseCapacity(JsonNode jsonNode) {
-        return parseVehicleSpaces(jsonNode, "total", null, null);
-    }
+  @Override
+  protected VehicleParkingSpaces parseCapacity(JsonNode jsonNode) {
+    return parseVehicleSpaces(jsonNode, "total", null, null);
+  }
 
-    @Override
-    protected VehicleParkingSpaces parseAvailability(JsonNode jsonNode) {
-        return parseVehicleSpaces(jsonNode, "free", null, null);
-    }
+  @Override
+  protected VehicleParkingSpaces parseAvailability(JsonNode jsonNode) {
+    return parseVehicleSpaces(jsonNode, "free", null, null);
+  }
 }

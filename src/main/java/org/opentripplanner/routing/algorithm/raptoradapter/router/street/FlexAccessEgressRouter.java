@@ -16,33 +16,28 @@ public class FlexAccessEgressRouter {
   private FlexAccessEgressRouter() {}
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
-      RoutingContext routingContext,
-      AdditionalSearchDays searchDays,
-      FlexParameters params,
-      boolean isEgress
+    RoutingContext routingContext,
+    AdditionalSearchDays searchDays,
+    FlexParameters params,
+    boolean isEgress
   ) {
+    Collection<NearbyStop> accessStops = !isEgress
+      ? AccessEgressRouter.streetSearch(routingContext, StreetMode.WALK, false)
+      : List.of();
 
-    Collection<NearbyStop> accessStops = !isEgress ? AccessEgressRouter.streetSearch(
-        routingContext,
-        StreetMode.WALK,
-        false
-    ) : List.of();
-
-    Collection<NearbyStop> egressStops = isEgress ? AccessEgressRouter.streetSearch(
-        routingContext,
-        StreetMode.WALK,
-        true
-    ) : List.of();
+    Collection<NearbyStop> egressStops = isEgress
+      ? AccessEgressRouter.streetSearch(routingContext, StreetMode.WALK, true)
+      : List.of();
 
     FlexRouter flexRouter = new FlexRouter(
-        routingContext.graph,
-        params,
-        routingContext.opt.getDateTime(),
-        routingContext.opt.arriveBy,
-        searchDays.additionalSearchDaysInPast(),
-        searchDays.additionalSearchDaysInFuture(),
-        accessStops,
-        egressStops
+      routingContext.graph,
+      params,
+      routingContext.opt.getDateTime(),
+      routingContext.opt.arriveBy,
+      searchDays.additionalSearchDaysInPast(),
+      searchDays.additionalSearchDaysInFuture(),
+      accessStops,
+      egressStops
     );
 
     return isEgress ? flexRouter.createFlexEgresses() : flexRouter.createFlexAccesses();

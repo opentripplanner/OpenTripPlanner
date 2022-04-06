@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
@@ -20,14 +19,15 @@ import org.slf4j.LoggerFactory;
  */
 public class VehicleRentalServiceDirectoryFetcher {
 
-  private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalServiceDirectoryFetcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+    VehicleRentalServiceDirectoryFetcher.class
+  );
 
   private static final int DEFAULT_FREQUENCY_SEC = 15;
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(
-      VehicleRentalServiceDirectoryFetcherParameters parameters
+    VehicleRentalServiceDirectoryFetcherParameters parameters
   ) {
-
     LOG.info("Fetching list of updaters from {}", parameters.getUrl());
 
     List<GraphUpdater> updaters = new ArrayList<>();
@@ -40,8 +40,8 @@ public class VehicleRentalServiceDirectoryFetcher {
 
       if (sources == null) {
         LOG.warn(
-            "Error reading json from {}. Are json tag names configured properly?",
-            parameters.getUrl()
+          "Error reading json from {}. Are json tag names configured properly?",
+          parameters.getUrl()
         );
         return updaters;
       }
@@ -52,30 +52,30 @@ public class VehicleRentalServiceDirectoryFetcher {
 
         if (network == null || updaterUrl == null) {
           LOG.warn(
-              "Error reading json from {}. Are json tag names configured properly?",
-              parameters.getUrl()
+            "Error reading json from {}. Are json tag names configured properly?",
+            parameters.getUrl()
           );
           return updaters;
         }
 
         VehicleRentalParameters vehicleRentalParameters = new VehicleRentalParameters(
-            "vehicle-rental-service-directory:" + network,
-            DEFAULT_FREQUENCY_SEC,
-            new GbfsDataSourceParameters(
-                updaterUrl.asText(),
-                parameters.getLanguage(),
-                parameters.getHeaders()
-            )
+          "vehicle-rental-service-directory:" + network,
+          DEFAULT_FREQUENCY_SEC,
+          new GbfsDataSourceParameters(
+            updaterUrl.asText(),
+            parameters.getLanguage(),
+            parameters.getHeaders()
+          )
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
-        var dataSource =
-                VehicleRentalDataSourceFactory.create(vehicleRentalParameters.sourceParameters());
+        var dataSource = VehicleRentalDataSourceFactory.create(
+          vehicleRentalParameters.sourceParameters()
+        );
         GraphUpdater updater = new VehicleRentalUpdater(vehicleRentalParameters, dataSource);
         updaters.add(updater);
       }
-    }
-    catch (java.io.IOException e) {
+    } catch (java.io.IOException e) {
       LOG.warn("Error fetching list of vehicle rental endpoints from {}", parameters.getUrl(), e);
     }
 

@@ -19,43 +19,44 @@ import java.util.Objects;
  * * Created by mabu on 28.7.2015.
  */
 public class TravelOption {
-    public String value;
-    public String name;
 
-    public TravelOption(String value, String name) {
-        this.value = value;
-        this.name = name;
-    }
+  public String value;
+  public String name;
 
-    /**
-     * Creates TravelOption where value and name are same
-     *
-     * @param value
-     */
-    public TravelOption(String value) {
-        this.value = value;
-        this.name = value;
-    }
+  public TravelOption(String value, String name) {
+    this.value = value;
+    this.name = name;
+  }
 
-    @Override public String toString() {
-        return "TravelOption{" +
-            "value='" + value + '\'' +
-            ", name='" + name + '\'' +
-            '}';
-    }
+  /**
+   * Creates TravelOption where value and name are same
+   *
+   * @param value
+   */
+  public TravelOption(String value) {
+    this.value = value;
+    this.name = value;
+  }
 
-    @Override public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TravelOption that = (TravelOption) o;
-        return Objects.equals(value, that.value) && Objects.equals(name, that.name);
-    }
+  @Override
+  public String toString() {
+    return "TravelOption{" + "value='" + value + '\'' + ", name='" + name + '\'' + '}';
+  }
 
-    @Override public int hashCode() {
-        return Objects.hash(value, name);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    TravelOption that = (TravelOption) o;
+    return Objects.equals(value, that.value) && Objects.equals(name, that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(value, name);
+  }
 }

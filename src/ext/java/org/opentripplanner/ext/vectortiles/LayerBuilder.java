@@ -6,16 +6,16 @@ import com.wdtinc.mapbox_vector_tile.adapt.jts.TileGeomResult;
 import com.wdtinc.mapbox_vector_tile.build.MvtLayerBuild;
 import com.wdtinc.mapbox_vector_tile.build.MvtLayerParams;
 import com.wdtinc.mapbox_vector_tile.build.MvtLayerProps;
+import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
-
-import java.util.List;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters;
 
 public abstract class LayerBuilder<T> {
-  static private final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
+
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   private final MvtLayerProps layerProps = new MvtLayerProps();
   private final VectorTile.Tile.Layer.Builder layerBuilder;
   private final PropertyMapper<T> mapper;
@@ -28,19 +28,24 @@ public abstract class LayerBuilder<T> {
   VectorTile.Tile.Layer build(Envelope envelope, LayerParameters params) {
     Envelope query = new Envelope(envelope);
     query.expandBy(
-        envelope.getWidth() * params.expansionFactor(),
-        envelope.getHeight() * params.expansionFactor());
-
-    TileGeomResult tileGeom = JtsAdapter.createTileGeom(
-        getGeometries(query),
-        envelope,
-        query,
-        GEOMETRY_FACTORY,
-        MvtLayerParams.DEFAULT,
-        g -> true
+      envelope.getWidth() * params.expansionFactor(),
+      envelope.getHeight() * params.expansionFactor()
     );
 
-    List<VectorTile.Tile.Feature> features = JtsAdapter.toFeatures(tileGeom.mvtGeoms, layerProps, this.mapper);
+    TileGeomResult tileGeom = JtsAdapter.createTileGeom(
+      getGeometries(query),
+      envelope,
+      query,
+      GEOMETRY_FACTORY,
+      MvtLayerParams.DEFAULT,
+      g -> true
+    );
+
+    List<VectorTile.Tile.Feature> features = JtsAdapter.toFeatures(
+      tileGeom.mvtGeoms,
+      layerProps,
+      this.mapper
+    );
     layerBuilder.addAllFeatures(features);
 
     MvtLayerBuild.writeProps(layerBuilder, layerProps);
@@ -51,5 +56,5 @@ public abstract class LayerBuilder<T> {
    * Get a list of geometries in this layer inside the query envelope. The geometries should include
    * an object of type T as their userData.
    */
-  abstract protected List<Geometry> getGeometries(Envelope query);
+  protected abstract List<Geometry> getGeometries(Envelope query);
 }

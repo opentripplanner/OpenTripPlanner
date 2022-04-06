@@ -1,9 +1,8 @@
 package org.opentripplanner.routing.error;
 
+import java.util.List;
 import java.util.concurrent.CompletionException;
 import org.opentripplanner.routing.api.response.RoutingError;
-
-import java.util.List;
 
 public class RoutingValidationException extends RuntimeException {
 

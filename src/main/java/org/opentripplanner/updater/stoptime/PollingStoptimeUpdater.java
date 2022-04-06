@@ -25,133 +25,140 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class PollingStoptimeUpdater extends PollingGraphUpdater {
-    private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
 
-    /**
-     * Parent update manager. Is used to execute graph writer runnables.
-     */
-    private WriteToGraphCallback saveResultOnGraph;
+  private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
 
-    /**
-     * Update streamer
-     */
-    private final TripUpdateSource updateSource;
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  private WriteToGraphCallback saveResultOnGraph;
 
-    /**
-     * Property to set on the RealtimeDataSnapshotSource
-     */
-    private Integer logFrequency;
+  /**
+   * Update streamer
+   */
+  private final TripUpdateSource updateSource;
 
-    /**
-     * Property to set on the RealtimeDataSnapshotSource
-     */
-    private Integer maxSnapshotFrequency;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer logFrequency;
 
-    /**
-     * Property to set on the RealtimeDataSnapshotSource
-     */
-    private final Boolean purgeExpiredData;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private Integer maxSnapshotFrequency;
 
-    /**
-     * Feed id that is used for the trip ids in the TripUpdates
-     */
-    private final String feedId;
+  /**
+   * Property to set on the RealtimeDataSnapshotSource
+   */
+  private final Boolean purgeExpiredData;
 
-    private final boolean fuzzyTripMatching;
+  /**
+   * Feed id that is used for the trip ids in the TripUpdates
+   */
+  private final String feedId;
 
-    /**
-     * Set only if we should attempt to match the trip_id from other data in TripDescriptor
-     */
-    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private final boolean fuzzyTripMatching;
 
-    public PollingStoptimeUpdater(PollingStoptimeUpdaterParameters parameters) {
-        super(parameters);
-        // Create update streamer from preferences
-        this.feedId = parameters.getFeedId();
-        this.updateSource = createSource(parameters);
+  /**
+   * Set only if we should attempt to match the trip_id from other data in TripDescriptor
+   */
+  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-        // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...
-        int logFrequency = parameters.getLogFrequency();
-        if (logFrequency >= 0) {
-            this.logFrequency = logFrequency;
-        }
-        int maxSnapshotFrequency = parameters.getMaxSnapshotFrequencyMs();
-        if (maxSnapshotFrequency >= 0) {
-            this.maxSnapshotFrequency = maxSnapshotFrequency;
-        }
-        this.purgeExpiredData = parameters.purgeExpiredData();
-        this.fuzzyTripMatching = parameters.fuzzyTripMatching();
+  public PollingStoptimeUpdater(PollingStoptimeUpdaterParameters parameters) {
+    super(parameters);
+    // Create update streamer from preferences
+    this.feedId = parameters.getFeedId();
+    this.updateSource = createSource(parameters);
 
-        LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
+    // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...
+    int logFrequency = parameters.getLogFrequency();
+    if (logFrequency >= 0) {
+      this.logFrequency = logFrequency;
+    }
+    int maxSnapshotFrequency = parameters.getMaxSnapshotFrequencyMs();
+    if (maxSnapshotFrequency >= 0) {
+      this.maxSnapshotFrequency = maxSnapshotFrequency;
+    }
+    this.purgeExpiredData = parameters.purgeExpiredData();
+    this.fuzzyTripMatching = parameters.fuzzyTripMatching();
+
+    LOG.info(
+      "Creating stop time updater running every {} seconds : {}",
+      pollingPeriodSeconds,
+      updateSource
+    );
+  }
+
+  @Override
+  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+    this.saveResultOnGraph = saveResultOnGraph;
+  }
+
+  @Override
+  public void setup(Graph graph) {
+    if (fuzzyTripMatching) {
+      this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
     }
 
-    @Override
-    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-        this.saveResultOnGraph = saveResultOnGraph;
+    // Only create a realtime data snapshot source if none exists already
+    TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(
+      TimetableSnapshotSource::new
+    );
+
+    // Set properties of realtime data snapshot source
+    if (logFrequency != null) {
+      snapshotSource.logFrequency = logFrequency;
     }
-
-    @Override
-    public void setup(Graph graph) {
-        if (fuzzyTripMatching) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
-        }
-
-        // Only create a realtime data snapshot source if none exists already
-        TimetableSnapshotSource snapshotSource =
-            graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
-
-        // Set properties of realtime data snapshot source
-        if (logFrequency != null) {
-            snapshotSource.logFrequency = logFrequency;
-        }
-        if (maxSnapshotFrequency != null) {
-            snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
-        }
-        if (purgeExpiredData != null) {
-            snapshotSource.purgeExpiredData = purgeExpiredData;
-        }
-        if (fuzzyTripMatcher != null) {
-            snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
-        }
+    if (maxSnapshotFrequency != null) {
+      snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
     }
-
-    /**
-     * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
-     * applies those updates to the graph.
-     */
-    @Override
-    public void runPolling() {
-        // Get update lists from update source
-        List<TripUpdate> updates = updateSource.getUpdates();
-        boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
-
-        if (updates != null) {
-            // Handle trip updates via graph writer runnable
-            TripUpdateGraphWriterRunnable runnable =
-                    new TripUpdateGraphWriterRunnable(fullDataset, updates, feedId);
-            saveResultOnGraph.execute(runnable);
-        }
+    if (purgeExpiredData != null) {
+      snapshotSource.purgeExpiredData = purgeExpiredData;
     }
-
-    @Override
-    public void teardown() {
+    if (fuzzyTripMatcher != null) {
+      snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
     }
+  }
 
-    public String toString() {
-        String s = (updateSource == null) ? "NONE" : updateSource.toString();
-        return "Streaming stoptime updater with update source = " + s;
+  /**
+   * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
+   * applies those updates to the graph.
+   */
+  @Override
+  public void runPolling() {
+    // Get update lists from update source
+    List<TripUpdate> updates = updateSource.getUpdates();
+    boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
+
+    if (updates != null) {
+      // Handle trip updates via graph writer runnable
+      TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
+        fullDataset,
+        updates,
+        feedId
+      );
+      saveResultOnGraph.execute(runnable);
     }
+  }
 
+  @Override
+  public void teardown() {}
 
-    private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {
-        switch (parameters.getSourceType()) {
-            case GTFS_RT_HTTP:
-                return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());
-            case GTFS_RT_FILE:
-                return new GtfsRealtimeFileTripUpdateSource(parameters.fileSourceParameters());
-        }
-        throw new IllegalArgumentException(
-            "Unknown update streamer source type: " + parameters.getSourceType()
-        );
+  public String toString() {
+    String s = (updateSource == null) ? "NONE" : updateSource.toString();
+    return "Streaming stoptime updater with update source = " + s;
+  }
+
+  private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {
+    switch (parameters.getSourceType()) {
+      case GTFS_RT_HTTP:
+        return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());
+      case GTFS_RT_FILE:
+        return new GtfsRealtimeFileTripUpdateSource(parameters.fileSourceParameters());
     }
+    throw new IllegalArgumentException(
+      "Unknown update streamer source type: " + parameters.getSourceType()
+    );
+  }
 }

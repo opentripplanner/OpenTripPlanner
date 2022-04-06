@@ -1,11 +1,10 @@
 package org.opentripplanner.netex.validation;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
-
-import javax.annotation.Nullable;
 
 class DSJOperatingDayNotFound extends AbstractHMapValidationRule<String, DatedServiceJourney> {
 
@@ -21,12 +20,7 @@ class DSJOperatingDayNotFound extends AbstractHMapValidationRule<String, DatedSe
   public DataImportIssue logMessage(String dsjId, DatedServiceJourney dsj) {
     String ref = getOperatingDayRef(dsj);
 
-    return new ObjectNotFound(
-        "DatedServiceJourney",
-        dsj.getId(),
-        "OperatingDayRef",
-        ref
-    );
+    return new ObjectNotFound("DatedServiceJourney", dsj.getId(), "OperatingDayRef", ref);
   }
 
   @Nullable

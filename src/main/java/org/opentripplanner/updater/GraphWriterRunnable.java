@@ -10,13 +10,12 @@ import org.opentripplanner.routing.graph.Graph;
  * - Be aware that while only one graph writer runnable is running to write to the graph, several
  *   request-threads might be reading the graph.
  * - Be sure that the request-threads always see a consistent view of the graph while planning.
- * 
+ *
  * @see GraphUpdaterManager
  */
 public interface GraphWriterRunnable {
-
-    /**
-     * This function is executed to modify the graph.
-     */
-    void run(Graph graph);
+  /**
+   * This function is executed to modify the graph.
+   */
+  void run(Graph graph);
 }

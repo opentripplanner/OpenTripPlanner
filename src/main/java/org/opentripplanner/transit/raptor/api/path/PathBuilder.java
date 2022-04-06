@@ -13,7 +13,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
-
 /**
  * The path builder is a utility to build paths. The path builder is responsible for reconstructing
  * information that was used in decision making inside Raptor, but not kept due to performance
@@ -39,11 +38,13 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
 
   @Nullable
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
+
   protected final RaptorSlackProvider slackProvider;
+
   @Nullable
   protected final CostCalculator costCalculator;
-  private final RaptorStopNameResolver stopNameResolver;
 
+  private final RaptorStopNameResolver stopNameResolver;
 
   // Path leg elements as a double linked list. This makes it easy to look at
   // legs before and after in the logic and easy to fork, building alternative
@@ -53,20 +54,20 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
 
   protected PathBuilder(PathBuilder<T> other) {
     this(
-            other.transferConstraintsSearch,
-            other.slackProvider,
-            other.costCalculator,
-            other.stopNameResolver
+      other.transferConstraintsSearch,
+      other.slackProvider,
+      other.costCalculator,
+      other.stopNameResolver
     );
     this.head = other.head == null ? null : other.head.mutate();
     this.tail = this.head == null ? null : last(this.head);
   }
 
   protected PathBuilder(
-          @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-          RaptorSlackProvider slackProvider,
-          @Nullable CostCalculator costCalculator,
-          @Nullable RaptorStopNameResolver stopNameResolver
+    @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+    RaptorSlackProvider slackProvider,
+    @Nullable CostCalculator costCalculator,
+    @Nullable RaptorStopNameResolver stopNameResolver
   ) {
     this.transferConstraintsSearch = transferConstraintsSearch;
     this.slackProvider = slackProvider;
@@ -82,16 +83,16 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
    * calculates generalized-cost in the build phase. (Insert new tail)
    */
   public static <T extends RaptorTripSchedule> PathBuilder<T> headPathBuilder(
-          @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-          RaptorSlackProvider slackProvider,
-          @Nullable CostCalculator costCalculator,
-          @Nullable RaptorStopNameResolver stopNameResolver
+    @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+    RaptorSlackProvider slackProvider,
+    @Nullable CostCalculator costCalculator,
+    @Nullable RaptorStopNameResolver stopNameResolver
   ) {
     return new HeadPathBuilder<>(
-            transferConstraintsSearch,
-            slackProvider,
-            costCalculator,
-            stopNameResolver
+      transferConstraintsSearch,
+      slackProvider,
+      costCalculator,
+      stopNameResolver
     );
   }
 
@@ -103,17 +104,16 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
    * calculates generalized-cost in the build phase.
    */
   public static <T extends RaptorTripSchedule> PathBuilder<T> tailPathBuilder(
-          RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-          RaptorSlackProvider slackProvider,
-          @Nullable CostCalculator costCalculator,
-          @Nullable RaptorStopNameResolver stopNameResolver
-
+    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+    RaptorSlackProvider slackProvider,
+    @Nullable CostCalculator costCalculator,
+    @Nullable RaptorStopNameResolver stopNameResolver
   ) {
     return new TailPathBuilder<>(
-            transferConstraintsSearch,
-            slackProvider,
-            costCalculator,
-            stopNameResolver
+      transferConstraintsSearch,
+      slackProvider,
+      costCalculator,
+      stopNameResolver
     );
   }
 
@@ -126,9 +126,9 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   public void transit(
-          T trip,
-          BoardAndAlightTime times,
-          RaptorConstrainedTransfer txConstrainedTransferAfter
+    T trip,
+    BoardAndAlightTime times,
+    RaptorConstrainedTransfer txConstrainedTransferAfter
   ) {
     add(PathBuilderLeg.transitLeg(trip, times, txConstrainedTransferAfter));
   }
@@ -175,10 +175,9 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   protected void addTail(PathBuilderLeg<T> newLeg) {
-    if(head == null) {
+    if (head == null) {
       head = tail = newLeg;
-    }
-    else {
+    } else {
       tail.setNext(newLeg);
       newLeg.setPrev(tail);
       tail = newLeg;
@@ -186,16 +185,14 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   protected void addHead(PathBuilderLeg<T> newLeg) {
-    if(head == null) {
+    if (head == null) {
       head = tail = newLeg;
-    }
-    else {
+    } else {
       newLeg.setNext(head);
       head.setPrev(newLeg);
       head = newLeg;
     }
   }
-
 
   /* private methods */
 
@@ -205,10 +202,14 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
 
   private void insertConstrainedTransfers() {
     // If constrained transfer is not in use
-    if(transferConstraintsSearch == null) { return; }
+    if (transferConstraintsSearch == null) {
+      return;
+    }
 
     var prev = head.nextTransitLeg();
-    if(prev == null) { return; }
+    if (prev == null) {
+      return;
+    }
     var curr = prev.nextTransitLeg();
 
     while (curr != null) {
@@ -221,14 +222,19 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   private void addTransferConstraints(PathBuilderLeg<T> from, PathBuilderLeg<T> to) {
     @SuppressWarnings("ConstantConditions")
     var tx = transferConstraintsSearch.findConstrainedTransfer(
-            from.trip(), from.toStopPos(), to.trip(), to.fromStopPos()
+      from.trip(),
+      from.toStopPos(),
+      to.trip(),
+      to.fromStopPos()
     );
-    if(tx != null) { from.setConstrainedTransferAfterLeg(tx); }
+    if (tx != null) {
+      from.setConstrainedTransferAfterLeg(tx);
+    }
   }
 
   protected AccessPathLeg<T> createPathLegs(
-          CostCalculator costCalculator,
-          RaptorSlackProvider slackProvider
+    CostCalculator costCalculator,
+    RaptorSlackProvider slackProvider
   ) {
     return head.createAccessPathLeg(costCalculator, slackProvider);
   }
@@ -244,29 +250,34 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   private static class HeadPathBuilder<T extends RaptorTripSchedule> extends PathBuilder<T> {
 
     private HeadPathBuilder(
-            @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-            RaptorSlackProvider slackProvider,
-            CostCalculator costCalculator,
-            @Nullable RaptorStopNameResolver stopNameResolver
+      @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+      RaptorSlackProvider slackProvider,
+      CostCalculator costCalculator,
+      @Nullable RaptorStopNameResolver stopNameResolver
     ) {
       super(transferConstraintsSearch, slackProvider, costCalculator, stopNameResolver);
     }
 
-    @Override protected void add(PathBuilderLeg<T> newLeg) { addHead(newLeg); }
+    @Override
+    protected void add(PathBuilderLeg<T> newLeg) {
+      addHead(newLeg);
+    }
   }
-
 
   private static class TailPathBuilder<T extends RaptorTripSchedule> extends PathBuilder<T> {
 
     private TailPathBuilder(
-            @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-            RaptorSlackProvider slackProvider,
-            CostCalculator costCalculator,
-            @Nullable RaptorStopNameResolver stopNameResolver
+      @Nullable RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+      RaptorSlackProvider slackProvider,
+      CostCalculator costCalculator,
+      @Nullable RaptorStopNameResolver stopNameResolver
     ) {
       super(transferConstraintsSearch, slackProvider, costCalculator, stopNameResolver);
     }
 
-    @Override protected void add(PathBuilderLeg<T> newLeg) { addTail(newLeg); }
+    @Override
+    protected void add(PathBuilderLeg<T> newLeg) {
+      addTail(newLeg);
+    }
   }
 }

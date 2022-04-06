@@ -15,13 +15,16 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVertex> {
+
   private final Graph graph;
 
   public static DigitransitStopPropertyMapper create(Graph graph) {
     return new DigitransitStopPropertyMapper(graph);
   }
 
-  private DigitransitStopPropertyMapper(Graph graph) {this.graph = graph;}
+  private DigitransitStopPropertyMapper(Graph graph) {
+    this.graph = graph;
+  }
 
   @Override
   public Collection<T2<String, Object>> map(TransitStopVertex input) {
@@ -29,26 +32,32 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
     Collection<TripPattern> patternsForStop = graph.index.getPatternsForStop(stop);
 
     String type = patternsForStop
-        .stream()
-        .map(TripPattern::getMode)
-        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-        .entrySet()
-        .stream()
-        .max(Map.Entry.comparingByValue())
-        .map(Map.Entry::getKey)
-        .map(Enum::name)
-        .orElse(null);
+      .stream()
+      .map(TripPattern::getMode)
+      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+      .entrySet()
+      .stream()
+      .max(Map.Entry.comparingByValue())
+      .map(Map.Entry::getKey)
+      .map(Enum::name)
+      .orElse(null);
 
-    String patterns = JSONArray.toJSONString(patternsForStop.stream().map(tripPattern -> {
-      int stopPos = tripPattern.findStopPosition(stop);
-      var headsign  = stopPos < 0 ? "Not Available" :
-              tripPattern.getScheduledTimetable().getTripTimes().get(0).getHeadsign(stopPos);
-      JSONObject pattern = new JSONObject();
-      pattern.put("headsign", headsign);
-      pattern.put("type", tripPattern.getRoute().getMode().name());
-      pattern.put("shortName", tripPattern.getRoute().getShortName());
-      return pattern;
-    }).collect(Collectors.toList()));
+    String patterns = JSONArray.toJSONString(
+      patternsForStop
+        .stream()
+        .map(tripPattern -> {
+          int stopPos = tripPattern.findStopPosition(stop);
+          var headsign = stopPos < 0
+            ? "Not Available"
+            : tripPattern.getScheduledTimetable().getTripTimes().get(0).getHeadsign(stopPos);
+          JSONObject pattern = new JSONObject();
+          pattern.put("headsign", headsign);
+          pattern.put("type", tripPattern.getRoute().getMode().name());
+          pattern.put("shortName", tripPattern.getRoute().getShortName());
+          return pattern;
+        })
+        .collect(Collectors.toList())
+    );
 
     return List.of(
       new T2<>("gtfsId", stop.getId().toString()),
@@ -57,8 +66,12 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
       new T2<>("code", stop.getCode()),
       new T2<>("platform", stop.getPlatformCode()),
       new T2<>("desc", stop.getDescription()),
-      new T2<>("parentStation", stop.getParentStation() != null ? stop.getParentStation().getId() : "null"),
+      new T2<>(
+        "parentStation",
+        stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
+      ),
       new T2<>("type", type),
-      new T2<>("patterns", patterns));
+      new T2<>("patterns", patterns)
+    );
   }
 }

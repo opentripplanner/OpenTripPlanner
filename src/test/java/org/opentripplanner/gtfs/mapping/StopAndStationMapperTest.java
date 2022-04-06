@@ -1,134 +1,133 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.util.TranslationHelper;
-
-import java.util.Collection;
-import java.util.Collections;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+import java.util.Collections;
+import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.TranslationHelper;
+
 public class StopAndStationMapperTest {
-    private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
-    private static final String CODE = "Code";
+  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
-    private static final String DESC = "Desc";
+  private static final String CODE = "Code";
 
-    private static final String DIRECTION = "Direction";
+  private static final String DESC = "Desc";
 
-    private static final double LAT = 60.0d;
+  private static final String DIRECTION = "Direction";
 
-    private static final double LON = 45.0d;
+  private static final double LAT = 60.0d;
 
-    private static final String NAME = "Name";
+  private static final double LON = 45.0d;
 
-    private static final String PARENT = "Parent";
+  private static final String NAME = "Name";
 
-    private static final String PLATFORM_CODE = "Platform Code";
+  private static final String PARENT = "Parent";
 
-    private static final String TIMEZONE = "GMT";
+  private static final String PLATFORM_CODE = "Platform Code";
 
-    private static final String URL = "www.url.me";
+  private static final String TIMEZONE = "GMT";
 
-    private static final int VEHICLE_TYPE = 5;
+  private static final String URL = "www.url.me";
 
-    private static final int WHEELCHAIR_BOARDING = 1;
+  private static final int VEHICLE_TYPE = 5;
 
-    private static final WheelChairBoarding WHEELCHAIR_BOARDING_ENUM = WheelChairBoarding.POSSIBLE;
+  private static final int WHEELCHAIR_BOARDING = 1;
 
-    private static final String ZONE_ID = "Zone Id";
+  private static final WheelChairBoarding WHEELCHAIR_BOARDING_ENUM = WheelChairBoarding.POSSIBLE;
 
-    private static final Stop STOP = new Stop();
+  private static final String ZONE_ID = "Zone Id";
 
-    static {
-        STOP.setId(AGENCY_AND_ID);
-        STOP.setCode(CODE);
-        STOP.setDesc(DESC);
-        STOP.setDirection(DIRECTION);
-        STOP.setLat(LAT);
-        STOP.setLon(LON);
-        STOP.setName(NAME);
-        STOP.setParentStation(PARENT);
-        STOP.setPlatformCode(PLATFORM_CODE);
-        STOP.setTimezone(TIMEZONE);
-        STOP.setUrl(URL);
-        STOP.setVehicleType(VEHICLE_TYPE);
-        STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
-        STOP.setZoneId(ZONE_ID);
-    }
+  private static final Stop STOP = new Stop();
 
-    private final StopMapper subject = new StopMapper(new TranslationHelper());
+  static {
+    STOP.setId(AGENCY_AND_ID);
+    STOP.setCode(CODE);
+    STOP.setDesc(DESC);
+    STOP.setDirection(DIRECTION);
+    STOP.setLat(LAT);
+    STOP.setLon(LON);
+    STOP.setName(NAME);
+    STOP.setParentStation(PARENT);
+    STOP.setPlatformCode(PLATFORM_CODE);
+    STOP.setTimezone(TIMEZONE);
+    STOP.setUrl(URL);
+    STOP.setVehicleType(VEHICLE_TYPE);
+    STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
+    STOP.setZoneId(ZONE_ID);
+  }
 
-    @Test
-    public void testMapCollection() {
-        assertNull(null, subject.map((Collection<Stop>) null));
-        assertTrue(subject.map(Collections.emptyList()).isEmpty());
-        assertEquals(1, subject.map(Collections.singleton(STOP)).size());
-    }
+  private final StopMapper subject = new StopMapper(new TranslationHelper());
 
-    @Test
-    public void testMap() {
-        org.opentripplanner.model.Stop result = subject.map(STOP);
+  @Test
+  public void testMapCollection() {
+    assertNull(null, subject.map((Collection<Stop>) null));
+    assertTrue(subject.map(Collections.emptyList()).isEmpty());
+    assertEquals(1, subject.map(Collections.singleton(STOP)).size());
+  }
 
-        assertEquals("A:1", result.getId().toString());
-        assertEquals(CODE, result.getCode());
-        assertEquals(DESC, result.getDescription());
-        assertEquals(LAT, result.getLat(), 0.0001d);
-        assertEquals(LON, result.getLon(), 0.0001d);
-        assertEquals(NAME, result.getName().toString());
-        assertEquals(URL, result.getUrl().toString());
-        assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
-        assertEquals(ZONE_ID, result.getFirstZoneAsString());
-    }
+  @Test
+  public void testMap() {
+    org.opentripplanner.model.Stop result = subject.map(STOP);
 
-    @Test
-    public void testMapWithNulls() {
-        Stop input = new Stop();
-        input.setId(AGENCY_AND_ID);
-        input.setName(NAME);
+    assertEquals("A:1", result.getId().toString());
+    assertEquals(CODE, result.getCode());
+    assertEquals(DESC, result.getDescription());
+    assertEquals(LAT, result.getLat(), 0.0001d);
+    assertEquals(LON, result.getLon(), 0.0001d);
+    assertEquals(NAME, result.getName().toString());
+    assertEquals(URL, result.getUrl().toString());
+    assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(ZONE_ID, result.getFirstZoneAsString());
+  }
 
-        org.opentripplanner.model.Stop result = subject.map(input);
+  @Test
+  public void testMapWithNulls() {
+    Stop input = new Stop();
+    input.setId(AGENCY_AND_ID);
+    input.setName(NAME);
 
-        assertNotNull(result.getId());
-        assertNull(result.getCode());
-        assertNull(result.getDescription());
-        assertEquals(NAME, result.getName().toString());
-        assertNull(result.getParentStation());
-        assertNull(result.getCode());
-        assertNull(result.getUrl());
-        // Skip getting coordinate, it will throw an exception
-        assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
-        assertNull(result.getFirstZoneAsString());
-    }
+    org.opentripplanner.model.Stop result = subject.map(input);
 
+    assertNotNull(result.getId());
+    assertNull(result.getCode());
+    assertNull(result.getDescription());
+    assertEquals(NAME, result.getName().toString());
+    assertNull(result.getParentStation());
+    assertNull(result.getCode());
+    assertNull(result.getUrl());
+    // Skip getting coordinate, it will throw an exception
+    assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertNull(result.getFirstZoneAsString());
+  }
 
-    @Test(expected = IllegalStateException.class)
-    public void verifyMissingCoordinateThrowsException() {
-        Stop input = new Stop();
-        input.setId(AGENCY_AND_ID);
-        input.setName(NAME);
+  @Test(expected = IllegalStateException.class)
+  public void verifyMissingCoordinateThrowsException() {
+    Stop input = new Stop();
+    input.setId(AGENCY_AND_ID);
+    input.setName(NAME);
 
-        org.opentripplanner.model.Stop result = subject.map(input);
+    org.opentripplanner.model.Stop result = subject.map(input);
 
-        // Getting the coordinate will throw an IllegalArgumentException if not set,
-        // this is considered to be a implementation error
-        result.getCoordinate();
-    }
+    // Getting the coordinate will throw an IllegalArgumentException if not set,
+    // this is considered to be a implementation error
+    result.getCoordinate();
+  }
 
-    /** Mapping the same object twice, should return the the same instance. */
-    @Test
-    public void testMapCache() {
-        org.opentripplanner.model.Stop result1 = subject.map(STOP);
-        org.opentripplanner.model.Stop result2 = subject.map(STOP);
+  /** Mapping the same object twice, should return the the same instance. */
+  @Test
+  public void testMapCache() {
+    org.opentripplanner.model.Stop result1 = subject.map(STOP);
+    org.opentripplanner.model.Stop result2 = subject.map(STOP);
 
-      assertSame(result1, result2);
-    }
+    assertSame(result1, result2);
+  }
 }

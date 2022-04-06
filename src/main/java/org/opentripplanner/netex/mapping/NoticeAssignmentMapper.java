@@ -28,119 +28,121 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  */
 class NoticeAssignmentMapper {
 
-    private final DataImportIssueStore issueStore;
+  private final DataImportIssueStore issueStore;
 
-    private final FeedScopedIdFactory idFactory;
+  private final FeedScopedIdFactory idFactory;
 
-    private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId = ArrayListMultimap.create();
+  private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId = ArrayListMultimap.create();
 
-    private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
+  private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
 
-    private final EntityById<Route> routesById;
+  private final EntityById<Route> routesById;
 
-    private final EntityById<Trip> tripsById;
+  private final EntityById<Trip> tripsById;
 
-    private final Map<String, StopTime> stopTimesByNetexId;
+  private final Map<String, StopTime> stopTimesByNetexId;
 
-    /** Note! The notce mapper cashes notices, making sure duplicates are not created. */
-    private final NoticeMapper noticeMapper;
+  /** Note! The notce mapper cashes notices, making sure duplicates are not created. */
+  private final NoticeMapper noticeMapper;
 
+  NoticeAssignmentMapper(
+    DataImportIssueStore issueStore,
+    FeedScopedIdFactory idFactory,
+    Collection<ServiceJourney> serviceJourneys,
+    ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
+    EntityById<Route> routesById,
+    EntityById<Trip> tripsById,
+    Map<String, StopTime> stopTimesByNetexId
+  ) {
+    this.issueStore = issueStore;
+    this.idFactory = idFactory;
+    this.noticeMapper = new NoticeMapper(idFactory);
+    this.noticesById = noticesById;
+    this.routesById = routesById;
+    this.tripsById = tripsById;
+    this.stopTimesByNetexId = stopTimesByNetexId;
 
-    NoticeAssignmentMapper(
-            DataImportIssueStore issueStore,
-            FeedScopedIdFactory idFactory,
-            Collection<ServiceJourney> serviceJourneys,
-            ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
-            EntityById<Route> routesById,
-            EntityById<Trip> tripsById,
-            Map<String, StopTime> stopTimesByNetexId
-    ) {
-        this.issueStore = issueStore;
-        this.idFactory = idFactory;
-        this.noticeMapper = new NoticeMapper(idFactory);
-        this.noticesById = noticesById;
-        this.routesById = routesById;
-        this.tripsById = tripsById;
-        this.stopTimesByNetexId = stopTimesByNetexId;
+    // Index passing time by stopPoint id
+    for (ServiceJourney sj : serviceJourneys) {
+      for (TimetabledPassingTime it : sj.getPassingTimes().getTimetabledPassingTime()) {
+        passingTimeByStopPointId.put(it.getPointInJourneyPatternRef().getValue().getRef(), it);
+      }
+    }
+  }
 
-        // Index passing time by stopPoint id
-        for (ServiceJourney sj : serviceJourneys) {
-            for (TimetabledPassingTime it : sj.getPassingTimes().getTimetabledPassingTime()) {
-                passingTimeByStopPointId.put(it.getPointInJourneyPatternRef().getValue().getRef(), it);
-            }
-        }
+  Multimap<TransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
+    // TODO OTP2 - Idealy this should en up as one key,value pair.
+    //             The `StopPointInJourneyPattern` which result in more than one key/valye pair,
+    //             can be replaced with a new compound key type.
+    Multimap<TransitEntity, Notice> noticiesByEntity = ArrayListMultimap.create();
+
+    String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
+    Notice otpNotice = getOrMapNotice(noticeAssignment);
+
+    if (otpNotice == null) {
+      issueStore.add(
+        "NoticeAssignmentWithoutNotice",
+        "Notice in notice assignment is missing for assignment %s",
+        noticeAssignment
+      );
+      return noticiesByEntity;
     }
 
-    Multimap<TransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
-        // TODO OTP2 - Idealy this should en up as one key,value pair.
-        //             The `StopPointInJourneyPattern` which result in more than one key/valye pair,
-        //             can be replaced with a new compound key type.
-        Multimap<TransitEntity, Notice> noticiesByEntity = ArrayListMultimap.create();
+    // Special case for StopPointInJourneyPattern. The OTP model do not have this element, so
+    // we attach the notice to all StopTimes for the pattern at the given stop.
+    Collection<TimetabledPassingTime> times = passingTimeByStopPointId.get(noticedObjectId);
+    if (times != null && !times.isEmpty()) {
+      for (TimetabledPassingTime time : times) {
+        addStopTimeNotice(noticiesByEntity, time.getId(), otpNotice);
+      }
+    } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
+      addStopTimeNotice(noticiesByEntity, noticedObjectId, otpNotice);
+    } else {
+      FeedScopedId otpId = idFactory.createId(noticedObjectId);
 
-        String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
-        Notice otpNotice = getOrMapNotice(noticeAssignment);
-
-        if(otpNotice == null) {
-            issueStore.add(
-                    "NoticeAssignmentWithoutNotice",
-                    "Notice in notice assignment is missing for assignment %s",
-                    noticeAssignment
-            );
-            return noticiesByEntity;
-        }
-
-        // Special case for StopPointInJourneyPattern. The OTP model do not have this element, so
-        // we attach the notice to all StopTimes for the pattern at the given stop.
-        Collection<TimetabledPassingTime> times =  passingTimeByStopPointId.get(noticedObjectId);
-        if (times != null && !times.isEmpty()) {
-            for (TimetabledPassingTime time : times) {
-                addStopTimeNotice(noticiesByEntity, time.getId(), otpNotice);
-            }
-        } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
-            addStopTimeNotice(noticiesByEntity, noticedObjectId, otpNotice);
-        } else {
-            FeedScopedId otpId = idFactory.createId(noticedObjectId);
-
-            if(routesById.containsKey(otpId)) {
-                noticiesByEntity.put(routesById.get(otpId), otpNotice);
-            }
-            else if(tripsById.containsKey(otpId)) {
-                noticiesByEntity.put(tripsById.get(otpId), otpNotice);
-            }
-            else {
-                issueStore.add(
-                        "NoticeAssignmentWithUnknownEntity",
-                        "Could not map notice assignment %s for element with id %s",
-                        noticeAssignment.getId(), noticedObjectId
-                );
-            }
-        }
-        return noticiesByEntity;
+      if (routesById.containsKey(otpId)) {
+        noticiesByEntity.put(routesById.get(otpId), otpNotice);
+      } else if (tripsById.containsKey(otpId)) {
+        noticiesByEntity.put(tripsById.get(otpId), otpNotice);
+      } else {
+        issueStore.add(
+          "NoticeAssignmentWithUnknownEntity",
+          "Could not map notice assignment %s for element with id %s",
+          noticeAssignment.getId(),
+          noticedObjectId
+        );
+      }
     }
+    return noticiesByEntity;
+  }
 
-    private StopTimeKey lookupStopTimeKey(String timeTablePassingTimeId) {
-        return stopTimesByNetexId.get(timeTablePassingTimeId).getId();
+  private StopTimeKey lookupStopTimeKey(String timeTablePassingTimeId) {
+    return stopTimesByNetexId.get(timeTablePassingTimeId).getId();
+  }
+
+  @Nullable
+  private Notice getOrMapNotice(NoticeAssignment assignment) {
+    org.rutebanken.netex.model.Notice notice = assignment.getNotice() != null
+      ? assignment.getNotice()
+      : noticesById.lookup(assignment.getNoticeRef().getRef());
+
+    return notice == null ? null : noticeMapper.map(notice);
+  }
+
+  private void addStopTimeNotice(
+    Multimap<TransitEntity, Notice> map,
+    String stopTimeId,
+    Notice notice
+  ) {
+    StopTime stopTime = stopTimesByNetexId.get(stopTimeId);
+    if (stopTime == null) {
+      issueStore.add(
+        "NoticeAssigmentWithoutStopTime",
+        "NoticeAssigment mapping failed, StopTime not found. StopTime id: %s",
+        stopTimeId
+      );
+      return;
     }
-
-    @Nullable
-    private Notice getOrMapNotice(NoticeAssignment assignment) {
-        org.rutebanken.netex.model.Notice notice = assignment.getNotice() != null
-                ? assignment.getNotice()
-                : noticesById.lookup(assignment.getNoticeRef().getRef());
-
-        return notice == null ? null : noticeMapper.map(notice);
-    }
-
-    private void addStopTimeNotice(Multimap<TransitEntity, Notice> map, String stopTimeId, Notice notice) {
-        StopTime stopTime = stopTimesByNetexId.get(stopTimeId);
-        if(stopTime == null) {
-            issueStore.add(
-                    "NoticeAssigmentWithoutStopTime",
-                    "NoticeAssigment mapping failed, StopTime not found. StopTime id: %s",
-                    stopTimeId
-            );
-            return;
-        }
-        map.put(stopTime.getId(), notice);
-    }
+    map.put(stopTime.getId(), notice);
+  }
 }

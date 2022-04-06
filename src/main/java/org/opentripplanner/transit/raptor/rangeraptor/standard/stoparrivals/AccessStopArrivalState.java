@@ -19,17 +19,15 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> implements Sto
   private RaptorTransfer accessArriveOnStreet;
   private RaptorTransfer accessArriveOnBoard;
 
-
   public AccessStopArrivalState(
-          int time,
-          RaptorTransfer accessPath,
-          boolean isOverallBestTime,
-          DefaultStopArrivalState<T> other
+    int time,
+    RaptorTransfer accessPath,
+    boolean isOverallBestTime,
+    DefaultStopArrivalState<T> other
   ) {
     this.delegate = other;
     setAccessTime(time, accessPath, isOverallBestTime);
   }
-
 
   /* Implement StopArrivalState */
 
@@ -120,9 +118,7 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> implements Sto
   }
 
   @Override
-  public void transferToStop(
-          int fromStop, int arrivalTime, RaptorTransfer transferPath
-  ) {
+  public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
     accessArriveOnStreet = null;
     delegate.transferToStop(fromStop, arrivalTime, transferPath);
   }
@@ -132,11 +128,11 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> implements Sto
     var builder = ToStringBuilder.of(AccessStopArrivalState.class);
     delegate.toStringAddBody(builder);
 
-    if(arrivedByAccessOnBoard()) {
+    if (arrivedByAccessOnBoard()) {
       builder.addDurationSec("onBoard", accessArriveOnBoard.durationInSeconds());
     }
 
-    if(arrivedByAccessOnStreet()) {
+    if (arrivedByAccessOnStreet()) {
       builder.addDurationSec("onStreet", accessArriveOnStreet.durationInSeconds());
     }
 
@@ -148,10 +144,9 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> implements Sto
   void setAccessTime(int time, RaptorTransfer access, boolean isOverallBestTime) {
     this.delegate.setAccessTime(time, isOverallBestTime, access.stopReachedOnBoard());
 
-    if(access.stopReachedOnBoard()) {
+    if (access.stopReachedOnBoard()) {
       accessArriveOnBoard = access;
-    }
-    else {
+    } else {
       accessArriveOnStreet = access;
     }
   }

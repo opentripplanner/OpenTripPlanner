@@ -7,29 +7,28 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 public record TestCaseDefinition(
-        String id,
-        String description,
-        int departureTime,
-        int arrivalTime,
-        int window,
-        GenericLocation fromPlace,
-        GenericLocation toPlace,
-        List<String>tags,
-        RequestModes modes
+  String id,
+  String description,
+  int departureTime,
+  int arrivalTime,
+  int window,
+  GenericLocation fromPlace,
+  GenericLocation toPlace,
+  List<String> tags,
+  RequestModes modes
 ) {
-
-
-
-    @Override
-    public String toString() {
-        return String.format(
-                "#%s %s - %s, %s - %s, %s-%s(%s)",
-                id, fromPlace.label, toPlace.label,
-                fromPlace.getCoordinate(),
-                toPlace.getCoordinate(),
-                TimeUtils.timeToStrCompact(departureTime, TestCase.NOT_SET),
-                TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),
-                DurationUtils.durationToStr(window, TestCase.NOT_SET)
-        );
-    }
+  @Override
+  public String toString() {
+    return String.format(
+      "#%s %s - %s, %s - %s, %s-%s(%s)",
+      id,
+      fromPlace.label,
+      toPlace.label,
+      fromPlace.getCoordinate(),
+      toPlace.getCoordinate(),
+      TimeUtils.timeToStrCompact(departureTime, TestCase.NOT_SET),
+      TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),
+      DurationUtils.durationToStr(window, TestCase.NOT_SET)
+    );
+  }
 }

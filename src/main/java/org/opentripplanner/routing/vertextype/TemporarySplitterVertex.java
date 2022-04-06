@@ -10,38 +10,44 @@ import org.opentripplanner.routing.graph.Edge;
  */
 public class TemporarySplitterVertex extends SplitterVertex implements TemporaryVertex {
 
-    private boolean wheelchairAccessible;
+  private boolean wheelchairAccessible;
 
-    final private boolean endVertex;
+  private final boolean endVertex;
 
-    public TemporarySplitterVertex(String label, double x, double y, StreetEdge streetEdge, boolean endVertex) {
-        super(null, label, x, y);
-        this.endVertex = endVertex;
-        this.wheelchairAccessible = streetEdge.isWheelchairAccessible();
-    }
+  public TemporarySplitterVertex(
+    String label,
+    double x,
+    double y,
+    StreetEdge streetEdge,
+    boolean endVertex
+  ) {
+    super(null, label, x, y);
+    this.endVertex = endVertex;
+    this.wheelchairAccessible = streetEdge.isWheelchairAccessible();
+  }
 
-    @Override
-    public void addIncoming(Edge edge) {
-        // Removed check for edge being temporary
-        super.addIncoming(edge);
-    }
+  @Override
+  public void addIncoming(Edge edge) {
+    // Removed check for edge being temporary
+    super.addIncoming(edge);
+  }
 
-    @Override
-    public void addOutgoing(Edge edge) {
-        // Removed check for edge being temporary
-        super.addOutgoing(edge);
-    }
+  @Override
+  public void addOutgoing(Edge edge) {
+    // Removed check for edge being temporary
+    super.addOutgoing(edge);
+  }
 
-    @Override
-    public boolean isEndVertex() {
-        return endVertex;
-    }
+  @Override
+  public boolean isEndVertex() {
+    return endVertex;
+  }
 
-    public boolean isWheelchairAccessible() {
-        return wheelchairAccessible;
-    }
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
+  }
 
-    public void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
+  public void setWheelchairAccessible(boolean wheelchairAccessible) {
+    this.wheelchairAccessible = wheelchairAccessible;
+  }
 }

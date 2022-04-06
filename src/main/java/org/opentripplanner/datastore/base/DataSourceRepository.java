@@ -1,12 +1,10 @@
 package org.opentripplanner.datastore.base;
 
-
+import java.net.URI;
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
-
-import javax.validation.constraints.NotNull;
-import java.net.URI;
 
 /**
  * It is an abstraction to reading of and writing to files whenever the file is located on the local
@@ -24,38 +22,37 @@ import java.net.URI;
  * so there is no need to use the repository directly.
  */
 public interface DataSourceRepository {
+  /**
+   * @return a description that identify the datasource which is helpful to the user in case an
+   * error occurs when using the repository.
+   */
+  String description();
 
-    /**
-     * @return a description that identify the datasource which is helpful to the user in case an
-     * error occurs when using the repository.
-     */
-    String description();
+  /**
+   * Open a connection to the data repository/storage. This method is called once before any read
+   * operations.
+   */
+  void open();
 
-    /**
-     * Open a connection to the data repository/storage. This method is called once before any read
-     * operations.
-     */
-    void open();
+  /**
+   * Get the a data source for the given uri and type.
+   * <p>
+   * The source may or may not {@link DataSource#exists()}.
+   *
+   * @param uri  a uniq URI to get the data source.
+   * @param type the file type to load.
+   * @return the datasource wrapper that can be used to access the data source.
+   */
+  DataSource findSource(@NotNull URI uri, @NotNull FileType type);
 
-    /**
-     * Get the a data source for the given uri and type.
-     * <p>
-     * The source may or may not {@link DataSource#exists()}.
-     *
-     * @param uri  a uniq URI to get the data source.
-     * @param type the file type to load.
-     * @return the datasource wrapper that can be used to access the data source.
-     */
-    DataSource findSource(@NotNull URI uri, @NotNull FileType type);
-
-    /**
-     * Get the a composite data source (zip/directory) for the given uri and type.
-     * <p>
-     * The source may or may not {@link DataSource#exists()}.
-     *
-     * @param uri  a uniq URI to get the data source.
-     * @param type the file type to load.
-     * @return the datasource wrapper that can be used to access the data source.
-     */
-    CompositeDataSource findCompositeSource(@NotNull URI uri, @NotNull FileType type);
+  /**
+   * Get the a composite data source (zip/directory) for the given uri and type.
+   * <p>
+   * The source may or may not {@link DataSource#exists()}.
+   *
+   * @param uri  a uniq URI to get the data source.
+   * @param type the file type to load.
+   * @return the datasource wrapper that can be used to access the data source.
+   */
+  CompositeDataSource findCompositeSource(@NotNull URI uri, @NotNull FileType type);
 }

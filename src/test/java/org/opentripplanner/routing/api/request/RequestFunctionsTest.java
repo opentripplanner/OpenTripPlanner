@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.api.request;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 import java.util.function.DoubleFunction;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class RequestFunctionsTest {
 
@@ -34,8 +33,7 @@ public class RequestFunctionsTest {
     try {
       RequestFunctions.parse("not-a-function");
       fail();
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       assertEquals("Unable to parse function: 'not-a-function'", e.getMessage());
     }
   }

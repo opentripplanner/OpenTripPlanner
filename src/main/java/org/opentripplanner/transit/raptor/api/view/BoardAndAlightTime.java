@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * Board and alight time tuple value object.
  */
 public class BoardAndAlightTime {
+
   private final RaptorTripSchedule trip;
   private final int boardStopPos;
   private final int alightStopPos;
@@ -18,11 +19,17 @@ public class BoardAndAlightTime {
     this.alightStopPos = alightStopPos;
   }
 
-  public static BoardAndAlightTime create(RaptorTripSchedule trip, int boardStop, int boardTime, int alightStop, int alightTime) {
+  public static BoardAndAlightTime create(
+    RaptorTripSchedule trip,
+    int boardStop,
+    int boardTime,
+    int alightStop,
+    int alightTime
+  ) {
     return new BoardAndAlightTime(
-            trip,
-            trip.findDepartureStopPosition(boardTime, boardStop),
-            trip.findArrivalStopPosition(alightTime, alightStop)
+      trip,
+      trip.findDepartureStopPosition(boardTime, boardStop),
+      trip.findArrivalStopPosition(alightTime, alightStop)
     );
   }
 
@@ -45,25 +52,29 @@ public class BoardAndAlightTime {
   @Override
   public String toString() {
     return ValueObjectToStringBuilder
-        .of()
-        .addText("[")
-        .addObj(trip.pattern().stopIndex(boardStopPos))
-        .addText(" ~ ")
-        .addServiceTime(boardTime())
-        .addText(" ")
-        .addServiceTime(alightTime())
-        .addText("(")
-        .addDuration(alightTime() - boardTime())
-        .addText(") ~ ")
-        .addObj(trip.pattern().stopIndex(alightStopPos))
-        .addText("]")
-        .toString();
+      .of()
+      .addText("[")
+      .addObj(trip.pattern().stopIndex(boardStopPos))
+      .addText(" ~ ")
+      .addServiceTime(boardTime())
+      .addText(" ")
+      .addServiceTime(alightTime())
+      .addText("(")
+      .addDuration(alightTime() - boardTime())
+      .addText(") ~ ")
+      .addObj(trip.pattern().stopIndex(alightStopPos))
+      .addText("]")
+      .toString();
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (o == null || getClass() != o.getClass()) { return false; }
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     BoardAndAlightTime that = (BoardAndAlightTime) o;
     return boardStopPos == that.boardStopPos && alightStopPos == that.alightStopPos;
   }

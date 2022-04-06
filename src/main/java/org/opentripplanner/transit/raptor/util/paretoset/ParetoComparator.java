@@ -15,9 +15,8 @@ package org.opentripplanner.transit.raptor.util.paretoset;
  */
 @FunctionalInterface
 public interface ParetoComparator<T> {
-
-    /**
-     * At least one of the left criteria dominates one of the corresponding right criteria.
-     */
-    boolean leftDominanceExist(T left, T right);
+  /**
+   * At least one of the left criteria dominates one of the corresponding right criteria.
+   */
+  boolean leftDominanceExist(T left, T right);
 }

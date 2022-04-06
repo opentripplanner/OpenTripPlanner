@@ -73,24 +73,24 @@ public class GroupBySimilarity {
    * parameters,
    */
   public static GroupBySimilarity createWithMoreThanOneItineraryPerGroup(
-          double groupByP,
-          int maxNumOfItinerariesPerGroup,
-          boolean nestedGroupingByAllSameStations,
-          double maxCostOtherLegsFactor
+    double groupByP,
+    int maxNumOfItinerariesPerGroup,
+    boolean nestedGroupingByAllSameStations,
+    double maxCostOtherLegsFactor
   ) {
     return new GroupBySimilarity(
-        groupByP,
-        maxNumOfItinerariesPerGroup,
-        nestedGroupingByAllSameStations,
-        maxCostOtherLegsFactor
+      groupByP,
+      maxNumOfItinerariesPerGroup,
+      nestedGroupingByAllSameStations,
+      maxCostOtherLegsFactor
     );
   }
 
   private GroupBySimilarity(
-          double groupByP,
-          int maxNumOfItinerariesPerGroup,
-          boolean nestedGroupingByAllSameStations,
-          double maxCostOtherLegsFactor
+    double groupByP,
+    int maxNumOfItinerariesPerGroup,
+    boolean nestedGroupingByAllSameStations,
+    double maxCostOtherLegsFactor
   ) {
     this.groupByP = groupByP;
     this.maxNumOfItinerariesPerGroup = maxNumOfItinerariesPerGroup;
@@ -100,11 +100,12 @@ public class GroupBySimilarity {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(GroupBySimilarity.class)
-        .addNum("groupByP", groupByP)
-        .addNum("maxNumOfItinerariesPerGroup", maxNumOfItinerariesPerGroup)
-        .addBoolIfTrue("nestedGroupingByAllSameStations", nestedGroupingByAllSameStations)
-        .addNum("maxCostOtherLegsFactor", maxCostOtherLegsFactor)
-        .toString();
+    return ToStringBuilder
+      .of(GroupBySimilarity.class)
+      .addNum("groupByP", groupByP)
+      .addNum("maxNumOfItinerariesPerGroup", maxNumOfItinerariesPerGroup)
+      .addBoolIfTrue("nestedGroupingByAllSameStations", nestedGroupingByAllSameStations)
+      .addNum("maxCostOtherLegsFactor", maxCostOtherLegsFactor)
+      .toString();
   }
 }

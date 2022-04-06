@@ -5,7 +5,6 @@ import static org.opentripplanner.ext.interactivelauncher.DebugLoggingSupport.co
 import org.opentripplanner.ext.interactivelauncher.views.MainView;
 import org.opentripplanner.standalone.OTPMain;
 
-
 /**
  * This class provide a main method to start a GUI which can start OTPMain.
  * <p>
@@ -18,6 +17,7 @@ import org.opentripplanner.standalone.OTPMain;
  * is started.
  */
 public class InteractiveOtpMain {
+
   private Model model;
 
   public static void main(String[] args) {
@@ -38,5 +38,4 @@ public class InteractiveOtpMain {
     System.out.println("Start OTP: " + model + "\n");
     OTPMain.main(model.asOtpArgs());
   }
-
 }

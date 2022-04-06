@@ -7,7 +7,9 @@ public class RouteTypeMapper {
   private static final int DEFAULT_ROUTE_TYPE = -1;
 
   public static int mapToApi(TransitMode domain) {
-    if(domain == null) { return DEFAULT_ROUTE_TYPE; }
+    if (domain == null) {
+      return DEFAULT_ROUTE_TYPE;
+    }
 
     switch (domain) {
       case RAIL:

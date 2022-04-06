@@ -1,9 +1,10 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 final class ViewUtils {
+
   private static final boolean DEBUG_LAYOUT = false;
   static final int SECTION_SPACE = 10;
   static final Color BACKGROUND = new Color(0xe0, 0xf0, 0xff);
@@ -19,12 +20,14 @@ final class ViewUtils {
   }
 
   static void addComp(JComponent c, Box panel) {
-    if(DEBUG_LAYOUT) { c.setBorder(BorderFactory.createLineBorder(Color.green)); }
+    if (DEBUG_LAYOUT) {
+      c.setBorder(BorderFactory.createLineBorder(Color.green));
+    }
     panel.add(c);
   }
 
-  static void debugLayout(JComponent ... components) {
-    if(DEBUG_LAYOUT) {
+  static void debugLayout(JComponent... components) {
+    if (DEBUG_LAYOUT) {
       for (JComponent c : components) {
         c.setBorder(BorderFactory.createLineBorder(Color.red));
       }

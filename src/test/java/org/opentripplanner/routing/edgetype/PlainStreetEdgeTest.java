@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -16,304 +18,313 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import static org.junit.Assert.*;
-
 public class PlainStreetEdgeTest {
 
-    private Graph graph;
-    private IntersectionVertex v0, v1, v2;
-    private RoutingRequest proto;
+  private Graph graph;
+  private IntersectionVertex v0, v1, v2;
+  private RoutingRequest proto;
 
-    @Before
-    public void before() {
-        graph = new Graph();
+  @Before
+  public void before() {
+    graph = new Graph();
 
-        v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
-        v1 = vertex("maple_1st", 2.0, 2.0);
-        v2 = vertex("maple_2nd", 1.0, 2.0);
-        
-        proto = new RoutingRequest();
-        proto.carSpeed = 15.0f;
-        proto.walkSpeed = 1.0;
-        proto.bikeSpeed = 5.0f;
-        proto.bikeWalkingSpeed = 0.8;
-        proto.bikeReluctance = 1.0;
-        proto.carReluctance = 1.0;
-        proto.walkReluctance = 1.0;
-        proto.stairsReluctance = 1.0;
-        proto.turnReluctance = 1.0;
-        proto.setStreetSubRequestModes(TraverseModeSet.allModes());
-    }
+    v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
+    v1 = vertex("maple_1st", 2.0, 2.0);
+    v2 = vertex("maple_2nd", 1.0, 2.0);
 
-    @Test
-    public void testInAndOutAngles() {
-        // An edge heading straight West
-        StreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
-        
-        // Edge has same first and last angle.
-        assertEquals(90, e1.getInAngle());
-        assertEquals(90, e1.getOutAngle());
-        
-        // 2 new ones
-        StreetVertex u = vertex("test1", 2.0, 1.0);
-        StreetVertex v = vertex("test2", 2.0, 2.0);
-        
-        // Second edge, heading straight North
-        StreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
+    proto = new RoutingRequest();
+    proto.carSpeed = 15.0f;
+    proto.walkSpeed = 1.0;
+    proto.bikeSpeed = 5.0f;
+    proto.bikeWalkingSpeed = 0.8;
+    proto.bikeReluctance = 1.0;
+    proto.carReluctance = 1.0;
+    proto.walkReluctance = 1.0;
+    proto.stairsReluctance = 1.0;
+    proto.turnReluctance = 1.0;
+    proto.setStreetSubRequestModes(TraverseModeSet.allModes());
+  }
 
-        // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
-        assertEquals(180, Math.abs(e2.getInAngle()));
-        assertEquals(180, Math.abs(e2.getOutAngle()));
-    }
+  @Test
+  public void testInAndOutAngles() {
+    // An edge heading straight West
+    StreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
 
-    @Test
-    public void testTraverseAsPedestrian() {
-        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        e1.setCarSpeed(10.0f);
+    // Edge has same first and last angle.
+    assertEquals(90, e1.getInAngle());
+    assertEquals(90, e1.getOutAngle());
 
-        RoutingRequest options = proto.clone();
-        options.setMode(TraverseMode.WALK);
+    // 2 new ones
+    StreetVertex u = vertex("test1", 2.0, 1.0);
+    StreetVertex v = vertex("test2", 2.0, 2.0);
 
-        State s0 = new State(new RoutingContext(options, graph, v1, v2));
-        State s1 = e1.traverse(s0);
-        
-        // Should use the speed on the edge.
-        double expectedWeight = e1.getDistanceMeters() / options.walkSpeed;
-        long expectedDuration = (long) Math.ceil(expectedWeight);
-        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
-        assertEquals(expectedWeight, s1.getWeight(), 0.0);
-    }
-    
-    @Test
-    public void testTraverseAsCar() {
-        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        e1.setCarSpeed(10.0f);
+    // Second edge, heading straight North
+    StreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
 
-        RoutingRequest options = proto.clone();
-        options.setMode(TraverseMode.CAR);
+    // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
+    assertEquals(180, Math.abs(e2.getInAngle()));
+    assertEquals(180, Math.abs(e2.getOutAngle()));
+  }
 
-        State s0 = new State(new RoutingContext(options, graph, v1, v2));
-        State s1 = e1.traverse(s0);
-        
-        // Should use the speed on the edge.
-        double expectedWeight = e1.getDistanceMeters() / e1.getCarSpeed();
-        long expectedDuration = (long) Math.ceil(expectedWeight);
-        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
-        assertEquals(expectedWeight, s1.getWeight(), 0.0);
-    }
-    
-    @Test
-    public void testModeSetCanTraverse() {
-        StreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
-        
-        TraverseModeSet modes = TraverseModeSet.allModes();
-        assertTrue(e.canTraverse(modes));
-        
-        modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK);
-        assertTrue(e.canTraverse(modes));
-        
-        e = edge(v1, v2, 1.0, StreetTraversalPermission.CAR);
-        assertFalse(e.canTraverse(modes));
-        
-        modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
-        assertTrue(e.canTraverse(modes));
-    }
-    
-    /**
-     * Test the traversal of two edges with different traverse modes, with a focus on cycling.
-     * This test will fail unless the following three conditions are met:
-     * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
-     * 2. Turn costs are computed such that bike walking is taken into account correctly.
-     * 3. User-specified bike speeds are applied correctly during turn cost computation.
-     */
-    @Test
-    public void testTraverseModeSwitchBike() {
-        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
-        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+  @Test
+  public void testTraverseAsPedestrian() {
+    StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+    e1.setCarSpeed(10.0f);
 
-        v1.trafficLight = true;
+    RoutingRequest options = proto.clone();
+    options.setMode(TraverseMode.WALK);
 
-        RoutingRequest forward = proto.clone();
-        forward.bikeSpeed = 3.0f;
-        forward.setMode(TraverseMode.BICYCLE);
+    State s0 = new State(new RoutingContext(options, graph, v1, v2));
+    State s1 = e1.traverse(s0);
 
-        State s0 = new State(new RoutingContext(forward, graph, v0, v2));
-        State s1 = e0.traverse(s0);
-        State s2 = e1.traverse(s1);
+    // Should use the speed on the edge.
+    double expectedWeight = e1.getDistanceMeters() / options.walkSpeed;
+    long expectedDuration = (long) Math.ceil(expectedWeight);
+    assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+    assertEquals(expectedWeight, s1.getWeight(), 0.0);
+  }
 
-        RoutingRequest reverse = proto.clone();
-        reverse.setArriveBy(true);
-        reverse.bikeSpeed = 3.0f;
-        reverse.setMode(TraverseMode.BICYCLE);
+  @Test
+  public void testTraverseAsCar() {
+    StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+    e1.setCarSpeed(10.0f);
 
-        State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
-        State s4 = e1.traverse(s3);
-        State s5 = e0.traverse(s4);
+    RoutingRequest options = proto.clone();
+    options.setMode(TraverseMode.CAR);
 
-        assertEquals(104, s2.getElapsedTimeSeconds());
-        assertEquals(104, s5.getElapsedTimeSeconds());
-    }
+    State s0 = new State(new RoutingContext(options, graph, v1, v2));
+    State s1 = e1.traverse(s0);
 
-    /**
-     * Test the traversal of two edges with different traverse modes, with a focus on walking.
-     * This test will fail unless the following three conditions are met:
-     * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
-     * 2. Turn costs are computed such that bike walking is taken into account correctly.
-     * 3. Enabling bike mode on a routing request bases the bike walking speed on the walking speed.
-     */
-    @Test
-    public void testTraverseModeSwitchWalk() {
-        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
+    // Should use the speed on the edge.
+    double expectedWeight = e1.getDistanceMeters() / e1.getCarSpeed();
+    long expectedDuration = (long) Math.ceil(expectedWeight);
+    assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+    assertEquals(expectedWeight, s1.getWeight(), 0.0);
+  }
 
-        v1.trafficLight = true;
+  @Test
+  public void testModeSetCanTraverse() {
+    StreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
 
-        RoutingRequest forward = proto.clone();
-        forward.setMode(TraverseMode.BICYCLE);
+    TraverseModeSet modes = TraverseModeSet.allModes();
+    assertTrue(e.canTraverse(modes));
 
-        State s0 = new State(new RoutingContext(forward, graph, v0, v2));
-        State s1 = e0.traverse(s0);
-        State s2 = e1.traverse(s1);
+    modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK);
+    assertTrue(e.canTraverse(modes));
 
-        RoutingRequest reverse = proto.clone();
-        reverse.setMode(TraverseMode.BICYCLE);
-        reverse.setArriveBy(true);
+    e = edge(v1, v2, 1.0, StreetTraversalPermission.CAR);
+    assertFalse(e.canTraverse(modes));
 
-        State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
-        State s4 = e1.traverse(s3);
-        State s5 = e0.traverse(s4);
+    modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
+    assertTrue(e.canTraverse(modes));
+  }
 
-        assertEquals(42, s2.getElapsedTimeSeconds());
-        assertEquals(42, s5.getElapsedTimeSeconds());
-    }
+  /**
+   * Test the traversal of two edges with different traverse modes, with a focus on cycling.
+   * This test will fail unless the following three conditions are met:
+   * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
+   * 2. Turn costs are computed such that bike walking is taken into account correctly.
+   * 3. User-specified bike speeds are applied correctly during turn cost computation.
+   */
+  @Test
+  public void testTraverseModeSwitchBike() {
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
-    /**
-     * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
-     */
-    @Test
-    public void testBikeSwitch() {
-        StreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
-        StreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
-        StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    v1.trafficLight = true;
 
-        RoutingRequest noPenalty = proto.clone();
-        noPenalty.bikeSwitchTime = 0;
-        noPenalty.bikeSwitchCost = 0;
-        noPenalty.setMode(TraverseMode.BICYCLE);
+    RoutingRequest forward = proto.clone();
+    forward.bikeSpeed = 3.0f;
+    forward.setMode(TraverseMode.BICYCLE);
 
-        State s0 = new State(new RoutingContext(noPenalty, graph, v0, v0));
-        State s1 = e0.traverse(s0);
-        State s2 = e1.traverse(s1);
-        State s3 = e2.traverse(s2);
+    State s0 = new State(new RoutingContext(forward, graph, v0, v2));
+    State s1 = e0.traverse(s0);
+    State s2 = e1.traverse(s1);
 
-        RoutingRequest withPenalty = proto.clone();
-        withPenalty.bikeSwitchTime = 42;
-        withPenalty.bikeSwitchCost = 23;
-        withPenalty.setMode(TraverseMode.BICYCLE);
+    RoutingRequest reverse = proto.clone();
+    reverse.setArriveBy(true);
+    reverse.bikeSpeed = 3.0f;
+    reverse.setMode(TraverseMode.BICYCLE);
 
-        State s4 = new State(new RoutingContext(withPenalty, graph, v0, v0));
-        State s5 = e0.traverse(s4);
-        State s6 = e1.traverse(s5);
-        State s7 = e2.traverse(s6);
+    State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
+    State s4 = e1.traverse(s3);
+    State s5 = e0.traverse(s4);
 
-        assertNull(s0.getBackMode());
-        assertEquals(TraverseMode.WALK, s1.getBackMode());
-        assertEquals(TraverseMode.BICYCLE, s2.getBackMode());
-        assertEquals(TraverseMode.BICYCLE, s3.getBackMode());
+    assertEquals(104, s2.getElapsedTimeSeconds());
+    assertEquals(104, s5.getElapsedTimeSeconds());
+  }
 
-        assertNull(s4.getBackMode());
-        assertEquals(TraverseMode.WALK, s5.getBackMode());
-        assertEquals(TraverseMode.BICYCLE, s6.getBackMode());
-        assertEquals(TraverseMode.BICYCLE, s7.getBackMode());
+  /**
+   * Test the traversal of two edges with different traverse modes, with a focus on walking.
+   * This test will fail unless the following three conditions are met:
+   * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
+   * 2. Turn costs are computed such that bike walking is taken into account correctly.
+   * 3. Enabling bike mode on a routing request bases the bike walking speed on the walking speed.
+   */
+  @Test
+  public void testTraverseModeSwitchWalk() {
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
-        assertEquals(0, s0.getElapsedTimeSeconds());
-        assertEquals(0, s1.getElapsedTimeSeconds());
-        assertEquals(0, s2.getElapsedTimeSeconds());
-        assertEquals(0, s3.getElapsedTimeSeconds());
+    v1.trafficLight = true;
 
-        assertEquals(0.0, s0.getWeight(), 0.0);
-        assertEquals(0.0, s1.getWeight(), 0.0);
-        assertEquals(0.0, s2.getWeight(), 0.0);
-        assertEquals(0.0, s3.getWeight(), 0.0);
+    RoutingRequest forward = proto.clone();
+    forward.setMode(TraverseMode.BICYCLE);
 
-        assertEquals(0.0, s4.getWeight(), 0.0);
-        assertEquals(0.0, s5.getWeight(), 0.0);
-        assertEquals(23.0, s6.getWeight(), 0.0);
-        assertEquals(23.0, s7.getWeight(), 0.0);
+    State s0 = new State(new RoutingContext(forward, graph, v0, v2));
+    State s1 = e0.traverse(s0);
+    State s2 = e1.traverse(s1);
 
-        assertEquals(0, s4.getElapsedTimeSeconds());
-        assertEquals(0, s5.getElapsedTimeSeconds());
-        assertEquals(42, s6.getElapsedTimeSeconds());
-        assertEquals(42, s7.getElapsedTimeSeconds());
-    }
+    RoutingRequest reverse = proto.clone();
+    reverse.setMode(TraverseMode.BICYCLE);
+    reverse.setArriveBy(true);
 
-    @Test
-    public void testTurnRestriction() {
-        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
-        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
-        RoutingRequest routingRequest = proto.clone();
-        RoutingContext routingContext = new RoutingContext(routingRequest, graph, v0, v2);
-        State state = new State(v2, 0, routingRequest, routingContext);
+    State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
+    State s4 = e1.traverse(s3);
+    State s5 = e0.traverse(s4);
 
-        state.getOptions().setArriveBy(true);
-        e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
+    assertEquals(42, s2.getElapsedTimeSeconds());
+    assertEquals(42, s5.getElapsedTimeSeconds());
+  }
 
-        assertNotNull(e0.traverse(e1.traverse(state)));
-    }
+  /**
+   * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
+   */
+  @Test
+  public void testBikeSwitch() {
+    StreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
+    StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
-    @Test
-    public void testElevationProfile() {
-        var elevationProfile = new PackedCoordinateSequence.Double(new double[]{0, 10, 50, 12}, 2, 0);
-        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL, elevationProfile);
+    RoutingRequest noPenalty = proto.clone();
+    noPenalty.bikeSwitchTime = 0;
+    noPenalty.bikeSwitchCost = 0;
+    noPenalty.setMode(TraverseMode.BICYCLE);
 
-        assertArrayEquals(elevationProfile.toCoordinateArray(), e0.getElevationProfile().toCoordinateArray());
-    }
+    State s0 = new State(new RoutingContext(noPenalty, graph, v0, v0));
+    State s1 = e0.traverse(s0);
+    State s2 = e1.traverse(s1);
+    State s3 = e2.traverse(s2);
 
-    /****
-     * Private Methods
-     ****/
+    RoutingRequest withPenalty = proto.clone();
+    withPenalty.bikeSwitchTime = 42;
+    withPenalty.bikeSwitchCost = 23;
+    withPenalty.setMode(TraverseMode.BICYCLE);
 
-    private IntersectionVertex vertex(String label, double x, double y) {
-        return new IntersectionVertex(graph, label, x, y);
-    }
+    State s4 = new State(new RoutingContext(withPenalty, graph, v0, v0));
+    State s5 = e0.traverse(s4);
+    State s6 = e1.traverse(s5);
+    State s7 = e2.traverse(s6);
 
-    /**
-     * Create an edge. If twoWay, create two edges (back and forth).
-     * 
-     * @param vA
-     * @param vB
-     * @param length
-     */
-    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
-            StreetTraversalPermission perm) {
-        String labelA = vA.getLabel();
-        String labelB = vB.getLabel();
-        String name = String.format("%s_%s", labelA, labelB);
-        Coordinate[] coords = new Coordinate[2];
-        coords[0] = vA.getCoordinate();
-        coords[1] = vB.getCoordinate();
-        LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+    assertNull(s0.getBackMode());
+    assertEquals(TraverseMode.WALK, s1.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s2.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s3.getBackMode());
 
-        return new StreetEdge(vA, vB, geom, name, length, perm, false);
-    }
+    assertNull(s4.getBackMode());
+    assertEquals(TraverseMode.WALK, s5.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s6.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s7.getBackMode());
 
-    private StreetEdge edge(
-            StreetVertex vA,
-            StreetVertex vB,
-            double length,
-            StreetTraversalPermission perm,
-            PackedCoordinateSequence elevationProfile
-    ) {
-        String labelA = vA.getLabel();
-        String labelB = vB.getLabel();
-        String name = String.format("%s_%s", labelA, labelB);
-        Coordinate[] coords = new Coordinate[2];
-        coords[0] = vA.getCoordinate();
-        coords[1] = vB.getCoordinate();
-        LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+    assertEquals(0, s0.getElapsedTimeSeconds());
+    assertEquals(0, s1.getElapsedTimeSeconds());
+    assertEquals(0, s2.getElapsedTimeSeconds());
+    assertEquals(0, s3.getElapsedTimeSeconds());
 
-        var edge = new StreetEdge(vA, vB, geom, name, length, perm, false);
-        StreetElevationExtension.addToEdge(edge, elevationProfile, false);
-        return edge;
-    }
+    assertEquals(0.0, s0.getWeight(), 0.0);
+    assertEquals(0.0, s1.getWeight(), 0.0);
+    assertEquals(0.0, s2.getWeight(), 0.0);
+    assertEquals(0.0, s3.getWeight(), 0.0);
+
+    assertEquals(0.0, s4.getWeight(), 0.0);
+    assertEquals(0.0, s5.getWeight(), 0.0);
+    assertEquals(23.0, s6.getWeight(), 0.0);
+    assertEquals(23.0, s7.getWeight(), 0.0);
+
+    assertEquals(0, s4.getElapsedTimeSeconds());
+    assertEquals(0, s5.getElapsedTimeSeconds());
+    assertEquals(42, s6.getElapsedTimeSeconds());
+    assertEquals(42, s7.getElapsedTimeSeconds());
+  }
+
+  @Test
+  public void testTurnRestriction() {
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
+    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
+    RoutingRequest routingRequest = proto.clone();
+    RoutingContext routingContext = new RoutingContext(routingRequest, graph, v0, v2);
+    State state = new State(v2, 0, routingRequest, routingContext);
+
+    state.getOptions().setArriveBy(true);
+    e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
+
+    assertNotNull(e0.traverse(e1.traverse(state)));
+  }
+
+  @Test
+  public void testElevationProfile() {
+    var elevationProfile = new PackedCoordinateSequence.Double(
+      new double[] { 0, 10, 50, 12 },
+      2,
+      0
+    );
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL, elevationProfile);
+
+    assertArrayEquals(
+      elevationProfile.toCoordinateArray(),
+      e0.getElevationProfile().toCoordinateArray()
+    );
+  }
+
+  /****
+   * Private Methods
+   ****/
+
+  private IntersectionVertex vertex(String label, double x, double y) {
+    return new IntersectionVertex(graph, label, x, y);
+  }
+
+  /**
+   * Create an edge. If twoWay, create two edges (back and forth).
+   *
+   * @param vA
+   * @param vB
+   * @param length
+   */
+  private StreetEdge edge(
+    StreetVertex vA,
+    StreetVertex vB,
+    double length,
+    StreetTraversalPermission perm
+  ) {
+    String labelA = vA.getLabel();
+    String labelB = vB.getLabel();
+    String name = String.format("%s_%s", labelA, labelB);
+    Coordinate[] coords = new Coordinate[2];
+    coords[0] = vA.getCoordinate();
+    coords[1] = vB.getCoordinate();
+    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+    return new StreetEdge(vA, vB, geom, name, length, perm, false);
+  }
+
+  private StreetEdge edge(
+    StreetVertex vA,
+    StreetVertex vB,
+    double length,
+    StreetTraversalPermission perm,
+    PackedCoordinateSequence elevationProfile
+  ) {
+    String labelA = vA.getLabel();
+    String labelB = vB.getLabel();
+    String name = String.format("%s_%s", labelA, labelB);
+    Coordinate[] coords = new Coordinate[2];
+    coords[0] = vA.getCoordinate();
+    coords[1] = vB.getCoordinate();
+    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+    var edge = new StreetEdge(vA, vB, geom, name, length, perm, false);
+    StreetElevationExtension.addToEdge(edge, elevationProfile, false);
+    return edge;
+  }
 }

@@ -13,43 +13,42 @@ import org.opentripplanner.routing.graph.Vertex;
  * @author andrewbyrd
  */
 public interface DataImportIssue {
+  /**
+   * The issue report is grouped by type name.
+   */
+  default String getType() {
+    return getClass().getSimpleName();
+  }
 
-    /**
-     * The issue report is grouped by type name.
-     */
-    default String getType() {
-        return getClass().getSimpleName();
-    }
+  /**
+   * Provide a detailed message, including enough data to be able to fix the problem (in the
+   * source system).
+   */
+  String getMessage();
 
-    /**
-     * Provide a detailed message, including enough data to be able to fix the problem (in the
-     * source system).
-     */
-    String getMessage();
+  /**
+   *  This method is used by the HTML report builder. It is useful to put links to
+   *  OSM here.
+   */
+  default String getHTMLMessage() {
+    return this.getMessage();
+  }
 
-    /**
-     *  This method is used by the HTML report builder. It is useful to put links to
-     *  OSM here.
-     */
-    default String getHTMLMessage() {
-        return this.getMessage();
-    }
+  /**
+   * @deprecated This is used in the {@link org.opentripplanner.visualizer.ShowGraph} only,
+   * which status is unclear. Is anyone still using it?
+   */
+  @Deprecated
+  default Edge getReferencedEdge() {
+    return null;
+  }
 
-    /**
-     * @deprecated This is used in the {@link org.opentripplanner.visualizer.ShowGraph} only,
-     * which status is unclear. Is anyone still using it?
-     */
-    @Deprecated
-    default Edge getReferencedEdge() {
-        return null;
-    }
-
-    /**
-     * @deprecated This is used in the {@link org.opentripplanner.visualizer.ShowGraph} only,
-     * which status is unclear. Is anyone still using it?
-     */
-    @Deprecated
-    default Vertex getReferencedVertex() {
-        return null;
-    }
+  /**
+   * @deprecated This is used in the {@link org.opentripplanner.visualizer.ShowGraph} only,
+   * which status is unclear. Is anyone still using it?
+   */
+  @Deprecated
+  default Vertex getReferencedVertex() {
+    return null;
+  }
 }

@@ -13,55 +13,53 @@ import org.rutebanken.netex.model.Authority;
  */
 class AuthorityToAgencyMapper {
 
-    private final FeedScopedIdFactory idFactory;
-    private final String timeZone;
+  private final FeedScopedIdFactory idFactory;
+  private final String timeZone;
 
-    /**
-     * This id is used to generate a "dummy" authority when the input data is not associated with an
-     * authority. The OTP Model requires an agency to exist, while Netex do not.
-     */
-    private final String dummyAgencyId;
+  /**
+   * This id is used to generate a "dummy" authority when the input data is not associated with an
+   * authority. The OTP Model requires an agency to exist, while Netex do not.
+   */
+  private final String dummyAgencyId;
 
+  AuthorityToAgencyMapper(FeedScopedIdFactory idFactory, String timeZone) {
+    this.idFactory = idFactory;
+    this.timeZone = timeZone;
+    this.dummyAgencyId = "Dummy-" + timeZone;
+  }
 
-    AuthorityToAgencyMapper(FeedScopedIdFactory idFactory, String timeZone) {
-        this.idFactory = idFactory;
-        this.timeZone = timeZone;
-        this.dummyAgencyId = "Dummy-" + timeZone;
-    }
+  /**
+   * Map authority and time zone to OTP agency.
+   */
+  Agency mapAuthorityToAgency(Authority source) {
+    Agency target = new Agency(
+      idFactory.createId(source.getId()),
+      source.getName().getValue(),
+      timeZone
+    );
 
-    /**
-     * Map authority and time zone to OTP agency.
-     */
-    Agency mapAuthorityToAgency(Authority source){
-        Agency target = new Agency(
-            idFactory.createId(source.getId()),
-            source.getName().getValue(),
-            timeZone
-        );
+    withOptional(
+      source.getContactDetails(),
+      c -> {
+        target.setUrl(c.getUrl());
+        target.setPhone(c.getPhone());
+      }
+    );
+    return target;
+  }
 
-        withOptional(source.getContactDetails(), c -> {
-            target.setUrl(c.getUrl());
-            target.setPhone(c.getPhone());
-        });
-        return target;
-    }
+  /**
+   * Create a new dummy agency with time zone set. All other values are set to
+   * "N/A" and id set to {@code "Dummy-" + timeZone}.
+   */
+  Agency createDummyAgency() {
+    Agency agency = new Agency(idFactory.createId(dummyAgencyId), "N/A", timeZone);
+    agency.setUrl("N/A");
+    agency.setPhone("N/A");
+    return agency;
+  }
 
-    /**
-     * Create a new dummy agency with time zone set. All other values are set to
-     * "N/A" and id set to {@code "Dummy-" + timeZone}.
-     */
-    Agency createDummyAgency(){
-        Agency agency = new Agency(
-            idFactory.createId(dummyAgencyId),
-            "N/A",
-            timeZone
-        );
-        agency.setUrl("N/A");
-        agency.setPhone("N/A");
-        return agency;
-    }
-
-    String dummyAgencyId() {
-       return dummyAgencyId;
-    }
+  String dummyAgencyId() {
+    return dummyAgencyId;
+  }
 }

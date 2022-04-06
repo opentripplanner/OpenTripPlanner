@@ -13,10 +13,11 @@ import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
  * using {@link RaptorTestConstants#stopIndexToName(int)}.
  */
 public class PathUtils {
+
   private static final RaptorTestConstants TRANSLATOR = new RaptorTestConstants() {};
 
   /** Util class, private constructor */
-  private PathUtils() { }
+  private PathUtils() {}
 
   public static String pathsToString(RaptorResponse<?> response) {
     return pathsToString(response.paths());
@@ -30,20 +31,16 @@ public class PathUtils {
     return pathsToString(response.paths(), p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
   }
 
-  public static String join(String ... paths) {
+  public static String join(String... paths) {
     return String.join("\n", paths);
   }
-
 
   /* private methods */
 
   private static String pathsToString(
-          Collection<? extends Path<?>> paths,
-          Function<Path<?>, String> mapToStr
+    Collection<? extends Path<?>> paths,
+    Function<Path<?>, String> mapToStr
   ) {
-    return paths.stream()
-            .sorted()
-            .map(mapToStr)
-            .collect(Collectors.joining("\n"));
+    return paths.stream().sorted().map(mapToStr).collect(Collectors.joining("\n"));
   }
 }

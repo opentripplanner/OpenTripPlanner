@@ -3,118 +3,118 @@ package org.opentripplanner.model;
 
 public final class Pathway extends TransitEntity {
 
-    private static final long serialVersionUID = -2404871423254094109L;
+  private static final long serialVersionUID = -2404871423254094109L;
 
-    private int pathwayMode;
+  private int pathwayMode;
 
-    private StationElement fromStop;
+  private StationElement fromStop;
 
-    private StationElement toStop;
+  private StationElement toStop;
 
-    private String name;
+  private String name;
 
-    private String reversedName;
+  private String reversedName;
 
-    private int traversalTime;
+  private int traversalTime;
 
-    private double length;
+  private double length;
 
-    private int stairCount;
+  private int stairCount;
 
-    private double slope;
+  private double slope;
 
-    private boolean isBidirectional;
+  private boolean isBidirectional;
 
-    public Pathway(FeedScopedId id) {
-        super(id);
-    }
+  public Pathway(FeedScopedId id) {
+    super(id);
+  }
 
-    public void setPathwayMode(int pathwayMode) {
-        this.pathwayMode = pathwayMode;
-    }
+  public void setPathwayMode(int pathwayMode) {
+    this.pathwayMode = pathwayMode;
+  }
 
-    public int getPathwayMode() {
-        return pathwayMode;
-    }
+  public int getPathwayMode() {
+    return pathwayMode;
+  }
 
-    public void setFromStop(StationElement fromStop) {
-        this.fromStop = fromStop;
-    }
+  public void setFromStop(StationElement fromStop) {
+    this.fromStop = fromStop;
+  }
 
-    public StationElement getFromStop() {
-        return fromStop;
-    }
+  public StationElement getFromStop() {
+    return fromStop;
+  }
 
-    public void setToStop(StationElement toStop) {
-        this.toStop = toStop;
-    }
+  public void setToStop(StationElement toStop) {
+    this.toStop = toStop;
+  }
 
-    public StationElement getToStop() {
-        return toStop;
-    }
+  public StationElement getToStop() {
+    return toStop;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getReversedName() {
-        return reversedName;
-    }
+  public String getReversedName() {
+    return reversedName;
+  }
 
-    public void setReversedName(String reversedName) {
-        this.reversedName = reversedName;
-    }
+  public void setReversedName(String reversedName) {
+    this.reversedName = reversedName;
+  }
 
-    public void setTraversalTime(int traversalTime) {
-        this.traversalTime = traversalTime;
-    }
+  public void setTraversalTime(int traversalTime) {
+    this.traversalTime = traversalTime;
+  }
 
-    public int getTraversalTime() {
-        return traversalTime;
-    }
+  public int getTraversalTime() {
+    return traversalTime;
+  }
 
-    public double getLength() {
-        return length;
-    }
+  public double getLength() {
+    return length;
+  }
 
-    public void setLength(double length) {
-        this.length = length;
-    }
+  public void setLength(double length) {
+    this.length = length;
+  }
 
-    public boolean isBidirectional() {
-        return isBidirectional;
-    }
+  public boolean isBidirectional() {
+    return isBidirectional;
+  }
 
-    public void setBidirectional(boolean bidirectional) {
-        isBidirectional = bidirectional;
-    }
+  public void setBidirectional(boolean bidirectional) {
+    isBidirectional = bidirectional;
+  }
 
-    public int getStairCount() {
-        return stairCount;
-    }
+  public int getStairCount() {
+    return stairCount;
+  }
 
-    public void setStairCount(int stairCount) {
-        this.stairCount = stairCount;
-    }
+  public void setStairCount(int stairCount) {
+    this.stairCount = stairCount;
+  }
 
-    public double getSlope() {
-        return slope;
-    }
+  public double getSlope() {
+    return slope;
+  }
 
-    public void setSlope(double slope) {
-        this.slope = slope;
-    }
+  public void setSlope(double slope) {
+    this.slope = slope;
+  }
 
-    @Override
-    public String toString() {
-        return "<Pathway " + getId() + ">";
-    }
+  @Override
+  public String toString() {
+    return "<Pathway " + getId() + ">";
+  }
 
-    public boolean isPathwayModeWheelchairAccessible() {
-        return getPathwayMode() != 2 && getPathwayMode() != 4;
-    }
+  public boolean isPathwayModeWheelchairAccessible() {
+    return getPathwayMode() != 2 && getPathwayMode() != 4;
+  }
 }

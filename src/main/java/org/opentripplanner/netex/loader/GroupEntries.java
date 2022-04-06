@@ -1,10 +1,9 @@
 package org.opentripplanner.netex.loader;
 
-import org.opentripplanner.datastore.DataSource;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.datastore.DataSource;
 
 /**
  * A named group of NeTEx file entries. The entries are grouped together
@@ -12,31 +11,32 @@ import java.util.List;
  * entries.
  */
 public class GroupEntries {
-    private final String name;
-    private final List<DataSource> sharedEntries = new ArrayList<>();
-    private final List<DataSource> entries = new ArrayList<>();
 
-    GroupEntries(String name) {
-        this.name = name;
-    }
+  private final String name;
+  private final List<DataSource> sharedEntries = new ArrayList<>();
+  private final List<DataSource> entries = new ArrayList<>();
 
-    public String name() {
-        return name;
-    }
+  GroupEntries(String name) {
+    this.name = name;
+  }
 
-    void addSharedEntry(DataSource entry) {
-        sharedEntries.add(entry);
-    }
+  public String name() {
+    return name;
+  }
 
-    public Collection<DataSource> sharedEntries() {
-        return sharedEntries;
-    }
+  void addSharedEntry(DataSource entry) {
+    sharedEntries.add(entry);
+  }
 
-    void addIndependentEntries(DataSource entry) {
-        entries.add(entry);
-    }
+  public Collection<DataSource> sharedEntries() {
+    return sharedEntries;
+  }
 
-    public Collection<DataSource> independentEntries() {
-        return entries;
-    }
+  void addIndependentEntries(DataSource entry) {
+    entries.add(entry);
+  }
+
+  public Collection<DataSource> independentEntries() {
+    return entries;
+  }
 }

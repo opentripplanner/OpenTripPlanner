@@ -34,20 +34,19 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  */
 public class InstanceCountingClassResolver extends DefaultClassResolver {
 
-    private final TObjectIntMap<Class<?>> instanceCounts = new TObjectIntHashMap<>();
+  private final TObjectIntMap<Class<?>> instanceCounts = new TObjectIntHashMap<>();
 
-    public Registration getRegistration(Class type) {
-        instanceCounts.adjustOrPutValue(type, 1, 1);
-        return super.getRegistration(type);
-    }
+  public Registration getRegistration(Class type) {
+    instanceCounts.adjustOrPutValue(type, 1, 1);
+    return super.getRegistration(type);
+  }
 
-    public void summarize() {
-        instanceCounts.forEachEntry((classe, count) -> {
-            Registration registration = getRegistration(classe);
-            String serializerName = registration.getSerializer().getClass().getSimpleName();
-            System.out.println(count + " " + classe.getSimpleName() + " " + serializerName);
-            return true;
-        });
-    }
-
+  public void summarize() {
+    instanceCounts.forEachEntry((classe, count) -> {
+      Registration registration = getRegistration(classe);
+      String serializerName = registration.getSerializer().getClass().getSimpleName();
+      System.out.println(count + " " + classe.getSimpleName() + " " + serializerName);
+      return true;
+    });
+  }
 }

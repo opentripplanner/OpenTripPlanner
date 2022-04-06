@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 /**
  * A vertex for a vehicle rental station.
@@ -14,21 +14,27 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public class VehicleRentalStationVertex extends Vertex {
 
-    private static final long serialVersionUID = 2L;
+  private static final long serialVersionUID = 2L;
 
-    private VehicleRentalPlace station;
+  private VehicleRentalPlace station;
 
-    public VehicleRentalStationVertex(Graph g, VehicleRentalPlace station) {
-        //FIXME: raw_name can be null if bike station is made from graph updater
-        super(g, "vehicle rental station " + station.getId(), station.getLongitude(), station.getLatitude(), station.getName());
-        this.station = station;
-    }
+  public VehicleRentalStationVertex(Graph g, VehicleRentalPlace station) {
+    //FIXME: raw_name can be null if bike station is made from graph updater
+    super(
+      g,
+      "vehicle rental station " + station.getId(),
+      station.getLongitude(),
+      station.getLatitude(),
+      station.getName()
+    );
+    this.station = station;
+  }
 
-    public VehicleRentalPlace getStation() {
-        return station;
-    }
+  public VehicleRentalPlace getStation() {
+    return station;
+  }
 
-    public void setStation(VehicleRentalPlace station) {
-        this.station = station;
-    }
+  public void setStation(VehicleRentalPlace station) {
+    this.station = station;
+  }
 }
