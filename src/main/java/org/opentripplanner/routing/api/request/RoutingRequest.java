@@ -802,7 +802,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setAccessibility(boolean wheelchair) {
-        this.accessibilityRequest = WheelchairAccessibilityRequest.makeDefault(wheelchair);
+        this.accessibilityRequest = this.accessibilityRequest.withEnabled(wheelchair);
     }
 
     public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {

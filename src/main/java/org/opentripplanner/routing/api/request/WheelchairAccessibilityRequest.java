@@ -17,4 +17,12 @@ public record WheelchairAccessibilityRequest(
     public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {
         return new WheelchairAccessibilityRequest(enabled, DEFAULTS.trips, DEFAULTS.stops);
     }
+
+    public WheelchairAccessibilityRequest withEnabled(boolean enabled) {
+        return new WheelchairAccessibilityRequest(
+                enabled,
+                this.trips,
+                this.stops
+        );
+    }
 }
