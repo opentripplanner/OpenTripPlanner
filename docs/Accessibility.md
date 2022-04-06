@@ -55,8 +55,13 @@ Those costs can be configured as follows in `router-config.json`:
       "trips": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
-        "inaccessibleCost": 600
+        "inaccessibleCost": 3600
       },
+      "stops": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 600,
+        "inaccessibleCost": 3600
+      }
     }
   },
   "updaters": []

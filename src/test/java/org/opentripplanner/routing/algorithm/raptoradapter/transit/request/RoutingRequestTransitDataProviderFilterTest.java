@@ -24,7 +24,6 @@ import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;

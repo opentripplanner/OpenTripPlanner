@@ -1,10 +1,14 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest.DEFAULTS;
+
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,10 +104,8 @@ public class RoutingRequestMapper {
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
 
-        boolean wheelchairAccessible = c.asBoolean("wheelchair",
-                dft.accessibilityRequest.enabled()
-        );
-        request.setAccessibility(wheelchairAccessible);
+        request.accessibilityRequest = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
+
 
         mapTransferOptimization(
             (TransferOptimizationRequest)request.transferOptimization,
@@ -113,6 +115,29 @@ public class RoutingRequestMapper {
         request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
 
         return request;
+    }
+
+    private static WheelchairAccessibilityRequest mapAccessibilityRequest(NodeAdapter a) {
+
+        var trips = mapAccessibilityFeature(a.path("trips"), DEFAULTS.trips());
+        var stops = mapAccessibilityFeature(a.path("stops"), DEFAULTS.stops());
+
+        return new WheelchairAccessibilityRequest(
+                a.asBoolean("enabled", DEFAULTS.enabled()),
+                trips,
+                stops
+        );
+    }
+
+    private static WheelchairAccessibilityFeature mapAccessibilityFeature(
+            NodeAdapter trips,
+            WheelchairAccessibilityFeature deflt
+    ) {
+        return new WheelchairAccessibilityFeature(
+                trips.asBoolean("onlyConsiderAccessible", deflt.onlyConsiderAccessible()),
+                trips.asInt("unknownCost", deflt.unknownCost()),
+                trips.asInt("inaccessibleCost", deflt.inaccessibleCost())
+        );
     }
 
     private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {
