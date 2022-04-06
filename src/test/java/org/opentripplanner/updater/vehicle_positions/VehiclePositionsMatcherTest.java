@@ -24,200 +24,185 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class VehiclePositionsMatcherTest {
 
-    ZoneId zoneId = ZoneId.of("Europe/Berlin");
-    String feedId = "feed1";
-    String tripId = "trip1";
-    FeedScopedId scopedTripId = new FeedScopedId(feedId, tripId);
+  ZoneId zoneId = ZoneId.of("Europe/Berlin");
+  String feedId = "feed1";
+  String tripId = "trip1";
+  FeedScopedId scopedTripId = new FeedScopedId(feedId, tripId);
 
-    @Test
-    public void matchRealtimePositionsToTrip() {
-        var pos = vehiclePosition(tripId);
-        testVehiclePositions(pos);
-    }
+  @Test
+  public void matchRealtimePositionsToTrip() {
+    var pos = vehiclePosition(tripId);
+    testVehiclePositions(pos);
+  }
 
-    @Test
-    @DisplayName("If the vehicle position has no start_date we need to guess the service day")
-    public void inferStartDate() {
+  @Test
+  @DisplayName("If the vehicle position has no start_date we need to guess the service day")
+  public void inferStartDate() {
+    var posWithoutServiceDate = VehiclePosition
+      .newBuilder()
+      .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
+      .setStopId("stop-1")
+      .build();
+    testVehiclePositions(posWithoutServiceDate);
+  }
 
-        var posWithoutServiceDate = VehiclePosition.newBuilder()
-                .setTrip(TripDescriptor.newBuilder()
-                        .setTripId(tripId)
-                        .build())
-                .setStopId("stop-1")
-                .build();
-        testVehiclePositions(posWithoutServiceDate);
-    }
+  private void testVehiclePositions(VehiclePosition pos) {
+    var service = new RealtimeVehiclePositionService();
+    var trip = new Trip(scopedTripId);
+    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
+    var stopPattern = new StopPattern(stopTimes);
 
-    private void testVehiclePositions(VehiclePosition pos) {
-        var service = new RealtimeVehiclePositionService();
-        var trip = new Trip(scopedTripId);
-        var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
-        var stopPattern = new StopPattern(stopTimes);
+    var pattern = new TripPattern(new FeedScopedId(feedId, tripId), null, stopPattern);
+    pattern
+      .getScheduledTimetable()
+      .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
 
-        var pattern = new TripPattern(new FeedScopedId(feedId, tripId), null, stopPattern);
-        pattern.getScheduledTimetable()
-                .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
+    var tripForId = Map.of(scopedTripId, trip);
+    var patternForTrip = Map.of(trip, pattern);
 
-        var tripForId = Map.of(scopedTripId, trip);
-        var patternForTrip = Map.of(trip, pattern);
+    // an untouched pattern has no vehicle positions
+    assertEquals(0, service.getVehiclePositions(pattern).size());
 
-        // an untouched pattern has no vehicle positions
-        assertEquals(0, service.getVehiclePositions(pattern).size());
+    // Map positions to trips in feed
+    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+      feedId,
+      tripForId::get,
+      patternForTrip::get,
+      (id, time) -> patternForTrip.get(id),
+      service,
+      zoneId
+    );
 
-        // Map positions to trips in feed
-        VehiclePositionPatternMatcher matcher =
-                new VehiclePositionPatternMatcher(
-                        feedId,
-                        tripForId::get,
-                        patternForTrip::get,
-                        (id, time) -> patternForTrip.get(id),
-                        service,
-                        zoneId
-                );
+    var positions = List.of(pos);
 
-        var positions = List.of(pos);
+    // Execute the same match-to-pattern step as the runner
+    matcher.applyVehiclePositionUpdates(positions);
 
-        // Execute the same match-to-pattern step as the runner
-        matcher.applyVehiclePositionUpdates(positions);
+    // ensure that gtfs-rt was matched to an OTP pattern correctly
+    var vehiclePositions = service.getVehiclePositions(pattern);
+    assertEquals(1, vehiclePositions.size());
 
-        // ensure that gtfs-rt was matched to an OTP pattern correctly
-        var vehiclePositions = service.getVehiclePositions(pattern);
-        assertEquals(1, vehiclePositions.size());
+    assertEquals(tripId, vehiclePositions.get(0).trip().getId().getId());
 
-        assertEquals(tripId, vehiclePositions.get(0).trip().getId().getId());
+    // if we have an empty list of updates then clear the positions from the previous update
+    matcher.applyVehiclePositionUpdates(List.of());
+    assertEquals(0, service.getVehiclePositions(pattern).size());
+  }
 
-        // if we have an empty list of updates then clear the positions from the previous update
-        matcher.applyVehiclePositionUpdates(List.of());
-        assertEquals(0, service.getVehiclePositions(pattern).size());
-    }
+  @Test
+  public void clearOldTrips() {
+    var service = new RealtimeVehiclePositionService();
 
-    @Test
-    public void clearOldTrips() {
+    var tripId1 = "trip1";
+    var tripId2 = "trip2";
+    var scopedTripId1 = new FeedScopedId(feedId, tripId1);
+    var scopedTripId2 = new FeedScopedId(feedId, tripId2);
 
-        var service = new RealtimeVehiclePositionService();
+    var trip1 = new Trip(scopedTripId1);
+    var trip2 = new Trip(scopedTripId2);
 
-        var tripId1 = "trip1";
-        var tripId2 = "trip2";
-        var scopedTripId1 = new FeedScopedId(feedId, tripId1);
-        var scopedTripId2 = new FeedScopedId(feedId, tripId2);
+    var stopPattern1 = new StopPattern(
+      List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2))
+    );
 
-        var trip1 = new Trip(scopedTripId1);
-        var trip2 = new Trip(scopedTripId2);
+    var stopPattern2 = new StopPattern(
+      List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2))
+    );
 
-        var stopPattern1 =
-                new StopPattern(
-                        List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2)));
+    var pattern1 = new TripPattern(new FeedScopedId(feedId, tripId1), null, stopPattern1);
+    var pattern2 = new TripPattern(new FeedScopedId(feedId, tripId2), null, stopPattern2);
 
-        var stopPattern2 =
-                new StopPattern(
-                        List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2)));
+    var tripForId = Map.of(scopedTripId1, trip1, scopedTripId2, trip2);
 
-        var pattern1 = new TripPattern(new FeedScopedId(feedId, tripId1), null, stopPattern1);
-        var pattern2 = new TripPattern(new FeedScopedId(feedId, tripId2), null, stopPattern2);
+    var patternForTrip = Map.of(trip1, pattern1, trip2, pattern2);
 
-        var tripForId = Map.of(
-                scopedTripId1, trip1,
-                scopedTripId2, trip2
-        );
+    // an untouched pattern has no vehicle positions
+    assertEquals(0, service.getVehiclePositions(pattern1).size());
 
-        var patternForTrip = Map.of(
-                trip1, pattern1,
-                trip2, pattern2
-        );
+    // Map positions to trips in feed
+    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+      feedId,
+      tripForId::get,
+      patternForTrip::get,
+      (id, time) -> patternForTrip.get(id),
+      service,
+      zoneId
+    );
 
-        // an untouched pattern has no vehicle positions
-        assertEquals(0, service.getVehiclePositions(pattern1).size());
+    var pos1 = vehiclePosition(tripId1);
 
-        // Map positions to trips in feed
-        VehiclePositionPatternMatcher matcher =
-                new VehiclePositionPatternMatcher(
-                        feedId,
-                        tripForId::get,
-                        patternForTrip::get,
-                        (id, time) -> patternForTrip.get(id),
-                        service,
-                        zoneId
-                );
+    var pos2 = vehiclePosition(tripId2);
 
-        var pos1 = vehiclePosition(tripId1);
+    var positions = List.of(pos1, pos2);
 
-        var pos2 = vehiclePosition(tripId2);
+    // Execute the same match-to-pattern step as the runner
+    matcher.applyVehiclePositionUpdates(positions);
 
-        var positions = List.of(pos1, pos2);
+    // ensure that gtfs-rt was matched to an OTP pattern correctly
+    assertEquals(1, service.getVehiclePositions(pattern1).size());
+    assertEquals(1, service.getVehiclePositions(pattern2).size());
 
-        // Execute the same match-to-pattern step as the runner
-        matcher.applyVehiclePositionUpdates(positions);
+    matcher.applyVehiclePositionUpdates(List.of(pos1));
+    assertEquals(1, service.getVehiclePositions(pattern1).size());
+    // because there are no more updates for pattern2 we remove all positions
+    assertEquals(0, service.getVehiclePositions(pattern2).size());
+  }
 
-        // ensure that gtfs-rt was matched to an OTP pattern correctly
-        assertEquals(1, service.getVehiclePositions(pattern1).size());
-        assertEquals(1, service.getVehiclePositions(pattern2).size());
+  @Test
+  void inferServiceDateAtMiddleOfDay() {
+    var trip = new Trip(scopedTripId);
+    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1));
 
-        matcher.applyVehiclePositionUpdates(List.of(pos1));
-        assertEquals(1, service.getVehiclePositions(pattern1).size());
-        // because there are no more updates for pattern2 we remove all positions
-        assertEquals(0, service.getVehiclePositions(pattern2).size());
-    }
+    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
-    @Test
-    void inferServiceDateAtMiddleOfDay() {
-        var trip = new Trip(scopedTripId);
-        var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1));
+    var time = OffsetDateTime.parse("2022-04-05T15:26:04+02:00").toInstant();
+    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
 
-        var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    assertEquals(LocalDate.parse("2022-04-05"), inferredDate);
+  }
 
-        var time = OffsetDateTime.parse("2022-04-05T15:26:04+02:00").toInstant();
-        var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+  @Test
+  void inferServiceDateCloseToMidnight() {
+    var trip = new Trip(scopedTripId);
 
-        assertEquals(LocalDate.parse("2022-04-05"), inferredDate);
-    }
+    var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
+    var fivePastMidnight = fiveToMidnight + (10 * 60);
+    var stopTimes = List.of(stopTime(trip, 0, fiveToMidnight), stopTime(trip, 1, fivePastMidnight));
 
-    @Test
-    void inferServiceDateCloseToMidnight() {
-        var trip = new Trip(scopedTripId);
+    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
-        var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
-        var fivePastMidnight = fiveToMidnight + (10 * 60);
-        var stopTimes =
-                List.of(stopTime(trip, 0, fiveToMidnight), stopTime(trip, 1, fivePastMidnight));
+    var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
 
-        var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
+    // yesterday
+    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
 
-        var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
+    assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
+  }
 
-        // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
-        // yesterday
-        var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+  private static VehiclePosition vehiclePosition(String tripId1) {
+    return VehiclePosition
+      .newBuilder()
+      .setTrip(TripDescriptor.newBuilder().setTripId(tripId1).setStartDate("20220314").build())
+      .setStopId("stop-1")
+      .build();
+  }
 
-        assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
-    }
+  private static StopTime stopTime(Trip trip, int seq, int time) {
+    var stopTime = stopTime(trip, seq);
+    stopTime.setArrivalTime(time);
+    stopTime.setDepartureTime(time);
+    return stopTime;
+  }
 
-    private static VehiclePosition vehiclePosition(String tripId1) {
-        return VehiclePosition.newBuilder()
-                .setTrip(TripDescriptor.newBuilder()
-                        .setTripId(tripId1)
-                        .setStartDate("20220314")
-                        .build())
-                .setStopId("stop-1")
-                .build();
-    }
+  private static StopTime stopTime(Trip trip, int seq) {
+    var stopTime = new StopTime();
+    stopTime.setTrip(trip);
+    stopTime.setStopSequence(seq);
 
+    var stop = Stop.stopForTest("stop-" + seq, 0, 0);
+    stopTime.setStop(stop);
 
-    private static StopTime stopTime(Trip trip, int seq, int time) {
-        var stopTime = stopTime(trip, seq);
-        stopTime.setArrivalTime(time);
-        stopTime.setDepartureTime(time);
-        return stopTime;
-    }
-
-    private static StopTime stopTime(Trip trip, int seq) {
-        var stopTime = new StopTime();
-        stopTime.setTrip(trip);
-        stopTime.setStopSequence(seq);
-
-        var stop = Stop.stopForTest("stop-" + seq, 0, 0);
-        stopTime.setStop(stop);
-
-        return stopTime;
-    }
-
+    return stopTime;
+  }
 }

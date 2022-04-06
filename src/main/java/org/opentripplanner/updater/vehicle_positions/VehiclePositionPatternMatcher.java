@@ -40,264 +40,262 @@ import org.slf4j.LoggerFactory;
  */
 public class VehiclePositionPatternMatcher {
 
-    private static final Logger LOG =
-            LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
 
-    private final String feedId;
-    private final RealtimeVehiclePositionService service;
-    private final ZoneId timeZoneId;
+  private final String feedId;
+  private final RealtimeVehiclePositionService service;
+  private final ZoneId timeZoneId;
 
-    private final Function<FeedScopedId, Trip> getTripForId;
-    private final Function<Trip, TripPattern> getStaticPattern;
-    private final BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern;
+  private final Function<FeedScopedId, Trip> getTripForId;
+  private final Function<Trip, TripPattern> getStaticPattern;
+  private final BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern;
 
-    private static final int MIDNIGHT_SECONDS = 60 * 60 * 24;
+  private static final int MIDNIGHT_SECONDS = 60 * 60 * 24;
 
-    private Set<TripPattern> patternsInPreviousUpdate = Set.of();
+  private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
-    public VehiclePositionPatternMatcher(
-            String feedId,
-            Function<FeedScopedId, Trip> getTripForId,
-            Function<Trip, TripPattern> getStaticPattern,
-            BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern,
-            RealtimeVehiclePositionService service,
-            ZoneId timeZoneId
-    ) {
-        this.feedId = feedId;
-        this.getTripForId = getTripForId;
-        this.getStaticPattern = getStaticPattern;
-        this.getRealtimePattern = getRealtimePattern;
-        this.service = service;
-        this.timeZoneId = timeZoneId;
+  public VehiclePositionPatternMatcher(
+    String feedId,
+    Function<FeedScopedId, Trip> getTripForId,
+    Function<Trip, TripPattern> getStaticPattern,
+    BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern,
+    RealtimeVehiclePositionService service,
+    ZoneId timeZoneId
+  ) {
+    this.feedId = feedId;
+    this.getTripForId = getTripForId;
+    this.getStaticPattern = getStaticPattern;
+    this.getRealtimePattern = getRealtimePattern;
+    this.service = service;
+    this.timeZoneId = timeZoneId;
+  }
+
+  /**
+   * Attempts to match each vehicle position to a pattern, then adds each to a pattern
+   *
+   * @param vehiclePositions List of vehicle positions to match to patterns
+   */
+  public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions) {
+    // we take the list of positions and out of them create a Map<TripPattern, List<VehiclePosition>>
+    // that map makes it very easy to update the positions in the service
+    // it also enables the bookkeeping about which pattern previously had positions but no longer do
+    // these need to be removed from the service as we assume that the vehicle has stopped
+    var positions = vehiclePositions
+      .stream()
+      .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
+      .filter(Objects::nonNull)
+      .collect(Collectors.groupingBy(t -> t.first))
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Entry::getKey,
+          e -> e.getValue().stream().map(t -> t.second).collect(Collectors.toList())
+        )
+      );
+
+    positions.forEach(service::setVehiclePositions);
+    Set<TripPattern> patternsInCurrentUpdate = positions.keySet();
+
+    // if there was a position in the previous update but not in the current one, we assume
+    // that the pattern has no more vehicle positions.
+    var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
+    toDelete.forEach(service::clearVehiclePositions);
+    patternsInPreviousUpdate = patternsInCurrentUpdate;
+
+    if (!vehiclePositions.isEmpty() && patternsInCurrentUpdate.isEmpty()) {
+      LOG.error(
+        "Could not match any vehicle positions for feedId '{}'. Are you sure that the updater is using the correct feedId?",
+        feedId
+      );
+    }
+  }
+
+  private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
+    String feedId,
+    VehiclePosition vehiclePosition
+  ) {
+    if (!vehiclePosition.hasTrip()) {
+      LOG.warn(
+        "Realtime vehicle positions {} has no trip ID. Ignoring.",
+        toString(vehiclePosition)
+      );
+      return null;
     }
 
-    /**
-     * Attempts to match each vehicle position to a pattern, then adds each to a pattern
-     *
-     * @param vehiclePositions List of vehicle positions to match to patterns
-     */
-    public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions) {
-
-        // we take the list of positions and out of them create a Map<TripPattern, List<VehiclePosition>>
-        // that map makes it very easy to update the positions in the service
-        // it also enables the bookkeeping about which pattern previously had positions but no longer do
-        // these need to be removed from the service as we assume that the vehicle has stopped
-        var positions = vehiclePositions.stream()
-                .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
-                .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(t -> t.first))
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Entry::getKey,
-                        e -> e.getValue().stream().map(t -> t.second).collect(Collectors.toList())
-                ));
-
-        positions.forEach(service::setVehiclePositions);
-        Set<TripPattern> patternsInCurrentUpdate = positions.keySet();
-
-        // if there was a position in the previous update but not in the current one, we assume
-        // that the pattern has no more vehicle positions.
-        var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
-        toDelete.forEach(service::clearVehiclePositions);
-        patternsInPreviousUpdate = patternsInCurrentUpdate;
-
-        if (!vehiclePositions.isEmpty() && patternsInCurrentUpdate.isEmpty()) {
-            LOG.error(
-                    "Could not match any vehicle positions for feedId '{}'. Are you sure that the updater is using the correct feedId?",
-                    feedId
-            );
-        }
+    var tripId = vehiclePosition.getTrip().getTripId();
+    var trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
+    if (trip == null) {
+      LOG.warn(
+        "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
+        feedId,
+        tripId
+      );
+      return null;
     }
 
-    private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
-            String feedId,
-            VehiclePosition vehiclePosition
-    ) {
-        if (!vehiclePosition.hasTrip()) {
-            LOG.warn(
-                    "Realtime vehicle positions {} has no trip ID. Ignoring.",
-                    toString(vehiclePosition)
-            );
-            return null;
-        }
+    var serviceDate = Optional
+      .of(vehiclePosition.getTrip().getStartDate())
+      .map(Strings::emptyToNull)
+      .flatMap(ServiceDate::parseStringToOptional)
+      .orElseGet(() -> inferServiceDate(trip));
 
-        var tripId = vehiclePosition.getTrip().getTripId();
-        var trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
-        if (trip == null) {
-            LOG.warn(
-                    "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
-                    feedId, tripId
-            );
-            return null;
-        }
+    var pattern = getRealtimePattern.apply(trip, serviceDate);
+    if (pattern == null) {
+      LOG.warn("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
+      return null;
+    }
 
-        var serviceDate =
-                Optional.of(vehiclePosition.getTrip().getStartDate())
-                        .map(Strings::emptyToNull)
-                        .flatMap(ServiceDate::parseStringToOptional)
-                        .orElseGet(() -> inferServiceDate(trip));
+    // Add position to pattern
+    var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), trip);
 
-        var pattern = getRealtimePattern.apply(trip, serviceDate);
-        if (pattern == null) {
-            LOG.warn(
-                    "Unable to match OTP pattern ID for vehicle position with trip ID {}",
-                    tripId
-            );
-            return null;
-        }
+    return new T2<>(pattern, newPosition);
+  }
 
-        // Add position to pattern
-        var newPosition = mapVehiclePosition(
-                vehiclePosition,
-                pattern.getStops(),
-                trip
+  private ServiceDate inferServiceDate(Trip trip) {
+    var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
+    return new ServiceDate(inferServiceDate(staticTripTimes, timeZoneId, Instant.now()));
+  }
+
+  /**
+   * When a vehicle position doesn't state the service date of its trip then we need to infer it.
+   * <p>
+   * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
+   */
+  protected static LocalDate inferServiceDate(
+    TripTimes staticTripTimes,
+    ZoneId timeZoneId,
+    Instant now
+  ) {
+    var start = staticTripTimes.getScheduledDepartureTime(0);
+    var today = now.atZone(timeZoneId).toLocalDate();
+    // if we have a trip that starts before 24:00 and finishes the next day, we have to figure out
+    // the correct service day
+    if (crossesMidnight(staticTripTimes)) {
+      var nowSeconds = LocalTime.ofInstant(now, timeZoneId).toSecondOfDay();
+      // when nowSeconds is less than the start we are already at the next day
+      // (because nowSeconds can never be greater than MIDNIGHT_SECONDS but stop times can)
+      // so we have to select yesterday as the service day
+      //
+      // there is an edge case here: if we receive a position before the trip has even started
+      // (according to the schedule) then we give it the wrong service day.
+      // since this an edge case (update before start) of an edge case (trip that crosses midnight),
+      // i will ignore this. if this is problematic then you should put the start_date in the
+      // vehicle position.
+      if (nowSeconds < start) {
+        return today.minusDays(1);
+      }
+      // if we are before midnight
+      else {
+        return today;
+      }
+    }
+    // if we have a trip that starts after midnight but is associated with the previous service
+    // day. the start time would be something like 25:10.
+    else if (start > MIDNIGHT_SECONDS) {
+      return today.minusDays(1);
+    }
+    // here is another edge case: if the trip finished at close to midnight but for some reason
+    // is still sending updates after midnight then we are guessing the wrong day.
+    // if this concerns you, then you should really put the start_date into your feed.
+    else {
+      return today;
+    }
+  }
+
+  /**
+   * If the trip times starts before 24:00 and finishes after 24:00. In other words if the
+   * calendar date changes when the trip runs.
+   */
+  private static boolean crossesMidnight(TripTimes tripTimes) {
+    var start = tripTimes.getScheduledDepartureTime(0);
+    var end = tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1);
+    return start < MIDNIGHT_SECONDS && end > MIDNIGHT_SECONDS;
+  }
+
+  /**
+   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used
+   * by the API.
+   */
+  private static RealtimeVehiclePosition mapVehiclePosition(
+    VehiclePosition vehiclePosition,
+    List<StopLocation> stopsOnVehicleTrip,
+    Trip trip
+  ) {
+    var newPosition = RealtimeVehiclePosition.builder();
+
+    if (vehiclePosition.hasPosition()) {
+      var position = vehiclePosition.getPosition();
+      newPosition.setCoordinates(
+        new WgsCoordinate(position.getLatitude(), position.getLongitude())
+      );
+
+      if (position.hasSpeed()) {
+        newPosition.setSpeed(position.getSpeed());
+      }
+      if (position.hasBearing()) {
+        newPosition.setHeading(position.getBearing());
+      }
+    }
+
+    if (vehiclePosition.hasVehicle()) {
+      var vehicle = vehiclePosition.getVehicle();
+      var id = new FeedScopedId(trip.getId().getFeedId(), vehicle.getId());
+      newPosition
+        .setVehicleId(id)
+        .setLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
+    }
+
+    if (vehiclePosition.hasTimestamp()) {
+      newPosition.setTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
+    }
+
+    if (vehiclePosition.hasCurrentStatus()) {
+      newPosition.setStopStatus(toModel(vehiclePosition.getCurrentStatus()));
+    }
+
+    // we prefer the to get the current stop from the stop_id
+    if (vehiclePosition.hasStopId()) {
+      var matchedStops = stopsOnVehicleTrip
+        .stream()
+        .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
+        .toList();
+      if (matchedStops.size() == 1) {
+        newPosition.setStop(matchedStops.get(0));
+      } else {
+        LOG.warn(
+          "Stop ID {} is not in trip {}. Not setting stopRelationship.",
+          vehiclePosition.getStopId(),
+          trip.getId()
         );
-
-        return new T2<>(pattern, newPosition);
+      }
+    }
+    // but if stop_id isn't there we try current_stop_sequence
+    else if (vehiclePosition.hasCurrentStopSequence()) {
+      var stop = stopsOnVehicleTrip.get(vehiclePosition.getCurrentStopSequence());
+      newPosition.setStop(stop);
     }
 
-    private ServiceDate inferServiceDate(Trip trip) {
-        var staticTripTimes =
-                getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
-        return new ServiceDate(inferServiceDate(staticTripTimes, timeZoneId, Instant.now()));
+    newPosition.setTrip(trip);
+
+    return newPosition.build();
+  }
+
+  private static StopStatus toModel(VehicleStopStatus currentStatus) {
+    return switch (currentStatus) {
+      case IN_TRANSIT_TO -> StopStatus.IN_TRANSIT_TO;
+      case INCOMING_AT -> StopStatus.INCOMING_AT;
+      case STOPPED_AT -> StopStatus.STOPPED_AT;
+    };
+  }
+
+  private static String toString(VehiclePosition vehiclePosition) {
+    String message;
+    try {
+      message = JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
+    } catch (InvalidProtocolBufferException ignored) {
+      message = vehiclePosition.toString();
     }
-
-    /**
-     * When a vehicle position doesn't state the service date of its trip then we need to infer it.
-     * <p>
-     * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
-     */
-    protected static LocalDate inferServiceDate(TripTimes staticTripTimes, ZoneId timeZoneId, Instant now) {
-        var start = staticTripTimes.getScheduledDepartureTime(0);
-        var today = now.atZone(timeZoneId).toLocalDate();
-        // if we have a trip that starts before 24:00 and finishes the next day, we have to figure out
-        // the correct service day
-        if (crossesMidnight(staticTripTimes)) {
-            var nowSeconds = LocalTime.ofInstant(now, timeZoneId).toSecondOfDay();
-            // when nowSeconds is less than the start we are already at the next day
-            // (because nowSeconds can never be greater than MIDNIGHT_SECONDS but stop times can)
-            // so we have to select yesterday as the service day
-            //
-            // there is an edge case here: if we receive a position before the trip has even started
-            // (according to the schedule) then we give it the wrong service day.
-            // since this an edge case (update before start) of an edge case (trip that crosses midnight),
-            // i will ignore this. if this is problematic then you should put the start_date in the
-            // vehicle position.
-            if (nowSeconds < start) {
-                return today.minusDays(1);
-            }
-            // if we are before midnight
-            else {
-                return today;
-            }
-        }
-        // if we have a trip that starts after midnight but is associated with the previous service
-        // day. the start time would be something like 25:10.
-        else if (start > MIDNIGHT_SECONDS) {
-            return today.minusDays(1);
-        }
-        // here is another edge case: if the trip finished at close to midnight but for some reason
-        // is still sending updates after midnight then we are guessing the wrong day.
-        // if this concerns you, then you should really put the start_date into your feed.
-        else {
-            return today;
-        }
-    }
-
-    /**
-     * If the trip times starts before 24:00 and finishes after 24:00. In other words if the
-     * calendar date changes when the trip runs.
-     */
-    private static boolean crossesMidnight(TripTimes tripTimes) {
-        var start = tripTimes.getScheduledDepartureTime(0);
-        var end = tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1);
-        return start < MIDNIGHT_SECONDS && end > MIDNIGHT_SECONDS;
-    }
-
-    /**
-     * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used
-     * by the API.
-     */
-    private static RealtimeVehiclePosition mapVehiclePosition(
-            VehiclePosition vehiclePosition,
-            List<StopLocation> stopsOnVehicleTrip,
-            Trip trip
-    ) {
-        var newPosition = RealtimeVehiclePosition.builder();
-
-        if (vehiclePosition.hasPosition()) {
-            var position = vehiclePosition.getPosition();
-            newPosition.setCoordinates(
-                    new WgsCoordinate(position.getLatitude(), position.getLongitude()));
-
-            if (position.hasSpeed()) {
-                newPosition.setSpeed(position.getSpeed());
-            }
-            if (position.hasBearing()) {
-                newPosition.setHeading(position.getBearing());
-            }
-        }
-
-        if (vehiclePosition.hasVehicle()) {
-            var vehicle = vehiclePosition.getVehicle();
-            var id = new FeedScopedId(trip.getId().getFeedId(), vehicle.getId());
-            newPosition.setVehicleId(id)
-                    .setLabel(Optional.ofNullable(vehicle.getLabel())
-                            .orElse(vehicle.getLicensePlate()));
-        }
-
-        if (vehiclePosition.hasTimestamp()) {
-            newPosition.setTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
-        }
-
-        if (vehiclePosition.hasCurrentStatus()) {
-            newPosition.setStopStatus(toModel(vehiclePosition.getCurrentStatus()));
-        }
-
-        // we prefer the to get the current stop from the stop_id
-        if (vehiclePosition.hasStopId()) {
-            var matchedStops = stopsOnVehicleTrip
-                    .stream()
-                    .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
-                    .toList();
-            if (matchedStops.size() == 1) {
-                newPosition.setStop(matchedStops.get(0));
-            }
-            else {
-                LOG.warn(
-                        "Stop ID {} is not in trip {}. Not setting stopRelationship.",
-                        vehiclePosition.getStopId(), trip.getId()
-                );
-            }
-        }
-        // but if stop_id isn't there we try current_stop_sequence
-        else if (vehiclePosition.hasCurrentStopSequence()) {
-            var stop = stopsOnVehicleTrip.get(vehiclePosition.getCurrentStopSequence());
-            newPosition.setStop(stop);
-        }
-
-        newPosition.setTrip(trip);
-
-        return newPosition.build();
-    }
-
-    private static StopStatus toModel(VehicleStopStatus currentStatus) {
-        return switch (currentStatus) {
-            case IN_TRANSIT_TO -> StopStatus.IN_TRANSIT_TO;
-            case INCOMING_AT -> StopStatus.INCOMING_AT;
-            case STOPPED_AT -> StopStatus.STOPPED_AT;
-        };
-    }
-
-    private static String toString(VehiclePosition vehiclePosition) {
-        String message;
-        try {
-            message = JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
-        }
-        catch (InvalidProtocolBufferException ignored) {
-            message = vehiclePosition.toString();
-        }
-        return message;
-    }
+    return message;
+  }
 }
