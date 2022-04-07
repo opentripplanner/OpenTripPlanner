@@ -800,19 +800,15 @@ public class TimetableHelper {
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
   public static Optional<PickDrop> mapDropOffType(PickDrop currentValue, ArrivalBoardingActivityEnumeration arrivalBoardingActivityEnumeration) {
-    switch (arrivalBoardingActivityEnumeration) {
-        case ALIGHTING:
-            if (currentValue.isNotRoutable()) {
-                return Optional.of(SCHEDULED);
-            }
-            return Optional.empty();
-        case NO_ALIGHTING:
-            return Optional.of(NONE);
-        case PASS_THRU:
-            return Optional.of(CANCELLED);
-        default:
-            return Optional.empty();
+    if (arrivalBoardingActivityEnumeration == null) {
+      return Optional.empty();
     }
+
+    return switch (arrivalBoardingActivityEnumeration) {
+      case ALIGHTING -> currentValue.isNotRoutable() ?  Optional.of(SCHEDULED) : Optional.empty();
+      case NO_ALIGHTING -> Optional.of(NONE);
+      case PASS_THRU -> Optional.of(CANCELLED);
+    };
   }
 
   /**
@@ -826,19 +822,15 @@ public class TimetableHelper {
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
   public static Optional<PickDrop> mapPickUpType(PickDrop currentValue, DepartureBoardingActivityEnumeration departureBoardingActivityEnumeration) {
-    switch (departureBoardingActivityEnumeration) {
-        case BOARDING:
-            if (currentValue.isNotRoutable()) {
-                return Optional.of(SCHEDULED);
-            }
-            return Optional.empty();
-        case NO_BOARDING:
-            return Optional.of(NONE);
-        case PASS_THRU:
-            return Optional.of(CANCELLED);
-        default:
-            return Optional.empty();
+    if (departureBoardingActivityEnumeration == null) {
+      return Optional.empty();
     }
+
+    return switch (departureBoardingActivityEnumeration) {
+      case BOARDING -> currentValue.isNotRoutable() ?  Optional.of(SCHEDULED) : Optional.empty();
+      case NO_BOARDING -> Optional.of(NONE);
+      case PASS_THRU -> Optional.of(CANCELLED);
+    };
   }
 
   /**
