@@ -9,8 +9,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * This is a Request builder to help construct valid requests. Se the
- * request classes for documentation on each parameter.
+ * This is a Request builder to help construct valid requests. Se the request classes for
+ * documentation on each parameter.
  * <p/>
  * <ul>
  *     <li>{@link RaptorRequest}
@@ -20,104 +20,102 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
-    // Search
-    private final SearchParamsBuilder<T> searchParams;
-    private SearchDirection searchDirection;
-    private RaptorSlackProvider slackProvider;
+
+  // Search
+  private final SearchParamsBuilder<T> searchParams;
+  private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
+  // Timer
+  private final Set<String> timingTags;
+  // Debug
+  private final DebugRequestBuilder debug;
+  private SearchDirection searchDirection;
+  private RaptorSlackProvider slackProvider;
+  // Algorithm
+  private RaptorProfile profile;
+
+  public RaptorRequestBuilder() {
+    this(RaptorRequest.defaults());
+  }
+
+  RaptorRequestBuilder(RaptorRequest<T> defaults) {
+    this.searchParams = new SearchParamsBuilder<>(this, defaults.searchParams());
+    this.searchDirection = defaults.searchDirection();
+    this.slackProvider = defaults.slackProvider();
 
     // Algorithm
-    private RaptorProfile profile;
-    private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
+    this.profile = defaults.profile();
+    this.optimizations.addAll(defaults.optimizations());
 
     // Timer
-    private final Set<String> timingTags;
+    timingTags = new HashSet<>(defaults.timingTags());
 
     // Debug
-    private final DebugRequestBuilder debug;
+    this.debug = new DebugRequestBuilder(defaults.debug());
+  }
 
-    public RaptorRequestBuilder() {
-        this(RaptorRequest.defaults());
-    }
+  public SearchParamsBuilder<T> searchParams() {
+    return searchParams;
+  }
 
-    RaptorRequestBuilder(RaptorRequest<T> defaults) {
-        this.searchParams = new SearchParamsBuilder<>(this, defaults.searchParams());
-        this.searchDirection = defaults.searchDirection();
-        this.slackProvider = defaults.slackProvider();
+  public RaptorProfile profile() {
+    return profile;
+  }
 
-        // Algorithm
-        this.profile = defaults.profile();
-        this.optimizations.addAll(defaults.optimizations());
+  public RaptorRequestBuilder<T> profile(RaptorProfile profile) {
+    this.profile = profile;
+    return this;
+  }
 
-        // Timer
-        timingTags = new HashSet<>(defaults.timingTags());
+  public SearchDirection searchDirection() {
+    return searchDirection;
+  }
 
-        // Debug
-        this.debug = new DebugRequestBuilder(defaults.debug());
-    }
+  public RaptorRequestBuilder<T> searchDirection(SearchDirection searchDirection) {
+    this.searchDirection = searchDirection;
+    return this;
+  }
 
-    public SearchParamsBuilder<T> searchParams() {
-        return searchParams;
-    }
+  public RaptorSlackProvider slackProvider() {
+    return slackProvider;
+  }
 
-    public RaptorProfile profile() {
-        return profile;
-    }
+  public void slackProvider(@NotNull RaptorSlackProvider slackProvider) {
+    this.slackProvider = slackProvider;
+  }
 
-    public RaptorRequestBuilder<T> profile(RaptorProfile profile) {
-        this.profile = profile;
-        return this;
-    }
+  public Collection<Optimization> optimizations() {
+    return optimizations;
+  }
 
-    public SearchDirection searchDirection() {
-        return searchDirection;
-    }
+  public RaptorRequestBuilder<T> enableOptimization(Optimization optimization) {
+    this.optimizations.add(optimization);
+    return this;
+  }
 
-    public RaptorRequestBuilder<T> searchDirection(SearchDirection searchDirection) {
-        this.searchDirection = searchDirection;
-        return this;
-    }
+  public RaptorRequestBuilder<T> clearOptimizations() {
+    this.optimizations.clear();
+    return this;
+  }
 
-    public RaptorSlackProvider slackProvider() {
-        return slackProvider;
-    }
+  public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
+    this.optimizations.remove(optimization);
+    return this;
+  }
 
-    public void slackProvider(@NotNull RaptorSlackProvider slackProvider) {
-        this.slackProvider = slackProvider;
-    }
+  public RaptorRequestBuilder<T> addTimingTags(Collection<String> tags) {
+    this.timingTags.addAll(tags);
+    return this;
+  }
 
-    public Collection<Optimization> optimizations() {
-        return optimizations;
-    }
+  public Set<String> timingTags() {
+    return timingTags;
+  }
 
-    public RaptorRequestBuilder<T> enableOptimization(Optimization optimization) {
-        this.optimizations.add(optimization);
-        return this;
-    }
+  public DebugRequestBuilder debug() {
+    return this.debug;
+  }
 
-    public RaptorRequestBuilder<T> clearOptimizations() {
-        this.optimizations.clear();
-        return this;
-    }
-
-    public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
-        this.optimizations.remove(optimization);
-        return this;
-    }
-
-    public RaptorRequestBuilder<T> addTimingTags(Collection<String> tags) {
-        this.timingTags.addAll(tags);
-        return this;
-    }
-
-    public Set<String> timingTags() {
-        return timingTags;
-    }
-
-    public DebugRequestBuilder debug() {
-        return this.debug;
-    }
-
-    public RaptorRequest<T> build() {
-        return new RaptorRequest<>(this);
-    }
+  public RaptorRequest<T> build() {
+    return new RaptorRequest<>(this);
+  }
 }

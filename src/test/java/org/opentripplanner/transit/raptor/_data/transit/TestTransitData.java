@@ -15,7 +15,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostPa
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -27,18 +26,26 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 @SuppressWarnings("UnusedReturnValue")
-public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
+public class TestTransitData
+  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
-  public static final TransferConstraint TX_GUARANTEED = TransferConstraint.create().guaranteed()
-          .build();
-  public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint.create().notAllowed()
-          .build();
-  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint.create().minTransferTime(3600)
-          .build();
+  public static final TransferConstraint TX_GUARANTEED = TransferConstraint
+    .create()
+    .guaranteed()
+    .build();
+  public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint
+    .create()
+    .notAllowed()
+    .build();
+  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint
+    .create()
+    .minTransferTime(3600)
+    .build();
 
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
@@ -81,10 +88,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
 
   @Override
   public CostCalculator multiCriteriaCostCalculator() {
-    return new DefaultCostCalculator(
-            costParamsBuilder.build(),
-            stopBoarAlightCost()
-    );
+    return new DefaultCostCalculator(costParamsBuilder.build(), stopBoarAlightCost());
   }
 
   @Override
@@ -93,21 +97,26 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
       @Nullable
       @Override
       public RaptorConstrainedTransfer findConstrainedTransfer(
-              TestTripSchedule fromTrip,
-              int fromStopPosition,
-              TestTripSchedule toTrip,
-              int toStopPosition
+        TestTripSchedule fromTrip,
+        int fromStopPosition,
+        TestTripSchedule toTrip,
+        int toStopPosition
       ) {
-        var list = routes.stream()
-                .flatMap(r -> r.listTransferConstraintsForwardSearch().stream())
-                .filter(tx -> tx.getSourceTrip().equals(fromTrip))
-                .filter(tx -> tx.getSourceStopPos() == fromStopPosition)
-                .filter(tx -> tx.getTrip().equals(toTrip))
-                .filter(tx -> tx.getStopPositionInPattern() == toStopPosition)
-                .collect(Collectors.toList());
+        var list = routes
+          .stream()
+          .flatMap(r -> r.listTransferConstraintsForwardSearch().stream())
+          .filter(tx -> tx.getSourceTrip().equals(fromTrip))
+          .filter(tx -> tx.getSourceStopPos() == fromStopPosition)
+          .filter(tx -> tx.getTrip().equals(toTrip))
+          .filter(tx -> tx.getStopPositionInPattern() == toStopPosition)
+          .collect(Collectors.toList());
 
-        if(list.isEmpty()) { return null; }
-        if(list.size() == 1) { return list.get(0); }
+        if (list.isEmpty()) {
+          return null;
+        }
+        if (list.size() == 1) {
+          return list.get(0);
+        }
         throw new IllegalStateException("More than on transfers found: " + list);
       }
     };
@@ -122,22 +131,23 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   @Override
   public int getValidTransitDataStartTime() {
     return this.routes.stream()
-        .mapToInt(route -> route.timetable().getTripSchedule(0).departure(0))
-        .min()
-        .getAsInt();
+      .mapToInt(route -> route.timetable().getTripSchedule(0).departure(0))
+      .min()
+      .getAsInt();
   }
 
   @Override
   public int getValidTransitDataEndTime() {
     return this.routes.stream()
-        .mapToInt(route -> {
-          RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
-          RaptorTripPattern pattern = route.pattern();
-          return timetable.getTripSchedule(timetable.numberOfTripSchedules() - 1)
-                  .departure(pattern.numberOfStopsInPattern() - 1);
-        })
-        .max()
-        .getAsInt();
+      .mapToInt(route -> {
+        RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
+        RaptorTripPattern pattern = route.pattern();
+        return timetable
+          .getTripSchedule(timetable.numberOfTripSchedules() - 1)
+          .departure(pattern.numberOfStopsInPattern() - 1);
+      })
+      .max()
+      .getAsInt();
   }
 
   public TestRoute getRoute(int index) {
@@ -147,23 +157,23 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request) {
     var debug = request.debug();
 
-    if(debug.stops().isEmpty()) {
+    if (debug.stops().isEmpty()) {
       debug.addStops(stopsVisited());
     }
     var logger = new SystemErrDebugLogger(true);
 
     debug
-        .stopArrivalListener(logger::stopArrivalLister)
-        .patternRideDebugListener(logger::patternRideLister)
-        .pathFilteringListener(logger::pathFilteringListener)
-        .logger(logger);
+      .stopArrivalListener(logger::stopArrivalLister)
+      .patternRideDebugListener(logger::patternRideLister)
+      .pathFilteringListener(logger::pathFilteringListener)
+      .logger(logger);
   }
 
   public TestTransitData withRoute(TestRoute route) {
     this.routes.add(route);
     int routeIndex = this.routes.indexOf(route);
     var pattern = route.pattern();
-    for(int i=0; i< pattern.numberOfStopsInPattern(); ++i) {
+    for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       expandNumOfStops(stopIndex);
       routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
@@ -171,7 +181,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     return this;
   }
 
-  public TestTransitData withRoutes(TestRoute ... routes) {
+  public TestTransitData withRoutes(TestRoute... routes) {
     for (TestRoute route : routes) {
       withRoute(route);
     }
@@ -186,8 +196,10 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   public TestTransitData withGuaranteedTransfer(
-          TestTripSchedule fromTrip, int fromStop,
-          TestTripSchedule toTrip, int toStop
+    TestTripSchedule fromTrip,
+    int fromStop,
+    TestTripSchedule toTrip,
+    int toStop
   ) {
     return withConstrainedTransfer(fromTrip, fromStop, toTrip, toStop, TX_GUARANTEED);
   }
@@ -200,9 +212,11 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   public TestTransitData withConstrainedTransfer(
-          TestTripSchedule fromTrip, int fromStop,
-          TestTripSchedule toTrip, int toStop,
-          TransferConstraint constraint
+    TestTripSchedule fromTrip,
+    int fromStop,
+    TestTripSchedule toTrip,
+    int toStop,
+    TransferConstraint constraint
   ) {
     int fromStopPos = fromTrip.pattern().findStopPositionAfter(0, fromStop);
     int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStop);
@@ -211,12 +225,12 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
       route.addTransferConstraint(fromTrip, fromStopPos, toTrip, toStopPos, constraint);
     }
     constrainedTransfers.add(
-        new ConstrainedTransfer(
-            null,
-            new TestTransferPoint(fromStop, fromTrip, false),
-            new TestTransferPoint(toStop, toTrip, false),
-            constraint
-        )
+      new ConstrainedTransfer(
+        null,
+        new TestTransferPoint(fromStop, fromTrip, false),
+        new TestTransferPoint(toStop, toTrip, false),
+        constraint
+      )
     );
     return this;
   }
@@ -226,15 +240,15 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   public ConstrainedTransfer findConstrainedTransfer(
-          TestTripSchedule fromTrip,
-          int fromStop,
-          TestTripSchedule toTrip,
-          int toStop
+    TestTripSchedule fromTrip,
+    int fromStop,
+    TestTripSchedule toTrip,
+    int toStop
   ) {
     for (ConstrainedTransfer tx : constrainedTransfers) {
-      if(
-          ((TestTransferPoint)tx.getFrom()).matches(fromTrip, fromStop) &&
-          ((TestTransferPoint)tx.getTo()).matches(toTrip, toStop)
+      if (
+        ((TestTransferPoint) tx.getFrom()).matches(fromTrip, fromStop) &&
+        ((TestTransferPoint) tx.getTo()).matches(toTrip, toStop)
       ) {
         return tx;
       }
@@ -244,14 +258,16 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
 
   public TransferServiceAdaptor<TestTripSchedule> transferServiceAdaptor() {
     return new TransferServiceAdaptor<>(null, null) {
-      @Override protected ConstrainedTransfer findTransfer(
-              TripStopTime<TestTripSchedule> from, TestTripSchedule toTrip, int toStop
+      @Override
+      protected ConstrainedTransfer findTransfer(
+        TripStopTime<TestTripSchedule> from,
+        TestTripSchedule toTrip,
+        int toStop
       ) {
         return findConstrainedTransfer(from.trip(), from.stop(), toTrip, toStop);
       }
     };
   }
-
 
   /* private methods */
 
@@ -261,7 +277,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   private void expandNumOfStops(int stopIndex) {
-    for (int i=numberOfStops(); i<=stopIndex; ++i) {
+    for (int i = numberOfStops(); i <= stopIndex; ++i) {
       transfersFromStop.add(new ArrayList<>());
       transfersToStop.add(new ArrayList<>());
       routeIndexesByStopIndex.add(new HashSet<>());
@@ -271,9 +287,9 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   private List<Integer> stopsVisited() {
     final List<Integer> stops = new ArrayList<>();
     for (int i = 0; i < routeIndexesByStopIndex.size(); i++) {
-       if(!routeIndexesByStopIndex.get(i).isEmpty()) {
-         stops.add(i);
-       }
+      if (!routeIndexesByStopIndex.get(i).isEmpty()) {
+        stops.add(i);
+      }
     }
     return stops;
   }

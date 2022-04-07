@@ -19,18 +19,16 @@ import org.opentripplanner.standalone.config.RouterConfig;
  * is normalized without comments, and extra whitespace.
  */
 public class RouterConfigSerializer extends Serializer<RouterConfig> {
-    public static final String SOURCE = "SerializedGraph";
 
-    @Override
-    public void write(Kryo kryo, Output output, RouterConfig object) {
-        output.writeString(object.toJson());
-    }
-    @Override
-    public RouterConfig read(Kryo kryo, Input input, Class<? extends RouterConfig> type) {
-        return new RouterConfig(
-                ConfigLoader.nodeFromString(input.readString(), SOURCE),
-                SOURCE,
-                false
-        );
-    }
+  public static final String SOURCE = "SerializedGraph";
+
+  @Override
+  public void write(Kryo kryo, Output output, RouterConfig object) {
+    output.writeString(object.toJson());
+  }
+
+  @Override
+  public RouterConfig read(Kryo kryo, Input input, Class<? extends RouterConfig> type) {
+    return new RouterConfig(ConfigLoader.nodeFromString(input.readString(), SOURCE), SOURCE, false);
+  }
 }

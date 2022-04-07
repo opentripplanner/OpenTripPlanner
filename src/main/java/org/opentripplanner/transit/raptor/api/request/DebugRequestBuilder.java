@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import io.micrometer.core.instrument.Tag;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,120 +19,121 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
  * Mutable version of {@link DebugRequest}.
  */
 public class DebugRequestBuilder {
-    private final Set<Integer> stops = new HashSet<>();
-    private List<Integer> path = new ArrayList<>();
-    private int debugPathFromStopIndex;
-    private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
-    private Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener;
-    private Consumer<DebugEvent<Path<?>>> pathFilteringListener;
-    private DebugLogger logger;
 
+  private final Set<Integer> stops = new HashSet<>();
+  private List<Integer> path = new ArrayList<>();
+  private int debugPathFromStopIndex;
+  private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
+  private Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener;
+  private Consumer<DebugEvent<Path<?>>> pathFilteringListener;
+  private DebugLogger logger;
 
-    DebugRequestBuilder(DebugRequest debug) {
-        this.stops.addAll(debug.stops());
-        this.path.addAll(debug.path());
-        this.debugPathFromStopIndex = debug.debugPathFromStopIndex();
-        this.stopArrivalListener = debug.stopArrivalListener();
-        this.patternRideDebugListener = debug.patternRideDebugListener();
-        this.pathFilteringListener = debug.pathFilteringListener();
-        this.logger = debug.logger();
+  DebugRequestBuilder(DebugRequest debug) {
+    this.stops.addAll(debug.stops());
+    this.path.addAll(debug.path());
+    this.debugPathFromStopIndex = debug.debugPathFromStopIndex();
+    this.stopArrivalListener = debug.stopArrivalListener();
+    this.patternRideDebugListener = debug.patternRideDebugListener();
+    this.pathFilteringListener = debug.pathFilteringListener();
+    this.logger = debug.logger();
+  }
+
+  /** Read-only view to stops added sorted in ascending order. */
+  public List<Integer> stops() {
+    return stops.stream().sorted().collect(Collectors.toList());
+  }
+
+  public DebugRequestBuilder addStops(Collection<Integer> stops) {
+    this.stops.addAll(stops);
+    return this;
+  }
+
+  public DebugRequestBuilder addStops(int... stops) {
+    return addStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
+  }
+
+  /**
+   * The list of stops for a given path to debug.
+   */
+  public List<Integer> path() {
+    return path;
+  }
+
+  public DebugRequestBuilder setPath(List<Integer> stopsInPath) {
+    if (!path.isEmpty()) {
+      throw new IllegalStateException(
+        "The API support only one debug path. " + "Existing: " + path + ", new: " + stopsInPath
+      );
     }
+    this.path = new ArrayList<>(stopsInPath);
+    return this;
+  }
 
-    /** Read-only view to stops added sorted in ascending order.  */
-    public List<Integer> stops() {
-        return stops.stream().sorted().collect(Collectors.toList());
-    }
+  public int debugPathFromStopIndex() {
+    return debugPathFromStopIndex;
+  }
 
-    public DebugRequestBuilder addStops(Collection<Integer> stops) {
-        this.stops.addAll(stops);
-        return this;
-    }
+  /**
+   * Select the stop index where the debugging should start. It is the index of the stops in the
+   * path list.
+   */
+  public DebugRequestBuilder debugPathFromStopIndex(int stopIndex) {
+    this.debugPathFromStopIndex = stopIndex;
+    return this;
+  }
 
-    public DebugRequestBuilder addStops(int ... stops) {
-        return addStops(Arrays.stream(stops).boxed().collect(Collectors.toList()));
-    }
+  public Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener() {
+    return stopArrivalListener;
+  }
 
-    /**
-     * The list of stops for a given path to debug.
-     */
-    public List<Integer> path() {
-        return path;
-    }
+  public DebugRequestBuilder stopArrivalListener(Consumer<DebugEvent<ArrivalView<?>>> listener) {
+    this.stopArrivalListener = listener;
+    return this;
+  }
 
-    public DebugRequestBuilder setPath(List<Integer> stopsInPath) {
-        if(!path.isEmpty()) {
-            throw new IllegalStateException(
-                    "The API support only one debug path. "
-                    + "Existing: " + path + ", new: " + stopsInPath
-            );
-        }
-        this.path = new ArrayList<>(stopsInPath);
-        return this;
-    }
+  public Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener() {
+    return patternRideDebugListener;
+  }
 
-    public int debugPathFromStopIndex() {
-        return debugPathFromStopIndex;
-    }
+  public DebugRequestBuilder patternRideDebugListener(
+    Consumer<DebugEvent<PatternRide<?>>> listener
+  ) {
+    this.patternRideDebugListener = listener;
+    return this;
+  }
 
-    /**
-     * Select the stop index where the debugging should start. It is the index of the stops in the
-     * path list.
-     * */
-    public DebugRequestBuilder debugPathFromStopIndex(int stopIndex) {
-        this.debugPathFromStopIndex = stopIndex;
-        return this;
-    }
+  public Consumer<DebugEvent<Path<?>>> pathFilteringListener() {
+    return pathFilteringListener;
+  }
 
-    public Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener() {
-        return stopArrivalListener;
-    }
+  public DebugRequestBuilder pathFilteringListener(Consumer<DebugEvent<Path<?>>> listener) {
+    this.pathFilteringListener = listener;
+    return this;
+  }
 
-    public DebugRequestBuilder stopArrivalListener(Consumer<DebugEvent<ArrivalView<?>>> listener) {
-        this.stopArrivalListener = listener;
-        return this;
-    }
+  public DebugLogger logger() {
+    return logger;
+  }
 
-    public Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener() {
-        return patternRideDebugListener;
-    }
+  public DebugRequestBuilder logger(DebugLogger logger) {
+    this.logger = logger;
+    return this;
+  }
 
-    public DebugRequestBuilder patternRideDebugListener(Consumer<DebugEvent<PatternRide<?>>> listener) {
-        this.patternRideDebugListener = listener;
-        return this;
-    }
+  public DebugRequestBuilder reverseDebugRequest() {
+    Collections.reverse(this.path);
+    return this;
+  }
 
-    public Consumer<DebugEvent<Path<?>>> pathFilteringListener() {
-        return pathFilteringListener;
-    }
-
-    public DebugRequestBuilder pathFilteringListener(Consumer<DebugEvent<Path<?>>> listener) {
-        this.pathFilteringListener = listener;
-        return this;
-    }
-
-    public DebugLogger logger() {
-        return logger;
-    }
-
-    public DebugRequestBuilder logger(DebugLogger logger) {
-        this.logger = logger;
-        return this;
-    }
-
-    public DebugRequestBuilder reverseDebugRequest() {
-        Collections.reverse(this.path);
-        return this;
-    }
-
-    public DebugRequest build() {
-        return new DebugRequest(
-                List.copyOf(stops),
-                List.copyOf(path),
-                debugPathFromStopIndex,
-                stopArrivalListener,
-                patternRideDebugListener,
-                pathFilteringListener,
-                logger
-        );
-    }
+  public DebugRequest build() {
+    return new DebugRequest(
+      List.copyOf(stops),
+      List.copyOf(path),
+      debugPathFromStopIndex,
+      stopArrivalListener,
+      patternRideDebugListener,
+      pathFilteringListener,
+      logger
+    );
+  }
 }

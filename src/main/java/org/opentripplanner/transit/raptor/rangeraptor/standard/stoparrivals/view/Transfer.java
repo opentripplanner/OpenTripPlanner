@@ -7,45 +7,45 @@ import org.opentripplanner.transit.raptor.api.view.TransferPathView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 
 final class Transfer<T extends RaptorTripSchedule>
-    extends StopArrivalViewAdapter<T>
-    implements TransferPathView
-{
-    private final StopArrivalState<T> arrival;
-    private final StopsCursor<T> cursor;
+  extends StopArrivalViewAdapter<T>
+  implements TransferPathView {
 
-    Transfer(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
-        super(round, stop);
-        this.arrival = arrival;
-        this.cursor = cursor;
-    }
+  private final StopArrivalState<T> arrival;
+  private final StopsCursor<T> cursor;
 
-    @Override
-    public int arrivalTime() {
-        return arrival.time();
-    }
+  Transfer(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
+    super(round, stop);
+    this.arrival = arrival;
+    this.cursor = cursor;
+  }
 
-    @Override
-    public boolean arrivedByTransfer() {
-        return true;
-    }
+  @Override
+  public int arrivalTime() {
+    return arrival.time();
+  }
 
-    @Override
-    public TransferPathView transferPath() {
-        return this;
-    }
+  @Override
+  public ArrivalView<T> previous() {
+    return cursor.stop(round(), arrival.transferFromStop(), true);
+  }
 
-    @Override
-    public int durationInSeconds() {
-        return arrival.transferPath().durationInSeconds();
-    }
+  @Override
+  public boolean arrivedByTransfer() {
+    return true;
+  }
 
-    @Override
-    public RaptorTransfer transfer() {
-        return arrival.transferPath();
-    }
+  @Override
+  public TransferPathView transferPath() {
+    return this;
+  }
 
-    @Override
-    public ArrivalView<T> previous() {
-        return cursor.stop(round(), arrival.transferFromStop(), true);
-    }
+  @Override
+  public RaptorTransfer transfer() {
+    return arrival.transferPath();
+  }
+
+  @Override
+  public int durationInSeconds() {
+    return arrival.transferPath().durationInSeconds();
+  }
 }

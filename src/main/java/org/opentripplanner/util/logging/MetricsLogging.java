@@ -27,55 +27,60 @@ import org.opentripplanner.standalone.server.Router;
  */
 public class MetricsLogging {
 
-    public MetricsLogging(OTPServer otpServer) {
-        new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
-        new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
-        new JvmCompilationMetrics().bindTo(Metrics.globalRegistry);
-        new JvmGcMetrics().bindTo(Metrics.globalRegistry);
-        new JvmHeapPressureMetrics().bindTo(Metrics.globalRegistry);
-        new JvmInfoMetrics().bindTo(Metrics.globalRegistry);
-        new JvmMemoryMetrics().bindTo(Metrics.globalRegistry);
-        new JvmThreadMetrics().bindTo(Metrics.globalRegistry);
-        new LogbackMetrics().bindTo(Metrics.globalRegistry);
-        new ProcessorMetrics().bindTo(Metrics.globalRegistry);
-        new UptimeMetrics().bindTo(Metrics.globalRegistry);
+  public MetricsLogging(OTPServer otpServer) {
+    new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
+    new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
+    new JvmCompilationMetrics().bindTo(Metrics.globalRegistry);
+    new JvmGcMetrics().bindTo(Metrics.globalRegistry);
+    new JvmHeapPressureMetrics().bindTo(Metrics.globalRegistry);
+    new JvmInfoMetrics().bindTo(Metrics.globalRegistry);
+    new JvmMemoryMetrics().bindTo(Metrics.globalRegistry);
+    new JvmThreadMetrics().bindTo(Metrics.globalRegistry);
+    new LogbackMetrics().bindTo(Metrics.globalRegistry);
+    new ProcessorMetrics().bindTo(Metrics.globalRegistry);
+    new UptimeMetrics().bindTo(Metrics.globalRegistry);
 
-        Router router = otpServer.getRouter();
-        Graph graph = router.graph;
+    Router router = otpServer.getRouter();
+    Graph graph = router.graph;
 
-        if(graph.getTransitLayer() != null) {
-            new GuavaCacheMetrics(
-                    graph.getTransitLayer().getTransferCache().getTransferCache(),
-                    "raptorTransfersCache",
-                    List.of(Tag.of("cache", "raptorTransfers"))
-            ).bindTo(Metrics.globalRegistry);
-        }
-        new ExecutorServiceMetrics(
-                ForkJoinPool.commonPool(),
-                "commonPool",
-                List.of(Tag.of("pool", "commonPool"))
-        ).bindTo(Metrics.globalRegistry);
-
-        if (graph.updaterManager != null) {
-            new ExecutorServiceMetrics(
-                    graph.updaterManager.getUpdaterPool(),
-                    "graphUpdaters",
-                    List.of(Tag.of("pool", "graphUpdaters"))
-            ).bindTo(Metrics.globalRegistry);
-
-            new ExecutorServiceMetrics(
-                    graph.updaterManager.getScheduler(),
-                    "graphUpdateScheduler",
-                    List.of(Tag.of("pool", "graphUpdateScheduler"))
-            ).bindTo(Metrics.globalRegistry);
-        }
-
-        if (router.raptorConfig.isMultiThreaded()) {
-            new ExecutorServiceMetrics(
-                    router.raptorConfig.threadPool(),
-                    "raptorHeuristics",
-                    List.of(Tag.of("pool", "raptorHeuristics"))
-            ).bindTo(Metrics.globalRegistry);
-        }
+    if (graph.getTransitLayer() != null) {
+      new GuavaCacheMetrics(
+        graph.getTransitLayer().getTransferCache().getTransferCache(),
+        "raptorTransfersCache",
+        List.of(Tag.of("cache", "raptorTransfers"))
+      )
+        .bindTo(Metrics.globalRegistry);
     }
+    new ExecutorServiceMetrics(
+      ForkJoinPool.commonPool(),
+      "commonPool",
+      List.of(Tag.of("pool", "commonPool"))
+    )
+      .bindTo(Metrics.globalRegistry);
+
+    if (graph.updaterManager != null) {
+      new ExecutorServiceMetrics(
+        graph.updaterManager.getUpdaterPool(),
+        "graphUpdaters",
+        List.of(Tag.of("pool", "graphUpdaters"))
+      )
+        .bindTo(Metrics.globalRegistry);
+
+      new ExecutorServiceMetrics(
+        graph.updaterManager.getScheduler(),
+        "graphUpdateScheduler",
+        List.of(Tag.of("pool", "graphUpdateScheduler"))
+      )
+        .bindTo(Metrics.globalRegistry);
+    }
+
+    if (router.raptorConfig.isMultiThreaded()) {
+      new ExecutorServiceMetrics(
+        router.raptorConfig.threadPool(),
+        "raptorHeuristics",
+        List.of(Tag.of("pool", "raptorHeuristics"))
+      )
+        .bindTo(Metrics.globalRegistry);
+    }
+  }
 }

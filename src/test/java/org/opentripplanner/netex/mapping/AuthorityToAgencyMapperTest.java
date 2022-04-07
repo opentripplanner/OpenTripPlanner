@@ -11,61 +11,63 @@ import org.rutebanken.netex.model.ContactStructure;
 import org.rutebanken.netex.model.MultilingualString;
 
 public class AuthorityToAgencyMapperTest {
-    private static final String ID = "ID";
-    private static final String NAME = "Olsen";
-    private static final String URL = "http://olsen.no/help";
-    private static final String PHONE = "+47 88882222";
-    private static final String TIME_ZONE = "CEST";
-    private static final String N_A = "N/A";
 
-    private final AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(ID_FACTORY, TIME_ZONE);
+  private static final String ID = "ID";
+  private static final String NAME = "Olsen";
+  private static final String URL = "http://olsen.no/help";
+  private static final String PHONE = "+47 88882222";
+  private static final String TIME_ZONE = "CEST";
+  private static final String N_A = "N/A";
 
-    @Test public void mapAgency() {
-        // Given
-        Authority authority = authority(ID, NAME, URL, PHONE);
+  private final AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(ID_FACTORY, TIME_ZONE);
 
-        // When mapped
-        Agency a = mapper.mapAuthorityToAgency(authority);
+  @Test
+  public void mapAgency() {
+    // Given
+    Authority authority = authority(ID, NAME, URL, PHONE);
 
-        // Then expect
-        assertEquals(ID, a.getId().getId());
-        assertEquals(NAME, a.getName());
-        assertEquals(TIME_ZONE, a.getTimezone());
-        assertEquals(URL, a.getUrl());
-        assertEquals(PHONE, a.getPhone());
-    }
+    // When mapped
+    Agency a = mapper.mapAuthorityToAgency(authority);
 
-    @Test public void mapAgencyWithoutOptionalElements() {
-        // Given
-        Authority authority = authority(ID, NAME, null, null);
+    // Then expect
+    assertEquals(ID, a.getId().getId());
+    assertEquals(NAME, a.getName());
+    assertEquals(TIME_ZONE, a.getTimezone());
+    assertEquals(URL, a.getUrl());
+    assertEquals(PHONE, a.getPhone());
+  }
 
-        // When mapped
-        Agency a = mapper.mapAuthorityToAgency(authority);
+  @Test
+  public void mapAgencyWithoutOptionalElements() {
+    // Given
+    Authority authority = authority(ID, NAME, null, null);
 
-        // Then expect
-        assertNull(a.getUrl());
-        assertNull(a.getPhone());
-    }
+    // When mapped
+    Agency a = mapper.mapAuthorityToAgency(authority);
 
-    @Test public void getDefaultAgency() {
-        // When mapped
-        Agency a = mapper.createDummyAgency();
+    // Then expect
+    assertNull(a.getUrl());
+    assertNull(a.getPhone());
+  }
 
-        // Then expect
-        assertEquals("Dummy-" + a.getTimezone(), a.getId().getId());
-        assertEquals(N_A, a.getName());
-        assertEquals(TIME_ZONE, a.getTimezone());
-        assertEquals(N_A, a.getUrl());
-        assertEquals(N_A, a.getPhone());
-    }
+  @Test
+  public void getDefaultAgency() {
+    // When mapped
+    Agency a = mapper.createDummyAgency();
 
-    @SuppressWarnings("SameParameterValue")
-    private static Authority authority(String id, String name, String url, String phone) {
-        return new Authority()
-                .withId(id)
-                .withName(new MultilingualString().withValue(name))
-                .withContactDetails(
-                        new ContactStructure().withUrl(url).withPhone(phone)
-                );
-    }
+    // Then expect
+    assertEquals("Dummy-" + a.getTimezone(), a.getId().getId());
+    assertEquals(N_A, a.getName());
+    assertEquals(TIME_ZONE, a.getTimezone());
+    assertEquals(N_A, a.getUrl());
+    assertEquals(N_A, a.getPhone());
+  }
+
+  @SuppressWarnings("SameParameterValue")
+  private static Authority authority(String id, String name, String url, String phone) {
+    return new Authority()
+      .withId(id)
+      .withName(new MultilingualString().withValue(name))
+      .withContactDetails(new ContactStructure().withUrl(url).withPhone(phone));
+  }
 }

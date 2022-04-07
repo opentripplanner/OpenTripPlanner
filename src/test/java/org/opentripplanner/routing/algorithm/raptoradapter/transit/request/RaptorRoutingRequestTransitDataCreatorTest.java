@@ -30,16 +30,15 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   public static final FeedScopedId TP_ID_3 = new FeedScopedId("F", "3");
 
   private static final TripPattern TP = new TripPattern(
-          new FeedScopedId("F", "P1"),
-          new Route(new FeedScopedId("F", "L1")),
-          new StopPattern(List.of(new StopTime(), new StopTime()))
+    new FeedScopedId("F", "P1"),
+    new Route(new FeedScopedId("F", "L1")),
+    new StopPattern(List.of(new StopTime(), new StopTime()))
   );
 
   @BeforeEach
   public void setup() {
     TP.getRoute().setMode(TransitMode.BUS);
   }
-
 
   @Test
   public void testMergeTripPatterns() {
@@ -51,7 +50,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
-    int[] stopIndexes = new int[]{0, 1};
+    int[] stopIndexes = new int[] { 0, 1 };
 
     // Total available trip patterns
     TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, stopIndexes, TP);
@@ -75,8 +74,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
     // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset in time when requested.
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
-        startOfTime,
-        tripPatternsForDates
+      startOfTime,
+      tripPatternsForDates
     );
 
     // Get the results
@@ -97,13 +96,14 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   }
 
   private static TripPatternForDates findTripPatternForDate(
-      FeedScopedId patternId, List<TripPatternForDates> list
+    FeedScopedId patternId,
+    List<TripPatternForDates> list
   ) {
     return list
-        .stream()
-        .filter(p -> patternId.equals(p.getTripPattern().getId()))
-        .findFirst()
-        .orElseThrow();
+      .stream()
+      .filter(p -> patternId.equals(p.getTripPattern().getId()))
+      .findFirst()
+      .orElseThrow();
   }
 
   private TripTimes createTripTimesForTest() {
@@ -113,9 +113,10 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     stopTime1.setDepartureTime(0);
     stopTime2.setArrivalTime(7200);
 
-    return new TripTimes(new Trip(new FeedScopedId("Test", "Test")),
-        Arrays.asList(stopTime1, stopTime2),
-        new Deduplicator()
+    return new TripTimes(
+      new Trip(new FeedScopedId("Test", "Test")),
+      Arrays.asList(stopTime1, stopTime2),
+      new Deduplicator()
     );
   }
 }

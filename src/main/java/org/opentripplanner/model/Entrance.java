@@ -9,23 +9,15 @@ import org.opentripplanner.util.I18NString;
 public final class Entrance extends StationElement {
 
   public Entrance(
-      FeedScopedId id,
-      I18NString name,
-      String code,
-      String description,
-      WgsCoordinate coordinate,
-      WheelChairBoarding wheelchairBoarding,
-      StopLevel level
+    FeedScopedId id,
+    I18NString name,
+    String code,
+    String description,
+    WgsCoordinate coordinate,
+    WheelChairBoarding wheelchairBoarding,
+    StopLevel level
   ) {
-    super(
-            id,
-            name,
-            code,
-            description,
-            coordinate,
-            wheelchairBoarding,
-            level
-    );
+    super(id, name, code, description, coordinate, wheelchairBoarding, level);
   }
 
   @Override

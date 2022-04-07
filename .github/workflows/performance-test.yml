@@ -41,7 +41,7 @@ jobs:
           key: graph
 
       - name: Build jar
-        run: mvn -DskipTests --batch-mode package
+        run: mvn -DskipTests --batch-mode package -P prettierSkip
 
       - name: Download OSM & Netex data
         run: |

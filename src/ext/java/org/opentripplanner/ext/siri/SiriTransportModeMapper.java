@@ -1,16 +1,13 @@
 package org.opentripplanner.ext.siri;
 
+import java.util.List;
 import org.opentripplanner.model.TransitMode;
 import uk.org.siri.siri20.VehicleModesEnumeration;
-
-import java.util.List;
 
 public class SiriTransportModeMapper {
 
   /**
    * Maps first SIRI-VehicleMode to OTP-mode
-   * @param vehicleModes
-   * @return
    */
   static TransitMode mapTransitMainMode(List<VehicleModesEnumeration> vehicleModes) {
     if (vehicleModes != null && !vehicleModes.isEmpty()) {

@@ -12,21 +12,21 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
-
 /**
- * Utility to help build paths for testing. The path builder is "reusable",
- * every time the {@code access(...)} methods are called the builder reset it self.
- *
+ * Utility to help build paths for testing. The path builder is "reusable", every time the {@code
+ * access(...)} methods are called the builder reset it self.
+ * <p>
  * If the {@code costCalculator} is null, paths will not include cost.
  */
 public class TestPathBuilder {
+
   private static final int BOARD_ALIGHT_OFFSET = 30;
 
   @Nullable
   private final CostCalculator costCalculator;
 
-  private PathBuilder<TestTripSchedule> builder;
   private final int alightSlack;
+  private PathBuilder<TestTripSchedule> builder;
   private int startTime;
 
   public TestPathBuilder(int alightSlack, @Nullable CostCalculator costCalculator) {
@@ -35,8 +35,8 @@ public class TestPathBuilder {
   }
 
   /**
-   * Create access starting at the fixed given {@code starting}. Opening hours is used to
-   * enforce the access start time and prevent time-shifting it.
+   * Create access starting at the fixed given {@code starting}. Opening hours is used to enforce
+   * the access start time and prevent time-shifting it.
    */
   public TestPathBuilder access(int startTime, int duration, int toStop) {
     return access(startTime, TestTransfer.walk(toStop, duration, startTime, startTime));
@@ -80,10 +80,10 @@ public class TestPathBuilder {
     int fromStop = currentStop();
 
     TestTripSchedule trip = TestTripSchedule
-        .schedule(TestTripPattern.pattern(patternName, fromStop, toStop))
-        .arrDepOffset(BOARD_ALIGHT_OFFSET)
-        .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
-        .build();
+      .schedule(TestTripPattern.pattern(patternName, fromStop, toStop))
+      .arrDepOffset(BOARD_ALIGHT_OFFSET)
+      .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
+      .build();
 
     return bus(trip, toStop);
   }
@@ -97,7 +97,6 @@ public class TestPathBuilder {
     return builder.build(startTime);
   }
 
-
   /* private methods */
 
   int currentStop() {
@@ -106,11 +105,12 @@ public class TestPathBuilder {
 
   private void reset(int startTime) {
     this.startTime = startTime;
-    this.builder = PathBuilder.tailPathBuilder(
-            null,
-            RaptorSlackProvider.defaultSlackProvider(0, 0, alightSlack),
-            costCalculator,
-            RaptorStopNameResolver.nullSafe(null)
-    );
+    this.builder =
+      PathBuilder.tailPathBuilder(
+        null,
+        RaptorSlackProvider.defaultSlackProvider(0, 0, alightSlack),
+        costCalculator,
+        RaptorStopNameResolver.nullSafe(null)
+      );
   }
 }

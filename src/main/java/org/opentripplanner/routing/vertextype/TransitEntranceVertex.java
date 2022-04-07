@@ -19,16 +19,19 @@ public class TransitEntranceVertex extends Vertex {
    */
   public TransitEntranceVertex(Graph graph, Entrance entrance) {
     super(
-        graph,
-        entrance.getId().toString(),
-        entrance.getCoordinate().longitude(),
-        entrance.getCoordinate().latitude(),
-        entrance.getName()
+      graph,
+      entrance.getId().toString(),
+      entrance.getCoordinate().longitude(),
+      entrance.getCoordinate().latitude(),
+      entrance.getName()
     );
     this.entrance = entrance;
     this.wheelchairBoarding = entrance.getWheelchairBoarding();
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-    graph.expandToInclude(entrance.getCoordinate().longitude(), entrance.getCoordinate().latitude());
+    graph.expandToInclude(
+      entrance.getCoordinate().longitude(),
+      entrance.getCoordinate().latitude()
+    );
   }
 
   public WheelChairBoarding getWheelchairBoarding() {

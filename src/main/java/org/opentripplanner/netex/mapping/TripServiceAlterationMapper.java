@@ -4,8 +4,11 @@ import org.opentripplanner.model.TripAlteration;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 public class TripServiceAlterationMapper {
+
   public static TripAlteration mapAlteration(ServiceAlterationEnumeration netexValue) {
-    if (netexValue == null) { return TripAlteration.PLANNED; }
+    if (netexValue == null) {
+      return TripAlteration.PLANNED;
+    }
     return switch (netexValue) {
       case PLANNED -> TripAlteration.PLANNED;
       case CANCELLATION -> TripAlteration.CANCELLATION;

@@ -12,7 +12,8 @@ public enum RoutingErrorCode {
   NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
 
   /**
-   * The origin and destination are so close to each other, that walking is always better than transit.
+   * The origin and destination are so close to each other, that walking is always better than
+   * transit.
    */
   WALKING_BETTER_THAN_TRANSIT,
 
@@ -36,5 +37,5 @@ public enum RoutingErrorCode {
    */
   NO_STOPS_IN_RANGE,
 
-  SYSTEM_ERROR
+  SYSTEM_ERROR,
 }

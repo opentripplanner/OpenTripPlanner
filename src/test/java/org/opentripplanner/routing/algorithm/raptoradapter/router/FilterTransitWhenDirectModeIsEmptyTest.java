@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Set;
 import org.junit.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
-
-import java.util.Set;
-
-import static org.junit.Assert.*;
 
 public class FilterTransitWhenDirectModeIsEmptyTest {
 

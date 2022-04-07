@@ -58,7 +58,7 @@ public interface PlanTestConstants {
   int T11_50 = time("11:50");
 
   // Stop/Places
-  Place A = place("A", 5.0, 8.0 );
+  Place A = place("A", 5.0, 8.0);
   Place B = place("B", 6.0, 8.5);
   Place C = place("C", 7.0, 9.0);
   Place D = place("D", 8.0, 9.5);
@@ -69,19 +69,19 @@ public interface PlanTestConstants {
 
   private static Place place(String name, double lat, double lon) {
     var stop = new Stop(
-            new FeedScopedId(FEED_ID, name),
-            new NonLocalizedString(name),
-            null,
-            null,
-            WgsCoordinate.creatOptionalCoordinate(lat, lon),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+      new FeedScopedId(FEED_ID, name),
+      new NonLocalizedString(name),
+      null,
+      null,
+      WgsCoordinate.creatOptionalCoordinate(lat, lon),
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
     return Place.forStop(stop);
   }

@@ -42,143 +42,140 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class FlexIntegrationTest {
 
-    static Instant dateTime = ZonedDateTime.parse("2021-12-02T12:00:00-05:00[America/New_York]")
-            .toInstant();
+  static Instant dateTime = ZonedDateTime
+    .parse("2021-12-02T12:00:00-05:00[America/New_York]")
+    .toInstant();
 
-    static Graph graph;
-    static RoutingService service;
-    static Router router;
+  static Graph graph;
+  static RoutingService service;
+  static Router router;
 
-    @BeforeAll
-    static void setup() {
-        OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-        var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
-        var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
-        var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
-        var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
+  @Test
+  public void shouldReturnARouteTransferringFromBusToFlex() {
+    var from = new GenericLocation(33.84329482265106, -84.583740234375);
+    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
-        graph = ConstantsForTests.buildOsmGraph(osmPath);
-        addGtfsToGraph(graph, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
-        router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
-        router.startup();
+    var itin = getItinerary(from, to, 2);
 
-        service = new RoutingService(graph);
+    assertEquals(4, itin.legs.size());
+
+    var walkToBus = itin.legs.get(0);
+    assertEquals(TraverseMode.WALK, walkToBus.getMode());
+
+    var bus = itin.legs.get(1);
+    assertEquals(BUS, bus.getMode());
+    assertEquals("30", bus.getRoute().getShortName());
+
+    var transfer = itin.legs.get(2);
+    assertEquals(TraverseMode.WALK, transfer.getMode());
+
+    var flex = itin.legs.get(3);
+    assertEquals(BUS, flex.getMode());
+    assertEquals("Zone 2", flex.getRoute().getShortName());
+    assertTrue(flex.isFlexibleTrip());
+  }
+
+  @Test
+  public void shouldReturnARouteWithTwoTransfers() {
+    var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
+    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+
+    var itin = getItinerary(from, to, 1);
+
+    assertEquals(5, itin.legs.size());
+
+    var firstBus = itin.legs.get(0);
+    assertEquals(BUS, firstBus.getMode());
+    assertEquals("856", firstBus.getRoute().getShortName());
+
+    var transferToSecondBus = itin.legs.get(1);
+    assertEquals(WALK, transferToSecondBus.getMode());
+
+    var secondBus = itin.legs.get(2);
+    assertEquals(BUS, secondBus.getMode());
+    assertEquals("30", secondBus.getRoute().getShortName());
+
+    var transferToFlex = itin.legs.get(3);
+    assertEquals(WALK, transferToFlex.getMode());
+
+    var finalFlex = itin.legs.get(4);
+    assertEquals(BUS, finalFlex.getMode());
+    assertEquals("Zone 2", finalFlex.getRoute().getShortName());
+    assertTrue(finalFlex.isFlexibleTrip());
+  }
+
+  @BeforeAll
+  static void setup() {
+    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
+    var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
+    var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
+    var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
+    var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
+
+    graph = ConstantsForTests.buildOsmGraph(osmPath);
+    addGtfsToGraph(graph, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
+    router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
+
+    service = new RoutingService(graph);
+  }
+
+  @AfterAll
+  static void teardown() {
+    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+  }
+
+  private static String getAbsolutePath(String cobbOsm) {
+    try {
+      return getFileForResource(cobbOsm).getAbsolutePath();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    private static String getAbsolutePath(String cobbOsm) {
-        try {
-            return getFileForResource(cobbOsm).getAbsolutePath();
-        }
-        catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
+  private static void addGtfsToGraph(Graph graph, List<String> gtfsFiles) {
+    var extra = new HashMap<Class<?>, Object>();
 
-    @Test
-    public void shouldReturnARouteTransferringFromBusToFlex() {
-        var from = new GenericLocation(33.84329482265106, -84.583740234375);
-        var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    // GTFS
+    var gtfsBundles = gtfsFiles
+      .stream()
+      .map(f -> new GtfsBundle(new File(f)))
+      .collect(Collectors.toList());
+    GtfsModule gtfsModule = new GtfsModule(gtfsBundles, ServiceDateInterval.unbounded());
+    gtfsModule.buildGraph(graph, extra);
 
-        var itin = getItinerary(from, to, 2);
+    // link stations to streets
+    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
+    streetLinkerModule.buildGraph(graph, extra);
 
-        assertEquals(4, itin.legs.size());
+    // link flex locations to streets
+    var flexMapper = new FlexLocationsToStreetEdgesMapper();
+    flexMapper.buildGraph(graph, new HashMap<>());
 
-        var walkToBus = itin.legs.get(0);
-        assertEquals(TraverseMode.WALK, walkToBus.getMode());
+    // generate direct transfers
+    var req = new RoutingRequest();
 
-        var bus = itin.legs.get(1);
-        assertEquals(BUS, bus.getMode());
-        assertEquals("30", bus.getRoute().getShortName());
+    // we don't have a complete coverage of the entire area so use straight lines for transfers
+    var transfers = new DirectTransferGenerator(Duration.ofMinutes(10), List.of(req));
+    transfers.buildGraph(graph, extra);
 
-        var transfer = itin.legs.get(2);
-        assertEquals(TraverseMode.WALK, transfer.getMode());
+    graph.index();
+  }
 
-        var flex = itin.legs.get(3);
-        assertEquals(BUS, flex.getMode());
-        assertEquals("Zone 2", flex.getRoute().getShortName());
-        assertTrue(flex.isFlexibleTrip());
-    }
+  private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
+    RoutingRequest request = new RoutingRequest();
+    request.setDateTime(dateTime);
+    request.from = from;
+    request.to = to;
+    request.numItineraries = 10;
+    request.searchWindow = Duration.ofHours(2);
+    request.modes.egressMode = FLEXIBLE;
 
-    @Test
-    public void shouldReturnARouteWithTwoTransfers() {
-        var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
-        var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    var result = service.route(request, router);
+    var itineraries = result.getTripPlan().itineraries;
 
-        var itin = getItinerary(from, to, 1);
+    assertFalse(itineraries.isEmpty());
 
-        assertEquals(5, itin.legs.size());
-
-        var firstBus = itin.legs.get(0);
-        assertEquals(BUS, firstBus.getMode());
-        assertEquals("856", firstBus.getRoute().getShortName());
-
-        var transferToSecondBus = itin.legs.get(1);
-        assertEquals(WALK, transferToSecondBus.getMode());
-
-        var secondBus = itin.legs.get(2);
-        assertEquals(BUS, secondBus.getMode());
-        assertEquals("30", secondBus.getRoute().getShortName());
-
-        var transferToFlex = itin.legs.get(3);
-        assertEquals(WALK, transferToFlex.getMode());
-
-        var finalFlex = itin.legs.get(4);
-        assertEquals(BUS, finalFlex.getMode());
-        assertEquals("Zone 2", finalFlex.getRoute().getShortName());
-        assertTrue(finalFlex.isFlexibleTrip());
-    }
-
-    private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
-        RoutingRequest request = new RoutingRequest();
-        request.setDateTime(dateTime);
-        request.from = from;
-        request.to = to;
-        request.numItineraries = 10;
-        request.searchWindow = Duration.ofHours(2);
-        request.modes.egressMode = FLEXIBLE;
-
-        var result = service.route(request, router);
-        var itineraries = result.getTripPlan().itineraries;
-
-        assertFalse(itineraries.isEmpty());
-
-        return itineraries.get(index);
-    }
-
-    private static void addGtfsToGraph(
-            Graph graph,
-            List<String> gtfsFiles
-    ) {
-        var extra = new HashMap<Class<?>, Object>();
-
-        // GTFS
-        var gtfsBundles = gtfsFiles.stream()
-                .map(f -> new GtfsBundle(new File(f)))
-                .collect(Collectors.toList());
-        GtfsModule gtfsModule = new GtfsModule(gtfsBundles, ServiceDateInterval.unbounded());
-        gtfsModule.buildGraph(graph, extra);
-
-        // link stations to streets
-        StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-        streetLinkerModule.buildGraph(graph, extra);
-
-        // link flex locations to streets
-        var flexMapper = new FlexLocationsToStreetEdgesMapper();
-        flexMapper.buildGraph(graph, new HashMap<>());
-
-        // generate direct transfers
-        var req = new RoutingRequest();
-
-        // we don't have a complete coverage of the entire area so use straight lines for transfers
-        var transfers = new DirectTransferGenerator(Duration.ofMinutes(10), List.of(req));
-        transfers.buildGraph(graph, extra);
-
-        graph.index();
-    }
-
-
-    @AfterAll
-    static void teardown() {
-        OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
-    }
+    return itineraries.get(index);
+  }
 }

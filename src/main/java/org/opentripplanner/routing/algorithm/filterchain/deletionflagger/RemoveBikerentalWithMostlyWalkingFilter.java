@@ -13,34 +13,36 @@ import org.opentripplanner.model.plan.Leg;
  */
 public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletionFlagger {
 
-    private final double bikeRentalDistanceRatio;
+  private final double bikeRentalDistanceRatio;
 
-    public RemoveBikerentalWithMostlyWalkingFilter(double bikeRentalDistanceRatio) {
-        this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
-    }
+  public RemoveBikerentalWithMostlyWalkingFilter(double bikeRentalDistanceRatio) {
+    this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
+  }
 
-    @Override
-    public String name() {
-        return "bikerental-vs-walk-filter";
-    }
+  @Override
+  public String name() {
+    return "bikerental-vs-walk-filter";
+  }
 
-    @Override
-    public Predicate<Itinerary> predicate() {
-        return itinerary -> {
-            var containsTransit =
-                    itinerary.legs.stream().anyMatch(l -> l != null && l.getMode().isTransit());
+  @Override
+  public Predicate<Itinerary> predicate() {
+    return itinerary -> {
+      var containsTransit = itinerary.legs
+        .stream()
+        .anyMatch(l -> l != null && l.getMode().isTransit());
 
-            double bikeRentalDistance = itinerary.legs
-                    .stream()
-                    .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
-                    .mapToDouble(Leg::getDistanceMeters)
-                    .sum();
-            double totalDistance = itinerary.distanceMeters();
+      double bikeRentalDistance = itinerary.legs
+        .stream()
+        .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
+        .mapToDouble(Leg::getDistanceMeters)
+        .sum();
+      double totalDistance = itinerary.distanceMeters();
 
-            return bikeRentalDistance != 0
-                    && !containsTransit
-                    && (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio;
-        };
-    }
+      return (
+        bikeRentalDistance != 0 &&
+        !containsTransit &&
+        (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio
+      );
+    };
+  }
 }
-

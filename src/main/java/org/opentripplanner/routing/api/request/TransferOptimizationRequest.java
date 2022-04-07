@@ -4,6 +4,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.util.OTPFeature;
 
 public class TransferOptimizationRequest implements TransferOptimizationParameters {
+
   public boolean optimizeTransferWaitTime = true;
   public double minSafeWaitTimeFactor = 5.0;
   public double backTravelWaitTimeFactor = 1.0;

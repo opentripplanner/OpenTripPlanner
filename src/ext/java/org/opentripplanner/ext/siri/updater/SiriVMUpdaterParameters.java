@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri.updater;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
 public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
+
   private final String configRef;
   private final String feedId;
   private final int logFrequency;
@@ -18,17 +19,17 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
   private final int timeoutSec;
 
   public SiriVMUpdaterParameters(
-      String configRef,
-      String feedId,
-      int logFrequency,
-      int maxSnapshotFrequencyMs,
-      boolean purgeExpiredData,
-      boolean fuzzyTripMatching,
-      boolean blockReadinessUntilInitialized,
-      String url,
-      String requestorRef,
-      int frequencySec,
-      int timeoutSec
+    String configRef,
+    String feedId,
+    int logFrequency,
+    int maxSnapshotFrequencyMs,
+    boolean purgeExpiredData,
+    boolean fuzzyTripMatching,
+    boolean blockReadinessUntilInitialized,
+    String url,
+    String requestorRef,
+    int frequencySec,
+    int timeoutSec
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -49,21 +50,55 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
   }
 
   @Override
-  public String getConfigRef() { return configRef; }
+  public String getConfigRef() {
+    return configRef;
+  }
 
-  public String getFeedId() { return feedId; }
-  public int getLogFrequency() { return logFrequency; }
-  public int getMaxSnapshotFrequencyMs() { return maxSnapshotFrequencyMs; }
-  public boolean purgeExpiredData() { return purgeExpiredData; }
-  public boolean fuzzyTripMatching() { return fuzzyTripMatching; }
-  public boolean blockReadinessUntilInitialized() { return blockReadinessUntilInitialized; }
+  public String getFeedId() {
+    return feedId;
+  }
+
+  public int getLogFrequency() {
+    return logFrequency;
+  }
+
+  public int getMaxSnapshotFrequencyMs() {
+    return maxSnapshotFrequencyMs;
+  }
+
+  public boolean purgeExpiredData() {
+    return purgeExpiredData;
+  }
+
+  public boolean fuzzyTripMatching() {
+    return fuzzyTripMatching;
+  }
+
+  public boolean blockReadinessUntilInitialized() {
+    return blockReadinessUntilInitialized;
+  }
 
   public SiriVMHttpTripUpdateSource.Parameters sourceParameters() {
     return new SiriVMHttpTripUpdateSource.Parameters() {
-      @Override public String getRequestorRef() { return requestorRef; }
-      @Override public String getFeedId() { return feedId; }
-      @Override public int getTimeoutSec() { return timeoutSec; }
-      @Override public String getUrl() { return url; }
+      @Override
+      public String getUrl() {
+        return url;
+      }
+
+      @Override
+      public String getRequestorRef() {
+        return requestorRef;
+      }
+
+      @Override
+      public String getFeedId() {
+        return feedId;
+      }
+
+      @Override
+      public int getTimeoutSec() {
+        return timeoutSec;
+      }
     };
   }
 }

@@ -20,38 +20,38 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return transit option with the lowest cost when to rides are equal, but
- * have different transit-reluctance.
+ * Raptor should return transit option with the lowest cost when to rides are equal, but have
+ * different transit-reluctance.
  */
 public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
 
+  private static final String EXPECTED =
+    "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-          RaptorConfig.defaultConfigForTest()
+    RaptorConfig.defaultConfigForTest()
   );
-
-  private final static String EXPECTED =  "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s "
-          + "[0:00:30 0:03 2m30s 0tx $%d]";
 
   @BeforeEach
   public void setup() {
     // Given 2 identical routes R1 and R2
     data.withRoute(
-        route(pattern("R1", STOP_A, STOP_B))
+      route(pattern("R1", STOP_A, STOP_B))
         .withTimetable(schedule("00:01, 00:02:40").transitReluctanceIndex(0))
     );
     data.withRoute(
-        route(pattern("R2", STOP_A, STOP_B))
+      route(pattern("R2", STOP_A, STOP_B))
         .withTimetable(schedule("00:01, 00:02:40").transitReluctanceIndex(1))
     );
 
-    requestBuilder.searchParams()
-        .addAccessPaths(walk(STOP_A, D30s))
-        .addEgressPaths(walk(STOP_B, D20s))
-        .earliestDepartureTime(T00_00)
-        .latestArrivalTime(T00_10)
-        .timetableEnabled(true);
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addEgressPaths(walk(STOP_B, D20s))
+      .earliestDepartureTime(T00_00)
+      .latestArrivalTime(T00_10)
+      .timetableEnabled(true);
 
     requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
 

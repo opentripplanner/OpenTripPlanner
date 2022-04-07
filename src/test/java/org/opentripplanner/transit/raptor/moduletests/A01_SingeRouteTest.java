@@ -26,14 +26,16 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  */
 public class A01_SingeRouteTest implements RaptorTestConstants {
 
-  private static final String EXP_PATH = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s "
-          + "[0:00:30 0:05:20 4m50s 0tx";
+  private static final String EXP_PATH =
+    "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s " + "[0:00:30 0:05:20 4m50s 0tx";
   private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
   private static final String EXP_PATH_WITH_COST = EXP_PATH + " $940]";
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
-  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(RaptorConfig.defaultConfigForTest());
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
 
   /**
    * Stops: 0..3
@@ -53,19 +55,15 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     data.withRoute(
-        route(
-            pattern("R1", STOP_B, STOP_C, STOP_D)
-        )
-        .withTimetable(
-            schedule("00:01, 00:03, 00:05")
-        )
+      route(pattern("R1", STOP_B, STOP_C, STOP_D)).withTimetable(schedule("00:01, 00:03, 00:05"))
     );
-    requestBuilder.searchParams()
-        .addAccessPaths(walk(STOP_B, D30s))
-        .addEgressPaths(walk(STOP_D, D20s))
-        .earliestDepartureTime(T00_00)
-        .latestArrivalTime(T00_10)
-        .timetableEnabled(true);
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(walk(STOP_B, D30s))
+      .addEgressPaths(walk(STOP_D, D20s))
+      .earliestDepartureTime(T00_00)
+      .latestArrivalTime(T00_10)
+      .timetableEnabled(true);
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
@@ -73,9 +71,10 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
   @Test
   public void standardOneIteration() {
     var request = requestBuilder
-        .profile(RaptorProfile.STANDARD)
-        .searchParams().searchOneIterationOnly()
-        .build();
+      .profile(RaptorProfile.STANDARD)
+      .searchParams()
+      .searchOneIterationOnly()
+      .build();
 
     var response = raptorService.route(request, data);
 
@@ -85,9 +84,9 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
   @Test
   public void standardReverseWithoutSearchWindow() {
     var request = requestBuilder
-        .searchDirection(SearchDirection.REVERSE)
-        .profile(RaptorProfile.STANDARD)
-        .build();
+      .searchDirection(SearchDirection.REVERSE)
+      .profile(RaptorProfile.STANDARD)
+      .build();
 
     var response = raptorService.route(request, data);
 
@@ -96,9 +95,7 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
 
   @Test
   public void multiCriteria() {
-    var request = requestBuilder
-        .profile(RaptorProfile.MULTI_CRITERIA)
-        .build();
+    var request = requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).build();
 
     var response = raptorService.route(request, data);
 

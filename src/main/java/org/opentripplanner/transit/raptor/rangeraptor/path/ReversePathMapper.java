@@ -10,7 +10,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
-
 /**
  * Build a path from a destination arrival - this maps between the domain of routing to the domain
  * of result paths. All values not needed for routing is computed as part of this mapping.
@@ -24,67 +23,67 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
  * This mapper uses recursion to reverse the results.
  */
 public final class ReversePathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
-    private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
-    private final RaptorSlackProvider slackProvider;
-    private final CostCalculator costCalculator;
-    private final RaptorStopNameResolver stopNameResolver;
-    private final BoardAndAlightTimeSearch tripSearch;
 
-    private int iterationDepartureTime = -1;
+  private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
+  private final RaptorSlackProvider slackProvider;
+  private final CostCalculator costCalculator;
+  private final RaptorStopNameResolver stopNameResolver;
+  private final BoardAndAlightTimeSearch tripSearch;
 
-    public ReversePathMapper(
-            RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
-            RaptorSlackProvider slackProvider,
-            CostCalculator costCalculator,
-            RaptorStopNameResolver stopNameResolver,
-            WorkerLifeCycle lifeCycle,
-            boolean useApproximateTripTimesSearch
-    ) {
-        this.transferConstraintsSearch = transferConstraintsSearch;
-        this.slackProvider = slackProvider;
-        this.costCalculator = costCalculator;
-        this.stopNameResolver = stopNameResolver;
-        this.tripSearch = tripTimesSearch(useApproximateTripTimesSearch);
-        lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
+  private int iterationDepartureTime = -1;
+
+  public ReversePathMapper(
+    RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
+    RaptorSlackProvider slackProvider,
+    CostCalculator costCalculator,
+    RaptorStopNameResolver stopNameResolver,
+    WorkerLifeCycle lifeCycle,
+    boolean useApproximateTripTimesSearch
+  ) {
+    this.transferConstraintsSearch = transferConstraintsSearch;
+    this.slackProvider = slackProvider;
+    this.costCalculator = costCalculator;
+    this.stopNameResolver = stopNameResolver;
+    this.tripSearch = tripTimesSearch(useApproximateTripTimesSearch);
+    lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
+  }
+
+  @Override
+  public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
+    var pathBuilder = PathBuilder.tailPathBuilder(
+      transferConstraintsSearch,
+      slackProvider,
+      costCalculator,
+      stopNameResolver
+    );
+    var arrival = destinationArrival.previous();
+
+    pathBuilder.access(destinationArrival.egressPath().egress());
+
+    while (true) {
+      if (arrival.arrivedByAccess()) {
+        pathBuilder.egress(arrival.accessPath().access());
+        return pathBuilder.build(iterationDepartureTime);
+      } else if (arrival.arrivedByTransit()) {
+        var times = tripSearch.find(arrival);
+        var transit = arrival.transitPath();
+        pathBuilder.transit(transit.trip(), times);
+      } else if (arrival.arrivedByTransfer()) {
+        pathBuilder.transfer(arrival.transferPath().transfer(), arrival.previous().stop());
+      } else {
+        throw new IllegalStateException("Unexpected arrival: " + arrival);
+      }
+      arrival = arrival.previous();
     }
+  }
 
-    private void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
-        this.iterationDepartureTime = iterationDepartureTime;
-    }
+  private static BoardAndAlightTimeSearch tripTimesSearch(boolean useApproximateTimeSearch) {
+    return useApproximateTimeSearch
+      ? TripTimesSearch::findTripReverseSearchApproximateTime
+      : TripTimesSearch::findTripReverseSearch;
+  }
 
-    @Override
-    public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
-        var pathBuilder = PathBuilder.tailPathBuilder(
-                transferConstraintsSearch, slackProvider, costCalculator, stopNameResolver
-        );
-        var arrival = destinationArrival.previous();
-
-        pathBuilder.access(destinationArrival.egressPath().egress());
-
-        while (true) {
-            if(arrival.arrivedByAccess()) {
-                pathBuilder.egress(arrival.accessPath().access());
-                return pathBuilder.build(iterationDepartureTime);
-            }
-            else if(arrival.arrivedByTransit()) {
-                var times = tripSearch.find(arrival);
-                var transit = arrival.transitPath();
-                pathBuilder.transit(transit.trip(), times);
-            }
-            else if(arrival.arrivedByTransfer()) {
-                pathBuilder.transfer(arrival.transferPath().transfer(), arrival.previous().stop());
-            }
-            else {
-                throw new IllegalStateException("Unexpected arrival: " + arrival);
-            }
-            arrival = arrival.previous();
-        }
-    }
-
-
-    private static BoardAndAlightTimeSearch tripTimesSearch(boolean useApproximateTimeSearch) {
-        return useApproximateTimeSearch
-                ? TripTimesSearch::findTripReverseSearchApproximateTime
-                : TripTimesSearch::findTripReverseSearch;
-    }
+  private void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
+    this.iterationDepartureTime = iterationDepartureTime;
+  }
 }

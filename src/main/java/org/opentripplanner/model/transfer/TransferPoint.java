@@ -44,13 +44,38 @@ import org.opentripplanner.model.Trip;
  *     trip-transfer-point, since the stop could change to another platform(common for railway
  *     stations). To account for this the RT-update would need to patch the trip-transfer-point.
  *     We simplify the RT-updates by converting the stop to a stop-position-in-pattern.
- *     <p>
+ * <p>
  *     This is the most specific point type.
  *   </li>
  * </ol>
  * <p>
  */
 public interface TransferPoint {
+  /**
+   * Utility method witch can be used in APIs to get the trip, if it exists, from a transfer point.
+   */
+  @Nullable
+  static Trip getTrip(TransferPoint point) {
+    return point.isTripTransferPoint() ? point.asTripTransferPoint().getTrip() : null;
+  }
+
+  /**
+   * Utility method witch can be used in APIs to get the route, if it exists, from a transfer
+   * point.
+   */
+  @Nullable
+  static Route getRoute(TransferPoint point) {
+    if (point.isTripTransferPoint()) {
+      return point.asTripTransferPoint().getTrip().getRoute();
+    }
+    if (point.isRouteStopTransferPoint()) {
+      return point.asRouteStopTransferPoint().getRoute();
+    }
+    if (point.isRouteStationTransferPoint()) {
+      return point.asRouteStationTransferPoint().getRoute();
+    }
+    return null;
+  }
 
   /** Return {@code true} if this transfer point apply to all trips in pattern */
   boolean appliesToAllTrips();
@@ -63,57 +88,47 @@ public interface TransferPoint {
   int getSpecificityRanking();
 
   /** is a Trip specific transfer point */
-  default boolean isTripTransferPoint() { return false; }
+  default boolean isTripTransferPoint() {
+    return false;
+  }
 
-  default TripTransferPoint asTripTransferPoint() { return (TripTransferPoint) this; }
+  default TripTransferPoint asTripTransferPoint() {
+    return (TripTransferPoint) this;
+  }
 
   /** is a Route specific transfer point */
-  default boolean isRouteStationTransferPoint() { return false; }
+  default boolean isRouteStationTransferPoint() {
+    return false;
+  }
 
   default RouteStationTransferPoint asRouteStationTransferPoint() {
     return (RouteStationTransferPoint) this;
   }
 
   /** is a Route specific transfer point */
-  default boolean isRouteStopTransferPoint() { return false; }
+  default boolean isRouteStopTransferPoint() {
+    return false;
+  }
 
   default RouteStopTransferPoint asRouteStopTransferPoint() {
     return (RouteStopTransferPoint) this;
   }
 
   /** is a Stop specific transfer point (no Trip or Route) */
-  default boolean isStopTransferPoint() { return false; }
-
-  default StopTransferPoint asStopTransferPoint() { return (StopTransferPoint) this; }
-
-  /** is a Station specific transfer point (no Trip or Route) */
-  default boolean isStationTransferPoint() { return false; }
-
-  default StationTransferPoint asStationTransferPoint() { return (StationTransferPoint) this; }
-
-
-  /**
-   * Utility method witch can be used in APIs to get the trip, if it exists, from a transfer point.
-   */
-  @Nullable
-  static Trip getTrip(TransferPoint point) {
-    return point.isTripTransferPoint() ? point.asTripTransferPoint().getTrip() : null;
+  default boolean isStopTransferPoint() {
+    return false;
   }
 
-  /**
-   * Utility method witch can be used in APIs to get the route, if it exists, from a transfer point.
-   */
-  @Nullable
-  static Route getRoute(TransferPoint point) {
-    if(point.isTripTransferPoint()) {
-      return point.asTripTransferPoint().getTrip().getRoute();
-    }
-    if(point.isRouteStopTransferPoint()) {
-      return point.asRouteStopTransferPoint().getRoute();
-    }
-    if(point.isRouteStationTransferPoint()) {
-      return point.asRouteStationTransferPoint().getRoute();
-    }
-    return null;
+  default StopTransferPoint asStopTransferPoint() {
+    return (StopTransferPoint) this;
+  }
+
+  /** is a Station specific transfer point (no Trip or Route) */
+  default boolean isStationTransferPoint() {
+    return false;
+  }
+
+  default StationTransferPoint asStationTransferPoint() {
+    return (StationTransferPoint) this;
   }
 }

@@ -9,62 +9,60 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class LegacyGraphQLRentalVehicleImpl
-        implements LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicle {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicle {
 
-    @Override
-    public DataFetcher<Relay.ResolvedGlobalId> id() {
-        return environment -> new Relay.ResolvedGlobalId(
-                "RentalVehicle",
-                getSource(environment).getId().toString()
-        );
-    }
+  @Override
+  public DataFetcher<Boolean> allowPickupNow() {
+    return environment -> getSource(environment).allowPickupNow();
+  }
 
-    @Override
-    public DataFetcher<String> vehicleId() {
-        return environment -> getSource(environment).getId().toString();
-    }
+  @Override
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment ->
+      new Relay.ResolvedGlobalId("RentalVehicle", getSource(environment).getId().toString());
+  }
 
-    @Override
-    public DataFetcher<RentalVehicleType> vehicleType() {
-        return environment -> getSource(environment).vehicleType;
-    }
+  @Override
+  public DataFetcher<Double> lat() {
+    return environment -> getSource(environment).getLatitude();
+  }
 
-    @Override
-    public DataFetcher<String> name() {
-        return environment -> getSource(environment).getName().toString(environment.getLocale());
-    }
+  @Override
+  public DataFetcher<Double> lon() {
+    return environment -> getSource(environment).getLongitude();
+  }
 
-    @Override
-    public DataFetcher<Boolean> allowPickupNow() {
-        return environment -> getSource(environment).allowPickupNow();
-    }
+  @Override
+  public DataFetcher<String> name() {
+    return environment -> getSource(environment).getName().toString(environment.getLocale());
+  }
 
-    @Override
-    public DataFetcher<String> network() {
-        return environment -> getSource(environment).getNetwork();
-    }
+  @Override
+  public DataFetcher<String> network() {
+    return environment -> getSource(environment).getNetwork();
+  }
 
-    @Override
-    public DataFetcher<Double> lon() {
-        return environment -> getSource(environment).getLongitude();
-    }
+  @Override
+  public DataFetcher<Boolean> operative() {
+    return environment -> getSource(environment).isAllowPickup();
+  }
 
-    @Override
-    public DataFetcher<Double> lat() {
-        return environment -> getSource(environment).getLatitude();
-    }
+  @Override
+  public DataFetcher<VehicleRentalStationUris> rentalUris() {
+    return environment -> getSource(environment).getRentalUris();
+  }
 
-    @Override
-    public DataFetcher<Boolean> operative() {
-        return environment -> getSource(environment).isAllowPickup();
-    }
+  @Override
+  public DataFetcher<String> vehicleId() {
+    return environment -> getSource(environment).getId().toString();
+  }
 
-    @Override
-    public DataFetcher<VehicleRentalStationUris> rentalUris() {
-        return environment -> getSource(environment).getRentalUris();
-    }
+  @Override
+  public DataFetcher<RentalVehicleType> vehicleType() {
+    return environment -> getSource(environment).vehicleType;
+  }
 
-    private VehicleRentalVehicle getSource(DataFetchingEnvironment environment) {
-        return environment.getSource();
-    }
+  private VehicleRentalVehicle getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
+  }
 }
