@@ -23,7 +23,11 @@ import org.opentripplanner.transit.raptor.util.IntIterators;
  * tripSchedulesByDay refers to days in order.
  */
 public class TripPatternForDates
-  implements RaptorRoute<TripSchedule>, RaptorTimeTable<TripSchedule>, RaptorTripPattern {
+  implements
+    RaptorRoute<TripSchedule>,
+    RaptorTimeTable<TripSchedule>,
+    RaptorTripPattern,
+    TripSearchTimetable<TripSchedule> {
 
   private final TripPatternWithRaptorStopIndexes tripPattern;
 
@@ -109,7 +113,7 @@ public class TripPatternForDates
 
   /**
    * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes, but is
-   * realy an implementation detail that should not leak outside the class.
+   * an implementation detail that should not leak outside the class.
    */
   @Deprecated
   public int tripPatternForDateOffsets(int index) {
@@ -137,7 +141,7 @@ public class TripPatternForDates
     return getTripPattern().constrainedTransferReverseSearch();
   }
 
-  // Implementing RaptorTripPattern
+  /* Implementing RaptorStopPattern */
 
   @Override
   public int stopIndex(int stopPositionInPattern) {
@@ -166,7 +170,16 @@ public class TripPatternForDates
     );
   }
 
-  // Implementing RaptorTimeTable
+  /*  Implementing RaptorTimeTable */
+
+  @Override
+  public RaptorTripScheduleSearch<TripSchedule> tripSearch(SearchDirection direction) {
+    if (useCustomizedTripSearch()) {
+      return createCustomizedTripSearch(direction);
+    }
+    return TripScheduleSearchFactory.create(direction, this);
+  }
+
   @Override
   public TripSchedule getTripSchedule(int index) {
     return new TripScheduleWithOffset(this, index);
@@ -184,25 +197,6 @@ public class TripPatternForDates
     return (int index) -> departureTimes[base + index];
   }
 
-  @Override
-  public int numberOfTripSchedules() {
-    return numberOfTripSchedules;
-  }
-
-  @Override
-  public boolean useCustomizedTripSearch() {
-    return isFrequencyBased;
-  }
-
-  @Override
-  public RaptorTripScheduleSearch<TripSchedule> createCustomizedTripSearch(
-    SearchDirection direction
-  ) {
-    return direction.isForward()
-      ? new TripFrequencyBoardSearch<>(this)
-      : new TripFrequencyAlightSearch<>(this);
-  }
-
   public IntUnaryOperator getArrivalTimesForTrip(int index) {
     return (int stopPositionInPattern) ->
       arrivalTimes[stopPositionInPattern * numberOfTripSchedules + index];
@@ -211,6 +205,36 @@ public class TripPatternForDates
   public IntUnaryOperator getDepartureTimesForTrip(int index) {
     return (int stopPositionInPattern) ->
       departureTimes[stopPositionInPattern * numberOfTripSchedules + index];
+  }
+
+  @Override
+  public int numberOfTripSchedules() {
+    return numberOfTripSchedules;
+  }
+
+  /**
+   * Raptor provides a trips search for regular trip schedules, but in some cases it makes
+   * sense to be able to override this - for example for frequency based trips.
+   *
+   * @return {@code true} If you do not want to use the built-in trip search and instead
+   *         will provide your own. Make sure to implement the
+   *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
+   *         searches.
+   */
+  public boolean useCustomizedTripSearch() {
+    return isFrequencyBased;
+  }
+
+  /**
+   * Factory method to provide an alternative trip search in Raptor.
+   * @see #useCustomizedTripSearch()
+   */
+  public RaptorTripScheduleSearch<TripSchedule> createCustomizedTripSearch(
+    SearchDirection direction
+  ) {
+    return direction.isForward()
+      ? new TripFrequencyBoardSearch<>(this)
+      : new TripFrequencyAlightSearch<>(this);
   }
 
   @Override

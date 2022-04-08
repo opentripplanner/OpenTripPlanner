@@ -3,19 +3,15 @@ package org.opentripplanner.transit.raptor.api.transit;
 import javax.annotation.Nullable;
 
 /**
- * The purpose of the TripScheduleSearch is to optimize the search for a trip schedule for a given
- * pattern. Normally the search scan trips sequentially, aborting when a valid trip is found, it can
- * do so because the trips are ordered after the FIRST stop alight/board times. We also assume that
- * trips do not pass each other; Hence trips in service on a given day will be in order for all
- * other stops too.
+ * The purpose of the TripScheduleSearch is to search for a trip schedule for a given pattern.
+ * The search need to be optimized for speed, this is one of the most frequently called
+ * operations in Raptor and accessing objects in memory should be avoided.
  * <p/>
- * The search use a binary search if the number of trip schedules is above a given threshold. A
- * linear search is slow when the number of schedules is very large, let say more than 300 trip
- * schedules.
- * <p/>
- * The implementation of this interface take care the search direction (forward/reverse). For a
- * reverse search (searching backward in time) the trip found departure/arrival times are swapped.
- * This is one of the things that allows for the algorithm to be generic, used in both cases.
+ * There should be two implementations of this interface, one for board-times and one for
+ * alight-times. When Raptor search in reverse direction the alight-time search should be used. For
+ * a reverse search (searching backward in time) the trip found departure/arrival times are swapped.
+ * This is one of the things that allows for the Raptor implementation to be generic, used in both
+ * cases.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
