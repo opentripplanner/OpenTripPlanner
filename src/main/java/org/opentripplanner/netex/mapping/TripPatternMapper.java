@@ -274,11 +274,22 @@ class TripPatternMapper {
       .filter(Objects::nonNull)
       .map(replacement -> {
         if (datedServiceJourney.equals(replacement)) {
+          issueStore.add(
+            "InvalidDatedServiceJourneyRef",
+            "DatedServiceJourney %s has reference to itself, skipping",
+            datedServiceJourney.getId()
+          );
           return null;
         }
         String serviceJourneyRef = replacement.getJourneyRef().get(0).getValue().getRef();
         ServiceJourney serviceJourney = serviceJourneyById.lookup(serviceJourneyRef);
         if (serviceJourney == null) {
+          issueStore.add(
+            "InvalidDatedServiceJourneyRef",
+            "DatedServiceJourney %s has reference to %s, which is not found, skipping",
+            datedServiceJourney.getId(),
+            serviceJourneyRef
+          );
           return null;
         }
         return mapDatedServiceJourney(tripMapper.mapServiceJourney(serviceJourney), replacement);
