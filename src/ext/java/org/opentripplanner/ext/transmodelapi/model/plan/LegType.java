@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ALTERNATIVE_LEGS_FILTER;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
+import static org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter.NO_FILTER;
 
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
@@ -23,7 +25,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.stoptimes.AlternativeLegs;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegType {
@@ -434,6 +436,15 @@ public class LegType {
               .defaultValueProgrammatic(1)
               .type(Scalars.GraphQLInt)
           )
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("filter")
+              .description("Whether the leg should be similar to this leg in some way.")
+              .defaultValueProgrammatic("noFilter")
+              .type(ALTERNATIVE_LEGS_FILTER)
+              .build()
+          )
           .dataFetcher(env -> {
             Leg leg = leg(env);
             if (!leg.isScheduledTransitLeg()) {
@@ -441,7 +452,13 @@ public class LegType {
             }
             int previous = env.getArgument("previous");
             RoutingService routingService = GqlUtil.getRoutingService(env);
-            return AlternativeLegs.getAlternativeLegs(leg, previous, routingService, true);
+            return AlternativeLegs.getAlternativeLegs(
+              leg,
+              previous,
+              routingService,
+              true,
+              env.getArgument("filter")
+            );
           })
           .build()
       )
@@ -461,6 +478,15 @@ public class LegType {
               .defaultValueProgrammatic(1)
               .type(Scalars.GraphQLInt)
           )
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("filter")
+              .description("Whether the leg should be similar to this leg in some way.")
+              .defaultValueProgrammatic("noFilter")
+              .type(ALTERNATIVE_LEGS_FILTER)
+              .build()
+          )
           .dataFetcher(env -> {
             Leg leg = leg(env);
             if (!leg.isScheduledTransitLeg()) {
@@ -468,7 +494,13 @@ public class LegType {
             }
             int next = env.getArgument("next");
             RoutingService routingService = GqlUtil.getRoutingService(env);
-            return AlternativeLegs.getAlternativeLegs(leg, next, routingService, false);
+            return AlternativeLegs.getAlternativeLegs(
+              leg,
+              next,
+              routingService,
+              false,
+              env.getArgument("filter")
+            );
           })
           .build()
       )

@@ -12,6 +12,8 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 
 /**
  * Check that the correct alternative legs are found, and that the search traverses the date
@@ -40,7 +42,8 @@ class AlternativeLegsTest extends GtfsTest {
       originalLeg,
       3,
       routingService,
-      true
+      true,
+      AlternativeLegsFilter.NO_FILTER
     );
 
     var legs = Itinerary.toStr(
@@ -75,7 +78,8 @@ class AlternativeLegsTest extends GtfsTest {
       originalLeg,
       3,
       routingService,
-      false
+      false,
+      AlternativeLegsFilter.NO_FILTER
     );
 
     var legs = Itinerary.toStr(

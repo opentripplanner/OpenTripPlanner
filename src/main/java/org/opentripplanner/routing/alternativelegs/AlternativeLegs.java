@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.stoptimes;
+package org.opentripplanner.routing.alternativelegs;
 
 import static org.opentripplanner.routing.stoptimes.StopTimesHelper.skipByTripCancellation;
 
@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
@@ -48,7 +46,8 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     RoutingService routingService,
-    boolean searchBackward
+    boolean searchBackward,
+    AlternativeLegsFilter filter
   ) {
     StopLocation fromStop = leg.getFrom().stop;
     StopLocation toStop = leg.getTo().stop;
@@ -74,10 +73,13 @@ public class AlternativeLegs {
       legComparator = legComparator.reversed();
     }
 
+    Predicate<TripPattern> tripPatternPredicate = filter.getFilter(leg);
+
     return origins
       .stream()
       .flatMap(stop -> routingService.getPatternsForStop(stop, timetableSnapshot).stream())
       .filter(tripPattern -> tripPattern.getStops().stream().anyMatch(destinations::contains))
+      .filter(tripPatternPredicate)
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
       .flatMap(t ->
         generateLegs(
@@ -103,14 +105,14 @@ public class AlternativeLegs {
   private static Stream<ScheduledTransitLeg> generateLegs(
     RoutingService routingService,
     TimetableSnapshot timetableSnapshot,
-    T2<TripPattern, P2<Integer>> patternWithBoardAlightPositions,
+    TripPatternBetweenStops tripPatternBetweenStops,
     Calendar departureTime,
     ServiceDate originalDate,
     boolean searchBackward
   ) {
-    TripPattern pattern = patternWithBoardAlightPositions.first;
-    int boardingPosition = patternWithBoardAlightPositions.second.first;
-    int alightingPosition = patternWithBoardAlightPositions.second.second;
+    TripPattern pattern = tripPatternBetweenStops.tripPattern;
+    int boardingPosition = tripPatternBetweenStops.positions.boardingPosition;
+    int alightingPosition = tripPatternBetweenStops.positions.alightingPosition;
 
     // TODO: What should we have here
     ZoneId timeZone = routingService.getTimeZone().toZoneId();
@@ -210,7 +212,7 @@ public class AlternativeLegs {
   }
 
   @Nonnull
-  private static Stream<T2<TripPattern, P2<Integer>>> withBoardingAlightingPositions(
+  private static Stream<TripPatternBetweenStops> withBoardingAlightingPositions(
     Collection<StopLocation> origins,
     Collection<StopLocation> destinations,
     TripPattern tripPattern
@@ -235,8 +237,17 @@ public class AlternativeLegs {
           .stream(alightingPositions)
           // Filter out the impossible combinations
           .filter(alightingPosition -> boardingPosition < alightingPosition)
-          .mapToObj(alightingPosition -> new P2<>(boardingPosition, alightingPosition))
+          .mapToObj(alightingPosition ->
+            new BoardingAlightingPositions(boardingPosition, alightingPosition)
+          )
       )
-      .map(pair -> new T2<>(tripPattern, pair));
+      .map(pair -> new TripPatternBetweenStops(tripPattern, pair));
   }
+
+  private record BoardingAlightingPositions(int boardingPosition, int alightingPosition) {}
+
+  private record TripPatternBetweenStops(
+    TripPattern tripPattern,
+    BoardingAlightingPositions positions
+  ) {}
 }
