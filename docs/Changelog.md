@@ -33,6 +33,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add GBFS form factors to GraphQL API [#4062](https://github.com/opentripplanner/OpenTripPlanner/pull/4062)
 - Add Geocoder API for debug client searches [#4068](https://github.com/opentripplanner/OpenTripPlanner/pull/4068)
 - Link platforms also against railway=platform [#4065](https://github.com/opentripplanner/OpenTripPlanner/pull/4065)
+- Consider Wheelchair boarding/alightning when routing from or to directly to a stop [#4046](https://github.com/opentripplanner/OpenTripPlanner/pull/4046)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
