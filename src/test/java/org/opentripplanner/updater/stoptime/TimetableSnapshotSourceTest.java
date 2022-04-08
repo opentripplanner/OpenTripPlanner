@@ -335,7 +335,7 @@ public class TimetableSnapshotSourceTest {
     );
 
     final int scheduleTripIndex = schedule.getTripIndex(addedTripId);
-    assertEquals( -1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
+    assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
   }
 
   @Test
@@ -517,7 +517,7 @@ public class TimetableSnapshotSourceTest {
         new FeedScopedId(feedId, modifiedTripId),
         serviceDate
       );
-      assertNotNull(newTripPattern,"New trip pattern should be found");
+      assertNotNull(newTripPattern, "New trip pattern should be found");
 
       final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
