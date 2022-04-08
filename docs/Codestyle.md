@@ -38,12 +38,37 @@ The check is run by the CI server and will fail the build if the code is incorre
 
 ### IntellJ and Code Style Formatting
 
-If you use IntelliJ, the code-style is automatically imported when you first import the project. If
-you have set a custom code-style in your settings (as we used in v2.1.0 of OTP), then you should
-need to change to the _Project_ Code Style. Open the `Preferences` from the menu and select _
-Editor > Code Style_. Then select **Project** in the _Scheme drop down.
+You should use the prettier Maven plugin to reformat the code or run prettier with Node(faster).
+
+The prettier do NOT format doc and markdown files, only Java code. So for other files you should
+use the _project_ code-style. It is automatically imported when you first open the project. But, if
+you have set a custom code-style in your settings (as we used until OTP v2.1), then you need to
+change to the _Project_ Code Style. Open the `Preferences` from the menu and select _
+Editor > Code Style_. Then select **Project** in the \_Scheme drop down.
+
+#### Run Prettier Maven Plugin as an external tool in IntelliJ
+
+You can run the Prettier Maven plugin as an external tool in IntelliJ. Set it up as an
+`External tool` and assign a key-shortcut to the tool execution.
+
+![External Tool Dialog](images/ExternalToolDialog.png)
+
+```
+Name:              Prettier Format Current File
+Program:           mvn
+Arguments:         prettier:write -Dprettier.inputGlobs=$FilePathRelativeToProjectRoot$
+Working Directory: $ProjectFileDir$
+```
+> **Tip!**  Add a unused key shortcut to execute the external tool, then you can use the old 
+> short-cut to format other file types.
+
+
 
 #### Install File Watchers Plugin in IntelliJ
+
+You can also configure IntelliJ to run the prettier every time IntelliJ save a Java file. But,
+if you are editing the file at the same time you will get a warning that the file in memory and the
+file on disk both changed - and asked to select one of them.
 
 1. In the menyopen _Prefernces..._ and select _Plugins_.
 2. Search for "File Watchers" in Marketplace
@@ -56,18 +81,14 @@ ways to set it up. Below is hwo to configure it using Maven to run the formatter
 without any installation of other components, but might be a bit slow. So, you might want to install
 [prettier-java](https://github.com/jhipster/prettier-java/) in your shell and run it instead.
 
-
-> *Name:* Format files with Prettier
->
-> *File type:* Java
->
-> *Scope:* Project Files
->
-> *Program:* mvn
->
-> *Arguments:* prettier:write -Dprettier.inputGlobs=$FilePathRelativeToProjectRoot$
->
-> *Working Directory:* $ProjectFileDir$
+```
+Name:              Format files with Prettier
+File type:         Java
+Scope:             Project Files
+Program:           mvn
+Arguments:         prettier:write -Dprettier.inputGlobs=$FilePathRelativeToProjectRoot$
+Working Directory: $ProjectFileDir$
+```
 
 ### Other IDEs
 
@@ -148,12 +169,12 @@ guidelines include:
  * Purpose is to allow a generic configuration object to be read via AJAX/JSON, and inserted into an
  * Ext Store
  * The implementation is TriMet route map specific...but replacing ConfigureStore object (or member
- * variables) with another implementation, will give this widget flexibility for other uses beyond 
+ * variables) with another implementation, will give this widget flexibility for other uses beyond
  * the iMap.
  *
  * @class
  */
 ```
 
-*Note: There is still a lot of code following other style conventions, but please adhere to
-consistent style when you write new code, and help clean up and reformat code as you refactor.*
+> **Note:** There is still a lot of code following other style conventions, but please adhere to
+> consistent style when you write new code, and help clean up and reformat code as you refactor.
