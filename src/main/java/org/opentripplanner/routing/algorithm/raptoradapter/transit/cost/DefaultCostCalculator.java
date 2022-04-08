@@ -106,9 +106,9 @@ public final class DefaultCostCalculator implements CostCalculator {
       waitFactor *
       alightSlack;
 
-    if (stopVisitCost != null) {
-      cost += stopVisitCost[toStop];
-    }
+//    if (stopVisitCost != null) {
+//      cost += stopVisitCost[toStop];
+//    }
 
     return cost;
   }
@@ -153,7 +153,7 @@ public final class DefaultCostCalculator implements CostCalculator {
 
     cost += firstBoarding ? boardCostOnly : boardAndTransferCost;
 
-    if (stopVisitCost != null) {
+    if (stopVisitCost != null && !firstBoarding) {
       cost += stopVisitCost[boardStop];
     }
     return cost;
@@ -194,7 +194,7 @@ public final class DefaultCostCalculator implements CostCalculator {
 
       int cost = waitFactor * boardWaitTime;
 
-      if (stopVisitCost != null) {
+      if (stopVisitCost != null && !firstBoarding) {
         cost += stopVisitCost[boardStop];
       }
       return cost;
