@@ -110,6 +110,6 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
 
   int durationIncludingSlack(TransitPathLeg<T> leg) {
     var p = leg.trip().pattern();
-    return leg.duration() + slackProvider.transitSlack(p);
+    return leg.duration() + slackProvider.transitSlack(p.slackIndex());
   }
 }
