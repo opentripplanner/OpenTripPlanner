@@ -1,12 +1,11 @@
 package org.opentripplanner.updater.stoptime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -17,14 +16,12 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
@@ -32,7 +29,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -40,35 +36,22 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
-/**
- * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
- */
-@Ignore
 public class TimetableSnapshotSourceTest {
 
-  private static final Graph graph = new Graph();
+  static Graph graph = new Graph();
   private static final boolean fullDataset = false;
   private static final ServiceDate serviceDate = new ServiceDate();
   private static byte[] cancellation;
-  private static GtfsContext context;
   private static String feedId;
 
   private TimetableSnapshotSource updater;
 
-  @BeforeClass
-  public static void setUpClass() throws Exception {
-    // The ".turnOnSetAgencyToFeedIdForAllElements()" is commented out so it can be
-    // removed from the code, it in no longer in use. It is not deleted here to better
-    // allow the reader of the test understand how the test once worked. There should
-    // be new test to replace this one.
+  @BeforeAll
+  public static void setUpClass() {
+    graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
 
-    context =
-      contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
+    feedId = "agency"; // TODO: find out where this id comes from
 
-    feedId = context.getFeedId().getId();
-
-    GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-    factory.run(graph);
     graph.index();
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -83,9 +66,8 @@ public class TimetableSnapshotSourceTest {
     cancellation = tripUpdateBuilder.build().toByteArray();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
     updater = new TimetableSnapshotSource(graph);
   }
 
@@ -101,7 +83,7 @@ public class TimetableSnapshotSourceTest {
       graphIndex,
       serviceCodes,
       fullDataset,
-      Arrays.asList(TripUpdate.parseFrom(cancellation)),
+      List.of(TripUpdate.parseFrom(cancellation)),
       feedId
     );
 
@@ -115,7 +97,7 @@ public class TimetableSnapshotSourceTest {
       graphIndex,
       serviceCodes,
       fullDataset,
-      Arrays.asList(TripUpdate.parseFrom(cancellation)),
+      List.of(TripUpdate.parseFrom(cancellation)),
       feedId
     );
     assertSame(snapshot, updater.getTimetableSnapshot());
@@ -334,7 +316,7 @@ public class TimetableSnapshotSourceTest {
     // Get trip pattern of last (most recently added) outgoing edge
     // FIXME create a new test to see that add-trip realtime updates work
     TripPattern tripPattern = null;
-    assertNotNull("Added trip pattern should be found", tripPattern);
+    assertNotNull(tripPattern, "Added trip pattern should be found");
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
@@ -344,8 +326,8 @@ public class TimetableSnapshotSourceTest {
 
     final int forTodayAddedTripIndex = forToday.getTripIndex(addedTripId);
     assertTrue(
-      "Added trip should be found in time table for service date",
-      forTodayAddedTripIndex > -1
+      forTodayAddedTripIndex > -1,
+      "Added trip should be found in time table for service date"
     );
     assertEquals(
       RealTimeState.ADDED,
@@ -353,7 +335,7 @@ public class TimetableSnapshotSourceTest {
     );
 
     final int scheduleTripIndex = schedule.getTripIndex(addedTripId);
-    assertEquals("Added trip should not be found in scheduled time table", -1, scheduleTripIndex);
+    assertEquals( -1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
   }
 
   @Test
@@ -477,7 +459,7 @@ public class TimetableSnapshotSourceTest {
       graphIndex,
       serviceCodes,
       fullDataset,
-      Arrays.asList(tripUpdate),
+      List.of(tripUpdate),
       feedId
     );
 
@@ -502,29 +484,29 @@ public class TimetableSnapshotSourceTest {
         modifiedTripId
       );
       assertTrue(
-        "Original trip should be found in scheduled time table",
-        originalTripIndexScheduled > -1
+        originalTripIndexScheduled > -1,
+        "Original trip should be found in scheduled time table"
       );
       final TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
         originalTripIndexScheduled
       );
       assertFalse(
-        "Original trip times should not be canceled in scheduled time table",
-        originalTripTimesScheduled.isCanceled()
+        originalTripTimesScheduled.isCanceled(),
+        "Original trip times should not be canceled in scheduled time table"
       );
       assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
 
       final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(modifiedTripId);
       assertTrue(
-        "Original trip should be found in time table for service date",
-        originalTripIndexForToday > -1
+        originalTripIndexForToday > -1,
+        "Original trip should be found in time table for service date"
       );
       final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
         originalTripIndexForToday
       );
       assertTrue(
-        "Original trip times should be canceled in time table for service date",
-        originalTripTimesForToday.isCanceled()
+        originalTripTimesForToday.isCanceled(),
+        "Original trip times should be canceled in time table for service date"
       );
       assertEquals(RealTimeState.CANCELED, originalTripTimesForToday.getRealTimeState());
     }
@@ -535,7 +517,7 @@ public class TimetableSnapshotSourceTest {
         new FeedScopedId(feedId, modifiedTripId),
         serviceDate
       );
-      assertNotNull("New trip pattern should be found", newTripPattern);
+      assertNotNull(newTripPattern,"New trip pattern should be found");
 
       final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
@@ -546,8 +528,8 @@ public class TimetableSnapshotSourceTest {
         modifiedTripId
       );
       assertTrue(
-        "New trip should be found in time table for service date",
-        newTimetableForTodayModifiedTripIndex > -1
+        newTimetableForTodayModifiedTripIndex > -1,
+        "New trip should be found in time table for service date"
       );
       assertEquals(
         RealTimeState.MODIFIED,
@@ -555,9 +537,9 @@ public class TimetableSnapshotSourceTest {
       );
 
       assertEquals(
-        "New trip should not be found in scheduled time table",
         -1,
-        newTimetableScheduled.getTripIndex(modifiedTripId)
+        newTimetableScheduled.getTripIndex(modifiedTripId),
+        "New trip should not be found in scheduled time table"
       );
     }
   }
@@ -582,7 +564,7 @@ public class TimetableSnapshotSourceTest {
       graphIndex,
       serviceCodes,
       fullDataset,
-      Arrays.asList(TripUpdate.parseFrom(cancellation)),
+      List.of(TripUpdate.parseFrom(cancellation)),
       feedId
     );
     final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
@@ -607,7 +589,7 @@ public class TimetableSnapshotSourceTest {
       graphIndex,
       serviceCodes,
       fullDataset,
-      Arrays.asList(tripUpdate),
+      List.of(tripUpdate),
       feedId
     );
     final TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
