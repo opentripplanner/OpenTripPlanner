@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -11,6 +12,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -116,6 +118,23 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     }
 
     return true;
+  }
+
+  @Override
+  public BitSet filterAvailableStops(
+    TripPatternWithRaptorStopIndexes tripPattern,
+    BitSet boardingPossible
+  ) {
+    // Currently the function only checks wheelchair accessibility if requested, if not just return default (input) values
+    if (!requireWheelchairAccessible) {
+      return boardingPossible;
+    }
+
+    var copy = (BitSet) boardingPossible.clone();
+    // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
+    copy.and(tripPattern.getWheelchairAccessible());
+
+    return copy;
   }
 
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
