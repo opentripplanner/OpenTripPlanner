@@ -1,8 +1,5 @@
 package org.opentripplanner.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
@@ -14,9 +11,9 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -32,10 +29,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.TestUtils;
 
-/**
- * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
- */
-@Ignore
 public class TimetableTest {
 
   private static final TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
@@ -45,7 +38,7 @@ public class TimetableTest {
   private static TripPattern pattern;
   private static Timetable timetable;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUp() throws Exception {
     GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
     graph = new Graph();
@@ -96,7 +89,7 @@ public class TimetableTest {
       serviceDate
     );
     TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    Assertions.assertNull(updatedTripTimes);
 
     // update trip with bad data
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -110,7 +103,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    Assertions.assertNull(updatedTripTimes);
 
     // update trip with non-increasing data
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -132,7 +125,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    Assertions.assertNull(updatedTripTimes);
 
     //---
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 0, 0);
@@ -147,9 +140,9 @@ public class TimetableTest {
         .getShortestPathTree();
 
     path = spt.getPath(stop_c);
-    assertNotNull(path);
+    Assertions.assertNotNull(path);
     endTime = startTime + 20 * 60;
-    assertEquals(endTime, path.getEndTime());
+    Assertions.assertEquals(endTime, path.getEndTime());
 
     // update trip
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -169,12 +162,15 @@ public class TimetableTest {
       TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
     );
     tripUpdate = tripUpdateBuilder.build();
-    assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
+    Assertions.assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNotNull(updatedTripTimes);
+    Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
-    assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
+    Assertions.assertEquals(
+      20 * 60 + 120,
+      timetable.getTripTimes(trip_1_1_index).getArrivalTime(2)
+    );
 
     //---
 
@@ -185,9 +181,9 @@ public class TimetableTest {
         .getShortestPathTree();
 
     path = spt.getPath(stop_c);
-    assertNotNull(path);
+    Assertions.assertNotNull(path);
     endTime = startTime + 20 * 60 + 120;
-    assertEquals(endTime, path.getEndTime());
+    Assertions.assertEquals(endTime, path.getEndTime());
 
     // cancel trip
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -198,7 +194,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNotNull(updatedTripTimes);
+    Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
@@ -206,8 +202,8 @@ public class TimetableTest {
     // TODO This will not work since individual stops cannot be cancelled using GTFS updates
     //      yet
     for (int i = 0; i < tripTimes.getNumStops(); i++) {
-      assertEquals(PickDrop.CANCELLED, pattern.getBoardType(i));
-      assertEquals(PickDrop.CANCELLED, pattern.getAlightType(i));
+      Assertions.assertEquals(PickDrop.CANCELLED, pattern.getBoardType(i));
+      Assertions.assertEquals(PickDrop.CANCELLED, pattern.getAlightType(i));
     }
 
     //---
@@ -219,9 +215,9 @@ public class TimetableTest {
         .getShortestPathTree();
 
     path = spt.getPath(stop_c);
-    assertNotNull(path);
+    Assertions.assertNotNull(path);
     endTime = startTime + 40 * 60;
-    assertEquals(endTime, path.getEndTime());
+    Assertions.assertEquals(endTime, path.getEndTime());
 
     // update trip arrival time incorrectly
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -237,7 +233,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNotNull(updatedTripTimes);
+    Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip arrival time only
@@ -254,7 +250,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNotNull(updatedTripTimes);
+    Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip departure time only
@@ -271,7 +267,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNotNull(updatedTripTimes);
+    Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip using stop id
@@ -288,7 +284,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNotNull(updatedTripTimes);
+    Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip arrival time at first stop and make departure time incoherent at second stop
@@ -310,6 +306,6 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    Assertions.assertNull(updatedTripTimes);
   }
 }
