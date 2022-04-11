@@ -75,11 +75,7 @@ public class TimetableTest {
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     tripUpdate = tripUpdateBuilder.build();
-    var patch = timetable.createUpdatedTripTimes(
-      tripUpdate,
-      timeZone,
-      serviceDate
-    );
+    var patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     assertNull(patch);
 
     // update trip with bad data
@@ -158,10 +154,7 @@ public class TimetableTest {
     var updatedTripTimes = patch.getTripTimes();
     Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
-    assertEquals(
-      20 * 60 + 120,
-      timetable.getTripTimes(trip_1_1_index).getArrivalTime(2)
-    );
+    assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
 
     //---
 
@@ -190,7 +183,7 @@ public class TimetableTest {
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
-    assertEquals(RealTimeState.CANCELED,tripTimes.getRealTimeState());
+    assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
 
     // TODO This will not work since individual stops cannot be cancelled using GTFS updates
     //      yet

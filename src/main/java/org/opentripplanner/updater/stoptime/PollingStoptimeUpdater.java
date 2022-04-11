@@ -139,7 +139,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
+    return MoreObjects
+      .toStringHelper(this)
       .add("updateSource", updateSource)
       .add("feedId", feedId)
       .add("fuzzyTripMatching", fuzzyTripMatching)
