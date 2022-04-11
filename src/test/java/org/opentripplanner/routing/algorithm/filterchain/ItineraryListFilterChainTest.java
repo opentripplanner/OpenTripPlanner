@@ -11,7 +11,9 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import java.time.Instant;
 import java.util.List;
+import org.geotools.xml.xsi.XSISimpleTypes.ID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -113,6 +115,28 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertFalse(i1.isFlaggedForDeletion());
     assertFalse(i2.isFlaggedForDeletion());
     assertTrue(i3.isFlaggedForDeletion());
+  }
+
+  @Test
+  public void testSameFirstOrLastTripFilter() {
+    ItineraryListFilterChain chain = createBuilder(false, false, 20)
+      .withSameFirstOrLastTripFilter(true)
+      .build();
+
+    int ID_1 = 1;
+    int ID_2 = 2;
+    int ID_3 = 3;
+
+    Itinerary i1 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_2, 52, 100, C).build();
+
+    Itinerary i2 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_3, 52, 150, C).build();
+
+    List<Itinerary> input = List.of(i1, i2);
+
+    chain.filter(input);
+
+    assertFalse(i1.isFlaggedForDeletion());
+    assertTrue(i2.isFlaggedForDeletion());
   }
 
   @Test

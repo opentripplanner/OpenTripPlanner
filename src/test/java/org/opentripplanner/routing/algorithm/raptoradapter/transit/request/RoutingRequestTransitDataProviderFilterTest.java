@@ -7,9 +7,12 @@ import static org.opentripplanner.model.WheelChairBoarding.NOT_POSSIBLE;
 import static org.opentripplanner.model.WheelChairBoarding.POSSIBLE;
 
 import java.time.LocalDate;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.BikeAccess;
@@ -40,6 +43,50 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
     WheelchairAccessibilityRequest.DEFAULTS;
+
+  /**
+   * Test filter for wheelchair access.
+   *
+   * @param wheelchair If true stops are wheelchair accessible else not
+   */
+  @ParameterizedTest
+  @ValueSource(strings = { "true", "false" })
+  public void testWheelchairAccess(boolean wheelchair) {
+    var wheelchairBoarding = wheelchair ? POSSIBLE : NOT_POSSIBLE;
+
+    var firstStop = Stop.stopForTest("TEST:START", wheelchairBoarding, 0.0, 0.0);
+    var lastStop = Stop.stopForTest("TEST:END", wheelchairBoarding, 0.0, 0.0);
+
+    var stopTimeStart = new StopTime();
+    var stopTimeEnd = new StopTime();
+
+    stopTimeStart.setStop(firstStop);
+    stopTimeEnd.setStop(lastStop);
+
+    var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
+    var pattern = new TripPattern(null, new Route(TEST_ROUTE_ID), stopPattern);
+
+    var tripPattern = new TripPatternWithRaptorStopIndexes(pattern, new int[2]);
+
+    var filter = new RoutingRequestTransitDataProviderFilter(
+      false,
+      true,
+      false,
+      Set.of(),
+      Set.of(),
+      Set.of()
+    );
+
+    var boardingPossible = new BitSet();
+
+    boardingPossible.set(0, 2);
+
+    var wheelchairPossible = filter.filterAvailableStops(tripPattern, boardingPossible);
+
+    assertEquals(wheelchair, wheelchairPossible.get(0), "Wrong boarding value on first stop");
+    assertEquals(wheelchair, wheelchairPossible.get(1), "Wrong boarding value on second stop");
+  }
+
 
   @Test
   public void notFilteringExpectedTripPatternForDateTest() {

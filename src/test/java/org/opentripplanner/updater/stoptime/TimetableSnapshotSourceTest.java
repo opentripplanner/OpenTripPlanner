@@ -10,6 +10,7 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -370,7 +371,7 @@ public class TimetableSnapshotSourceTest {
       final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
       tripDescriptorBuilder.setTripId(modifiedTripId);
-      tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.MODIFIED);
+      tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.REPLACEMENT);
       tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
       final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());

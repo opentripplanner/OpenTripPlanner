@@ -17,8 +17,13 @@ import javax.validation.constraints.NotNull;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedule> {
+  /** Used to indicate that no trip is found. */
+  static final int NOT_FOUND = -1;
+
   /**
    * The trip timetable index for the trip  found.
+   * <p>
+   * If not found {@link #NOT_FOUND} is returned.
    */
   int getTripIndex();
 

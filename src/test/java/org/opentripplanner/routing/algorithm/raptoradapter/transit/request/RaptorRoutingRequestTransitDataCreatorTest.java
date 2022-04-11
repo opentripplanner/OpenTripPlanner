@@ -7,11 +7,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitMode;
@@ -32,7 +34,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   private static final TripPattern TP = new TripPattern(
     new FeedScopedId("F", "P1"),
     new Route(new FeedScopedId("F", "L1")),
-    new StopPattern(List.of(new StopTime(), new StopTime()))
+    new StopPattern(List.of(createStopTime(), createStopTime()))
   );
 
   @BeforeEach
@@ -75,7 +77,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset in time when requested.
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
       startOfTime,
-      tripPatternsForDates
+      tripPatternsForDates,
+      new TestTransitDataProviderFilter()
     );
 
     // Get the results
@@ -118,5 +121,40 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
       Arrays.asList(stopTime1, stopTime2),
       new Deduplicator()
     );
+  }
+
+  /**
+   * Utility function to create bare minimum of valid StopTime with no interesting attributes
+   *
+   * @return StopTime instance
+   */
+  private static StopTime createStopTime() {
+    var st = new StopTime();
+    st.setStop(Stop.stopForTest("Stop:1", 0.0, 0.0));
+    return st;
+  }
+
+  /**
+   * Utility class that does nothing, used just to avoid null value on filter
+   */
+  private static class TestTransitDataProviderFilter implements TransitDataProviderFilter {
+
+    @Override
+    public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
+      return false;
+    }
+
+    @Override
+    public boolean tripTimesPredicate(TripTimes tripTimes) {
+      return false;
+    }
+
+    @Override
+    public BitSet filterAvailableStops(
+      TripPatternWithRaptorStopIndexes tripPattern,
+      BitSet boardingPossible
+    ) {
+      return boardingPossible;
+    }
   }
 }

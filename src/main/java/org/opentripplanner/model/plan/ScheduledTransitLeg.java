@@ -24,6 +24,8 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.mapping.AccessibilityScore;
@@ -297,6 +299,16 @@ public class ScheduledTransitLeg implements Leg {
   @Override
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  @Override
+  public LegReference getLegReference() {
+    return new ScheduledTransitLegReference(
+      tripTimes.getTrip().getId(),
+      serviceDate,
+      boardStopPosInPattern,
+      alightStopPosInPattern
+    );
   }
 
   public void addAlert(TransitAlert alert) {

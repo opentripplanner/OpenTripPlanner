@@ -66,7 +66,7 @@ public class EstimatedCallType {
           .dataFetcher(environment ->
             1000 *
             (
-              ((TripTimeOnDate) environment.getSource()).getServiceDay() +
+              ((TripTimeOnDate) environment.getSource()).getServiceDayMidnight() +
               ((TripTimeOnDate) environment.getSource()).getScheduledArrival()
             )
           )
@@ -82,7 +82,9 @@ public class EstimatedCallType {
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
-            return 1000 * (tripTimeOnDate.getServiceDay() + tripTimeOnDate.getRealtimeArrival());
+            return (
+              1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getRealtimeArrival())
+            );
           })
           .build()
       )
@@ -99,7 +101,9 @@ public class EstimatedCallType {
             if (tripTimeOnDate.getActualArrival() == -1) {
               return null;
             }
-            return 1000 * (tripTimeOnDate.getServiceDay() + tripTimeOnDate.getActualArrival());
+            return (
+              1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getActualArrival())
+            );
           })
           .build()
       )
@@ -112,7 +116,7 @@ public class EstimatedCallType {
           .dataFetcher(environment ->
             1000 *
             (
-              ((TripTimeOnDate) environment.getSource()).getServiceDay() +
+              ((TripTimeOnDate) environment.getSource()).getServiceDayMidnight() +
               ((TripTimeOnDate) environment.getSource()).getScheduledDeparture()
             )
           )
@@ -128,7 +132,10 @@ public class EstimatedCallType {
           )
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
-            return 1000 * (tripTimeOnDate.getServiceDay() + tripTimeOnDate.getRealtimeDeparture());
+            return (
+              1000 *
+              (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getRealtimeDeparture())
+            );
           })
           .build()
       )
@@ -145,7 +152,9 @@ public class EstimatedCallType {
             if (tripTimeOnDate.getActualDeparture() == -1) {
               return null;
             }
-            return 1000 * (tripTimeOnDate.getServiceDay() + tripTimeOnDate.getActualDeparture());
+            return (
+              1000 * (tripTimeOnDate.getServiceDayMidnight() + tripTimeOnDate.getActualDeparture())
+            );
           })
           .build()
       )
@@ -344,9 +353,7 @@ public class EstimatedCallType {
 
     TransitAlertService alertPatchService = routingService.getTransitAlertService();
 
-    final ServiceDate serviceDate = new ServiceDate(
-      LocalDate.ofEpochDay(1 + tripTimeOnDate.getServiceDay() / (24 * 3600))
-    );
+    final ServiceDate serviceDate = tripTimeOnDate.getServiceDay();
 
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
@@ -368,7 +375,7 @@ public class EstimatedCallType {
       alertPatchService.getDirectionAndRouteAlerts(trip.getDirection().gtfsCode, routeId)
     );
 
-    long serviceDayMillis = 1000L * tripTimeOnDate.getServiceDay();
+    long serviceDayMillis = 1000L * tripTimeOnDate.getServiceDayMidnight();
     long arrivalMillis = 1000L * tripTimeOnDate.getRealtimeArrival();
     long departureMillis = 1000L * tripTimeOnDate.getRealtimeDeparture();
 
