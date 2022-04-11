@@ -107,6 +107,9 @@ public class FaresTest {
       ConstantsForTests.KCM_GTFS,
       new SeattleFareServiceFactory()
     );
+
+    assertEquals("America/Los_Angeles", graph.getTimeZone().getID());
+
     var feedId = graph.getFeedIds().iterator().next();
 
     var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
@@ -124,8 +127,13 @@ public class FaresTest {
     var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
     var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
     var leg = peakItinerary.legs.get(0);
+
     assertTrue(toLocalTime(leg.getStartTime()).isAfter(LocalTime.parse("08:00")));
-    assertTrue(toLocalTime(leg.getStartTime()).isBefore(LocalTime.parse("09:00")));
+    var startTime = toLocalTime(leg.getStartTime());
+    assertTrue(
+      startTime.isBefore(LocalTime.parse("09:00")),
+      "Leg's start should be before 09:00 but is " + startTime
+    );
 
     assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
   }
