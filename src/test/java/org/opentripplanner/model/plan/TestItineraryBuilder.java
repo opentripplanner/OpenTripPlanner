@@ -18,6 +18,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -145,6 +146,24 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   public TestItineraryBuilder bus(int tripId, int startTime, int endTime, Place to) {
     return bus(tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
+  }
+
+  public TestItineraryBuilder bus(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    LocalDate serviceDay
+  ) {
+    return bus(
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      serviceDay
+    );
   }
 
   /**
