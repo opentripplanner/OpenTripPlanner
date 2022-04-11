@@ -69,7 +69,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   public RoutingRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {
     this(
       request.modes.transferMode == StreetMode.BIKE,
-      request.accessibilityRequest,
+      request.wheelchairAccessibility,
       request.includePlannedCancellations,
       request.modes.transitModes,
       request.getBannedRoutes(graphIndex.getAllRoutes()),

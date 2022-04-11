@@ -33,7 +33,7 @@ class RoutingRequestMapperTest {
 
     var subject = RoutingRequestMapper.mapRoutingRequest(nodeAdapter);
 
-    var accessibility = subject.accessibilityRequest;
+    var accessibility = subject.wheelchairAccessibility;
     assertTrue(accessibility.enabled());
 
     assertFalse(accessibility.trips().onlyConsiderAccessible());

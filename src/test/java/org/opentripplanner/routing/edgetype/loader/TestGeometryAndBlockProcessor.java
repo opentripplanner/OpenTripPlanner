@@ -401,7 +401,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     }
 
     RoutingRequest options = new RoutingRequest();
-    options.accessibilityRequest = WheelchairAccessibilityRequest.makeDefault(true);
+    options.wheelchairAccessibility = WheelchairAccessibilityRequest.makeDefault(true);
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
 
     ShortestPathTree spt;

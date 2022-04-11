@@ -71,7 +71,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transferService = transferService;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
-    var accessibility = routingContext.opt.accessibilityRequest;
+    var accessibility = routingContext.opt.wheelchairAccessibility;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at

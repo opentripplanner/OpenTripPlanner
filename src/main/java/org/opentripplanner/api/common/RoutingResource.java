@@ -756,7 +756,7 @@ public abstract class RoutingResource {
       request.timetableView = timetableView;
     }
 
-    if (wheelchair != null) request.setAccessibility(wheelchair);
+    if (wheelchair != null) request.setWheelchairAccessible(wheelchair);
 
     if (numItineraries != null) request.setNumItineraries(numItineraries);
 

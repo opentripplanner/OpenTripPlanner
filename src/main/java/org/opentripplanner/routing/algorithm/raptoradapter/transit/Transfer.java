@@ -51,7 +51,7 @@ public class Transfer {
     rr.bikeSwitchTime = roundTo100(request.bikeSwitchTime);
 
     // it's a record (immutable) so can be safely reused
-    rr.accessibilityRequest = request.accessibilityRequest;
+    rr.wheelchairAccessibility = request.wheelchairAccessibility;
     rr.maxWheelchairSlope = request.maxWheelchairSlope;
 
     rr.walkSpeed = roundToHalf(request.walkSpeed);

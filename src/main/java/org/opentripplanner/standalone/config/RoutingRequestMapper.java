@@ -141,7 +141,7 @@ public class RoutingRequestMapper {
     request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
     request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
 
-    request.accessibilityRequest = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
+    request.wheelchairAccessibility = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
 
     mapTransferOptimization(
       (TransferOptimizationRequest) request.transferOptimization,
@@ -165,13 +165,13 @@ public class RoutingRequestMapper {
   }
 
   private static WheelchairAccessibilityFeature mapAccessibilityFeature(
-    NodeAdapter trips,
+    NodeAdapter adapter,
     WheelchairAccessibilityFeature deflt
   ) {
     return new WheelchairAccessibilityFeature(
-      trips.asBoolean("onlyConsiderAccessible", deflt.onlyConsiderAccessible()),
-      trips.asInt("unknownCost", deflt.unknownCost()),
-      trips.asInt("inaccessibleCost", deflt.inaccessibleCost())
+      adapter.asBoolean("onlyConsiderAccessible", deflt.onlyConsiderAccessible()),
+      adapter.asInt("unknownCost", deflt.unknownCost()),
+      adapter.asInt("inaccessibleCost", deflt.inaccessibleCost())
     );
   }
 

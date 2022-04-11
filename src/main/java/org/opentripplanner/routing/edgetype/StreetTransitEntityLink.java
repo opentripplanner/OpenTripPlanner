@@ -83,7 +83,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     // This allows searching for nearby transit stops using walk-only options.
     StateEditor s1 = s0.edit(this);
 
-    var accessibility = s0.getOptions().accessibilityRequest;
+    var accessibility = s0.getOptions().wheelchairAccessibility;
     if (accessibility.enabled()) {
       if (
         accessibility.stops().onlyConsiderAccessible() &&
@@ -91,9 +91,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       ) {
         return null;
       } else if (wheelchairBoarding == WheelChairBoarding.NO_INFORMATION) {
-        s1.incrementWeight(req.accessibilityRequest.stops().unknownCost());
+        s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
       } else if (wheelchairBoarding == WheelChairBoarding.NOT_POSSIBLE) {
-        s1.incrementWeight(req.accessibilityRequest.stops().inaccessibleCost());
+        s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
       }
     }
 

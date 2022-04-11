@@ -103,7 +103,7 @@ public class VehicleParkingEdge extends Edge {
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
-        options.accessibilityRequest.enabled(),
+        options.wheelchairAccessibility.enabled(),
         options.useVehicleParkingAvailabilityInformation
       )
     ) {
@@ -144,7 +144,7 @@ public class VehicleParkingEdge extends Edge {
     if (
       !vehicleParking.hasSpacesAvailable(
         s0.getNonTransitMode(),
-        options.accessibilityRequest.enabled(),
+        options.wheelchairAccessibility.enabled(),
         options.useVehicleParkingAvailabilityInformation
       )
     ) {

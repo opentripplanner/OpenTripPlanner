@@ -156,7 +156,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     options.bikeParkTime = 60;
     options.carParkCost = 240;
     options.carParkTime = 180;
-    options.accessibilityRequest =
+    options.wheelchairAccessibility =
       WheelchairAccessibilityRequest.makeDefault(requireWheelChairAccessible);
     options.bannedVehicleParkingTags = bannedTags;
     options.requiredVehicleParkingTags = requiredTags;

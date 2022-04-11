@@ -85,7 +85,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       rr -> {
         rr.from = new GenericLocation(47.5010, 19.03);
         rr.to = new GenericLocation(47.5010, 19.03);
-        rr.accessibilityRequest = WheelchairAccessibilityRequest.makeDefault(true);
+        rr.wheelchairAccessibility = WheelchairAccessibilityRequest.makeDefault(true);
       },
       "C1C2 street",
       "C1C2 street",

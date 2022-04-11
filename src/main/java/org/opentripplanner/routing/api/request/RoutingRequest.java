@@ -243,7 +243,7 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
    */
-  public WheelchairAccessibilityRequest accessibilityRequest =
+  public WheelchairAccessibilityRequest wheelchairAccessibility =
     WheelchairAccessibilityRequest.DEFAULTS;
   /**
    * The maximum number of itineraries to return. In OTP1 this parameter terminates the search, but
@@ -736,8 +736,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.bicycleOptimizeType = bicycleOptimizeType;
   }
 
-  public void setAccessibility(boolean wheelchair) {
-    this.accessibilityRequest = this.accessibilityRequest.withEnabled(wheelchair);
+  public void setWheelchairAccessible(boolean wheelchair) {
+    this.wheelchairAccessibility = this.wheelchairAccessibility.withEnabled(wheelchair);
   }
 
   public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {

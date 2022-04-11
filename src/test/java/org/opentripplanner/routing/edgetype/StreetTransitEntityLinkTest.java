@@ -70,7 +70,7 @@ class StreetTransitEntityLinkTest {
 
     var req = new RoutingRequest();
     var feature = new WheelchairAccessibilityFeature(onlyAccessible, 100, 100);
-    req.accessibilityRequest = new WheelchairAccessibilityRequest(true, feature, feature);
+    req.wheelchairAccessibility = new WheelchairAccessibilityRequest(true, feature, feature);
 
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);
