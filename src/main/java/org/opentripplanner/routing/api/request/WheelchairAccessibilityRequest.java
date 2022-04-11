@@ -12,7 +12,7 @@ public record WheelchairAccessibilityRequest(
   );
 
   public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {
-    return new WheelchairAccessibilityRequest(enabled, DEFAULTS.trips, DEFAULTS.stops);
+    return DEFAULTS.withEnabled(enabled);
   }
 
   public WheelchairAccessibilityRequest withEnabled(boolean enabled) {
