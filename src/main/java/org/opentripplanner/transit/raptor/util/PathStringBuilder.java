@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.util;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -78,13 +78,13 @@ public class PathStringBuilder {
   public PathStringBuilder transit(
     TraverseMode mode,
     String trip,
-    Calendar fromTime,
-    Calendar toTime
+    ZonedDateTime fromTime,
+    ZonedDateTime toTime
   ) {
     return start().append(mode.name()).space().append(trip).space().time(fromTime, toTime).end();
   }
 
-  public PathStringBuilder other(TraverseMode mode, Calendar fromTime, Calendar toTime) {
+  public PathStringBuilder other(TraverseMode mode, ZonedDateTime fromTime, ZonedDateTime toTime) {
     return start().append(mode.name()).space().time(fromTime, toTime).end();
   }
 
@@ -145,7 +145,7 @@ public class PathStringBuilder {
 
   /* private helpers */
 
-  private PathStringBuilder time(Calendar from, Calendar to) {
+  private PathStringBuilder time(ZonedDateTime from, ZonedDateTime to) {
     return append(TimeUtils.timeToStrCompact(from)).space().append(TimeUtils.timeToStrCompact(to));
   }
 

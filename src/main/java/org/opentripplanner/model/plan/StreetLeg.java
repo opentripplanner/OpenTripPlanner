@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
-import java.util.Calendar;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,9 +20,9 @@ public class StreetLeg implements Leg {
 
   private final TraverseMode mode;
 
-  private final Calendar startTime;
+  private final ZonedDateTime startTime;
 
-  private final Calendar endTime;
+  private final ZonedDateTime endTime;
 
   private final double distanceMeters;
 
@@ -33,21 +34,19 @@ public class StreetLeg implements Leg {
   private final List<WalkStep> walkSteps;
   private final Set<StreetNote> streetNotes = new HashSet<>();
   private final int generalizedCost;
-  private List<P2<Double>> legElevation;
+  private final List<P2<Double>> legElevation;
   private Double elevationLost = null;
   private Double elevationGained = null;
+
   private FeedScopedId pathwayId;
-
   private Boolean walkingBike;
-
   private Boolean rentedVehicle;
-
   private String vehicleRentalNetwork;
 
   public StreetLeg(
     TraverseMode mode,
-    Calendar startTime,
-    Calendar endTime,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
     Place from,
     Place to,
     double distanceMeters,
@@ -96,12 +95,12 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public Calendar getStartTime() {
+  public ZonedDateTime getStartTime() {
     return startTime;
   }
 
   @Override
-  public Calendar getEndTime() {
+  public ZonedDateTime getEndTime() {
     return endTime;
   }
 
@@ -193,6 +192,29 @@ public class StreetLeg implements Leg {
 
   public void addStretNote(StreetNote streetNote) {
     streetNotes.add(streetNote);
+  }
+
+  @Override
+  public Leg timeShiftBy(Duration duration) {
+    StreetLeg copy = new StreetLeg(
+      mode,
+      startTime.plus(duration),
+      endTime.plus(duration),
+      from,
+      to,
+      distanceMeters,
+      generalizedCost,
+      legGeometry,
+      legElevation,
+      walkSteps
+    );
+
+    copy.setPathwayId(pathwayId);
+    copy.setWalkingBike(walkingBike);
+    copy.setRentedVehicle(rentedVehicle);
+    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
+
+    return copy;
   }
 
   /**

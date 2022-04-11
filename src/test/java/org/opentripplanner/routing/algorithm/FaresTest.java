@@ -8,7 +8,6 @@ import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -124,8 +123,8 @@ public class FaresTest {
     var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
     var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
     var leg = peakItinerary.legs.get(0);
-    assertTrue(toLocalTime(leg.getStartTime()).isAfter(LocalTime.parse("08:00")));
-    assertTrue(toLocalTime(leg.getStartTime()).isBefore(LocalTime.parse("09:00")));
+    assertTrue(leg.getStartTime().toLocalTime().isAfter(LocalTime.parse("08:00")));
+    assertTrue(leg.getStartTime().toLocalTime().isBefore(LocalTime.parse("09:00")));
 
     assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
   }
@@ -272,9 +271,5 @@ public class FaresTest {
       new DebugTimingAggregator()
     );
     return result.getItineraries();
-  }
-
-  private static LocalTime toLocalTime(Calendar time) {
-    return time.toInstant().atZone(time.getTimeZone().toZoneId()).toLocalTime();
   }
 }

@@ -5,7 +5,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,7 +118,7 @@ public class TimeUtils {
     return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toCompactStr();
   }
 
-  public static String timeToStrCompact(Calendar time) {
+  public static String timeToStrCompact(ZonedDateTime time) {
     return time == null ? "" : RelativeTime.from(time).toCompactStr();
   }
 
@@ -131,21 +130,12 @@ public class TimeUtils {
     return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toLongStr();
   }
 
-  public static String timeToStrLong(Calendar time) {
+  public static String timeToStrLong(ZonedDateTime time) {
     return RelativeTime.from(time).toLongStr();
   }
 
   public static String timeToStrLong(LocalTime time) {
     return time.toString();
-  }
-
-  public static Calendar midnightOf(Calendar time) {
-    final Calendar midnight = (Calendar) time.clone();
-    midnight.set(Calendar.HOUR, 0);
-    midnight.set(Calendar.MINUTE, 0);
-    midnight.set(Calendar.SECOND, 0);
-    midnight.set(Calendar.MILLISECOND, 0);
-    return midnight;
   }
 
   /**
@@ -164,13 +154,5 @@ public class TimeUtils {
    */
   public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
     return RelativeTime.ofSeconds(seconds).toZonedDateTime(date, zoneId);
-  }
-
-  public static ZonedDateTime zonedDateTime(Calendar time) {
-    return time.toInstant().atZone(time.getTimeZone().toZoneId());
-  }
-
-  public static LocalTime localTime(Calendar time) {
-    return zonedDateTime(time).toLocalTime();
   }
 }

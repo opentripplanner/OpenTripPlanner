@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
-import java.util.GregorianCalendar;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -28,8 +27,8 @@ public class ItineraryTest implements PlanTestConstants {
 
     // Expected fields on walking leg set
     assertSameLocation(A, result.firstLeg().getFrom());
-    assertEquals(GregorianCalendar.from(newTime(T11_00)), result.firstLeg().getStartTime());
-    assertEquals(GregorianCalendar.from(newTime(T11_05)), result.firstLeg().getEndTime());
+    assertEquals(newTime(T11_00), result.firstLeg().getStartTime());
+    assertEquals(newTime(T11_05), result.firstLeg().getEndTime());
     assertEquals(TraverseMode.WALK, result.firstLeg().getMode());
     assertEquals(420.0d, result.firstLeg().getDistanceMeters(), 1E-3);
     assertSameLocation(B, result.lastLeg().getTo());
@@ -52,8 +51,8 @@ public class ItineraryTest implements PlanTestConstants {
     // Expected fields on bus leg set
     assertSameLocation(A, result.firstLeg().getFrom());
     assertSameLocation(B, result.firstLeg().getTo());
-    assertEquals(GregorianCalendar.from(newTime(T11_00)), result.firstLeg().getStartTime());
-    assertEquals(GregorianCalendar.from(newTime(T11_10)), result.firstLeg().getEndTime());
+    assertEquals(newTime(T11_00), result.firstLeg().getStartTime());
+    assertEquals(newTime(T11_10), result.firstLeg().getEndTime());
     assertEquals(TraverseMode.BUS, result.firstLeg().getMode());
     assertEquals(new FeedScopedId("F", "55"), result.firstLeg().getTrip().getId());
     assertEquals(7500, result.firstLeg().getDistanceMeters(), 1E-3);
@@ -76,8 +75,8 @@ public class ItineraryTest implements PlanTestConstants {
     // Expected fields on bus leg set
     assertSameLocation(A, result.firstLeg().getFrom());
     assertSameLocation(B, result.firstLeg().getTo());
-    assertEquals(GregorianCalendar.from(newTime(T11_05)), result.firstLeg().getStartTime());
-    assertEquals(GregorianCalendar.from(newTime(T11_15)), result.firstLeg().getEndTime());
+    assertEquals(newTime(T11_05), result.firstLeg().getStartTime());
+    assertEquals(newTime(T11_15), result.firstLeg().getEndTime());
     assertEquals(TraverseMode.RAIL, result.firstLeg().getMode());
     assertEquals(new FeedScopedId("F", "20"), result.firstLeg().getTrip().getId());
     assertEquals(15_000, result.firstLeg().getDistanceMeters(), 1E-3);

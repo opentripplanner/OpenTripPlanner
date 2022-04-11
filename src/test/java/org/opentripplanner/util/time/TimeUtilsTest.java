@@ -4,16 +4,21 @@ import static java.time.ZoneOffset.UTC;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.TimeZone;
 import org.junit.Test;
 
 public class TimeUtilsTest {
 
-  private static final Calendar CAL = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+  private static final ZonedDateTime CAL = ZonedDateTime.of(
+    LocalDate.of(2019, Month.JANUARY, 15),
+    LocalTime.of(9, 36, 7),
+    ZoneId.of("UTC")
+  );
+
   private final int T00_00_01 = time(0, 0, 1);
   private final int T00_01_00 = time(0, 1, 0);
   private final int T01_00_00 = time(1, 0, 0);
@@ -23,11 +28,6 @@ public class TimeUtilsTest {
   private final int T26_03_15 = time(26, 3, 15);
 
   private final int NOT_SET = 999_999;
-
-  static {
-    CAL.clear();
-    CAL.set(2019, Calendar.JANUARY, 15, 9, 36, 7);
-  }
 
   @Test
   public void timeToStrCompact() {
@@ -112,18 +112,6 @@ public class TimeUtilsTest {
     assertEquals("[3723]", Arrays.toString(TimeUtils.times("01:02:03")));
     assertEquals("[3600, 60, 1]", Arrays.toString(TimeUtils.times("1 0:1 0:0:1")));
     assertEquals("[3600, 60, 1, 7200]", Arrays.toString(TimeUtils.times("1,0:1;0:0:1,; 2")));
-  }
-
-  @Test
-  public void midnightOf() {
-    // When
-    Calendar midnight = TimeUtils.midnightOf(CAL);
-
-    // Then
-    assertEquals(0, midnight.get(Calendar.HOUR_OF_DAY));
-    assertEquals(0, midnight.get(Calendar.MINUTE));
-    assertEquals(0, midnight.get(Calendar.SECOND));
-    assertEquals(0, midnight.get(Calendar.MILLISECOND));
   }
 
   @Test

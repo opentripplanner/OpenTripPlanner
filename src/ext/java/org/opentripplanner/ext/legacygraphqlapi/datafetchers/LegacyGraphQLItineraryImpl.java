@@ -36,7 +36,7 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Long> endTime() {
-    return environment -> getSource(environment).endTime().getTime().getTime();
+    return environment -> getSource(environment).endTime().toInstant().toEpochMilli();
   }
 
   @Override
@@ -72,7 +72,7 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Long> startTime() {
-    return environment -> getSource(environment).startTime().getTime().getTime();
+    return environment -> getSource(environment).startTime().toInstant().toEpochMilli();
   }
 
   @Override

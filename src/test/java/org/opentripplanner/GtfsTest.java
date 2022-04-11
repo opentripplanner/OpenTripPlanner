@@ -118,8 +118,8 @@ public abstract class GtfsTest {
     String fromStopId,
     String alert
   ) {
-    assertEquals(startTime, leg.getStartTime().getTimeInMillis());
-    assertEquals(endTime, leg.getEndTime().getTimeInMillis());
+    assertEquals(startTime, leg.getStartTime().toInstant().toEpochMilli());
+    assertEquals(endTime, leg.getEndTime().toInstant().toEpochMilli());
     assertEquals(toStopId, leg.getTo().stop.getId().getId());
     assertEquals(feedId.getId(), leg.getTo().stop.getId().getFeedId());
     if (fromStopId != null) {

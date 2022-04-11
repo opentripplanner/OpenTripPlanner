@@ -2,7 +2,6 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ALTERNATIVE_LEGS_FILTER;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
-import static org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter.NO_FILTER;
 
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
@@ -71,7 +70,11 @@ public class LegType {
           .description("The aimed date and time this leg starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
           .dataFetcher(env -> // startTime is already adjusted for realtime - need to subtract delay to get aimed time
-            leg(env).getStartTime().getTimeInMillis() - (1000L * leg(env).getDepartureDelay())
+            leg(env)
+              .getStartTime()
+              .minusSeconds(leg(env).getDepartureDelay())
+              .toInstant()
+              .toEpochMilli()
           )
           .build()
       )
@@ -81,7 +84,7 @@ public class LegType {
           .name("expectedStartTime")
           .description("The expected, realtime adjusted date and time this leg starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(env -> leg(env).getStartTime().getTimeInMillis())
+          .dataFetcher(env -> leg(env).getStartTime().toInstant().toEpochMilli())
           .build()
       )
       .field(
@@ -91,7 +94,11 @@ public class LegType {
           .description("The aimed date and time this leg ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
           .dataFetcher(env -> // endTime is already adjusted for realtime - need to subtract delay to get aimed time
-            leg(env).getEndTime().getTimeInMillis() - 1000L * leg(env).getArrivalDelay()
+            leg(env)
+              .getEndTime()
+              .minusSeconds(leg(env).getArrivalDelay())
+              .toInstant()
+              .toEpochMilli()
           )
           .build()
       )
@@ -101,7 +108,7 @@ public class LegType {
           .name("expectedEndTime")
           .description("The expected, realtime adjusted date and time this leg ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(env -> leg(env).getEndTime().getTimeInMillis())
+          .dataFetcher(env -> leg(env).getEndTime().toInstant().toEpochMilli())
           .build()
       )
       .field(

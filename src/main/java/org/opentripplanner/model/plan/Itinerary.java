@@ -2,8 +2,9 @@ package org.opentripplanner.model.plan;
 
 import static java.util.Locale.ROOT;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -147,14 +148,14 @@ public class Itinerary {
   /**
    * Time that the trip departs.
    */
-  public Calendar startTime() {
+  public ZonedDateTime startTime() {
     return firstLeg().getStartTime();
   }
 
   /**
    * Time that the trip arrives.
    */
-  public Calendar endTime() {
+  public ZonedDateTime endTime() {
     return lastLeg().getEndTime();
   }
 
@@ -235,10 +236,13 @@ public class Itinerary {
     return !systemNotices.isEmpty();
   }
 
-  public void timeShiftToStartAt(Calendar afterTime) {
-    Calendar startTimeFirstLeg = firstLeg().getStartTime();
-    long adjustmentMilliSeconds = afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis();
-    timeShift(adjustmentMilliSeconds);
+  public Itinerary getItineraryShiftedToStartAt(ZonedDateTime afterTime) {
+    Duration duration = Duration.between(firstLeg().getStartTime(), afterTime);
+    List<Leg> timeShiftedLegs = legs
+      .stream()
+      .map(leg -> leg.timeShiftBy(duration))
+      .collect(Collectors.toList());
+    return new Itinerary(timeShiftedLegs);
   }
 
   /** @see #equals(Object) */
@@ -315,14 +319,5 @@ public class Itinerary {
     buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
 
     return buf.toString();
-  }
-
-  private void timeShift(long adjustmentMilliSeconds) {
-    for (Leg leg : this.legs) {
-      leg
-        .getStartTime()
-        .setTimeInMillis(leg.getStartTime().getTimeInMillis() + adjustmentMilliSeconds);
-      leg.getEndTime().setTimeInMillis(leg.getEndTime().getTimeInMillis() + adjustmentMilliSeconds);
-    }
   }
 }

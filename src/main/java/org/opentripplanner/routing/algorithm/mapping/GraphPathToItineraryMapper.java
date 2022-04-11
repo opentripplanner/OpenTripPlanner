@@ -1,7 +1,9 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -52,7 +54,7 @@ public class GraphPathToItineraryMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphPathToItineraryMapper.class);
 
-  private final TimeZone timeZone;
+  private final ZoneId timeZone;
   private final AlertToLegMapper alertToLegMapper;
   private final StreetNotesService streetNotesService;
   private final double ellipsoidToGeoidDifference;
@@ -63,7 +65,7 @@ public class GraphPathToItineraryMapper {
     StreetNotesService streetNotesService,
     double ellipsoidToGeoidDifference
   ) {
-    this.timeZone = timeZone;
+    this.timeZone = timeZone.toZoneId();
     this.alertToLegMapper = alertToLegMapper;
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
@@ -348,10 +350,8 @@ public class GraphPathToItineraryMapper {
     }
   }
 
-  private Calendar makeCalendar(State state) {
-    Calendar calendar = Calendar.getInstance(timeZone);
-    calendar.setTimeInMillis(state.getTimeInMillis());
-    return calendar;
+  private ZonedDateTime makeCalendar(State state) {
+    return Instant.ofEpochMilli(state.getTimeInMillis()).atZone(timeZone);
   }
 
   /**
@@ -361,8 +361,8 @@ public class GraphPathToItineraryMapper {
     State fromState = states.get(0);
     State toState = states.get(1);
     FlexTripEdge flexEdge = (FlexTripEdge) toState.backEdge;
-    Calendar startTime = makeCalendar(fromState);
-    Calendar endTime = makeCalendar(toState);
+    ZonedDateTime startTime = makeCalendar(fromState);
+    ZonedDateTime endTime = makeCalendar(toState);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
     Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
@@ -411,7 +411,7 @@ public class GraphPathToItineraryMapper {
     var previousStateIsVehicleParking =
       firstState.getBackState() != null && firstState.getBackEdge() instanceof VehicleParkingEdge;
 
-    Calendar startTime = makeCalendar(
+    ZonedDateTime startTime = makeCalendar(
       previousStateIsVehicleParking ? firstState.getBackState() : firstState
     );
 

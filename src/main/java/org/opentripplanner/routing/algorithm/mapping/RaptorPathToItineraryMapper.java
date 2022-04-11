@@ -4,9 +4,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
@@ -153,9 +151,7 @@ public class RaptorPathToItineraryMapper {
       return List.of();
     }
 
-    subItinerary.timeShiftToStartAt(createCalendar(accessPathLeg.fromTime()));
-
-    return subItinerary.legs;
+    return subItinerary.getItineraryShiftedToStartAt(createCalendar(accessPathLeg.fromTime())).legs;
   }
 
   private Leg mapTransitLeg(
@@ -245,9 +241,7 @@ public class RaptorPathToItineraryMapper {
       return null;
     }
 
-    subItinerary.timeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
-
-    return subItinerary;
+    return subItinerary.getItineraryShiftedToStartAt(createCalendar(egressPathLeg.fromTime()));
   }
 
   private List<Leg> mapNonTransitLeg(
@@ -281,7 +275,7 @@ public class RaptorPathToItineraryMapper {
       RoutingContext routingContext = new RoutingContext(request, graph, (Vertex) null, null);
 
       StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
-      se.setTimeSeconds(createCalendar(pathLeg.fromTime()).getTimeInMillis() / 1000);
+      se.setTimeSeconds(createCalendar(pathLeg.fromTime()).toEpochSecond());
 
       State s = se.makeState();
       ArrayList<State> transferStates = new ArrayList<>();
@@ -304,10 +298,7 @@ public class RaptorPathToItineraryMapper {
     }
   }
 
-  private Calendar createCalendar(int timeInSeconds) {
-    ZonedDateTime zdt = transitSearchTimeZero.plusSeconds(timeInSeconds);
-    Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
-    c.setTimeInMillis(zdt.toInstant().toEpochMilli());
-    return c;
+  private ZonedDateTime createCalendar(int timeInSeconds) {
+    return transitSearchTimeZero.plusSeconds(timeInSeconds);
   }
 }
