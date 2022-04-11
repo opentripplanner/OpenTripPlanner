@@ -13,22 +13,22 @@ class RoutingRequestMapperTest {
   public void loadFromJson() {
     var nodeAdapter = newNodeAdapterForTest(
       """
-                        {
-                          "wheelchairAccessibility": {
-                            "enabled": true,
-                            "trips": {
-                              "onlyConsiderAccessible": false,
-                              "unknownCost": 1,
-                              "inaccessibleCost": 2
-                            },
-                            "stops": {
-                              "onlyConsiderAccessible": false,
-                              "unknownCost": 3,
-                              "inaccessibleCost": 4
-                            }
-                          }
-                        }
-                        """
+      {
+        "wheelchairAccessibility": {
+          "enabled": true,
+          "trips": {
+            "onlyConsiderAccessible": false,
+            "unknownCost": 1,
+            "inaccessibleCost": 2
+          },
+          "stops": {
+            "onlyConsiderAccessible": false,
+            "unknownCost": 3,
+            "inaccessibleCost": 4
+          }
+        }
+      }
+      """
     );
 
     var subject = RoutingRequestMapper.mapRoutingRequest(nodeAdapter);
