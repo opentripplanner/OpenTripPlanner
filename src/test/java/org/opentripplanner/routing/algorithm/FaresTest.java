@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -109,6 +110,8 @@ public class FaresTest {
     );
 
     assertEquals("America/Los_Angeles", graph.getTimeZone().getID());
+
+    assertEquals(1, graph.getFeedIds().size());
 
     var feedId = graph.getFeedIds().iterator().next();
 
@@ -279,7 +282,11 @@ public class FaresTest {
       additionalSearchDays,
       new DebugTimingAggregator()
     );
-    return result.getItineraries();
+    return result
+      .getItineraries()
+      .stream()
+      .sorted(Comparator.comparingInt(x -> x.generalizedCost))
+      .toList();
   }
 
   private static LocalTime toLocalTime(Calendar time) {
