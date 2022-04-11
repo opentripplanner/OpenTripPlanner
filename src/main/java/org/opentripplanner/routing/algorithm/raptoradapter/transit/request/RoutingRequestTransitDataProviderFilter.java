@@ -129,16 +129,19 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     TripPatternWithRaptorStopIndexes tripPattern,
     BitSet boardingPossible
   ) {
-    // Currently the function only checks wheelchair accessibility if requested, if not just return default (input) values
-    if (!requireWheelchairAccessible) {
-      return boardingPossible;
+    // if the user wants wheelchair-accessible routes and the configuration requires us to only
+    // consider those stops which have the correct accessibility values then use only this for
+    // checking whether to board/alight
+    if (
+      wheelchairAccessibility.enabled() && wheelchairAccessibility.stops().onlyConsiderAccessible()
+    ) {
+      var copy = (BitSet) boardingPossible.clone();
+      // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
+      copy.and(tripPattern.getWheelchairAccessible());
+
+      return copy;
     }
-
-    var copy = (BitSet) boardingPossible.clone();
-    // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
-    copy.and(tripPattern.getWheelchairAccessible());
-
-    return copy;
+    return boardingPossible;
   }
 
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {

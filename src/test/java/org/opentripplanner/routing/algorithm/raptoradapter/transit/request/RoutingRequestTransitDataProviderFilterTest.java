@@ -70,7 +70,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      true,
+      WheelchairAccessibilityRequest.makeDefault(true),
       false,
       Set.of(),
       Set.of(),
@@ -86,7 +86,6 @@ public class RoutingRequestTransitDataProviderFilterTest {
     assertEquals(wheelchair, wheelchairPossible.get(0), "Wrong boarding value on first stop");
     assertEquals(wheelchair, wheelchairPossible.get(1), "Wrong boarding value on second stop");
   }
-
 
   @Test
   public void notFilteringExpectedTripPatternForDateTest() {
