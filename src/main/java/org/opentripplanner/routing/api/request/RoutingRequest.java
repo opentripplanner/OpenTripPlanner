@@ -1130,9 +1130,6 @@ public class RoutingRequest implements Cloneable, Serializable {
       clone.raptorOptions = new RaptorOptions(this.raptorOptions);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
 
-      // is immutable so can safely use the same reference
-      clone.accessibilityRequest = accessibilityRequest;
-
       return clone;
     } catch (CloneNotSupportedException e) {
       /* this will never happen since our super is the cloneable object */
