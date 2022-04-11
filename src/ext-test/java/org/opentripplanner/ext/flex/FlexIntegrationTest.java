@@ -104,6 +104,29 @@ public class FlexIntegrationTest {
     assertTrue(finalFlex.isFlexibleTrip());
   }
 
+  @Test
+  public void flexDirect() {
+    // near flex zone
+    var from = new GenericLocation(33.85281, -84.60271);
+    // in the middle of flex zone
+    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+
+    var itin = getItinerary(from, to, 0, true);
+
+    // one walk and one flex
+    assertEquals(3, itin.legs.size());
+
+    var walkToFlex = itin.legs.get(0);
+    assertEquals(TraverseMode.WALK, walkToFlex.getMode());
+
+    var flex = itin.legs.get(1);
+    assertEquals(BUS, flex.getMode());
+    assertEquals("Zone 1", flex.getRoute().getShortName());
+    assertTrue(flex.isFlexibleTrip());
+
+    assertEquals("2021-12-02T12:30-05:00[America/New_York]", flex.getStartTime().toString());
+  }
+
   @BeforeAll
   static void setup() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
@@ -163,6 +186,15 @@ public class FlexIntegrationTest {
   }
 
   private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
+    return getItinerary(from, to, index, false);
+  }
+
+  private Itinerary getItinerary(
+    GenericLocation from,
+    GenericLocation to,
+    int index,
+    boolean includeDirect
+  ) {
     RoutingRequest request = new RoutingRequest();
     request.setDateTime(dateTime);
     request.from = from;
@@ -170,6 +202,9 @@ public class FlexIntegrationTest {
     request.numItineraries = 10;
     request.searchWindow = Duration.ofHours(2);
     request.modes.egressMode = FLEXIBLE;
+    if (includeDirect) {
+      request.modes.directMode = FLEXIBLE;
+    }
 
     var result = service.route(request, router);
     var itineraries = result.getTripPlan().itineraries;
