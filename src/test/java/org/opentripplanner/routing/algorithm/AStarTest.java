@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
@@ -29,7 +29,7 @@ public class AStarTest {
 
   private Graph graph;
 
-  @Before
+  @BeforeEach
   public void before() {
     graph = new Graph();
 
@@ -256,7 +256,7 @@ public class AStarTest {
 
     for (Vertex v : targets) {
       GraphPath path = tree.getPath(v);
-      assertNotNull("No path found for target " + v.getLabel(), path);
+      assertNotNull(path, "No path found for target " + v.getLabel());
     }
   }
 
