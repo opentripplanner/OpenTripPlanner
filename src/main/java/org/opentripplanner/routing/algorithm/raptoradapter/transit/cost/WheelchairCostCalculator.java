@@ -25,21 +25,10 @@ public class WheelchairCostCalculator implements CostCalculator {
     @Nonnull WheelchairAccessibilityRequest requirements
   ) {
     // assign the costs for boarding a trip with the following accessibility values
-    wheelchairBoardingCost =
-      Map
-        .of(
-          NO_INFORMATION,
-          RaptorCostConverter.toRaptorCost(requirements.trips().unknownCost()),
-          POSSIBLE,
-          0,
-          NOT_POSSIBLE,
-          RaptorCostConverter.toRaptorCost(requirements.trips().inaccessibleCost())
-        )
-        .entrySet()
-        .stream()
-        .sorted(Comparator.comparingInt(k -> k.getKey().ordinal()))
-        .mapToInt(Entry::getValue)
-        .toArray();
+    wheelchairBoardingCost = new int[3];
+    wheelchairBoardingCost[POSSIBLE.ordinal()] = 0;
+    wheelchairBoardingCost[NO_INFORMATION.ordinal()] = RaptorCostConverter.toRaptorCost(requirements.trips().unknownCost());
+    wheelchairBoardingCost[NOT_POSSIBLE.ordinal()] = RaptorCostConverter.toRaptorCost(requirements.trips().inaccessibleCost());
 
     this.delegate = delegate;
   }
