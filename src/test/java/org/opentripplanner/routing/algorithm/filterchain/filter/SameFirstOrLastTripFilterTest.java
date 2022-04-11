@@ -45,7 +45,7 @@ public class SameFirstOrLastTripFilterTest implements PlanTestConstants {
     assertTrue(i3.isFlaggedForDeletion());
     // Matches with i2
     assertTrue(i4.isFlaggedForDeletion());
-    // Would match with i3, but i3 is filtered out
+    // Would match with i3 and i4, but they are filtered out
     assertFalse(i5.isFlaggedForDeletion());
   }
 }
