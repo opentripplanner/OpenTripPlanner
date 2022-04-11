@@ -7,8 +7,8 @@ public record WheelchairAccessibilityRequest(
 ) {
   public static final WheelchairAccessibilityRequest DEFAULTS = new WheelchairAccessibilityRequest(
     false,
-    new WheelchairAccessibilityFeature(true, 600, 3600),
-    new WheelchairAccessibilityFeature(true, 600, 3600)
+    WheelchairAccessibilityFeature.ofOnlyAccessible(),
+    WheelchairAccessibilityFeature.ofOnlyAccessible()
   );
 
   public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {

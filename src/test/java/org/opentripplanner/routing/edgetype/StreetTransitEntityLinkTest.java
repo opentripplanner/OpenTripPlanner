@@ -69,7 +69,12 @@ class StreetTransitEntityLinkTest {
     var to = new TransitStopVertex(graph, stop, Set.of(TransitMode.RAIL));
 
     var req = new RoutingRequest();
-    var feature = new WheelchairAccessibilityFeature(onlyAccessible, 100, 100);
+    WheelchairAccessibilityFeature feature;
+    if (onlyAccessible) {
+      feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
+    } else {
+      feature = WheelchairAccessibilityFeature.ofCost(100, 100);
+    }
     req.wheelchairAccessibility = new WheelchairAccessibilityRequest(true, feature, feature);
 
     var ctx = new RoutingContext(req, graph, from, to);

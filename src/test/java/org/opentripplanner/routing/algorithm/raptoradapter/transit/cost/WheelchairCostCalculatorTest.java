@@ -17,8 +17,8 @@ public class WheelchairCostCalculatorTest {
     new DummyCostCalculator(),
     new WheelchairAccessibilityRequest(
       true,
-      new WheelchairAccessibilityFeature(false, UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
-      new WheelchairAccessibilityFeature(false, UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST)
+      WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
+      WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST)
     )
   );
 

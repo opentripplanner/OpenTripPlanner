@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest.DEFAULTS;
+import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -151,28 +152,6 @@ public class RoutingRequestMapper {
     request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
 
     return request;
-  }
-
-  private static WheelchairAccessibilityRequest mapAccessibilityRequest(NodeAdapter a) {
-    var trips = mapAccessibilityFeature(a.path("trips"), DEFAULTS.trips());
-    var stops = mapAccessibilityFeature(a.path("stops"), DEFAULTS.stops());
-
-    return new WheelchairAccessibilityRequest(
-      a.asBoolean("enabled", DEFAULTS.enabled()),
-      trips,
-      stops
-    );
-  }
-
-  private static WheelchairAccessibilityFeature mapAccessibilityFeature(
-    NodeAdapter adapter,
-    WheelchairAccessibilityFeature deflt
-  ) {
-    return new WheelchairAccessibilityFeature(
-      adapter.asBoolean("onlyConsiderAccessible", deflt.onlyConsiderAccessible()),
-      adapter.asInt("unknownCost", deflt.unknownCost()),
-      adapter.asInt("inaccessibleCost", deflt.inaccessibleCost())
-    );
   }
 
   private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {
