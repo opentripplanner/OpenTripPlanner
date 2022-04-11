@@ -29,8 +29,8 @@ public class WheelchairAccessibilityRequestMapper {
     if (onlyAccessible) {
       return WheelchairAccessibilityFeature.ofOnlyAccessible();
     } else {
-      var unknownCost = adapter.asInt("unknownCost", deflt.unknownCost());
-      var inaccessibleCost = adapter.asInt("inaccessibleCost", deflt.inaccessibleCost());
+      var unknownCost = adapter.asInt("unknownCost", 60 * 10);
+      var inaccessibleCost = adapter.asInt("inaccessibleCost", 60 * 60);
       return WheelchairAccessibilityFeature.ofCost(unknownCost, inaccessibleCost);
     }
   }
