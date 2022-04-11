@@ -33,6 +33,8 @@ public class ParetoSet<T> extends AbstractCollection<T> {
 
   private int size = 0;
 
+  private T goodElement = null;
+
   /**
    * Create a new ParetoSet with a comparator and a drop event listener.
    *
@@ -81,6 +83,12 @@ public class ParetoSet<T> extends AbstractCollection<T> {
       return true;
     }
 
+    // Quick shortcut, one element probably dominate most of the new elements
+    if (goodElement != null && leftVectorDominatesRightVector(goodElement, newValue)) {
+      notifyElementRejected(newValue, goodElement);
+      return false;
+    }
+
     boolean mutualDominanceExist = false;
     boolean equivalentVectorExist = false;
 
@@ -96,6 +104,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
         removeDominatedElementsFromRestOfSetAndAddNewElement(newValue, i);
         return true;
       } else if (rightDominance) {
+        goodElement = elements[i];
         notifyElementRejected(newValue, it);
         return false;
       } else {
@@ -122,6 +131,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
   @Override
   public void clear() {
     size = 0;
+    goodElement = null;
   }
 
   @Override
@@ -140,10 +150,16 @@ public class ParetoSet<T> extends AbstractCollection<T> {
       return true;
     }
 
+    // Quick shortcut, one element probably dominate most of the new elements
+    if (goodElement != null && leftVectorDominatesRightVector(goodElement, newValue)) {
+      notifyElementRejected(newValue, goodElement);
+      return false;
+    }
+
     boolean mutualDominanceExist = false;
     boolean equivalentVectorExist = false;
 
-    for (int i = 0; i < size; ++i) {
+    for (int i = size - 1; i >= 0; --i) {
       boolean leftDominance = leftDominanceExist(newValue, elements[i]);
       boolean rightDominance = rightDominanceExist(newValue, elements[i]);
 
@@ -155,6 +171,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
       } else if (leftDominance) {
         return true;
       } else if (rightDominance) {
+        goodElement = elements[i];
         return false;
       } else {
         if (mutualDominanceExist) {
