@@ -40,13 +40,15 @@ public class TimetableSnapshotSourceTest {
   private static final boolean fullDataset = false;
   private static final ServiceDate serviceDate = new ServiceDate();
   private static byte[] cancellation;
-  private static final String feedId = "agency"; // TODO: find out where this id comes from
+  private static String feedId;
 
   private TimetableSnapshotSource updater;
 
   @BeforeAll
   public static void setUpClass() {
     graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+
+    feedId = graph.getFeedIds().stream().findFirst().get();
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -296,8 +298,6 @@ public class TimetableSnapshotSourceTest {
     Deduplicator deduplicator = graph.deduplicator;
     GraphIndex graphIndex = graph.index;
 
-    var feedId = "1"; // TODO figure why this is required
-
     Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
     updater.applyTripUpdates(
       calendarService,
@@ -446,8 +446,6 @@ public class TimetableSnapshotSourceTest {
 
       tripUpdate = tripUpdateBuilder.build();
     }
-
-    var feedId = "1"; // TODO figure why this is required
 
     // WHEN
     CalendarService calendarService = graph.getCalendarService();

@@ -34,18 +34,20 @@ public class TimetableTest {
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static TripPattern pattern;
   private static Timetable timetable;
+  private static String feedId;
 
   @BeforeAll
   public static void setUp() throws Exception {
     graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
 
+    feedId = graph.getFeedIds().stream().findFirst().get();
     patternIndex = new HashMap<>();
 
     for (TripPattern pattern : graph.tripPatternForId.values()) {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 
-    pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
+    pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     timetable = pattern.getScheduledTimetable();
   }
 
@@ -57,9 +59,7 @@ public class TimetableTest {
     StopTimeUpdate.Builder stopTimeUpdateBuilder;
     StopTimeEvent.Builder stopTimeEventBuilder;
 
-    String feedId = graph.getFeedIds().iterator().next();
-
-    int trip_1_1_index = timetable.getTripIndex(new FeedScopedId("agency", "1.1"));
+    int trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
 
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_c = graph.getVertex(feedId + ":C");

@@ -153,7 +153,7 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
 
     // D -> E, null case
 
@@ -172,10 +172,10 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 2);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
     assertEquals(fareComponents.get(1).price, tenUSD);
     assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BC"));
-    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
+    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
 
     // B -> D, 2 fully connected components
     from = GenericLocation.fromStopId("Origin", feedId, "B");
@@ -186,8 +186,8 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "2"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "3"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "3"));
 
     // E -> G, missing in between fare
     from = GenericLocation.fromStopId("Origin", feedId, "E");
@@ -198,8 +198,8 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
 
     // C -> E, missing fare after
     from = GenericLocation.fromStopId("Origin", feedId, "C");
@@ -210,7 +210,7 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "3"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "3"));
 
     // D -> G, missing fare before
     from = GenericLocation.fromStopId("Origin", feedId, "D");
@@ -221,8 +221,8 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
 
     // A -> D, use individual component parts
     from = GenericLocation.fromStopId("Origin", feedId, "A");
@@ -233,11 +233,11 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 2);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
     assertEquals(fareComponents.get(1).price, tenUSD);
     assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BD"));
-    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
-    assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId("agency", "3"));
+    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId(feedId, "3"));
   }
 
   private static Fare getFare(
