@@ -296,11 +296,6 @@ public class StateEditor {
     child.stateData.currentMode = nonTransitMode;
   }
 
-  public void setStartTimeSeconds(long seconds) {
-    cloneStateDataAsNeeded();
-    child.stateData.startTime = seconds;
-  }
-
   /**
    * Set non-incremental state values from an existing state. Incremental values are not currently
    * set.
