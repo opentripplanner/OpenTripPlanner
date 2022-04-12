@@ -51,10 +51,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return null;
   }
 
-  public Trip getTrip() {
-    return null;
-  }
-
   public String toString() {
     return "StreetTransitLink(" + fromv + " -> " + tov + ")";
   }

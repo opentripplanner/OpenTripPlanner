@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.Operator;
@@ -59,27 +58,27 @@ public class FlexibleTransitLeg implements Leg {
 
   @Override
   public Agency getAgency() {
-    return edge.getTrip().getRoute().getAgency();
+    return getTrip().getRoute().getAgency();
   }
 
   @Override
   public Operator getOperator() {
-    return edge.getTrip().getOperator();
+    return getTrip().getOperator();
   }
 
   @Override
   public Route getRoute() {
-    return edge.getTrip().getRoute();
+    return getTrip().getRoute();
   }
 
   @Override
   public Trip getTrip() {
-    return edge.getTrip();
+    return edge.getFlexTrip().getTrip();
   }
 
   @Override
   public TraverseMode getMode() {
-    return TraverseMode.fromTransitMode(edge.getTrip().getRoute().getMode());
+    return TraverseMode.fromTransitMode(getTrip().getRoute().getMode());
   }
 
   @Override
@@ -104,12 +103,12 @@ public class FlexibleTransitLeg implements Leg {
 
   @Override
   public Integer getRouteType() {
-    return edge.getTrip().getRoute().getGtfsType();
+    return getTrip().getRoute().getGtfsType();
   }
 
   @Override
   public String getHeadsign() {
-    return edge.getTrip().getTripHeadsign();
+    return getTrip().getTripHeadsign();
   }
 
   @Override
