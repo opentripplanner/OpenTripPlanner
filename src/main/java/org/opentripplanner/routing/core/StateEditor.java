@@ -333,10 +333,6 @@ public class StateEditor {
     }
   }
 
-  public long getTimeSeconds() {
-    return child.getTimeSeconds();
-  }
-
   public void setTimeSeconds(long seconds) {
     child.time = seconds * 1000;
   }

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -350,10 +349,6 @@ public class GraphPathToItineraryMapper {
     }
   }
 
-  private ZonedDateTime makeCalendar(State state) {
-    return Instant.ofEpochMilli(state.getTimeInMillis()).atZone(timeZone);
-  }
-
   /**
    * Generate a flex leg from the states belonging to the flex leg
    */
@@ -361,8 +356,8 @@ public class GraphPathToItineraryMapper {
     State fromState = states.get(0);
     State toState = states.get(1);
     FlexTripEdge flexEdge = (FlexTripEdge) toState.backEdge;
-    ZonedDateTime startTime = makeCalendar(fromState);
-    ZonedDateTime endTime = makeCalendar(toState);
+    ZonedDateTime startTime = fromState.getTime().atZone(timeZone);
+    ZonedDateTime endTime = toState.getTime().atZone(timeZone);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
     Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
@@ -411,14 +406,12 @@ public class GraphPathToItineraryMapper {
     var previousStateIsVehicleParking =
       firstState.getBackState() != null && firstState.getBackEdge() instanceof VehicleParkingEdge;
 
-    ZonedDateTime startTime = makeCalendar(
-      previousStateIsVehicleParking ? firstState.getBackState() : firstState
-    );
+    State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
     StreetLeg leg = new StreetLeg(
       resolveMode(states),
-      startTime,
-      makeCalendar(lastState),
+      startTimeState.getTime().atZone(timeZone),
+      lastState.getTime().atZone(timeZone),
       makePlace(firstState),
       makePlace(lastState),
       distanceMeters,

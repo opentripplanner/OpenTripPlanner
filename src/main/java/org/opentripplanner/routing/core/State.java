@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.core;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Objects;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -233,24 +234,6 @@ public class State implements Cloneable {
     return new StateEditor(this, e);
   }
 
-  public String toStringVerbose() {
-    return (
-      "<State " +
-      new Date(getTimeInMillis()) +
-      " w=" +
-      this.getWeight() +
-      " t=" +
-      this.getElapsedTimeSeconds() +
-      " d=" +
-      this.getWalkDistance() +
-      " r=" +
-      this.isRentingVehicle() +
-      " pr=" +
-      this.isVehicleParked() +
-      ">"
-    );
-  }
-
   /*
    * FIELD ACCESSOR METHODS States are immutable, so they have only get methods. The corresponding
    * set methods are in StateEditor.
@@ -372,10 +355,6 @@ public class State implements Cloneable {
     return this.backEdge;
   }
 
-  public long getStartTimeSeconds() {
-    return stateData.startTime;
-  }
-
   /**
    * Optional next result that allows {@link Edge} to return multiple results.
    *
@@ -428,8 +407,8 @@ public class State implements Cloneable {
     return stateData.currentMode;
   }
 
-  public long getTimeInMillis() {
-    return time;
+  public Instant getTime() {
+    return Instant.ofEpochMilli(time);
   }
 
   public void timeshiftBySeconds(int timeShift) {
@@ -577,23 +556,20 @@ public class State implements Cloneable {
   }
 
   public String toString() {
-    return (
-      "<State " +
-      new Date(getTimeInMillis()) +
-      " [" +
-      weight +
-      "] " +
-      (isRentingVehicle() ? "VEHICLE_RENT " : "") +
-      (isVehicleParked() ? "VEHICLE_PARKED " : "") +
-      vertex +
-      ">"
-    );
+    return ToStringBuilder
+      .of(State.class)
+      .addTime("time", getTime())
+      .addNum("weight", weight)
+      .addObj("vertex", vertex)
+      .addBoolIfTrue("VEHICLE_RENT", isRentingVehicle())
+      .addBoolIfTrue("VEHICLE_PARKED", isVehicleParked())
+      .toString();
   }
 
   void checkNegativeWeight() {
     double dw = this.weight - backState.weight;
     if (dw < 0) {
-      throw new NegativeWeightException(String.valueOf(dw) + " on edge " + backEdge);
+      throw new NegativeWeightException(dw + " on edge " + backEdge);
     }
   }
 
