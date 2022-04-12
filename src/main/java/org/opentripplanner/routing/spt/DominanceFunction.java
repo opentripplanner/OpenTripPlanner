@@ -2,7 +2,6 @@ package org.opentripplanner.routing.spt;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
@@ -97,15 +96,6 @@ public abstract class DominanceFunction implements Serializable {
 
     // These two states are comparable (they are on the same "plane" or "copy" of the graph).
     return betterOrEqual(a, b);
-  }
-
-  /**
-   * Create a new shortest path tree using this function, considering whether it allows co-dominant
-   * States. MultiShortestPathTree is the general case -- it will work with both single- and
-   * multi-state functions.
-   */
-  public ShortestPathTree getNewShortestPathTree(RoutingRequest routingRequest) {
-    return new ShortestPathTree(routingRequest, this);
   }
 
   /**

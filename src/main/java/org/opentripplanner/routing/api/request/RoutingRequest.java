@@ -1315,14 +1315,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.bikeTriangleTimeFactor = time;
   }
 
-  /**
-   * Create a new ShortestPathTree instance using the DominanceFunction specified in this
-   * RoutingRequest.
-   */
-  public ShortestPathTree getNewShortestPathTree() {
-    return this.dominanceFunction.getNewShortestPathTree(this);
-  }
-
   public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {
     if ("duration".equals(pathComparator)) {
       return new DurationComparator();

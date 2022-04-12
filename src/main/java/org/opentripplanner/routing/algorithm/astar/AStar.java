@@ -61,7 +61,7 @@ public class AStar {
     this.timeout = timeout;
 
     this.rctx = rctx;
-    this.spt = rctx.opt.getNewShortestPathTree();
+    this.spt = new ShortestPathTree(rctx.opt.dominanceFunction);
     this.heuristic.initialize(rctx);
 
     // Priority Queue.
