@@ -340,7 +340,8 @@ public class SiriAlertsUpdateHandler {
               List<FeedScopedId> tripIds = new ArrayList<>();
 
               FeedScopedId tripIdFromVehicleJourney = siriFuzzyTripMatcher.getTripId(
-                vehicleJourneyRef.getValue()
+                vehicleJourneyRef.getValue(),
+                feedId
               );
 
               ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime() !=
@@ -391,7 +392,7 @@ public class SiriAlertsUpdateHandler {
             final DataFrameRefStructure dataFrameRef = framedVehicleJourneyRef.getDataFrameRef();
             final String datedVehicleJourneyRef = framedVehicleJourneyRef.getDatedVehicleJourneyRef();
 
-            FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef);
+            FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef, feedId);
 
             if (tripId != null) {
               ServiceDate serviceDate = null;
