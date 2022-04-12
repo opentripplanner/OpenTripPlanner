@@ -40,7 +40,7 @@ The check is run by the CI server and will fail the build if the code is incorre
 
 You should use the prettier Maven plugin to reformat the code or run prettier with Node(faster).
 
-The prettier do NOT format doc and markdown files, only Java code. So for other files you should
+The prettier does NOT format the doc and markdown files, only Java code. So, for other files you should
 use the _project_ code-style. It is automatically imported when you first open the project. But, if
 you have set a custom code-style in your settings (as we used until OTP v2.1), then you need to
 change to the _Project_ Code Style. Open the `Preferences` from the menu and select _
