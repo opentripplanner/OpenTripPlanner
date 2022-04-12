@@ -42,6 +42,9 @@ public class ShortestPathTree {
 
   private final Map<Vertex, List<State>> stateSets;
 
+  /** Indicates that the search timed out or was otherwise aborted. */
+  private boolean aborted = false;
+
   public ShortestPathTree(RoutingRequest options, DominanceFunction dominanceFunction) {
     this.options = options;
     this.dominanceFunction = dominanceFunction;
@@ -236,6 +239,14 @@ public class ShortestPathTree {
       allStates.addAll(stateSet);
     }
     return allStates;
+  }
+
+  public void setAborted() {
+    aborted = true;
+  }
+
+  public boolean isAborted() {
+    return aborted;
   }
 
   public String toString() {

@@ -33,9 +33,6 @@ public class RoutingContext {
 
   public final Set<Vertex> toVertices;
 
-  /** Indicates that the search timed out or was otherwise aborted. */
-  public boolean aborted;
-
   /**
    * Indicates that a maximum slope constraint was specified but was removed during routing to
    * produce a result.
