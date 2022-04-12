@@ -134,6 +134,13 @@ public class OTPMain {
         graphBuilder.run();
         // Hand off the graph to the server as the default graph
         graph = graphBuilder.getGraph();
+        if (graphBuilder.hasTransitData() && !graph.hasTransit) {
+          throw new OtpAppException(
+            "The provided transit data have no trips within the configured transit " +
+            "service period. See build config 'transitServiceStart' and " +
+            "'transitServiceEnd'"
+          );
+        }
       } else {
         throw new IllegalStateException("An error occurred while building the graph.");
       }

@@ -53,6 +53,8 @@ public class GraphBuilder implements Runnable {
 
   private final Graph graph;
 
+  private boolean hasTransitData = false;
+
   private GraphBuilder(Graph baseGraph) {
     this.graph = baseGraph == null ? new Graph() : baseGraph;
   }
@@ -74,6 +76,7 @@ public class GraphBuilder implements Runnable {
     boolean hasTransitData = hasGtfs || hasNetex;
 
     GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
+    graphBuilder.hasTransitData = hasTransitData;
 
     if (hasOsm) {
       List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
@@ -227,6 +230,10 @@ public class GraphBuilder implements Runnable {
 
   public Graph getGraph() {
     return graph;
+  }
+
+  public boolean hasTransitData() {
+    return hasTransitData;
   }
 
   public void run() {

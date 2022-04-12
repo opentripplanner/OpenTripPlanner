@@ -66,6 +66,7 @@ public class NetexModule implements GraphBuilderModule {
   ) {
     graph.clearTimeZone();
     CalendarServiceData calendarServiceData = graph.getCalendarDataService();
+    boolean hasTransit = false;
     try {
       for (NetexBundle netexBundle : netexBundles) {
         netexBundle.checkInputs();
@@ -89,6 +90,8 @@ public class NetexModule implements GraphBuilderModule {
         }
 
         OtpTransitService otpService = transitBuilder.build();
+
+        hasTransit = otpService.getAllServiceIds().size() > 0;
 
         // TODO OTP2 - Move this into the AddTransitModelEntitiesToGraph
         //           - and make sure thay also work with GTFS feeds - GTFS do no
@@ -116,7 +119,7 @@ public class NetexModule implements GraphBuilderModule {
     graph.putService(CalendarServiceData.class, calendarServiceData);
     graph.updateTransitFeedValidity(calendarServiceData, issueStore);
 
-    graph.hasTransit = true;
+    graph.hasTransit = hasTransit;
     graph.calculateTransitCenter();
   }
 
