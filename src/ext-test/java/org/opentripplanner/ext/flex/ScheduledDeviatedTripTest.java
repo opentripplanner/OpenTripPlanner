@@ -41,7 +41,7 @@ import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
-import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.opentripplanner.util.model.EncodedPolyline;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
@@ -188,9 +188,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertEquals(1, intermediateStops.size());
     assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
-    EncodedPolylineBean legGeometry = PolylineEncoder.createEncodings(leg.getLegGeometry());
+    EncodedPolyline legGeometry = PolylineEncoder.encodeGeometry(leg.getLegGeometry());
     assertThatPolylinesAreEqual(
-      legGeometry.getPoints(),
+      legGeometry.points(),
       "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
     );
   }

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
@@ -68,13 +67,8 @@ class RelativeTime {
     }
   }
 
-  static RelativeTime from(Calendar time) {
-    return new RelativeTime(
-      0,
-      time.get(Calendar.HOUR_OF_DAY),
-      time.get(Calendar.MINUTE),
-      time.get(Calendar.SECOND)
-    );
+  static RelativeTime from(ZonedDateTime time) {
+    return new RelativeTime(0, time.getHour(), time.getMinute(), time.getSecond());
   }
 
   String toLongStr() {

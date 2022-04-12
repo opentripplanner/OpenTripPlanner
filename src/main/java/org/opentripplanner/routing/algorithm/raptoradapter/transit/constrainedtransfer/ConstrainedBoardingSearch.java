@@ -102,6 +102,23 @@ public final class ConstrainedBoardingSearch
     );
   }
 
+  private Iterable<TransferForPattern> findMatchingTransfers(
+    TripSchedule tripSchedule,
+    int stopIndex
+  ) {
+    final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
+    // for performance reasons we use a for loop here as streams are much slower.
+    // I experimented with LinkedList and ArrayList and LinkedList was faster, presumably
+    // because insertion is quick and we don't need index-based access, only iteration.
+    var result = new LinkedList<TransferForPattern>();
+    for (var t : currentTransfers) {
+      if (t.matchesSourcePoint(stopIndex, trip)) {
+        result.add(t);
+      }
+    }
+    return result;
+  }
+
   /**
    * Find the trip to board (trip index) and the transfer constraint.
    * <p>
@@ -114,7 +131,7 @@ public final class ConstrainedBoardingSearch
    *
    * @return {@code true} if a matching trip is found
    */
-  public boolean findTimetableTripInfo(
+  private boolean findTimetableTripInfo(
     RaptorTimeTable<TripSchedule> timetable,
     Iterable<TransferForPattern> transfers,
     int stopPos,
@@ -199,22 +216,5 @@ public final class ConstrainedBoardingSearch
       }
     }
     return false;
-  }
-
-  private Iterable<TransferForPattern> findMatchingTransfers(
-    TripSchedule tripSchedule,
-    int stopIndex
-  ) {
-    final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
-    // for performance reasons we use a for loop here as streams are much slower.
-    // I experimented with LinkedList and ArrayList and LinkedList was faster, presumably
-    // because insertion is quick and we don't need index-based access, only iteration.
-    var result = new LinkedList<TransferForPattern>();
-    for (var t : currentTransfers) {
-      if (t.matchesSourcePoint(stopIndex, trip)) {
-        result.add(t);
-      }
-    }
-    return result;
   }
 }

@@ -25,7 +25,7 @@ the [GitHub Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/
 can [download the NeTex file](https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip) from
 the Continuous Integration Pipeline. There is
 a [text file](test/ci-performance-test/travelSearch-expected-results.csv) with the expected results
-witch might need to be updated when OTP is changed and the test fails. The OSM data used is
+which might need to be updated when OTP is changed and the test fails. The OSM data used is
 the [norway-210101.osm.pbf](https://download.geofabrik.de/europe/norway-210101.osm.pbf) file from
 Geofabrik OSM extract from January 1st 2021.
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.core;
 
+import java.time.Instant;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
@@ -11,7 +12,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 public class StateData implements Cloneable {
 
   // the time at which the search started
-  protected long startTime;
+  protected Instant startTime;
 
   // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 

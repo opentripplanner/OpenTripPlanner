@@ -63,7 +63,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Long> endTime() {
-    return environment -> getSource(environment).getEndTime().getTime().getTime();
+    return environment -> getSource(environment).getEndTime().toInstant().toEpochMilli();
   }
 
   @Override
@@ -169,7 +169,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Long> startTime() {
-    return environment -> getSource(environment).getStartTime().getTime().getTime();
+    return environment -> getSource(environment).getStartTime().toInstant().toEpochMilli();
   }
 
   @Override

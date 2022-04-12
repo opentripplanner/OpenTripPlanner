@@ -1,9 +1,8 @@
 package org.opentripplanner.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -14,28 +13,20 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.TestUtils;
 
-/**
- * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
- */
-@Ignore
 public class TimetableTest {
 
   private static final TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
@@ -44,23 +35,20 @@ public class TimetableTest {
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static TripPattern pattern;
   private static Timetable timetable;
+  private static String feedId;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUp() throws Exception {
-    GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
-    graph = new Graph();
+    graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
 
-    GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-    factory.run(graph);
-    graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
-
+    feedId = graph.getFeedIds().stream().findFirst().get();
     patternIndex = new HashMap<>();
 
     for (TripPattern pattern : graph.tripPatternForId.values()) {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 
-    pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
+    pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     timetable = pattern.getScheduledTimetable();
   }
 
@@ -72,9 +60,7 @@ public class TimetableTest {
     StopTimeUpdate.Builder stopTimeUpdateBuilder;
     StopTimeEvent.Builder stopTimeEventBuilder;
 
-    String feedId = graph.getFeedIds().iterator().next();
-
-    int trip_1_1_index = timetable.getTripIndex(new FeedScopedId("agency", "1.1"));
+    int trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
 
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_c = graph.getVertex(feedId + ":C");
@@ -90,13 +76,8 @@ public class TimetableTest {
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     tripUpdate = tripUpdateBuilder.build();
-    TripTimesPatch tripTimesPatch = timetable.createUpdatedTripTimes(
-      tripUpdate,
-      timeZone,
-      serviceDate
-    );
-    TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    var patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    assertNull(patch);
 
     // update trip with bad data
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -108,9 +89,8 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setStopSequence(0);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
     tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    assertNull(patch);
 
     // update trip with non-increasing data
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -130,26 +110,12 @@ public class TimetableTest {
       TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 0)
     );
     tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    assertNull(patch);
 
     //---
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 0, 0);
-    long endTime;
     options.setDateTime(Instant.ofEpochSecond(startTime));
-
-    //---
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    assertNotNull(path);
-    endTime = startTime + 20 * 60;
-    assertEquals(endTime, path.getEndTime());
 
     // update trip
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -170,58 +136,11 @@ public class TimetableTest {
     );
     tripUpdate = tripUpdateBuilder.build();
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    var updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
     assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-
-    //---
-
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    assertNotNull(path);
-    endTime = startTime + 20 * 60 + 120;
-    assertEquals(endTime, path.getEndTime());
-
-    // cancel trip
-    tripDescriptorBuilder = TripDescriptor.newBuilder();
-    tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-    tripUpdateBuilder = TripUpdate.newBuilder();
-    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-    tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNotNull(updatedTripTimes);
-    timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
-
-    TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
-
-    // TODO This will not work since individual stops cannot be cancelled using GTFS updates
-    //      yet
-    for (int i = 0; i < tripTimes.getNumStops(); i++) {
-      assertEquals(PickDrop.CANCELLED, pattern.getBoardType(i));
-      assertEquals(PickDrop.CANCELLED, pattern.getAlightType(i));
-    }
-
-    //---
-
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    assertNotNull(path);
-    endTime = startTime + 40 * 60;
-    assertEquals(endTime, path.getEndTime());
 
     // update trip arrival time incorrectly
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -235,8 +154,8 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(0);
     tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -252,8 +171,8 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(1);
     tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -267,10 +186,10 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setStopSequence(2);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-    stopTimeEventBuilder.setDelay(-1);
+    stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -284,10 +203,10 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setStopId("B");
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-    stopTimeEventBuilder.setDelay(-1);
+    stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -308,8 +227,7 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(-1);
     tripUpdate = tripUpdateBuilder.build();
-    tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = tripTimesPatch.getTripTimes();
-    assertNull(updatedTripTimes);
+    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    assertNull(patch);
   }
 }

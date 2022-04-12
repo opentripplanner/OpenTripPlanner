@@ -418,7 +418,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     if (!isTransit()) {
       return toTime;
     }
-    return toTime + slackProvider.alightSlack(asTransitLeg().trip.pattern());
+    return toTime + slackProvider.alightSlack(asTransitLeg().trip.pattern().slackIndex());
   }
 
   private int waitTimeAfterPrevStopArrival(RaptorSlackProvider slackProvider) {
@@ -438,7 +438,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   ) {
     var leg = asTransitLeg();
     int slack =
-      slackProvider.boardSlack(leg.trip.pattern()) +
+      slackProvider.boardSlack(leg.trip.pattern().slackIndex()) +
       (withTransferSlack ? slackProvider.transferSlack() : 0);
 
     return leg.fromTime() - slack;
@@ -471,7 +471,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private void timeShiftTransferTime(RaptorSlackProvider slackProvider) {
     int newFromTime;
     if (prev.isTransit()) {
-      newFromTime = prev.toTime() + slackProvider.alightSlack(prev.asTransitLeg().trip.pattern());
+      newFromTime =
+        prev.toTime() + slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
     } else if (prev.isAccess()) {
       newFromTime = prev.toTime();
     } else {
@@ -528,7 +529,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     return costCalculator.transitArrivalCost(
       boardCost,
-      slackProvider.alightSlack(leg.trip.pattern()),
+      slackProvider.alightSlack(leg.trip.pattern().slackIndex()),
       durationInSec(),
       leg.trip.transitReluctanceFactorIndex(),
       toStop()

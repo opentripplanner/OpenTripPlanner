@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import java.util.Calendar;
+import java.time.ZonedDateTime;
 import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
@@ -13,12 +13,12 @@ public class StopArrival {
   /**
    * The time the rider will arrive at the place.
    */
-  public final Calendar arrival;
+  public final ZonedDateTime arrival;
 
   /**
    * The time the rider will depart the place.
    */
-  public final Calendar departure;
+  public final ZonedDateTime departure;
 
   /**
    * For transit trips, the stop index (numbered from zero from the start of the trip).
@@ -32,8 +32,8 @@ public class StopArrival {
 
   public StopArrival(
     Place place,
-    Calendar arrival,
-    Calendar departure,
+    ZonedDateTime arrival,
+    ZonedDateTime departure,
     Integer stopPosInPattern,
     Integer gtfsStopSequence
   ) {

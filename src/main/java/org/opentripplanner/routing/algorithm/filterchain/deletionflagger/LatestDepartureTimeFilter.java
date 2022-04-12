@@ -8,10 +8,10 @@ public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
 
   public static final String TAG = "latest-departure-time-limit";
 
-  private final long limitMs;
+  private final Instant limit;
 
   public LatestDepartureTimeFilter(Instant latestDepartureTime) {
-    this.limitMs = latestDepartureTime.toEpochMilli();
+    this.limit = latestDepartureTime;
   }
 
   @Override
@@ -21,7 +21,7 @@ public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
 
   @Override
   public Predicate<Itinerary> predicate() {
-    return it -> it.startTime().getTimeInMillis() > limitMs;
+    return it -> it.startTime().toInstant().isAfter(limit);
   }
 
   @Override

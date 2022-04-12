@@ -2,8 +2,9 @@ package org.opentripplanner.api.mapping;
 
 import static org.opentripplanner.api.mapping.ElevationMapper.mapElevation;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.model.ApiAlert;
@@ -39,35 +40,39 @@ public class LegMapper {
     final int lastIdx = size - 1;
 
     for (int i = 0; i < size; ++i) {
-      Calendar arrivalTimeFromPlace = (i == 0) ? null : domain.get(i - 1).getEndTime();
-      Calendar departureTimeToPlace = (i == lastIdx) ? null : domain.get(i + 1).getStartTime();
+      ZonedDateTime arrivalTimeFromPlace = (i == 0) ? null : domain.get(i - 1).getEndTime();
+      ZonedDateTime departureTimeToPlace = (i == lastIdx) ? null : domain.get(i + 1).getStartTime();
 
       apiLegs.add(mapLeg(domain.get(i), arrivalTimeFromPlace, departureTimeToPlace));
     }
     return apiLegs;
   }
 
-  public ApiLeg mapLeg(Leg domain, Calendar arrivalTimeFromPlace, Calendar departureTimeToPlace) {
+  public ApiLeg mapLeg(
+    Leg domain,
+    ZonedDateTime arrivalTimeFromPlace,
+    ZonedDateTime departureTimeToPlace
+  ) {
     if (domain == null) {
       return null;
     }
     ApiLeg api = new ApiLeg();
-    api.startTime = domain.getStartTime();
-    api.endTime = domain.getEndTime();
+    api.startTime = GregorianCalendar.from(domain.getStartTime());
+    api.endTime = GregorianCalendar.from(domain.getEndTime());
 
     // Set the arrival and departure times, even if this is redundant information
     api.from =
       placeMapper.mapPlace(
         domain.getFrom(),
         arrivalTimeFromPlace,
-        api.startTime,
+        domain.getStartTime(),
         domain.getBoardStopPosInPattern(),
         domain.getBoardingGtfsStopSequence()
       );
     api.to =
       placeMapper.mapPlace(
         domain.getTo(),
-        api.endTime,
+        domain.getEndTime(),
         departureTimeToPlace,
         domain.getAlightStopPosInPattern(),
         domain.getAlightGtfsStopSequence()
@@ -119,7 +124,7 @@ public class LegMapper {
     if (addIntermediateStops) {
       api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
     }
-    api.legGeometry = PolylineEncoder.createEncodings(domain.getLegGeometry());
+    api.legGeometry = PolylineEncoder.encodeGeometry(domain.getLegGeometry());
     api.legElevation = mapElevation(domain.getLegElevation());
     api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
     api.alerts =

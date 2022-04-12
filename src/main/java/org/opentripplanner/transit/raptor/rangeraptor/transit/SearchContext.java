@@ -266,8 +266,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
     RaptorRequest<?> request
   ) {
     return request.searchDirection().isForward()
-      ? p -> request.slackProvider().boardSlack(p)
-      : p -> request.slackProvider().alightSlack(p);
+      ? p -> request.slackProvider().boardSlack(p.slackIndex())
+      : p -> request.slackProvider().alightSlack(p.slackIndex());
   }
 
   private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(

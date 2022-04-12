@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -15,7 +16,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of
@@ -85,8 +85,8 @@ class ItineraryResultMapper {
       } else if (leg.isTransitLeg()) {
         buf.transit(
           leg.getMode().name() + " " + leg.getRoute().getShortName(),
-          TimeUtils.localTime(leg.getStartTime()).toSecondOfDay(),
-          TimeUtils.localTime(leg.getEndTime()).toSecondOfDay()
+          leg.getStartTime().get(ChronoField.SECOND_OF_DAY),
+          leg.getEndTime().get(ChronoField.SECOND_OF_DAY)
         );
       }
     }
@@ -137,8 +137,8 @@ class ItineraryResultMapper {
         .filter(Leg::isWalkingLeg)
         .mapToInt(l -> (int) Math.round(l.getDistanceMeters()))
         .sum(),
-      TimeUtils.localTime(itinerary.startTime()).toSecondOfDay(),
-      TimeUtils.localTime(itinerary.endTime()).toSecondOfDay(),
+      itinerary.startTime().get(ChronoField.SECOND_OF_DAY),
+      itinerary.endTime().get(ChronoField.SECOND_OF_DAY),
       agencies,
       modes,
       routes,

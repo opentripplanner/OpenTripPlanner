@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.BitSet;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
@@ -158,8 +156,9 @@ public class ToStringBuilderTest {
 
   @Test
   public void addCalTime() {
-    Calendar c = GregorianCalendar.from(
-      ZonedDateTime.of(LocalDateTime.of(2012, 1, 28, 23, 45, 12), ZoneId.systemDefault())
+    ZonedDateTime c = ZonedDateTime.of(
+      LocalDateTime.of(2012, 1, 28, 23, 45, 12),
+      ZoneId.systemDefault()
     );
     assertEquals("ToStringBuilderTest{c: 23:45:12}", subject().addTimeCal("c", c).toString());
   }

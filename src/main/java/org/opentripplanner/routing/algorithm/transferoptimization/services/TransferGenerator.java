@@ -200,10 +200,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     } else {
       return (
         fromTime +
-        slackProvider.alightSlack(fromTrip.pattern()) +
+        slackProvider.alightSlack(fromTrip.pattern().slackIndex()) +
         transferDurationInSeconds +
         slackProvider.transferSlack() +
-        slackProvider.boardSlack(toTrip.pattern())
+        slackProvider.boardSlack(toTrip.pattern().slackIndex())
       );
     }
   }

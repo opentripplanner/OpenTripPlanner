@@ -2,14 +2,13 @@ package org.opentripplanner.model.base;
 
 import static java.lang.Boolean.TRUE;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -44,7 +43,6 @@ public class ToStringBuilder {
   private final StringBuilder sb = new StringBuilder();
   private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
-  private SimpleDateFormat calendarTimeFormat;
   boolean first = true;
 
   private ToStringBuilder(String name) {
@@ -183,8 +181,8 @@ public class ToStringBuilder {
    * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
    * DATE is not printed. {@code null} value is ignored.
    */
-  public ToStringBuilder addTimeCal(String name, Calendar time) {
-    return addIfNotNull(name, time, t -> formatTime(t.getTime()));
+  public ToStringBuilder addTimeCal(String name, ZonedDateTime time) {
+    return addIfNotNull(name, time, this::formatTime);
   }
 
   /**
@@ -304,10 +302,7 @@ public class ToStringBuilder {
     sb.append(value);
   }
 
-  private String formatTime(Date time) {
-    if (calendarTimeFormat == null) {
-      calendarTimeFormat = new SimpleDateFormat("HH:mm:ss");
-    }
-    return calendarTimeFormat.format(time.getTime());
+  private String formatTime(ZonedDateTime time) {
+    return time.format(DateTimeFormatter.ISO_LOCAL_TIME);
   }
 }

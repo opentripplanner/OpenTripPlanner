@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 import io.micrometer.core.instrument.Timer;
 import java.util.Collection;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -16,7 +17,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTim
 import org.opentripplanner.transit.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 
 /**
@@ -26,8 +26,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
  * Land Use Sketch Planning Using Interactive Accessibility Methods on Combined Schedule and
  * Headway-Based Networks.” Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
  * <p>
- * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,” January
- * 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+ * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing,”
+ * January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
  * <p>
  * This version do support the following features:
  * <ul>
@@ -52,7 +52,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
   private final RoutingStrategy<T> transitWorker;
 
   /**
-   * The RangeRaptor state - we delegate keeping track of state to the state object, this allow the
+   * The RangeRaptor state - we delegate keeping track of state to the state object, this allows the
    * worker implementation to focus on the algorithm, while the state keep track of the result.
    * <p/>
    * This also allow us to try out different strategies for storing the result in memory. For a long
@@ -125,7 +125,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    * Run the scheduled search, round 0 is the street search
    * <p/>
    * We are using the Range-RAPTOR extension described in Delling, Daniel, Thomas Pajor, and Renato
-   * Werneck. “Round-Based Public Transit Routing,” January 1, 2012. http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
+   * Werneck. “Round-Based Public Transit Routing,” January 1, 2012.
+   * http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
    *
    * @return a unique set of paths
    */
@@ -208,8 +209,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             ? calculator.transferConstraintsSearch(route)
             : null;
 
-          int alightSlack = slackProvider.alightSlack(pattern);
-          int boardSlack = slackProvider.boardSlack(pattern);
+          int alightSlack = slackProvider.alightSlack(pattern.slackIndex());
+          int boardSlack = slackProvider.boardSlack(pattern.slackIndex());
 
           transitWorker.prepareForTransitWith();
 
@@ -306,7 +307,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     int prevTransitArrivalTime = calculator.minusDuration(
       prevTransitStopArrivalTime,
-      slackProvider.alightSlack(sourceStopArrival.trip().pattern())
+      slackProvider.alightSlack(sourceStopArrival.trip().pattern().slackIndex())
     );
 
     int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);

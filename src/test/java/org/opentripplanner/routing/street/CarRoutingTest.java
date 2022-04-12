@@ -148,6 +148,6 @@ public class CarRoutingTest {
       i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR))
     );
     Geometry legGeometry = itineraries.get(0).legs.get(0).getLegGeometry();
-    return PolylineEncoder.createEncodings(legGeometry).getPoints();
+    return PolylineEncoder.encodeGeometry(legGeometry).points();
   }
 }

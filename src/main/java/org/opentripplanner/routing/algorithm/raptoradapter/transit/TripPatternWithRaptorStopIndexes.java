@@ -15,10 +15,9 @@ public class TripPatternWithRaptorStopIndexes {
 
   private final TripPattern pattern;
   private final int[] stopIndexes;
-
   private final BitSet boardingPossible;
-
   private final BitSet alightingPossible;
+  private final BitSet wheelchairAccessible;
 
   /**
    * List of transfers TO this pattern for each stop position in pattern used by Raptor during the
@@ -46,10 +45,12 @@ public class TripPatternWithRaptorStopIndexes {
     final int nStops = stopIndexes.length;
     boardingPossible = new BitSet(nStops);
     alightingPossible = new BitSet(nStops);
+    wheelchairAccessible = new BitSet(nStops);
 
     for (int s = 0; s < nStops; s++) {
       boardingPossible.set(s, pattern.canBoard(s));
       alightingPossible.set(s, pattern.canAlight(s));
+      wheelchairAccessible.set(s, pattern.wheelchairAccessible(s));
     }
   }
 
@@ -71,6 +72,18 @@ public class TripPatternWithRaptorStopIndexes {
 
   public final TripPattern getPattern() {
     return this.pattern;
+  }
+
+  public BitSet getBoardingPossible() {
+    return boardingPossible;
+  }
+
+  public BitSet getAlightingPossible() {
+    return alightingPossible;
+  }
+
+  public BitSet getWheelchairAccessible() {
+    return wheelchairAccessible;
   }
 
   /**
