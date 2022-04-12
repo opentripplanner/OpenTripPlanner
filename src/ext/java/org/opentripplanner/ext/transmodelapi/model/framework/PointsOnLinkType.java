@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.framework;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.opentripplanner.util.model.EncodedPolyline;
 
 public class PointsOnLinkType {
 
@@ -20,7 +20,7 @@ public class PointsOnLinkType {
           .name("length")
           .description("The number of points in the string")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(environment -> ((EncodedPolylineBean) environment.getSource()).getLength())
+          .dataFetcher(environment -> ((EncodedPolyline) environment.getSource()).length())
           .build()
       )
       .field(
@@ -32,7 +32,7 @@ public class PointsOnLinkType {
             "(https://www.freeformatter.com/javascript-escape.html)"
           )
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((EncodedPolylineBean) environment.getSource()).getPoints())
+          .dataFetcher(environment -> ((EncodedPolyline) environment.getSource()).points())
           .build()
       )
       .build();
