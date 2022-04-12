@@ -114,22 +114,7 @@ public class TimetableTest {
 
     //---
     long startTime = TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 0, 0);
-    long endTime;
     options.setDateTime(Instant.ofEpochSecond(startTime));
-
-    //---
-    /*
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    Assertions.assertNotNull(path);
-    endTime = startTime + 20 * 60;
-    Assertions.assertEquals(endTime, path.getEndTime());
-    */
 
     // update trip
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -155,57 +140,6 @@ public class TimetableTest {
     Assertions.assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
     assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-
-    //---
-
-    /*spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    Assertions.assertNotNull(path);
-    endTime = startTime + 20 * 60 + 120;
-    Assertions.assertEquals(endTime, path.getEndTime());
-     */
-
-    // cancel trip
-    tripDescriptorBuilder = TripDescriptor.newBuilder();
-    tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-    tripUpdateBuilder = TripUpdate.newBuilder();
-    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-    tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-    updatedTripTimes = patch.getTripTimes();
-    Assertions.assertNotNull(updatedTripTimes);
-    timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
-
-    TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
-    assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
-
-    // TODO This will not work since individual stops cannot be cancelled using GTFS updates
-    //      yet
-    /*
-    for (int i = 0; i < tripTimes.getNumStops(); i++) {
-      Assertions.assertEquals(PickDrop.CANCELLED, pattern.getBoardType(i));
-      Assertions.assertEquals(PickDrop.CANCELLED, pattern.getAlightType(i));
-    }
-
-    //---
-
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    Assertions.assertNotNull(path);
-    endTime = startTime + 40 * 60;
-    Assertions.assertEquals(endTime, path.getEndTime());
-     */
 
     // update trip arrival time incorrectly
     tripDescriptorBuilder = TripDescriptor.newBuilder();
