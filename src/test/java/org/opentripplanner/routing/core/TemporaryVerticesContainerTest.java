@@ -1,16 +1,15 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -28,11 +27,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 
-/**
- * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
- */
-@Ignore
-public class RoutingContextDestroyTest {
+public class TemporaryVerticesContainerTest {
 
   private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
   // Given:
@@ -49,7 +44,7 @@ public class RoutingContextDestroyTest {
   private TemporaryVerticesContainer subject;
 
   // - and some roads
-  @Before
+  @BeforeEach
   public void setup() {
     createStreetEdge(a, b, "a -> b");
     createStreetEdge(b, a, "b -> a");
@@ -58,13 +53,13 @@ public class RoutingContextDestroyTest {
   }
 
   @Test
-  public void temporaryChangesRemovedOnContextDestroy() {
+  public void temporaryChangesRemovedOnClose() {
     // Given - A request
     RoutingRequest request = new RoutingRequest();
     request.from = from;
     request.to = to;
 
-    // When - the context is created
+    // When - the container is created
     subject = new TemporaryVerticesContainer(g, request);
 
     // Then:
@@ -75,7 +70,7 @@ public class RoutingContextDestroyTest {
 
     // Then - permanent vertexes
     for (Vertex v : permanentVertexes) {
-      // - does not reference the any temporary nodes any more
+      // - does not reference the any temporary nodes anymore
       for (Edge e : v.getIncoming()) {
         assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getFromVertex());
       }
@@ -119,10 +114,10 @@ public class RoutingContextDestroyTest {
     String msg = "All reachable vertexes from origin: " + vertexesReachableFromOrigin;
 
     // it is possible to reach the A, B, C and the Destination Vertex
-    assertTrue(msg, vertexesReachableFromOrigin.contains("A"));
-    assertTrue(msg, vertexesReachableFromOrigin.contains("B"));
-    assertTrue(msg, vertexesReachableFromOrigin.contains("C"));
-    assertTrue(msg, vertexesReachableFromOrigin.contains("Destination"));
+    assertTrue(vertexesReachableFromOrigin.contains("A"), msg);
+    assertTrue(vertexesReachableFromOrigin.contains("B"), msg);
+    assertTrue(vertexesReachableFromOrigin.contains("C"), msg);
+    assertTrue(vertexesReachableFromOrigin.contains("Destination"), msg);
 
     // And - from the destination we can backtrack
     Collection<String> vertexesReachableFromDestination = findAllReachableVertexes(
@@ -133,12 +128,12 @@ public class RoutingContextDestroyTest {
     msg = "All reachable vertexes back from destination: " + vertexesReachableFromDestination;
 
     // and reach the A, B and the Origin Vertex
-    assertTrue(msg, vertexesReachableFromDestination.contains("A"));
-    assertTrue(msg, vertexesReachableFromDestination.contains("B"));
-    assertTrue(msg, vertexesReachableFromDestination.contains("Origin"));
+    assertTrue(vertexesReachableFromDestination.contains("A"), msg);
+    assertTrue(vertexesReachableFromDestination.contains("B"), msg);
+    assertTrue(vertexesReachableFromDestination.contains("Origin"), msg);
 
     // But - not the C Vertex
-    assertFalse(msg, vertexesReachableFromDestination.contains("C"));
+    assertFalse(vertexesReachableFromDestination.contains("C"), msg);
   }
 
   private void createStreetEdge(StreetVertex v0, StreetVertex v1, String name) {
@@ -151,7 +146,7 @@ public class RoutingContextDestroyTest {
 
   private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {
     String sourceName = src.getDefaultName();
-    assertFalse(sourceName + " -> " + e.getDefaultName(), e instanceof TemporaryEdge);
-    assertFalse(sourceName + " -> " + v.getDefaultName(), v instanceof TemporaryVertex);
+    assertFalse(e instanceof TemporaryEdge, sourceName + " -> " + e.getDefaultName());
+    assertFalse(v instanceof TemporaryVertex, sourceName + " -> " + v.getDefaultName());
   }
 }
