@@ -151,7 +151,7 @@ public class RaptorPathToItineraryMapper {
       return List.of();
     }
 
-    return subItinerary.withTimeShiftToStartAt(createCalendar(accessPathLeg.fromTime())).legs;
+    return subItinerary.withTimeShiftToStartAt(createZonedDateTime(accessPathLeg.fromTime())).legs;
   }
 
   private Leg mapTransitLeg(
@@ -182,8 +182,8 @@ public class RaptorPathToItineraryMapper {
           tripSchedule.getOriginalTripPattern(),
           boardStopIndexInPattern,
           alightStopIndexInPattern,
-          createCalendar(pathLeg.fromTime() + frequencyHeadwayInSeconds),
-          createCalendar(pathLeg.toTime()),
+          createZonedDateTime(pathLeg.fromTime() + frequencyHeadwayInSeconds),
+          createZonedDateTime(pathLeg.toTime()),
           tripSchedule.getServiceDate(),
           transitSearchTimeZero.getZone().normalized(),
           (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
@@ -198,8 +198,8 @@ public class RaptorPathToItineraryMapper {
           tripSchedule.getOriginalTripPattern(),
           boardStopIndexInPattern,
           alightStopIndexInPattern,
-          createCalendar(pathLeg.fromTime()),
-          createCalendar(pathLeg.toTime()),
+          createZonedDateTime(pathLeg.fromTime()),
+          createZonedDateTime(pathLeg.toTime()),
           tripSchedule.getServiceDate(),
           transitSearchTimeZero.getZone().normalized(),
           (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
@@ -241,7 +241,7 @@ public class RaptorPathToItineraryMapper {
       return null;
     }
 
-    return subItinerary.withTimeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
+    return subItinerary.withTimeShiftToStartAt(createZonedDateTime(egressPathLeg.fromTime()));
   }
 
   private List<Leg> mapNonTransitLeg(
@@ -256,8 +256,8 @@ public class RaptorPathToItineraryMapper {
       return List.of(
         new StreetLeg(
           transferMode,
-          createCalendar(pathLeg.fromTime()),
-          createCalendar(pathLeg.toTime()),
+          createZonedDateTime(pathLeg.fromTime()),
+          createZonedDateTime(pathLeg.toTime()),
           from,
           to,
           transfer.getDistanceMeters(),
@@ -275,7 +275,7 @@ public class RaptorPathToItineraryMapper {
       RoutingContext routingContext = new RoutingContext(request, graph, (Vertex) null, null);
 
       StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
-      se.setTimeSeconds(createCalendar(pathLeg.fromTime()).toEpochSecond());
+      se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
 
       State s = se.makeState();
       ArrayList<State> transferStates = new ArrayList<>();
@@ -298,7 +298,7 @@ public class RaptorPathToItineraryMapper {
     }
   }
 
-  private ZonedDateTime createCalendar(int timeInSeconds) {
+  private ZonedDateTime createZonedDateTime(int timeInSeconds) {
     return transitSearchTimeZero.plusSeconds(timeInSeconds);
   }
 }
