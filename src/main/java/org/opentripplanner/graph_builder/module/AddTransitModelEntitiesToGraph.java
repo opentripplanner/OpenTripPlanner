@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
@@ -59,10 +58,6 @@ public class AddTransitModelEntitiesToGraph {
 
   private final int subwayAccessTime;
 
-  private AddTransitModelEntitiesToGraph(GtfsContext context) {
-    this(context.getFeedId(), context.getTransitService(), 0);
-  }
-
   /**
    * @param subwayAccessTime a positive integer for the extra time to access a subway platform, if
    *                         negative the default value of zero is used.
@@ -75,10 +70,6 @@ public class AddTransitModelEntitiesToGraph {
     this.feedId = feedId;
     this.transitService = transitModel;
     this.subwayAccessTime = Math.max(subwayAccessTime, 0);
-  }
-
-  public static void addToGraph(GtfsContext context, Graph graph) {
-    new AddTransitModelEntitiesToGraph(context).applyToGraph(graph);
   }
 
   public static void addToGraph(

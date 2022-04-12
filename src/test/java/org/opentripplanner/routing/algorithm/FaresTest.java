@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -107,6 +108,11 @@ public class FaresTest {
       ConstantsForTests.KCM_GTFS,
       new SeattleFareServiceFactory()
     );
+
+    assertEquals("America/Los_Angeles", graph.getTimeZone().getID());
+
+    assertEquals(1, graph.getFeedIds().size());
+
     var feedId = graph.getFeedIds().iterator().next();
 
     var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
@@ -124,8 +130,13 @@ public class FaresTest {
     var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
     var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
     var leg = peakItinerary.legs.get(0);
+
     assertTrue(toLocalTime(leg.getStartTime()).isAfter(LocalTime.parse("08:00")));
-    assertTrue(toLocalTime(leg.getStartTime()).isBefore(LocalTime.parse("09:00")));
+    var startTime = toLocalTime(leg.getStartTime());
+    assertTrue(
+      startTime.isBefore(LocalTime.parse("09:00")),
+      "Leg's start should be before 09:00 but is " + startTime
+    );
 
     assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
   }
@@ -153,7 +164,7 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
 
     // D -> E, null case
 
@@ -172,10 +183,10 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 2);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
     assertEquals(fareComponents.get(1).price, tenUSD);
     assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BC"));
-    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
+    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
 
     // B -> D, 2 fully connected components
     from = GenericLocation.fromStopId("Origin", feedId, "B");
@@ -186,8 +197,8 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "2"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "3"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "3"));
 
     // E -> G, missing in between fare
     from = GenericLocation.fromStopId("Origin", feedId, "E");
@@ -198,8 +209,8 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
 
     // C -> E, missing fare after
     from = GenericLocation.fromStopId("Origin", feedId, "C");
@@ -210,7 +221,7 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "3"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "3"));
 
     // D -> G, missing fare before
     from = GenericLocation.fromStopId("Origin", feedId, "D");
@@ -221,8 +232,8 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
 
     // A -> D, use individual component parts
     from = GenericLocation.fromStopId("Origin", feedId, "A");
@@ -233,11 +244,11 @@ public class FaresTest {
     assertEquals(fareComponents.size(), 2);
     assertEquals(fareComponents.get(0).price, tenUSD);
     assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
     assertEquals(fareComponents.get(1).price, tenUSD);
     assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BD"));
-    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
-    assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId("agency", "3"));
+    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId(feedId, "3"));
   }
 
   private static Fare getFare(
@@ -271,7 +282,11 @@ public class FaresTest {
       additionalSearchDays,
       new DebugTimingAggregator()
     );
-    return result.getItineraries();
+    return result
+      .getItineraries()
+      .stream()
+      .sorted(Comparator.comparingInt(x -> x.generalizedCost))
+      .toList();
   }
 
   private static LocalTime toLocalTime(Calendar time) {
