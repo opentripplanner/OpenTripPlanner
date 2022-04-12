@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.stoptime;
 
-import com.google.common.base.MoreObjects;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -139,11 +139,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
   @Override
   public String toString() {
-    return MoreObjects
-      .toStringHelper(this)
-      .add("updateSource", updateSource)
-      .add("feedId", feedId)
-      .add("fuzzyTripMatching", fuzzyTripMatching)
+    return ToStringBuilder
+      .of(this.getClass())
+      .addObj("updateSource", updateSource)
+      .addStr("feedId", feedId)
+      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatching)
       .toString();
   }
 

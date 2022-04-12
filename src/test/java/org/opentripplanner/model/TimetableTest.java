@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
@@ -137,7 +138,7 @@ public class TimetableTest {
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
     patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     var updatedTripTimes = patch.getTripTimes();
-    Assertions.assertNotNull(updatedTripTimes);
+    assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
     assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
 
@@ -155,7 +156,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = patch.getTripTimes();
-    Assertions.assertNotNull(updatedTripTimes);
+    assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip arrival time only
@@ -172,7 +173,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = patch.getTripTimes();
-    Assertions.assertNotNull(updatedTripTimes);
+    assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip departure time only
@@ -189,7 +190,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = patch.getTripTimes();
-    Assertions.assertNotNull(updatedTripTimes);
+    assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip using stop id
@@ -206,7 +207,7 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     updatedTripTimes = patch.getTripTimes();
-    Assertions.assertNotNull(updatedTripTimes);
+    assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
     // update trip arrival time at first stop and make departure time incoherent at second stop
