@@ -50,8 +50,6 @@ public class VehiclePositionPatternMatcher {
   private final Function<Trip, TripPattern> getStaticPattern;
   private final BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern;
 
-  private static final int MIDNIGHT_SECONDS = 60 * 60 * 24;
-
   private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
   public VehiclePositionPatternMatcher(
@@ -194,16 +192,6 @@ public class VehiclePositionPatternMatcher {
       .min(Comparator.comparingLong(TemporalDistance::distance))
       .map(TemporalDistance::date)
       .orElse(today);
-  }
-
-  /**
-   * If the trip times starts before 24:00 and finishes after 24:00. In other words if the
-   * calendar date changes when the trip runs.
-   */
-  private static boolean crossesMidnight(TripTimes tripTimes) {
-    var start = tripTimes.getScheduledDepartureTime(0);
-    var end = tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1);
-    return start < MIDNIGHT_SECONDS && end > MIDNIGHT_SECONDS;
   }
 
   /**

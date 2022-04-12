@@ -149,17 +149,32 @@ public class VehiclePositionsMatcherTest {
     assertEquals(0, service.getVehiclePositions(pattern2).size());
   }
 
+  private record ServiceDayTestCase(String time, String expectedDate) {}
+
   @Test
-  void inferServiceDateAtMiddleOfDay() {
+  void inferServiceDayOfTripAt6() {
     var trip = new Trip(scopedTripId);
-    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1));
+
+    var twelveOclock = (int) Duration.ofHours(18).toSeconds();
+    var fivePast12 = twelveOclock + 300;
+
+    var stopTimes = List.of(stopTime(trip, 0, twelveOclock), stopTime(trip, 1, fivePast12));
 
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
-    var time = OffsetDateTime.parse("2022-04-05T15:26:04+02:00").toInstant();
-    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+    // the trip starts at 18:00 and finishes at 18:05
+    List
+      .of(
+        new ServiceDayTestCase("2022-04-05T15:26:04+02:00", "2022-04-05"),
+        new ServiceDayTestCase("2022-04-06T00:26:04+02:00", "2022-04-05"),
+        new ServiceDayTestCase("2022-04-06T10:26:04+02:00", "2022-04-06")
+      )
+      .forEach(testCase -> {
+        var time = OffsetDateTime.parse(testCase.time).toInstant();
+        var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
 
-    assertEquals(LocalDate.parse("2022-04-05"), inferredDate);
+        assertEquals(LocalDate.parse(testCase.expectedDate), inferredDate);
+      });
   }
 
   @Test
@@ -200,8 +215,6 @@ public class VehiclePositionsMatcherTest {
     var stopTime = new StopTime();
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);
-    stopTime.setArrivalTime((int) Duration.ofHours(12).plusMinutes(seq).toSeconds());
-    stopTime.setDepartureTime((int) Duration.ofHours(12).plusMinutes(seq + 1).toSeconds());
 
     var stop = Stop.stopForTest("stop-" + seq, 0, 0);
     stopTime.setStop(stop);
