@@ -630,11 +630,6 @@ public class RoutingRequest implements Cloneable, Serializable {
    * it exists.
    */
   public boolean useVehicleParkingAvailabilityInformation = false;
-  /**
-   * The function that compares paths converging on the same vertex to decide which ones continue to
-   * be explored.
-   */
-  public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
   /**
    * Accept only paths that use transit (no street-only paths).

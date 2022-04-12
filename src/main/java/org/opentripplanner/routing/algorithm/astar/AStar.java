@@ -13,6 +13,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.time.DateUtils;
@@ -50,6 +51,7 @@ public class AStar {
     TraverseVisitor traverseVisitor,
     RoutingContext rctx,
     SearchTerminationStrategy terminationStrategy,
+    DominanceFunction dominanceFunction,
     Duration timeout,
     Edge originBackEdge
   ) {
@@ -61,7 +63,7 @@ public class AStar {
     this.timeout = timeout;
 
     this.rctx = rctx;
-    this.spt = new ShortestPathTree(rctx.opt.dominanceFunction);
+    this.spt = new ShortestPathTree(dominanceFunction);
     this.heuristic.initialize(rctx);
 
     // Priority Queue.

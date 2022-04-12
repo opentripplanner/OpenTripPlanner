@@ -169,7 +169,6 @@ public class NearbyStopFinder {
     List<NearbyStop> stopsFound = Lists.newArrayList();
 
     routingRequest.setArriveBy(reverseDirection);
-    routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
 
     RoutingContext routingContext;
     if (!reverseDirection) {
@@ -197,9 +196,9 @@ public class NearbyStopFinder {
       return stopsFound;
     }
 
-    var skipEdgeStrategy = getSkipEdgeStrategy(reverseDirection, routingRequest);
     ShortestPathTree spt = AStarBuilder
-      .allDirections(skipEdgeStrategy)
+      .allDirections(getSkipEdgeStrategy(reverseDirection, routingRequest))
+      .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
       .getShortestPathTree();
 

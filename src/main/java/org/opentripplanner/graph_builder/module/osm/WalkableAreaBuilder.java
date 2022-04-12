@@ -367,11 +367,11 @@ public class WalkableAreaBuilder {
       mode = TraverseMode.CAR;
     }
     RoutingRequest options = new RoutingRequest(mode);
-    options.dominanceFunction = new DominanceFunction.EarliestArrival();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree spt = AStarBuilder
         .allDirections(new ListedEdgesOnly(edges))
+        .setDominanceFunction(new DominanceFunction.EarliestArrival())
         .setContext(new RoutingContext(options, graph, vertex, null))
         .getShortestPathTree();
 
