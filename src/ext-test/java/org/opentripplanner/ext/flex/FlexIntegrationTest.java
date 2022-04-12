@@ -113,7 +113,7 @@ public class FlexIntegrationTest {
 
     var itin = getItinerary(from, to, 0, true);
 
-    // one walk and one flex
+    // walk, flex, walk
     assertEquals(3, itin.legs.size());
 
     var walkToFlex = itin.legs.get(0);
