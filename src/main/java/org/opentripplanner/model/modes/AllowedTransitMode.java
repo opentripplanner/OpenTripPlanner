@@ -51,7 +51,12 @@ public class AllowedTransitMode {
    * Check if this filter allows the provided TransitMode
    */
   public boolean allows(TransitMode transitMode, String netexSubMode) {
-    return mainMode == transitMode && (subMode == null || subMode.equals(netexSubMode));
+    boolean mainModeMatch = mainMode == transitMode;
+    boolean submodeMatch =
+      subMode == null ||
+      subMode.equals(netexSubMode) ||
+      (subMode.equals("unknown") && netexSubMode == null);
+    return mainModeMatch && submodeMatch;
   }
 
   public TransitMode getMainMode() {
