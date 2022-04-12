@@ -11,6 +11,11 @@ public class TestTripPattern implements RaptorTripPattern {
 
   private final String name;
   private final int[] stopIndexes;
+  /**
+   * By caching the index, we avoid looking up the pattern during routing, this reduces memory lookups and
+   * improves the performance.
+   */
+  private int slackIndex = 0;
 
   /**
    * <pre>
@@ -35,6 +40,11 @@ public class TestTripPattern implements RaptorTripPattern {
   /** Create a pattern with name 'R1' and given stop indexes */
   public static TestTripPattern pattern(int... stopIndexes) {
     return new TestTripPattern("R1", stopIndexes, new int[stopIndexes.length]);
+  }
+
+  public TestTripPattern withSlackIndex(int index) {
+    this.slackIndex = index;
+    return this;
   }
 
   /**
@@ -85,6 +95,11 @@ public class TestTripPattern implements RaptorTripPattern {
   @Override
   public boolean alightingPossibleAt(int stopPositionInPattern) {
     return isNotRestricted(stopPositionInPattern, ALIGHTING_MASK);
+  }
+
+  @Override
+  public int slackIndex() {
+    return slackIndex;
   }
 
   @Override

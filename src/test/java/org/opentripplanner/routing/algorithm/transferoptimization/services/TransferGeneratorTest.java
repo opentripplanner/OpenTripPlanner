@@ -49,7 +49,8 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   @Test
   void findTransferPathWithoutTransfers() {
     data.withRoutes(
-      route("L1", STOP_A, STOP_B, STOP_C).withTimetable(schedule("10:00 10:20 10:30"))
+      route(TestTripPattern.pattern("L1", STOP_A, STOP_B, STOP_C).withSlackIndex(1))
+        .withTimetable(schedule("10:00 10:20 10:30"))
     );
     var schedule = data.getRoute(0).getTripSchedule(0);
 
@@ -187,12 +188,12 @@ public class TransferGeneratorTest implements RaptorTestConstants {
       }
 
       @Override
-      public int boardSlack(RaptorTripPattern pattern) {
-        return ((TestTripPattern) pattern).getName().equals("L1") ? 20 * 60 : 0;
+      public int boardSlack(int slackIndex) {
+        return slackIndex == 1 ? 20 * 60 : 0;
       }
 
       @Override
-      public int alightSlack(RaptorTripPattern pattern) {
+      public int alightSlack(int slackIndex) {
         return 0;
       }
     };

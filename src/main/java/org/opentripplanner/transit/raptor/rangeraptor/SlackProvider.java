@@ -23,7 +23,7 @@ public interface SlackProvider {
    * <p>
    * Unit: seconds.
    */
-  int boardSlack(RaptorTripPattern pattern);
+  int boardSlack(int slackIndex);
 
   /**
    * The alight-slack (duration time in seconds) to add to the trip alight time for the given
@@ -33,7 +33,7 @@ public interface SlackProvider {
    * <p>
    * Unit: seconds.
    */
-  int alightSlack(RaptorTripPattern pattern);
+  int alightSlack(int slackIndex);
 
   /**
    * Regular transfer slack should be added to all access and egress paths with one or more number

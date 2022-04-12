@@ -21,6 +21,12 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   default void setup() {}
 
   /**
+   * This is the total number of stops, it should be possible to retrieve transfers and pattern for
+   * every stop from 0 to {@code numberOfStops()-1}.
+   */
+  int numberOfStops();
+
+  /**
    * This method is responsible for providing all transfers from a given stop to all possible stops
    * around that stop.
    * <p/>
@@ -50,6 +56,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    *
    * @return a map of distances from the given input stop to all other stops.
    */
+  @Flyweight
   Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop);
 
   /**
@@ -58,6 +65,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    *
    * @return a map of distances to the given input stop from all other stops.
    */
+  @Flyweight
   Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop);
 
   /**
@@ -74,12 +82,6 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * {@link #getTransfersFromStop(int)} for detail on how to implement this.
    */
   RaptorRoute<T> getRouteForIndex(int routeIndex);
-
-  /**
-   * This is the total number of stops, it should be possible to retrieve transfers and pattern for
-   * every stop from 0 to {@code numberOfStops()-1}.
-   */
-  int numberOfStops();
 
   /**
    * Create/provide the cost criteria calculator.
