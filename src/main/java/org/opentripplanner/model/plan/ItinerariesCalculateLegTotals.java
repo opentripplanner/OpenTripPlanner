@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -30,10 +31,10 @@ class ItinerariesCalculateLegTotals {
   }
 
   private void calculate(List<Leg> legs) {
-    long startTimeMs = legs.get(0).getStartTime().getTimeInMillis();
-    long endTimeMs = legs.get(legs.size() - 1).getEndTime().getTimeInMillis();
-
-    totalDurationSeconds = (int) Math.round((endTimeMs - startTimeMs) / 1000.0);
+    totalDurationSeconds =
+      (int) Duration
+        .between(legs.get(0).getStartTime(), legs.get(legs.size() - 1).getEndTime())
+        .toSeconds();
 
     for (Leg leg : legs) {
       long dt = leg.getDuration();

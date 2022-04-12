@@ -1,6 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -29,8 +30,8 @@ public class ItineraryMapper {
     ApiItinerary api = new ApiItinerary();
 
     api.duration = (long) domain.durationSeconds;
-    api.startTime = domain.startTime();
-    api.endTime = domain.endTime();
+    api.startTime = GregorianCalendar.from(domain.startTime());
+    api.endTime = GregorianCalendar.from(domain.endTime());
     api.walkTime = domain.nonTransitTimeSeconds;
     api.transitTime = domain.transitTimeSeconds;
     api.waitingTime = domain.waitingTimeSeconds;

@@ -1,7 +1,6 @@
 package org.opentripplanner.model.plan.legreference;
 
 import java.time.ZoneId;
-import java.util.GregorianCalendar;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -64,8 +63,8 @@ public record ScheduledTransitLegReference(
       tripPattern,
       fromStopPositionInPattern,
       toStopPositionInPattern,
-      GregorianCalendar.from(serviceDate.toZonedDateTime(timeZone, boardingTime)),
-      GregorianCalendar.from(serviceDate.toZonedDateTime(timeZone, alightingTime)),
+      serviceDate.toZonedDateTime(timeZone, boardingTime),
+      serviceDate.toZonedDateTime(timeZone, alightingTime),
       serviceDate.toLocalDate(),
       timeZone,
       null,

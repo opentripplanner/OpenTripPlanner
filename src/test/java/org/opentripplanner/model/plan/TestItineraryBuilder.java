@@ -18,7 +18,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -263,8 +262,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
       tripPattern,
       fromStopIndex,
       toStopIndex,
-      GregorianCalendar.from(newTime(start)),
-      GregorianCalendar.from(newTime(end)),
+      newTime(start),
+      newTime(end),
       serviceDate != null ? serviceDate : SERVICE_DAY,
       UTC,
       null,
@@ -287,8 +286,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
     StreetLeg leg = new StreetLeg(
       mode,
-      GregorianCalendar.from(newTime(startTime)),
-      GregorianCalendar.from(newTime(endTime)),
+      newTime(startTime),
+      newTime(endTime),
       stop(lastPlace),
       stop(to),
       speed(mode) * (endTime - startTime),

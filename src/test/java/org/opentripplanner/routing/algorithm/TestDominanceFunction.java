@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.mockito.Mockito.mock;
 
+import java.time.Instant;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -20,8 +21,8 @@ public class TestDominanceFunction extends TestCase {
 
     // Test if domination works in the general case
 
-    State stateA = new State(fromVertex, 0, request, null);
-    State stateB = new State(toVertex, 0, request, null);
+    State stateA = new State(fromVertex, Instant.EPOCH, request, null);
+    State stateB = new State(toVertex, Instant.EPOCH, request, null);
     stateA.weight = 1;
     stateB.weight = 2;
 

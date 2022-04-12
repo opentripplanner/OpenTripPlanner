@@ -1,9 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import java.util.Calendar;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.Agency;
@@ -60,8 +60,7 @@ public interface Leg {
    * The leg's duration in seconds
    */
   default long getDuration() {
-    // Round to the closest second; Hence subtract 500 ms before dividing by 1000
-    return (500 + getEndTime().getTimeInMillis() - getStartTime().getTimeInMillis()) / 1000;
+    return Duration.between(getStartTime(), getEndTime()).toSeconds();
   }
 
   /**
@@ -131,12 +130,12 @@ public interface Leg {
   /**
    * The date and time this leg begins.
    */
-  Calendar getStartTime();
+  ZonedDateTime getStartTime();
 
   /**
    * The date and time this leg ends.
    */
-  Calendar getEndTime();
+  ZonedDateTime getEndTime();
 
   /**
    * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
@@ -198,9 +197,12 @@ public interface Leg {
     return null;
   }
 
+  /**
+   * Get the timezone offset in milliseconds.
+   */
   default int getAgencyTimeZoneOffset() {
-    TimeZone timeZone = getStartTime().getTimeZone();
-    return timeZone.getOffset(getStartTime().getTimeInMillis());
+    int MILLIS_TO_SECONDS = 1000;
+    return getStartTime().getOffset().getTotalSeconds() * MILLIS_TO_SECONDS;
   }
 
   /**
@@ -371,6 +373,10 @@ public interface Leg {
   }
 
   default void addAlert(TransitAlert alert) {
+    throw new UnsupportedOperationException();
+  }
+
+  default Leg withTimeShift(Duration duration) {
     throw new UnsupportedOperationException();
   }
 }

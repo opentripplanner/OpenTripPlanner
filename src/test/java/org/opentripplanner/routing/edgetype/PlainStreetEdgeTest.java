@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Instant;
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -258,7 +259,7 @@ public class PlainStreetEdgeTest {
     StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
     RoutingRequest routingRequest = proto.clone();
     RoutingContext routingContext = new RoutingContext(routingRequest, graph, v0, v2);
-    State state = new State(v2, 0, routingRequest, routingContext);
+    State state = new State(v2, Instant.EPOCH, routingRequest, routingContext);
 
     state.getOptions().setArriveBy(true);
     e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
