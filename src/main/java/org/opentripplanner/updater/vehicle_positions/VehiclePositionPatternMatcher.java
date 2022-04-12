@@ -6,12 +6,11 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -20,6 +19,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
@@ -164,43 +164,36 @@ public class VehiclePositionPatternMatcher {
    */
   protected static LocalDate inferServiceDate(
     TripTimes staticTripTimes,
-    ZoneId timeZoneId,
+    ZoneId zoneId,
     Instant now
   ) {
     var start = staticTripTimes.getScheduledDepartureTime(0);
-    var today = now.atZone(timeZoneId).toLocalDate();
-    // if we have a trip that starts before 24:00 and finishes the next day, we have to figure out
-    // the correct service day
-    if (crossesMidnight(staticTripTimes)) {
-      var nowSeconds = LocalTime.ofInstant(now, timeZoneId).toSecondOfDay();
-      // when nowSeconds is less than the start we are already at the next day
-      // (because nowSeconds can never be greater than MIDNIGHT_SECONDS but stop times can)
-      // so we have to select yesterday as the service day
-      //
-      // there is an edge case here: if we receive a position before the trip has even started
-      // (according to the schedule) then we give it the wrong service day.
-      // since this an edge case (update before start) of an edge case (trip that crosses midnight),
-      // i will ignore this. if this is problematic then you should put the start_date in the
-      // vehicle position.
-      if (nowSeconds < start) {
-        return today.minusDays(1);
-      }
-      // if we are before midnight
-      else {
-        return today;
-      }
-    }
-    // if we have a trip that starts after midnight but is associated with the previous service
-    // day. the start time would be something like 25:10.
-    else if (start > MIDNIGHT_SECONDS) {
-      return today.minusDays(1);
-    }
-    // here is another edge case: if the trip finished at close to midnight but for some reason
-    // is still sending updates after midnight then we are guessing the wrong day.
-    // if this concerns you, then you should really put the start_date into your feed.
-    else {
-      return today;
-    }
+    var end = staticTripTimes.getScheduledDepartureTime(staticTripTimes.getNumStops() - 1);
+
+    var today = now.atZone(zoneId).toLocalDate();
+    var yesterday = today.minusDays(1);
+    var tomorrow = today.plusDays(1);
+
+    // we compute the temporal "distance" to either the start or the end of the trip on either
+    // yesterday, today or tomorrow. whichever one has the lowest "distance" to now is guessed to be
+    // the service day of the undated vehicle position
+    // if this is concerning to you, you should put a start_date in your feed.
+    return Stream
+      .of(yesterday, today, tomorrow)
+      .map(day -> {
+        var startTime = day.atStartOfDay(zoneId).plusSeconds(start).toInstant();
+        var endTime = day.atStartOfDay(zoneId).plusSeconds(end).toInstant();
+
+        var lowestDistance = Stream
+          .of(Duration.between(startTime, now), Duration.between(endTime, now))
+          .map(Duration::abs) // distances can be positive and negative
+          .min(Comparator.comparingLong(Duration::toSeconds))
+          .orElse(Duration.ZERO);
+        return new TemporalDistance(day, lowestDistance.toSeconds());
+      })
+      .min(Comparator.comparingLong(TemporalDistance::distance))
+      .map(TemporalDistance::date)
+      .orElse(today);
   }
 
   /**
@@ -280,6 +273,8 @@ public class VehiclePositionPatternMatcher {
 
     return newPosition.build();
   }
+
+  private record TemporalDistance(LocalDate date, long distance) {}
 
   private static StopStatus toModel(VehicleStopStatus currentStatus) {
     return switch (currentStatus) {

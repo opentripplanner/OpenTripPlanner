@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -199,6 +200,8 @@ public class VehiclePositionsMatcherTest {
     var stopTime = new StopTime();
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);
+    stopTime.setArrivalTime((int) Duration.ofHours(12).plusMinutes(seq).toSeconds());
+    stopTime.setDepartureTime((int) Duration.ofHours(12).plusMinutes(seq + 1).toSeconds());
 
     var stop = Stop.stopForTest("stop-" + seq, 0, 0);
     stopTime.setStop(stop);
