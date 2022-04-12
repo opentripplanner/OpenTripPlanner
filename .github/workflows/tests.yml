@@ -37,3 +37,14 @@ jobs:
         run: |
           mvn test -Dgpg.skip -Dmaven.javadoc.skip=true -s $SETTINGS_PATH
         working-directory: ${{ github.workspace }}/OTP
+  
+  deploy-prod:
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: tests
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+
+    steps:
+      - uses: ./.github/workflows/deploy.yml
+        with:
+          environment: prod

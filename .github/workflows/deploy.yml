@@ -1,16 +1,29 @@
-name: Deploy to dev
+name: Deploy
 
 on:
+  repository_dispatch:
+    types: [trigger_deploy]
+  workflow_call: # Called after tests pass on master branch push
+    inputs:
+      environment:
+        description: 'Environment (dev or prod)'
+        type: string # environment type not supported here, yet
+        default: dev
   workflow_dispatch:
-  push:
-    branches: [master]
+    inputs:
+      environment:
+        description: 'Environment'
+        type: environment
+        required: true
+        default: dev
 
 jobs:
-  deploy-dev:
-    name: Deploy master to dev server
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment || inputs.environment }}
     runs-on: ubuntu-latest
-    environment: dev
-    concurrency: dev
+    environment: ${{ github.event.inputs.environment || inputs.environment }}
+    concurrency: ${{ github.event.inputs.environment || inputs.environment }}
+
     env:
       SETTINGS_PATH: ${{ github.workspace }}/OTP/mbta/ci-maven-settings.xml
     
