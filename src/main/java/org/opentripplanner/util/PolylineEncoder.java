@@ -6,25 +6,30 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.opentripplanner.util.model.EncodedPolyline;
 
+/**
+ * This encodes geometries to the Google Polyline encoding
+ *
+ * {@see EncodedPolyline}
+ */
 public class PolylineEncoder {
 
-  public static EncodedPolylineBean createEncodings(Geometry geometry) {
+  public static EncodedPolyline encodeGeometry(Geometry geometry) {
     if (geometry instanceof LineString string) {
-      return createEncodings(string.getCoordinates());
+      return encodeCoordinates(string.getCoordinates());
     } else if (geometry instanceof MultiLineString mls) {
-      return createEncodings(mls.getCoordinates());
+      return encodeCoordinates(mls.getCoordinates());
     } else if (geometry instanceof Polygon polygon) {
-      return createEncodings(polygon.getCoordinates());
+      return encodeCoordinates(polygon.getCoordinates());
     } else if (geometry instanceof Point point) {
-      return createEncodings(point.getCoordinates());
+      return encodeCoordinates(point.getCoordinates());
     } else {
       throw new IllegalArgumentException(geometry.toString());
     }
   }
 
-  static EncodedPolylineBean createEncodings(Coordinate[] points) {
+  static EncodedPolyline encodeCoordinates(Coordinate[] points) {
     StringBuilder encodedPoints = new StringBuilder();
 
     int plat = 0;
@@ -45,7 +50,7 @@ public class PolylineEncoder {
       count++;
     }
 
-    return new EncodedPolylineBean(encodedPoints.toString(), count);
+    return new EncodedPolyline(encodedPoints.toString(), count);
   }
 
   private static String encodeSignedNumber(int num) {

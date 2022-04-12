@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.opentripplanner.util.model.EncodedPolyline;
 
 public class PolylineEncoderTest {
 
@@ -18,9 +18,9 @@ public class PolylineEncoderTest {
     points.add(new Coordinate(-73.85062, 40.903125, Double.NaN));
     points.add(new Coordinate(-73.85136, 40.902261, Double.NaN));
     points.add(new Coordinate(-73.85151, 40.902066, Double.NaN));
-    EncodedPolylineBean eplb = PolylineEncoder.createEncodings(points.toArray(new Coordinate[0]));
-    assertEquals("o{sxFl}vaMjDpCf@\\", eplb.getPoints());
-    assertEquals(3, eplb.getLength());
+    EncodedPolyline eplb = PolylineEncoder.encodeCoordinates(points.toArray(new Coordinate[0]));
+    assertEquals("o{sxFl}vaMjDpCf@\\", eplb.points());
+    assertEquals(3, eplb.length());
   }
 
   @Test
@@ -35,16 +35,16 @@ public class PolylineEncoderTest {
           new Coordinate(0, 0),
         }
       );
-    var polyline = PolylineEncoder.createEncodings(polygon);
+    var polyline = PolylineEncoder.encodeGeometry(polygon);
 
-    assertEquals("??_ibE_ibE_ibE_ibE~reK~reK", polyline.getPoints());
+    assertEquals("??_ibE_ibE_ibE_ibE~reK~reK", polyline.points());
   }
 
   @Test
   public void testPoint() {
     var point = GeometryUtils.getGeometryFactory().createPoint(new Coordinate(100, 100));
-    var polyline = PolylineEncoder.createEncodings(point);
+    var polyline = PolylineEncoder.encodeGeometry(point);
 
-    assertEquals("_gjaR_gjaR", polyline.getPoints());
+    assertEquals("_gjaR_gjaR", polyline.points());
   }
 }

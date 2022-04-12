@@ -2,7 +2,7 @@ package org.opentripplanner.api.model;
 
 import java.util.Calendar;
 import java.util.List;
-import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.opentripplanner.util.model.EncodedPolyline;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -180,7 +180,7 @@ public class ApiLeg {
   /**
    * The leg's geometry.
    */
-  public EncodedPolylineBean legGeometry;
+  public EncodedPolyline legGeometry;
 
   /**
    * The elevation profile as a comma-separated list of x,y values. x is the distance from the start

@@ -60,7 +60,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.opentripplanner.util.model.EncodedPolyline;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -458,9 +458,9 @@ public class IndexAPI {
   /** Return geometry for the trip as a packed coordinate sequence */
   @GET
   @Path("/trips/{tripId}/geometry")
-  public EncodedPolylineBean getGeometryForTrip(@PathParam("tripId") String tripId) {
+  public EncodedPolyline getGeometryForTrip(@PathParam("tripId") String tripId) {
     TripPattern pattern = getTripPatternForTripId(createRoutingService(), tripId);
-    return PolylineEncoder.createEncodings(pattern.getGeometry());
+    return PolylineEncoder.encodeGeometry(pattern.getGeometry());
   }
 
   /**
@@ -513,9 +513,9 @@ public class IndexAPI {
   /** Return geometry for the pattern as a packed coordinate sequence */
   @GET
   @Path("/patterns/{patternId}/geometry")
-  public EncodedPolylineBean getGeometryForPattern(@PathParam("patternId") String patternId) {
+  public EncodedPolyline getGeometryForPattern(@PathParam("patternId") String patternId) {
     LineString line = getTripPattern(createRoutingService(), patternId).getGeometry();
-    return PolylineEncoder.createEncodings(line);
+    return PolylineEncoder.encodeGeometry(line);
   }
 
   /**
