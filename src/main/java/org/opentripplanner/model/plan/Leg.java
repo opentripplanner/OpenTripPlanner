@@ -376,7 +376,7 @@ public interface Leg {
     throw new UnsupportedOperationException();
   }
 
-  default Leg timeShiftBy(Duration duration) {
+  default Leg withTimeShift(Duration duration) {
     throw new UnsupportedOperationException();
   }
 }

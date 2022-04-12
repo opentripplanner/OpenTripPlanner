@@ -151,7 +151,7 @@ public class RaptorPathToItineraryMapper {
       return List.of();
     }
 
-    return subItinerary.getItineraryShiftedToStartAt(createCalendar(accessPathLeg.fromTime())).legs;
+    return subItinerary.withTimeShiftToStartAt(createCalendar(accessPathLeg.fromTime())).legs;
   }
 
   private Leg mapTransitLeg(
@@ -241,7 +241,7 @@ public class RaptorPathToItineraryMapper {
       return null;
     }
 
-    return subItinerary.getItineraryShiftedToStartAt(createCalendar(egressPathLeg.fromTime()));
+    return subItinerary.withTimeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
   }
 
   private List<Leg> mapNonTransitLeg(

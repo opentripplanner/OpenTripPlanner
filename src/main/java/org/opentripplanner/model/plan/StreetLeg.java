@@ -195,7 +195,7 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public Leg timeShiftBy(Duration duration) {
+  public Leg withTimeShift(Duration duration) {
     StreetLeg copy = new StreetLeg(
       mode,
       startTime.plus(duration),

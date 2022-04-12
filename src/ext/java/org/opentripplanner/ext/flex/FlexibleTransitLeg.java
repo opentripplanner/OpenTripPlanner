@@ -182,7 +182,7 @@ public class FlexibleTransitLeg implements Leg {
   }
 
   @Override
-  public Leg timeShiftBy(Duration duration) {
+  public Leg withTimeShift(Duration duration) {
     FlexibleTransitLeg copy = new FlexibleTransitLeg(
       edge,
       startTime.plus(duration),

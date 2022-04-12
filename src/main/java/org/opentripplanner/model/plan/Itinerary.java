@@ -236,11 +236,11 @@ public class Itinerary {
     return !systemNotices.isEmpty();
   }
 
-  public Itinerary getItineraryShiftedToStartAt(ZonedDateTime afterTime) {
+  public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
     Duration duration = Duration.between(firstLeg().getStartTime(), afterTime);
     List<Leg> timeShiftedLegs = legs
       .stream()
-      .map(leg -> leg.timeShiftBy(duration))
+      .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
     return new Itinerary(timeShiftedLegs);
   }
