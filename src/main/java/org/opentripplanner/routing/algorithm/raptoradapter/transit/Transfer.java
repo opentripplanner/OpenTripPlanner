@@ -52,6 +52,7 @@ public class Transfer {
 
     rr.wheelchairAccessible = request.wheelchairAccessible;
     rr.maxWheelchairSlope = request.maxWheelchairSlope;
+    rr.wheelchairSlopeTooSteepCostFactor = request.wheelchairSlopeTooSteepCostFactor;
 
     rr.walkSpeed = roundToHalf(request.walkSpeed);
     rr.bikeSpeed = roundToHalf(request.bikeSpeed);
