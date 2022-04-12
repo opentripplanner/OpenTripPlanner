@@ -97,8 +97,17 @@ public class SiriAlertsUpdateHandler {
             alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
             expiredCounter++;
           } else {
-            TransitAlert alert = handleAlert(sxElement);
-            addedCounter++;
+            TransitAlert alert = null;
+            try {
+              alert = handleAlert(sxElement);
+              addedCounter++;
+            } catch (Exception e) {
+              LOG.info(
+                "Caught exception when processing situation with situationNumber {}: {}",
+                situationNumber,
+                e
+              );
+            }
             if (alert != null) {
               alert.setId(situationNumber);
               if (alert.getEntities().isEmpty()) {
