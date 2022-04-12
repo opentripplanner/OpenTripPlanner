@@ -11,6 +11,10 @@ public class TestTripPattern implements RaptorTripPattern {
 
   private final String name;
   private final int[] stopIndexes;
+  /**
+   * By caching the index, we avoid looking up the pattern during routing, this reduces memory lookups and
+   * improves the performance.
+   */
   private int slackIndex = 0;
 
   /**

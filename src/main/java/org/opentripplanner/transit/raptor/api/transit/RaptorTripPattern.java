@@ -7,7 +7,7 @@ package org.opentripplanner.transit.raptor.api.transit;
  */
 public interface RaptorTripPattern {
   /**
-   * Number of stops in pattern.
+   * Number of stops in the pattern.
    */
   int numberOfStopsInPattern();
 
@@ -35,7 +35,7 @@ public interface RaptorTripPattern {
   boolean alightingPossibleAt(int stopPositionInPattern);
 
   /**
-   * Alight and board slack is added by raptor based on this index. The index allow the data
+   * Alight and board slack is added by raptor based on this index. The index allows the data
    * provider to setup and use different board and alight slacks for each "type" of
    * RaptorTripPattern. The {@link RaptorSlackProvider} is used to return the actual slack.
    */

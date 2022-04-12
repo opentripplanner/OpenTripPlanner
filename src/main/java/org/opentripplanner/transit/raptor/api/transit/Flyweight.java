@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This interface is used to tag methods witch return flyweight objects. The implementation may
  * choose not to implement the return type as a flyweight object, but the Raptor implementation
- * is guaranteed to threat them as such - enabling the optimization.
+ * is guaranteed to treat them as such - enabling the optimization.
  * <p>
  * A flyweight object is a temporary view to the state of the callee, which the caller can access
  * immediately after the object is returned, until the next method call to the callee is performed.
