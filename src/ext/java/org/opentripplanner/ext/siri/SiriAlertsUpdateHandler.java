@@ -97,8 +97,17 @@ public class SiriAlertsUpdateHandler {
             alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
             expiredCounter++;
           } else {
-            TransitAlert alert = handleAlert(sxElement);
-            addedCounter++;
+            TransitAlert alert = null;
+            try {
+              alert = handleAlert(sxElement);
+              addedCounter++;
+            } catch (Exception e) {
+              LOG.info(
+                "Caught exception when processing situation with situationNumber {}: {}",
+                situationNumber,
+                e
+              );
+            }
             if (alert != null) {
               alert.setId(situationNumber);
               if (alert.getEntities().isEmpty()) {
@@ -340,7 +349,8 @@ public class SiriAlertsUpdateHandler {
               List<FeedScopedId> tripIds = new ArrayList<>();
 
               FeedScopedId tripIdFromVehicleJourney = siriFuzzyTripMatcher.getTripId(
-                vehicleJourneyRef.getValue()
+                vehicleJourneyRef.getValue(),
+                feedId
               );
 
               ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime() !=
@@ -391,7 +401,7 @@ public class SiriAlertsUpdateHandler {
             final DataFrameRefStructure dataFrameRef = framedVehicleJourneyRef.getDataFrameRef();
             final String datedVehicleJourneyRef = framedVehicleJourneyRef.getDatedVehicleJourneyRef();
 
-            FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef);
+            FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef, feedId);
 
             if (tripId != null) {
               ServiceDate serviceDate = null;

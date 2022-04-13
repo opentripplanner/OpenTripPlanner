@@ -147,6 +147,24 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return bus(tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
   }
 
+  public TestItineraryBuilder bus(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    LocalDate serviceDay
+  ) {
+    return bus(
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      serviceDay
+    );
+  }
+
   /**
    * Add a rail/train leg to the itinerary
    */
@@ -244,8 +262,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
       tripPattern,
       fromStopIndex,
       toStopIndex,
-      GregorianCalendar.from(newTime(start)),
-      GregorianCalendar.from(newTime(end)),
+      newTime(start),
+      newTime(end),
       serviceDate != null ? serviceDate : SERVICE_DAY,
       UTC,
       null,
@@ -268,8 +286,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
     StreetLeg leg = new StreetLeg(
       mode,
-      GregorianCalendar.from(newTime(startTime)),
-      GregorianCalendar.from(newTime(endTime)),
+      newTime(startTime),
+      newTime(endTime),
       stop(lastPlace),
       stop(to),
       speed(mode) * (endTime - startTime),

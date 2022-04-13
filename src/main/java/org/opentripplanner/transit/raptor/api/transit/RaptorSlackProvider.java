@@ -19,12 +19,12 @@ public interface RaptorSlackProvider {
       }
 
       @Override
-      public int boardSlack(RaptorTripPattern pattern) {
+      public int boardSlack(int slackIndex) {
         return boardSlack;
       }
 
       @Override
-      public int alightSlack(RaptorTripPattern pattern) {
+      public int alightSlack(int slackIndex) {
         return alightSlack;
       }
     };
@@ -32,7 +32,7 @@ public interface RaptorSlackProvider {
 
   /**
    * The transfer-slack (duration time in seconds) to add between transfers. This is in addition to
-   * {@link #boardSlack(RaptorTripPattern)} and {@link #alightSlack(RaptorTripPattern)}.
+   * {@link #boardSlack(int)} and {@link #alightSlack(int)}.
    * <p>
    * Unit: seconds.
    */
@@ -47,7 +47,7 @@ public interface RaptorSlackProvider {
    * <p>
    * Unit: seconds.
    */
-  int boardSlack(RaptorTripPattern pattern);
+  int boardSlack(int slackIndex);
 
   /**
    * The alight-slack (duration time in seconds) to add to the trip alight time for the given
@@ -58,15 +58,15 @@ public interface RaptorSlackProvider {
    * <p>
    * Unit: seconds.
    */
-  int alightSlack(RaptorTripPattern pattern);
+  int alightSlack(int slackIndex);
 
   /**
-   * Return the {@link #boardSlack(RaptorTripPattern) plus {@link #alightSlack(RaptorTripPattern)
+   * Return the {@link #boardSlack(int) plus {@link #alightSlack(int)
    * slack.
    * <p>
    * Unit: seconds.
    */
-  default int transitSlack(RaptorTripPattern pattern) {
-    return boardSlack(pattern) + alightSlack(pattern);
+  default int transitSlack(int slackIndex) {
+    return boardSlack(slackIndex) + alightSlack(slackIndex);
   }
 }

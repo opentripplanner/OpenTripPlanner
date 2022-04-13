@@ -838,7 +838,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Set<TripPattern> patterns = new HashSet<>();
 
     Trip tripMatchedByServiceJourneyId = siriFuzzyTripMatcher.findTripByDatedVehicleJourneyRef(
-      estimatedVehicleJourney
+      estimatedVehicleJourney,
+      feedId
     );
 
     if (tripMatchedByServiceJourneyId != null) {

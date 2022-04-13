@@ -89,6 +89,8 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -1473,6 +1475,33 @@ public class TransmodelGraphQLSchema {
               .getRoutingService(environment)
               .getTransitAlertService()
               .getAlertById(environment.getArgument("situationNumber"));
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("leg")
+          .description("Refetch a single leg based on its id")
+          .withDirective(gqlUtil.timingData)
+          .type(LegType.REF)
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("id")
+              .type(new GraphQLNonNull(Scalars.GraphQLID))
+              .build()
+          )
+          .dataFetcher(environment -> {
+            final String id = environment.getArgument("id");
+            if (id.isBlank()) {
+              return null;
+            }
+            LegReference ref = LegReferenceSerializer.decode(id);
+            if (ref == null) {
+              return null;
+            }
+            return ref.getLeg(GqlUtil.getRoutingService(environment));
           })
           .build()
       )

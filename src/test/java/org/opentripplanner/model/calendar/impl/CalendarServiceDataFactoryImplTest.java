@@ -3,9 +3,8 @@ package org.opentripplanner.model.calendar.impl;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl.merge;
@@ -15,8 +14,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -55,7 +55,7 @@ public class CalendarServiceDataFactoryImplTest {
 
   private static CalendarService calendarService;
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() throws IOException {
     // The context builder uses the CalendarServiceDataFactoryImpl to create data
     data = createCtxBuilder().getCalendarServiceData();
@@ -66,7 +66,7 @@ public class CalendarServiceDataFactoryImplTest {
   public void testMerge() {
     Set<Character> result = merge(asList('A', 'B'), asList('B', 'C'));
 
-    assertTrue(result.toString(), result.containsAll(asList('A', 'B', 'C')));
+    assertTrue(result.containsAll(asList('A', 'B', 'C')), result.toString());
     assertEquals(3, result.size());
   }
 
@@ -136,7 +136,7 @@ public class CalendarServiceDataFactoryImplTest {
     Set<ServiceDate> weekdays = calendarService.getServiceDatesForServiceId(SERVICE_WEEKDAYS_ID);
 
     assertTrue(weekdays.contains(A_FRIDAY));
-    assertFalse(weekdays.contains(A_SUNDAY));
+    Assertions.assertFalse(weekdays.contains(A_SUNDAY));
     assertEquals(10697, weekdays.size());
   }
 

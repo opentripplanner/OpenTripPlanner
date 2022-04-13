@@ -169,6 +169,6 @@ public class SplitEdgeTurnRestrictionsTest {
       i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR))
     );
     Geometry geometry = itineraries.get(0).legs.get(0).getLegGeometry();
-    return PolylineEncoder.createEncodings(geometry).getPoints();
+    return PolylineEncoder.encodeGeometry(geometry).points();
   }
 }

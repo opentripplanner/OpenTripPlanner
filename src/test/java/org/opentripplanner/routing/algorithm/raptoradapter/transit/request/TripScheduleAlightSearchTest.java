@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
@@ -11,7 +11,9 @@ import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 public class TripScheduleAlightSearchTest implements RaptorTestConstants {
 
@@ -52,7 +54,7 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
 
   private final TestTripPattern pattern = pattern("R1", STOP_A, STOP_B);
 
-  private RaptorRoute<TestTripSchedule> route = TestRoute
+  private TestRoute route = TestRoute
     .route(pattern)
     .withTimetable(
       // Trips in service
@@ -66,9 +68,8 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
   private final TestTripSchedule tripC = route.timetable().getTripSchedule(TRIP_C);
 
   // The service under test - the subject
-  private TripScheduleAlightSearch<TestTripSchedule> subject = new TripScheduleAlightSearch<>(
-    TRIPS_BINARY_SEARCH_THRESHOLD,
-    route.timetable()
+  private RaptorTripScheduleSearch<TestTripSchedule> subject = route.tripSearch(
+    SearchDirection.REVERSE
   );
 
   @Test
@@ -196,12 +197,6 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
     searchForTrip(TIME_A2, STOP_POS_1).assertTripFound().withIndex(indexA).withAlightTime(TIME_A2);
   }
 
-  private static void addNTimes(List<TestTripSchedule> trips, TestTripSchedule tripS, int n) {
-    for (int i = 0; i < n; i++) {
-      trips.add(tripS);
-    }
-  }
-
   private void withTrips(TestTripSchedule... schedules) {
     useRoute(TestRoute.route(pattern).withTimetable(schedules));
   }
@@ -212,8 +207,13 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
 
   private void useRoute(TestRoute route) {
     this.route = route;
-    this.subject =
-      new TripScheduleAlightSearch<>(TRIPS_BINARY_SEARCH_THRESHOLD, this.route.timetable());
+    this.subject = route.tripSearch(SearchDirection.REVERSE);
+  }
+
+  private static void addNTimes(List<TestTripSchedule> trips, TestTripSchedule tripS, int n) {
+    for (int i = 0; i < n; i++) {
+      trips.add(tripS);
+    }
   }
 
   private TripAssert searchForTrip(int arrivalTime, int stopPosition) {

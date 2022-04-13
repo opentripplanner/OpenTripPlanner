@@ -24,8 +24,10 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.Transit
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameFirstOrLastTrip;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 
 /**
@@ -43,6 +45,7 @@ public class ItineraryListFilterChainBuilder {
   private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
   private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
   private boolean removeWalkAllTheWayResults;
+  private boolean sameFirstOrLastTripFilter;
   private DoubleFunction<Double> transitGeneralizedCostLimit;
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
@@ -211,11 +214,21 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withSameFirstOrLastTripFilter(boolean enable) {
+    this.sameFirstOrLastTripFilter = enable;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
+
+    if (sameFirstOrLastTripFilter) {
+      filters.add(new SortingFilter(generalizedCostComparator()));
+      filters.add(new SameFirstOrLastTripFilter());
+    }
 
     // Filter transit itineraries on generalized-cost
     if (transitGeneralizedCostLimit != null) {

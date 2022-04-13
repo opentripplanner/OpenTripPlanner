@@ -38,7 +38,7 @@ public class TripTimeMapper {
     api.blockId = domain.getBlockId();
     api.headsign = domain.getHeadsign();
     api.tripId = FeedScopedIdMapper.mapToApi(domain.getTrip().getId());
-    api.serviceDay = domain.getServiceDay();
+    api.serviceDay = domain.getServiceDayMidnight();
 
     return api;
   }

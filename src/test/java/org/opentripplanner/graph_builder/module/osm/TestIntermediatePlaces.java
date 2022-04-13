@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import io.micrometer.core.instrument.Metrics;
-import java.util.Calendar;
+import java.time.Instant;
 import java.util.List;
 import java.util.TimeZone;
 import org.junit.BeforeClass;
@@ -307,26 +307,26 @@ public class TestIntermediatePlaces {
 
   // Check that the start time and end time of each leg are consistent
   private void validateLegsTemporally(RoutingRequest request, Itinerary itinerary) {
-    Calendar departTime = Calendar.getInstance(timeZone);
-    Calendar arriveTime = Calendar.getInstance(timeZone);
+    Instant departTime;
+    Instant arriveTime;
     if (request.arriveBy) {
-      departTime = itinerary.legs.get(0).getStartTime();
-      arriveTime.setTimeInMillis(request.getDateTime().toEpochMilli());
+      departTime = itinerary.legs.get(0).getStartTime().toInstant();
+      arriveTime = request.getDateTime();
     } else {
-      departTime.setTimeInMillis(request.getDateTime().toEpochMilli());
-      arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).getEndTime();
+      departTime = request.getDateTime();
+      arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).getEndTime().toInstant();
     }
     long sumOfDuration = 0;
     for (Leg leg : itinerary.legs) {
-      assertFalse(departTime.after(leg.getStartTime()));
-      assertFalse(leg.getStartTime().after(leg.getEndTime()));
+      assertFalse(departTime.isAfter(leg.getStartTime().toInstant()));
+      assertFalse(leg.getStartTime().isAfter(leg.getEndTime()));
 
-      departTime = leg.getEndTime();
+      departTime = leg.getEndTime().toInstant();
       sumOfDuration += leg.getDuration();
     }
     sumOfDuration += itinerary.waitingTimeSeconds;
 
-    assertFalse(departTime.after(arriveTime));
+    assertFalse(departTime.isAfter(arriveTime));
 
     // Check the total duration of the legs,
     int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors

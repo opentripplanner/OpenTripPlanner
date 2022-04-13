@@ -12,6 +12,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
@@ -187,18 +188,24 @@ public class SiriFuzzyTripMatcher {
     return mappedRoutesCache.getOrDefault(lineRefValue, new HashSet<>());
   }
 
-  public FeedScopedId getTripId(String vehicleJourney) {
+  public FeedScopedId getTripId(String vehicleJourney, String feedId) {
     Trip trip = vehicleJourneyTripCache.get(vehicleJourney);
     if (trip != null) {
       return trip.getId();
+    } else {
+      //Attempt to find trip using datedServiceJourneys
+      TripOnServiceDate tripOnServiceDate = routingService
+        .getTripOnServiceDateById()
+        .get(new FeedScopedId(feedId, vehicleJourney));
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate.getTrip().getId();
+      }
     }
     //Fallback to handle extrajourneys
-    for (String feedId : routingService.getFeedIds()) {
-      trip = routingService.getTripForId().get(new FeedScopedId(feedId, vehicleJourney));
-      if (trip != null) {
-        vehicleJourneyTripCache.put(vehicleJourney, trip);
-        return trip.getId();
-      }
+    trip = routingService.getTripForId().get(new FeedScopedId(feedId, vehicleJourney));
+    if (trip != null) {
+      vehicleJourneyTripCache.put(vehicleJourney, trip);
+      return trip.getId();
     }
     return null;
   }
@@ -268,13 +275,19 @@ public class SiriFuzzyTripMatcher {
     return matches;
   }
 
-  Trip findTripByDatedVehicleJourneyRef(EstimatedVehicleJourney journey) {
+  Trip findTripByDatedVehicleJourneyRef(EstimatedVehicleJourney journey, String feedId) {
     String serviceJourneyId = resolveDatedVehicleJourneyRef(journey);
     if (serviceJourneyId != null) {
-      for (String feedId : routingService.getFeedIds()) {
-        Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, serviceJourneyId));
-        if (trip != null) {
-          return trip;
+      Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, serviceJourneyId));
+      if (trip != null) {
+        return trip;
+      } else {
+        //Attempt to find trip using datedServiceJourneyId
+        TripOnServiceDate tripOnServiceDate = routingService
+          .getTripOnServiceDateById()
+          .get(new FeedScopedId(feedId, serviceJourneyId));
+        if (tripOnServiceDate != null) {
+          return tripOnServiceDate.getTrip();
         }
       }
     }

@@ -68,12 +68,25 @@ public final class Stop extends StationElement implements StopLocation {
     this.netexSubmode = netexSubmode;
   }
 
-  /** @see #stopForTest(String, double, double, Station) */
+  public static Stop stopForTest(
+    String idAndName,
+    WheelChairBoarding wheelChairBoarding,
+    double lat,
+    double lon
+  ) {
+    return stopForTest(idAndName, null, lat, lon, null, wheelChairBoarding);
+  }
+
+  /**
+   * @see #stopForTest(String, double, double, Station)
+   */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
     return stopForTest(idAndName, null, lat, lon, null);
   }
 
-  /** @see #stopForTest(String, double, double, Station) */
+  /**
+   * @see #stopForTest(String, double, double, Station)
+   */
   public static Stop stopForTest(String idAndName, String desc, double lat, double lon) {
     return stopForTest(idAndName, desc, lat, lon, null);
   }
@@ -86,6 +99,16 @@ public final class Stop extends StationElement implements StopLocation {
     return stopForTest(idAndName, null, lat, lon, parent);
   }
 
+  public static Stop stopForTest(
+    String idAndName,
+    String desc,
+    double lat,
+    double lon,
+    Station parent
+  ) {
+    return stopForTest(idAndName, desc, lat, lon, parent, null);
+  }
+
   /**
    * Create a minimal Stop object for unit-test use, where the test only care about id, name,
    * description and coordinate. The feedId is static set to "F"
@@ -95,7 +118,8 @@ public final class Stop extends StationElement implements StopLocation {
     String desc,
     double lat,
     double lon,
-    Station parent
+    Station parent,
+    WheelChairBoarding wheelChairBoarding
   ) {
     var stop = new Stop(
       new FeedScopedId("F", idAndName),
@@ -103,7 +127,7 @@ public final class Stop extends StationElement implements StopLocation {
       idAndName,
       desc,
       new WgsCoordinate(lat, lon),
-      null,
+      wheelChairBoarding,
       null,
       null,
       null,

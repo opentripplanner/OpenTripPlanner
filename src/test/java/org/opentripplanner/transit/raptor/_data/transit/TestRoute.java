@@ -3,9 +3,9 @@ package org.opentripplanner.transit.raptor._data.transit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
@@ -36,48 +36,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     return route(TestTripPattern.pattern(name, stopIndexes));
   }
 
-  @Override
-  public TestTripSchedule getTripSchedule(int index) {
-    return schedules.get(index);
-  }
-
-  @Override
-  public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
-    final int[] arrivalTimes = schedules
-      .stream()
-      .mapToInt(schedule -> schedule.arrival(stopPositionInPattern))
-      .toArray();
-    return (int i) -> arrivalTimes[i];
-  }
-
-  @Override
-  public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
-    final int[] departureTimes = schedules
-      .stream()
-      .mapToInt(schedule -> schedule.departure(stopPositionInPattern))
-      .toArray();
-    return (int i) -> departureTimes[i];
-  }
-
-  @Override
-  public int numberOfTripSchedules() {
-    return schedules.size();
-  }
-
-  @Override
-  public boolean useCustomizedTripSearch() {
-    return false;
-  }
-
-  @Override
-  public RaptorTripScheduleSearch<TestTripSchedule> createCustomizedTripSearch(
-    SearchDirection direction
-  ) {
-    throw new IllegalStateException(
-      "Support for frequency based trips are not implemented here. " +
-      "This is outside the scope of the Raptor unit tests."
-    );
-  }
+  /* RaptorRoute */
 
   @Override
   public RaptorTimeTable<TestTripSchedule> timetable() {
@@ -97,6 +56,23 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
   @Override
   public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch() {
     return transferConstraintsReverseSearch;
+  }
+
+  /* RaptorTimeTable */
+
+  @Override
+  public TestTripSchedule getTripSchedule(int index) {
+    return schedules.get(index);
+  }
+
+  @Override
+  public int numberOfTripSchedules() {
+    return schedules.size();
+  }
+
+  @Override
+  public RaptorTripScheduleSearch<TestTripSchedule> tripSearch(SearchDirection direction) {
+    return TripScheduleSearchFactory.create(direction, new TestTripSearchTimetable(this));
   }
 
   public List<TestConstrainedTransfer> listTransferConstraintsForwardSearch() {

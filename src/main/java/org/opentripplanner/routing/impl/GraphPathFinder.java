@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.impl;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
@@ -92,7 +94,7 @@ public class GraphPathFinder {
    */
   public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
     RoutingRequest request = routingContext.opt;
-    long reqTime = request.getDateTime().getEpochSecond();
+    Instant reqTime = request.getDateTime().truncatedTo(ChronoUnit.MILLIS);
 
     // We used to perform a protective clone of the RoutingRequest here.
     // There is no reason to do this if we don't modify the request.
@@ -130,12 +132,12 @@ public class GraphPathFinder {
         GraphPath graphPath = gpi.next();
         // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
         if (request.arriveBy) {
-          if (graphPath.states.getLast().getTimeSeconds() > reqTime) {
+          if (graphPath.states.getLast().getTime().isAfter(reqTime)) {
             LOG.error("A graph path arrives after the requested time. This implies a bug.");
             gpi.remove();
           }
         } else {
-          if (graphPath.states.getFirst().getTimeSeconds() < reqTime) {
+          if (graphPath.states.getFirst().getTime().isBefore(reqTime)) {
             LOG.error("A graph path leaves before the requested time. This implies a bug.");
             gpi.remove();
           }

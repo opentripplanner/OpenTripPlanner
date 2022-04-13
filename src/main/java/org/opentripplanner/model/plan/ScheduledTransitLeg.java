@@ -3,10 +3,9 @@ package org.opentripplanner.model.plan;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +23,8 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -38,8 +39,8 @@ public class ScheduledTransitLeg implements Leg {
   protected final TripTimes tripTimes;
   protected final TripPattern tripPattern;
 
-  private final Calendar startTime;
-  private final Calendar endTime;
+  private final ZonedDateTime startTime;
+  private final ZonedDateTime endTime;
   private final LineString legGeometry;
   private final Set<TransitAlert> transitAlerts = new HashSet<>();
   private final ConstrainedTransfer transferFromPrevLeg;
@@ -56,8 +57,8 @@ public class ScheduledTransitLeg implements Leg {
     TripPattern tripPattern,
     int boardStopIndexInPattern,
     int alightStopIndexInPattern,
-    Calendar startTime,
-    Calendar endTime,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
     LocalDate serviceDate,
     ZoneId zoneId,
     ConstrainedTransfer transferFromPreviousLeg,
@@ -149,12 +150,12 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   @Override
-  public Calendar getStartTime() {
+  public ZonedDateTime getStartTime() {
     return startTime;
   }
 
   @Override
-  public Calendar getEndTime() {
+  public ZonedDateTime getEndTime() {
     return endTime;
   }
 
@@ -217,8 +218,8 @@ public class ScheduledTransitLeg implements Leg {
 
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, tripTimes.getArrivalTime(i))),
-        GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, tripTimes.getDepartureTime(i))),
+        serviceDate.toZonedDateTime(zoneId, tripTimes.getArrivalTime(i)),
+        serviceDate.toZonedDateTime(zoneId, tripTimes.getDepartureTime(i)),
         i,
         tripTimes.getOriginalGtfsStopSequence(i)
       );
@@ -296,6 +297,16 @@ public class ScheduledTransitLeg implements Leg {
   @Override
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  @Override
+  public LegReference getLegReference() {
+    return new ScheduledTransitLegReference(
+      tripTimes.getTrip().getId(),
+      serviceDate,
+      boardStopPosInPattern,
+      alightStopPosInPattern
+    );
   }
 
   public void addAlert(TransitAlert alert) {

@@ -10,6 +10,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * original trip from the path when creating itineraries.
  */
 public interface TripSchedule extends RaptorTripSchedule {
+  LocalDate getServiceDate();
+
   /**
    * TODO OTP2 - Add JavaDoc
    */
@@ -19,8 +21,6 @@ public interface TripSchedule extends RaptorTripSchedule {
    * TODO OTP2 - Add JavaDoc
    */
   TripPattern getOriginalTripPattern();
-
-  LocalDate getServiceDate();
 
   /**
    * Return {@code true} if this trip is not based on a fixed schedule, but instead a frequency

@@ -13,6 +13,7 @@ import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -447,6 +448,15 @@ public class EnumTypes {
     .value("untilPreviousDay", "untilPreviousDay")
     .value("advanceAndDayOfTravel", "advanceAndDayOfTravel")
     .value("other", "other")
+    .build();
+
+  public static GraphQLEnumType ALTERNATIVE_LEGS_FILTER = GraphQLEnumType
+    .newEnum()
+    .name("AlternativeLegsFilter")
+    .value("noFilter", AlternativeLegsFilter.NO_FILTER)
+    .value("sameAuthority", AlternativeLegsFilter.SAME_AGENCY)
+    .value("sameMode", AlternativeLegsFilter.SAME_MODE)
+    .value("sameLine", AlternativeLegsFilter.SAME_ROUTE)
     .build();
 
   private static <T extends Enum> GraphQLEnumType createEnum(
