@@ -137,16 +137,14 @@ public class VehiclePositionPatternMatcher {
     // if this is concerning to you, you should put a start_date in your feed.
     return Stream
       .of(yesterday, today, tomorrow)
-      .map(day -> {
+      .flatMap(day -> {
         var startTime = day.atStartOfDay(zoneId).plusSeconds(start).toInstant();
         var endTime = day.atStartOfDay(zoneId).plusSeconds(end).toInstant();
 
-        var lowestDistance = Stream
+        return Stream
           .of(Duration.between(startTime, now), Duration.between(endTime, now))
-          .map(Duration::abs) // distances can be positive and negative
-          .min(Comparator.comparingLong(Duration::toSeconds))
-          .orElse(Duration.ZERO);
-        return new TemporalDistance(day, lowestDistance.toSeconds());
+          .map(Duration::abs) // temporal "distances" can be positive and negative
+          .map(duration -> new TemporalDistance(day, duration.toSeconds()));
       })
       .min(Comparator.comparingLong(TemporalDistance::distance))
       .map(TemporalDistance::date)
