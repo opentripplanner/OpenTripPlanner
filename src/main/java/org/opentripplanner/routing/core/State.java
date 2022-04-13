@@ -359,10 +359,6 @@ public class State implements Cloneable {
     return Instant.ofEpochMilli(time);
   }
 
-  public void timeshiftBySeconds(int timeShift) {
-    time += (timeShift * 1000L);
-  }
-
   public boolean multipleOptionsBefore() {
     boolean foundAlternatePaths = false;
     TraverseMode requestedMode = getNonTransitMode();
@@ -482,9 +478,6 @@ public class State implements Cloneable {
     return ret;
   }
 
-  // TODO: There is no documentation about what this means. No one knows precisely.
-  // Needs to be replaced with clearly defined fields.
-
   public boolean hasEnteredNoThruTrafficArea() {
     return stateData.enteredNoThroughTrafficArea;
   }
@@ -532,6 +525,9 @@ public class State implements Cloneable {
       return 0.0;
     }
   }
+
+  // TODO: There is no documentation about what this means. No one knows precisely.
+  // Needs to be replaced with clearly defined fields.
 
   private State reversedClone() {
     // We no longer compensate for schedule slack (minTransferTime) here.
