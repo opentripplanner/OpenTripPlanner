@@ -927,7 +927,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       drawCount += 1;
       if (drawCount % BLOCK_SIZE == 0 && millis() - startMillis > FRAME_TIME) {
         // ran out of time to draw this frame.
-        // enabled fast-drawing when too few edges were drawn:
+        // enable fast-drawing when too few edges were drawn:
         // drawFast = drawCount < visibleStreetEdges.size() / 10;
         // leave edge drawing loop to let other work happen.
         break;

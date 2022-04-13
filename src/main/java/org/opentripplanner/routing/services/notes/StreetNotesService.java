@@ -44,7 +44,6 @@ public class StreetNotesService implements Serializable {
 
     @Override
     public boolean matches(State state) {
-      state.getOptions();
       return state.getOptions().wheelchairAccessibility.enabled();
     }
   };
