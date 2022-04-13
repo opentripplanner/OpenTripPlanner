@@ -5,7 +5,6 @@ import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;

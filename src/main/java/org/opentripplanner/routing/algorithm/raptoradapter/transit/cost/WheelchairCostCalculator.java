@@ -52,6 +52,7 @@ public class WheelchairCostCalculator implements CostCalculator {
       trip,
       transferConstraints
     );
+    // this is an unsafe cast but is ok because the trip is guaranteed to be of type TripSchedule
     var tripSchedule = (TripSchedule) trip;
     int index = tripSchedule.getOriginalTripTimes().getTrip().getWheelchairBoarding().ordinal();
     int wheelchairCost = wheelchairBoardingCost[index];
