@@ -57,7 +57,10 @@ public class TransitLayerUpdater {
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
   }
 
-  public void update(Set<Timetable> updatedTimetables, Map<TripPattern, SortedSet<Timetable>> timetables) {
+  public void update(
+    Set<Timetable> updatedTimetables,
+    Map<TripPattern, SortedSet<Timetable>> timetables
+  ) {
     if (!graph.hasRealtimeTransitLayer()) {
       return;
     }
@@ -67,7 +70,6 @@ public class TransitLayerUpdater {
     // Make a shallow copy of the realtime transit layer. Only the objects that are copied will be
     // changed during this update process.
     TransitLayer realtimeTransitLayer = new TransitLayer(graph.getRealtimeTransitLayer());
-
 
     // Map TripPatterns for this update to Raptor TripPatterns
     final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = realtimeTransitLayer
@@ -139,13 +141,22 @@ public class TransitLayerUpdater {
         }
 
         for (TripTimes triptimes : timetable.getTripTimes()) {
-          var id = new TripIdAndServiceDate(triptimes.getTrip().getId(), timetable.getServiceDate());
-          TripPatternForDate previousTripPatternForDate = tripPatternsForTripIdAndServiceDateCache.put(id, newTripPatternForDate);
+          var id = new TripIdAndServiceDate(
+            triptimes.getTrip().getId(),
+            timetable.getServiceDate()
+          );
+          TripPatternForDate previousTripPatternForDate = tripPatternsForTripIdAndServiceDateCache.put(
+            id,
+            newTripPatternForDate
+          );
           if (previousTripPatternForDate != null) {
             previouslyUsedPatterns.add(previousTripPatternForDate);
           } else {
-            LOG.debug("NEW TripPatternForDate: {} - {}", newTripPatternForDate.getLocalDate(),
-                                                         newTripPatternForDate.getTripPattern().getId());
+            LOG.debug(
+              "NEW TripPatternForDate: {} - {}",
+              newTripPatternForDate.getLocalDate(),
+              newTripPatternForDate.getTripPattern().getId()
+            );
           }
         }
       }
@@ -177,11 +188,12 @@ public class TransitLayerUpdater {
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
         if (tripPatternForDate.getLocalDate().equals(date)) {
           var oldTimeTable = timetables.get(tripPatternForDate.getTripPattern().getPattern());
-          var toRemove = oldTimeTable.stream()
-                  .filter(tt -> tt.getServiceDate().equals(new ServiceDate(date)))
-                  .findFirst()
-                  .map(tt -> tt.getTripTimes().isEmpty())
-                  .orElse(false);
+          var toRemove = oldTimeTable
+            .stream()
+            .filter(tt -> tt.getServiceDate().equals(new ServiceDate(date)))
+            .findFirst()
+            .map(tt -> tt.getTripTimes().isEmpty())
+            .orElse(false);
 
           if (toRemove) {
             patternsForDate.remove(tripPatternForDate);

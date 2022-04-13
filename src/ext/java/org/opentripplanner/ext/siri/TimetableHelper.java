@@ -640,14 +640,20 @@ public class TimetableHelper {
             if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelDropOff();
             }
-            var dropOffType = mapDropOffType(stopTime.getDropOffType(), estimatedCall.getArrivalBoardingActivity());
+            var dropOffType = mapDropOffType(
+              stopTime.getDropOffType(),
+              estimatedCall.getArrivalBoardingActivity()
+            );
             dropOffType.ifPresent(stopTime::setDropOffType);
 
             CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
             if (departureStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelPickup();
             }
-            var pickUpType = mapPickUpType(stopTime.getPickupType(), estimatedCall.getDepartureBoardingActivity());
+            var pickUpType = mapPickUpType(
+              stopTime.getPickupType(),
+              estimatedCall.getDepartureBoardingActivity()
+            );
             pickUpType.ifPresent(stopTime::setPickupType);
 
             if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
@@ -799,13 +805,16 @@ public class TimetableHelper {
    * @param arrivalBoardingActivityEnumeration The incoming boardingActivity to be mapped
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
-  public static Optional<PickDrop> mapDropOffType(PickDrop currentValue, ArrivalBoardingActivityEnumeration arrivalBoardingActivityEnumeration) {
+  public static Optional<PickDrop> mapDropOffType(
+    PickDrop currentValue,
+    ArrivalBoardingActivityEnumeration arrivalBoardingActivityEnumeration
+  ) {
     if (arrivalBoardingActivityEnumeration == null) {
       return Optional.empty();
     }
 
     return switch (arrivalBoardingActivityEnumeration) {
-      case ALIGHTING -> currentValue.isNotRoutable() ?  Optional.of(SCHEDULED) : Optional.empty();
+      case ALIGHTING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
       case NO_ALIGHTING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
@@ -821,13 +830,16 @@ public class TimetableHelper {
    * @param departureBoardingActivityEnumeration The incoming departureBoardingActivityEnumeration to be mapped
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
-  public static Optional<PickDrop> mapPickUpType(PickDrop currentValue, DepartureBoardingActivityEnumeration departureBoardingActivityEnumeration) {
+  public static Optional<PickDrop> mapPickUpType(
+    PickDrop currentValue,
+    DepartureBoardingActivityEnumeration departureBoardingActivityEnumeration
+  ) {
     if (departureBoardingActivityEnumeration == null) {
       return Optional.empty();
     }
 
     return switch (departureBoardingActivityEnumeration) {
-      case BOARDING -> currentValue.isNotRoutable() ?  Optional.of(SCHEDULED) : Optional.empty();
+      case BOARDING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
       case NO_BOARDING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
