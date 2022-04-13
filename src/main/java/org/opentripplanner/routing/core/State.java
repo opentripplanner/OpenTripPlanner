@@ -4,11 +4,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -284,51 +282,6 @@ public class State implements Cloneable {
 
   public Instant getTime() {
     return Instant.ofEpochMilli(time);
-  }
-
-  public boolean multipleOptionsBefore() {
-    boolean foundAlternatePaths = false;
-    TraverseMode requestedMode = getNonTransitMode();
-    for (Edge out : backState.vertex.getOutgoing()) {
-      if (out == backEdge) {
-        continue;
-      }
-      if (!(out instanceof StreetEdge)) {
-        continue;
-      }
-      State outState = out.traverse(backState);
-      if (outState == null) {
-        continue;
-      }
-      if (!outState.getBackMode().equals(requestedMode)) {
-        //walking a bike, so, not really an exit
-        continue;
-      }
-      // this section handles the case of an option which is only an option if you walk your
-      // bike. It is complicated because you will not need to walk your bike until one
-      // edge after the current edge.
-
-      //now, from here, try a continuing path.
-      Vertex tov = outState.getVertex();
-      boolean found = false;
-      for (Edge out2 : tov.getOutgoing()) {
-        State outState2 = out2.traverse(outState);
-        if (outState2 != null && !Objects.equals(outState2.getBackMode(), requestedMode)) {
-          // walking a bike, so, not really an exit
-          continue;
-        }
-        found = true;
-        break;
-      }
-      if (!found) {
-        continue;
-      }
-
-      // there were paths we didn't take.
-      foundAlternatePaths = true;
-      break;
-    }
-    return foundAlternatePaths;
   }
 
   public String getVehicleRentalNetwork() {
