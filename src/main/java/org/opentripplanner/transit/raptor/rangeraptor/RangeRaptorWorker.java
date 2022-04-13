@@ -209,8 +209,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             ? calculator.transferConstraintsSearch(route)
             : null;
 
-          int alightSlack = slackProvider.alightSlack(pattern);
-          int boardSlack = slackProvider.boardSlack(pattern);
+          int alightSlack = slackProvider.alightSlack(pattern.slackIndex());
+          int boardSlack = slackProvider.boardSlack(pattern.slackIndex());
 
           transitWorker.prepareForTransitWith();
 
@@ -307,7 +307,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     int prevTransitArrivalTime = calculator.minusDuration(
       prevTransitStopArrivalTime,
-      slackProvider.alightSlack(sourceStopArrival.trip().pattern())
+      slackProvider.alightSlack(sourceStopArrival.trip().pattern().slackIndex())
     );
 
     int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);

@@ -9,6 +9,11 @@ import org.opentripplanner.model.WheelChairBoarding;
  */
 public interface RaptorTripPattern {
   /**
+   * Number of stops in the pattern.
+   */
+  int numberOfStopsInPattern();
+
+  /**
    * The stop index
    *
    * @param stopPositionInPattern stop position number in pattern, starting at 0.
@@ -32,9 +37,11 @@ public interface RaptorTripPattern {
   boolean alightingPossibleAt(int stopPositionInPattern);
 
   /**
-   * Number of stops in pattern.
+   * Alight and board slack is added by raptor based on this index. The index allows the data
+   * provider to setup and use different board and alight slacks for each "type" of
+   * RaptorTripPattern. The {@link RaptorSlackProvider} is used to return the actual slack.
    */
-  int numberOfStopsInPattern();
+  int slackIndex();
 
   /**
    * Pattern debug info, return transit mode and route name. This is  used for debugging purposes

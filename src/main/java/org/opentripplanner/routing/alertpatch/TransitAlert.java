@@ -60,10 +60,6 @@ public class TransitAlert implements Serializable {
     this.alertUrlList = alertUrlList;
   }
 
-  public boolean displayDuring(State state) {
-    return displayDuring(state.getStartTimeSeconds(), state.getTimeSeconds());
-  }
-
   public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
     for (TimePeriod timePeriod : timePeriods) {
       if (endTimeSeconds >= timePeriod.startTime) {

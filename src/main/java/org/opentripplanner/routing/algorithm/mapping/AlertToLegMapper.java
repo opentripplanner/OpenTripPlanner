@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
@@ -33,8 +33,8 @@ public class AlertToLegMapper {
       ? StopCondition.DEPARTURE
       : StopCondition.FIRST_DEPARTURE;
 
-    Date legStartTime = leg.getStartTime().getTime();
-    Date legEndTime = leg.getEndTime().getTime();
+    ZonedDateTime legStartTime = leg.getStartTime();
+    ZonedDateTime legEndTime = leg.getEndTime();
     StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
     StopLocation toStop = leg.getTo() == null ? null : leg.getTo().stop;
 
@@ -60,8 +60,8 @@ public class AlertToLegMapper {
           alerts.addAll(getAlertsForStopAndTrip(stop, tripId, leg.getServiceDate()));
           alerts.addAll(getAlertsForStop(stop));
 
-          Date stopArrival = visit.arrival.getTime();
-          Date stopDepature = visit.departure.getTime();
+          ZonedDateTime stopArrival = visit.arrival;
+          ZonedDateTime stopDepature = visit.departure;
 
           addTransitAlertPatchesToLeg(
             leg,
@@ -97,8 +97,8 @@ public class AlertToLegMapper {
       .getTransitAlerts()
       .removeIf(alertPatch ->
         !alertPatch.displayDuring(
-          leg.getStartTime().getTimeInMillis() / 1000,
-          leg.getEndTime().getTimeInMillis() / 1000
+          leg.getStartTime().toEpochSecond(),
+          leg.getEndTime().toEpochSecond()
         )
       );
   }
@@ -107,12 +107,12 @@ public class AlertToLegMapper {
     Leg leg,
     Collection<StopCondition> stopConditions,
     Collection<TransitAlert> alertPatches,
-    Date fromTime,
-    Date toTime
+    ZonedDateTime fromTime,
+    ZonedDateTime toTime
   ) {
     if (alertPatches != null) {
       for (TransitAlert alert : alertPatches) {
-        if (alert.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)) {
+        if (alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond())) {
           if (
             !alert.getStopConditions().isEmpty() && // Skip if stopConditions are not set for alert
             stopConditions != null &&
@@ -135,8 +135,8 @@ public class AlertToLegMapper {
   private static void addTransitAlertPatchesToLeg(
     Leg leg,
     Collection<TransitAlert> alertPatches,
-    Date fromTime,
-    Date toTime
+    ZonedDateTime fromTime,
+    ZonedDateTime toTime
   ) {
     addTransitAlertPatchesToLeg(leg, null, alertPatches, fromTime, toTime);
   }

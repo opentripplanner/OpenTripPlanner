@@ -1,7 +1,5 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
 import com.csvreader.CsvReader;
 import com.google.common.collect.Lists;
 import java.io.File;
@@ -10,26 +8,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
+import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
@@ -98,15 +95,12 @@ public class ConstantsForTests {
   public static final String ISLAND_PRUNE_OSM =
     "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
 
-  public static final Locale DEFAULT_LOCALE = new Locale("en", "US");
-
   private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
     new File(NETEX_DIR, NETEX_FILENAME),
     FileType.NETEX
   );
 
   private static ConstantsForTests instance = null;
-  private final Graph minNetexGraph = null;
   private Graph portlandGraph = null;
   private Graph portlandGraphWithElevation = null;
 
@@ -264,24 +258,16 @@ public class ConstantsForTests {
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
   ) {
-    try {
-      var context = contextBuilder(feedId, file).withIssueStoreAndDeduplicator(graph).build();
+    var bundle = new GtfsBundle(new File(file));
+    bundle.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
 
-      AddTransitModelEntitiesToGraph.addToGraph(context, graph);
-      GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-      factory.setFareServiceFactory(fareServiceFactory);
-      factory.run(graph);
-      graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
+    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded());
+    module.setFareServiceFactory(fareServiceFactory);
 
-      graph.updateTransitFeedValidity(
-        context.getCalendarServiceData(),
-        new DataImportIssueStore(false)
-      );
-      graph.index();
-      graph.hasTransit = true;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    module.buildGraph(graph, new HashMap<>());
+
+    graph.index();
+    graph.hasTransit = true;
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {

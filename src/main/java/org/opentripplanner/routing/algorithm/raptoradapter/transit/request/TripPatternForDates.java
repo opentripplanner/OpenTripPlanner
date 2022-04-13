@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -40,6 +41,8 @@ public class TripPatternForDates
 
   private final boolean isFrequencyBased;
 
+  private final int slackIndex;
+
   /**
    * The arrival times in a nStops * numberOfTripSchedules sized array. The trips are stored first
    * by the stop position and then by trip index, so with stops 1 and 2, and trips A and B, the
@@ -68,6 +71,7 @@ public class TripPatternForDates
     this.offsets = offsets.stream().mapToInt(i -> i).toArray();
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
+    this.slackIndex = SlackProvider.slackIndex(tripPattern.getPattern());
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
@@ -142,7 +146,12 @@ public class TripPatternForDates
     return getTripPattern().constrainedTransferReverseSearch();
   }
 
-  /* Implementing RaptorStopPattern */
+  /* Implementing RaptorTripPattern */
+
+  @Override
+  public int numberOfStopsInPattern() {
+    return tripPattern.getStopIndexes().length;
+  }
 
   @Override
   public int stopIndex(int stopPositionInPattern) {
@@ -160,8 +169,8 @@ public class TripPatternForDates
   }
 
   @Override
-  public int numberOfStopsInPattern() {
-    return tripPattern.getStopIndexes().length;
+  public int slackIndex() {
+    return slackIndex;
   }
 
   @Override

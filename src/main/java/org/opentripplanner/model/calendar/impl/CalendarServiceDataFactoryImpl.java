@@ -3,6 +3,7 @@ package org.opentripplanner.model.calendar.impl;
 
 import static java.util.stream.Collectors.groupingBy;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -196,7 +197,8 @@ public class CalendarServiceDataFactoryImpl {
       }
 
       if (active) {
-        addServiceDate(activeDates, new ServiceDate(c));
+        var localDate = LocalDate.ofInstant(c.toInstant(), timeZone.toZoneId());
+        addServiceDate(activeDates, new ServiceDate(localDate));
       }
 
       c.add(java.util.Calendar.DAY_OF_YEAR, 1);

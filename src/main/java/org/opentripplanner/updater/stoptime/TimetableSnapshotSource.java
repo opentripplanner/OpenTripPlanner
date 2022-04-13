@@ -656,7 +656,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param stops         list of stops corresponding to stop time updates
    * @param serviceDate   service date of trip
    * @param realTimeState real-time state of new trip
-   * @return true iff successful
+   * @return true if successful
    */
   private boolean addTripToGraphAndBuffer(
     final Deduplicator deduplicator,
@@ -870,7 +870,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     Trip trip = getTripForTripId(feedId, tripId);
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
-      LOG.warn("Graph does not contain trip id of MODIFIED trip, skipping.");
+      LOG.warn(
+        "Feed '{}' does not contain trip id '{}' of MODIFIED trip, skipping.",
+        feedId,
+        tripDescriptor.getTripId()
+      );
       return false;
     }
 

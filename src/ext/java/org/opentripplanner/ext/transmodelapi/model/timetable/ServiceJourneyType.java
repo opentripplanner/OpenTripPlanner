@@ -293,7 +293,7 @@ public class ServiceJourneyType {
               return null;
             }
 
-            return PolylineEncoder.createEncodings(geometry);
+            return PolylineEncoder.encodeGeometry(geometry);
           })
           .build()
       )

@@ -88,18 +88,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * @deprecated Convert to {@link java.time.ZonedDateTime} instead of old Calendar.
-   */
-  @Deprecated
-  public ServiceDate(Calendar calendar) {
-    this(
-      calendar.get(Calendar.YEAR),
-      calendar.get(Calendar.MONTH) + 1,
-      calendar.get(Calendar.DAY_OF_MONTH)
-    );
-  }
-
-  /**
    * Construct a ServiceDate from the specified {@link Date} object, using the default {@link
    * TimeZone} object for the current VM to localize the date.
    *

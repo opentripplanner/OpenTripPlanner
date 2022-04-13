@@ -26,6 +26,7 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    * @see #search(int, int, int)
    */
   @Nullable
+  @Flyweight
   default RaptorTripScheduleBoardOrAlightEvent<T> search(
     int earliestBoardTime,
     int stopPositionInPattern
@@ -51,6 +52,7 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
    *                              trips already processed.
    */
   @Nullable
+  @Flyweight
   RaptorTripScheduleBoardOrAlightEvent<T> search(
     int earliestBoardTime,
     int stopPositionInPattern,

@@ -11,6 +11,8 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -33,11 +35,12 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, flexParams);
   }
 
-  public GraphPath createDirectGraphPath(
+  public Itinerary createDirectGraphPath(
     NearbyStop egress,
     boolean arriveBy,
     int departureTime,
-    ZonedDateTime startOfTime
+    ZonedDateTime startOfTime,
+    GraphPathToItineraryMapper graphPathToItineraryMapper
   ) {
     List<Edge> egressEdges = egress.edges;
 
@@ -92,13 +95,11 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       timeShift = secondsFromStartOfTime + earliestDepartureTime - preFlexTime;
     }
 
-    State s = state;
-    while (s != null) {
-      s.timeshiftBySeconds(timeShift);
-      s = s.getBackState();
-    }
+    ZonedDateTime startTime = startOfTime.plusSeconds(timeShift);
 
-    return new GraphPath(state);
+    return graphPathToItineraryMapper
+      .generateItinerary(new GraphPath(state))
+      .withTimeShiftToStartAt(startTime);
   }
 
   protected List<Edge> getTransferEdges(PathTransfer transfer) {

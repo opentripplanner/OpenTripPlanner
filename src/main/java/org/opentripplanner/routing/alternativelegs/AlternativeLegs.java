@@ -6,10 +6,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -106,7 +104,7 @@ public class AlternativeLegs {
     RoutingService routingService,
     TimetableSnapshot timetableSnapshot,
     TripPatternBetweenStops tripPatternBetweenStops,
-    Calendar departureTime,
+    ZonedDateTime departureTime,
     ServiceDate originalDate,
     boolean searchBackward
   ) {
@@ -127,7 +125,7 @@ public class AlternativeLegs {
 
     Queue<TripTimeOnDate> pq = new PriorityQueue<>(comparator);
 
-    long startTime = departureTime.getTimeInMillis() / 1000;
+    long startTime = departureTime.toEpochSecond();
 
     // Loop through all possible days
     ServiceDate[] serviceDates = { originalDate.previous(), originalDate, originalDate.next() };
@@ -201,8 +199,8 @@ public class AlternativeLegs {
       pattern,
       boardingPosition,
       alightingPosition,
-      GregorianCalendar.from(boardingTime),
-      GregorianCalendar.from(alightingTime),
+      boardingTime,
+      alightingTime,
       serviceDay.toLocalDate(),
       timeZone,
       null,

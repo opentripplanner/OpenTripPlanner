@@ -114,7 +114,7 @@ public class JourneyPatternType {
             if (geometry == null) {
               return null;
             } else {
-              return PolylineEncoder.createEncodings(geometry);
+              return PolylineEncoder.encodeGeometry(geometry);
             }
           })
           .build()

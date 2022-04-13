@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.Map;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 /**
  * This class provides transferSlack, boardSlack and alightSlack for the Raptor algorithm.
@@ -48,13 +48,13 @@ public final class SlackProvider implements RaptorSlackProvider {
   }
 
   @Override
-  public int boardSlack(RaptorTripPattern pattern) {
-    return boardSlack[index(pattern)];
+  public int boardSlack(int slackIndex) {
+    return boardSlack[slackIndex];
   }
 
   @Override
-  public int alightSlack(RaptorTripPattern pattern) {
-    return alightSlack[index(pattern)];
+  public int alightSlack(int slackIndex) {
+    return alightSlack[slackIndex];
   }
 
   /* private methods */
@@ -62,16 +62,16 @@ public final class SlackProvider implements RaptorSlackProvider {
   private static int[] slackByMode(Map<TransitMode, Integer> modeSlack, int defaultSlack) {
     int[] result = new int[TransitMode.values().length];
     for (TransitMode mode : TransitMode.values()) {
-      result[index(mode)] = modeSlack.getOrDefault(mode, defaultSlack);
+      result[SlackProvider.slackIndex(mode)] = modeSlack.getOrDefault(mode, defaultSlack);
     }
     return result;
   }
 
-  private static int index(RaptorTripPattern pattern) {
-    return index(((TripPatternForDates) pattern).getTripPattern().getTransitMode());
+  public static int slackIndex(TripPattern pattern) {
+    return slackIndex(pattern.getMode());
   }
 
-  private static int index(final TransitMode mode) {
+  private static int slackIndex(final TransitMode mode) {
     return mode.ordinal();
   }
 }

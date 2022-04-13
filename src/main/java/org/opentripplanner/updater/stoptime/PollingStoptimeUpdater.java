@@ -2,6 +2,7 @@ package org.opentripplanner.updater.stoptime;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -136,9 +137,14 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
   }
 
+  @Override
   public String toString() {
-    String s = (updateSource == null) ? "NONE" : updateSource.toString();
-    return "Streaming stoptime updater with update source = " + s;
+    return ToStringBuilder
+      .of(this.getClass())
+      .addObj("updateSource", updateSource)
+      .addStr("feedId", feedId)
+      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatching)
+      .toString();
   }
 
   private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {

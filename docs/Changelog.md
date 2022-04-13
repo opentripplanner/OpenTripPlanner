@@ -36,6 +36,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Consider Wheelchair boarding/alightning when routing from or to directly to a stop [#4046](https://github.com/opentripplanner/OpenTripPlanner/pull/4046)
 - Add an implementation for fetching alternative legs [#4071](https://github.com/opentripplanner/OpenTripPlanner/pull/4071)
 - Group/filter on first/last trip in itineraries [#4051](https://github.com/opentripplanner/OpenTripPlanner/pull/4051)
+- Allow single SIRI-situations to fail without affecting others [#4083](https://github.com/opentripplanner/OpenTripPlanner/pull/4083)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

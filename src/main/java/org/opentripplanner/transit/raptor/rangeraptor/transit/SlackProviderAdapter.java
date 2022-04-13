@@ -54,13 +54,13 @@ public final class SlackProviderAdapter {
     }
 
     @Override
-    public int boardSlack(RaptorTripPattern pattern) {
-      return source.boardSlack(pattern) + transferSlack;
+    public int boardSlack(int slackIndex) {
+      return source.boardSlack(slackIndex) + transferSlack;
     }
 
     @Override
-    public int alightSlack(RaptorTripPattern pattern) {
-      return source.alightSlack(pattern);
+    public int alightSlack(int slackIndex) {
+      return source.alightSlack(slackIndex);
     }
 
     @Override
@@ -84,13 +84,13 @@ public final class SlackProviderAdapter {
     }
 
     @Override
-    public int boardSlack(RaptorTripPattern pattern) {
-      return source.alightSlack(pattern) + transferSlack;
+    public int boardSlack(int slackIndex) {
+      return source.alightSlack(slackIndex) + transferSlack;
     }
 
     @Override
-    public int alightSlack(RaptorTripPattern pattern) {
-      return source.boardSlack(pattern);
+    public int alightSlack(int slackIndex) {
+      return source.boardSlack(slackIndex);
     }
 
     @Override

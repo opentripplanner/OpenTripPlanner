@@ -2,9 +2,8 @@ package org.opentripplanner.model.plan;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
@@ -25,8 +24,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
     TripPattern tripPattern,
     int boardStopIndexInPattern,
     int alightStopIndexInPattern,
-    Calendar startTime,
-    Calendar endTime,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
     LocalDate serviceDate,
     ZoneId zoneId,
     ConstrainedTransfer transferFromPreviousLeg,
@@ -72,8 +71,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, arrivalTime)),
-        GregorianCalendar.from(serviceDate.toZonedDateTime(zoneId, departureTime)),
+        serviceDate.toZonedDateTime(zoneId, arrivalTime),
+        serviceDate.toZonedDateTime(zoneId, departureTime),
         i,
         tripTimes.getOriginalGtfsStopSequence(i)
       );

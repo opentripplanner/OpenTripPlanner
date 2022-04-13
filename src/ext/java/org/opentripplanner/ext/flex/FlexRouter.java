@@ -127,14 +127,14 @@ public class FlexRouter {
           .anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          GraphPath graphPath = template.createDirectGraphPath(
+          Itinerary itinerary = template.createDirectGraphPath(
             egress,
             arriveBy,
             departureTime,
-            startOfTime
+            startOfTime,
+            graphPathToItineraryMapper
           );
-          if (graphPath != null) {
-            Itinerary itinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
+          if (itinerary != null) {
             var fareService = graph.getService(FareService.class);
             if (fareService != null) {
               itinerary.fare = fareService.getCost(itinerary);

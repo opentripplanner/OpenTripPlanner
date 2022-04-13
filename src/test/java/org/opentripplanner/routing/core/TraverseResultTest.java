@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.time.Instant;
 import org.junit.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
@@ -15,7 +16,7 @@ public class TraverseResultTest {
     /* note: times are rounded to seconds toward zero */
 
     for (int i = 0; i < 4; i++) {
-      State r = new State(null, i * 1000, new RoutingRequest(), null);
+      State r = new State(null, Instant.ofEpochSecond(i * 1000), new RoutingRequest(), null);
       resultChain = r.addToExistingResultChain(resultChain);
     }
 

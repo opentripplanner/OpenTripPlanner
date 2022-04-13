@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +49,7 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class GraphPathToItineraryMapper {
 
-  private final TimeZone timeZone;
+  private final ZoneId timeZone;
   private final AlertToLegMapper alertToLegMapper;
   private final StreetNotesService streetNotesService;
   private final double ellipsoidToGeoidDifference;
@@ -59,7 +60,7 @@ public class GraphPathToItineraryMapper {
     StreetNotesService streetNotesService,
     double ellipsoidToGeoidDifference
   ) {
-    this.timeZone = timeZone;
+    this.timeZone = timeZone.toZoneId();
     this.alertToLegMapper = alertToLegMapper;
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
@@ -344,12 +345,6 @@ public class GraphPathToItineraryMapper {
     }
   }
 
-  private Calendar makeCalendar(State state) {
-    Calendar calendar = Calendar.getInstance(timeZone);
-    calendar.setTimeInMillis(state.getTimeInMillis());
-    return calendar;
-  }
-
   /**
    * Generate a flex leg from the states belonging to the flex leg
    */
@@ -357,8 +352,8 @@ public class GraphPathToItineraryMapper {
     State fromState = states.get(0);
     State toState = states.get(1);
     FlexTripEdge flexEdge = (FlexTripEdge) toState.backEdge;
-    Calendar startTime = makeCalendar(fromState);
-    Calendar endTime = makeCalendar(toState);
+    ZonedDateTime startTime = fromState.getTime().atZone(timeZone);
+    ZonedDateTime endTime = toState.getTime().atZone(timeZone);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
     Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
@@ -407,14 +402,12 @@ public class GraphPathToItineraryMapper {
     var previousStateIsVehicleParking =
       firstState.getBackState() != null && firstState.getBackEdge() instanceof VehicleParkingEdge;
 
-    Calendar startTime = makeCalendar(
-      previousStateIsVehicleParking ? firstState.getBackState() : firstState
-    );
+    State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
     StreetLeg leg = new StreetLeg(
       resolveMode(states),
-      startTime,
-      makeCalendar(lastState),
+      startTimeState.getTime().atZone(timeZone),
+      lastState.getTime().atZone(timeZone),
       makePlace(firstState),
       makePlace(lastState),
       distanceMeters,
