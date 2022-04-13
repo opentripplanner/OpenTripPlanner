@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import jdk.jfr.Experimental;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.Fare;
@@ -221,6 +222,18 @@ public class Itinerary {
     return legs.stream().filter(Leg::isTransitLeg).findFirst();
   }
 
+  /**
+   * An experimental feature for calculating a numeric score between 0 and 1 which indicates
+   * how accessible the itinerary is as a whole. This is not a very scientific method but just
+   * a rough guidance that expresses certainty or uncertainty about the accessibility.
+   *
+   * The intended audience for this score are frontend developers wanting to show a simple UI
+   * rather than having to iterate over all the stops and trips.
+   *
+   * Note: the information to calculate this score are all available to the frontend, however
+   * calculating them on the backend makes life a little easier and changes are automatically
+   * applied to all frontends.
+   */
   public Float accessibilityScore() {
     var scores = legs
       .stream()
