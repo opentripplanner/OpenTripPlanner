@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,6 +33,9 @@ import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -61,6 +65,8 @@ public class TimetableSnapshotSource {
      * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
      */
     public int maxSnapshotFrequency = 1000; // msec
+
+    public boolean addMissingStopsFromOriginalJourney = false;
 
     /**
      * The last committed snapshot that was handed off to a routing thread. This snapshot may be
@@ -831,14 +837,16 @@ public class TimetableSnapshotSource {
             }
         }
 
+        final TripUpdate tripUpdateWithStops = addStops(tripUpdate, feedId, trip, serviceDate);
+
         // Check whether at least two stop updates exist
-        if (tripUpdate.getStopTimeUpdateCount() < 2) {
+        if (tripUpdateWithStops.getStopTimeUpdateCount() < 2) {
             LOG.warn("MODIFIED trip has less then two stops, skipping.");
             return false;
         }
 
         // Check whether all stop times are available and all stops exist
-        List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
+        List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdateWithStops);
         if (stops == null) {
             return false;
         }
@@ -847,9 +855,75 @@ public class TimetableSnapshotSource {
         // Handle modified trip
         //
 
-        final boolean success = handleModifiedTrip(graph, trip, tripUpdate, stops, feedId, serviceDate);
+        final boolean success = handleModifiedTrip(graph, trip, tripUpdateWithStops, stops, feedId, serviceDate);
 
         return success;
+    }
+
+    private TripUpdate addStops(final TripUpdate tripUpdate, final String feedId, final Trip trip, final ServiceDate serviceDate) {
+        if (!addMissingStopsFromOriginalJourney) {
+            return tripUpdate;
+        }
+        final TripPattern tripPattern = getPatternForTripId(feedId, tripUpdate.getTrip().getTripId());
+
+        final StopPattern pattern = tripPattern.stopPattern;
+
+        if (pattern.stops.length == tripUpdate.getStopTimeUpdateCount()) {
+            return tripUpdate;
+        }
+
+        LOG.debug("Adding missing stops for this tripUpdate");
+
+        try {
+            final Map<String, StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList()
+                    .stream()
+                    .collect(toMap(StopTimeUpdate::getStopId, identity()));
+
+            final List<StopTimeUpdate> newStopTimeUpdates = new ArrayList<>();
+
+            final TripTimes tt = tripPattern.scheduledTimetable.getTripTimes(trip);
+
+            if (tt == null) {
+                throw new IllegalStateException("No tripTimes found for trip in pattern!");
+            }
+
+            final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
+            final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
+
+            for (int i = 0; i < pattern.stops.length; i++) {
+                final Stop stop = pattern.stops[i];
+                if (stopTimeUpdates.containsKey(stop.getId().getId())) {
+                    newStopTimeUpdates.add(stopTimeUpdates.get(stop.getId().getId()));
+                } else {
+                    final StopTimeUpdate.Builder builder = StopTimeUpdate.newBuilder()
+                            .setStopSequence(i + 1)
+                            .setStopId(stop.getId().getId());
+                    // First stop has no arrival
+                    if (i != 0) {
+                        builder.setArrival(TripUpdate.StopTimeEvent.newBuilder()
+                                .setDelay(tt.getArrivalDelay(i))
+                                .setTime(tt.getArrivalTime(i) + midnightSecondsSinceEpoch)
+                                .build());
+                    }
+                    // Last stop has no departure
+                    if (i != pattern.stops.length - 1) {
+                        builder.setDeparture(TripUpdate.StopTimeEvent.newBuilder()
+                                .setDelay(tt.getDepartureDelay(i))
+                                .setTime(tt.getDepartureTime(i) + midnightSecondsSinceEpoch)
+                                .build());
+                    }
+                    newStopTimeUpdates.add(builder.build());
+                }
+            }
+
+            return TripUpdate.newBuilder(tripUpdate)
+                    .clearStopTimeUpdate()
+                    .addAllStopTimeUpdate(newStopTimeUpdates)
+                    .build();
+        } catch (IllegalStateException ex) {
+            LOG.warn("Could not add missing stops to the tripUpdate", ex);
+        }
+        return tripUpdate;
     }
 
     /**

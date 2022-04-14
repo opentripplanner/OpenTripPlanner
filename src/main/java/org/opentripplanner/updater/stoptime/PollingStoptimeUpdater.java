@@ -59,6 +59,13 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     private String feedId;
 
     /**
+     * StopTimeUpdates in TripUpdates can be incomplete in some translation cases (e.g. Dutch KV17 --> GTFS). The
+     * missing stops can be added automatically.
+     * default: false
+     */
+    private boolean addMissingStopsFromOriginalJourney = false;
+
+    /**
      * Set only if we should attempt to match the trip_id from other data in TripDescriptor
      */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
@@ -102,6 +109,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
         }
+        this.addMissingStopsFromOriginalJourney = config.path("addMissingStopsFromOriginalJourney").asBoolean(false);
         LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }
 
@@ -127,6 +135,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (fuzzyTripMatcher != null) {
             snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
         }
+        snapshotSource.addMissingStopsFromOriginalJourney = addMissingStopsFromOriginalJourney;
     }
 
     /**
