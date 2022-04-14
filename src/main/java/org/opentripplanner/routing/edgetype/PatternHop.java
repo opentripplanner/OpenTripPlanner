@@ -7,6 +7,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -89,6 +90,11 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
+        // Find the timetable at the request date for this pattern, if it's available
+        if (options.rctx.timetableSnapshot != null) {
+            return options.rctx.timetableSnapshot.resolve(getPattern(), new ServiceDate(options.getDateTime()))
+                    .getBestRunningTime(stopIndex);
+        }
         return getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
     }
 
