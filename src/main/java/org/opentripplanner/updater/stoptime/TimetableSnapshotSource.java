@@ -145,7 +145,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param deduplicator    deduplicator for different types
    * @param graphIndex      graph's index
    * @param serviceCodes    graph's service codes
-   * @param fullDataset     true iff the list with updates represent all updates that are active
+   * @param fullDataset     true if the list with updates represent all updates that are active
    *                        right now, i.e. all previous updates should be disregarded
    * @param updates         GTFS-RT TripUpdate's that should be applied atomically
    */
@@ -280,18 +280,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         }
       }
 
-      LOG.info(
-        "[feedId: {}] {} of {} update messages were applied successfully",
-        feedId,
-        successfullyApplied,
-        updates.size()
-      );
-      if (!failuresByRelationship.isEmpty()) {
+      if (fullDataset) {
         LOG.info(
-          "[feedId: {}] Failures by scheduleRelationship {}",
+          "[feedId: {}] {} of {} update messages were applied successfully",
           feedId,
-          failuresByRelationship
+          successfullyApplied,
+          updates.size()
         );
+        if (!failuresByRelationship.isEmpty()) {
+          LOG.info(
+            "[feedId: {}] Failures by scheduleRelationship {}",
+            feedId,
+            failuresByRelationship
+          );
+        }
       }
 
       // Make a snapshot after each message in anticipation of incoming requests
@@ -425,7 +427,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param serviceCodes    graph's service codes
    * @param tripUpdate      GTFS-RT TripUpdate message
    * @param tripDescriptor  GTFS-RT TripDescriptor
-   * @return true iff successful
+   * @return true if successful
    */
   private boolean validateAndHandleAddedTrip(
     final CalendarService calendarService,
@@ -612,7 +614,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripDescriptor  GTFS-RT TripDescriptor
    * @param stops           the stops of each StopTimeUpdate in the TripUpdate message
    * @param serviceDate     service date for added trip
-   * @return true iff successful
+   * @return true if successful
    */
   private boolean handleAddedTrip(
     final CalendarService calendarService,
@@ -994,7 +996,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripUpdate   GTFS-RT TripUpdate message
    * @param stops        the stops of each StopTimeUpdate in the TripUpdate message
    * @param serviceDate  service date for modified trip
-   * @return true iff successful
+   * @return true if successful
    */
   private boolean handleModifiedTrip(
     final Deduplicator deduplicator,
