@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0 (2022-04-14)
+
+- Changed PatternHop timeLowerBound calculation, to use updated timetables
+- Added a configurable addStops-method to TimetableSnapshotSource, to help creating valid TripPatterns
+
 ## 1.5.0 (2020-11-27)
 
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

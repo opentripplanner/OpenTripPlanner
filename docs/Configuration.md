@@ -650,6 +650,8 @@ Real-time data sources are configured in `router-config.json`. The `updaters` se
 of which has a `type` field and other configuration fields specific to that type. Common to all updater entries that
 connect to a network resource is the `url` field.
 
+There is an optional `addMissingStopsFromOriginalJourney` field, to add all stops from a journey for TripUpdates that may not have all stops.
+
 ```JSON
 // router-config.json
 {
@@ -726,6 +728,12 @@ connect to a network resource is the `url` field.
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
             "type": "websocket-gtfs-rt-updater"
+        },
+
+        // Add missing stops for journeys that could miss stops
+        {
+          // other config-fields
+          "addMissingStopsFromOriginalJourney": true
         }
     ]
 }
