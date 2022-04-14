@@ -261,6 +261,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
     return flexTrips;
   }
 
+  @Override
+  public boolean hasActiveTransit() {
+    return serviceIds.size() > 0;
+  }
+
   /*  Private Methods */
 
   /**

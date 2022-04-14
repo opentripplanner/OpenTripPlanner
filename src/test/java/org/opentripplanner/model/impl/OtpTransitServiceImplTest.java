@@ -4,6 +4,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
@@ -188,6 +189,11 @@ public class OtpTransitServiceImplTest {
 
     assertEquals(2, serviceIds.size());
     assertEquals("Z:alldays", first(serviceIds).toString());
+  }
+
+  @Test
+  public void testHasActiveTransit() {
+    assertTrue(subject.hasActiveTransit());
   }
 
   private static FareRule createFareRule() {

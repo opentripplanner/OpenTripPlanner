@@ -77,4 +77,9 @@ public interface OtpTransitService {
   Collection<Trip> getAllTrips();
 
   Collection<FlexTrip> getAllFlexTrips();
+
+  /**
+   * @return if transit service has any active services
+   */
+  boolean hasActiveTransit();
 }

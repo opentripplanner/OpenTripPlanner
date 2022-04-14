@@ -127,7 +127,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         OtpTransitService transitModel = builder.build();
 
-        hasTransit = transitModel.getAllServiceIds().size() > 0;
+        hasTransit = transitModel.hasActiveTransit();
 
         addTransitModelToGraph(graph, gtfsBundle, transitModel);
 

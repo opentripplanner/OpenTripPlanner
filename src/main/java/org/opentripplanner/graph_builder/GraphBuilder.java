@@ -53,7 +53,7 @@ public class GraphBuilder implements Runnable {
 
   private final Graph graph;
 
-  private boolean hasTransitData = false;
+  private boolean hasTransitDataSets = false;
 
   private GraphBuilder(Graph baseGraph) {
     this.graph = baseGraph == null ? new Graph() : baseGraph;
@@ -73,10 +73,10 @@ public class GraphBuilder implements Runnable {
     boolean hasOsm = dataSources.has(OSM);
     boolean hasGtfs = dataSources.has(GTFS);
     boolean hasNetex = dataSources.has(NETEX);
-    boolean hasTransitData = hasGtfs || hasNetex;
+    boolean hasTransitDataSets = hasGtfs || hasNetex;
 
     GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
-    graphBuilder.hasTransitData = hasTransitData;
+    graphBuilder.hasTransitDataSets = hasTransitDataSets;
 
     if (hasOsm) {
       List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
@@ -118,7 +118,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(netexModule(config, dataSources.get(NETEX)));
     }
 
-    if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
+    if (hasTransitDataSets && (hasOsm || graphBuilder.graph.hasStreets)) {
       if (config.matchBusRoutesToStreets) {
         graphBuilder.addModule(new BusRouteStreetMatcher());
       }
@@ -181,7 +181,7 @@ public class GraphBuilder implements Runnable {
         )
       );
     }
-    if (hasTransitData) {
+    if (hasTransitDataSets) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
       if (OTPFeature.FlexRouting.isOn()) {
         graphBuilder.addModule(new FlexLocationsToStreetEdgesMapper());
@@ -232,8 +232,8 @@ public class GraphBuilder implements Runnable {
     return graph;
   }
 
-  public boolean hasTransitData() {
-    return hasTransitData;
+  public boolean hasTransitDataSets() {
+    return hasTransitDataSets;
   }
 
   public void run() {
