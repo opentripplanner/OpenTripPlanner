@@ -7,6 +7,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.support.AnnotationConsumer;
 
+/**
+ * This annotation processor allows you to provide a variable as the input for a JUnit {@link
+ * org.junit.jupiter.params.ParameterizedTest}.
+ *
+ * Check the usages of {@link VariableSource} to see examples for how to use.
+ */
 class VariableArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<VariableSource> {
 
   private String variableName;
