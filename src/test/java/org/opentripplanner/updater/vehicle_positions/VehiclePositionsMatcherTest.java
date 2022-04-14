@@ -11,8 +11,12 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.VariableSource;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -149,10 +153,15 @@ public class VehiclePositionsMatcherTest {
     assertEquals(0, service.getVehiclePositions(pattern2).size());
   }
 
-  private record ServiceDayTestCase(String time, String expectedDate) {}
+  static Stream<Arguments> arguments = Stream.of(
+    Arguments.of("2022-04-05T15:26:04+02:00", "2022-04-05"),
+    Arguments.of("2022-04-06T00:26:04+02:00", "2022-04-05"),
+    Arguments.of("2022-04-06T10:26:04+02:00", "2022-04-06")
+  );
 
-  @Test
-  void inferServiceDayOfTripAt6() {
+  @ParameterizedTest(name = "{0} should resolve to {1}")
+  @VariableSource("arguments")
+  void inferServiceDayOfTripAt6(String time, String expectedDate) {
     var trip = new Trip(scopedTripId);
 
     var twelveOclock = (int) Duration.ofHours(18).toSeconds();
@@ -162,19 +171,10 @@ public class VehiclePositionsMatcherTest {
 
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
-    // the trip starts at 18:00 and finishes at 18:05
-    List
-      .of(
-        new ServiceDayTestCase("2022-04-05T15:26:04+02:00", "2022-04-05"),
-        new ServiceDayTestCase("2022-04-06T00:26:04+02:00", "2022-04-05"),
-        new ServiceDayTestCase("2022-04-06T10:26:04+02:00", "2022-04-06")
-      )
-      .forEach(testCase -> {
-        var time = OffsetDateTime.parse(testCase.time).toInstant();
-        var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+    var instant = OffsetDateTime.parse(time).toInstant();
+    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
 
-        assertEquals(LocalDate.parse(testCase.expectedDate), inferredDate);
-      });
+    assertEquals(LocalDate.parse(expectedDate), inferredDate);
   }
 
   @Test
