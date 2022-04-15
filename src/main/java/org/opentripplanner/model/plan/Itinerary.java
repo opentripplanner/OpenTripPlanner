@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -223,38 +224,30 @@ public class Itinerary {
   }
 
   /**
-   * An experimental feature for calculating a numeric score between 0 and 1 which indicates
-   * how accessible the itinerary is as a whole. This is not a very scientific method but just
-   * a rough guidance that expresses certainty or uncertainty about the accessibility.
-   *
-   * The intended audience for this score are frontend developers wanting to show a simple UI
-   * rather than having to iterate over all the stops and trips.
-   *
+   * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
+   * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
+   * guidance that expresses certainty or uncertainty about the accessibility.
+   * <p>
+   * The intended audience for this score are frontend developers wanting to show a simple UI rather
+   * than having to iterate over all the stops and trips.
+   * <p>
    * Note: the information to calculate this score are all available to the frontend, however
    * calculating them on the backend makes life a little easier and changes are automatically
    * applied to all frontends.
    */
   public Float accessibilityScore() {
-    var scores = legs
+    return legs
       .stream()
       .map(Leg::accessibilityScore)
       .filter(Objects::nonNull)
-      .mapToDouble(Float::doubleValue)
-      .toArray();
-
-    var sum = Arrays.stream(scores).sum();
-    if (scores.length > 0) {
-      return (float) sum / scores.length;
-    } else {
-      return null;
-    }
+      .min(Comparator.comparingDouble(Float::doubleValue))
+      .orElse(null);
   }
 
   /**
-     * An itinerary can be flagged for removal with a system notice.
-     * <p>
-     * For example when tuning or manually testing the itinerary-filter-chain it you can enable
-      {@link
+   * An itinerary can be flagged for removal with a system notice.
+   * <p>
+   * For example when tuning or manually testing the itinerary-filter-chain it you can enable {@link
    * org.opentripplanner.routing.api.request.ItineraryFilterParameters#debug} and instead of
    * removing itineraries from the result the itineraries will be tagged by the filters instead.
    * This enables investigating, why an expected itinerary is missing from the result set. It can be
