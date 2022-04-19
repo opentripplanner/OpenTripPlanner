@@ -53,7 +53,7 @@ By default OTP only pre-calculates transfers between stops for able-bodied walke
 obstacles wheelchair users can use them, too, but there won't be guaranteed to be one.
 
 If you want OTP to also pre-generate wheelchair-accessible transfers use the following configuration
-in `build-settings.json`:
+in `build-config.json`:
 
 ```json
 {
@@ -63,7 +63,7 @@ in `build-settings.json`:
     },
     {
       "modes": "WALK",
-      "wheelchair": true
+      "wheelchairAccessibility": { "enabled": true }
     }
   ]
 }
