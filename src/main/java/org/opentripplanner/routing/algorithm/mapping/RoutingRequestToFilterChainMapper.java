@@ -25,7 +25,8 @@ public class RoutingRequestToFilterChainMapper {
     Instant filterOnLatestDepartureTime,
     boolean removeWalkAllTheWayResults,
     boolean maxNumberOfItinerariesCropHead,
-    Consumer<Itinerary> maxLimitReachedSubscriber
+    Consumer<Itinerary> maxLimitReachedSubscriber,
+    boolean wheelchairAccessible
   ) {
     var builder = new ItineraryListFilterChainBuilder(sortOrder);
 
@@ -58,6 +59,9 @@ public class RoutingRequestToFilterChainMapper {
       .withParkAndRideDurationRatio(params.parkAndRideDurationRatio)
       .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit)
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip)
+      .withExperimentalAccessibilityScore(
+        params.experimentalAccessibilityScore && wheelchairAccessible
+      )
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)

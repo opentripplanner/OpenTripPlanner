@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import javax.validation.constraints.Null;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -29,7 +28,6 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.algorithm.mapping.AccessibilityScore;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -325,8 +323,8 @@ public class ScheduledTransitLeg implements Leg {
     return accessibilityScore;
   }
 
-  ScheduledTransitLeg withAccessibilityScore(Float score) {
-    return new ScheduledTransitLeg(
+  public ScheduledTransitLeg withAccessibilityScore(Float score) {
+    var copy = new ScheduledTransitLeg(
       tripTimes,
       tripPattern,
       boardStopPosInPattern,
@@ -340,6 +338,8 @@ public class ScheduledTransitLeg implements Leg {
       generalizedCost,
       score
     );
+
+    return copy;
   }
 
   /**

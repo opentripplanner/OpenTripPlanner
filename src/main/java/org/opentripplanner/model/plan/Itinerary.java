@@ -16,6 +16,7 @@ import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.rutebanken.netex.model.FlooringTypeEnumeration;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -61,6 +62,7 @@ public class Itinerary {
    * then walks to their destination, has four legs.
    */
   public final List<Leg> legs;
+  private final Float accessibilityScore;
   /**
    * How much time is spent walking/biking/driving, in seconds.
    */
@@ -121,6 +123,10 @@ public class Itinerary {
   public Fare fare = new Fare();
 
   public Itinerary(List<Leg> legs) {
+    this(legs, null);
+  }
+
+  public Itinerary(List<Leg> legs, Float accessibilityScore) {
     this.legs = List.copyOf(legs);
 
     // Set aggregated data
@@ -135,6 +141,7 @@ public class Itinerary {
     this.streetOnly = totals.streetOnly;
     this.elevationGained = totals.totalElevationGained;
     this.elevationLost = totals.totalElevationLost;
+    this.accessibilityScore = accessibilityScore;
   }
 
   /**
@@ -236,12 +243,22 @@ public class Itinerary {
    * applied to all frontends.
    */
   public Float accessibilityScore() {
-    return legs
-      .stream()
-      .map(Leg::accessibilityScore)
-      .filter(Objects::nonNull)
-      .min(Comparator.comparingDouble(Float::doubleValue))
-      .orElse(null);
+    return accessibilityScore;
+  }
+
+  public Itinerary withAccessibilityScore(List<Leg> legs, Float score) {
+    var copy = new Itinerary(legs, score);
+    copy.nonTransitTimeSeconds = nonTransitTimeSeconds;
+    copy.elevationLost = elevationLost;
+    copy.elevationGained = elevationGained;
+    copy.generalizedCost = generalizedCost;
+    copy.waitTimeOptimizedCost = waitTimeOptimizedCost;
+    copy.transferPriorityCost = transferPriorityCost;
+    copy.tooSloped = tooSloped;
+    copy.arrivedAtDestinationWithRentedVehicle = arrivedAtDestinationWithRentedVehicle;
+    copy.fare = fare;
+
+    return copy;
   }
 
   /**

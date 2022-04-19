@@ -22,12 +22,12 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveT
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.ExperimentalAccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameFirstOrLastTrip;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 
 /**
@@ -52,6 +52,7 @@ public class ItineraryListFilterChainBuilder {
   private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
   private Instant latestDepartureTimeLimit = null;
   private Consumer<Itinerary> maxLimitReachedSubscriber;
+  private boolean experimentalAccessibilityScore;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -219,6 +220,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withExperimentalAccessibilityScore(boolean enable) {
+    this.experimentalAccessibilityScore = enable;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
@@ -228,6 +234,10 @@ public class ItineraryListFilterChainBuilder {
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
       filters.add(new SameFirstOrLastTripFilter());
+    }
+
+    if (experimentalAccessibilityScore) {
+      filters.add(new ExperimentalAccessibilityScoreFilter());
     }
 
     // Filter transit itineraries on generalized-cost

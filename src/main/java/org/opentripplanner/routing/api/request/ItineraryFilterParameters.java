@@ -92,6 +92,13 @@ public class ItineraryFilterParameters {
    */
   public boolean filterItinerariesWithSameFirstOrLastTrip;
 
+  /**
+   * Whether to compute the experimental accessibility score currently being tested at IBI.
+   *
+   * {@link org.opentripplanner.routing.algorithm.filterchain.filter.ExperimentalAccessibilityScoreFilter}
+   */
+  public boolean experimentalAccessibilityScore;
+
   private ItineraryFilterParameters() {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
@@ -102,6 +109,7 @@ public class ItineraryFilterParameters {
     this.transitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
+    this.experimentalAccessibilityScore = false;
   }
 
   public ItineraryFilterParameters(
@@ -113,7 +121,8 @@ public class ItineraryFilterParameters {
     DoubleFunction<Double> nonTransitGeneralizedCostLimit,
     double bikeRentalDistanceRatio,
     double parkAndRideDurationRatio,
-    boolean filterItinerariesWithSameFirstOrLastTrip
+    boolean filterItinerariesWithSameFirstOrLastTrip,
+    boolean experimentalAccessibilityScore
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -124,6 +133,7 @@ public class ItineraryFilterParameters {
     this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
     this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
+    this.experimentalAccessibilityScore = experimentalAccessibilityScore;
   }
 
   public static ItineraryFilterParameters createDefault() {
