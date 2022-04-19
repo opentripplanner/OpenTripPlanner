@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.Agency;
@@ -362,6 +363,7 @@ public interface Leg {
    * calculating them on the backend makes life a little easier and changes are automatically
    * applied to all frontends.
    */
+  @Nullable
   default Float accessibilityScore() {
     return null;
   }

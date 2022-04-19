@@ -44,7 +44,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
       zoneId,
       transferFromPreviousLeg,
       transferToNextLeg,
-      generalizedCost
+      generalizedCost,
+      null
     );
     this.frequencyHeadwayInSeconds = frequencyHeadwayInSeconds;
   }

@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
+import javax.validation.constraints.Null;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -52,6 +54,7 @@ public class ScheduledTransitLeg implements Leg {
   protected final ServiceDate serviceDate;
   protected final ZoneId zoneId;
   private double distanceMeters;
+  private final Float accessibilityScore;
 
   public ScheduledTransitLeg(
     TripTimes tripTimes,
@@ -64,7 +67,8 @@ public class ScheduledTransitLeg implements Leg {
     ZoneId zoneId,
     ConstrainedTransfer transferFromPreviousLeg,
     ConstrainedTransfer transferToNextLeg,
-    int generalizedCost
+    int generalizedCost,
+    @Nullable Float accessibilityScore
   ) {
     this.tripTimes = tripTimes;
     this.tripPattern = tripPattern;
@@ -83,6 +87,7 @@ public class ScheduledTransitLeg implements Leg {
 
     this.generalizedCost = generalizedCost;
 
+    this.accessibilityScore = accessibilityScore;
     List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(
       tripPattern,
       boardStopIndexInPattern,
@@ -315,8 +320,26 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   @Override
+  @Nullable
   public Float accessibilityScore() {
-    return AccessibilityScore.compute(this);
+    return accessibilityScore;
+  }
+
+  ScheduledTransitLeg withAccessibilityScore(Float score) {
+    return new ScheduledTransitLeg(
+      tripTimes,
+      tripPattern,
+      boardStopPosInPattern,
+      alightStopPosInPattern,
+      startTime,
+      endTime,
+      serviceDate.toLocalDate(),
+      zoneId,
+      transferFromPrevLeg,
+      transferToNextLeg,
+      generalizedCost,
+      score
+    );
   }
 
   /**

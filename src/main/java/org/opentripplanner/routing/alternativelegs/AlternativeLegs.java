@@ -205,7 +205,8 @@ public class AlternativeLegs {
       timeZone,
       null,
       null,
-      ZERO_COST
+      ZERO_COST,
+      null
     );
   }
 

@@ -204,7 +204,8 @@ public class RaptorPathToItineraryMapper {
           transitSearchTimeZero.getZone().normalized(),
           (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
           (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
-          toOtpDomainCost(pathLeg.generalizedCost())
+          toOtpDomainCost(pathLeg.generalizedCost()),
+          null
         );
     }
 
