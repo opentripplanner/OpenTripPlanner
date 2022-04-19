@@ -9,6 +9,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
@@ -16,6 +17,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripOnServiceDate;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
  * A GraphQL query for retrieving data on DatedServiceJourneys
@@ -92,7 +94,7 @@ public class DatedServiceJourneyQuery {
         var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));
         var serviceJourneys = mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"));
         var privateCodes = environment.<List<String>>getArgument("privateCodes");
-        var operatingDays = environment.<List<Long>>getArgument("operatingDays");
+        var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
         var alterations = environment.<List<TripAlteration>>getArgument("alterations");
         var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
 
@@ -118,10 +120,7 @@ public class DatedServiceJourneyQuery {
         }
 
         // At least one operationg day is required
-        var days = operatingDays
-          .stream()
-          .map(gqlUtil.serviceDateMapper::secondsSinceEpochToServiceDate)
-          .toList();
+        var days = operatingDays.stream().map(ServiceDate::new).toList();
 
         stream =
           stream.filter(tripOnServiceDate -> days.contains(tripOnServiceDate.getServiceDate()));

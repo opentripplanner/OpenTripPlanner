@@ -26,6 +26,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,6 +91,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.RoutingService;
@@ -1216,7 +1219,15 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             List<FeedScopedId> lineIds = mapIDsToDomain(environment.getArgument("lines"));
             List<String> privateCodes = environment.getArgument("privateCodes");
-            List<Long> activeDates = environment.getArgument("activeDates");
+            List<LocalDate> activeDates = environment.getArgument("activeDates");
+
+            var activeServiceDates = Optional
+              .ofNullable(activeDates)
+              .orElse(emptyList())
+              .stream()
+              .map(ServiceDate::new)
+              .toList();
+
             // TODO OTP2 - Use FeedScoped ID
             List<String> authorities = environment.getArgument("authorities");
             return GqlUtil
@@ -1236,22 +1247,17 @@ public class TransmodelGraphQLSchema {
                 authorities.isEmpty() ||
                 authorities.contains(t.getRoute().getAgency().getId().getId())
               )
-              .filter(t -> {
-                return (
-                  activeDates == null ||
-                  activeDates.isEmpty() ||
+              .filter(t ->
+                (
+                  activeServiceDates.isEmpty() ||
                   GqlUtil
                     .getRoutingService(environment)
                     .getCalendarService()
                     .getServiceDatesForServiceId(t.getServiceId())
                     .stream()
-                    .anyMatch(sd ->
-                      activeDates.contains(
-                        gqlUtil.serviceDateMapper.serviceDateToSecondsSinceEpoch(sd)
-                      )
-                    )
-                );
-              })
+                    .anyMatch(activeServiceDates::contains)
+                )
+              )
               .collect(Collectors.toList());
           })
           .build()

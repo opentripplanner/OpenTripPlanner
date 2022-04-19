@@ -9,8 +9,10 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.Optional;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripOnServiceDate;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
  * A DatedServiceJourney GraphQL Type for use in endpoints fetching DatedServiceJourney data
@@ -35,9 +37,11 @@ public class DatedServiceJourneyType {
           )
           .type(gqlUtil.dateScalar)
           .dataFetcher(environment ->
-            gqlUtil.serviceDateMapper.serviceDateToSecondsSinceEpoch(
-              tripOnServiceDate(environment).getServiceDate()
-            )
+            Optional
+              .ofNullable(tripOnServiceDate(environment))
+              .map(TripOnServiceDate::getServiceDate)
+              .map(ServiceDate::toLocalDate)
+              .orElse(null)
           )
       )
       .field(
