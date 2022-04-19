@@ -72,7 +72,7 @@ public class Router {
    * Start up a new router once it has been created.
    */
   public void startup() {
-    this.tileRendererManager = new TileRendererManager(this.graph);
+    this.tileRendererManager = new TileRendererManager(this.graph, this.defaultRoutingRequest);
 
     if (routerConfig.requestLogFile() != null) {
       this.requestLogger = createLogger(routerConfig.requestLogFile());
