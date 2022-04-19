@@ -38,6 +38,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.S3BucketConfig;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,10 +233,6 @@ public class GraphBuilder implements Runnable {
     return graph;
   }
 
-  public boolean hasTransitDataSets() {
-    return hasTransitDataSets;
-  }
-
   public void run() {
     // Record how long it takes to build the graph, purely for informational purposes.
     long startTime = System.currentTimeMillis();
@@ -253,6 +250,7 @@ public class GraphBuilder implements Runnable {
       load.buildGraph(graph, extra, issueStore);
     }
     issueStore.summarize();
+    validate();
 
     long endTime = System.currentTimeMillis();
     LOG.info(
@@ -263,5 +261,24 @@ public class GraphBuilder implements Runnable {
 
   private void addModule(GraphBuilderModule loader) {
     graphBuilderModules.add(loader);
+  }
+
+  private boolean hasTransitDataSets() {
+    return hasTransitDataSets;
+  }
+
+  /**
+   * Validates the build. Currently, only checks if the graph has transit data if any transit data
+   * sets were included in the build. If all transit data gets filtered out due to transit period configuration,
+   * for example, then this function will throw a {@link OtpAppException}.
+   */
+  private void validate() {
+    if (hasTransitDataSets() && !graph.hasTransit) {
+      throw new OtpAppException(
+        "The provided transit data have no trips within the configured transit " +
+        "service period. See build config 'transitServiceStart' and " +
+        "'transitServiceEnd'"
+      );
+    }
   }
 }
