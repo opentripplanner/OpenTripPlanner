@@ -127,7 +127,8 @@ public class GtfsModule implements GraphBuilderModule {
 
         OtpTransitService transitModel = builder.build();
 
-        hasTransit = transitModel.hasActiveTransit();
+        // if this or previously processed gtfs bundle has transit that has not been filtered out
+        hasTransit = hasTransit || transitModel.hasActiveTransit();
 
         addTransitModelToGraph(graph, gtfsBundle, transitModel);
 
@@ -149,7 +150,8 @@ public class GtfsModule implements GraphBuilderModule {
     );
     graph.updateTransitFeedValidity(calendarServiceData, issueStore);
 
-    graph.hasTransit = hasTransit;
+    // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
+    graph.hasTransit = graph.hasTransit || hasTransit;
     graph.calculateTransitCenter();
   }
 
