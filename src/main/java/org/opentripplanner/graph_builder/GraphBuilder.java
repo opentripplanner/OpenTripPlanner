@@ -54,7 +54,7 @@ public class GraphBuilder implements Runnable {
 
   private final Graph graph;
 
-  private boolean hasTransitDataSets = false;
+  private boolean hasTransitData = false;
 
   private GraphBuilder(Graph baseGraph) {
     this.graph = baseGraph == null ? new Graph() : baseGraph;
@@ -74,10 +74,10 @@ public class GraphBuilder implements Runnable {
     boolean hasOsm = dataSources.has(OSM);
     boolean hasGtfs = dataSources.has(GTFS);
     boolean hasNetex = dataSources.has(NETEX);
-    boolean hasTransitDataSets = hasGtfs || hasNetex;
+    boolean hasTransitData = hasGtfs || hasNetex;
 
     GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
-    graphBuilder.hasTransitDataSets = hasTransitDataSets;
+    graphBuilder.hasTransitData = hasTransitData;
 
     if (hasOsm) {
       List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
@@ -119,7 +119,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(netexModule(config, dataSources.get(NETEX)));
     }
 
-    if (hasTransitDataSets && (hasOsm || graphBuilder.graph.hasStreets)) {
+    if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
       if (config.matchBusRoutesToStreets) {
         graphBuilder.addModule(new BusRouteStreetMatcher());
       }
@@ -182,7 +182,7 @@ public class GraphBuilder implements Runnable {
         )
       );
     }
-    if (hasTransitDataSets) {
+    if (hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
       if (OTPFeature.FlexRouting.isOn()) {
         graphBuilder.addModule(new FlexLocationsToStreetEdgesMapper());
@@ -263,8 +263,8 @@ public class GraphBuilder implements Runnable {
     graphBuilderModules.add(loader);
   }
 
-  private boolean hasTransitDataSets() {
-    return hasTransitDataSets;
+  private boolean hasTransitData() {
+    return hasTransitData;
   }
 
   /**
@@ -273,7 +273,7 @@ public class GraphBuilder implements Runnable {
    * for example, then this function will throw a {@link OtpAppException}.
    */
   private void validate() {
-    if (hasTransitDataSets() && !graph.hasTransit) {
+    if (hasTransitData() && !graph.hasTransit) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit " +
         "service period. See build config 'transitServiceStart' and " +
