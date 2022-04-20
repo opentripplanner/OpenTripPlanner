@@ -19,13 +19,13 @@ public final class DefaultCostCalculator implements CostCalculator {
   private final int boardAndTransferCost;
   private final int waitFactor;
   private final FactorStrategy transitFactors;
-  private final int[] stopVisitCost;
+  private final int[] stopTransferCost;
 
   /**
    * Cost unit: SECONDS - The unit for all input parameters are in the OTP TRANSIT model cost unit
    * (in Raptor the unit for cost is centi-seconds).
    *
-   * @param stopVisitCost Unit centi-seconds. This parameter is used "as-is" and not transformed
+   * @param stopTransferCost Unit centi-seconds. This parameter is used "as-is" and not transformed
    *                      into the Raptor cast unit to avoid the transformation for each request.
    *                      Use {@code null} to ignore stop cost.
    */
@@ -34,7 +34,7 @@ public final class DefaultCostCalculator implements CostCalculator {
     int transferCost,
     double waitReluctanceFactor,
     @Nullable double[] transitReluctanceFactors,
-    @Nullable int[] stopVisitCost
+    @Nullable int[] stopTransferCost
   ) {
     this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);
     this.transferCostOnly = RaptorCostConverter.toRaptorCost(transferCost);
@@ -46,16 +46,16 @@ public final class DefaultCostCalculator implements CostCalculator {
         ? new SingleValueFactorStrategy(McCostParams.DEFAULT_TRANSIT_RELUCTANCE)
         : new IndexBasedFactorStrategy(transitReluctanceFactors);
 
-    this.stopVisitCost = stopVisitCost;
+    this.stopTransferCost = stopTransferCost;
   }
 
-  public DefaultCostCalculator(McCostParams params, int[] stopVisitCost) {
+  public DefaultCostCalculator(McCostParams params, int[] stopTransferCost) {
     this(
       params.boardCost(),
       params.transferCost(),
       params.waitReluctanceFactor(),
       params.transitReluctanceFactors(),
-      stopVisitCost
+      stopTransferCost
     );
   }
 
@@ -106,9 +106,11 @@ public final class DefaultCostCalculator implements CostCalculator {
       waitFactor *
       alightSlack;
 
-//    if (stopVisitCost != null) {
-//      cost += stopVisitCost[toStop];
-//    }
+    // Add transfer cost on all alighting events.
+    // If it turns out to be the last one this cost will be removed during costEgress phase.
+    if (stopTransferCost != null) {
+      cost += stopTransferCost[toStop];
+    }
 
     return cost;
   }
@@ -131,9 +133,16 @@ public final class DefaultCostCalculator implements CostCalculator {
 
   @Override
   public int costEgress(RaptorTransfer egress) {
-    return egress.hasRides()
-      ? egress.generalizedCost() + transferCostOnly
-      : egress.generalizedCost();
+    if (egress.hasRides()) {
+      return egress.generalizedCost() + transferCostOnly;
+    } else {
+      // Remove cost that was added during alighting.
+      // We do not want to add this cost on last alighting since it should only be applied on transfers
+      // It has to be done here because during alighting we do not know yet if it will be
+      // a transfer or not.
+      var transferCost = stopTransferCost != null ? stopTransferCost[egress.stop()] : 0;
+      return egress.generalizedCost() - transferCost;
+    }
   }
 
   /** This is public for test purposes only */
@@ -153,8 +162,9 @@ public final class DefaultCostCalculator implements CostCalculator {
 
     cost += firstBoarding ? boardCostOnly : boardAndTransferCost;
 
-    if (stopVisitCost != null && !firstBoarding) {
-      cost += stopVisitCost[boardStop];
+    // If it's first boarding event then it is not a transfer
+    if (stopTransferCost != null && !firstBoarding) {
+      cost += stopTransferCost[boardStop];
     }
     return cost;
   }
@@ -194,8 +204,9 @@ public final class DefaultCostCalculator implements CostCalculator {
 
       int cost = waitFactor * boardWaitTime;
 
-      if (stopVisitCost != null && !firstBoarding) {
-        cost += stopVisitCost[boardStop];
+      // If it's first boarding event then it is not a transfer
+      if (stopTransferCost != null && !firstBoarding) {
+        cost += stopTransferCost[boardStop];
       }
       return cost;
     }
