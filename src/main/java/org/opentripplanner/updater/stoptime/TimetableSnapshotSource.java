@@ -454,7 +454,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final String tripId = tripDescriptor.getTripId();
     final Trip trip = getTripForTripId(feedId, tripId);
 
-    Consumer<String> warn = (String message) -> TimetableSnapshotSource.warn(trip.getId(), message);
+    Consumer<String> warn = (String message) ->
+      TimetableSnapshotSource.warn(feedId, tripId, message);
 
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
