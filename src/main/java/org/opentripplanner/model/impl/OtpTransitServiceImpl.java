@@ -122,7 +122,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
     this.trips = immutableList(builder.getTripsById().values());
-    this.flexTrips = immutableList(builder.getFlexTripsById().values());    
+    this.flexTrips = immutableList(builder.getFlexTripsById().values());
   }
 
   @Override
