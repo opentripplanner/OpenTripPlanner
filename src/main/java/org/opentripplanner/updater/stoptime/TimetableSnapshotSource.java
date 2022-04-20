@@ -875,12 +875,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final Timetable timetable = buffer.resolve(pattern, serviceDate);
       final int tripIndex = timetable.getTripIndex(tripId);
       if (tripIndex == -1) {
-        warn(
-          tripId.getFeedId(),
-          tripId.getId(),
-          "Could not cancel previously added trip {}",
-          tripId
-        );
+        warn(tripId, "Could not cancel previously added trip on ", serviceDate);
       } else {
         final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
         newTripTimes.cancelTrip();
@@ -1121,7 +1116,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return routingService.getStopForId(new FeedScopedId(feedId, stopId));
   }
 
-  public static void warn(String feedId, String tripId, String message, Object... params) {
+  private static void warn(FeedScopedId id, String message, Object... params) {
+    warn(id.getFeedId(), id.getId(), message, params);
+  }
+
+  private static void warn(String feedId, String tripId, String message, Object... params) {
     String m = "[feedId: %s, tripId: %s] %s".formatted(feedId, tripId, message);
     LOG.warn(m, params);
   }
