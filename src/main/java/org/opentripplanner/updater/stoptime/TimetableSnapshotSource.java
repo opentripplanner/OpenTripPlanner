@@ -454,26 +454,26 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final String tripId = tripDescriptor.getTripId();
     final Trip trip = getTripForTripId(feedId, tripId);
 
-    Consumer<String> _warn = (String message) ->
+    Consumer<String> warn = (String message) ->
       TimetableSnapshotSource.warn(feedId, tripId, message);
 
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
       // frequency based)?
-      _warn.accept("Graph already contains trip id of ADDED trip, skipping.");
+      warn.accept("Graph already contains trip id of ADDED trip, skipping.");
       return false;
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      _warn.accept("ADDED trip doesn't have a start date in TripDescriptor, skipping.");
+      warn.accept("ADDED trip doesn't have a start date in TripDescriptor, skipping.");
       return false;
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      _warn.accept("ADDED trip has less then two stops, skipping.");
+      warn.accept("ADDED trip has less then two stops, skipping.");
       return false;
     }
 
@@ -520,7 +520,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .map(TripDescriptor::getTripId)
       .orElse("unknown");
 
-    Consumer<String> _warn = (String message) ->
+    Consumer<String> warn = (String message) ->
       TimetableSnapshotSource.warn(feedId, tripId, message);
 
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
@@ -532,13 +532,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Check non-negative
         if (stopSequence < 0) {
-          _warn.accept("Trip update contains negative stop sequence, skipping.");
+          warn.accept("Trip update contains negative stop sequence, skipping.");
           return null;
         }
 
         // Check whether sequence is increasing
         if (previousStopSequence != null && previousStopSequence > stopSequence) {
-          _warn.accept("Trip update contains decreasing stop sequence, skipping.");
+          warn.accept("Trip update contains decreasing stop sequence, skipping.");
           return null;
         }
         previousStopSequence = stopSequence;
@@ -577,12 +577,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getArrival().getTime();
         if (previousTime != null && previousTime > time) {
-          _warn.accept("Trip update contains decreasing times, skipping.");
+          warn.accept("Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        _warn.accept("Trip update misses arrival time, skipping.");
+        warn.accept("Trip update misses arrival time, skipping.");
         return null;
       }
 
@@ -591,12 +591,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getDeparture().getTime();
         if (previousTime != null && previousTime > time) {
-          _warn.accept("Trip update contains decreasing times, skipping.");
+          warn.accept("Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        _warn.accept("Trip update misses departure time, skipping.");
+        warn.accept("Trip update misses departure time, skipping.");
         return null;
       }
     }
@@ -732,7 +732,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       "number of stop should match the number of stop time updates"
     );
 
-    Consumer<String> _warn = (String message) ->
+    Consumer<String> warn = (String message) ->
       TimetableSnapshotSource.warn(trip.getId().getFeedId(), trip.getId().getId(), message);
 
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
@@ -753,7 +753,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
         final long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          _warn.accept(
+          warn.accept(
             "ADDED trip has invalid arrival time (compared to start date in " +
             "TripDescriptor), skipping."
           );
@@ -766,7 +766,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final long departureTime =
           stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          _warn.accept(
+          warn.accept(
             "ADDED trip has invalid departure time (compared to start date in " +
             "TripDescriptor), skipping."
           );
@@ -934,33 +934,33 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     String tripId = tripDescriptor.getTripId();
     Trip trip = getTripForTripId(feedId, tripId);
 
-    Consumer<String> _warn = (String message) ->
+    Consumer<String> warn = (String message) ->
       TimetableSnapshotSource.warn(feedId, tripId, message);
 
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
-      _warn.accept("Feed does not contain trip id of MODIFIED trip, skipping.");
+      warn.accept("Feed does not contain trip id of MODIFIED trip, skipping.");
       return false;
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      _warn.accept("MODIFIED trip doesn't have a start date in TripDescriptor, skipping.");
+      warn.accept("MODIFIED trip doesn't have a start date in TripDescriptor, skipping.");
       return false;
     } else {
       // Check whether service date is served by trip
       final Set<FeedScopedId> serviceIds = calendarService.getServiceIdsOnDate(serviceDate);
       if (!serviceIds.contains(trip.getServiceId())) {
         // TODO: should we support this and change service id of trip?
-        _warn.accept("MODIFIED trip has a service date that is not served by trip, skipping.");
+        warn.accept("MODIFIED trip has a service date that is not served by trip, skipping.");
         return false;
       }
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      _warn.accept("MODIFIED trip has less then two stops, skipping.");
+      warn.accept("MODIFIED trip has less then two stops, skipping.");
       return false;
     }
 
