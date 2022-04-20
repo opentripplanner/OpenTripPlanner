@@ -186,10 +186,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         var tripId = Optional
           .ofNullable(tripUpdate.getTrip())
           .map(TripDescriptor::getTripId)
-          .orElse("<null>");
+          .map(tId -> new FeedScopedId(feedId, tId))
+          .orElse(new FeedScopedId(feedId, "null"));
 
         if (!tripUpdate.hasTrip()) {
-          warn(feedId, tripId, "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
+          warn(tripId, "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
           continue;
         }
 
@@ -201,7 +202,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             serviceDate = ServiceDate.parseString(tripDescriptor.getStartDate());
           } catch (final ParseException e) {
             warn(
-              feedId,
               tripId,
               "Failed to parse start date in gtfs-rt trip update: {}",
               tripDescriptor.getStartDate()
@@ -214,7 +214,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
         if (!tripDescriptor.hasTripId()) {
-          warn(feedId, tripId, "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
+          warn(tripId, "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
           continue;
         }
 
@@ -360,7 +360,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = getPatternForTripId(feedId, tripId);
 
     if (pattern == null) {
-      warn(feedId, tripId, "No pattern found for tripId {}, skipping TripUpdate.", tripId);
+      warn(feedId, tripId, "No pattern found for tripId, skipping TripUpdate.");
       return false;
     }
 
@@ -454,8 +454,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final String tripId = tripDescriptor.getTripId();
     final Trip trip = getTripForTripId(feedId, tripId);
 
-    Consumer<String> warn = (String message) ->
-      TimetableSnapshotSource.warn(feedId, tripId, message);
+    Consumer<String> warn = (String message) -> TimetableSnapshotSource.warn(trip.getId(), message);
 
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
@@ -518,10 +517,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     var tripId = Optional
       .ofNullable(tripUpdate.getTrip())
       .map(TripDescriptor::getTripId)
-      .orElse("unknown");
+      .map(tId -> new FeedScopedId(feedId, tId))
+      .orElse(new FeedScopedId(feedId, "null"));
 
-    Consumer<String> warn = (String message) ->
-      TimetableSnapshotSource.warn(feedId, tripId, message);
+    Consumer<String> warn = (String message) -> TimetableSnapshotSource.warn(tripId, message);
 
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
       final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
@@ -555,7 +554,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           stops.add(stop);
         } else {
           warn(
-            feedId,
             tripId,
             "Graph doesn't contain stop id '{}' of trip update, skipping.",
             stopTimeUpdate.getStopId()
@@ -563,12 +561,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           return null;
         }
       } else {
-        warn(
-          feedId,
-          tripId,
-          "Trip update misses a stop id at stop time list index {}, skipping.",
-          index
-        );
+        warn(tripId, "Trip update misses a stop id at stop time list index {}, skipping.", index);
         return null;
       }
 
@@ -732,8 +725,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       "number of stop should match the number of stop time updates"
     );
 
-    Consumer<String> warn = (String message) ->
-      TimetableSnapshotSource.warn(trip.getId().getFeedId(), trip.getId().getId(), message);
+    Consumer<String> warn = (String message) -> TimetableSnapshotSource.warn(trip.getId(), message);
 
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
     final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
