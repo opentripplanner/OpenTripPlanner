@@ -20,15 +20,13 @@ public class LegMapper {
   private final AlertMapper alertMapper;
   private final PlaceMapper placeMapper;
   private final boolean addIntermediateStops;
-  private final boolean addAccessibilityScore;
 
-  public LegMapper(Locale locale, boolean addIntermediateStops, boolean addAccessibilityScore) {
+  public LegMapper(Locale locale, boolean addIntermediateStops) {
     this.walkStepMapper = new WalkStepMapper(locale);
     this.streetNoteMaperMapper = new StreetNoteMaperMapper(locale);
     this.alertMapper = new AlertMapper(locale);
     this.placeMapper = new PlaceMapper(locale);
     this.addIntermediateStops = addIntermediateStops;
-    this.addAccessibilityScore = addAccessibilityScore;
   }
 
   public List<ApiLeg> mapLegs(List<Leg> domain) {
@@ -143,9 +141,7 @@ public class LegMapper {
 
     api.rentedBike = domain.getRentedVehicle();
     api.walkingBike = domain.getWalkingBike();
-    if (addAccessibilityScore) {
-      api.accessibilityScore = domain.accessibilityScore();
-    }
+    api.accessibilityScore = domain.accessibilityScore();
 
     return api;
   }

@@ -9,12 +9,8 @@ public class TripPlanMapper {
   private final ItineraryMapper itineraryMapper;
   private final PlaceMapper placeMapper;
 
-  public TripPlanMapper(
-    Locale locale,
-    boolean addIntermediateStops,
-    boolean addAccessibilityScore
-  ) {
-    this.itineraryMapper = new ItineraryMapper(locale, addIntermediateStops, addAccessibilityScore);
+  public TripPlanMapper(Locale locale, boolean addIntermediateStops) {
+    this.itineraryMapper = new ItineraryMapper(locale, addIntermediateStops);
     this.placeMapper = new PlaceMapper(locale);
   }
 

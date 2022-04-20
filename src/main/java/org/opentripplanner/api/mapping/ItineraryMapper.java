@@ -11,15 +11,9 @@ import org.opentripplanner.model.plan.Itinerary;
 public class ItineraryMapper {
 
   private final LegMapper legMapper;
-  private final boolean addAccessibilityScore;
 
-  public ItineraryMapper(
-    Locale locale,
-    boolean addIntermediateStops,
-    boolean addAccessibilityScore
-  ) {
-    this.legMapper = new LegMapper(locale, addIntermediateStops, addAccessibilityScore);
-    this.addAccessibilityScore = addAccessibilityScore;
+  public ItineraryMapper(Locale locale, boolean addIntermediateStops) {
+    this.legMapper = new LegMapper(locale, addIntermediateStops);
   }
 
   public List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
@@ -51,9 +45,7 @@ public class ItineraryMapper {
     api.fare = domain.fare;
     api.legs = legMapper.mapLegs(domain.legs);
     api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.systemNotices);
-    if (addAccessibilityScore) {
-      api.accessibilityScore = domain.accessibilityScore();
-    }
+    api.accessibilityScore = domain.accessibilityScore();
 
     return api;
   }

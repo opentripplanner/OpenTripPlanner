@@ -77,8 +77,7 @@ public class PlannerResource extends RoutingResource {
       // Map to API
       TripPlanMapper tripPlanMapper = new TripPlanMapper(
         request.locale,
-        request.showIntermediateStops,
-        request.wheelchairAccessibility.enabled()
+        request.showIntermediateStops
       );
       response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
       if (res.getPreviousPageCursor() != null) {
