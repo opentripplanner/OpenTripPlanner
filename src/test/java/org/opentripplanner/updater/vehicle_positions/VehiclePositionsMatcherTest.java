@@ -164,10 +164,10 @@ public class VehiclePositionsMatcherTest {
   void inferServiceDayOfTripAt6(String time, String expectedDate) {
     var trip = new Trip(scopedTripId);
 
-    var twelveOclock = (int) Duration.ofHours(18).toSeconds();
-    var fivePast12 = twelveOclock + 300;
+    var sixOclock = (int) Duration.ofHours(18).toSeconds();
+    var fivePast6 = sixOclock + 300;
 
-    var stopTimes = List.of(stopTime(trip, 0, twelveOclock), stopTime(trip, 1, fivePast12));
+    var stopTimes = List.of(stopTime(trip, 0, sixOclock), stopTime(trip, 1, fivePast6));
 
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
