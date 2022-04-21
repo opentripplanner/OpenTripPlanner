@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -199,6 +201,43 @@ public class TimetableSnapshotSourceTest {
 
     assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex2).getRealTimeState());
     assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex2).getRealTimeState());
+  }
+
+  /**
+   * This test just asserts that invalid trip ids don't throw an exception and are ignored instead
+   */
+  @Test
+  public void invalidTripId() {
+    Stream
+      .of("", null)
+      .forEach(id -> {
+        var tripDescriptorBuilder = TripDescriptor.newBuilder();
+        tripDescriptorBuilder.setTripId("");
+        tripDescriptorBuilder.setScheduleRelationship(
+          TripDescriptor.ScheduleRelationship.SCHEDULED
+        );
+        var tripUpdateBuilder = TripUpdate.newBuilder();
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+        var tripUpdate = tripUpdateBuilder.build();
+
+        CalendarService calendarService = graph.getCalendarService();
+        Deduplicator deduplicator = graph.deduplicator;
+        GraphIndex graphIndex = graph.index;
+        Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
+        updater.applyTripUpdates(
+          calendarService,
+          deduplicator,
+          graphIndex,
+          serviceCodes,
+          fullDataset,
+          List.of(tripUpdate),
+          feedId
+        );
+
+        var snapshot = updater.getTimetableSnapshot();
+        assertNull(snapshot);
+      });
   }
 
   @Test

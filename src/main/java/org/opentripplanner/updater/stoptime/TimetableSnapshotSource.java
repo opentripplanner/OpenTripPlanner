@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
@@ -178,21 +177,26 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       int successfullyApplied = 0;
       int uIndex = 0;
       for (TripUpdate tripUpdate : updates) {
-        if (fuzzyTripMatcher != null && tripUpdate.hasTrip()) {
+        if (!tripUpdate.hasTrip()) {
+          warn(feedId, "", "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
+          continue;
+        }
+
+        if (fuzzyTripMatcher != null) {
           final TripDescriptor trip = fuzzyTripMatcher.match(feedId, tripUpdate.getTrip());
           tripUpdate = tripUpdate.toBuilder().setTrip(trip).build();
         }
 
-        FeedScopedId tripId = getFeedScopedId(feedId, tripUpdate);
+        final TripDescriptor tripDescriptor = tripUpdate.getTrip();
 
-        if (!tripUpdate.hasTrip()) {
-          warn(tripId, "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
+        if (!tripDescriptor.hasTripId() || tripDescriptor.getTripId().isBlank()) {
+          warn(feedId, "", "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
           continue;
         }
 
-        ServiceDate serviceDate = new ServiceDate();
-        final TripDescriptor tripDescriptor = tripUpdate.getTrip();
+        FeedScopedId tripId = new FeedScopedId(feedId, tripUpdate.getTrip().getTripId());
 
+        ServiceDate serviceDate = new ServiceDate();
         if (tripDescriptor.hasStartDate()) {
           try {
             serviceDate = ServiceDate.parseString(tripDescriptor.getStartDate());
@@ -207,11 +211,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         } else {
           // TODO: figure out the correct service date. For the special case that a trip
           // starts for example at 40:00, yesterday would probably be a better guess.
-        }
-
-        if (!tripDescriptor.hasTripId()) {
-          warn(tripId, "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
-          continue;
         }
 
         uIndex += 1;
@@ -229,7 +228,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               serviceCodes,
               tripUpdate,
               tripDescriptor,
-              feedId,
+              tripId,
               serviceDate
             );
             case ADDED -> validateAndHandleAddedTrip(
@@ -239,11 +238,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               serviceCodes,
               tripUpdate,
               tripDescriptor,
-              feedId,
+              tripId,
               serviceDate
             );
             case UNSCHEDULED -> handleUnscheduledTrip();
-            case CANCELED -> handleCanceledTrip(tripDescriptor, feedId, serviceDate);
+            case CANCELED -> handleCanceledTrip(tripId, serviceDate);
             case REPLACEMENT -> validateAndHandleModifiedTrip(
               calendarService,
               deduplicator,
@@ -251,7 +250,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               serviceCodes,
               tripUpdate,
               tripDescriptor,
-              feedId,
+              tripId,
               serviceDate
             );
             case DUPLICATED -> false;
@@ -261,7 +260,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           successfullyApplied++;
           totalSuccessfullyApplied++;
         } else {
-          warn(feedId, tripDescriptor.getTripId(), "Failed to apply TripUpdate.");
+          warn(tripId, "Failed to apply TripUpdate.");
           LOG.trace(" Contents: {}", tripUpdate);
           if (failuresByRelationship.containsKey(tripScheduleRelationship)) {
             var c = failuresByRelationship.get(tripScheduleRelationship);
@@ -348,26 +347,25 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final Map<FeedScopedId, Integer> serviceCodes,
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
-    final String feedId,
+    final FeedScopedId tripId,
     final ServiceDate serviceDate
   ) {
     // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
-    final String tripId = tripDescriptor.getTripId();
-    final TripPattern pattern = getPatternForTripId(feedId, tripId);
+    final TripPattern pattern = getPatternForTripId(tripId);
 
     if (pattern == null) {
-      warn(feedId, tripId, "No pattern found for tripId, skipping TripUpdate.");
+      warn(tripId, "No pattern found for tripId, skipping TripUpdate.");
       return false;
     }
 
     if (tripUpdate.getStopTimeUpdateCount() < 1) {
-      warn(feedId, tripId, "TripUpdate contains no updates, skipping.");
+      warn(tripId, "TripUpdate contains no updates, skipping.");
       return false;
     }
 
     // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the sequence of stops has
     // changed, and is now changing back to the originally scheduled one) cancel that previously created trip.
-    cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
+    cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     // Get new TripTimes based on scheduled timetable
     final TripTimesPatch tripTimesPatch = pattern
@@ -393,7 +391,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .cancelStops(skippedStopIndices)
         .build();
 
-      final Trip trip = getTripForTripId(feedId, tripId);
+      final Trip trip = getTripForTripId(tripId);
       // Get cached trip pattern or create one if it doesn't exist yet
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
@@ -406,7 +404,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final int serviceCode = serviceCodes.get(trip.getServiceId());
       newPattern.setServiceCode(serviceCode);
 
-      cancelScheduledTrip(feedId, tripId, serviceDate);
+      cancelScheduledTrip(tripId, serviceDate);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
     } else {
       // Set the updated trip times in the buffer
@@ -432,7 +430,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final Map<FeedScopedId, Integer> serviceCodes,
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
-    final String feedId,
+    final FeedScopedId tripId,
     final ServiceDate serviceDate
   ) {
     // Preconditions
@@ -447,34 +445,30 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
 
     // Check whether trip id already exists in graph
-    final String tripId = tripDescriptor.getTripId();
-    final Trip trip = getTripForTripId(feedId, tripId);
-
-    Consumer<String> warn = (String message) ->
-      TimetableSnapshotSource.warn(feedId, tripId, message);
+    final Trip trip = getTripForTripId(tripId);
 
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
       // frequency based)?
-      warn.accept("Graph already contains trip id of ADDED trip, skipping.");
+      warn(tripId, "Graph already contains trip id of ADDED trip, skipping.");
       return false;
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      warn.accept("ADDED trip doesn't have a start date in TripDescriptor, skipping.");
+      warn(tripId, "ADDED trip doesn't have a start date in TripDescriptor, skipping.");
       return false;
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      warn.accept("ADDED trip has less then two stops, skipping.");
+      warn(tripId, "ADDED trip has less then two stops, skipping.");
       return false;
     }
 
     // Check whether all stop times are available and all stops exist
-    final var stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
+    final var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
     if (stops == null) {
       return false;
     }
@@ -490,7 +484,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       tripUpdate,
       tripDescriptor,
       stops,
-      feedId,
+      tripId,
       serviceDate
     );
   }
@@ -499,20 +493,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Check stop time updates of trip update that results in a new trip (ADDED or MODIFIED) and find
    * all stops of that trip.
    *
-   * @param feedId     feed id this trip update is intented for
-   * @param tripUpdate trip update
    * @return stops when stop time updates are correct; null if there are errors
    */
   private List<StopLocation> checkNewStopTimeUpdatesAndFindStops(
-    final String feedId,
+    final FeedScopedId tripId,
     final TripUpdate tripUpdate
   ) {
     Integer previousStopSequence = null;
     Long previousTime = null;
     final List<StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList();
     final List<StopLocation> stops = new ArrayList<>(stopTimeUpdates.size());
-
-    FeedScopedId tripId = getFeedScopedId(feedId, tripUpdate);
 
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
       final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
@@ -540,7 +530,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Find stops
       if (stopTimeUpdate.hasStopId()) {
         // Find stop
-        final var stop = getStopForStopId(feedId, stopTimeUpdate.getStopId());
+        final var stop = getStopForStopId(
+          new FeedScopedId(tripId.getFeedId(), stopTimeUpdate.getStopId())
+        );
         if (stop != null) {
           // Remember stop
           stops.add(stop);
@@ -588,15 +580,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return stops;
   }
 
-  private FeedScopedId getFeedScopedId(String feedId, TripUpdate tripUpdate) {
-    return Optional
-      .ofNullable(tripUpdate.getTrip())
-      .map(TripDescriptor::getTripId)
-      .filter(id -> !id.isBlank())
-      .map(tId -> new FeedScopedId(feedId, tId))
-      .orElse(new FeedScopedId(feedId, "null"));
-  }
-
   /**
    * Handle GTFS-RT TripUpdate message containing an ADDED trip.
    *
@@ -618,7 +601,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
     final List<StopLocation> stops,
-    final String feedId,
+    final FeedScopedId tripId,
     final ServiceDate serviceDate
   ) {
     // Preconditions
@@ -630,8 +613,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Check whether trip id has been used for previously ADDED trip message and cancel
     // previously created trip
-    final String tripId = tripDescriptor.getTripId();
-    cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
+    cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     //
     // Create added trip
@@ -640,32 +622,36 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     Route route = null;
     if (tripDescriptor.hasRouteId()) {
       // Try to find route
-      route = getRouteForRouteId(feedId, tripDescriptor.getRouteId());
+      route = getRouteForRouteId(new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId()));
     }
 
     if (route == null) {
       // Create new Route
       // Use route id of trip descriptor if available
       FeedScopedId id = tripDescriptor.hasRouteId()
-        ? new FeedScopedId(feedId, tripDescriptor.getRouteId())
-        : new FeedScopedId(feedId, tripId);
+        ? new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
+        : tripId;
 
       route = new Route(id);
       // Create dummy agency for added trips
-      Agency dummyAgency = new Agency(new FeedScopedId(feedId, "Dummy"), "Dummy", "Europe/Paris");
+      Agency dummyAgency = new Agency(
+        new FeedScopedId(tripId.getFeedId(), "Dummy"),
+        "Dummy",
+        "Europe/Paris"
+      );
       route.setAgency(dummyAgency);
       // Guess the route type as it doesn't exist yet in the specifications
       // Bus. Used for short- and long-distance bus routes.
       route.setGtfsType(3);
       route.setMode(TransitMode.BUS);
       // Create route name
-      route.setLongName(tripId);
+      route.setLongName(tripDescriptor.getTripId());
     }
 
     // Create new Trip
 
     // TODO: which Agency ID to use? Currently use feed id.
-    final Trip trip = new Trip(new FeedScopedId(feedId, tripId));
+    final Trip trip = new Trip(tripId);
     trip.setRoute(route);
 
     // Find service ID running on this service date
@@ -673,7 +659,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (serviceIds.isEmpty()) {
       // No service id exists: return error for now
       warn(
-        feedId,
         tripId,
         "ADDED trip has service date {} for which no service id is available, skipping.",
         serviceDate.asISO8601()
@@ -819,23 +804,23 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Cancel scheduled trip in buffer given trip id (without agency id) on service date
+   * Cancel scheduled trip in buffer given trip id  on service date
    *
-   * @param tripId      trip id without agency id
+   * @param tripId      trip id
    * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
-  private boolean cancelScheduledTrip(String feedId, String tripId, final ServiceDate serviceDate) {
+  private boolean cancelScheduledTrip(FeedScopedId tripId, final ServiceDate serviceDate) {
     boolean success = false;
 
-    final TripPattern pattern = getPatternForTripId(feedId, tripId);
+    final TripPattern pattern = getPatternForTripId(tripId);
 
     if (pattern != null) {
       // Cancel scheduled trip times for this trip in this pattern
       final Timetable timetable = pattern.getScheduledTimetable();
       final int tripIndex = timetable.getTripIndex(tripId);
       if (tripIndex == -1) {
-        warn(feedId, tripId, "Could not cancel scheduled trip because it's not in the timetable");
+        warn(tripId, "Could not cancel scheduled trip because it's not in the timetable");
       } else {
         final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
         newTripTimes.cancelTrip();
@@ -904,7 +889,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final Map<FeedScopedId, Integer> serviceCodes,
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
-    final String feedId,
+    final FeedScopedId tripId,
     final ServiceDate serviceDate
   ) {
     // Preconditions
@@ -919,41 +904,37 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
 
     // Check whether trip id already exists in graph
-    String tripId = tripDescriptor.getTripId();
-    Trip trip = getTripForTripId(feedId, tripId);
-
-    Consumer<String> warn = (String message) ->
-      TimetableSnapshotSource.warn(feedId, tripId, message);
+    Trip trip = getTripForTripId(tripId);
 
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
-      warn.accept("Feed does not contain trip id of MODIFIED trip, skipping.");
+      warn(tripId, "Feed does not contain trip id of MODIFIED trip, skipping.");
       return false;
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      warn.accept("MODIFIED trip doesn't have a start date in TripDescriptor, skipping.");
+      warn(tripId, "REPLACEMENT trip doesn't have a start date in TripDescriptor, skipping.");
       return false;
     } else {
       // Check whether service date is served by trip
       final Set<FeedScopedId> serviceIds = calendarService.getServiceIdsOnDate(serviceDate);
       if (!serviceIds.contains(trip.getServiceId())) {
         // TODO: should we support this and change service id of trip?
-        warn.accept("MODIFIED trip has a service date that is not served by trip, skipping.");
+        warn(tripId, "REPLACEMENT trip has a service date that is not served by trip, skipping.");
         return false;
       }
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      warn.accept("MODIFIED trip has less then two stops, skipping.");
+      warn(tripId, "REPLACEMENT trip has less then two stops, skipping.");
       return false;
     }
 
     // Check whether all stop times are available and all stops exist
-    var stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
+    var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
     if (stops == null) {
       return false;
     }
@@ -969,13 +950,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       trip,
       tripUpdate,
       stops,
-      feedId,
       serviceDate
     );
   }
 
   /**
-   * Handle GTFS-RT TripUpdate message containing a MODIFIED trip.
+   * Handle GTFS-RT TripUpdate message containing a REPLACEMENT trip.
    *
    * @param deduplicator deduplicator for different types
    * @param graphIndex   graph's index
@@ -993,7 +973,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final Trip trip,
     final TripUpdate tripUpdate,
     final List<StopLocation> stops,
-    final String feedId,
     final ServiceDate serviceDate
   ) {
     // Preconditions
@@ -1004,13 +983,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Cancel scheduled trip
+    var tripId = trip.getId();
+    cancelScheduledTrip(tripId, serviceDate);
 
-    final String tripId = tripUpdate.getTrip().getTripId();
-    cancelScheduledTrip(feedId, tripId, serviceDate);
-
-    // Check whether trip id has been used for previously ADDED/MODIFIED trip message and cancel
+    // Check whether trip id has been used for previously ADDED/REPLACEMENT trip message and cancel
     // previously created trip
-    cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
+    cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     // Add new trip
     return addTripToGraphAndBuffer(
@@ -1025,23 +1003,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
   }
 
-  private boolean handleCanceledTrip(
-    final TripDescriptor tripDescriptor,
-    final String feedId,
-    final ServiceDate serviceDate
-  ) {
+  private boolean handleCanceledTrip(FeedScopedId tripId, final ServiceDate serviceDate) {
     // Try to cancel scheduled trip
-    final String tripId = tripDescriptor.getTripId();
-    final boolean cancelScheduledSuccess = cancelScheduledTrip(feedId, tripId, serviceDate);
+    final boolean cancelScheduledSuccess = cancelScheduledTrip(tripId, serviceDate);
 
     // Try to cancel previously added trip
-    final boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(
-      new FeedScopedId(feedId, tripId),
-      serviceDate
-    );
+    final boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     if (!cancelScheduledSuccess && !cancelPreviouslyAddedSuccess) {
-      warn(feedId, tripId, "No pattern found for tripId. Skipping cancellation.");
+      warn(tripId, "No pattern found for tripId. Skipping cancellation.");
       return false;
     }
     return true;
@@ -1065,48 +1035,41 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Retrieve a trip pattern given a feed id and trip id.
+   * Retrieve a trip pattern given a trip id.
    *
-   * @param feedId feed id for the trip id
-   * @param tripId trip id without agency
+   * @param tripId trip id
    * @return trip pattern or null if no trip pattern was found
    */
-  private TripPattern getPatternForTripId(String feedId, String tripId) {
-    Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
+  private TripPattern getPatternForTripId(FeedScopedId tripId) {
+    Trip trip = routingService.getTripForId().get(tripId);
     return routingService.getPatternForTrip().get(trip);
   }
 
   /**
    * Retrieve route given a route id without an agency
    *
-   * @param feedId  feed id for the route id
-   * @param routeId route id without the agency
    * @return route or null if route can't be found in graph index
    */
-  private Route getRouteForRouteId(String feedId, String routeId) {
-    return routingService.getRouteForId(new FeedScopedId(feedId, routeId));
+  private Route getRouteForRouteId(FeedScopedId routeId) {
+    return routingService.getRouteForId(routeId);
   }
 
   /**
    * Retrieve trip given a trip id without an agency
    *
-   * @param feedId feed id for the trip id
-   * @param tripId trip id without the agency
    * @return trip or null if trip can't be found in graph index
    */
-  private Trip getTripForTripId(String feedId, String tripId) {
-    return routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
+  private Trip getTripForTripId(FeedScopedId tripId) {
+    return routingService.getTripForId().get(tripId);
   }
 
   /**
    * Retrieve stop given a feed id and stop id.
    *
-   * @param feedId feed id for the stop id
-   * @param stopId trip id without the agency
    * @return stop or null if stop doesn't exist
    */
-  private StopLocation getStopForStopId(String feedId, String stopId) {
-    return routingService.getStopForId(new FeedScopedId(feedId, stopId));
+  private StopLocation getStopForStopId(FeedScopedId stopId) {
+    return routingService.getStopForId(stopId);
   }
 
   private static void warn(FeedScopedId id, String message, Object... params) {
