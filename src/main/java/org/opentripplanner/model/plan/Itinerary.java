@@ -5,18 +5,13 @@ import static java.util.Locale.ROOT;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import jdk.jfr.Experimental;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.rutebanken.netex.model.FlooringTypeEnumeration;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
