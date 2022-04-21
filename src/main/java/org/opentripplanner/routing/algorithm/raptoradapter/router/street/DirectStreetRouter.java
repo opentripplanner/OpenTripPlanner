@@ -51,7 +51,7 @@ public class DirectStreetRouter {
         router.graph.ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(response, routingContext);
+      ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
       return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();

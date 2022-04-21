@@ -101,11 +101,17 @@ public class Itinerary {
    * -1 indicate that the cost is not set/computed.
    */
   public int transferPriorityCost = -1;
+
   /**
-   * This itinerary has a greater slope than the user requested (but there are no possible
-   * itineraries with a good slope).
+   * This itinerary has a greater slope than the user requested.
    */
   public boolean tooSloped = false;
+
+  /**
+   * The maximum slope for any part of the itinerary.
+   */
+  public Double maxSlope = null;
+
   /**
    * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.

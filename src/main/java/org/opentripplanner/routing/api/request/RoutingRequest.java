@@ -257,6 +257,13 @@ public class RoutingRequest implements Cloneable, Serializable {
   public int numItineraries = 50;
   /** The maximum slope of streets for wheelchair trips. */
   public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+
+  /**
+   * What penalty factor should be given to street edges, which are over the max slope.
+   * Set to negative for disable routing on too steep edges.
+   */
+  public double wheelchairSlopeTooSteepCostFactor = 10.0;
+
   /** Whether the planner should return intermediate stops lists for transit legs. */
   public boolean showIntermediateStops = false;
   /**
