@@ -592,7 +592,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return Optional
       .ofNullable(tripUpdate.getTrip())
       .map(TripDescriptor::getTripId)
-      .filter(String::isBlank)
+      .filter(id -> !id.isBlank())
       .map(tId -> new FeedScopedId(feedId, tId))
       .orElse(new FeedScopedId(feedId, "null"));
   }
