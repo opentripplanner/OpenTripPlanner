@@ -349,7 +349,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final FeedScopedId tripId,
     final ServiceDate serviceDate
   ) {
-    // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
     final TripPattern pattern = getPatternForTripId(tripId);
 
     if (pattern == null) {
@@ -1045,7 +1044,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Retrieve route given a route id without an agency
+   * Retrieve route given a route id
    *
    * @return route or null if route can't be found in graph index
    */
@@ -1054,7 +1053,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Retrieve trip given a trip id without an agency
+   * Retrieve trip given a trip id
    *
    * @return trip or null if trip can't be found in graph index
    */
@@ -1063,7 +1062,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Retrieve stop given a feed id and stop id.
+   * Retrieve stop given a stop id.
    *
    * @return stop or null if stop doesn't exist
    */
