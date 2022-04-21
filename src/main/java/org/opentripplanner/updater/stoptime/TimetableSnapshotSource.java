@@ -183,11 +183,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           tripUpdate = tripUpdate.toBuilder().setTrip(trip).build();
         }
 
-        var tripId = Optional
-          .ofNullable(tripUpdate.getTrip())
-          .map(TripDescriptor::getTripId)
-          .map(tId -> new FeedScopedId(feedId, tId))
-          .orElse(new FeedScopedId(feedId, "null"));
+        FeedScopedId tripId = getFeedScopedId(feedId, tripUpdate);
 
         if (!tripUpdate.hasTrip()) {
           warn(tripId, "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
@@ -515,13 +511,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     Long previousTime = null;
     final List<StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList();
     final List<StopLocation> stops = new ArrayList<>(stopTimeUpdates.size());
-    var tripId = Optional
-      .ofNullable(tripUpdate.getTrip())
-      .map(TripDescriptor::getTripId)
-      .map(tId -> new FeedScopedId(feedId, tId))
-      .orElse(new FeedScopedId(feedId, "null"));
 
-    Consumer<String> warn = (String message) -> TimetableSnapshotSource.warn(tripId, message);
+    FeedScopedId tripId = getFeedScopedId(feedId, tripUpdate);
 
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
       final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
@@ -532,13 +523,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Check non-negative
         if (stopSequence < 0) {
-          warn.accept("Trip update contains negative stop sequence, skipping.");
+          warn(tripId, "Trip update contains negative stop sequence, skipping.");
           return null;
         }
 
         // Check whether sequence is increasing
         if (previousStopSequence != null && previousStopSequence > stopSequence) {
-          warn.accept("Trip update contains decreasing stop sequence, skipping.");
+          warn(tripId, "Trip update contains decreasing stop sequence, skipping.");
           return null;
         }
         previousStopSequence = stopSequence;
@@ -571,12 +562,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getArrival().getTime();
         if (previousTime != null && previousTime > time) {
-          warn.accept("Trip update contains decreasing times, skipping.");
+          warn(tripId, "Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        warn.accept("Trip update misses arrival time, skipping.");
+        warn(tripId, "Trip update misses arrival time, skipping.");
         return null;
       }
 
@@ -585,16 +576,25 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getDeparture().getTime();
         if (previousTime != null && previousTime > time) {
-          warn.accept("Trip update contains decreasing times, skipping.");
+          warn(tripId, "Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        warn.accept("Trip update misses departure time, skipping.");
+        warn(tripId, "Trip update misses departure time, skipping.");
         return null;
       }
     }
     return stops;
+  }
+
+  private FeedScopedId getFeedScopedId(String feedId, TripUpdate tripUpdate) {
+    return Optional
+      .ofNullable(tripUpdate.getTrip())
+      .map(TripDescriptor::getTripId)
+      .filter(String::isBlank)
+      .map(tId -> new FeedScopedId(feedId, tId))
+      .orElse(new FeedScopedId(feedId, "null"));
   }
 
   /**
