@@ -100,6 +100,8 @@ public class RoutingRequestMapper {
       c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
     request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
     request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
+    request.wheelchairSlopeTooSteepCostFactor =
+      c.asDouble("wheelchairSlopeTooSteepCostFactor", dft.wheelchairSlopeTooSteepCostFactor);
     request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes);
     request.nonpreferredTransferCost =
       c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);

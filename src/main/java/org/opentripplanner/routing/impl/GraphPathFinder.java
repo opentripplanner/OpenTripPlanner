@@ -96,33 +96,7 @@ public class GraphPathFinder {
     RoutingRequest request = routingContext.opt;
     Instant reqTime = request.getDateTime().truncatedTo(ChronoUnit.MILLIS);
 
-    // We used to perform a protective clone of the RoutingRequest here.
-    // There is no reason to do this if we don't modify the request.
-    // Any code that changes them should be performing the copy!
-
-    List<GraphPath> paths;
-    try {
-      paths = getPaths(routingContext);
-      if (paths == null && routingContext.opt.wheelchairAccessibility.enabled()) {
-        // There are no paths that meet the user's slope restrictions.
-        // Try again without slope restrictions, and warn the user in the response.
-        RoutingRequest relaxedRequest = request.clone();
-        relaxedRequest.maxWheelchairSlope = Double.MAX_VALUE;
-        routingContext.slopeRestrictionRemoved = true;
-        var relaxedContext = new RoutingContext(
-          relaxedRequest,
-          routingContext.graph,
-          routingContext.fromVertices,
-          routingContext.toVertices
-        );
-        paths = getPaths(relaxedContext);
-      }
-    } catch (RoutingValidationException e) {
-      if (e.getRoutingErrors().get(0).code.equals(RoutingErrorCode.LOCATION_NOT_FOUND)) LOG.info(
-        "Vertex not found: " + request.from + " : " + request.to
-      );
-      throw e;
-    }
+    List<GraphPath> paths = getPaths(routingContext);
 
     // Detect and report that most obnoxious of bugs: path reversal asymmetry.
     // Removing paths might result in an empty list, so do this check before the empty list check.

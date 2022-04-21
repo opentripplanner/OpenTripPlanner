@@ -17,6 +17,8 @@ public class AllowedTransitMode {
 
   private final String subMode;
 
+  private static final String UNKNOWN = "unknown";
+
   public AllowedTransitMode(TransitMode mainMode, String subMode) {
     this.mainMode = mainMode;
     this.subMode = subMode;
@@ -51,7 +53,12 @@ public class AllowedTransitMode {
    * Check if this filter allows the provided TransitMode
    */
   public boolean allows(TransitMode transitMode, String netexSubMode) {
-    return mainMode == transitMode && (subMode == null || subMode.equals(netexSubMode));
+    boolean mainModeMatch = mainMode == transitMode;
+    boolean submodeMatch =
+      subMode == null ||
+      subMode.equals(netexSubMode) ||
+      (UNKNOWN.equals(subMode) && netexSubMode == null);
+    return mainModeMatch && submodeMatch;
   }
 
   public TransitMode getMainMode() {
