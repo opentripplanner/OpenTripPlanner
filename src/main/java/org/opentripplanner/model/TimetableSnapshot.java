@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -417,52 +416,6 @@ public class TimetableSnapshot {
     @Override
     public int compare(Timetable t1, Timetable t2) {
       return t1.getServiceDate().compareTo(t2.getServiceDate());
-    }
-  }
-
-  /**
-   * Class to use as key in HashMap containing feed id, trip id and service date
-   * TODO shouldn't this be a static class?
-   */
-  public static class TripIdAndServiceDate {
-
-    private final FeedScopedId tripId;
-    private final ServiceDate serviceDate;
-
-    public TripIdAndServiceDate(final FeedScopedId tripId, final ServiceDate serviceDate) {
-      this.tripId = tripId;
-      this.serviceDate = serviceDate;
-    }
-
-    public FeedScopedId getTripId() {
-      return tripId;
-    }
-
-    public ServiceDate getServiceDate() {
-      return serviceDate;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(tripId, serviceDate);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (obj == null) {
-        return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
-      return (
-        Objects.equals(this.tripId, other.tripId) &&
-        Objects.equals(this.serviceDate, other.serviceDate)
-      );
     }
   }
 }

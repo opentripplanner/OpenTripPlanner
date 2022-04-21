@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot.TripIdAndServiceDate;
+import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
