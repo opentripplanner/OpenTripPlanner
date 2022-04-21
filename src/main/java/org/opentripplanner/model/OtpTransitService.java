@@ -77,4 +77,10 @@ public interface OtpTransitService {
   Collection<Trip> getAllTrips();
 
   Collection<FlexTrip> getAllFlexTrips();
+
+  /**
+   * @return if transit service has any active services. The graph build might filter out all
+   * transit services if they are outside the configured 'transitServiceStart' and 'transitServiceEnd'
+   */
+  boolean hasActiveTransit();
 }
