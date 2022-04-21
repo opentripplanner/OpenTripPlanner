@@ -106,6 +106,8 @@ public class RoutingRequestMapper {
           ? Duration.ofSeconds(c.asLong("maxDirectStreetDurationSeconds"))
           : dft.maxDirectStreetDuration
       );
+    request.maxDirectStreetDurationForMode =
+      c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
     request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
     request.wheelchairSlopeTooSteepCostFactor =

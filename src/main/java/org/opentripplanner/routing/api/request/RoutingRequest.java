@@ -122,6 +122,13 @@ public class RoutingRequest implements Cloneable, Serializable {
    * @see ItineraryListFilter
    */
   public Duration maxDirectStreetDuration = Duration.ofHours(4);
+
+  /**
+   * Override the settings in maxDirectStreetDuration for specific street modes. This is done
+   * because some street modes searches are much more resource intensive than others.
+   */
+  public Map<StreetMode, Duration> maxDirectStreetDurationForMode = new HashMap<>();
+
   /**
    * This is the maximum duration for access/egress street searches. This is a performance limit and
    * should therefore be set high. Results close to the limit are not guaranteed to be optimal.
@@ -1264,6 +1271,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
   public Duration getMaxAccessEgressDuration(StreetMode mode) {
     return maxAccessEgressDurationForMode.getOrDefault(mode, maxAccessEgressDuration);
+  }
+
+  public Duration getMaxDirectStreetDuration(StreetMode mode) {
+    return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
   }
 
   /** Check if route is preferred according to this request. */

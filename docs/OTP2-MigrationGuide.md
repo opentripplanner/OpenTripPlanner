@@ -188,6 +188,7 @@ permanently from OTP2, but may require some development to support valid importa
   off takes place. Since 2.1
 - `maxAccessEgressDurationForMode` Limit access/egress per street mode. Since 2.2
   - This was called `maxAccessEgressDurationSecondsForMode` between 2.0 and 2.2
+- `maxDirectStreetDurationForMode` Limit direct route duration per street mode. Since 2.2
 - `parkAndRideDurationRatio` Filter for park and ride with long walk. Since 2.1
 - `requiredVehicleParkingTags` and `bannedVehicleParkingTags`. Since 2.1
 - `searchWindow` Limit the departure window or arrival window for the routing search. Since 2.0

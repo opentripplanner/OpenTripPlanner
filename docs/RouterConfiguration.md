@@ -200,6 +200,21 @@ some street modes searches are much more resource intensive than others.
 This will limit only the BIKE_RENTAL mode to 1200 seconds, while keeping the default limit for all
 other access/egress modes.
 
+## maxDirectStreetDurationForMode
+
+Override the settings in maxDirectStreetDurationForMode for specific street modes. This is done 
+because some street modes searches are much more resource intensive than others.
+
+```JSON
+// router-config.json
+"maxDirectStreetDurationForMode": {
+  "CAR": "12h"
+}
+```
+
+This will limit extend the CAR mode to 12 hours, while keeping the default limit for all other 
+direct street modes.
+
 ## Logging incoming requests
 
 You can log some characteristics of trip planning requests in a file for later analysis. Some
