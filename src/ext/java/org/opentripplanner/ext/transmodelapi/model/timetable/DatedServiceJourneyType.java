@@ -38,7 +38,7 @@ public class DatedServiceJourneyType {
           .type(gqlUtil.dateScalar)
           .dataFetcher(environment ->
             Optional
-              .ofNullable(tripOnServiceDate(environment))
+              .of(tripOnServiceDate(environment))
               .map(TripOnServiceDate::getServiceDate)
               .map(ServiceDate::toLocalDate)
               .orElse(null)

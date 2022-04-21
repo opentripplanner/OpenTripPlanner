@@ -272,7 +272,7 @@ public class EstimatedCallType {
           .description("The date the estimated call is valid for.")
           .dataFetcher(environment ->
             Optional
-              .ofNullable(environment.getSource())
+              .of(environment.getSource())
               .map(TripTimeOnDate.class::cast)
               .map(TripTimeOnDate::getServiceDay)
               .map(ServiceDate::toLocalDate)

@@ -329,7 +329,7 @@ public class LegType {
           .type(gqlUtil.dateScalar)
           .dataFetcher(environment ->
             Optional
-              .ofNullable((Leg) environment.getSource())
+              .of((Leg) environment.getSource())
               .map(Leg::getServiceDate)
               .map(ServiceDate::toLocalDate)
               .orElse(null)

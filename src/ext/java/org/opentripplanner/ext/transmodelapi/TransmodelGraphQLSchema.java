@@ -1223,7 +1223,7 @@ public class TransmodelGraphQLSchema {
 
             var activeServiceDates = Optional
               .ofNullable(activeDates)
-              .orElse(emptyList())
+              .orElse(List.of())
               .stream()
               .map(ServiceDate::new)
               .toList();

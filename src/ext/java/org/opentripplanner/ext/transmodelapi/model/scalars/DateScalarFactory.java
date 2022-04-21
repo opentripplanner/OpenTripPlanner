@@ -25,7 +25,7 @@ public class DateScalarFactory {
       .name("Date")
       .description(DOCUMENTATION)
       .coercing(
-        new Coercing<>() {
+        new Coercing<LocalDate, String>() {
           @Override
           public String serialize(Object input) throws CoercingSerializeException {
             if (input instanceof LocalDate) {
