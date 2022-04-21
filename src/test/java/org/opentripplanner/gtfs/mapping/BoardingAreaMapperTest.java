@@ -14,7 +14,8 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.TranslationHelper;
 
-public class BoardingAreaMapperTest  {
+public class BoardingAreaMapperTest {
+
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "B1");
 
   private static final String CODE = "Code";
@@ -40,6 +41,7 @@ public class BoardingAreaMapperTest  {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
+  private final BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_BOARDING_AREA);
@@ -56,8 +58,6 @@ public class BoardingAreaMapperTest  {
     STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING.gtfsCode);
     STOP.setZoneId(ZONE_ID);
   }
-
-  private BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() {

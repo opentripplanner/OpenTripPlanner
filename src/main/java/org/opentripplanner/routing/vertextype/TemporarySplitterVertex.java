@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * TODO: decide what to do with this. Currently temporary vertices have only incoming or outgoing edges
@@ -12,38 +10,43 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class TemporarySplitterVertex extends SplitterVertex implements TemporaryVertex {
 
-    private boolean wheelchairAccessible;
+  private final boolean endVertex;
+  private boolean wheelchairAccessible;
 
-    final private boolean endVertex;
+  public TemporarySplitterVertex(
+    String label,
+    double x,
+    double y,
+    StreetEdge streetEdge,
+    boolean endVertex
+  ) {
+    super(null, label, x, y);
+    this.endVertex = endVertex;
+    this.wheelchairAccessible = streetEdge.isWheelchairAccessible();
+  }
 
-    public TemporarySplitterVertex(String label, double x, double y, StreetEdge streetEdge, boolean endVertex) {
-        super(null, label, x, y);
-        this.endVertex = endVertex;
-        this.wheelchairAccessible = streetEdge.isWheelchairAccessible();
-    }
+  @Override
+  public void addOutgoing(Edge edge) {
+    // Removed check for edge being temporary
+    super.addOutgoing(edge);
+  }
 
-    @Override
-    public void addIncoming(Edge edge) {
-        // Removed check for edge being temporary
-        super.addIncoming(edge);
-    }
+  @Override
+  public void addIncoming(Edge edge) {
+    // Removed check for edge being temporary
+    super.addIncoming(edge);
+  }
 
-    @Override
-    public void addOutgoing(Edge edge) {
-        // Removed check for edge being temporary
-        super.addOutgoing(edge);
-    }
+  @Override
+  public boolean isEndVertex() {
+    return endVertex;
+  }
 
-    @Override
-    public boolean isEndVertex() {
-        return endVertex;
-    }
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
+  }
 
-    public boolean isWheelchairAccessible() {
-        return wheelchairAccessible;
-    }
-
-    public void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
+  public void setWheelchairAccessible(boolean wheelchairAccessible) {
+    this.wheelchairAccessible = wheelchairAccessible;
+  }
 }

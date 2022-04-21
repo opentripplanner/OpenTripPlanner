@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -45,19 +45,19 @@ public final class Stop extends StationElement implements StopLocation {
   private HashSet<BoardingArea> boardingAreas;
 
   public Stop(
-      FeedScopedId id,
-      I18NString name,
-      String code,
-      String description,
-      WgsCoordinate coordinate,
-      WheelChairBoarding wheelchairBoarding,
-      StopLevel level,
-      String platformCode,
-      Collection<FareZone> fareZones,
-      I18NString url,
-      TimeZone timeZone,
-      TransitMode vehicleType,
-      String netexSubmode
+    FeedScopedId id,
+    I18NString name,
+    String code,
+    String description,
+    WgsCoordinate coordinate,
+    WheelChairBoarding wheelchairBoarding,
+    StopLevel level,
+    String platformCode,
+    Collection<FareZone> fareZones,
+    I18NString url,
+    TimeZone timeZone,
+    TransitMode vehicleType,
+    String netexSubmode
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
     this.platformCode = platformCode;
@@ -68,30 +68,73 @@ public final class Stop extends StationElement implements StopLocation {
     this.netexSubmode = netexSubmode;
   }
 
-  /** @see #stopForTest(String, double, double, Station) */
-  public static Stop stopForTest(String idAndName, double lat, double lon) {
-    return stopForTest(idAndName, lat, lon, null);
+  public static Stop stopForTest(
+    String idAndName,
+    WheelChairBoarding wheelChairBoarding,
+    double lat,
+    double lon
+  ) {
+    return stopForTest(idAndName, null, lat, lon, null, wheelChairBoarding);
   }
 
-    /**
-     * Create a minimal Stop object for unit-test use, where the test only care about id, name and
-     * coordinate. The feedId is static set to "F"
-     */
+  /**
+   * @see #stopForTest(String, double, double, Station)
+   */
+  public static Stop stopForTest(String idAndName, double lat, double lon) {
+    return stopForTest(idAndName, null, lat, lon, null);
+  }
+
+  /**
+   * @see #stopForTest(String, double, double, Station)
+   */
+  public static Stop stopForTest(String idAndName, String desc, double lat, double lon) {
+    return stopForTest(idAndName, desc, lat, lon, null);
+  }
+
+  /**
+   * Create a minimal Stop object for unit-test use, where the test only care about id, name and
+   * coordinate. The feedId is static set to "F"
+   */
   public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
+    return stopForTest(idAndName, null, lat, lon, parent);
+  }
+
+  public static Stop stopForTest(
+    String idAndName,
+    String desc,
+    double lat,
+    double lon,
+    Station parent
+  ) {
+    return stopForTest(idAndName, desc, lat, lon, parent, null);
+  }
+
+  /**
+   * Create a minimal Stop object for unit-test use, where the test only care about id, name,
+   * description and coordinate. The feedId is static set to "F"
+   */
+  public static Stop stopForTest(
+    String idAndName,
+    String desc,
+    double lat,
+    double lon,
+    Station parent,
+    WheelChairBoarding wheelChairBoarding
+  ) {
     var stop = new Stop(
-        new FeedScopedId("F", idAndName),
-        new NonLocalizedString(idAndName),
-        idAndName,
-        null,
-        new WgsCoordinate(lat, lon),
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+      new FeedScopedId("F", idAndName),
+      new NonLocalizedString(idAndName),
+      idAndName,
+      desc,
+      new WgsCoordinate(lat, lon),
+      wheelChairBoarding,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
     stop.setParentStation(parent);
     return stop;
@@ -109,33 +152,21 @@ public final class Stop extends StationElement implements StopLocation {
     return "<Stop " + getId() + ">";
   }
 
-  public String getPlatformCode() {
-    return platformCode;
-  }
-
   public I18NString getUrl() {
     return url;
   }
 
-  public TimeZone getTimeZone() {
-    return timeZone;
+  public String getPlatformCode() {
+    return platformCode;
   }
 
   public TransitMode getVehicleType() {
     return vehicleType;
   }
 
-  public Collection<BoardingArea> getBoardingAreas() {
-    return boardingAreas != null ? boardingAreas : Collections.emptySet();
-  }
-
-  /**
-   * Get the transfer cost priority for Stop. This will fetch the value from the parent
-   * [if parent exist] or return the default value.
-   */
-  @NotNull
-  public StopTransferPriority getPriority() {
-    return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
+  @Override
+  public String getVehicleSubmode() {
+    return netexSubmode;
   }
 
   public Collection<FareZone> getFareZones() {
@@ -147,8 +178,20 @@ public final class Stop extends StationElement implements StopLocation {
     return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
   }
 
-  @Override
-  public String getVehicleSubmode() {
-    return netexSubmode;
+  public TimeZone getTimeZone() {
+    return timeZone;
+  }
+
+  /**
+   * Get the transfer cost priority for Stop. This will fetch the value from the parent [if parent
+   * exist] or return the default value.
+   */
+  @NotNull
+  public StopTransferPriority getPriority() {
+    return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
+  }
+
+  public Collection<BoardingArea> getBoardingAreas() {
+    return boardingAreas != null ? boardingAreas : Collections.emptySet();
   }
 }

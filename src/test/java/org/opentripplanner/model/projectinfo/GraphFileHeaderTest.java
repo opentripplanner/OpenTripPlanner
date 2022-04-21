@@ -1,13 +1,14 @@
 package org.opentripplanner.model.projectinfo;
 
-import org.junit.Test;
-import org.opentripplanner.util.OtpAppException;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.projectinfo.GraphFileHeader.CHARSET;
 
+import org.junit.Test;
+import org.opentripplanner.util.OtpAppException;
+
 public class GraphFileHeaderTest {
+
   private static final String HEADER = "OpenTripPlannerGraph;000000A;";
   private static final byte[] HEADER_BYTES = HEADER.getBytes(CHARSET);
   private static final GraphFileHeader SUBJECT = new GraphFileHeader("A");
@@ -30,7 +31,7 @@ public class GraphFileHeaderTest {
   @Test(expected = OtpAppException.class)
   public void parseIllegalId() {
     String illegalVersionId = "€€€€€€";
-    byte[] header = ("OpenTripPlannerGraph;"+ illegalVersionId +";").getBytes(CHARSET);
+    byte[] header = ("OpenTripPlannerGraph;" + illegalVersionId + ";").getBytes(CHARSET);
     GraphFileHeader.parse(header);
   }
 
@@ -54,7 +55,6 @@ public class GraphFileHeaderTest {
     assertEquals("000000A", SUBJECT.otpSerializationVersionIdPadded());
   }
 
-
   @Test
   public void asString() {
     assertEquals("OpenTripPlannerGraph;000000A;", SUBJECT.asString());
@@ -62,10 +62,7 @@ public class GraphFileHeaderTest {
 
   @Test
   public void testToString() {
-    assertEquals(
-        "OpenTripPlannerGraph;000000A;",
-        SUBJECT.toString()
-    );
+    assertEquals("OpenTripPlannerGraph;000000A;", SUBJECT.toString());
   }
 
   @Test
@@ -83,8 +80,8 @@ public class GraphFileHeaderTest {
     assertEquals("<empty>", GraphFileHeader.prettyBytesToString(null));
     assertEquals("<empty>", GraphFileHeader.prettyBytesToString(new byte[0]));
     assertEquals(
-        "41 6C 66 61 2D 31  \"Alfa-1\"",
-        GraphFileHeader.prettyBytesToString(new byte[]{'A', 'l', 'f', 'a', '-', '1'})
+      "41 6C 66 61 2D 31  \"Alfa-1\"",
+      GraphFileHeader.prettyBytesToString(new byte[] { 'A', 'l', 'f', 'a', '-', '1' })
     );
   }
 }

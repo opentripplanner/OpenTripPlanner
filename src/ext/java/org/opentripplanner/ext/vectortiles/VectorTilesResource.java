@@ -1,20 +1,15 @@
 package org.opentripplanner.ext.vectortiles;
 
-
 import com.wdtinc.mapbox_vector_tile.VectorTile;
-import org.geotools.geometry.Envelope2D;
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.WebMercatorTile;
-import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
-import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
-import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.VectorTileConfig;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.util.WorldEnvelope;
-
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -25,21 +20,25 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import org.geotools.geometry.Envelope2D;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.common.geometry.WebMercatorTile;
+import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.VectorTileConfig;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.WorldEnvelope;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
-  enum LayerType {Stop, Station, VehicleRental, VehicleParking}
 
-  static Map<LayerType, BiFunction<Graph, LayerParameters, LayerBuilder>> layers = new HashMap<>();
+  private static final Map<LayerType, BiFunction<Graph, LayerParameters, LayerBuilder>> layers = new HashMap<>();
+  private final OTPServer otpServer;
+  private final String ignoreRouterId;
 
   static {
     layers.put(LayerType.Stop, StopsLayerBuilder::new);
@@ -48,24 +47,26 @@ public class VectorTilesResource {
     layers.put(LayerType.VehicleParking, VehicleParkingsLayerBuilder::new);
   }
 
-  @Context
-  private OTPServer otpServer;
-
-  /**
-   * @deprecated The support for multiple routers are removed from OTP2.
-   * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-   */
-  @Deprecated @PathParam("ignoreRouterId")
-  private String ignoreRouterId;
+  public VectorTilesResource(
+    @Context OTPServer otpServer,
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+  ) {
+    this.otpServer = otpServer;
+    this.ignoreRouterId = ignoreRouterId;
+  }
 
   @GET
   @Path("/{layers}/{z}/{x}/{y}.pbf")
   @Produces("application/x-protobuf")
   public Response tileGet(
-      @PathParam("x") int x,
-      @PathParam("y") int y,
-      @PathParam("z") int z,
-      @PathParam("layers") String requestedLayers
+    @PathParam("x") int x,
+    @PathParam("y") int y,
+    @PathParam("z") int z,
+    @PathParam("layers") String requestedLayers
   ) throws Exception {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
 
@@ -82,15 +83,18 @@ public class VectorTilesResource {
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
     for (LayerParameters layerParameters : router.routerConfig.vectorTileLayers().layers()) {
-      if (layers.contains(layerParameters.name())
-          && layerParameters.minZoom() <= z
-          && z <= layerParameters.maxZoom()
+      if (
+        layers.contains(layerParameters.name()) &&
+        layerParameters.minZoom() <= z &&
+        z <= layerParameters.maxZoom()
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
-        mvtBuilder.addLayers(VectorTilesResource.layers
+        mvtBuilder.addLayers(
+          VectorTilesResource.layers
             .get(LayerType.valueOf(layerParameters.type()))
             .apply(router.graph, layerParameters)
-            .build(envelope, layerParameters));
+            .build(envelope, layerParameters)
+        );
       }
     }
 
@@ -100,20 +104,20 @@ public class VectorTilesResource {
     }
     byte[] bytes = mvtBuilder.build().toByteArray();
     return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(bytes).build();
-  };
+  }
 
   @GET
   @Path("/{layers}/tilejson.json")
   @Produces(MediaType.APPLICATION_JSON)
   public TileJson getTileJson(
-      @Context UriInfo uri,
-      @Context HttpHeaders headers,
-      @PathParam("layers") String requestedLayers
+    @Context UriInfo uri,
+    @Context HttpHeaders headers,
+    @PathParam("layers") String requestedLayers
   ) {
     return new TileJson(otpServer.getRouter().graph, uri, headers, requestedLayers);
   }
 
-  private String getBaseAddress(UriInfo uri, HttpHeaders headers, String layers) {
+  private String getBaseAddress(UriInfo uri, HttpHeaders headers) {
     String protocol;
     if (headers.getRequestHeader("X-Forwarded-Proto") != null) {
       protocol = headers.getRequestHeader("X-Forwarded-Proto").get(0);
@@ -122,7 +126,7 @@ public class VectorTilesResource {
     }
 
     String host;
-    if (headers.getRequestHeader("X-Forwarded-Host") != null ) {
+    if (headers.getRequestHeader("X-Forwarded-Host") != null) {
       host = headers.getRequestHeader("X-Forwarded-Host").get(0);
     } else if (headers.getRequestHeader("Host") != null) {
       host = headers.getRequestHeader("Host").get(0);
@@ -130,10 +134,38 @@ public class VectorTilesResource {
       host = uri.getBaseUri().getHost() + ":" + uri.getBaseUri().getPort();
     }
 
-    return protocol + "://" +  host;
+    return protocol + "://" + host;
+  }
+
+  enum LayerType {
+    Stop,
+    Station,
+    VehicleRental,
+    VehicleParking,
+  }
+
+  public interface LayersParameters {
+    List<LayerParameters> layers();
+  }
+
+  public interface LayerParameters {
+    String name();
+
+    String type();
+
+    String mapper();
+
+    int maxZoom();
+
+    int minZoom();
+
+    int cacheMaxSeconds();
+
+    double expansionFactor();
   }
 
   private class TileJson implements Serializable {
+
     public final String tilejson = "2.2.0";
     public final String name = "OpenTripPlanner";
     public final String attribution;
@@ -145,56 +177,42 @@ public class VectorTilesResource {
     public final double[] center;
 
     private TileJson(Graph graph, UriInfo uri, HttpHeaders headers, String layers) {
-      attribution = graph
+      attribution =
+        graph
           .getFeedIds()
           .stream()
           .map(graph::getFeedInfo)
           .filter(Predicate.not(Objects::isNull))
           .map(feedInfo ->
-              "<a href='"
-                  + feedInfo.getPublisherUrl()
-                  + "'>"
-                  + feedInfo.getPublisherName()
-                  + "</a>"
+            "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
           )
           .collect(Collectors.joining(", "));
 
-      tiles = new String[]{
-              getBaseAddress(uri, headers, layers)
-                      + "/otp/routers/"
-                      + ignoreRouterId
-                      + "/vectorTiles/"
-                      + layers
-                      + "/{z}/{x}/{y}.pbf"
-      };
+      tiles =
+        new String[] {
+          getBaseAddress(uri, headers) +
+          "/otp/routers/" +
+          ignoreRouterId +
+          "/vectorTiles/" +
+          layers +
+          "/{z}/{x}/{y}.pbf",
+        };
 
       WorldEnvelope envelope = graph.getEnvelope();
 
-      bounds = new double[]{
+      bounds =
+        new double[] {
           envelope.getLowerLeftLongitude(),
           envelope.getLowerLeftLatitude(),
           envelope.getUpperRightLongitude(),
-          envelope.getUpperRightLatitude()
-      };
+          envelope.getUpperRightLatitude(),
+        };
 
-      center = graph
+      center =
+        graph
           .getCenter()
-          .map(coordinate -> new double[]{coordinate.x, coordinate.y, 9})
+          .map(coordinate -> new double[] { coordinate.x, coordinate.y, 9 })
           .orElse(null);
     }
-  }
-
-  public interface LayersParameters {
-    List<LayerParameters> layers();
-  }
-
-  public interface LayerParameters {
-    String name();
-    String type();
-    String mapper();
-    int maxZoom();
-    int minZoom();
-    int cacheMaxSeconds();
-    double expansionFactor();
   }
 }

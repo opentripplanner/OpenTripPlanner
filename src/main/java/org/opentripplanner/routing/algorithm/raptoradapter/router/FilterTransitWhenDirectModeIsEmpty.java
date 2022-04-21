@@ -1,16 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
-
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 /**
  * <p>
  * In OTP the street search and transit search is done as to separate searches. The results is then
- * merged and filtered to remove none optimal itineraries. But, when the client do NOT provide
- * a ´directMode´, OTP do not do the streetSearch. And, the removal of none optimal results is not
- * done, there is not street results to use to prune bad transit results with. In other words OTP
- * is forced to return at least one itinerary with at least one transit leg. So, instead of walking
+ * merged and filtered to remove none optimal itineraries. But, when the client do NOT provide a
+ * ´directMode´, OTP do not do the streetSearch. And, the removal of none optimal results is not
+ * done, there is not street results to use to prune bad transit results with. In other words OTP is
+ * forced to return at least one itinerary with at least one transit leg. So, instead of walking
  * maybe 100 meters, the OTP suggest you need to walk to the closest buss stop, take the bus one
  * stop and walk back, oten with more walking than just those 100 meters.
  * <p>
@@ -52,6 +51,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
  * NOT: {@code Origin ~ Walk 120m ~ Destination }
  */
 public class FilterTransitWhenDirectModeIsEmpty {
+
   private final StreetMode originalDirectMode;
 
   public FilterTransitWhenDirectModeIsEmpty(RequestModes modes) {

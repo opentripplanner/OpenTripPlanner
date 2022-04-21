@@ -1,59 +1,57 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.api.view.TransitPathView;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TransitStopArrival<T extends RaptorTripSchedule>
-    extends AbstractStopArrival<T>
-    implements TransitPathView<T>, TransitArrival<T>
-{
-    private final T trip;
+  extends AbstractStopArrival<T>
+  implements TransitPathView<T>, TransitArrival<T> {
 
-    public TransitStopArrival(
-        AbstractStopArrival<T> previousState,
-        int stopIndex,
-        int arrivalTime,
-        int totalCost,
-        T trip
-    ) {
-        super(
-                previousState,
-                previousState.arrivedByTransit() ? 2 : 1,
-                stopIndex,
-                arrivalTime,
-                totalCost
-        );
-        this.trip = trip;
-    }
+  private final T trip;
 
-    @Override
-    public boolean arrivedByTransit() {
-        return true;
-    }
+  public TransitStopArrival(
+    AbstractStopArrival<T> previousState,
+    int stopIndex,
+    int arrivalTime,
+    int totalCost,
+    T trip
+  ) {
+    super(
+      previousState,
+      previousState.arrivedByTransit() ? 2 : 1,
+      stopIndex,
+      arrivalTime,
+      totalCost
+    );
+    this.trip = trip;
+  }
 
-    @Override
-    public TransitPathView<T> transitPath() {
-        return this;
-    }
+  @Override
+  public int boardStop() {
+    return previousStop();
+  }
 
-    @Override
-    public T trip() {
-        return trip;
-    }
+  @Override
+  public T trip() {
+    return trip;
+  }
 
-    @Override
-    public int boardStop() {
-        return previousStop();
-    }
+  @Override
+  public TransitArrival<T> mostRecentTransitArrival() {
+    return this;
+  }
 
-    @Override
-    public TransitArrival<T> mostResentTransitArrival() {
-        return this;
-    }
+  @Override
+  public boolean arrivedByTransit() {
+    return true;
+  }
+
+  @Override
+  public TransitPathView<T> transitPath() {
+    return this;
+  }
 }

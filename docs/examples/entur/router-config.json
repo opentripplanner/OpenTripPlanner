@@ -1,4 +1,5 @@
 {
+  "configVersion" : "{{ Entur CI config build number inserted here }}",
   "streetRoutingTimeout": 5,
   "routingDefaults": {
     "walkSpeed": 1.3,
@@ -9,6 +10,9 @@
     "showIntermediateStops": false,
     "transferPenalty": 0,
     "walkReluctance": 4.0,
+    "bikeReluctance": 5.0,
+    "bikeWalkingReluctance": 10.0,
+    "carReluctance": 10.0,
     "stairsReluctance": 1.65,
     "turnReluctance": 1.0,
     "elevatorBoardTime": 90,
@@ -21,46 +25,65 @@
     "bikeParkTime": 60,
     "bikeParkCost": 120,
     "carDropoffTime": 120,
-    "waitReluctance": 0.7,
+    "waitReluctance": 1.0,
     "walkBoardCost": 600,
     "bikeBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
-    "itineraryFilters": {
-      "transitGeneralizedCostLimit": "3600 + 2.0 x",
-    },
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
-      "FERRY": 60,
       "AIRPLANE" : 2100
     },
     "alightSlackForMode": {
-      "FERRY": 30,
       "AIRPLANE" : 900
+    },
+    "transitReluctanceForMode" : {
+      "RAIL" : 0.85
+    },
+    "maxAccessEgressDurationSecondsForMode": {
+      "BIKE_RENTAL": 1200
+    },
+    "itineraryFilters" : {
+      "transitGeneralizedCostLimit" : "3600 + 2.5 x",
+      "bikeRentalDistanceRatio": 0.3
     },
     "carDecelerationSpeed": 2.9,
     "carAccelerationSpeed": 2.9,
     "ignoreRealtimeUpdates": false,
     "disableRemainingWeightHeuristic": false,
     "disableAlertFiltering": false,
-    "geoidElevation": false
-  },
-  "transit": {
-    "maxNumberOfTransfers" : 12,
-    "dynamicSearchWindow" : {
-      "minTripTimeCoefficient" : 0.75,
-      "minWinTimeMinutes" : 30,
-      "maxWinTimeMinutes" : 300
-    },
-    "stopTransferCost" : {
-      "DISCOURAGED" : 3000,
-      "ALLOWED" : 150,
-      "RECOMMENDED" : 60,
-      "PREFERRED" : 0
+    "geoidElevation": false,
+    "maxJourneyDuration": "36h",
+    "transferOptimization": {
+      "optimizeTransferWaitTime": true,
+      "minSafeWaitTimeFactor": 5.0,
+      "backTravelWaitTimeFactor": 1.0,
+      "extraStopBoardAlightCostsFactor": 8.0
     }
   },
-  "vehicleRentalServiceDirectory": {
-    "url": "https://api.dev.entur.io/mobility/v2/gbfs"
+  "transit": {
+  "maxNumberOfTransfers" : 12,
+  "dynamicSearchWindow" : {
+    "minTransitTimeCoefficient" : 0.5,
+    "minWaitTimeCoefficient" : 0.5,
+    "minWinTimeMinutes" : 60,
+    "maxWinTimeMinutes" : 300
+  },
+  "stopTransferCost" : {
+    "DISCOURAGED" : 1500,
+    "ALLOWED" : 75,
+    "RECOMMENDED" : 30,
+    "PREFERRED" : 0
+  }
+  },
+  "bikeRentalServiceDirectory": {
+    "url": "{{ url }}",
+    "sourcesName": "systems",
+    "updaterUrlName": "url",
+    "updaterNetworkName": "id",
+    "headers": {
+      "ET-Client-Name": "{{ Entur specific header }}"
+    }
   },
   "transmodelApi": {
     "hideFeedId" : true
@@ -70,29 +93,27 @@
     {
       "type": "siri-sx-updater",
       "frequencySec": 60,
-      "url": "https://<host>/realtime/v1/services?maxSize=50",
-      "feedId": "siri-sx",
-      "blockReadinessUntilInitialized": true,
-      "sourceType": "siri-sx"
+      "url": "{{ url }}",
+      "feedId": "RB",
+      "blockReadinessUntilInitialized": true
+    },
+    // SIRI ET Google Pubsub updater
+    {
+      "type": "siri-et-google-pubsub-updater",
+      "feedId": "RB",
+      "reconnectPeriodSec": 5,
+      "projectName": "entur-ror",
+      "topicName": "estimated_timetables",
+      "dataInitializationUrl": "{{ url }}"
     },
     // SIRI ET updater
     {
       "type": "siri-et-updater",
       "frequencySec": 20,
       "previewIntervalMinutes": 180,
-      "url": "https://<host>/realtime/v1/services",
+      "url": "{{ url }}",
       "feedId": "RB",
-      "blockReadinessUntilInitialized": true,
-      "sourceType": "siri-et"
-    },
-    // SIRI VM updater
-    {
-      "type": "siri-vm-updater",
-      "frequencySec": 60,
-      "url": "https://<host>/realtime/v1/services?excludedDatasetIds=<OperatorNameSpace>",
-      "feedId": "siri-vm",
-      "blockReadinessUntilInitialized": true,
-      "sourceType": "siri-vm"
+      "blockReadinessUntilInitialized": true
     }
   ]
 }

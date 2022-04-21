@@ -2,7 +2,6 @@ package org.opentripplanner.util.logging;
 
 import org.slf4j.Logger;
 
-
 /**
  * This class can be used to log N logging events with level:
  * <ul>
@@ -19,33 +18,33 @@ import org.slf4j.Logger;
  */
 public class MaxCountLogger extends AbstractFilterLogger {
 
-    private static final int MAX_COUNT = 10;
-    private int count = 0;
+  private static final int MAX_COUNT = 10;
+  private int count = 0;
 
-    public MaxCountLogger(Logger delegate) {
-        super(delegate);
-    }
+  public MaxCountLogger(Logger delegate) {
+    super(delegate);
+  }
 
-    /**
-     * Wrap given logger, and throttle INFO, WARN and ERROR messages.
-     */
-    public static MaxCountLogger maxCount(Logger log) {
-        return new MaxCountLogger(log);
-    }
+  /**
+   * Wrap given logger, and throttle INFO, WARN and ERROR messages.
+   */
+  public static MaxCountLogger maxCount(Logger log) {
+    return new MaxCountLogger(log);
+  }
 
-    @Override
-    boolean mute() {
-        ++count;
-        return count > MAX_COUNT;
+  /**
+   * Log the total number of log events if at least one event was muted. The log text is formatted
+   * like this: {@code "TOTAL: n - %message%" }.
+   */
+  public void logTotal(String message) {
+    if (mute()) {
+      getDelegate().warn("TOTAL: {} - {}", count, message);
     }
+  }
 
-    /**
-     * Log the total number of log events if at least one event was muted. The log text is
-     * formatted like this: {@code "TOTAL: n - %message%" }.
-     */
-    public void logTotal(String message) {
-        if(mute()) {
-            getDelegate().warn("TOTAL: {} - {}", count, message);
-        }
-    }
+  @Override
+  boolean mute() {
+    ++count;
+    return count > MAX_COUNT;
+  }
 }

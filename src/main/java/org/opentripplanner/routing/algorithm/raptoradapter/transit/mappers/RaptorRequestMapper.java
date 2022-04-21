@@ -10,112 +10,129 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
-    private final RoutingRequest request;
-    private final Collection<? extends RaptorTransfer> accessPaths;
-    private final Collection<? extends RaptorTransfer> egressPaths;
-    private final long transitSearchTimeZeroEpocSecond;
 
-    private RaptorRequestMapper(
-            RoutingRequest request,
-            Collection<? extends RaptorTransfer> accessPaths,
-            Collection<? extends RaptorTransfer> egressPaths,
-            long transitSearchTimeZeroEpocSecond
-    ) {
-        this.request = request;
-        this.accessPaths = accessPaths;
-        this.egressPaths = egressPaths;
-        this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
+  private final RoutingRequest request;
+  private final Collection<? extends RaptorTransfer> accessPaths;
+  private final Collection<? extends RaptorTransfer> egressPaths;
+  private final long transitSearchTimeZeroEpocSecond;
+
+  private RaptorRequestMapper(
+    RoutingRequest request,
+    Collection<? extends RaptorTransfer> accessPaths,
+    Collection<? extends RaptorTransfer> egressPaths,
+    long transitSearchTimeZeroEpocSecond
+  ) {
+    this.request = request;
+    this.accessPaths = accessPaths;
+    this.egressPaths = egressPaths;
+    this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
+  }
+
+  public static RaptorRequest<TripSchedule> mapRequest(
+    RoutingRequest request,
+    ZonedDateTime transitSearchTimeZero,
+    Collection<? extends RaptorTransfer> accessPaths,
+    Collection<? extends RaptorTransfer> egressPaths
+  ) {
+    return new RaptorRequestMapper(
+      request,
+      accessPaths,
+      egressPaths,
+      transitSearchTimeZero.toEpochSecond()
+    )
+      .doMap();
+  }
+
+  private RaptorRequest<TripSchedule> doMap() {
+    var builder = new RaptorRequestBuilder<TripSchedule>();
+    var searchParams = builder.searchParams();
+
+    if (request.pageCursor == null) {
+      int time = relativeTime(request.getDateTime());
+
+      int timeLimit = relativeTime(request.raptorOptions.getTimeLimit());
+
+      if (request.arriveBy) {
+        searchParams.latestArrivalTime(time);
+        searchParams.earliestDepartureTime(timeLimit);
+      } else {
+        searchParams.earliestDepartureTime(time);
+        searchParams.latestArrivalTime(timeLimit);
+      }
+      searchParams.searchWindow(request.searchWindow);
+    } else {
+      var c = request.pageCursor;
+
+      if (c.earliestDepartureTime != null) {
+        searchParams.earliestDepartureTime(relativeTime(c.earliestDepartureTime));
+      }
+      if (c.latestArrivalTime != null) {
+        searchParams.latestArrivalTime(relativeTime(c.latestArrivalTime));
+      }
+      searchParams.searchWindow(c.searchWindow);
     }
 
-    public static RaptorRequest<TripSchedule> mapRequest(
-            RoutingRequest request,
-            ZonedDateTime transitSearchTimeZero,
-            Collection<? extends RaptorTransfer> accessPaths,
-            Collection<? extends RaptorTransfer> egressPaths
-    ) {
-        return new RaptorRequestMapper(
-                request,
-                accessPaths,
-                egressPaths,
-                transitSearchTimeZero.toEpochSecond()
-        ).doMap();
+    if (request.maxTransfers != null) {
+      searchParams.maxNumberOfTransfers(request.maxTransfers);
     }
 
-    private RaptorRequest<TripSchedule> doMap(
-    ) {
-        var builder = new RaptorRequestBuilder<TripSchedule>();
-        var searchParams = builder.searchParams();
+    request.raptorOptions.getOptimizations().forEach(builder::enableOptimization);
+    builder.profile(request.raptorOptions.getProfile());
+    builder.searchDirection(request.raptorOptions.getSearchDirection());
 
-        if(request.pageCursor ==  null) {
-            int time = relativeTime(request.getDateTime());
-            if (request.arriveBy) {
-                searchParams.latestArrivalTime(time);
-            }
-            else {
-                searchParams.earliestDepartureTime(time);
-            }
-            searchParams.searchWindow(request.searchWindow);
-        }
-        else {
-            var c = request.pageCursor;
+    builder
+      .profile(RaptorProfile.MULTI_CRITERIA)
+      .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
+      .slackProvider(
+        new SlackProvider(
+          request.transferSlack,
+          request.boardSlack,
+          request.boardSlackForMode,
+          request.alightSlack,
+          request.alightSlackForMode
+        )
+      );
 
-            if (c.earliestDepartureTime != null) {
-                searchParams.earliestDepartureTime(relativeTime(c.earliestDepartureTime));
-            }
-            if (c.latestArrivalTime != null) {
-                searchParams.latestArrivalTime(relativeTime(c.latestArrivalTime));
-            }
-            searchParams.searchWindow(c.searchWindow);
-        }
+    builder
+      .searchParams()
+      .timetableEnabled(request.timetableView)
+      .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
+      .addAccessPaths(accessPaths)
+      .addEgressPaths(egressPaths);
 
-        if(request.maxTransfers != null) {
-            searchParams.maxNumberOfTransfers(request.maxTransfers);
-        }
+    if (request.raptorDebugging.isEnabled()) {
+      var debug = builder.debug();
+      var debugLogger = new SystemErrDebugLogger(true);
 
-        builder
-                .profile(RaptorProfile.MULTI_CRITERIA)
-                .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
-                .slackProvider(new SlackProvider(
-                        request.transferSlack,
-                        request.boardSlack,
-                        request.boardSlackForMode,
-                        request.alightSlack,
-                        request.alightSlackForMode
-                ));
-
-        builder
-                .searchParams()
-                .timetableEnabled(request.timetableView)
-                .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
-                .addAccessPaths(accessPaths)
-                .addEgressPaths(egressPaths);
-
-        if(request.raptorDebuging != null) {
-            var debug = builder.debug();
-            var debugLogger = new SystemErrDebugLogger(true);
-
-            debug.addStops(request.raptorDebuging.stops())
-                    .setPath(request.raptorDebuging.path())
-                    .debugPathFromStopIndex(request.raptorDebuging.debugPathFromStopIndex())
-                    .stopArrivalListener(debugLogger::stopArrivalLister)
-                    .patternRideDebugListener(debugLogger::patternRideLister)
-                    .pathFilteringListener(debugLogger::pathFilteringListener)
-                    .logger(debugLogger);
-        }
-
-        if(!request.timetableView && request.arriveBy) {
-            builder.searchParams().preferLateArrival(true);
-        }
-
-        return builder.build();
+      debug
+        .addStops(request.raptorDebugging.stops())
+        .setPath(request.raptorDebugging.path())
+        .debugPathFromStopIndex(request.raptorDebugging.debugPathFromStopIndex())
+        .stopArrivalListener(debugLogger::stopArrivalLister)
+        .patternRideDebugListener(debugLogger::patternRideLister)
+        .pathFilteringListener(debugLogger::pathFilteringListener)
+        .logger(debugLogger);
     }
 
-    private int relativeTime(Instant time) {
-        return (int)(time.getEpochSecond() - transitSearchTimeZeroEpocSecond);
+    builder.addTimingTags(request.tags.getTimingTags());
+
+    if (!request.timetableView && request.arriveBy) {
+      builder.searchParams().preferLateArrival(true);
     }
+
+    return builder.build();
+  }
+
+  private int relativeTime(Instant time) {
+    if (time == null) {
+      return SearchParams.TIME_NOT_SET;
+    }
+    return (int) (time.getEpochSecond() - transitSearchTimeZeroEpocSecond);
+  }
 }

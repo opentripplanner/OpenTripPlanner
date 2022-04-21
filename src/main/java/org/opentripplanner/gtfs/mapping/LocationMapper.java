@@ -1,6 +1,10 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.util.Optional;
+import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.UnsupportedGeometryException;
 import org.opentripplanner.model.FlexStopLocation;
@@ -9,15 +13,10 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 /** Responsible for mapping GTFS Location into the OTP model. */
 public class LocationMapper {
-  private static Logger LOG = LoggerFactory.getLogger(LocationMapper.class);
+
+  private static final Logger LOG = LoggerFactory.getLogger(LocationMapper.class);
 
   private final Map<org.onebusaway.gtfs.model.Location, FlexStopLocation> mappedLocations = new HashMap<>();
 
@@ -25,7 +24,7 @@ public class LocationMapper {
     return MapUtils.mapToList(allLocations, this::map);
   }
 
-  /** Map from GTFS to OTP model, {@code null} safe.  */
+  /** Map from GTFS to OTP model, {@code null} safe. */
   FlexStopLocation map(org.onebusaway.gtfs.model.Location orginal) {
     return orginal == null ? null : mappedLocations.computeIfAbsent(orginal, this::doMap);
   }
@@ -35,17 +34,17 @@ public class LocationMapper {
 
     // according to the spec stop location names are optional for flex zones so, we return the id
     // when it's null. *shrug*
-    otpLocation.setName(NonLocalizedString.ofNullableOrElse(
-            gtfsLocation.getName(),
-            otpLocation.getId().toString())
+    otpLocation.setName(
+      NonLocalizedString.ofNullableOrElse(gtfsLocation.getName(), otpLocation.getId().toString())
     );
     otpLocation.setUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()));
     otpLocation.setDescription(gtfsLocation.getDescription());
     otpLocation.setZoneId(gtfsLocation.getZoneId());
     try {
-      otpLocation.setGeometry(GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry()));
-    }
-    catch (UnsupportedGeometryException e) {
+      otpLocation.setGeometry(
+        GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry())
+      );
+    } catch (UnsupportedGeometryException e) {
       LOG.warn("Unsupported geometry type for " + gtfsLocation.getId());
     }
 

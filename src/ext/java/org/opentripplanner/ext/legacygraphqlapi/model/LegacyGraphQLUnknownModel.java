@@ -6,16 +6,16 @@ package org.opentripplanner.ext.legacygraphqlapi.model;
  */
 public class LegacyGraphQLUnknownModel {
 
-    /**
-     * Description of the entity
-     */
-    private final String description;
+  /**
+   * Description of the entity
+   */
+  private final String description;
 
-    public LegacyGraphQLUnknownModel(String description) {
-        this.description = description;
-    }
+  public LegacyGraphQLUnknownModel(String description) {
+    this.description = description;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 }

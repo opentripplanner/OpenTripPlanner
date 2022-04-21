@@ -13,12 +13,9 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
@@ -38,65 +35,47 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  */
 public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
-    private final Function<Stop, Set<Route>> getRoutesForStop;
+  public static final Set<StreetMode> applicableModes = Set.of(
+    BIKE_TO_PARK,
+    BIKE_RENTAL,
+    CAR_TO_PARK,
+    CAR_PICKUP,
+    CAR_RENTAL,
+    SCOOTER_RENTAL
+  );
+  private final Function<Stop, Set<Route>> getRoutesForStop;
+  private final int maxScore;
+  private double sumOfScores;
 
-    private double sumOfScores;
-    private final int maxScore;
+  public VehicleToStopSkipEdgeStrategy(Function<Stop, Set<Route>> getRoutesForStop) {
+    this.maxScore = 300;
+    this.getRoutesForStop = getRoutesForStop;
+  }
 
-    public final static Set<StreetMode> applicableModes =
-            Set.of(
-                    BIKE_TO_PARK,
-                    BIKE_RENTAL,
-                    CAR_TO_PARK,
-                    CAR_PICKUP,
-                    CAR_RENTAL,
-                    SCOOTER_RENTAL
-            );
+  @Override
+  public boolean shouldSkipEdge(State current, Edge edge) {
+    if (current.getNonTransitMode().isWalking()) {
+      if (current.getVertex() instanceof TransitStopVertex stopVertex) {
+        var score = getRoutesForStop
+          .apply(stopVertex.getStop())
+          .stream()
+          .map(Route::getMode)
+          .mapToInt(VehicleToStopSkipEdgeStrategy::score)
+          .sum();
 
-
-    public VehicleToStopSkipEdgeStrategy(Function<Stop, Set<Route>> getRoutesForStop) {
-        this.maxScore = 300;
-        this.getRoutesForStop = getRoutesForStop;
+        sumOfScores = sumOfScores + score;
+      }
+      return false;
+    } else {
+      return sumOfScores >= maxScore;
     }
+  }
 
-    @Override
-    public boolean shouldSkipEdge(
-            Set<Vertex> origins,
-            Set<Vertex> targets,
-            State current,
-            Edge edge,
-            ShortestPathTree spt,
-            RoutingRequest traverseOptions
-    ) {
-        if (current.getNonTransitMode().isWalking()) {
-            if (current.getVertex() instanceof TransitStopVertex) {
-                var stopVertex = (TransitStopVertex) current.getVertex();
-                var stop = stopVertex.getStop();
-                var score = getRoutesForStop.apply(stop)
-                        .stream()
-                        .map(Route::getMode)
-                        .mapToInt(VehicleToStopSkipEdgeStrategy::score)
-                        .sum();
-
-                sumOfScores = sumOfScores + score;
-            }
-            return false;
-        }
-        else {
-            return sumOfScores >= maxScore;
-        }
-    }
-
-    private static int score(TransitMode mode) {
-        switch (mode) {
-            case RAIL:
-            case FERRY:
-            case SUBWAY:
-                return 20;
-            case BUS:
-                return 1;
-            default:
-                return 2;
-        }
-    }
+  private static int score(TransitMode mode) {
+    return switch (mode) {
+      case RAIL, FERRY, SUBWAY -> 20;
+      case BUS -> 1;
+      default -> 2;
+    };
+  }
 }

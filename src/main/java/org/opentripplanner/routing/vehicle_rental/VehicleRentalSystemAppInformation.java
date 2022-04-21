@@ -5,11 +5,11 @@ package org.opentripplanner.routing.vehicle_rental;
  */
 public class VehicleRentalSystemAppInformation {
 
-    public final String storeUri;
-    public final String discoveryUri;
+  public final String storeUri;
+  public final String discoveryUri;
 
-    public VehicleRentalSystemAppInformation(String storeUri, String discoveryUri) {
-        this.storeUri = storeUri;
-        this.discoveryUri = discoveryUri;
-    }
+  public VehicleRentalSystemAppInformation(String storeUri, String discoveryUri) {
+    this.storeUri = storeUri;
+    this.discoveryUri = discoveryUri;
+  }
 }

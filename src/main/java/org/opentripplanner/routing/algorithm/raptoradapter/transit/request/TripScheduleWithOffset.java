@@ -1,85 +1,131 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 /**
- * This represents a single trip within a TripPattern, but with a time offset in seconds. This is used to represent
- * a trip on a subsequent service day than the first one in the date range used.
+ * This represents a single trip within a TripPattern, but with a time offset in seconds. This is
+ * used to represent a trip on a subsequent service day than the first one in the date range used.
+ * <p>
+ * Use flyweight pattern, reusing TripPatternForDates data
  */
 public final class TripScheduleWithOffset implements TripSchedule {
 
-    private final int secondsOffset;
-    private final TripPatternForDates pattern;
-    private final TripTimes tripTimes;
-    private final LocalDate serviceDate;
-    private final int sortIndex;
-    private final int transitReluctanceIndex;
+  private final TripPatternForDates pattern;
+  private final int sortIndex;
+  private final int transitReluctanceIndex;
+  private final int tripIndexForDates;
+  private final IntUnaryOperator arrivalTimes;
+  private final IntUnaryOperator departureTimes;
 
-    TripScheduleWithOffset(TripPatternForDates pattern, LocalDate localDate, TripTimes tripTimes, int offset) {
-        this.pattern = pattern;
-        this.tripTimes = tripTimes;
-        this.secondsOffset = offset;
-        this.serviceDate = localDate;
-        // Trip times are sorted based on the arrival times at stop 0,
-        this.sortIndex = arrival(0);
-        // Mode ordinal is used to index the transit factor/reluctance
-        this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
-    }
+  // Computed when needed later for RaptorPathToItineraryMapper
+  private int index;
+  private TripTimes tripTimes = null;
+  private LocalDate serviceDate = null;
+  private int secondsOffset;
 
-    @Override
-    public int tripSortIndex() {
-        return sortIndex;
-    }
+  TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
+    this.tripIndexForDates = tripIndexForDates;
+    this.pattern = pattern;
+    // Mode ordinal is used to index the transit factor/reluctance
+    this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
 
-    @Override
-    public int arrival(int stopPosInPattern) {
-        return this.tripTimes.getArrivalTime(stopPosInPattern) + secondsOffset;
-    }
+    // get arrival/departures lambda
+    this.arrivalTimes = pattern.getArrivalTimesForTrip(tripIndexForDates);
+    this.departureTimes = pattern.getDepartureTimesForTrip(tripIndexForDates);
 
-    @Override
-    public int departure(int stopPosInPattern) {
-        return this.tripTimes.getDepartureTime(stopPosInPattern) + secondsOffset;
-    }
+    // Trip times are sorted based on the arrival times at stop 0,
+    this.sortIndex = arrivalTimes.applyAsInt(0);
+  }
 
-    @Override
-    public RaptorTripPattern pattern() {
-        return pattern;
-    }
+  @Override
+  public int tripSortIndex() {
+    return sortIndex;
+  }
 
-    @Override
-    public TripTimes getOriginalTripTimes() {
-        return this.tripTimes;
-    }
+  @Override
+  public int arrival(int stopPosInPattern) {
+    return this.arrivalTimes.applyAsInt(stopPosInPattern);
+  }
 
-    @Override
-    public TripPattern getOriginalTripPattern() {
-        return pattern.getTripPattern().getPattern();
-    }
+  @Override
+  public int departure(int stopPosInPattern) {
+    return this.departureTimes.applyAsInt(stopPosInPattern);
+  }
 
-    @Override
-    public LocalDate getServiceDate() {
-        return serviceDate;
-    }
+  @Override
+  public RaptorTripPattern pattern() {
+    return pattern;
+  }
 
-    @Override
-    public int transitReluctanceFactorIndex() {
-        return transitReluctanceIndex;
-    }
+  @Override
+  public int transitReluctanceFactorIndex() {
+    return transitReluctanceIndex;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(TripScheduleWithOffset.class)
-                .addObj("trip", pattern.debugInfo())
-                .addServiceTime("depart", secondsOffset + tripTimes.getDepartureTime(0))
-                .toString();
+  /*
+   * Following methods are only called in RaptorPathToItineraryMapper or debug/tests, these are not optimised for performance
+   */
+  @Override
+  public TripTimes getOriginalTripTimes() {
+    if (tripTimes == null) {
+      this.findTripTimes();
     }
+    return this.tripTimes;
+  }
 
-    public int getSecondsOffset() {
-        return secondsOffset;
+  @Override
+  public TripPattern getOriginalTripPattern() {
+    return pattern.getTripPattern().getPattern();
+  }
+
+  @Override
+  public LocalDate getServiceDate() {
+    if (tripTimes == null) {
+      this.findTripTimes();
     }
+    return serviceDate;
+  }
+
+  public int getSecondsOffset() {
+    if (tripTimes == null) {
+      this.findTripTimes();
+    }
+    return secondsOffset;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TripScheduleWithOffset.class)
+      .addObj("trip", pattern.debugInfo())
+      .addServiceTime("depart", secondsOffset + tripTimes.getDepartureTime(0))
+      .toString();
+  }
+
+  private void findTripTimes() {
+    index = tripIndexForDates;
+    IntIterator indexIterator = pattern.tripPatternForDatesIndexIterator(true);
+    while (indexIterator.hasNext()) {
+      int i = indexIterator.next();
+      TripPatternForDate tripPatternForDate = pattern.tripPatternForDate(i);
+      int numSchedules = tripPatternForDate.numberOfTripSchedules();
+
+      if (index < numSchedules) {
+        this.tripTimes = tripPatternForDate.getTripTimes(index);
+        this.serviceDate = tripPatternForDate.getLocalDate();
+        this.secondsOffset = pattern.tripPatternForDateOffsets(i);
+        return;
+      }
+      index -= numSchedules;
+    }
+    throw new IndexOutOfBoundsException("Index out of bound: " + index);
+  }
 }

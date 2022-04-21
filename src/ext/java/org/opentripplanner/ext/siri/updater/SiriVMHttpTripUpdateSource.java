@@ -1,142 +1,136 @@
 package org.opentripplanner.ext.siri.updater;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
-    private static final Logger LOG = LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
 
-    private final static long RETRY_INTERVAL_MILLIS = 5000;
+  private static final Logger LOG = LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
 
-    private static final Map<String, String> requestHeaders = new HashMap<>();
+  private static final long RETRY_INTERVAL_MILLIS = 5000;
+  /**
+   * Feed id that is used to match trip ids in the TripUpdates
+   */
+  private final String feedId;
+  private final String url;
+  private final String originalRequestorRef;
+  /**
+   * True iff the last list with updates represent all updates that are active right now, i.e. all
+   * previous updates should be disregarded
+   */
+  private boolean fullDataset = true;
+  private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
+  private String requestorRef;
+  private int timeout;
+  private int retryCount = 0;
 
-    /**
-     * True iff the last list with updates represent all updates that are active right now, i.e. all
-     * previous updates should be disregarded
-     */
-    private boolean fullDataset = true;
+  public SiriVMHttpTripUpdateSource(Parameters parameters) {
+    this.url = parameters.getUrl();
+    this.requestorRef = parameters.getRequestorRef();
+    if (requestorRef == null || requestorRef.isEmpty()) {
+      requestorRef = "otp-" + UUID.randomUUID();
+    }
 
-    /**
-     * Feed id that is used to match trip ids in the TripUpdates
-     */
-    private final String feedId;
+    originalRequestorRef = this.requestorRef;
 
-    private final String url;
+    this.feedId = parameters.getFeedId();
 
-    private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
+    int timeoutSec = parameters.getTimeoutSec();
+    if (timeoutSec > 0) {
+      this.timeout = 1000 * timeoutSec;
+    }
+  }
 
-    private String requestorRef;
-    private int timeout;
-    private int retryCount = 0;
-    private final String originalRequestorRef;
+  @Override
+  public Siri getUpdates() {
+    long t1 = System.currentTimeMillis();
+    long creating = 0;
+    long fetching = 0;
+    long unmarshalling = 0;
 
+    fullDataset = false;
+    try {
+      String vmServiceRequest = SiriHelper.createVMServiceRequestAsXml(requestorRef);
+      creating = System.currentTimeMillis() - t1;
+      t1 = System.currentTimeMillis();
 
+      InputStream is = SiriHttpUtils.postData(url, vmServiceRequest, timeout);
+      if (is != null) {
+        // Decode message
+        fetching = System.currentTimeMillis() - t1;
+        t1 = System.currentTimeMillis();
+        Siri siri = SiriHelper.unmarshal(is);
+        unmarshalling = System.currentTimeMillis() - t1;
 
-    public SiriVMHttpTripUpdateSource(Parameters parameters) {
-        this.url = parameters.getUrl();
-        this.requestorRef = parameters.getRequestorRef();
-        if (requestorRef == null || requestorRef.isEmpty()) {
-            requestorRef = "otp-" + UUID.randomUUID().toString();
+        if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
+          LOG.info("Newer data has already been processed");
+          return null;
         }
+        lastTimestamp = siri.getServiceDelivery().getResponseTimestamp();
 
-        originalRequestorRef = this.requestorRef;
+        return siri;
+      }
+    } catch (IOException | JAXBException | XMLStreamException e) {
+      LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
+      LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
 
-        this.feedId = parameters.getFeedId();
+      final long sleepTime = RETRY_INTERVAL_MILLIS + RETRY_INTERVAL_MILLIS * retryCount;
 
-        int timeoutSec = parameters.getTimeoutSec();
-        if (timeoutSec > 0) {
-            this.timeout = 1000 * timeoutSec;
-        }
+      retryCount++;
 
-        requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-VM"));
+      LOG.info("Caught timeout - retry no. {} after {} millis", retryCount, sleepTime);
+
+      try {
+        Thread.sleep(sleepTime);
+      } catch (InterruptedException ex) {
+        // Ignore
+      }
+
+      // Creating new requestorRef so all data is refreshed
+      requestorRef = originalRequestorRef + "-retry-" + retryCount;
+
+      return getUpdates();
+    } finally {
+      LOG.info(
+        "Updating VM [{}]: Create req: {}, Fetching data: {}, Unmarshalling: {}",
+        requestorRef,
+        creating,
+        fetching,
+        unmarshalling
+      );
     }
+    return null;
+  }
 
-    @Override
-    public Siri getUpdates() {
-        long t1 = System.currentTimeMillis();
-        long creating = 0;
-        long fetching = 0;
-        long unmarshalling = 0;
+  @Override
+  public boolean getFullDatasetValueOfLastUpdates() {
+    return fullDataset;
+  }
 
-        fullDataset = false;
-        try {
-            String vmServiceRequest = SiriHelper.createVMServiceRequestAsXml(requestorRef);
-            creating = System.currentTimeMillis()-t1;
-            t1 = System.currentTimeMillis();
+  @Override
+  public String getFeedId() {
+    return this.feedId;
+  }
 
-            InputStream is = SiriHttpUtils.postData(url, vmServiceRequest, timeout, requestHeaders);
-            if (is != null) {
-                // Decode message
-                fetching = System.currentTimeMillis()-t1;
-                t1 = System.currentTimeMillis();
-                Siri siri = SiriHelper.unmarshal(is);
-                unmarshalling = System.currentTimeMillis()-t1;
+  public String toString() {
+    return "SiriVMHttpTripUpdateSource(" + url + ")";
+  }
 
-                if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
-                    LOG.info("Newer data has already been processed");
-                    return null;
-                }
-                lastTimestamp = siri.getServiceDelivery().getResponseTimestamp();
+  interface Parameters {
+    String getUrl();
 
-                return siri;
+    String getRequestorRef();
 
-            }
-        } catch (IOException | JAXBException | XMLStreamException e) {
-            LOG.info("Failed after {} ms", (System.currentTimeMillis()-t1));
-            LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
+    String getFeedId();
 
-            final long sleepTime = RETRY_INTERVAL_MILLIS + RETRY_INTERVAL_MILLIS * retryCount;
-
-            retryCount++;
-
-            LOG.info("Caught timeout - retry no. {} after {} millis", retryCount, sleepTime);
-
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException ex) {
-                // Ignore
-            }
-
-            // Creating new requestorRef so all data is refreshed
-            requestorRef = originalRequestorRef + "-retry-" + retryCount;
-
-            return getUpdates();
-
-        } finally {
-            LOG.info("Updating VM [{}]: Create req: {}, Fetching data: {}, Unmarshalling: {}", requestorRef, creating, fetching, unmarshalling);
-        }
-        return null;
-    }
-
-    @Override
-    public boolean getFullDatasetValueOfLastUpdates() {
-        return fullDataset;
-    }
-
-    public String toString() {
-        return "SiriVMHttpTripUpdateSource(" + url + ")";
-    }
-
-    @Override
-    public String getFeedId() {
-        return this.feedId;
-    }
-
-    interface Parameters {
-        String getUrl();
-        String getRequestorRef();
-        String getFeedId();
-        int getTimeoutSec();
-    }
+    int getTimeoutSec();
+  }
 }

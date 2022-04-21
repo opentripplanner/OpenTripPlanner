@@ -16,7 +16,7 @@ public enum StreetMode {
   BIKE(true, true, true, true, true, false),
   /**
    * Bike to a bike parking area, then walk the rest of the way.
-   *
+   * <p>
    * Direct mode and access mode only.
    */
   BIKE_TO_PARK(true, false, false, true, true, false),
@@ -24,27 +24,27 @@ public enum StreetMode {
    * Walk to a bike rental point, bike to a bike rental drop-off point, and walk the rest of the
    * way. This can include bike rental at fixed locations or free-floating services.
    */
-  BIKE_RENTAL(true, true, true, true, true,false),
+  BIKE_RENTAL(true, true, true, true, true, false),
   /**
    * Walk to a scooter rental point, ride a scooter to a scooter rental drop-off point, and walk the
    * rest of the way. This can include scooter rental at fixed locations or free-floating services.
    */
-  SCOOTER_RENTAL(true, true, true, true, true,false),
+  SCOOTER_RENTAL(true, true, true, true, true, false),
   /**
    * Car only
-   *
+   * <p>
    * Direct mode only.
    */
   CAR(true, false, false, false, false, true),
   /**
    * Start in the car, drive to a parking area, and walk the rest of the way.
-   *
+   * <p>
    * Direct mode and access mode only.
    */
   CAR_TO_PARK(true, false, false, true, false, true),
   /**
-   * Walk to a pickup point along the road, drive to a drop-off point along the road,
-   * and walk the rest of the way. This can include various taxi-services or kiss & ride.
+   * Walk to a pickup point along the road, drive to a drop-off point along the road, and walk the
+   * rest of the way. This can include various taxi-services or kiss & ride.
    */
   CAR_PICKUP(true, false, true, true, false, true),
   /**
@@ -58,25 +58,25 @@ public enum StreetMode {
    */
   FLEXIBLE(true, false, true, true, false, true);
 
-  boolean access;
+  final boolean access;
 
-  boolean transfer;
+  final boolean transfer;
 
-  boolean egress;
+  final boolean egress;
 
-  boolean includesWalking;
+  final boolean includesWalking;
 
-  boolean includesBiking;
+  final boolean includesBiking;
 
-  boolean includesDriving;
+  final boolean includesDriving;
 
   StreetMode(
-      boolean access,
-      boolean transfer,
-      boolean egress,
-      boolean includesWalking,
-      boolean includesBiking,
-      boolean includesDriving
+    boolean access,
+    boolean transfer,
+    boolean egress,
+    boolean includesWalking,
+    boolean includesBiking,
+    boolean includesDriving
   ) {
     this.access = access;
     this.transfer = transfer;

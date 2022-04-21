@@ -1,99 +1,99 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.I18NString;
 
 /**
  * A relatively low cost edge for travelling one level in an elevator.
- * @author mattwigway
  *
+ * @author mattwigway
  */
 public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
-    private static final long serialVersionUID = 3925814840369402222L;
+  private static final long serialVersionUID = 3925814840369402222L;
 
-    private StreetTraversalPermission permission;
+  private final StreetTraversalPermission permission;
 
-    public boolean wheelchairAccessible = true;
+  public boolean wheelchairAccessible = true;
 
-    private double levels = 1;
-    private int travelTime = 0;
+  private double levels = 1;
+  private int travelTime = 0;
 
-    public ElevatorHopEdge(
-        Vertex from, Vertex to, StreetTraversalPermission permission, double levels, int travelTime
-    ) {
-        this(from, to, permission);
-        this.levels = levels;
-        this.travelTime = travelTime;
+  public ElevatorHopEdge(
+    Vertex from,
+    Vertex to,
+    StreetTraversalPermission permission,
+    double levels,
+    int travelTime
+  ) {
+    this(from, to, permission);
+    this.levels = levels;
+    this.travelTime = travelTime;
+  }
+
+  public ElevatorHopEdge(Vertex from, Vertex to, StreetTraversalPermission permission) {
+    super(from, to);
+    this.permission = permission;
+  }
+
+  public StreetTraversalPermission getPermission() {
+    return permission;
+  }
+
+  public String toString() {
+    return "ElevatorHopEdge(" + fromv + " -> " + tov + ")";
+  }
+
+  @Override
+  public State traverse(State s0) {
+    RoutingRequest options = s0.getOptions();
+
+    if (options.wheelchairAccessible && !wheelchairAccessible) {
+      return null;
     }
 
-    public ElevatorHopEdge(Vertex from, Vertex to, StreetTraversalPermission permission) {
-        super(from, to);
-        this.permission = permission;
+    TraverseMode mode = s0.getNonTransitMode();
+
+    if (mode == TraverseMode.WALK && !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+      return null;
     }
 
-    @Override
-    public State traverse(State s0) {
-        RoutingRequest options = s0.getOptions();
-
-        if (options.wheelchairAccessible && !wheelchairAccessible) {
-            return null;
-        }
-
-        TraverseMode mode = s0.getNonTransitMode();
-
-        if (mode == TraverseMode.WALK && 
-            !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
-            return null;
-        }
-
-        if (mode == TraverseMode.BICYCLE && 
-            !permission.allows(StreetTraversalPermission.BICYCLE)) {
-            return null;
-        }
-        // there are elevators which allow cars
-        if (mode == TraverseMode.CAR
-            && !permission.allows(StreetTraversalPermission.CAR)) {
-            return null;
-        }
-
-        StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
-        s1.incrementWeight(
-            this.travelTime > 0 ? this.travelTime : (options.elevatorHopCost * this.levels)
-        );
-        s1.incrementTimeInSeconds(
-            this.travelTime > 0 ? this.travelTime : (int) (options.elevatorHopTime * this.levels)
-        );
-        return s1.makeState();
+    if (mode == TraverseMode.BICYCLE && !permission.allows(StreetTraversalPermission.BICYCLE)) {
+      return null;
+    }
+    // there are elevators which allow cars
+    if (mode == TraverseMode.CAR && !permission.allows(StreetTraversalPermission.CAR)) {
+      return null;
     }
 
-    @Override
-    public double getDistanceMeters() {
-        return 0;
-    }
+    StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
+    s1.incrementWeight(
+      this.travelTime > 0 ? this.travelTime : (options.elevatorHopCost * this.levels)
+    );
+    s1.incrementTimeInSeconds(
+      this.travelTime > 0 ? this.travelTime : (int) (options.elevatorHopTime * this.levels)
+    );
+    return s1.makeState();
+  }
 
-    @Override
-    public LineString getGeometry() {
-        return null;
-    }
+  @Override
+  public I18NString getName() {
+    return null;
+  }
 
-    @Override
-    public I18NString getName() {
-        return null;
-    }
+  @Override
+  public LineString getGeometry() {
+    return null;
+  }
 
-    public StreetTraversalPermission getPermission() {
-        return permission;
-    }
-
-    public String toString() {
-        return "ElevatorHopEdge(" + fromv + " -> " + tov + ")";
-    }
+  @Override
+  public double getDistanceMeters() {
+    return 0;
+  }
 }

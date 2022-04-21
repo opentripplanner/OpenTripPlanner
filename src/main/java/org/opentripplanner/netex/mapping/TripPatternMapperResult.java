@@ -2,12 +2,14 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 
 /**
@@ -16,17 +18,19 @@ import org.opentripplanner.model.TripPattern;
  */
 class TripPatternMapperResult {
 
-    /**
-     * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
-     */
-    final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
+  /**
+   * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
+   */
+  final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
 
-    final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
+  final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
 
-    final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
+  final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-    /**
-     * stopTimes by the timetabled-passing-time id
-     */
-    final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
+  /**
+   * stopTimes by the timetabled-passing-time id
+   */
+  final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
+
+  final ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
 }

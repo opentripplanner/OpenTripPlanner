@@ -1,39 +1,39 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.util.MapUtils;
+import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */
 class FareAttributeMapper {
-    private final Map<org.onebusaway.gtfs.model.FareAttribute, FareAttribute> mappedStops = new HashMap<>();
 
-    Collection<FareAttribute> map(Collection<org.onebusaway.gtfs.model.FareAttribute> allStops) {
-        return MapUtils.mapToList(allStops, this::map);
-    }
+  private final Map<org.onebusaway.gtfs.model.FareAttribute, FareAttribute> mappedStops = new HashMap<>();
 
-    /** Map from GTFS to OTP model, {@code null} safe.  */
-    FareAttribute map(org.onebusaway.gtfs.model.FareAttribute orginal) {
-        return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
-    }
+  Collection<FareAttribute> map(Collection<org.onebusaway.gtfs.model.FareAttribute> allStops) {
+    return MapUtils.mapToList(allStops, this::map);
+  }
 
-    private FareAttribute doMap(org.onebusaway.gtfs.model.FareAttribute rhs) {
-        FareAttribute lhs = new FareAttribute(mapAgencyAndId(rhs.getId()));
+  /** Map from GTFS to OTP model, {@code null} safe. */
+  FareAttribute map(org.onebusaway.gtfs.model.FareAttribute orginal) {
+    return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
+  }
 
-        lhs.setPrice(rhs.getPrice());
-        lhs.setCurrencyType(rhs.getCurrencyType());
-        lhs.setPaymentMethod(rhs.getPaymentMethod());
-        lhs.setTransfers(rhs.getTransfers());
-        lhs.setTransferDuration(rhs.getTransferDuration());
-        lhs.setYouthPrice(rhs.getYouthPrice());
-        lhs.setSeniorPrice(rhs.getSeniorPrice());
-        lhs.setJourneyDuration(rhs.getJourneyDuration());
+  private FareAttribute doMap(org.onebusaway.gtfs.model.FareAttribute rhs) {
+    FareAttribute lhs = new FareAttribute(mapAgencyAndId(rhs.getId()));
 
-        return lhs;
-    }
+    lhs.setPrice(rhs.getPrice());
+    lhs.setCurrencyType(rhs.getCurrencyType());
+    lhs.setPaymentMethod(rhs.getPaymentMethod());
+    lhs.setTransfers(rhs.getTransfers());
+    lhs.setTransferDuration(rhs.getTransferDuration());
+    lhs.setYouthPrice(rhs.getYouthPrice());
+    lhs.setSeniorPrice(rhs.getSeniorPrice());
+    lhs.setJourneyDuration(rhs.getJourneyDuration());
+
+    return lhs;
+  }
 }

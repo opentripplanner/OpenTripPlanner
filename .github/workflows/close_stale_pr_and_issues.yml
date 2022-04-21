@@ -1,4 +1,4 @@
-name: 'Close Stale issues'
+name: 'Close stale issues'
 
 on:
   schedule:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   stale:
+    if: github.repository_owner == 'opentripplanner'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v5.0.0
@@ -18,6 +19,6 @@ jobs:
           stale-issue-message: 'This issue is stale because it has been open 90 days with no activity. Remove stale label or comment or this will be closed in 30 days'
           days-before-stale: 90
           days-before-close: 30
-          operations-per-run: 6
+          operations-per-run: 68
           exempt-issue-labels: 'Roadmap'
           ascending: true

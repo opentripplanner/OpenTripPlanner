@@ -1,19 +1,5 @@
 package org.opentripplanner.netex.mapping.calendar;
 
-import org.junit.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
-
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.Assert.assertEquals;
@@ -26,7 +12,21 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeri
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
 
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.junit.Test;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
+import org.rutebanken.netex.model.DayType;
+import org.rutebanken.netex.model.DayTypeAssignment;
+import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.OperatingPeriod;
+
 public class DayTypeAssignmentMapperTest {
+
   private static final LocalDate D2020_10_21 = LocalDate.of(2020, 10, 21);
   private static final LocalDate D2020_11_01 = LocalDate.of(2020, 11, 1);
   private static final LocalDate D2020_11_03 = LocalDate.of(2020, 11, 3);
@@ -69,11 +69,11 @@ public class DayTypeAssignmentMapperTest {
 
     // WHEN - create calendar
     Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
-        dayTypes,
-        assignments,
-        EMPTY_OPERATING_DAYS,
-        EMPTY_PERIODS,
-        null
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      EMPTY_PERIODS,
+      null
     );
 
     // THEN - verify
@@ -99,20 +99,18 @@ public class DayTypeAssignmentMapperTest {
     // Remove 03.11
     assignments.add(DAY_TYPE_1, createDayTypeAssignment(DAY_TYPE_1, D2020_11_03, NOT_AVAILABLE));
 
-
     // WHEN - create calendar
     Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
-        dayTypes,
-        assignments,
-        EMPTY_OPERATING_DAYS,
-        EMPTY_PERIODS,
-        null
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      EMPTY_PERIODS,
+      null
     );
 
     // THEN - verify
     assertEquals("[2020-11-01]", toStr(result, DAY_TYPE_1));
   }
-
 
   @Test
   public void mapDayTypesToLocalDatesWithOperatingDay() {
@@ -128,11 +126,11 @@ public class DayTypeAssignmentMapperTest {
 
     // WHEN - create calendar
     Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
-        dayTypes,
-        assignments,
-        operatingDays,
-        EMPTY_PERIODS,
-        null
+      dayTypes,
+      assignments,
+      operatingDays,
+      EMPTY_PERIODS,
+      null
     );
 
     // THEN - verify
@@ -154,22 +152,25 @@ public class DayTypeAssignmentMapperTest {
       assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
       // Except 06.11.2020 to 23.11.2020
       periods.add(createOperatingPeriod(OP_2, D2020_11_03, D2020_11_27));
-      assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_2, NOT_AVAILABLE));
+      assignments.add(
+        DAY_TYPE_1,
+        createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_2, NOT_AVAILABLE)
+      );
     }
 
     // WHEN - create calendar
     Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
-        dayTypes,
-        assignments,
-        EMPTY_OPERATING_DAYS,
-        periods,
-        null
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      null
     );
 
     // THEN - verify
     assertEquals(
-        "[2020-11-01, 2020-11-02, 2020-11-28, 2020-11-29, 2020-11-30]",
-        toStr(result, DAY_TYPE_1)
+      "[2020-11-01, 2020-11-02, 2020-11-28, 2020-11-29, 2020-11-30]",
+      toStr(result, DAY_TYPE_1)
     );
   }
 
@@ -186,27 +187,29 @@ public class DayTypeAssignmentMapperTest {
       Boolean availableDefault = null;
       dayTypes.add(createDayType(DAY_TYPE_1, WEEKDAYS));
       periods.add(createOperatingPeriod(OP_3, D2020_12_22, D2020_12_31));
-      assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_3, availableDefault));
+      assignments.add(
+        DAY_TYPE_1,
+        createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_3, availableDefault)
+      );
       // Do not run service on christmas eve
       assignments.add(DAY_TYPE_1, createDayTypeAssignment(DAY_TYPE_1, D2020_12_24, NOT_AVAILABLE));
     }
 
     // WHEN - create calendar
     Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
-        dayTypes,
-        assignments,
-        operatingDays,
-        periods,
-        null
+      dayTypes,
+      assignments,
+      operatingDays,
+      periods,
+      null
     );
 
     // THEN - verify
     assertEquals(
-        "[2020-12-22, 2020-12-23, 2020-12-25, 2020-12-28, 2020-12-29, 2020-12-30, 2020-12-31]",
-        toStr(result, DAY_TYPE_1)
+      "[2020-12-22, 2020-12-23, 2020-12-25, 2020-12-28, 2020-12-29, 2020-12-30, 2020-12-31]",
+      toStr(result, DAY_TYPE_1)
     );
   }
-
 
   /* private helper methods */
 

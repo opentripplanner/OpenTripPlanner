@@ -9,28 +9,25 @@ import org.opentripplanner.model.base.ToStringBuilder;
  */
 public class ApiBookingTime implements Serializable {
 
-    /**
-     * The latest time at which the trip must be booked.
-     * <p>
-     * Unit: seconds since midnight
-     */
-    public final int time;
+  /**
+   * The latest time at which the trip must be booked.
+   * <p>
+   * Unit: seconds since midnight
+   */
+  public final int time;
 
-    /**
-     * How many days in advance this trip must be booked.
-     */
-    public final int daysPrior;
+  /**
+   * How many days in advance this trip must be booked.
+   */
+  public final int daysPrior;
 
-    public ApiBookingTime(int time, int daysPrior) {
-        this.time = time;
-        this.daysPrior = daysPrior;
-    }
+  public ApiBookingTime(int time, int daysPrior) {
+    this.time = time;
+    this.daysPrior = daysPrior;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(getClass())
-                .addNum("time", time)
-                .addNum("daysPrior", time)
-                .toString();
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(getClass()).addNum("time", time).addNum("daysPrior", time).toString();
+  }
 }

@@ -1,18 +1,22 @@
 package org.opentripplanner.ext.vehicleparking.kml;
 
+import java.util.List;
 import junit.framework.TestCase;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-
-import java.util.List;
 
 public class TestKmlBikeParkSource extends TestCase {
 
   private static final String TEST_FEED_ID = "testFeed";
 
   public void testKML() {
-    var parameters = new KmlUpdaterParameters("",
-            "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen.kml", TEST_FEED_ID,
-            null, 60, false, null
+    var parameters = new KmlUpdaterParameters(
+      "",
+      "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen.kml",
+      TEST_FEED_ID,
+      null,
+      60,
+      false,
+      null
     );
     KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(parameters);
     assertTrue(kmlDataSource.update());
@@ -29,10 +33,14 @@ public class TestKmlBikeParkSource extends TestCase {
   }
 
   public void testKMLWithFolder() {
-    var parameters = new KmlUpdaterParameters("",
-            "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen_folder.kml",
-            TEST_FEED_ID,
-            null, 60, false, null
+    var parameters = new KmlUpdaterParameters(
+      "",
+      "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen_folder.kml",
+      TEST_FEED_ID,
+      null,
+      60,
+      false,
+      null
     );
     KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(parameters);
     assertTrue(kmlDataSource.update());
@@ -47,5 +55,4 @@ public class TestKmlBikeParkSource extends TestCase {
     assertTrue(almere.getX() >= 5.21780 && almere.getX() <= 5.21782);
     assertTrue(almere.getY() >= 52.3746190 && almere.getY() <= 52.3746191);
   }
-
 }

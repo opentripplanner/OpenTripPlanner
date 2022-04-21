@@ -1,17 +1,17 @@
 package org.opentripplanner.model.projectinfo;
 
-import org.junit.Test;
-
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+import org.junit.Test;
 
 public class MavenProjectVersionTest {
 
   @Test
   public void parse() {
-    List.of(
+    List
+      .of(
         new TC("1", 1, 0, 0, ""),
         new TC("1.2", 1, 2, 0, ""),
         new TC("1.2.3", 1, 2, 3, ""),
@@ -21,17 +21,18 @@ public class MavenProjectVersionTest {
         new TC("1-rc-1", 1, 0, 0, "rc-1"),
         new TC("1.2.3-entur-31", 1, 2, 3, "entur-31"),
         new TC("1.2.3-SNAPSHOT", 1, 2, 3, "SNAPSHOT")
-    ).forEach(tc -> {
-      MavenProjectVersion v = MavenProjectVersion.parse(tc.input);
-      assertEquals(tc.input, tc.major, v.major);
-      assertEquals(tc.input, tc.minor, v.minor);
-      assertEquals(tc.input, tc.patch, v.patch);
-      assertEquals(tc.input, tc.qualifier, v.qualifier);
-    });
+      )
+      .forEach(tc -> {
+        MavenProjectVersion v = MavenProjectVersion.parse(tc.input);
+        assertEquals(tc.input, tc.major, v.major);
+        assertEquals(tc.input, tc.minor, v.minor);
+        assertEquals(tc.input, tc.patch, v.patch);
+        assertEquals(tc.input, tc.qualifier, v.qualifier);
+      });
   }
 
   @Test
-  public void unqualifiedVersion(){
+  public void unqualifiedVersion() {
     assertEquals("1.0.0", MavenProjectVersion.parse("1").unqualifiedVersion());
     assertEquals("1.2.0", MavenProjectVersion.parse("1.2").unqualifiedVersion());
     assertEquals("1.2.3", MavenProjectVersion.parse("1.2.3").unqualifiedVersion());
@@ -39,7 +40,7 @@ public class MavenProjectVersionTest {
   }
 
   @Test
-  public void toStringTest(){
+  public void toStringTest() {
     assertEquals("1", MavenProjectVersion.parse("1").toString());
     assertEquals("1.2.3", MavenProjectVersion.parse("1.2.3").toString());
     assertEquals("1-rc-2", MavenProjectVersion.parse("1-rc-2").toString());
@@ -47,13 +48,14 @@ public class MavenProjectVersionTest {
   }
 
   @Test
-  public void sameVersion(){
+  public void sameVersion() {
     MavenProjectVersion ver = MavenProjectVersion.parse("1.4.5-rc-32");
     MavenProjectVersion verSame = MavenProjectVersion.parse("1.4.5-rc-32");
     assertTrue(ver.sameVersion(verSame));
   }
 
   static class TC {
+
     final String input;
     final int major;
     final int minor;

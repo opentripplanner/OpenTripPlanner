@@ -1,10 +1,8 @@
 package org.opentripplanner.model;
 
-import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
@@ -12,6 +10,7 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 
 public class FlexStopLocation extends TransitEntity implements StopLocation {
+
   private static final long serialVersionUID = 1L;
 
   private I18NString name;
@@ -53,8 +52,17 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     this.url = url;
   }
 
-  public void setName(I18NString name) {
-    this.name = name;
+  @Override
+  public String getFirstZoneAsString() {
+    return zoneId;
+  }
+
+  /**
+   * Returns the centroid of this location.
+   */
+  @Override
+  public WgsCoordinate getCoordinate() {
+    return new WgsCoordinate(centroid.getY(), centroid.getX());
   }
 
   /**
@@ -70,23 +78,6 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     this.centroid = geometry.getCentroid();
   }
 
-  /**
-   * Returns the centroid of this location.
-   */
-  @Override
-  public WgsCoordinate getCoordinate() {
-    return new WgsCoordinate(centroid.getY(), centroid.getX());
-  }
-
-  @Override
-  public String getFirstZoneAsString() {
-    return zoneId;
-  }
-
-  public void setZoneId(String zoneId) {
-    this.zoneId = zoneId;
-  }
-
   @Override
   public boolean isPartOfStation() {
     return false;
@@ -99,5 +90,13 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public void setName(I18NString name) {
+    this.name = name;
+  }
+
+  public void setZoneId(String zoneId) {
+    this.zoneId = zoneId;
   }
 }

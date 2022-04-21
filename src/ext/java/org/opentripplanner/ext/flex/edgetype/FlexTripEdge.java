@@ -21,16 +21,20 @@ public class FlexTripEdge extends Edge {
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
 
   private static final long serialVersionUID = 1L;
-
+  private final FlexTrip trip;
   public StopLocation s1;
   public StopLocation s2;
-  private FlexTrip trip;
   public FlexAccessEgressTemplate flexTemplate;
   public FlexPath flexPath;
 
   public FlexTripEdge(
-      Vertex v1, Vertex v2, StopLocation s1, StopLocation s2, FlexTrip trip,
-      FlexAccessEgressTemplate flexTemplate, FlexPathCalculator calculator
+    Vertex v1,
+    Vertex v2,
+    StopLocation s1,
+    StopLocation s2,
+    FlexTrip trip,
+    FlexAccessEgressTemplate flexTemplate,
+    FlexPathCalculator calculator
   ) {
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
     // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.
@@ -41,14 +45,29 @@ public class FlexTripEdge extends Edge {
     this.flexTemplate = flexTemplate;
     this.fromv = v1;
     this.tov = v2;
-    this.flexPath = calculator.calculateFlexPath(fromv, tov, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
+    this.flexPath =
+      calculator.calculateFlexPath(
+        fromv,
+        tov,
+        flexTemplate.fromStopIndex,
+        flexTemplate.toStopIndex
+      );
+  }
+
+  public int getTimeInSeconds() {
+    return flexPath.durationSeconds;
+  }
+
+  @Override
+  public Trip getTrip() {
+    return trip.getTrip();
   }
 
   @Override
   public State traverse(State s0) {
-    if(this.flexPath == null) {
-       // not routable
-       return null;
+    if (this.flexPath == null) {
+      // not routable
+      return null;
     }
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.BUS);
@@ -61,13 +80,9 @@ public class FlexTripEdge extends Edge {
     return editor.makeState();
   }
 
-  public int getTimeInSeconds() {
-    return flexPath.durationSeconds;
-  }
-
   @Override
-  public double getDistanceMeters() {
-    return flexPath.distanceMeters;
+  public I18NString getName() {
+    return null;
   }
 
   @Override
@@ -76,13 +91,8 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
-  public I18NString getName() {
-    return null;
-  }
-
-  @Override
-  public Trip getTrip() {
-    return trip.getTrip();
+  public double getDistanceMeters() {
+    return flexPath.distanceMeters;
   }
 
   public FlexTrip getFlexTrip() {

@@ -11,80 +11,82 @@ import org.opentripplanner.model.base.ToStringBuilder;
  */
 public class TripSearchMetadata {
 
-    /**
-     * This is the time window used by the raptor search. The window is an optional parameter and
-     * OTP might override it/dynamically assign a new value.
-     */
-    public Duration searchWindowUsed;
+  /**
+   * This is the time window used by the raptor search. The window is an optional parameter and OTP
+   * might override it/dynamically assign a new value.
+   */
+  public Duration searchWindowUsed;
 
-    /**
-     * This is the suggested search time for the "next page" or time window. Insert it together
-     * with the {@link #searchWindowUsed} in the request to get a new set of trips following in the
-     * time-window AFTER the current search. No duplicate trips should be returned, unless a trip
-     * is delayed and new realtime-data is available.
-     */
-    @Deprecated
-    public Instant nextDateTime;
+  /**
+   * This is the suggested search time for the "next page" or time window. Insert it together with
+   * the {@link #searchWindowUsed} in the request to get a new set of trips following in the
+   * time-window AFTER the current search. No duplicate trips should be returned, unless a trip is
+   * delayed and new realtime-data is available.
+   */
+  @Deprecated
+  public Instant nextDateTime;
 
-    /**
-     * This is the suggested search time for the "previous page" or time window. Insert it together
-     * with the {@link #searchWindowUsed} in the request to get a new set of trips preceding in the
-     * time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
-     * is delayed and new realtime-data is available.
-     *
-     * @deprecated Use the PageInfo and request {@code nextCursor} and {@code previousCursor}
-     * instead.
-     */
-    @Deprecated
-    public Instant prevDateTime;
+  /**
+   * This is the suggested search time for the "previous page" or time window. Insert it together
+   * with the {@link #searchWindowUsed} in the request to get a new set of trips preceding in the
+   * time-window BEFORE the current search. No duplicate trips should be returned, unless a trip is
+   * delayed and new realtime-data is available.
+   *
+   * @deprecated Use the PageInfo and request {@code nextCursor} and {@code previousCursor} instead.
+   */
+  @Deprecated
+  public Instant prevDateTime;
 
+  private TripSearchMetadata(
+    Duration searchWindowUsed,
+    Instant prevDateTime,
+    Instant nextDateTime
+  ) {
+    this.searchWindowUsed = searchWindowUsed;
+    this.nextDateTime = nextDateTime;
+    this.prevDateTime = prevDateTime;
+  }
 
-    private TripSearchMetadata(Duration searchWindowUsed, Instant prevDateTime, Instant nextDateTime) {
-        this.searchWindowUsed = searchWindowUsed;
-        this.nextDateTime = nextDateTime;
-        this.prevDateTime = prevDateTime;
-    }
+  public static TripSearchMetadata createForArriveBy(
+    Instant reqTime,
+    int searchWindowUsed,
+    @Nullable Instant previousTimeInclusive
+  ) {
+    Instant prevDateTime = previousTimeInclusive == null
+      ? reqTime.minusSeconds(searchWindowUsed)
+      // Round up to closest minute, to meet the _inclusive_ requirement
+      : previousTimeInclusive.minusSeconds(1).truncatedTo(ChronoUnit.MINUTES).plusSeconds(60);
 
-    public static TripSearchMetadata createForArriveBy(
-        Instant reqTime,
-        int searchWindowUsed,
-        @Nullable Instant previousTimeInclusive
-    ) {
-        Instant prevDateTime = previousTimeInclusive == null
-                ? reqTime.minusSeconds(searchWindowUsed)
-                // Round up to closest minute, to meet the _inclusive_ requirement
-                : previousTimeInclusive
-                        .minusSeconds(1)
-                        .truncatedTo(ChronoUnit.MINUTES)
-                        .plusSeconds(60);
+    return new TripSearchMetadata(
+      Duration.ofSeconds(searchWindowUsed),
+      prevDateTime,
+      reqTime.plusSeconds(searchWindowUsed)
+    );
+  }
 
-        return new TripSearchMetadata(
-            Duration.ofSeconds(searchWindowUsed),
-            prevDateTime,
-            reqTime.plusSeconds(searchWindowUsed)
-        );
-    }
+  public static TripSearchMetadata createForDepartAfter(
+    Instant reqTime,
+    int searchWindowUsed,
+    Instant nextDateTimeExcusive
+  ) {
+    Instant nextDateTime = nextDateTimeExcusive == null
+      ? reqTime.plusSeconds(searchWindowUsed)
+      : nextDateTimeExcusive.truncatedTo(ChronoUnit.MINUTES);
 
-    public static TripSearchMetadata createForDepartAfter(
-        Instant reqTime, int searchWindowUsed, Instant nextDateTimeExcusive
-    ) {
-        Instant nextDateTime = nextDateTimeExcusive == null
-            ? reqTime.plusSeconds(searchWindowUsed)
-            : nextDateTimeExcusive.truncatedTo(ChronoUnit.MINUTES);
+    return new TripSearchMetadata(
+      Duration.ofSeconds(searchWindowUsed),
+      reqTime.minusSeconds(searchWindowUsed),
+      nextDateTime
+    );
+  }
 
-        return new TripSearchMetadata(
-            Duration.ofSeconds(searchWindowUsed),
-            reqTime.minusSeconds(searchWindowUsed),
-            nextDateTime
-        );
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(TripSearchMetadata.class)
-            .addDuration("searchWindowUsed", searchWindowUsed)
-            .addObj("nextDateTime", nextDateTime)
-            .addObj("prevDateTime", prevDateTime)
-            .toString();
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TripSearchMetadata.class)
+      .addDuration("searchWindowUsed", searchWindowUsed)
+      .addObj("nextDateTime", nextDateTime)
+      .addObj("prevDateTime", prevDateTime)
+      .toString();
+  }
 }

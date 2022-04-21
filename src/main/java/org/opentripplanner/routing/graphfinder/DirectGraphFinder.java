@@ -24,22 +24,19 @@ public class DirectGraphFinder implements GraphFinder {
   }
 
   /**
-   * Return all stops within a certain radius of the given vertex, using straight-line distance independent of streets.
-   * If the origin vertex is a StopVertex, the result will include it.
+   * Return all stops within a certain radius of the given vertex, using straight-line distance
+   * independent of streets. If the origin vertex is a StopVertex, the result will include it.
    */
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
     List<NearbyStop> stopsFound = Lists.newArrayList();
     Coordinate coordinate = new Coordinate(lon, lat);
     for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
-      double distance = Math.round(SphericalDistanceLibrary.distance(coordinate, it.getCoordinate()));
+      double distance = Math.round(
+        SphericalDistanceLibrary.distance(coordinate, it.getCoordinate())
+      );
       if (distance < radiusMeters) {
-        NearbyStop sd = new NearbyStop(
-            it,
-            distance,
-            null,
-            null
-        );
+        NearbyStop sd = new NearbyStop(it, distance, null, null);
         stopsFound.add(sd);
       }
     }
@@ -51,10 +48,16 @@ public class DirectGraphFinder implements GraphFinder {
 
   @Override
   public List<PlaceAtDistance> findClosestPlaces(
-      double lat, double lon, double maxDistance, int maxResults, List<TransitMode> filterByModes,
-      List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
-      List<String> filterByBikeParks, List<String> filterByCarParks, RoutingService routingService
+    double lat,
+    double lon,
+    double maxDistance,
+    int maxResults,
+    List<TransitMode> filterByModes,
+    List<PlaceType> filterByPlaceTypes,
+    List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByRoutes,
+    List<String> filterByBikeRentalStations,
+    RoutingService routingService
   ) {
     throw new UnsupportedOperationException("Not implemented");
   }

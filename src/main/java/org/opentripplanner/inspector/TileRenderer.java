@@ -1,54 +1,49 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Graphics2D;
-
-import org.opentripplanner.routing.graph.Graph;
-
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * Interface for a slippy map tile renderer.
- * 
+ *
  * @author laurent
  */
 public interface TileRenderer {
+  /** Return the BufferedImage color model the renderer would like to use */
+  int getColorModel();
 
-    /**
-     * Context used for rendering a tile.
-     * 
-     */
-    public abstract class TileRenderContext {
+  /** Implementation of the tile rendering */
+  void renderTile(TileRenderContext context);
 
-        /** Graphics where to paint tile to, in pixel CRS (no transform set) */
-        public Graphics2D graphics;
+  /** Gets descriptive name of this Tile Render */
+  String getName();
 
-        /** The JTS transform that convert from WGS84 CRS to pixel CRS */
-        public AffineTransformation transform;
+  /**
+   * Context used for rendering a tile.
+   */
+  abstract class TileRenderContext {
 
-        /** The graph being processed */
-        public Graph graph;
+    /** Graphics where to paint tile to, in pixel CRS (no transform set) */
+    public Graphics2D graphics;
 
-        /** Bounding box of the rendered tile in WGS84 CRS, w/o margins */
-        public Envelope bbox;
+    /** The JTS transform that convert from WGS84 CRS to pixel CRS */
+    public AffineTransformation transform;
 
-        /** Ground pixel density inverse */
-        public double metersPerPixel;
+    /** The graph being processed */
+    public Graph graph;
 
-        /** Tile size in pixels */
-        public int tileWidth, tileHeight;
+    /** Bounding box of the rendered tile in WGS84 CRS, w/o margins */
+    public Envelope bbox;
 
-        /** Expand the bounding box to add some margins, in pixel size. */
-        public abstract Envelope expandPixels(double marginXPixels, double marginYPixels);
-    }
+    /** Ground pixel density inverse */
+    public double metersPerPixel;
 
-    /** Return the BufferedImage color model the renderer would like to use */
-    public abstract int getColorModel();
+    /** Tile size in pixels */
+    public int tileWidth, tileHeight;
 
-    /** Implementation of the tile rendering */
-    public abstract void renderTile(TileRenderContext context);
-
-    /** Gets descriptive name of this Tile Render */
-    public abstract String getName();
-
+    /** Expand the bounding box to add some margins, in pixel size. */
+    public abstract Envelope expandPixels(double marginXPixels, double marginYPixels);
+  }
 }

@@ -2,10 +2,10 @@ package org.opentripplanner.model;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.util.I18NString;
 import java.util.TimeZone;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
@@ -13,7 +13,6 @@ import org.locationtech.jts.geom.GeometryCollection;
  * transit. StopLocations are referred to in stop times.
  */
 public interface StopLocation {
-
   /** The ID for the StopLocation */
   FeedScopedId getId();
 
@@ -22,6 +21,7 @@ public interface StopLocation {
 
   String getDescription();
 
+  @Nullable
   I18NString getUrl();
 
   /**
@@ -38,9 +38,13 @@ public interface StopLocation {
     return null;
   }
 
-  default TransitMode getVehicleType() { return null; }
+  default TransitMode getVehicleType() {
+    return null;
+  }
 
-  default String getVehicleSubmode() { return null; }
+  default String getVehicleSubmode() {
+    return null;
+  }
 
   default double getLat() {
     return getCoordinate().latitude();
@@ -50,13 +54,17 @@ public interface StopLocation {
     return getCoordinate().longitude();
   }
 
-  default Station getParentStation() { return null; }
+  default Station getParentStation() {
+    return null;
+  }
 
   default Collection<FareZone> getFareZones() {
     return List.of();
   }
 
-  default WheelChairBoarding getWheelchairBoarding() { return null; };
+  default WheelChairBoarding getWheelchairBoarding() {
+    return WheelChairBoarding.NO_INFORMATION;
+  }
 
   /**
    * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
@@ -74,15 +82,16 @@ public interface StopLocation {
 
   /**
    * The geometry of the stop.
-   *
-   * For fixed-schedule stops this will return the same data as
-   * getCoordinate().
-   *
+   * <p>
+   * For fixed-schedule stops this will return the same data as getCoordinate().
+   * <p>
    * For flex stops this will return the geometries of the stop or group of stops.
    */
   Geometry getGeometry();
 
-  default TimeZone getTimeZone() { return null; }
+  default TimeZone getTimeZone() {
+    return null;
+  }
 
   boolean isPartOfStation();
 

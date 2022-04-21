@@ -1,5 +1,14 @@
 package org.opentripplanner.netex.mapping;
 
+import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -19,15 +28,6 @@ import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.ServiceJourney;
 
-import javax.xml.bind.JAXBElement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 public class TripCalendarBuilder {
 
   private final CalendarServiceBuilder calendarServiceBuilder;
@@ -37,8 +37,10 @@ public class TripCalendarBuilder {
   private HierarchicalMap<String, Set<ServiceDate>> dayTypeCalendars = new HierarchicalMap<>();
   private HierarchicalMap<String, Set<ServiceDate>> dsjBySJId = new HierarchicalMap<>();
 
-
-  public TripCalendarBuilder(CalendarServiceBuilder calendarServiceBuilder, DataImportIssueStore issueStore) {
+  public TripCalendarBuilder(
+    CalendarServiceBuilder calendarServiceBuilder,
+    DataImportIssueStore issueStore
+  ) {
     this.calendarServiceBuilder = calendarServiceBuilder;
     this.issueStore = issueStore;
   }
@@ -57,39 +59,41 @@ public class TripCalendarBuilder {
    * Map DayTypeAssignments and store them in a hierarchical map to be able to retrieve them later.
    */
   public void addDayTypeAssignments(
-      ReadOnlyHierarchicalMapById<DayType> dayTypeById,
-      ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
-      ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
-      ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById
+    ReadOnlyHierarchicalMapById<DayType> dayTypeById,
+    ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
+    ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
+    ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById
   ) {
     dayTypeCalendars.addAll(
-        DayTypeAssignmentMapper.mapDayTypes(
-            dayTypeById,
-            dayTypeAssignmentByDayTypeId,
-            operatingDays,
-            operatingPeriodById,
-            issueStore
-        )
+      DayTypeAssignmentMapper.mapDayTypes(
+        dayTypeById,
+        dayTypeAssignmentByDayTypeId,
+        operatingDays,
+        operatingPeriodById,
+        issueStore
+      )
     );
   }
 
   void addDatedServiceJourneys(
-      ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
-      Map<String, List<DatedServiceJourney>> datedServiceJourneyBySJId
+    ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
+    Multimap<String, DatedServiceJourney> datedServiceJourneyBySJId
   ) {
     for (String sjId : datedServiceJourneyBySJId.keySet()) {
+      if (!dsjBySJId.containsKey(sjId)) {
+        dsjBySJId.add(sjId, new HashSet<>());
+      }
 
-      if (!dsjBySJId.containsKey(sjId)) { dsjBySJId.add(sjId, new HashSet<>()); }
-
-      dsjBySJId.lookup(sjId).addAll(
+      dsjBySJId
+        .lookup(sjId)
+        .addAll(
           DatedServiceJourneyMapper.mapToServiceDates(
-              datedServiceJourneyBySJId.get(sjId),
-              operatingDayById
+            datedServiceJourneyBySJId.get(sjId),
+            operatingDayById
           )
-      );
+        );
     }
   }
-
 
   Map<String, FeedScopedId> createTripCalendar(Iterable<ServiceJourney> serviceJourneys) {
     // Create a map to store the result
@@ -117,17 +121,18 @@ public class TripCalendarBuilder {
   private Collection<ServiceDate> getServiceDatesForDayType(ServiceJourney sj) {
     DayTypeRefs_RelStructure dayTypes = sj.getDayTypes();
 
-    if (dayTypes == null) { return List.of(); }
+    if (dayTypes == null) {
+      return List.of();
+    }
 
     List<ServiceDate> result = new ArrayList<>();
 
     for (JAXBElement<? extends DayTypeRefStructure> dt : dayTypes.getDayTypeRef()) {
       String dayTypeRef = dt.getValue().getRef();
       Set<ServiceDate> dates = dayTypeCalendars.lookup(dayTypeRef);
-      if(dates != null) {
+      if (dates != null) {
         result.addAll(dates);
-      }
-      else {
+      } else {
         reportSJDayTypeNotFound(sj, dayTypeRef);
       }
     }
@@ -139,11 +144,6 @@ public class TripCalendarBuilder {
   }
 
   private void reportSJDayTypeNotFound(ServiceJourney sj, String dayTypeRef) {
-    issueStore.add(
-        new ObjectNotFound(
-            "ServiceJourney", sj.getId(),
-            "DayTypes", dayTypeRef
-        )
-    );
+    issueStore.add(new ObjectNotFound("ServiceJourney", sj.getId(), "DayTypes", dayTypeRef));
   }
 }

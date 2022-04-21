@@ -3,10 +3,8 @@ package org.opentripplanner.routing.vertextype;
 import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +23,11 @@ public class TransitPathwayNodeVertex extends Vertex {
    */
   public TransitPathwayNodeVertex(Graph graph, PathwayNode node) {
     super(
-        graph,
-        node.getId().toString(),
-        node.getCoordinate().longitude(),
-        node.getCoordinate().latitude(),
-        node.getName()
+      graph,
+      node.getId().toString(),
+      node.getCoordinate().longitude(),
+      node.getCoordinate().latitude(),
+      node.getName()
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

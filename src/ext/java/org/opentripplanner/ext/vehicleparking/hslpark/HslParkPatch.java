@@ -7,29 +7,25 @@ import org.opentripplanner.model.FeedScopedId;
  */
 public class HslParkPatch {
 
-    private final FeedScopedId facilityId;
-    private final String capacityType;
-    private final Integer spacesAvailable;
+  private final FeedScopedId facilityId;
+  private final String capacityType;
+  private final Integer spacesAvailable;
 
-    public HslParkPatch(
-            FeedScopedId facilityId,
-            String capacityType,
-            Integer spacesAvailable
-    ) {
-        this.facilityId = facilityId;
-        this.capacityType = capacityType;
-        this.spacesAvailable = spacesAvailable;
-    }
+  public HslParkPatch(FeedScopedId facilityId, String capacityType, Integer spacesAvailable) {
+    this.facilityId = facilityId;
+    this.capacityType = capacityType;
+    this.spacesAvailable = spacesAvailable;
+  }
 
-    public FeedScopedId getId() {
-        return this.facilityId;
-    }
+  public FeedScopedId getId() {
+    return this.facilityId;
+  }
 
-    public String getCapacityType() {
-        return this.capacityType;
-    }
+  public String getCapacityType() {
+    return this.capacityType;
+  }
 
-    public Integer getSpacesAvailable() {
-        return this.spacesAvailable;
-    }
+  public Integer getSpacesAvailable() {
+    return this.spacesAvailable;
+  }
 }

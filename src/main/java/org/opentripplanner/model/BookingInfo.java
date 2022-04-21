@@ -7,7 +7,7 @@ import java.util.EnumSet;
 /**
  * Info about how a trip might be booked at a particular stop. All of this is pass-through
  * information, except information about booking time and booking notice.
- *
+ * <p>
  * // TODO Make the routing take into account booking time and booking notice.
  */
 public class BookingInfo implements Serializable {
@@ -43,15 +43,15 @@ public class BookingInfo implements Serializable {
   private final String dropOffMessage;
 
   public BookingInfo(
-      ContactInfo contactInfo,
-      EnumSet<BookingMethod> bookingMethods,
-      BookingTime earliestBookingTime,
-      BookingTime latestBookingTime,
-      Duration minimumBookingNotice,
-      Duration maximumBookingNotice,
-      String message,
-      String pickupMessage,
-      String dropOffMessage
+    ContactInfo contactInfo,
+    EnumSet<BookingMethod> bookingMethods,
+    BookingTime earliestBookingTime,
+    BookingTime latestBookingTime,
+    Duration minimumBookingNotice,
+    Duration maximumBookingNotice,
+    String message,
+    String pickupMessage,
+    String dropOffMessage
   ) {
     this.contactInfo = contactInfo;
     this.bookingMethods = bookingMethods;

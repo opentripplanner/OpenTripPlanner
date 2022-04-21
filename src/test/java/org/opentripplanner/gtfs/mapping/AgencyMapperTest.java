@@ -1,94 +1,94 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.Agency;
-
-import java.util.Collection;
-import java.util.Collections;
-
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+import java.util.Collections;
+import org.junit.Test;
+import org.onebusaway.gtfs.model.Agency;
+
 public class AgencyMapperTest {
-    private static final String FEED_ID = "FEED";
 
-    private static final Agency AGENCY = new Agency();
+  private static final String FEED_ID = "FEED";
 
-    private static final String ID = "ID";
+  private static final Agency AGENCY = new Agency();
 
-    private static final String NAME = "Ann";
+  private static final String ID = "ID";
 
-    private static final String LANG = "NO";
+  private static final String NAME = "Ann";
 
-    private static final String PHONE = "+47 987 65 432";
+  private static final String LANG = "NO";
 
-    private static final String TIMEZONE = "GMT";
+  private static final String PHONE = "+47 987 65 432";
 
-    private static final String URL = "www.url.com";
+  private static final String TIMEZONE = "GMT";
 
-    private static final String FARE_URL = "www.url.com/fare";
+  private static final String URL = "www.url.com";
 
-    private static final String BRANDING_URL = "www.url.com/brand";
+  private static final String FARE_URL = "www.url.com/fare";
 
-    static {
-        AGENCY.setId(ID);
-        AGENCY.setName(NAME);
-        AGENCY.setLang(LANG);
-        AGENCY.setPhone(PHONE);
-        AGENCY.setTimezone(TIMEZONE);
-        AGENCY.setUrl(URL);
-        AGENCY.setFareUrl(FARE_URL);
-        AGENCY.setBrandingUrl(BRANDING_URL);
-    }
+  private static final String BRANDING_URL = "www.url.com/brand";
+  private final AgencyMapper subject = new AgencyMapper(FEED_ID);
 
-    private AgencyMapper subject = new AgencyMapper(FEED_ID);
+  static {
+    AGENCY.setId(ID);
+    AGENCY.setName(NAME);
+    AGENCY.setLang(LANG);
+    AGENCY.setPhone(PHONE);
+    AGENCY.setTimezone(TIMEZONE);
+    AGENCY.setUrl(URL);
+    AGENCY.setFareUrl(FARE_URL);
+    AGENCY.setBrandingUrl(BRANDING_URL);
+  }
 
-    @Test
-    public void testMapCollection() throws Exception {
-        assertNull(subject.map((Collection<Agency>) null));
-        assertTrue(subject.map(Collections.emptyList()).isEmpty());
-        assertEquals(1, subject.map(singleton(AGENCY)).size());
-    }
+  @Test
+  public void testMapCollection() throws Exception {
+    assertNull(subject.map((Collection<Agency>) null));
+    assertTrue(subject.map(Collections.emptyList()).isEmpty());
+    assertEquals(1, subject.map(singleton(AGENCY)).size());
+  }
 
-    @Test
-    public void testMap() throws Exception {
-        org.opentripplanner.model.Agency result = subject.map(AGENCY);
+  @Test
+  public void testMap() throws Exception {
+    org.opentripplanner.model.Agency result = subject.map(AGENCY);
 
-        assertEquals("FEED:ID", result.getId().toString());
-        assertEquals(NAME, result.getName());
-        assertEquals(LANG, result.getLang());
-        assertEquals(PHONE, result.getPhone());
-        assertEquals(TIMEZONE, result.getTimezone());
-        assertEquals(URL, result.getUrl());
-        assertEquals(FARE_URL, result.getFareUrl());
-        assertEquals(BRANDING_URL, result.getBrandingUrl());
-    }
+    assertEquals("FEED:ID", result.getId().toString());
+    assertEquals(NAME, result.getName());
+    assertEquals(LANG, result.getLang());
+    assertEquals(PHONE, result.getPhone());
+    assertEquals(TIMEZONE, result.getTimezone());
+    assertEquals(URL, result.getUrl());
+    assertEquals(FARE_URL, result.getFareUrl());
+    assertEquals(BRANDING_URL, result.getBrandingUrl());
+  }
 
-    @Test
-    public void testMapWithNulls() throws Exception {
-        Agency orginal = new Agency();
-        orginal.setId(ID);
-        org.opentripplanner.model.Agency result = subject.map(orginal);
+  @Test
+  public void testMapWithNulls() throws Exception {
+    Agency orginal = new Agency();
+    orginal.setId(ID);
+    org.opentripplanner.model.Agency result = subject.map(orginal);
 
-        assertNotNull(result.getId());
-        assertNull(result.getName());
-        assertNull(result.getLang());
-        assertNull(result.getPhone());
-        assertNull(result.getTimezone());
-        assertNull(result.getUrl());
-        assertNull(result.getFareUrl());
-        assertNull(result.getBrandingUrl());
-    }
+    assertNotNull(result.getId());
+    assertNull(result.getName());
+    assertNull(result.getLang());
+    assertNull(result.getPhone());
+    assertNull(result.getTimezone());
+    assertNull(result.getUrl());
+    assertNull(result.getFareUrl());
+    assertNull(result.getBrandingUrl());
+  }
 
-    /** Mapping the same object twice, should return the the same instance. */
-    @Test
-    public void testMapCache() throws Exception {
-        org.opentripplanner.model.Agency result1 = subject.map(AGENCY);
-        org.opentripplanner.model.Agency result2 = subject.map(AGENCY);
+  /** Mapping the same object twice, should return the the same instance. */
+  @Test
+  public void testMapCache() throws Exception {
+    org.opentripplanner.model.Agency result1 = subject.map(AGENCY);
+    org.opentripplanner.model.Agency result2 = subject.map(AGENCY);
 
-        assertTrue(result1 == result2);
-    }
+    assertSame(result1, result2);
+  }
 }
