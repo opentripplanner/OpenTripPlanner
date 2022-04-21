@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import java.time.Duration;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -69,8 +70,14 @@ public class RoutingRequestMapper {
     request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
     request.boardSlackForMode =
       c.asEnumMap("boardSlackForMode", TransitMode.class, NodeAdapter::asInt);
-    request.maxAccessEgressDurationSecondsForMode =
-      c.asEnumMap("maxAccessEgressDurationSecondsForMode", StreetMode.class, NodeAdapter::asDouble);
+    request.maxAccessEgressDurationForMode =
+      c.exist("maxAccessEgressDurationForMode")
+        ? c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
+        : c.asEnumMap( // TODO: Remove deprecated parameter
+          "maxAccessEgressDurationSecondsForMode",
+          StreetMode.class,
+          (node, param) -> Duration.ofSeconds(node.asLong(param))
+        );
     request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
     request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
     request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
@@ -91,8 +98,14 @@ public class RoutingRequestMapper {
     request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
     request.locale = c.asLocale("locale", dft.locale);
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
-    request.maxDirectStreetDurationSeconds =
-      c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
+    request.maxDirectStreetDuration =
+      c.asDuration(
+        "maxDirectStreetDuration",
+        // TODO: Remove deprecated parameter
+        c.exist("maxDirectStreetDurationSeconds")
+          ? Duration.ofSeconds(c.asLong("maxDirectStreetDurationSeconds"))
+          : dft.maxDirectStreetDuration
+      );
     request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
     request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
     request.wheelchairSlopeTooSteepCostFactor =

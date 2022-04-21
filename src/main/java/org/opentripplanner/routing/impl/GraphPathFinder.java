@@ -66,7 +66,7 @@ public class GraphPathFinder {
     }
 
     AStarBuilder aStar = AStarBuilder
-      .oneToOneMaxDuration(Duration.ofSeconds((long) options.maxDirectStreetDurationSeconds))
+      .oneToOneMaxDuration(options.maxDirectStreetDuration)
       .setContext(routingContext)
       .setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
 
