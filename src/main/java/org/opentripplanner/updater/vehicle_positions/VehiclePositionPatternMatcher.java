@@ -230,13 +230,11 @@ public class VehiclePositionPatternMatcher {
   }
 
   private static String toString(VehiclePosition vehiclePosition) {
-    String message;
     try {
-      message = JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
+      return JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
     } catch (InvalidProtocolBufferException ignored) {
-      message = vehiclePosition.toString();
+      return vehiclePosition.toString();
     }
-    return message;
   }
 
   private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
