@@ -758,7 +758,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
-  private boolean cancelScheduledTrip(FeedScopedId tripId, final ServiceDate serviceDate) {
+  private boolean cancelScheduledTrip(final FeedScopedId tripId, final ServiceDate serviceDate) {
     boolean success = false;
 
     final TripPattern pattern = getPatternForTripId(tripId);
@@ -792,7 +792,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param serviceDate service date
    * @return true if a previously added trip was cancelled
    */
-  private boolean cancelPreviouslyAddedTrip(FeedScopedId tripId, final ServiceDate serviceDate) {
+  private boolean cancelPreviouslyAddedTrip(
+    final FeedScopedId tripId,
+    final ServiceDate serviceDate
+  ) {
     boolean success = false;
 
     final TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
