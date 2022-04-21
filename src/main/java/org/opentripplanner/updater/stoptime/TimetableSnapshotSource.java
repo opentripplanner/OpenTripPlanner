@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -711,8 +710,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       "number of stop should match the number of stop time updates"
     );
 
-    Consumer<String> warn = (String message) -> TimetableSnapshotSource.warn(trip.getId(), message);
-
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
     final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
     final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
@@ -731,7 +728,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
         final long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          warn.accept(
+          warn(
+            trip.getId(),
             "ADDED trip has invalid arrival time (compared to start date in " +
             "TripDescriptor), skipping."
           );
@@ -744,7 +742,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final long departureTime =
           stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          warn.accept(
+          warn(
+            trip.getId(),
             "ADDED trip has invalid departure time (compared to start date in " +
             "TripDescriptor), skipping."
           );
@@ -853,7 +852,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final Timetable timetable = buffer.resolve(pattern, serviceDate);
       final int tripIndex = timetable.getTripIndex(tripId);
       if (tripIndex == -1) {
-        warn(tripId, "Could not cancel previously added trip on ", serviceDate);
+        warn(tripId, "Could not cancel previously added trip on {}", serviceDate);
       } else {
         final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
         newTripTimes.cancelTrip();
