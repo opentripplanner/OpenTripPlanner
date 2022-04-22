@@ -31,7 +31,6 @@ public final class TripScheduleWithOffset implements TripSchedule {
   private TripTimes tripTimes = null;
   private LocalDate serviceDate = null;
   private int secondsOffset;
-  private final WheelChairBoarding wheelchairBoarding;
 
   TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
     this.tripIndexForDates = tripIndexForDates;
@@ -45,7 +44,6 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
     // Trip times are sorted based on the arrival times at stop 0,
     this.sortIndex = arrivalTimes.applyAsInt(0);
-    this.wheelchairBoarding = getOriginalTripTimes().getTrip().getWheelchairBoarding();
   }
 
   @Override
@@ -75,7 +73,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   @Override
   public WheelChairBoarding wheelchairBoarding() {
-    return wheelchairBoarding;
+    return getOriginalTripTimes().getTrip().getWheelchairBoarding();
   }
 
   /*
