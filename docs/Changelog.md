@@ -40,6 +40,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Read max slope from default routing request [#4098](https://github.com/opentripplanner/OpenTripPlanner/pull/4098)
 - Fix problem with submode filter [#4093](https://github.com/opentripplanner/OpenTripPlanner/pull/4093)
 - Make maxWheelchairSlope not a hard cut-off, but apply a cost instead [#4088](https://github.com/opentripplanner/OpenTripPlanner/pull/4088)
+- Expose Leg.serviceDate in trip end-point [#4096](https://github.com/opentripplanner/OpenTripPlanner/pull/4096)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
