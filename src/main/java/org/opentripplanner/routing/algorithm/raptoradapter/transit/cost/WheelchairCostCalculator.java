@@ -4,11 +4,7 @@ import static org.opentripplanner.model.WheelChairBoarding.NOT_POSSIBLE;
 import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
 import static org.opentripplanner.model.WheelChairBoarding.POSSIBLE;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Map.Entry;
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -52,9 +48,7 @@ public class WheelchairCostCalculator implements CostCalculator {
       trip,
       transferConstraints
     );
-    // this is an unsafe cast but is ok because the trip is guaranteed to be of type TripSchedule
-    var tripSchedule = (TripSchedule) trip;
-    int index = tripSchedule.getOriginalTripTimes().getTrip().getWheelchairBoarding().ordinal();
+    int index = trip.wheelchairBoarding().ordinal();
     int wheelchairCost = wheelchairBoardingCost[index];
 
     return defaultCost + wheelchairCost;

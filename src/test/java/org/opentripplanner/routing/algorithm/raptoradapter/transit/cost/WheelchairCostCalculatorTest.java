@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class WheelchairCostCalculatorTest {
@@ -24,19 +25,28 @@ public class WheelchairCostCalculatorTest {
 
   @Test
   public void boardAccessibleTrip() {
-    var schedule = new TestTripSchedule(WheelChairBoarding.POSSIBLE);
+    var schedule = TestTripSchedule
+      .schedule("10:00 10:05")
+      .wheelchairBoarding(WheelChairBoarding.POSSIBLE)
+      .build();
     assertEquals(DummyCostCalculator.COST, board(schedule));
   }
 
   @Test
   public void boardTripWithUnknownAccessibility() {
-    var schedule = new TestTripSchedule(WheelChairBoarding.NO_INFORMATION);
+    var schedule = TestTripSchedule
+      .schedule("10:00 10:05")
+      .wheelchairBoarding(WheelChairBoarding.NO_INFORMATION)
+      .build();
     assertEquals(DummyCostCalculator.COST + UNKNOWN_ACCESSIBILITY_COST * 100, board(schedule));
   }
 
   @Test
   public void boardInaccessibleTrip() {
-    var schedule = new TestTripSchedule(WheelChairBoarding.NOT_POSSIBLE);
+    var schedule = TestTripSchedule
+      .schedule("10:00 10:05")
+      .wheelchairBoarding(WheelChairBoarding.NOT_POSSIBLE)
+      .build();
     assertEquals(DummyCostCalculator.COST + (INACCESSIBLE_TRIP_COST * 100), board(schedule));
   }
 

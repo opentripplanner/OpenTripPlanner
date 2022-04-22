@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
@@ -36,6 +37,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
   protected final int offset;
   protected final int headway;
   protected final LocalDate serviceDate;
+  private final WheelChairBoarding wheelChairBoarding;
 
   public FrequencyBoardOrAlightEvent(
     RaptorTripPattern raptorTripPattern,
@@ -55,6 +57,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
     this.offset = offset;
     this.headway = headway;
     this.serviceDate = serviceDate;
+    wheelChairBoarding = tripTimes.getTrip().getWheelchairBoarding();
   }
 
   /* RaptorTripScheduleBoardOrAlightEvent implementation */
@@ -132,5 +135,10 @@ abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
   @Override
   public int frequencyHeadwayInSeconds() {
     return headway;
+  }
+
+  @Override
+  public WheelChairBoarding wheelchairBoarding() {
+    return wheelChairBoarding;
   }
 }
