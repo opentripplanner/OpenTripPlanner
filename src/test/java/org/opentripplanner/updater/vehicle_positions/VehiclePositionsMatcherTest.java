@@ -16,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.VariableSource;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -26,6 +25,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.test.support.VariableSource;
 
 public class VehiclePositionsMatcherTest {
 
@@ -153,14 +153,14 @@ public class VehiclePositionsMatcherTest {
     assertEquals(0, service.getVehiclePositions(pattern2).size());
   }
 
-  static Stream<Arguments> arguments = Stream.of(
+  static Stream<Arguments> inferenceTestCases = Stream.of(
     Arguments.of("2022-04-05T15:26:04+02:00", "2022-04-05"),
     Arguments.of("2022-04-06T00:26:04+02:00", "2022-04-05"),
     Arguments.of("2022-04-06T10:26:04+02:00", "2022-04-06")
   );
 
   @ParameterizedTest(name = "{0} should resolve to {1}")
-  @VariableSource("arguments")
+  @VariableSource("inferenceTestCases")
   void inferServiceDayOfTripAt6(String time, String expectedDate) {
     var trip = new Trip(scopedTripId);
 

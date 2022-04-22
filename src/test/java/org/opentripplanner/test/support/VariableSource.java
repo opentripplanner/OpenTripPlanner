@@ -1,4 +1,4 @@
-package org.opentripplanner;
+package org.opentripplanner.test.support;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

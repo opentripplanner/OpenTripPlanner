@@ -1,4 +1,4 @@
-package org.opentripplanner;
+package org.opentripplanner.test.support;
 
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
