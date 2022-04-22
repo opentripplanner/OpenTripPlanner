@@ -236,6 +236,11 @@ public class Itinerary {
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
    * <p>
+   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the 
+   * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not 
+   * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
+   * street traversal. 
+   * <p>
    * The intended audience for this score are frontend developers wanting to show a simple UI rather
    * than having to iterate over all the stops and trips.
    * <p>

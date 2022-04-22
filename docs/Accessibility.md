@@ -43,7 +43,7 @@ The parameters for `stops` and `trips` mean the following:
 
 | name                     |                                                                                                                                         |
 |--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `onlyConsiderAccessible` | Whether to include stops/trips of unknown accessibility or those which are known to be inaccessible in the search for wheelchair users. |
+| `onlyConsiderAccessible` | Whether to include unknown accessibility and inaccessible stops/tips in the search. |
 | `unknownCost`            | The cost to add if a stop/trip has unknown wheelchair accessibility                                                                     |
 | `inaccessibleCost`       | The cost to add if a stop/trip is known to be inaccessible                                                                              |
 
