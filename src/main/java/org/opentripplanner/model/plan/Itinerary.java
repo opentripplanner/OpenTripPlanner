@@ -57,7 +57,25 @@ public class Itinerary {
    * then walks to their destination, has four legs.
    */
   public final List<Leg> legs;
-  private final Float accessibilityScore;
+
+  /**
+   * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
+   * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
+   * guidance that expresses certainty or uncertainty about the accessibility.
+   * <p>
+   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the
+   * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
+   * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
+   * street traversal.
+   * <p>
+   * The intended audience for this score are frontend developers wanting to show a simple UI rather
+   * than having to iterate over all the stops and trips.
+   * <p>
+   * Note: the information to calculate this score are all available to the frontend, however
+   * calculating them on the backend makes life a little easier and changes are automatically
+   * applied to all frontends.
+   */
+  public Float accessibilityScore;
   /**
    * How much time is spent walking/biking/driving, in seconds.
    */
@@ -124,10 +142,6 @@ public class Itinerary {
   public Fare fare = new Fare();
 
   public Itinerary(List<Leg> legs) {
-    this(legs, null);
-  }
-
-  public Itinerary(List<Leg> legs, Float accessibilityScore) {
     this.legs = List.copyOf(legs);
 
     // Set aggregated data
@@ -142,7 +156,6 @@ public class Itinerary {
     this.streetOnly = totals.streetOnly;
     this.elevationGained = totals.totalElevationGained;
     this.elevationLost = totals.totalElevationLost;
-    this.accessibilityScore = accessibilityScore;
   }
 
   /**
@@ -229,42 +242,6 @@ public class Itinerary {
   /** Get the first transit leg if one exist */
   public Optional<Leg> firstTransitLeg() {
     return legs.stream().filter(Leg::isTransitLeg).findFirst();
-  }
-
-  /**
-   * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
-   * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
-   * guidance that expresses certainty or uncertainty about the accessibility.
-   * <p>
-   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the
-   * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
-   * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
-   * street traversal.
-   * <p>
-   * The intended audience for this score are frontend developers wanting to show a simple UI rather
-   * than having to iterate over all the stops and trips.
-   * <p>
-   * Note: the information to calculate this score are all available to the frontend, however
-   * calculating them on the backend makes life a little easier and changes are automatically
-   * applied to all frontends.
-   */
-  public Float accessibilityScore() {
-    return accessibilityScore;
-  }
-
-  public Itinerary withAccessibilityScore(List<Leg> legs, Float score) {
-    var copy = new Itinerary(legs, score);
-    copy.nonTransitTimeSeconds = nonTransitTimeSeconds;
-    copy.elevationLost = elevationLost;
-    copy.elevationGained = elevationGained;
-    copy.generalizedCost = generalizedCost;
-    copy.waitTimeOptimizedCost = waitTimeOptimizedCost;
-    copy.transferPriorityCost = transferPriorityCost;
-    copy.tooSloped = tooSloped;
-    copy.arrivedAtDestinationWithRentedVehicle = arrivedAtDestinationWithRentedVehicle;
-    copy.fare = fare;
-
-    return copy;
   }
 
   /**

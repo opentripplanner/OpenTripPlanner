@@ -38,8 +38,8 @@ public class AccessibilityScoreFilter implements ItineraryListFilter {
       })
       .toList();
 
-    var score = compute(legs);
-    return i.withAccessibilityScore(legs, score);
+    i.accessibilityScore = compute(legs);
+    return i;
   }
 
   public static Float compute(List<Leg> legs) {
