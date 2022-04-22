@@ -16,90 +16,89 @@ import org.slf4j.LoggerFactory;
 
 class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TimeTableFrameParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TimeTableFrameParser.class);
 
-    private final List<ServiceJourney> serviceJourneys = new ArrayList<>();
-    private final List<DatedServiceJourney> datedServiceJourneys = new ArrayList<>();
-    private final List<ServiceJourneyInterchange> serviceJourneyInterchanges = new ArrayList<>();
+  private final List<ServiceJourney> serviceJourneys = new ArrayList<>();
+  private final List<DatedServiceJourney> datedServiceJourneys = new ArrayList<>();
+  private final List<ServiceJourneyInterchange> serviceJourneyInterchanges = new ArrayList<>();
 
-    private final NoticeParser noticeParser = new NoticeParser();
+  private final NoticeParser noticeParser = new NoticeParser();
 
+  @Override
+  void parse(Timetable_VersionFrameStructure frame) {
+    parseJourneys(frame.getVehicleJourneys());
+    parseInterchanges(frame.getJourneyInterchanges());
 
-    @Override
-    void parse(Timetable_VersionFrameStructure frame) {
-        parseJourneys(frame.getVehicleJourneys());
-        parseInterchanges(frame.getJourneyInterchanges());
+    noticeParser.parseNotices(frame.getNotices());
+    noticeParser.parseNoticeAssignments(frame.getNoticeAssignments());
 
+    warnOnMissingMapping(LOG, frame.getNetworkView());
+    warnOnMissingMapping(LOG, frame.getLineView());
+    warnOnMissingMapping(LOG, frame.getOperatorView());
+    warnOnMissingMapping(LOG, frame.getAccessibilityAssessment());
 
-        noticeParser.parseNotices(frame.getNotices());
-        noticeParser.parseNoticeAssignments(frame.getNoticeAssignments());
+    // Keep list sorted alphabetically
+    warnOnMissingMapping(LOG, frame.getBookingTimes());
+    warnOnMissingMapping(LOG, frame.getVehicleTypeRef());
+    warnOnMissingMapping(LOG, frame.getCoupledJourneys());
+    warnOnMissingMapping(LOG, frame.getDefaultInterchanges());
+    warnOnMissingMapping(LOG, frame.getFlexibleServiceProperties());
+    warnOnMissingMapping(LOG, frame.getFrequencyGroups());
+    warnOnMissingMapping(LOG, frame.getGroupsOfServices());
+    warnOnMissingMapping(LOG, frame.getInterchangeRules());
+    warnOnMissingMapping(LOG, frame.getJourneyAccountingRef());
+    warnOnMissingMapping(LOG, frame.getJourneyAccountings());
+    warnOnMissingMapping(LOG, frame.getJourneyMeetings());
+    warnOnMissingMapping(LOG, frame.getJourneyPartCouples());
+    warnOnMissingMapping(LOG, frame.getNotices());
+    warnOnMissingMapping(LOG, frame.getNoticeAssignments());
+    warnOnMissingMapping(LOG, frame.getServiceCalendarFrameRef());
+    warnOnMissingMapping(LOG, frame.getServiceFacilitySets());
+    warnOnMissingMapping(LOG, frame.getTimeDemandTypes());
+    warnOnMissingMapping(LOG, frame.getTimeDemandTypeAssignments());
+    warnOnMissingMapping(LOG, frame.getTimingLinkGroups());
+    warnOnMissingMapping(LOG, frame.getTrainNumbers());
+    warnOnMissingMapping(LOG, frame.getTypesOfService());
+    warnOnMissingMapping(LOG, frame.getVehicleTypes());
+    warnOnMissingMapping(LOG, frame.getVehicleTypeRef());
 
-        warnOnMissingMapping(LOG, frame.getNetworkView());
-        warnOnMissingMapping(LOG, frame.getLineView());
-        warnOnMissingMapping(LOG, frame.getOperatorView());
-        warnOnMissingMapping(LOG, frame.getAccessibilityAssessment());
+    verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
+  }
 
-        // Keep list sorted alphabetically
-        warnOnMissingMapping(LOG, frame.getBookingTimes());
-        warnOnMissingMapping(LOG, frame.getVehicleTypeRef());
-        warnOnMissingMapping(LOG, frame.getCoupledJourneys());
-        warnOnMissingMapping(LOG, frame.getDefaultInterchanges());
-        warnOnMissingMapping(LOG, frame.getFlexibleServiceProperties());
-        warnOnMissingMapping(LOG, frame.getFrequencyGroups());
-        warnOnMissingMapping(LOG, frame.getGroupsOfServices());
-        warnOnMissingMapping(LOG, frame.getInterchangeRules());
-        warnOnMissingMapping(LOG, frame.getJourneyAccountingRef());
-        warnOnMissingMapping(LOG, frame.getJourneyAccountings());
-        warnOnMissingMapping(LOG, frame.getJourneyMeetings());
-        warnOnMissingMapping(LOG, frame.getJourneyPartCouples());
-        warnOnMissingMapping(LOG, frame.getNotices());
-        warnOnMissingMapping(LOG, frame.getNoticeAssignments());
-        warnOnMissingMapping(LOG, frame.getServiceCalendarFrameRef());
-        warnOnMissingMapping(LOG, frame.getServiceFacilitySets());
-        warnOnMissingMapping(LOG, frame.getTimeDemandTypes());
-        warnOnMissingMapping(LOG, frame.getTimeDemandTypeAssignments());
-        warnOnMissingMapping(LOG, frame.getTimingLinkGroups());
-        warnOnMissingMapping(LOG, frame.getTrainNumbers());
-        warnOnMissingMapping(LOG, frame.getTypesOfService());
-        warnOnMissingMapping(LOG, frame.getVehicleTypes());
-        warnOnMissingMapping(LOG, frame.getVehicleTypeRef());
+  @Override
+  void setResultOnIndex(NetexEntityIndex netexIndex) {
+    netexIndex.serviceJourneyById.addAll(serviceJourneys);
+    netexIndex.datedServiceJourneys.addAll(datedServiceJourneys);
+    netexIndex.serviceJourneyInterchangeById.addAll(serviceJourneyInterchanges);
+    noticeParser.setResultOnIndex(netexIndex);
+  }
 
-        verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
+  private void parseJourneys(JourneysInFrame_RelStructure element) {
+    if (element == null) {
+      return;
     }
-
-    @Override
-    void setResultOnIndex(NetexEntityIndex netexIndex) {
-        netexIndex.serviceJourneyById.addAll(serviceJourneys);
-        netexIndex.datedServiceJourneys.addAll(datedServiceJourneys);
-        netexIndex.serviceJourneyInterchangeById.addAll(serviceJourneyInterchanges);
-        noticeParser.setResultOnIndex(netexIndex);
+    for (Journey_VersionStructure it : element.getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()) {
+      if (it instanceof ServiceJourney) {
+        serviceJourneys.add((ServiceJourney) it);
+      } else if (it instanceof DatedServiceJourney) {
+        datedServiceJourneys.add((DatedServiceJourney) it);
+      } else {
+        warnOnMissingMapping(LOG, it);
+      }
     }
+  }
 
-    private void parseJourneys(JourneysInFrame_RelStructure element) {
-        if(element == null) { return; }
-        for (Journey_VersionStructure it : element.getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()) {
-            if (it instanceof ServiceJourney) {
-                serviceJourneys.add((ServiceJourney)it);
-            }
-            else if(it instanceof DatedServiceJourney) {
-                datedServiceJourneys.add((DatedServiceJourney) it);
-            }
-            else {
-                warnOnMissingMapping(LOG, it);
-            }
-        }
+  private void parseInterchanges(JourneyInterchangesInFrame_RelStructure element) {
+    if (element == null) {
+      return;
     }
-
-    private void parseInterchanges(JourneyInterchangesInFrame_RelStructure element) {
-        if(element == null) { return; }
-        var list = element.getServiceJourneyPatternInterchangeOrServiceJourneyInterchange();
-        for (Interchange_VersionStructure it : list) {
-            if (it instanceof ServiceJourneyInterchange) {
-                serviceJourneyInterchanges.add((ServiceJourneyInterchange) it);
-            }
-            else {
-                warnOnMissingMapping(LOG, it);
-            }
-        }
+    var list = element.getServiceJourneyPatternInterchangeOrServiceJourneyInterchange();
+    for (Interchange_VersionStructure it : list) {
+      if (it instanceof ServiceJourneyInterchange) {
+        serviceJourneyInterchanges.add((ServiceJourneyInterchange) it);
+      } else {
+        warnOnMissingMapping(LOG, it);
+      }
     }
+  }
 }

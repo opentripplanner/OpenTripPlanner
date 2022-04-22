@@ -1,13 +1,17 @@
 package org.opentripplanner.updater.stoptime;
 
 public class WebsocketGtfsRealtimeUpdaterParameters {
+
   private final String configRef;
   private final String feedId;
   private final String url;
   private final int reconnectPeriodSec;
 
   public WebsocketGtfsRealtimeUpdaterParameters(
-      String configRef, String feedId, String url, int reconnectPeriodSec
+    String configRef,
+    String feedId,
+    String url,
+    int reconnectPeriodSec
   ) {
     this.configRef = configRef;
     this.feedId = feedId;

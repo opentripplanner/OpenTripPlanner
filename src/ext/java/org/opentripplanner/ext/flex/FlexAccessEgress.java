@@ -5,6 +5,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.State;
 
 public class FlexAccessEgress {
+
   public final Stop stop;
   public final int preFlexTime;
   public final int flexTime;
@@ -17,16 +18,16 @@ public class FlexAccessEgress {
   public final boolean directToStop;
 
   public FlexAccessEgress(
-      Stop stop,
-      int preFlexTime,
-      int flexTime,
-      int postFlexTime,
-      int fromStopIndex,
-      int toStopIndex,
-      int differenceFromStartOfTime,
-      FlexTrip trip,
-      State lastState,
-      boolean directToStop
+    Stop stop,
+    int preFlexTime,
+    int flexTime,
+    int postFlexTime,
+    int fromStopIndex,
+    int toStopIndex,
+    int differenceFromStartOfTime,
+    FlexTrip trip,
+    State lastState,
+    boolean directToStop
   ) {
     this.stop = stop;
     this.preFlexTime = preFlexTime;
@@ -43,24 +44,28 @@ public class FlexAccessEgress {
   public int earliestDepartureTime(int departureTime) {
     int requestedTransitDepartureTime = departureTime + preFlexTime - differenceFromStartOfTime;
     int earliestAvailableTransitDepartureTime = trip.earliestDepartureTime(
-        requestedTransitDepartureTime,
-        fromStopIndex,
-        toStopIndex,
-        flexTime
+      requestedTransitDepartureTime,
+      fromStopIndex,
+      toStopIndex,
+      flexTime
     );
-    if (earliestAvailableTransitDepartureTime == -1) { return -1; }
+    if (earliestAvailableTransitDepartureTime == -1) {
+      return -1;
+    }
     return earliestAvailableTransitDepartureTime - preFlexTime + differenceFromStartOfTime;
   }
 
   public int latestArrivalTime(int arrivalTime) {
     int requestedTransitArrivalTime = arrivalTime - postFlexTime - differenceFromStartOfTime;
     int latestAvailableTransitArrivalTime = trip.latestArrivalTime(
-        requestedTransitArrivalTime,
-        fromStopIndex,
-        toStopIndex,
-        flexTime
+      requestedTransitArrivalTime,
+      fromStopIndex,
+      toStopIndex,
+      flexTime
     );
-    if (latestAvailableTransitArrivalTime == -1) { return -1; }
+    if (latestAvailableTransitArrivalTime == -1) {
+      return -1;
+    }
     return latestAvailableTransitArrivalTime + postFlexTime + differenceFromStartOfTime;
   }
 }

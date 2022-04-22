@@ -12,7 +12,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
@@ -23,7 +23,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 import org.opentripplanner.util.OTPFeature;
-
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,
@@ -60,15 +59,14 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   private final int validTransitDataEndTime;
 
   public RaptorRoutingRequestTransitData(
-      TransferService transferService,
-      TransitLayer transitLayer,
-      ZonedDateTime transitSearchTimeZero,
-      int additionalPastSearchDays,
-      int additionalFutureSearchDays,
-      TransitDataProviderFilter filter,
-      RoutingRequest routingRequest
+    TransferService transferService,
+    TransitLayer transitLayer,
+    ZonedDateTime transitSearchTimeZero,
+    int additionalPastSearchDays,
+    int additionalFutureSearchDays,
+    TransitDataProviderFilter filter,
+    RoutingContext routingContext
   ) {
-
     this.transferService = transferService;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
@@ -77,28 +75,33 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     // it is nice to NOT have it in the class. It isolate this code to only be available at
     // the time of construction
     var transitDataCreator = new RaptorRoutingRequestTransitDataCreator(
-            transitLayer, transitSearchTimeZero
+      transitLayer,
+      transitSearchTimeZero
     );
-    this.patternIndex = transitDataCreator.createTripPatterns(
+    this.patternIndex =
+      transitDataCreator.createTripPatterns(
         additionalPastSearchDays,
         additionalFutureSearchDays,
         filter
-    );
+      );
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(patternIndex);
-    this.transfers = transitLayer.getRaptorTransfersForRequest(routingRequest);
-    this.generalizedCostCalculator = new DefaultCostCalculator(
-            McCostParamsMapper.map(routingRequest),
-            transitLayer.getStopIndex().stopBoardAlightCosts
-    );
-    this.validTransitDataStartTime = DateMapper.secondsSinceStartOfTime(
-            this.transitSearchTimeZero,
+    this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
+    this.generalizedCostCalculator =
+      new DefaultCostCalculator(
+        McCostParamsMapper.map(routingContext.opt),
+        transitLayer.getStopIndex().stopBoardAlightCosts
+      );
+    this.validTransitDataStartTime =
+      DateMapper.secondsSinceStartOfTime(
+        this.transitSearchTimeZero,
         this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
-    );
+      );
     // The +1 is due to the validity being to the end of the day
-    this.validTransitDataEndTime = DateMapper.secondsSinceStartOfTime(
-            this.transitSearchTimeZero,
+    this.validTransitDataEndTime =
+      DateMapper.secondsSinceStartOfTime(
+        this.transitSearchTimeZero,
         this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
-    );
+      );
   }
 
   @Override
@@ -142,20 +145,26 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   @Override
   public RaptorPathConstrainedTransferSearch<TripSchedule> transferConstraintsSearch() {
-    if(OTPFeature.TransferConstraints.isOff() || transferService == null) { return null; }
+    if (OTPFeature.TransferConstraints.isOff() || transferService == null) {
+      return null;
+    }
 
     return new RaptorPathConstrainedTransferSearch<>() {
-      @Nullable @Override
+      @Nullable
+      @Override
       public RaptorConstrainedTransfer findConstrainedTransfer(
-              TripSchedule fromTrip, int fromStopPosition, TripSchedule toTrip, int toStopPosition
+        TripSchedule fromTrip,
+        int fromStopPosition,
+        TripSchedule toTrip,
+        int toStopPosition
       ) {
         return transferService.findTransfer(
-                fromTrip.getOriginalTripTimes().getTrip(),
-                fromStopPosition,
-                transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
-                toTrip.getOriginalTripTimes().getTrip(),
-                toStopPosition,
-                transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition))
+          fromTrip.getOriginalTripTimes().getTrip(),
+          fromStopPosition,
+          transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
+          toTrip.getOriginalTripTimes().getTrip(),
+          toStopPosition,
+          transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition))
         );
       }
     };
@@ -165,7 +174,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public RaptorStopNameResolver stopNameResolver() {
     return (int stopIndex) -> {
       var s = transitLayer.getStopByIndex(stopIndex);
-      return s==null ? "null" : s.getName() + "(" + stopIndex + ")";
+      return s == null ? "null" : s.getName() + "(" + stopIndex + ")";
     };
   }
 
@@ -178,5 +187,4 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public int getValidTransitDataEndTime() {
     return validTransitDataEndTime;
   }
-
 }

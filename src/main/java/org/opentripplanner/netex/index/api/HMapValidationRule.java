@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.index.api;
 
-
 import org.opentripplanner.graph_builder.DataImportIssue;
 
 /**
@@ -21,15 +20,6 @@ import org.opentripplanner.graph_builder.DataImportIssue;
  * </ol>
  */
 public interface HMapValidationRule<K, V> {
-  enum Status {
-    /** Element is OK. */
-    OK,
-    /** Log warning */
-    WARN,
-    /** Log warning and remove element from HierarchicalMap. */
-    DISCARD
-  }
-
   /**
    * Validate and return status, the caller will take the appropriate acction according to  the
    * retuned status.
@@ -40,4 +30,13 @@ public interface HMapValidationRule<K, V> {
    * The rule should provide a log message to use if the validation fails.
    */
   DataImportIssue logMessage(K key, V value);
+
+  enum Status {
+    /** Element is OK. */
+    OK,
+    /** Log warning */
+    WARN,
+    /** Log warning and remove element from HierarchicalMap. */
+    DISCARD,
+  }
 }

@@ -22,9 +22,9 @@ import org.opentripplanner.standalone.server.Router;
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
  * (bike safety factor, connectivity...).
- * 
+ * <p>
  * One can easily add a new layer by adding the following kind of code to a leaflet map:
- * 
+ *
  * <pre>
  *   var bikesafety = new L.TileLayer(
  *      'http://localhost:8080/otp/routers/default/inspector/tile/bike-safety/{z}/{x}/{y}.png',
@@ -32,69 +32,68 @@ import org.opentripplanner.standalone.server.Router;
  *   var map = L.map(...);
  *   L.control.layers(null, { "Bike safety": bikesafety }).addTo(map);
  * </pre>
- * 
+ * <p>
  * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
  * given layer.
- * 
+ *
+ * @author laurent
  * @see org.opentripplanner.inspector.TileRendererManager
  * @see TileRenderer
- * 
- * @author laurent
- * 
  */
 @Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource {
 
-    private final OTPServer otpServer;
+  private final OTPServer otpServer;
 
-    public GraphInspectorTileResource(
-            @Context
-            OTPServer otpServer,
-            /**
-             * @deprecated The support for multiple routers are removed from OTP2.
-             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-             */
-            @Deprecated @PathParam("ignoreRouterId")
-            String ignoreRouterId
-    ) {
-        this.otpServer = otpServer;
-    }
-
-    @GET @Path("/tile/{layer}/{z}/{x}/{y}.{ext}")
-    @Produces("image/*")
-    public Response tileGet(
-            @PathParam("x") int x, @PathParam("y") int y, @PathParam("z") int z,
-            @PathParam("layer") String layer, @PathParam("ext") String ext
-    ) throws Exception {
-
-        // Re-use analyst
-        Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
-        MapTile mapTile = new MapTile(env, 256, 256);
-
-        Router router = otpServer.getRouter();
-        BufferedImage image = router.tileRendererManager.renderTile(mapTile, layer);
-
-        MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(image.getWidth() * image.getHeight() / 4);
-        ImageIO.write(image, format.type, baos);
-        CacheControl cc = new CacheControl();
-        cc.setMaxAge(3600);
-        cc.setNoCache(false);
-        return Response.ok(baos.toByteArray()).type(format.toString()).cacheControl(cc).build();
-    }
-
+  public GraphInspectorTileResource(
+    @Context OTPServer otpServer,
     /**
-     * Gets all layer names
-     * 
-     * Used in fronted to create layer chooser
-     * @return 
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
-    @GET @Path("layers")
-    @Produces(MediaType.APPLICATION_JSON)
-    public InspectorLayersList getLayers() {
+    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+  ) {
+    this.otpServer = otpServer;
+  }
 
-        Router router = otpServer.getRouter();
-        return new InspectorLayersList(router.tileRendererManager.getRenderers());
-    }
+  @GET
+  @Path("/tile/{layer}/{z}/{x}/{y}.{ext}")
+  @Produces("image/*")
+  public Response tileGet(
+    @PathParam("x") int x,
+    @PathParam("y") int y,
+    @PathParam("z") int z,
+    @PathParam("layer") String layer,
+    @PathParam("ext") String ext
+  ) throws Exception {
+    // Re-use analyst
+    Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
+    MapTile mapTile = new MapTile(env, 256, 256);
 
+    Router router = otpServer.getRouter();
+    BufferedImage image = router.tileRendererManager.renderTile(mapTile, layer);
+
+    MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(
+      image.getWidth() * image.getHeight() / 4
+    );
+    ImageIO.write(image, format.type, baos);
+    CacheControl cc = new CacheControl();
+    cc.setMaxAge(3600);
+    cc.setNoCache(false);
+    return Response.ok(baos.toByteArray()).type(format.toString()).cacheControl(cc).build();
+  }
+
+  /**
+   * Gets all layer names
+   * <p>
+   * Used in fronted to create layer chooser
+   */
+  @GET
+  @Path("layers")
+  @Produces(MediaType.APPLICATION_JSON)
+  public InspectorLayersList getLayers() {
+    Router router = otpServer.getRouter();
+    return new InspectorLayersList(router.tileRendererManager.getRenderers());
+  }
 }

@@ -11,14 +11,13 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
-
 /**
  * Use this factory to create debug handlers. If a routing request has not enabled debugging {@code
  * null} is returned. Use the {@link #isDebugStopArrival(int)} like methods before retrieving a
  * handler.
- *<p>
- * See the <b>package.md</b> for Debugging implementation notes in the
- * raptor root package {@link org.opentripplanner.transit}.
+ * <p>
+ * See the <b>package.md</b> for Debugging implementation notes in the raptor root package {@link
+ * org.opentripplanner.transit}.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -30,15 +29,18 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
   private final DebugLogger logger;
 
   public DebugHandlerFactory(DebugRequest request, WorkerLifeCycle lifeCycle) {
-    this.stopHandler = isDebug(request.stopArrivalListener())
+    this.stopHandler =
+      isDebug(request.stopArrivalListener())
         ? new DebugHandlerStopArrivalAdapter(request, lifeCycle)
         : null;
 
-    this.pathHandler = isDebug(request.pathFilteringListener())
+    this.pathHandler =
+      isDebug(request.pathFilteringListener())
         ? new DebugHandlerPathAdapter(request, lifeCycle)
         : null;
 
-    this.patternRideHandler = isDebug(request.patternRideDebugListener())
+    this.patternRideHandler =
+      isDebug(request.patternRideDebugListener())
         ? new DebugHandlerPatternRideAdapter(request, lifeCycle)
         : null;
 
@@ -65,16 +67,14 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
     return stopHandler != null && stopHandler.isDebug(stop);
   }
 
-
   /* PatternRide */
 
   @Nullable
   public ParetoSetEventListener<PatternRide<?>> paretoSetPatternRideListener() {
     return patternRideHandler == null
-        ? null
-        : new ParetoSetDebugHandlerAdapter<>(patternRideHandler);
+      ? null
+      : new ParetoSetDebugHandlerAdapter<>(patternRideHandler);
   }
-
 
   /* path */
 
@@ -90,13 +90,13 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
 
   /* logger */
 
-  public DebugLogger debugLogger() { return logger;}
-
+  public DebugLogger debugLogger() {
+    return logger;
+  }
 
   /* private methods */
 
   private boolean isDebug(Object handler) {
     return handler != null;
   }
-
 }

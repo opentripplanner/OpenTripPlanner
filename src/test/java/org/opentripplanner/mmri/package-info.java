@@ -1,6 +1,6 @@
 /**
  * What is this package doing here?
- *
+ * <p>
  * In 2013, significant improvements were made to OTP as part of a precommercial procurement project
  * in The Netherlands called MMRI ("MultiModale ReisInformatie" => "multimodal travel information").
  * This project is itself part of a larger project called "Better Benutten" => "better utilization".
@@ -12,6 +12,10 @@
  * MMRI tests have now been added to OTP's own test suite. These versions are intended to be a close
  * approximation of reality, but several minor shortcuts have been taken, like applying trip updates
  * directly to the graph instead of going through the thread-safe graph writer framework. Given that
- * thread-safety is a technical issue and not a functional one, this is considered to be acceptable.
+ * thread-safety is a technical issue and not a functional one, this is considered to be
+ * acceptable.
+ * <p>
+ * The test cases are described <a href="https://github.com/plannerstack/testset">here</a>. and in
+ * <a href="./MMRI Testdocument.pdf">here</a>
  */
 package org.opentripplanner.mmri;

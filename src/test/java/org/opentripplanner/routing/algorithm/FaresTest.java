@@ -4,10 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -30,255 +31,259 @@ import org.opentripplanner.util.TestUtils;
 
 public class FaresTest {
 
-    private final WrappedCurrency USD = new WrappedCurrency("USD");
+  private final WrappedCurrency USD = new WrappedCurrency("USD");
 
-    @Test
-    public void testBasic() {
+  @Test
+  public void testBasic() {
+    var graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
 
-        var graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
+    var feedId = graph.getFeedIds().iterator().next();
 
-        var feedId = graph.getFeedIds().iterator().next();
+    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
-        router.startup();
+    var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+    var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
+    var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
-        var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
-        var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
-        var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
+    Fare fare = getFare(from, to, start, router);
+    assertEquals(fare.getFare(FareType.regular), new Money(USD, 425));
+  }
 
-        Fare fare = getFare(from, to, start, router);
-        assertEquals(fare.getFare(FareType.regular), new Money(USD, 425));
-    }
+  @Test
+  public void testPortland() {
+    Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    var portlandId = graph.getFeedIds().iterator().next();
 
-    @Test
-    public void testPortland() {
+    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
 
-        Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
-        var portlandId = graph.getFeedIds().iterator().next();
+    // from zone 3 to zone 2
+    var from = GenericLocation.fromStopId(
+      "Portland Int'l Airport MAX Station,Eastbound stop in Portland",
+      portlandId,
+      "10579"
+    );
+    var to = GenericLocation.fromStopId(
+      "NE 82nd Ave MAX Station,Westbound stop in Portland",
+      portlandId,
+      "8371"
+    );
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
-        router.startup();
+    Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
 
-        // from zone 3 to zone 2
-        var from = GenericLocation.fromStopId(
-                "Portland Int'l Airport MAX Station,Eastbound stop in Portland",
-                portlandId, "10579"
-        );
-        var to = GenericLocation.fromStopId("NE 82nd Ave MAX Station,Westbound stop in Portland",
-                portlandId, "8371"
-        );
+    Fare fare = getFare(from, to, startTime, router);
 
-        Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
+    assertEquals(new Money(USD, 200), fare.getFare(FareType.regular));
 
-        Fare fare = getFare(from, to, startTime, router);
+    // long trip
 
-        assertEquals(new Money(USD, 200), fare.getFare(FareType.regular));
+    startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
 
-        // long trip
+    from = GenericLocation.fromStopId("Origin", portlandId, "8389");
+    to = GenericLocation.fromStopId("Destination", portlandId, "1252");
 
-        startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
+    fare = getFare(from, to, startTime, router);
+    // this assertion was already commented out when I reactivated the test for OTP2 on 2021-11-11
+    // not sure what the correct fare should be
+    // assertEquals(new Money(new WrappedCurrency("USD"), 460), fare.getFare(FareType.regular));
 
-        from = GenericLocation.fromStopId("Origin", portlandId, "8389");
-        to = GenericLocation.fromStopId("Destination", portlandId, "1252");
+    // complex trip
+    // request.maxTransfers = 5;
+    // startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
+    // request.dateTime = startTime;
+    // request.from = GenericLocation.fromStopId("", portlandId, "10428");
+    // request.setRoutingContext(graph, portlandId + ":10428", portlandId + ":4231");
 
-        fare = getFare(from, to, startTime, router);
+    //
+    // this is commented out because portland's fares are, I think, broken in the gtfs. see
+    // thread on gtfs-changes.
+    // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
+  }
 
-        // this assertion was already commented out when I reactivated the test for OTP2 on 2021-11-11
-        // not sure what the correct fare should be
-        // assertEquals(new Money(new WrappedCurrency("USD"), 460), fare.getFare(FareType.regular));
+  @Test
+  public void testKCM() {
+    Graph graph = ConstantsForTests.buildGtfsGraph(
+      ConstantsForTests.KCM_GTFS,
+      new SeattleFareServiceFactory()
+    );
 
-        // complex trip
-        // request.maxTransfers = 5;
-        // startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
-        // request.dateTime = startTime;
-        // request.from = GenericLocation.fromStopId("", portlandId, "10428");
-        // request.setRoutingContext(graph, portlandId + ":10428", portlandId + ":4231");
+    assertEquals("America/Los_Angeles", graph.getTimeZone().getID());
 
-        //
-        // this is commented out because portland's fares are, I think, broken in the gtfs. see
-        // thread on gtfs-changes.
-        // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
-    }
+    assertEquals(1, graph.getFeedIds().size());
 
-    @Test
-    public void testKCM() {
+    var feedId = graph.getFeedIds().iterator().next();
 
-        Graph graph = ConstantsForTests.buildGtfsGraph(
-                ConstantsForTests.KCM_GTFS,
-                new SeattleFareServiceFactory()
-        );
-        var feedId = graph.getFeedIds().iterator().next();
+    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
-        router.startup();
+    var from = GenericLocation.fromStopId("Origin", feedId, "2010");
+    var to = GenericLocation.fromStopId("Destination", feedId, "2140");
 
-        var from = GenericLocation.fromStopId("Origin", feedId, "2010");
-        var to = GenericLocation.fromStopId("Destination", feedId, "2140");
+    var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
 
-        var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
+    var costOffPeak = getFare(from, to, dateTime, router);
 
-        var costOffPeak = getFare(from, to, dateTime, router);
+    assertEquals(new Money(USD, 250), costOffPeak.getFare(FareType.regular));
 
-        assertEquals(new Money(USD, 250), costOffPeak.getFare(FareType.regular));
+    var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
+    var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
+    var leg = peakItinerary.legs.get(0);
+    assertTrue(leg.getStartTime().toLocalTime().isAfter(LocalTime.parse("08:00")));
+    var startTime = leg.getStartTime().toLocalTime();
+    assertTrue(
+      startTime.isBefore(LocalTime.parse("09:00")),
+      "Leg's start should be before 09:00 but is " + startTime
+    );
 
-        var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
-        var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
-        var leg = peakItinerary.legs.get(0);
-        assertTrue(toLocalTime(leg.getStartTime()).isAfter(LocalTime.parse("08:00")));
-        assertTrue(toLocalTime(leg.getStartTime()).isBefore(LocalTime.parse("09:00")));
+    assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
+  }
 
-        assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
+  @Test
+  public void testFareComponent() {
+    Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
+    String feedId = graph.getFeedIds().iterator().next();
 
-    }
+    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router.startup();
 
-    @Test
-    public void testFareComponent() {
-        Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
-        String feedId = graph.getFeedIds().iterator().next();
+    Money tenUSD = new Money(USD, 1000);
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
-        router.startup();
+    var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 0, 0, 0);
 
-        Money tenUSD = new Money(USD, 1000);
+    // A -> B, base case
 
-        var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 0, 0, 0);
+    var from = GenericLocation.fromStopId("Origin", feedId, "A");
+    var to = GenericLocation.fromStopId("Destination", feedId, "B");
 
-        // A -> B, base case
+    var fare = getFare(from, to, dateTime, router);
 
-        var from = GenericLocation.fromStopId("Origin", feedId, "A");
-        var to = GenericLocation.fromStopId("Destination", feedId, "B");
+    var fareComponents = fare.getDetails(FareType.regular);
+    assertEquals(fareComponents.size(), 1);
+    assertEquals(fareComponents.get(0).price, tenUSD);
+    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
 
-        var fare = getFare(from, to, dateTime, router);
+    // D -> E, null case
 
-        var fareComponents = fare.getDetails(FareType.regular);
-        assertEquals(fareComponents.size(), 1);
-        assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
+    from = GenericLocation.fromStopId("Origin", feedId, "D");
+    to = GenericLocation.fromStopId("Destination", feedId, "E");
+    fare = getFare(from, to, dateTime, router);
+    assertNull(fare);
 
-        // D -> E, null case
+    // A -> C, 2 components in a path
 
-        from = GenericLocation.fromStopId("Origin", feedId, "D");
-        to = GenericLocation.fromStopId("Destination", feedId, "E");
-        fare = getFare(from, to, dateTime, router);
-        assertNull(fare);
+    from = GenericLocation.fromStopId("Origin", feedId, "A");
+    to = GenericLocation.fromStopId("Destination", feedId, "C");
+    fare = getFare(from, to, dateTime, router);
 
-        // A -> C, 2 components in a path
+    fareComponents = fare.getDetails(FareType.regular);
+    assertEquals(fareComponents.size(), 2);
+    assertEquals(fareComponents.get(0).price, tenUSD);
+    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
+    assertEquals(fareComponents.get(1).price, tenUSD);
+    assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BC"));
+    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
 
-        from = GenericLocation.fromStopId("Origin", feedId, "A");
-        to = GenericLocation.fromStopId("Destination", feedId, "C");
-        fare = getFare(from, to, dateTime, router);
+    // B -> D, 2 fully connected components
+    from = GenericLocation.fromStopId("Origin", feedId, "B");
+    to = GenericLocation.fromStopId("Destination", feedId, "D");
+    fare = getFare(from, to, dateTime, router);
 
-        fareComponents = fare.getDetails(FareType.regular);
-        assertEquals(fareComponents.size(), 2);
-        assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
-        assertEquals(fareComponents.get(1).price, tenUSD);
-        assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BC"));
-        assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
+    fareComponents = fare.getDetails(FareType.regular);
+    assertEquals(fareComponents.size(), 1);
+    assertEquals(fareComponents.get(0).price, tenUSD);
+    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "3"));
 
-        // B -> D, 2 fully connected components
-        from = GenericLocation.fromStopId("Origin", feedId, "B");
-        to = GenericLocation.fromStopId("Destination", feedId, "D");
-        fare = getFare(from, to, dateTime, router);
+    // E -> G, missing in between fare
+    from = GenericLocation.fromStopId("Origin", feedId, "E");
+    to = GenericLocation.fromStopId("Destination", feedId, "G");
+    fare = getFare(from, to, dateTime, router);
 
-        fareComponents = fare.getDetails(FareType.regular);
-        assertEquals(fareComponents.size(), 1);
-        assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "2"));
-        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "3"));
+    fareComponents = fare.getDetails(FareType.regular);
+    assertEquals(fareComponents.size(), 1);
+    assertEquals(fareComponents.get(0).price, tenUSD);
+    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
 
-        // E -> G, missing in between fare
-        from = GenericLocation.fromStopId("Origin", feedId, "E");
-        to = GenericLocation.fromStopId("Destination", feedId, "G");
-        fare = getFare(from, to, dateTime, router);
+    // C -> E, missing fare after
+    from = GenericLocation.fromStopId("Origin", feedId, "C");
+    to = GenericLocation.fromStopId("Destination", feedId, "E");
+    fare = getFare(from, to, dateTime, router);
 
-        fareComponents = fare.getDetails(FareType.regular);
-        assertEquals(fareComponents.size(), 1);
-        assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
-        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
+    fareComponents = fare.getDetails(FareType.regular);
+    assertEquals(fareComponents.size(), 1);
+    assertEquals(fareComponents.get(0).price, tenUSD);
+    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "3"));
 
-        // C -> E, missing fare after
-        from = GenericLocation.fromStopId("Origin", feedId, "C");
-        to = GenericLocation.fromStopId("Destination", feedId, "E");
-        fare = getFare(from, to, dateTime, router);
+    // D -> G, missing fare before
+    from = GenericLocation.fromStopId("Origin", feedId, "D");
+    to = GenericLocation.fromStopId("Destination", feedId, "G");
+    fare = getFare(from, to, dateTime, router);
 
-        fareComponents = fare.getDetails(FareType.regular);
-        assertEquals(fareComponents.size(), 1);
-        assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "3"));
+    fareComponents = fare.getDetails(FareType.regular);
+    assertEquals(fareComponents.size(), 1);
+    assertEquals(fareComponents.get(0).price, tenUSD);
+    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
 
-        // D -> G, missing fare before
-        from = GenericLocation.fromStopId("Origin", feedId, "D");
-        to = GenericLocation.fromStopId("Destination", feedId, "G");
-        fare = getFare(from, to, dateTime, router);
+    // A -> D, use individual component parts
+    from = GenericLocation.fromStopId("Origin", feedId, "A");
+    to = GenericLocation.fromStopId("Destination", feedId, "D");
+    fare = getFare(from, to, dateTime, router);
 
-        fareComponents = fare.getDetails(FareType.regular);
-        assertEquals(fareComponents.size(), 1);
-        assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "5"));
-        assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId("agency", "6"));
+    fareComponents = fare.getDetails(FareType.regular);
+    assertEquals(fareComponents.size(), 2);
+    assertEquals(fareComponents.get(0).price, tenUSD);
+    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
+    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
+    assertEquals(fareComponents.get(1).price, tenUSD);
+    assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BD"));
+    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId(feedId, "3"));
+  }
 
-        // A -> D, use individual component parts
-        from = GenericLocation.fromStopId("Origin", feedId, "A");
-        to = GenericLocation.fromStopId("Destination", feedId, "D");
-        fare = getFare(from, to, dateTime, router);
+  private static Fare getFare(
+    GenericLocation from,
+    GenericLocation to,
+    Instant time,
+    Router router
+  ) {
+    Itinerary itinerary = getItineraries(from, to, time, router).get(0);
+    return itinerary.fare;
+  }
 
-        fareComponents = fare.getDetails(FareType.regular);
-        assertEquals(fareComponents.size(), 2);
-        assertEquals(fareComponents.get(0).price, tenUSD);
-        assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-        assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId("agency", "1"));
-        assertEquals(fareComponents.get(1).price, tenUSD);
-        assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BD"));
-        assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId("agency", "2"));
-        assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId("agency", "3"));
-    }
+  private static List<Itinerary> getItineraries(
+    GenericLocation from,
+    GenericLocation to,
+    Instant time,
+    Router router
+  ) {
+    RoutingRequest request = new RoutingRequest();
+    request.setDateTime(time);
+    request.from = from;
+    request.to = to;
 
-    private static Fare getFare(
-            GenericLocation from,
-            GenericLocation to,
-            Instant time,
-            Router router
-    ) {
-        Itinerary itinerary = getItineraries(from, to, time, router).get(0);
-        return itinerary.fare;
-    }
+    var zonedDateTime = time.atZone(ZoneId.of("America/Los_Angeles"));
+    var additionalSearchDays = AdditionalSearchDays.defaults(zonedDateTime);
 
-    private static List<Itinerary> getItineraries(
-            GenericLocation from,
-            GenericLocation to,
-            Instant time,
-            Router router
-    ) {
-        RoutingRequest request = new RoutingRequest();
-        request.setDateTime(time);
-        request.from = from;
-        request.to = to;
-
-        var zonedDateTime = time.atZone(ZoneId.of("America/Los_Angeles"));
-        var additionalSearchDays = AdditionalSearchDays.defaults(zonedDateTime);
-
-        var result = TransitRouter.route(
-                request,
-                router,
-                zonedDateTime,
-                additionalSearchDays,
-                new DebugTimingAggregator()
-        );
-        return result.getItineraries();
-    }
-
-    private static LocalTime toLocalTime(Calendar time) {
-        return time.toInstant()
-                .atZone(time.getTimeZone().toZoneId())
-                .toLocalTime();
-    }
+    var result = TransitRouter.route(
+      request,
+      router,
+      zonedDateTime,
+      additionalSearchDays,
+      new DebugTimingAggregator()
+    );
+    return result
+      .getItineraries()
+      .stream()
+      .sorted(Comparator.comparingInt(x -> x.generalizedCost))
+      .toList();
+  }
 }
-

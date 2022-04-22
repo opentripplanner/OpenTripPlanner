@@ -11,15 +11,13 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
     JourneyPattern journeyPattern = index.getJourneyPatternsById().lookup(getPatternId(sj));
 
     int nStopPointsInJourneyPattern = journeyPattern
-        .getPointsInSequence()
-        .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-        .size();
+      .getPointsInSequence()
+      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      .size();
 
     int nTimetablePassingTimes = sj.getPassingTimes().getTimetabledPassingTime().size();
 
-    return nStopPointsInJourneyPattern != nTimetablePassingTimes
-        ?  Status.DISCARD
-        : Status.OK;
+    return nStopPointsInJourneyPattern != nTimetablePassingTimes ? Status.DISCARD : Status.OK;
   }
 
   @Override
@@ -32,6 +30,7 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
   }
 
   private static class StopPointsMismatch implements DataImportIssue {
+
     private final String sjId;
     private final String patternId;
 
@@ -42,10 +41,14 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
 
     @Override
     public String getMessage() {
-      return "Mismatch in stop points between ServiceJourney and JourneyPattern. "
-          + "ServiceJourney will be skipped. "
-          + " ServiceJourney=" + sjId
-          + ", JourneyPattern= " + patternId;
+      return (
+        "Mismatch in stop points between ServiceJourney and JourneyPattern. " +
+        "ServiceJourney will be skipped. " +
+        " ServiceJourney=" +
+        sjId +
+        ", JourneyPattern= " +
+        patternId
+      );
     }
   }
 }

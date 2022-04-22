@@ -13,42 +13,40 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
  */
 public class ParkAPIUpdaterParameters extends VehicleParkingUpdaterParameters {
 
-    private final String url;
-    private final String feedId;
-    private final Map<String, String> httpHeaders;
-    private final List<String> tags;
+  private final String url;
+  private final String feedId;
+  private final Map<String, String> httpHeaders;
+  private final List<String> tags;
 
+  public ParkAPIUpdaterParameters(
+    String configRef,
+    String url,
+    String feedId,
+    int frequencySec,
+    @NotNull Map<String, String> httpHeaders,
+    List<String> tags,
+    DataSourceType sourceType
+  ) {
+    super(configRef, frequencySec, sourceType);
+    this.url = url;
+    this.feedId = feedId;
+    this.httpHeaders = httpHeaders;
+    this.tags = tags;
+  }
 
-    public ParkAPIUpdaterParameters(
-            String configRef,
-            String url,
-            String feedId,
-            int frequencySec,
-            @NotNull
-                    Map<String, String> httpHeaders,
-            List<String> tags,
-            DataSourceType sourceType
-    ) {
-        super(configRef, frequencySec, sourceType);
-        this.url = url;
-        this.feedId = feedId;
-        this.httpHeaders = httpHeaders;
-        this.tags = tags;
-    }
+  public String getFeedId() {
+    return feedId;
+  }
 
-    public String getFeedId() {
-        return feedId;
-    }
+  public String getUrl() {
+    return url;
+  }
 
-    public String getUrl() {
-        return url;
-    }
+  public Map<String, String> getHttpHeaders() {
+    return httpHeaders;
+  }
 
-    public Map<String, String> getHttpHeaders() {
-        return httpHeaders;
-    }
-
-    public Collection<String> getTags() {
-        return tags;
-    }
+  public Collection<String> getTags() {
+    return tags;
+  }
 }

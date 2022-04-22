@@ -25,7 +25,11 @@ public class NearbyStop implements Comparable<NearbyStop> {
   public final State state;
 
   public NearbyStop(
-      StopLocation stop, double distance, List<Edge> edges, LineString geometry, State state
+    StopLocation stop,
+    double distance,
+    List<Edge> edges,
+    LineString geometry,
+    State state
   ) {
     this.stop = stop;
     this.distance = distance;
@@ -34,50 +38,8 @@ public class NearbyStop implements Comparable<NearbyStop> {
     this.state = state;
   }
 
-  public NearbyStop(
-      TransitStopVertex stopVertex, double distance, List<Edge> edges, State state
-  ) {
+  public NearbyStop(TransitStopVertex stopVertex, double distance, List<Edge> edges, State state) {
     this(stopVertex.getStop(), distance, edges, null, state);
-  }
-
-  @Override
-  public int compareTo(NearbyStop that) {
-    if ((this.state == null) != (that.state == null)) {
-      throw new IllegalStateException("Only NearbyStops which both contain or lack a state may be compared.");
-    }
-
-    if (this.state != null) {
-      return (int) (this.state.getWeight()) - (int) (that.state.getWeight());
-    }
-    return (int) (this.distance) - (int) (that.distance);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (o == null || getClass() != o.getClass()) { return false; }
-    final NearbyStop that = (NearbyStop) o;
-    return Double.compare(that.distance, distance) == 0
-            && stop.equals(that.stop)
-            && Objects.equals(edges, that.edges)
-            && Objects.equals(geometry, that.geometry)
-            && Objects.equals(state, that.state);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(stop, distance, edges, geometry, state);
-  }
-
-  public String toString() {
-    return String.format(
-            Locale.ROOT,
-            "stop %s at %.1f meters%s%s%s",
-            stop, distance,
-            edges != null ? " (" + edges.size() + " edges)" : "",
-            geometry != null ? " w/geometry" : "",
-            state != null ? " w/state" : ""
-    );
   }
 
   /**
@@ -92,12 +54,55 @@ public class NearbyStop implements Comparable<NearbyStop> {
       effectiveWalkDistance += edge.getEffectiveWalkDistance();
       edges.add(edge);
     }
-    return new NearbyStop(
-        stop,
-        effectiveWalkDistance,
-        edges,
-        null,
-        state
+    return new NearbyStop(stop, effectiveWalkDistance, edges, null, state);
+  }
+
+  @Override
+  public int compareTo(NearbyStop that) {
+    if ((this.state == null) != (that.state == null)) {
+      throw new IllegalStateException(
+        "Only NearbyStops which both contain or lack a state may be compared."
+      );
+    }
+
+    if (this.state != null) {
+      return (int) (this.state.getWeight()) - (int) (that.state.getWeight());
+    }
+    return (int) (this.distance) - (int) (that.distance);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(stop, distance, edges, geometry, state);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final NearbyStop that = (NearbyStop) o;
+    return (
+      Double.compare(that.distance, distance) == 0 &&
+      stop.equals(that.stop) &&
+      Objects.equals(edges, that.edges) &&
+      Objects.equals(geometry, that.geometry) &&
+      Objects.equals(state, that.state)
+    );
+  }
+
+  public String toString() {
+    return String.format(
+      Locale.ROOT,
+      "stop %s at %.1f meters%s%s%s",
+      stop,
+      distance,
+      edges != null ? " (" + edges.size() + " edges)" : "",
+      geometry != null ? " w/geometry" : "",
+      state != null ? " w/state" : ""
     );
   }
 }

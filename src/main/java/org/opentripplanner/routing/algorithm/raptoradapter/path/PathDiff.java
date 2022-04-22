@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
@@ -19,11 +20,10 @@ import org.opentripplanner.util.TableFormatter;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
-
 /**
- * This class is used to diff two set of paths. You may ask for the diff result
- * or pass in a logger to print the diff. Here is an example with two set with the to same paths
- * in both, but where the first path differ in cost:
+ * This class is used to diff two set of paths. You may ask for the diff result or pass in a logger
+ * to print the diff. Here is an example with two set with the to same paths in both, but where the
+ * first path differ in cost:
  * <pre>
  * STATUS  | TX | DURATION |  COST | WALK |   START  |    END   | PATH
  * DROPPED |  1 |   21m26s | 22510 |  37s | 14:11:44 | 14:33:10 | Walk 1m16s ~ 21420 ~ BUS 51 14:13 14:29 ~ 2341 ~ Walk 4m10s [14:11:44 14:33:10 21m26s $22510]
@@ -44,37 +44,38 @@ public class PathDiff<T extends RaptorTripSchedule> {
 
   private PathDiff(Path<T> path) {
     this.path = path;
-    this.walkDuration = path
+    this.walkDuration =
+      path
         .legStream()
         .filter(PathLeg::isTransferLeg)
         .mapToInt(l -> l.asTransferLeg().duration())
         .sum();
     this.routes.addAll(
-        path.transitLegs()
-            .map(l -> l.trip().pattern().debugInfo())
-            .collect(Collectors.toList())
-    );
+        path.transitLegs().map(l -> l.trip().pattern().debugInfo()).collect(Collectors.toList())
+      );
     this.stops.addAll(path.listStops());
   }
 
   public static <T extends RaptorTripSchedule> void logDiff(
-      String leftLabel,
-      Collection<? extends Path<T>> left,
-      String rightLabel,
-      Collection<? extends Path<T>> right,
-      boolean skipCost,
-      boolean skipEquals,
-      Consumer<String> logger
+    String leftLabel,
+    Collection<? extends Path<T>> left,
+    String rightLabel,
+    Collection<? extends Path<T>> right,
+    boolean skipCost,
+    boolean skipEquals,
+    Consumer<String> logger
   ) {
     var result = diff(left, right, skipCost);
 
     TableFormatter tbl = new TableFormatter(
-        List.of(Center, Right, Right, Right, Right, Right, Right, Left),
-        List.of("STATUS", "TX", "Duration", "Cost", "Walk", "Start", "End", "Path")
+      List.of(Center, Right, Right, Right, Right, Right, Right, Left),
+      List.of("STATUS", "TX", "Duration", "Cost", "Walk", "Start", "End", "Path")
     );
 
-    for (DiffTool.Entry<PathDiff<T>> e : result) {
-      if(skipEquals && e.isEqual()) { continue; }
+    for (DiffEntry<PathDiff<T>> e : result) {
+      if (skipEquals && e.isEqual()) {
+        continue;
+      }
       PathDiff<? extends T> it = e.element();
       tbl.addRow(
         e.status("EQ", "DROPPED", "NEW"),
@@ -90,25 +91,27 @@ public class PathDiff<T extends RaptorTripSchedule> {
     logger.accept("Compare " + leftLabel + " with " + rightLabel + "\n" + tbl.toString());
   }
 
-  public static <T extends RaptorTripSchedule> List<DiffTool.Entry<PathDiff<T>>> diff(
-      Collection<? extends Path<T>> left, Collection<? extends Path<T>> right, boolean skipCost
+  public static <T extends RaptorTripSchedule> List<DiffEntry<PathDiff<T>>> diff(
+    Collection<? extends Path<T>> left,
+    Collection<? extends Path<T>> right,
+    boolean skipCost
   ) {
     return DiffTool.diff(
-        left.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
-        right.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
-        comparator(skipCost)
+      left.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
+      right.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
+      comparator(skipCost)
     );
   }
 
   public static <T extends RaptorTripSchedule> Comparator<PathDiff<T>> comparator(
-      final boolean skipCost
+    final boolean skipCost
   ) {
     return new CompositeComparator<>(
-        Comparator.comparingInt(o -> o.path.endTime()),
-        Comparator.comparingInt(o -> -o.path.startTime()),
-        Comparator.comparingInt(o -> skipCost ? 0 : -o.path.generalizedCost()),
-        (o1, o2) -> compareLists(o1.routes, o2.routes, String::compareTo),
-        (o1, o2) -> compareLists(o1.stops, o2.stops, Integer::compareTo)
+      Comparator.comparingInt(o -> o.path.endTime()),
+      Comparator.comparingInt(o -> -o.path.startTime()),
+      Comparator.comparingInt(o -> skipCost ? 0 : -o.path.generalizedCost()),
+      (o1, o2) -> compareLists(o1.routes, o2.routes, String::compareTo),
+      (o1, o2) -> compareLists(o1.stops, o2.stops, Integer::compareTo)
     );
   }
 

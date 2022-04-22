@@ -1,10 +1,11 @@
 # Changelog
 
-The changelog list most feature changes between each release. The list is automatically created 
-based on merged pull requests. Search GitHub issues and pull requests for smaller issues. 
+The changelog list most feature changes between each release. The list is automatically created
+based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
 
 ## 2.2.0 (in progress)
+
 - Optimize merging of trip patterns on dates [#3925](https://github.com/opentripplanner/OpenTripPlanner/pull/3925)
 - Fix default value for transit alerts [#3934](https://github.com/opentripplanner/OpenTripPlanner/pull/3934)
 - Add the visualizer to the interactive launcher [#3932](https://github.com/opentripplanner/OpenTripPlanner/pull/3932)
@@ -25,13 +26,28 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Don't try to repair trips with negative dwell or driving times, drop them instead [#4019](https://github.com/opentripplanner/OpenTripPlanner/pull/4019)
 - Add support for NeTex DatedServiceJourneys [#3889](https://github.com/opentripplanner/OpenTripPlanner/pull/3889)
 - Add support for SKIPPED stop time updates in SCHEDULED update handling [#3960](https://github.com/opentripplanner/OpenTripPlanner/pull/3960)
-- New Norwegian way properties profile  [#3728](https://github.com/opentripplanner/OpenTripPlanner/pull/3728)
+- New Norwegian way properties profile [#3728](https://github.com/opentripplanner/OpenTripPlanner/pull/3728)
+- Elevation handling improvements [#4033](https://github.com/opentripplanner/OpenTripPlanner/pull/4033)
+- NeTEx mapping of WheelchairBoarding from ServiceJourney to Trip [#4043](https://github.com/opentripplanner/OpenTripPlanner/pull/4043)
+- Always parse Netex flexible lines [#4049](https://github.com/opentripplanner/OpenTripPlanner/pull/4049)
+- Add GBFS form factors to GraphQL API [#4062](https://github.com/opentripplanner/OpenTripPlanner/pull/4062)
+- Add Geocoder API for debug client searches [#4068](https://github.com/opentripplanner/OpenTripPlanner/pull/4068)
+- Link platforms also against railway=platform [#4065](https://github.com/opentripplanner/OpenTripPlanner/pull/4065)
+- Consider Wheelchair boarding/alightning when routing from or to directly to a stop [#4046](https://github.com/opentripplanner/OpenTripPlanner/pull/4046)
+- Add an implementation for fetching alternative legs [#4071](https://github.com/opentripplanner/OpenTripPlanner/pull/4071)
+- Group/filter on first/last trip in itineraries [#4051](https://github.com/opentripplanner/OpenTripPlanner/pull/4051)
+- Allow single SIRI-situations to fail without affecting others [#4083](https://github.com/opentripplanner/OpenTripPlanner/pull/4083)
+- Read max slope from default routing request [#4098](https://github.com/opentripplanner/OpenTripPlanner/pull/4098)
+- Fix problem with submode filter [#4093](https://github.com/opentripplanner/OpenTripPlanner/pull/4093)
+- Make maxWheelchairSlope not a hard cut-off, but apply a cost instead [#4088](https://github.com/opentripplanner/OpenTripPlanner/pull/4088)
+- Expose Leg.serviceDate in trip end-point [#4096](https://github.com/opentripplanner/OpenTripPlanner/pull/4096)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
-
 
 ## 2.1.0 (2022-03-17)
 
+
 ### Notable Changes
+
 - GBFS 2.2 is supported including "form factors" (bike, scooter, car) and floating vehicles (with no fixed station)
 - Constrained Transfers (Netex interchanges / GTFS `transfers.txt`)
 - Transfers for bicycle and wheelchair users distinct from walking paths
@@ -44,7 +60,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Response times should be roughly stable since 2.0. Performance much improved over OTP1 for long searches, may be somewhat slower for short searches. Extremely depdendent on data set used, so test on your specific data.
 - System integration tests for ongoing performance measurement 
 
+
 ### Detailed changes by Pull Request
+
 - Fix NullPointerException when a RealTime update do not match an existing TripPattern [#3284](https://github.com/opentripplanner/OpenTripPlanner/issues/3284)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
 - Prioritize "direct" routes over transfers in group-filters [#3309](https://github.com/opentripplanner/OpenTripPlanner/issues/3309)
@@ -182,7 +200,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory [#2795](https://github.com/opentripplanner/OpenTripPlanner/issues/2795)
 - NeTEx import support [#2769](https://github.com/opentripplanner/OpenTripPlanner/issues/2769)
-- New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
+- New Transit search algorithm, Raptor, replaces the AStar for all transit searches.
 - Added NeTEx notices [#2824](https://github.com/opentripplanner/OpenTripPlanner/issues/2824)
 - Make transfers and access/egress use effectiveWalkDistance to take slopes into account [#2857](https://github.com/opentripplanner/OpenTripPlanner/issues/2857)
 - Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import [#2813](https://github.com/opentripplanner/OpenTripPlanner/issues/2813)
@@ -255,7 +273,6 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Improve documentation for `mode` routing parameter [#2809](https://github.com/opentripplanner/OpenTripPlanner/issues/2809)
 - Switched to single license file, removing all OTP and OBA file license headers
 
-
 ## 1.3 (2018-08-03)
 
 - Fix stop linking to only one edge of platform [#2472](https://github.com/opentripplanner/OpenTripPlanner/issues/2472)
@@ -280,7 +297,6 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Docs: API, list of deployments, usage stats and tutorials
 - Docs: Update leadership committee listing following Boston Summit
 - Docs: Update OTP logo (Thanks Kate Chanba!)
-
 
 ## 1.2 (2017-09-18)
 
@@ -307,7 +323,6 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Optionally compact ("reverse-optimize") results with complete reverse search [#2449](https://github.com/opentripplanner/OpenTripPlanner/issues/2449)
 - Add updater for urbaninfrastructure city bikes [#2448](https://github.com/opentripplanner/OpenTripPlanner/issues/2448)
 - Miscellaneous documentation updates
-
 
 ## 1.1 (2017-03-16)
 
@@ -371,7 +386,6 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Switch to only use the new SimpleStreetLinker, even for search start and end points. Completely removed old linker classes. Changes for proper handling of wheelchairs and bicycles at start and end points.
 - Properly handle null timetableSnapshots when there is no real-time data.
 
-
 ## 0.20 (2016-06-10)
 
 - Re-enabled Enunciate, which works properly with OTP now. This means we have auto-generated API docs.
@@ -400,10 +414,13 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Handle embeded router configuration for POSTed graphs and zips for building.
 - Simplified router-config handling.
 - Properly lazy-initialize profile routing stopClusters. Added stop clusters to the Index API.
-- Completely removed the ill-advised path parser system, which was too clever for its own good.    
+- Completely removed the ill-advised path parser system, which was too clever for its own good.
 - Sort itineraries by total travel time rather than in-transit time.
 - Rental bikes: allow loading generic KML.
-- Removed the experimental TransportNetwork classes, which shared no code with the rest of OTP and were duplicated in the R5 project. There are still some elements that can be cleaned out when only R5 is used by Conveyal's analysis system. The broker code in OTP is now able to start up R5 workers for Analyst.
+- Removed the experimental TransportNetwork classes, which shared no code with the rest of OTP and 
+  were duplicated in the R5 project. There are still some elements that can be cleaned out when only
+  R5 is used by Conveyal's analysis system. The broker code in OTP is now able to start up R5 
+  workers for Analyst.
 - Use the Conveyal fork of the OBA GTFS loader, so that we can add our own extensions to GTFS.
 - Updated docs to offer Conveyal Maven repo as a place to get prebuilt OTP.
 
@@ -463,7 +480,8 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 ## 0.14.0 (2015-03-28)
 
 - JSON configuration of graph building and routers
-- Began moving documentation (including this changelog) into the OTP repo and rewriting it page by page. It is built statically from Markdown using mkdocs and published on readthedocs.
+- Began moving documentation (including this changelog) into the OTP repo and rewriting it page by
+  page. It is built statically from Markdown using mkdocs and published on readthedocs.
 - Street edge lists and bike rental station IDs in profile routing results (allows better rendering)
 - Improved correctness of profile routing
 - Qualified modes including rented bikes work in profile routing
@@ -483,7 +501,8 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - All client Javascript librariess are now pulled from a CDN
 - Dutch BAG and French BANO geocoders
 - Bus to street matching improvements
-- Complete MapDB based GTFS and OSM loader libraries (will become separate projects, not yet connected to OTP graph builder)
+- Complete MapDB based GTFS and OSM loader libraries (will become separate projects, not yet
+  connected to OTP graph builder)
 - API documentation generation working again
 - Disable some time consuming graph building steps by default
 - Finnish and Swedish translations
@@ -492,7 +511,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Stairs reluctance is much higher when carrying a bike
 - Graph visualizer routing progress animates when a search is triggered via the web API
 - Assume WGS84 (spherical distance calculations) everywhere
-- Removed custom motor vehicle (which was unmaintained and not documented)
+- Removed custom motor vehicle (which was unmaintained and not documented)
 - Ability to poll for bike rental locations only once at startup
 - Stoptimes are fetched for a specific service day in index API
 - Bicycle triangle support in profile routing
@@ -500,8 +519,11 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Command line option to output OTP's version
 
 ## 0.13.0 (2014-12-05)
+
 - Detect apparent errors in GTFS interlining
-- Long distance mode: use a pure weight-based state comparison, and use trip-banning retrying logic to get multiple paths. This compromises correctness somewhat but brings search times back within reason for large regional graphs. Also, we create significantly less SimpleTransfers.
+- Long distance mode: use a pure weight-based state comparison, and use trip-banning retrying logic
+  to get multiple paths. This compromises correctness somewhat but brings search times back within
+  reason for large regional graphs. Also, we create significantly less SimpleTransfers.
 - Progress on GTFS reading and writing library (not yet used by OTP).
 - Bug fixes for tiny street edges, time zones.
 - Deployment of artifacts to maven.conveyal.com via S3.
@@ -512,6 +534,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Fixed 'unconnected areas' infinite loop [#1605](https://github.com/opentripplanner/OpenTripPlanner/issues/1605)
 
 ## 0.12.0 (2014-11-11)
+
 - Graph building from zipball of data sent over the wire
 - OTP-specific GTFS loader library with error checking and recovery
 - Bike and car park and ride improvements
@@ -536,15 +559,21 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - basic Lucene-based built-in geocoder
 
 ## 0.11.0 (2014-03-24)
+
 - Built-in HTTP server layer, making it possible to distribute OTP as a standalone JAR
 - "Long-distance" mode for large graphs, including bidirectional goal direction heuristic.
 - Simplified Maven project structure with less submodules
 - GTFS-RT trip update support, including streaming incremental data, which directly affects route optimization
 
 ## 0.10.0 (2014-03-18)
-This release was made to consolidate all the development that had occurred with a 0.9.x-SNAPSHOT Maven version. The changes were very significant and it was not appropriate to tag them as a minor bugfix release after the 0.9 tag. Though this release was performed at the same time as 0.11.0, it represents a much earlier stage in the development of OTP.
+
+This release was made to consolidate all the development that had occurred with a 0.9.x-SNAPSHOT
+Maven version. The changes were very significant and it was not appropriate to tag them as a minor
+bugfix release after the 0.9 tag. Though this release was performed at the same time as 0.11.0, it
+represents a much earlier stage in the development of OTP.
 
 ## 0.7.0 (2012-04-29)
+
 - Bike rental support (thanks Laurent Grégoire)
 - Realtime bike rental availability feed support
 - Updated to new version of One Bus Away GTFS/CSV, fixing timezone and string interning issues (thanks Brian Ferris)
@@ -554,11 +583,13 @@ This release was made to consolidate all the development that had occurred with 
 - Significant (10-20%) speedup by moving a field into StateData (thanks Laurent Grégoire)
 
 ## 0.6.0 (2012-04-25)
+
 - area routing
 - more lenient parsing of times
 - new directions icon set with SVG sources (thanks Laurent G)
 
 ## 0.5.4 (2012-04-06)
+
 - catch 0 divisors in NED builder, preventing NaN propagation to edge lengths
 - avoid repeated insertion of edges into edge lists, which are now threadsafe edge sets
 - identity equality for edges
@@ -577,6 +608,7 @@ This release was made to consolidate all the development that had occurred with 
 - allow loading a base graph into graphbuilder instead of starting from scratch
 
 ## 0.5.3 (2012-03-23)
+
 - GTFS loader now loads feeds one-at-a-time, allowing per-feed configuration
 - half-written graph files are now deleted on graph build error
 - DST issue OTP-side fixes, tests adjusted to use timezones
@@ -590,17 +622,20 @@ This release was made to consolidate all the development that had occurred with 
 - complete Dutch translation
 
 ## 0.5.2 (2012-03-20)
+
 - hop speed/distance checks, duplicate shape point filtering, etc.
 
 ## 0.5.1 (2012-03-16)
+
 - more transit index features
 - default agencyIDs now determined on a per-feed basis
 - fixed fare overflow problem
 - fixed bug in loop road turn conversion
 - additional graphbuilder warnings and annotations
-- fixed a batch of bugs found by fixbugs  
+- fixed a batch of bugs found by fixbugs
 
 ## 0.5.0 (2012-03-09)
+
 - stop codes, zones, and agency names in planner responses
 - encapsulation of edge list modifications
 - expanded edge and vertex type hierarchy
@@ -618,4 +653,5 @@ This release was made to consolidate all the development that had occurred with 
 - and of course, lots of bugfixes
 
 ## 0.4.4 (2012-02-06)
+
 Release in anticipation of upcoming merges.

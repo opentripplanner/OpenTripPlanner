@@ -10,71 +10,77 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
  * Methods for accessing imported entities.
  */
 public interface OtpTransitService {
+  /**
+   * @return a list of all Agencies.
+   */
+  Collection<Agency> getAllAgencies();
 
-    /**
-     * @return  a list of all Agencies.
-     */
-    Collection<Agency> getAllAgencies();
+  /**
+   * @return a list of all Operators, the list may be empty if there are no Operators in the
+   * imported data.
+   */
+  Collection<Operator> getAllOperators();
 
-    /**
-     * @return a list of all Operators, the list may be empty if there are no Operators in the imported data.
-     */
-    Collection<Operator> getAllOperators();
+  Collection<FareAttribute> getAllFareAttributes();
 
-    Collection<FareAttribute> getAllFareAttributes();
+  Collection<FareRule> getAllFareRules();
 
-    Collection<FareRule> getAllFareRules();
+  Collection<FeedInfo> getAllFeedInfos();
 
-    Collection<FeedInfo> getAllFeedInfos();
+  Collection<GroupOfStations> getAllGroupsOfStations();
 
-    Collection<GroupOfStations> getAllGroupsOfStations();
+  Collection<MultiModalStation> getAllMultiModalStations();
 
-    Collection<MultiModalStation> getAllMultiModalStations();
+  /**
+   * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
+   * any type (Serializable).
+   */
+  Multimap<TransitEntity, Notice> getNoticeAssignments();
 
-    /**
-     * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
-     * any type (Serializable).
-     */
-    Multimap<TransitEntity, Notice> getNoticeAssignments();
+  Collection<Pathway> getAllPathways();
 
-    Collection<Pathway> getAllPathways();
+  /**
+   * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
+   */
+  Collection<FeedScopedId> getAllServiceIds();
 
-    /**
-     * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
-     */
-    Collection<FeedScopedId> getAllServiceIds();
+  List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
 
-    List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
+  Station getStationForId(FeedScopedId id);
 
-    Station getStationForId(FeedScopedId id);
+  Stop getStopForId(FeedScopedId id);
 
-    Stop getStopForId(FeedScopedId id);
+  Collection<Station> getAllStations();
 
-    Collection<Station> getAllStations();
+  Collection<Stop> getAllStops();
 
-    Collection<Stop> getAllStops();
+  Collection<Entrance> getAllEntrances();
 
-    Collection<Entrance> getAllEntrances();
+  Collection<PathwayNode> getAllPathwayNodes();
 
-    Collection<PathwayNode> getAllPathwayNodes();
+  Collection<BoardingArea> getAllBoardingAreas();
 
-    Collection<BoardingArea> getAllBoardingAreas();
+  Collection<FlexStopLocation> getAllLocations();
 
-    Collection<FlexStopLocation> getAllLocations();
+  Collection<FlexLocationGroup> getAllLocationGroups();
 
-    Collection<FlexLocationGroup> getAllLocationGroups();
+  /**
+   * @return the list of {@link StopTime} objects associated with the trip, sorted by {@link
+   * StopTime#getStopSequence()}
+   */
+  List<StopTime> getStopTimesForTrip(Trip trip);
 
-    /**
-     * @return the list of {@link StopTime} objects associated with the trip,
-     * sorted by {@link StopTime#getStopSequence()}
-     */
-    List<StopTime> getStopTimesForTrip(Trip trip);
+  Collection<ConstrainedTransfer> getAllTransfers();
 
-    Collection<ConstrainedTransfer> getAllTransfers();
+  Collection<TripPattern> getTripPatterns();
 
-    Collection<TripPattern> getTripPatterns();
+  Collection<Trip> getAllTrips();
 
-    Collection<Trip> getAllTrips();
+  Collection<FlexTrip> getAllFlexTrips();
 
-    Collection<FlexTrip> getAllFlexTrips();
+  /**
+   * @return if transit service has any active services. The graph build might filter out all
+   * transit services if they are outside the configured 'transitServiceStart' and 'transitServiceEnd'
+   */
+  boolean hasActiveTransit();
 }

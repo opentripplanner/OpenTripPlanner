@@ -1,5 +1,13 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
@@ -18,21 +26,13 @@ import org.rutebanken.netex.model.KeyListStructure;
 import org.rutebanken.netex.model.KeyValueStructure;
 import org.rutebanken.netex.model.MultilingualString;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
-
 public class FlexStopLocationMapperTest {
 
   public static final String FLEXIBLE_STOP_PLACE_ID = "RUT:FlexibleStopPlace:1";
   public static final String FLEXIBLE_STOP_PLACE_NAME = "Sauda-HentMeg";
   public static final String FLEXIBLE_AREA_ID = "RUT:FlexibleArea:1";
-  public static final Collection<Double> areaPosList = new ArrayList<>(Arrays.asList(
+  public static final Collection<Double> areaPosList = new ArrayList<>(
+    Arrays.asList(
       59.62575084033623,
       6.3023991052849,
       59.62883380609349,
@@ -81,39 +81,48 @@ public class FlexStopLocationMapperTest {
       6.317783255517423,
       59.62575084033623,
       6.3023991052849
-  ));
+    )
+  );
 
   @Test
   public void mapFlexStopLocation() {
-
-    FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(ID_FACTORY, List.of());
+    FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(
+      ID_FACTORY,
+      List.of()
+    );
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace();
 
-    FlexStopLocation flexStopLocation = (FlexStopLocation) flexStopLocationMapper.map(flexibleStopPlace);
+    FlexStopLocation flexStopLocation = (FlexStopLocation) flexStopLocationMapper.map(
+      flexibleStopPlace
+    );
 
     assertNotNull(flexStopLocation);
   }
 
   @Test
   public void mapFlexStopLocationGroup() {
-
     Stop stop1 = getStop("1", 59.6505778, 6.3608759);
     Stop stop2 = getStop("2", 59.6630333, 6.3697245);
 
     FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(
-        ID_FACTORY,
-        List.of(stop1, stop2)
+      ID_FACTORY,
+      List.of(stop1, stop2)
     );
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace();
-    flexibleStopPlace.setKeyList(new KeyListStructure().withKeyValue(
-        new KeyValueStructure()
-          .withKey("FlexibleStopAreaType")
-          .withValue("UnrestrictedPublicTransportAreas")));
+    flexibleStopPlace.setKeyList(
+      new KeyListStructure()
+        .withKeyValue(
+          new KeyValueStructure()
+            .withKey("FlexibleStopAreaType")
+            .withValue("UnrestrictedPublicTransportAreas")
+        )
+    );
 
     FlexLocationGroup flexLocationGroup = (FlexLocationGroup) flexStopLocationMapper.map(
-        flexibleStopPlace);
+      flexibleStopPlace
+    );
 
     // Only one of the stops should be inside the polygon
     assertEquals(1, flexLocationGroup.getLocations().size());
@@ -123,31 +132,44 @@ public class FlexStopLocationMapperTest {
 
   private FlexibleStopPlace getFlexibleStopPlace() {
     return new FlexibleStopPlace()
-        .withId(FLEXIBLE_STOP_PLACE_ID)
-        .withName(new MultilingualString().withValue(FLEXIBLE_STOP_PLACE_NAME))
-        .withAreas(new FlexibleStopPlace_VersionStructure.Areas().withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(
+      .withId(FLEXIBLE_STOP_PLACE_ID)
+      .withName(new MultilingualString().withValue(FLEXIBLE_STOP_PLACE_NAME))
+      .withAreas(
+        new FlexibleStopPlace_VersionStructure.Areas()
+          .withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(
             new FlexibleArea()
-                .withId(FLEXIBLE_AREA_ID)
-                .withPolygon(new PolygonType().withExterior(new AbstractRingPropertyType().withAbstractRing(
-                    MappingSupport.createJaxbElement(new LinearRingType().withPosList(new DirectPositionListType()
-                        .withValue(areaPosList))))))));
+              .withId(FLEXIBLE_AREA_ID)
+              .withPolygon(
+                new PolygonType()
+                  .withExterior(
+                    new AbstractRingPropertyType()
+                      .withAbstractRing(
+                        MappingSupport.createJaxbElement(
+                          new LinearRingType()
+                            .withPosList(new DirectPositionListType().withValue(areaPosList))
+                        )
+                      )
+                  )
+              )
+          )
+      );
   }
 
   private Stop getStop(String id, double latitude, double longitude) {
     return new Stop(
-        ID_FACTORY.createId(id),
-        new NonLocalizedString(id),
-        id,
-        null,
-        WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-        WheelChairBoarding.NO_INFORMATION,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+      ID_FACTORY.createId(id),
+      new NonLocalizedString(id),
+      id,
+      null,
+      WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
+      WheelChairBoarding.NO_INFORMATION,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
   }
 }

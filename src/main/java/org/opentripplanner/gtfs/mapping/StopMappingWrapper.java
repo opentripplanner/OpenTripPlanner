@@ -1,13 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.StopLevel;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
-
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 /**
  * Wrap GTFS Stop to provide a common base mapping for all {@link StationElement}s.
@@ -45,7 +45,9 @@ class StopMappingWrapper {
   }
 
   public StopLevel getLevel() {
-    if (stop.getLevel() == null) { return null; }
+    if (stop.getLevel() == null) {
+      return null;
+    }
     return new StopLevel(stop.getLevel().getName(), stop.getLevel().getIndex());
   }
 }

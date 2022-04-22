@@ -20,42 +20,46 @@ import org.opentripplanner.standalone.server.OTPServer;
 @Produces(MediaType.TEXT_PLAIN)
 public class ReportResource {
 
-    private final TransferService transferService;
-    private final GraphIndex index;
+  private final TransferService transferService;
+  private final GraphIndex index;
 
-    @SuppressWarnings("unused")
-    public ReportResource(@Context OTPServer server) {
-        this.transferService = server.getRouter().graph.getTransferService();
-        this.index = server.getRouter().graph.index;
-    }
+  @SuppressWarnings("unused")
+  public ReportResource(@Context OTPServer server) {
+    this.transferService = server.getRouter().graph.getTransferService();
+    this.index = server.getRouter().graph.index;
+  }
 
-    @GET
-    @Path("/transfers.csv")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public String getTransfersAsCsv() {
-        return TransfersReport.export(transferService.listAll(), index);
-    }
+  @GET
+  @Path("/transfers.csv")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  public String getTransfersAsCsv() {
+    return TransfersReport.export(transferService.listAll(), index);
+  }
 
-    @GET
-    @Path("/bicycle-safety.html")
-    @Produces(MediaType.TEXT_HTML)
-    public Response getBicycleSafetyPage() {
-        var is = getClass().getResourceAsStream("/reportapi/report.html");
-        try {
-            return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
-        }
-        catch (IOException e) {
-            return Response.serverError().build();
-        }
+  @GET
+  @Path("/bicycle-safety.html")
+  @Produces(MediaType.TEXT_HTML)
+  public Response getBicycleSafetyPage() {
+    var is = getClass().getResourceAsStream("/reportapi/report.html");
+    try {
+      return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
+    } catch (IOException e) {
+      return Response.serverError().build();
     }
+  }
 
-    @GET
-    @Path("/bicycle-safety.csv")
-    @Produces("text/csv")
-    public Response getBicycleSafetyAsCsv(@DefaultValue("default") @QueryParam("osmWayPropertySet") String osmWayPropertySet) {
-        return Response.ok(BicyleSafetyReport.makeCsv(osmWayPropertySet))
-                .header("Content-Disposition", "attachment; filename=\"" + osmWayPropertySet
-                        + "-bicycle-safety.csv\"")
-                .build();
-    }
+  @GET
+  @Path("/bicycle-safety.csv")
+  @Produces("text/csv")
+  public Response getBicycleSafetyAsCsv(
+    @DefaultValue("default") @QueryParam("osmWayPropertySet") String osmWayPropertySet
+  ) {
+    return Response
+      .ok(BicyleSafetyReport.makeCsv(osmWayPropertySet))
+      .header(
+        "Content-Disposition",
+        "attachment; filename=\"" + osmWayPropertySet + "-bicycle-safety.csv\""
+      )
+      .build();
+  }
 }

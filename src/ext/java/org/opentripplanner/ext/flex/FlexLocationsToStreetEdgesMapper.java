@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.flex;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -13,16 +15,15 @@ import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexLocationsToStreetEdgesMapper.class);
 
   @Override
   public void buildGraph(
-      Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore
+    Graph graph,
+    HashMap<Class<?>, Object> extra,
+    DataImportIssueStore issueStore
   ) {
     if (graph.locationsById.isEmpty()) {
       return;
@@ -30,18 +31,25 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
 
     StreetVertexIndex streetIndex = graph.getStreetIndex();
 
-    ProgressTracker progress = ProgressTracker.track("Add flex locations to street vertices", 1, graph.locationsById.size());
+    ProgressTracker progress = ProgressTracker.track(
+      "Add flex locations to street vertices",
+      1,
+      graph.locationsById.size()
+    );
 
     LOG.info(progress.startMessage());
     // TODO: Make this into a parallel stream, first calculate vertices per location and then add them.
     for (FlexStopLocation flexStopLocation : graph.locationsById.values()) {
-      for (Vertex vertx : streetIndex.getVerticesForEnvelope(flexStopLocation
-          .getGeometry()
-          .getEnvelopeInternal())
-      ) {
+      for (Vertex vertx : streetIndex.getVerticesForEnvelope(
+        flexStopLocation.getGeometry().getEnvelopeInternal()
+      )) {
         // Check that the vertex is connected to both driveable and walkable edges
-        if (!(vertx instanceof StreetVertex)) { continue; }
-        if (!((StreetVertex)vertx).isEligibleForCarPickupDropoff()) { continue; }
+        if (!(vertx instanceof StreetVertex)) {
+          continue;
+        }
+        if (!((StreetVertex) vertx).isEligibleForCarPickupDropoff()) {
+          continue;
+        }
 
         // The street index overselects, so need to check for exact geometry inclusion
         Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());

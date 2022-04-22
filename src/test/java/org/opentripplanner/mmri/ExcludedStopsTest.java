@@ -1,21 +1,29 @@
 package org.opentripplanner.mmri;
 
-import org.junit.Ignore;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.GtfsTest;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
-/**
- * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
- */
-@Ignore
-public class ExcludedStopsTest extends MmriTest {
-    @Override
-    public final String getFeedName() {
-        return "mmri/3f";
-    }
+@Disabled("Requires stop banning")
+public class ExcludedStopsTest extends GtfsTest {
 
-    public void test3f1() {
-        Leg leg = plan(+1388530860L, "3f1", "3f3", null, false, false, null, "", "3f2");
+  @Override
+  public final String getFeedName() {
+    return "mmri/3f";
+  }
 
-        validateLeg(leg, 1388530860000L, 1388531040000L, "3f3", "3f1", null);
-    }
+  @Test
+  public void test3f1() {
+    Itinerary itinerary = plan(+1388530860L, "3f1", "3f3", null, false, false, null, "", "3f2", 1);
+
+    Leg leg = itinerary.legs.toArray(new Leg[1])[0];
+
+    validateLeg(leg, 1388530860000L, 1388531040000L, "3f3", "3f1", null);
+
+    assertEquals("", itinerary.toStr());
+  }
 }

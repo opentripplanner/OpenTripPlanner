@@ -38,24 +38,24 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private RaptorRequest<T> heuristicReq;
 
   public HeuristicSearchTask(
-      RaptorRequest<T> request,
-      RaptorConfig<T> config,
-      RaptorTransitDataProvider<T> transitData
+    RaptorRequest<T> request,
+    RaptorConfig<T> config,
+    RaptorTransitDataProvider<T> transitData
   ) {
     this(
-        request.searchDirection(),
-        RequestAlias.alias(request, config.isMultiThreaded()),
-        config,
-        transitData
+      request.searchDirection(),
+      RequestAlias.alias(request, config.isMultiThreaded()),
+      config,
+      transitData
     );
     this.originalRequest = request;
   }
 
   public HeuristicSearchTask(
-      SearchDirection direction,
-      String name,
-      RaptorConfig<T> config,
-      RaptorTransitDataProvider<T> transitData
+    SearchDirection direction,
+    String name,
+    RaptorConfig<T> config,
+    RaptorTransitDataProvider<T> transitData
   ) {
     this.direction = direction;
     this.name = name;
@@ -102,11 +102,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (!isEnabled() || !other.isEnabled()) {
       return;
     }
-    DebugHeuristics.debug(
-        name(), result(),
-        other.name(), other.result(),
-        originalRequest
-    );
+    DebugHeuristics.debug(name(), result(), other.name(), other.result(), originalRequest);
   }
 
   /**
@@ -138,19 +134,21 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (search == null) {
       var profile = MIN_TRAVEL_DURATION_BEST_TIME;
 
-      if(request.searchParams().constrainedTransfersEnabled()) {
+      if (request.searchParams().constrainedTransfersEnabled()) {
         // We need to look up the previous transit arrival, this is not possible with the
         // BEST_TIMES only states.
         profile = MIN_TRAVEL_DURATION;
       }
 
-      heuristicReq = request
+      heuristicReq =
+        request
           .mutate()
           // Disable any optimization that is not valid for a heuristic search
           .clearOptimizations()
           .profile(profile)
           .searchDirection(direction)
-          .searchParams().searchOneIterationOnly()
+          .searchParams()
+          .searchOneIterationOnly()
           .build();
       search = config.createHeuristicSearch(transitData, heuristicReq);
     }

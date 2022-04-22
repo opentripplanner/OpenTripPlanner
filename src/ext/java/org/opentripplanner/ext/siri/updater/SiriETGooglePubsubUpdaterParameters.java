@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 public class SiriETGooglePubsubUpdaterParameters {
+
   private final String configRef;
   private final String feedId;
   private final String type;
@@ -11,14 +12,14 @@ public class SiriETGooglePubsubUpdaterParameters {
   private final boolean purgeExpiredData;
 
   public SiriETGooglePubsubUpdaterParameters(
-      String configRef,
-      String feedId,
-      String type,
-      String projectName,
-      String topicName,
-      String dataInitializationUrl,
-      int reconnectPeriodSec,
-      boolean purgeExpiredData
+    String configRef,
+    String feedId,
+    String type,
+    String projectName,
+    String topicName,
+    String dataInitializationUrl,
+    int reconnectPeriodSec,
+    boolean purgeExpiredData
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -30,12 +31,35 @@ public class SiriETGooglePubsubUpdaterParameters {
     this.purgeExpiredData = purgeExpiredData;
   }
 
-  String getConfigRef() { return configRef; }
-  String getFeedId() { return feedId; }
-  String getType() { return this.type; }
-  String getProjectName() { return this.projectName; }
-  String getTopicName() { return this.topicName; }
-  String getDataInitializationUrl() { return this.dataInitializationUrl; }
-  boolean purgeExpiredData() { return this.purgeExpiredData; }
-  int getReconnectPeriodSec() { return this.reconnectPeriodSec; }
+  String getConfigRef() {
+    return configRef;
+  }
+
+  String getFeedId() {
+    return feedId;
+  }
+
+  String getType() {
+    return this.type;
+  }
+
+  String getProjectName() {
+    return this.projectName;
+  }
+
+  String getTopicName() {
+    return this.topicName;
+  }
+
+  String getDataInitializationUrl() {
+    return this.dataInitializationUrl;
+  }
+
+  boolean purgeExpiredData() {
+    return this.purgeExpiredData;
+  }
+
+  int getReconnectPeriodSec() {
+    return this.reconnectPeriodSec;
+  }
 }
