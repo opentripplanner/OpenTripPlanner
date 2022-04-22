@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.siri.updater;
+package org.opentripplanner.updater.alerts;
 
 import org.opentripplanner.routing.services.TransitAlertService;
 

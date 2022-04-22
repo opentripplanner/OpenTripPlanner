@@ -4,7 +4,6 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
-import org.opentripplanner.ext.siri.updater.TransitAlertProvider;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
