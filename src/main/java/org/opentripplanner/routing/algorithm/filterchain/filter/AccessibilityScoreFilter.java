@@ -29,7 +29,7 @@ public class AccessibilityScoreFilter implements ItineraryListFilter {
   }
 
   private Itinerary addAccessibilityScore(Itinerary i) {
-    var legs = i.legs
+    var scoredLegs = i.legs
       .stream()
       .map(leg -> {
         if (leg instanceof ScheduledTransitLeg transitLeg) {
@@ -38,7 +38,8 @@ public class AccessibilityScoreFilter implements ItineraryListFilter {
       })
       .toList();
 
-    i.accessibilityScore = compute(legs);
+    i.legs = scoredLegs;
+    i.accessibilityScore = compute(scoredLegs);
     return i;
   }
 

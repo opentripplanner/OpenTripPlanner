@@ -56,7 +56,7 @@ public class Itinerary {
    * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6,
    * then walks to their destination, has four legs.
    */
-  public final List<Leg> legs;
+  public List<Leg> legs;
 
   /**
    * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
