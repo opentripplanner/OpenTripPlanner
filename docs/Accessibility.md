@@ -41,11 +41,14 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
 
 The parameters for `stops` and `trips` mean the following:
 
-| name                     |                                                                                                                                         |
-|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `onlyConsiderAccessible` | Whether to include unknown accessibility and inaccessible stops/tips in the search. |
-| `unknownCost`            | The cost to add if a stop/trip has unknown wheelchair accessibility                                                                     |
-| `inaccessibleCost`       | The cost to add if a stop/trip is known to be inaccessible                                                                              |
+| name                     |                                                                                      | default |
+|--------------------------|--------------------------------------------------------------------------------------|---------|
+| `onlyConsiderAccessible` | Whether to include unknown accessibility and inaccessible stops/trips in the search. | `false` |
+| `unknownCost`            | The cost to add if a stop/trip has unknown wheelchair accessibility                  | 600     |
+| `inaccessibleCost`       | The cost to add if a stop/trip is known to be inaccessible                           | 3600    |
+
+**Note**: Unless your accessibility data coverage is complete you will receive much better results by setting `onlyConsiderAccessible=true`, because
+otherwise you receive barely any results.
 
 ## Accessible transfers
 
