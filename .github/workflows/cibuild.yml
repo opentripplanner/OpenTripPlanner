@@ -30,7 +30,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Prepare coverage agent, build and test
-        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
+        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck,unit-tests
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner' && matrix.os == 'ubuntu-latest'
