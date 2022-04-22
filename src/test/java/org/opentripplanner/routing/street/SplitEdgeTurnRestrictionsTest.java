@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.street;
 
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
+import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import io.micrometer.core.instrument.Metrics;
 import java.io.IOException;

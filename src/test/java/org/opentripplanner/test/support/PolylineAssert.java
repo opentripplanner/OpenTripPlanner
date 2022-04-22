@@ -1,4 +1,4 @@
-package org.opentripplanner;
+package org.opentripplanner.test.support;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
