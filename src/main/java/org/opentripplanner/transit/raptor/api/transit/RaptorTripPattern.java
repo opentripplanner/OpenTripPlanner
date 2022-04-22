@@ -53,8 +53,6 @@ public interface RaptorTripPattern {
    */
   String debugInfo();
 
-  WheelChairBoarding wheelchairBoarding(int stopPositionInPattern);
-
   /**
    * Return the first occurrence of the stop position for the given stop index after the given
    * startPosition(inclusive). Note that the returned value might not be the only occurrence, if the

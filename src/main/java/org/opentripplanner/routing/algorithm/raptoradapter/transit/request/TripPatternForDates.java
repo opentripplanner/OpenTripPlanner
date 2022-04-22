@@ -55,6 +55,9 @@ public class TripPatternForDates
    * arrivalTimes.
    */
   private final int[] departureTimes;
+
+  private final WheelChairBoarding[] wheelchairBoardings;
+
   // bit arrays with boarding/alighting information for all stops on trip pattern
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
@@ -84,6 +87,8 @@ public class TripPatternForDates
     this.numberOfTripSchedules = numberOfTripSchedules;
     this.isFrequencyBased = hasFrequencies;
 
+    wheelchairBoardings = new WheelChairBoarding[numberOfTripSchedules];
+
     final int nStops = tripPattern.getStopIndexes().length;
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
     this.departureTimes = new int[nStops * numberOfTripSchedules];
@@ -91,6 +96,7 @@ public class TripPatternForDates
     for (int d = 0; d < tripPatternForDates.size(); d++) {
       int offset = this.offsets[d];
       for (var trip : tripPatternForDates.get(d).tripTimes()) {
+        wheelchairBoardings[i] = trip.getTrip().getWheelchairBoarding();
         for (int s = 0; s < nStops; s++) {
           this.arrivalTimes[s * numberOfTripSchedules + i] = trip.getArrivalTime(s) + offset;
           this.departureTimes[s * numberOfTripSchedules + i] = trip.getDepartureTime(s) + offset;
@@ -171,11 +177,6 @@ public class TripPatternForDates
   @Override
   public int slackIndex() {
     return slackIndex;
-  }
-
-  @Override
-  public WheelChairBoarding wheelchairBoarding(int stopPositionInPattern) {
-    return tripPattern.getPattern().getStop(stopPositionInPattern).getWheelchairBoarding();
   }
 
   @Override
@@ -260,5 +261,9 @@ public class TripPatternForDates
       .addServiceTimeSchedule("offsets", offsets)
       .addNum("nTrips", numberOfTripSchedules)
       .toString();
+  }
+
+  public WheelChairBoarding wheelchairBoardingForTrip(int index) {
+    return wheelchairBoardings[index];
   }
 }

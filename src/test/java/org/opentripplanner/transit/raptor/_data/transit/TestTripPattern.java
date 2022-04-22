@@ -114,11 +114,6 @@ public class TestTripPattern implements RaptorTripPattern {
   }
 
   @Override
-  public WheelChairBoarding wheelchairBoarding(int stopPositionInPattern) {
-    return WheelChairBoarding.NO_INFORMATION;
-  }
-
-  @Override
   public String toString() {
     return ToStringBuilder
       .of(TestTripPattern.class)

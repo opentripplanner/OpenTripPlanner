@@ -73,7 +73,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   @Override
   public WheelChairBoarding wheelchairBoarding() {
-    return getOriginalTripTimes().getTrip().getWheelchairBoarding();
+    return pattern.wheelchairBoardingForTrip(tripIndexForDates);
   }
 
   /*
