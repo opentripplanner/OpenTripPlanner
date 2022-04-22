@@ -285,7 +285,9 @@ public class Itinerary {
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
-    return new Itinerary(timeShiftedLegs);
+    var newItin = new Itinerary(timeShiftedLegs);
+    newItin.generalizedCost = generalizedCost;
+    return newItin;
   }
 
   /** @see #equals(Object) */

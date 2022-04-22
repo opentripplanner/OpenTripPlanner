@@ -98,6 +98,8 @@ public class GtfsModule implements GraphBuilderModule {
 
     CalendarServiceData calendarServiceData = graph.getCalendarDataService();
 
+    boolean hasTransit = false;
+
     try {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
         GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
@@ -125,6 +127,9 @@ public class GtfsModule implements GraphBuilderModule {
 
         OtpTransitService transitModel = builder.build();
 
+        // if this or previously processed gtfs bundle has transit that has not been filtered out
+        hasTransit = hasTransit || transitModel.hasActiveTransit();
+
         addTransitModelToGraph(graph, gtfsBundle, transitModel);
 
         createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph, issueStore);
@@ -145,7 +150,8 @@ public class GtfsModule implements GraphBuilderModule {
     );
     graph.updateTransitFeedValidity(calendarServiceData, issueStore);
 
-    graph.hasTransit = true;
+    // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
+    graph.hasTransit = graph.hasTransit || hasTransit;
     graph.calculateTransitCenter();
   }
 

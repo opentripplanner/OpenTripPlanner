@@ -4,9 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -14,25 +23,44 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.test.support.VariableSource;
 
 public class VehiclePositionsMatcherTest {
 
+  ZoneId zoneId = ZoneId.of("Europe/Berlin");
   String feedId = "feed1";
+  String tripId = "trip1";
+  FeedScopedId scopedTripId = new FeedScopedId(feedId, tripId);
 
   @Test
   public void matchRealtimePositionsToTrip() {
+    var pos = vehiclePosition(tripId);
+    testVehiclePositions(pos);
+  }
+
+  @Test
+  @DisplayName("If the vehicle position has no start_date we need to guess the service day")
+  public void inferStartDate() {
+    var posWithoutServiceDate = VehiclePosition
+      .newBuilder()
+      .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
+      .setStopId("stop-1")
+      .build();
+    testVehiclePositions(posWithoutServiceDate);
+  }
+
+  private void testVehiclePositions(VehiclePosition pos) {
     var service = new RealtimeVehiclePositionService();
-
-    var tripId = "trip1";
-    var scopedTripId = new FeedScopedId(feedId, tripId);
-
     var trip = new Trip(scopedTripId);
-
-    var stopPattern = new StopPattern(
-      List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2))
-    );
+    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
+    var stopPattern = new StopPattern(stopTimes);
 
     var pattern = new TripPattern(new FeedScopedId(feedId, tripId), null, stopPattern);
+    pattern
+      .getScheduledTimetable()
+      .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
 
     var tripForId = Map.of(scopedTripId, trip);
     var patternForTrip = Map.of(trip, pattern);
@@ -44,11 +72,11 @@ public class VehiclePositionsMatcherTest {
     VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
       feedId,
       tripForId::get,
+      patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
-      service
+      service,
+      zoneId
     );
-
-    var pos = vehiclePosition(tripId);
 
     var positions = List.of(pos);
 
@@ -100,8 +128,10 @@ public class VehiclePositionsMatcherTest {
     VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
       feedId,
       tripForId::get,
+      patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
-      service
+      service,
+      zoneId
     );
 
     var pos1 = vehiclePosition(tripId1);
@@ -123,7 +153,50 @@ public class VehiclePositionsMatcherTest {
     assertEquals(0, service.getVehiclePositions(pattern2).size());
   }
 
-  private VehiclePosition vehiclePosition(String tripId1) {
+  static Stream<Arguments> inferenceTestCases = Stream.of(
+    Arguments.of("2022-04-05T15:26:04+02:00", "2022-04-05"),
+    Arguments.of("2022-04-06T00:26:04+02:00", "2022-04-05"),
+    Arguments.of("2022-04-06T10:26:04+02:00", "2022-04-06")
+  );
+
+  @ParameterizedTest(name = "{0} should resolve to {1}")
+  @VariableSource("inferenceTestCases")
+  void inferServiceDayOfTripAt6(String time, String expectedDate) {
+    var trip = new Trip(scopedTripId);
+
+    var sixOclock = (int) Duration.ofHours(18).toSeconds();
+    var fivePast6 = sixOclock + 300;
+
+    var stopTimes = List.of(stopTime(trip, 0, sixOclock), stopTime(trip, 1, fivePast6));
+
+    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+    var instant = OffsetDateTime.parse(time).toInstant();
+    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
+
+    assertEquals(LocalDate.parse(expectedDate), inferredDate);
+  }
+
+  @Test
+  void inferServiceDateCloseToMidnight() {
+    var trip = new Trip(scopedTripId);
+
+    var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
+    var fivePastMidnight = fiveToMidnight + (10 * 60);
+    var stopTimes = List.of(stopTime(trip, 0, fiveToMidnight), stopTime(trip, 1, fivePastMidnight));
+
+    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+    var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
+
+    // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
+    // yesterday
+    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+
+    assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
+  }
+
+  private static VehiclePosition vehiclePosition(String tripId1) {
     return VehiclePosition
       .newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId1).setStartDate("20220314").build())
@@ -131,7 +204,14 @@ public class VehiclePositionsMatcherTest {
       .build();
   }
 
-  private StopTime stopTime(Trip trip, int seq) {
+  private static StopTime stopTime(Trip trip, int seq, int time) {
+    var stopTime = stopTime(trip, seq);
+    stopTime.setArrivalTime(time);
+    stopTime.setDepartureTime(time);
+    return stopTime;
+  }
+
+  private static StopTime stopTime(Trip trip, int seq) {
     var stopTime = new StopTime();
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);

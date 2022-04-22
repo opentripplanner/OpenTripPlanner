@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -111,20 +112,22 @@ public class FlexIntegrationTest {
     // in the middle of flex zone
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
-    var itin = getItinerary(from, to, 0, true);
+    var itin = getItinerary(from, to, 1, true);
 
-    // walk, flex, walk
-    assertEquals(3, itin.legs.size());
+    // walk, flex
+    assertEquals(2, itin.legs.size());
+    assertEquals("2021-12-02T12:53:12-05:00[America/New_York]", itin.startTime().toString());
+    assertEquals(3173, itin.generalizedCost);
 
     var walkToFlex = itin.legs.get(0);
     assertEquals(TraverseMode.WALK, walkToFlex.getMode());
 
     var flex = itin.legs.get(1);
     assertEquals(BUS, flex.getMode());
-    assertEquals("Zone 1", flex.getRoute().getShortName());
+    assertEquals("Zone 2", flex.getRoute().getShortName());
     assertTrue(flex.isFlexibleTrip());
 
-    assertEquals("2021-12-02T12:30-05:00[America/New_York]", flex.getStartTime().toString());
+    assertEquals("2021-12-02T13:00-05:00[America/New_York]", flex.getStartTime().toString());
   }
 
   @BeforeAll
@@ -193,7 +196,7 @@ public class FlexIntegrationTest {
     GenericLocation from,
     GenericLocation to,
     int index,
-    boolean includeDirect
+    boolean onlyDirect
   ) {
     RoutingRequest request = new RoutingRequest();
     request.setDateTime(dateTime);
@@ -202,8 +205,9 @@ public class FlexIntegrationTest {
     request.numItineraries = 10;
     request.searchWindow = Duration.ofHours(2);
     request.modes.egressMode = FLEXIBLE;
-    if (includeDirect) {
+    if (onlyDirect) {
       request.modes.directMode = FLEXIBLE;
+      request.modes.transitModes = Set.of();
     }
 
     var result = service.route(request, router);

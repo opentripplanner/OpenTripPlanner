@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,11 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
   }
 
   public String toString() {
-    return "GtfsRealtimeHttpUpdateStreamer(" + url + ")";
+    return ToStringBuilder
+      .of(this.getClass())
+      .addStr("feedId", feedId)
+      .addStr("url", url)
+      .toString();
   }
 
   interface Parameters {

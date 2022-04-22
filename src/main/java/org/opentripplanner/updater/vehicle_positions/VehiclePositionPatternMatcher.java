@@ -2,9 +2,15 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -13,6 +19,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
@@ -23,6 +30,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,22 +44,28 @@ public class VehiclePositionPatternMatcher {
 
   private final String feedId;
   private final RealtimeVehiclePositionService service;
+  private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
-  private final BiFunction<Trip, ServiceDate, TripPattern> getPatternForTrip;
+  private final Function<Trip, TripPattern> getStaticPattern;
+  private final BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern;
 
   private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
   public VehiclePositionPatternMatcher(
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
-    BiFunction<Trip, ServiceDate, TripPattern> getPatternForTrip,
-    RealtimeVehiclePositionService service
+    Function<Trip, TripPattern> getStaticPattern,
+    BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern,
+    RealtimeVehiclePositionService service,
+    ZoneId timeZoneId
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
-    this.getPatternForTrip = getPatternForTrip;
+    this.getStaticPattern = getStaticPattern;
+    this.getRealtimePattern = getRealtimePattern;
     this.service = service;
+    this.timeZoneId = timeZoneId;
   }
 
   /**
@@ -93,6 +107,48 @@ public class VehiclePositionPatternMatcher {
         feedId
       );
     }
+  }
+
+  private ServiceDate inferServiceDate(Trip trip) {
+    var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
+    return new ServiceDate(inferServiceDate(staticTripTimes, timeZoneId, Instant.now()));
+  }
+
+  /**
+   * When a vehicle position doesn't state the service date of its trip then we need to infer it.
+   * <p>
+   * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
+   */
+  protected static LocalDate inferServiceDate(
+    TripTimes staticTripTimes,
+    ZoneId zoneId,
+    Instant now
+  ) {
+    var start = staticTripTimes.getScheduledDepartureTime(0);
+    var end = staticTripTimes.getScheduledDepartureTime(staticTripTimes.getNumStops() - 1);
+
+    var today = now.atZone(zoneId).toLocalDate();
+    var yesterday = today.minusDays(1);
+    var tomorrow = today.plusDays(1);
+
+    // we compute the temporal "distance" to either the start or the end of the trip on either
+    // yesterday, today or tomorrow. whichever one has the lowest "distance" to now is guessed to be
+    // the service day of the undated vehicle position
+    // if this is concerning to you, you should put a start_date in your feed.
+    return Stream
+      .of(yesterday, today, tomorrow)
+      .flatMap(day -> {
+        var startTime = day.atStartOfDay(zoneId).plusSeconds(start).toInstant();
+        var endTime = day.atStartOfDay(zoneId).plusSeconds(end).toInstant();
+
+        return Stream
+          .of(Duration.between(startTime, now), Duration.between(endTime, now))
+          .map(Duration::abs) // temporal "distances" can be positive and negative
+          .map(duration -> new TemporalDistance(day, duration.toSeconds()));
+      })
+      .min(Comparator.comparingLong(TemporalDistance::distance))
+      .map(TemporalDistance::date)
+      .orElse(today);
   }
 
   /**
@@ -138,12 +194,18 @@ public class VehiclePositionPatternMatcher {
 
     // we prefer the to get the current stop from the stop_id
     if (vehiclePosition.hasStopId()) {
-      List<StopLocation> matchedStops = stopsOnVehicleTrip
+      var matchedStops = stopsOnVehicleTrip
         .stream()
         .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
         .toList();
       if (matchedStops.size() == 1) {
         newPosition.setStop(matchedStops.get(0));
+      } else {
+        LOG.warn(
+          "Stop ID {} is not in trip {}. Not setting stopRelationship.",
+          vehiclePosition.getStopId(),
+          trip.getId()
+        );
       }
     }
     // but if stop_id isn't there we try current_stop_sequence
@@ -157,6 +219,8 @@ public class VehiclePositionPatternMatcher {
     return newPosition.build();
   }
 
+  private record TemporalDistance(LocalDate date, long distance) {}
+
   private static StopStatus toModel(VehicleStopStatus currentStatus) {
     return switch (currentStatus) {
       case IN_TRANSIT_TO -> StopStatus.IN_TRANSIT_TO;
@@ -165,17 +229,28 @@ public class VehiclePositionPatternMatcher {
     };
   }
 
+  private static String toString(VehiclePosition vehiclePosition) {
+    try {
+      return JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
+    } catch (InvalidProtocolBufferException ignored) {
+      return vehiclePosition.toString();
+    }
+  }
+
   private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
     String feedId,
     VehiclePosition vehiclePosition
   ) {
     if (!vehiclePosition.hasTrip()) {
-      LOG.warn("Realtime vehicle positions {} has no trip ID. Ignoring.", vehiclePosition);
+      LOG.warn(
+        "Realtime vehicle positions {} has no trip ID. Ignoring.",
+        toString(vehiclePosition)
+      );
       return null;
     }
 
-    String tripId = vehiclePosition.getTrip().getTripId();
-    Trip trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
+    var tripId = vehiclePosition.getTrip().getTripId();
+    var trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
     if (trip == null) {
       LOG.warn(
         "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
@@ -185,20 +260,13 @@ public class VehiclePositionPatternMatcher {
       return null;
     }
 
-    var localDate = Optional
+    var serviceDate = Optional
       .of(vehiclePosition.getTrip().getStartDate())
       .map(Strings::emptyToNull)
-      .flatMap(ServiceDate::parseStringToOptional);
+      .flatMap(ServiceDate::parseStringToOptional)
+      .orElseGet(() -> inferServiceDate(trip));
 
-    if (localDate.isEmpty()) {
-      LOG.warn(
-        "Trip with id {} doesn't contain a valid start_data which is required. Ignoring.",
-        vehiclePosition.getTrip().getTripId()
-      );
-      return null;
-    }
-
-    TripPattern pattern = getPatternForTrip.apply(trip, localDate.get());
+    var pattern = getRealtimePattern.apply(trip, serviceDate);
     if (pattern == null) {
       LOG.warn("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
       return null;
