@@ -71,13 +71,7 @@ public class RoutingRequestMapper {
     request.boardSlackForMode =
       c.asEnumMap("boardSlackForMode", TransitMode.class, NodeAdapter::asInt);
     request.maxAccessEgressDurationForMode =
-      c.exist("maxAccessEgressDurationForMode")
-        ? c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
-        : c.asEnumMap( // TODO: Remove deprecated parameter
-          "maxAccessEgressDurationSecondsForMode",
-          StreetMode.class,
-          (node, param) -> Duration.ofSeconds(node.asLong(param))
-        );
+      c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
     request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
     request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
@@ -99,13 +93,7 @@ public class RoutingRequestMapper {
     request.locale = c.asLocale("locale", dft.locale);
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
     request.maxDirectStreetDuration =
-      c.asDuration(
-        "maxDirectStreetDuration",
-        // TODO: Remove deprecated parameter
-        c.exist("maxDirectStreetDurationSeconds")
-          ? Duration.ofSeconds(c.asLong("maxDirectStreetDurationSeconds"))
-          : dft.maxDirectStreetDuration
-      );
+      c.asDuration("maxDirectStreetDuration", dft.maxDirectStreetDuration);
     request.maxDirectStreetDurationForMode =
       c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
