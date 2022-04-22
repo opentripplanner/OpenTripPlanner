@@ -160,7 +160,7 @@ public abstract class GtfsTest {
     graph.index();
     router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
-    timetableSnapshotSource = new TimetableSnapshotSource(graph);
+    timetableSnapshotSource = TimetableSnapshotSource.ofGraph(graph);
     timetableSnapshotSource.purgeExpiredData = false;
     graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
     alertPatchServiceImpl = new TransitAlertServiceImpl(graph);
@@ -176,19 +176,7 @@ public abstract class GtfsTest {
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
-      CalendarService calendarService = graph.getCalendarService();
-      Deduplicator deduplicator = graph.deduplicator;
-      GraphIndex graphIndex = graph.index;
-      Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-      timetableSnapshotSource.applyTripUpdates(
-        calendarService,
-        deduplicator,
-        graphIndex,
-        serviceCodes,
-        fullDataset,
-        updates,
-        feedId.getId()
-      );
+      timetableSnapshotSource.applyTripUpdates(fullDataset, updates, feedId.getId());
       alertsUpdateHandler.update(feedMessage);
     } catch (Exception exception) {}
   }

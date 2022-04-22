@@ -17,7 +17,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,11 +27,8 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -66,38 +62,18 @@ public class TimetableSnapshotSourceTest {
 
   @BeforeEach
   public void setUp() {
-    updater = new TimetableSnapshotSource(graph);
+    updater = TimetableSnapshotSource.ofGraph(graph);
   }
 
   @Test
   public void testGetSnapshot() throws InvalidProtocolBufferException {
-    CalendarService calendarService = graph.getCalendarService();
-    Deduplicator deduplicator = graph.deduplicator;
-    GraphIndex graphIndex = graph.index;
-    Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(TripUpdate.parseFrom(cancellation)), feedId);
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     assertNotNull(snapshot);
     assertSame(snapshot, updater.getTimetableSnapshot());
 
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(TripUpdate.parseFrom(cancellation)), feedId);
     assertSame(snapshot, updater.getTimetableSnapshot());
 
     updater.maxSnapshotFrequency = (-1);
@@ -115,20 +91,7 @@ public class TimetableSnapshotSourceTest {
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
-    CalendarService calendarService = graph.getCalendarService();
-    Deduplicator deduplicator = graph.deduplicator;
-    GraphIndex graphIndex = graph.index;
-    Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(TripUpdate.parseFrom(cancellation)), feedId);
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern, serviceDate);
@@ -173,19 +136,7 @@ public class TimetableSnapshotSourceTest {
 
     final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    CalendarService calendarService = graph.getCalendarService();
-    Deduplicator deduplicator = graph.deduplicator;
-    GraphIndex graphIndex = graph.index;
-    Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(tripUpdate),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(tripUpdate), feedId);
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern, serviceDate);
@@ -221,19 +172,7 @@ public class TimetableSnapshotSourceTest {
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         var tripUpdate = tripUpdateBuilder.build();
 
-        CalendarService calendarService = graph.getCalendarService();
-        Deduplicator deduplicator = graph.deduplicator;
-        GraphIndex graphIndex = graph.index;
-        Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-        updater.applyTripUpdates(
-          calendarService,
-          deduplicator,
-          graphIndex,
-          serviceCodes,
-          fullDataset,
-          List.of(tripUpdate),
-          feedId
-        );
+        updater.applyTripUpdates(fullDataset, List.of(tripUpdate), feedId);
 
         var snapshot = updater.getTimetableSnapshot();
         assertNull(snapshot);
@@ -328,20 +267,7 @@ public class TimetableSnapshotSourceTest {
     }
 
     // WHEN
-    CalendarService calendarService = graph.getCalendarService();
-    Deduplicator deduplicator = graph.deduplicator;
-    GraphIndex graphIndex = graph.index;
-
-    Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(tripUpdate),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(tripUpdate), feedId);
 
     // THEN
     // Find new pattern in graph starting from stop A
@@ -482,19 +408,7 @@ public class TimetableSnapshotSourceTest {
     }
 
     // WHEN
-    CalendarService calendarService = graph.getCalendarService();
-    Deduplicator deduplicator = graph.deduplicator;
-    GraphIndex graphIndex = graph.index;
-    Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(tripUpdate),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(tripUpdate), feedId);
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -587,19 +501,7 @@ public class TimetableSnapshotSourceTest {
     updater.maxSnapshotFrequency = 0;
     updater.purgeExpiredData = false;
 
-    CalendarService calendarService = graph.getCalendarService();
-    Deduplicator deduplicator = graph.deduplicator;
-    GraphIndex graphIndex = graph.index;
-    Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(TripUpdate.parseFrom(cancellation)), feedId);
     final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
     updater.purgeExpiredData = true;
@@ -616,15 +518,7 @@ public class TimetableSnapshotSourceTest {
 
     final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    updater.applyTripUpdates(
-      calendarService,
-      deduplicator,
-      graphIndex,
-      serviceCodes,
-      fullDataset,
-      List.of(tripUpdate),
-      feedId
-    );
+    updater.applyTripUpdates(fullDataset, List.of(tripUpdate), feedId);
     final TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
 
     assertNotSame(snapshotA, snapshotB);
