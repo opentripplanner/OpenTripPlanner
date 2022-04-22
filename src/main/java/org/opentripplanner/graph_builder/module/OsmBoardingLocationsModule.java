@@ -1,10 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -14,7 +11,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
+import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,27 +21,19 @@ import org.slf4j.LoggerFactory;
  * for GTFS stops is provided by tags in the OSM data.
  * <p>
  * When OSM data is being loaded, certain OSM nodes that represent transit stops are made into
- * TransitStopStreetVertex instances. In some cities, these nodes have a ref=* tag which gives the
- * corresponding GFTS stop ID for the stop. See http://wiki.openstreetmap.org/wiki/Tag:highway%3Dbus_stop
+ * {@link OsmBoardingLocationVertex} instances. In some cities, these nodes have a ref=* tag which
+ * gives the corresponding GFTS stop ID for the stop. See
+ * <a href="http://wiki.openstreetmap.org/wiki/Tag:highway%3Dbus_stop">the OSM wiki page</a>.
  * <p>
  * This module will attempt to link all transit stops to such nodes in the OSM data, based on the
- * stop ID and ref tag. It is run before the main transit stop linker, and if no linkage was created
- * here, the main linker should create one based on distance or other heuristics.
+ * stop ID or stop code and ref tag. It is run before the main transit stop linker, and if no
+ * linkage was created here, the main linker should create one based on distance or other
+ * heuristics.
  */
-public class TransitToTaggedStopsModule implements GraphBuilderModule {
+public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
-  private final double searchRadiusM = 250;
-  private final double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
-  StreetVertexIndex index;
-
-  public List<String> provides() {
-    return Arrays.asList("street to transit", "linking");
-  }
-
-  public List<String> getPrerequisites() {
-    return Arrays.asList("streets"); // why not "transit" ?
-  }
+  private static final Logger LOG = LoggerFactory.getLogger(OsmBoardingLocationsModule.class);
+  private final double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(250);
 
   @Override
   public void buildGraph(
@@ -52,12 +41,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    LOG.info("Linking transit stops to tagged bus stops...");
-
-    index = graph.getStreetIndex();
-
-    // iterate over a copy of vertex list because it will be modified
-    ArrayList<Vertex> vertices = new ArrayList<>();
+    LOG.info("Improving boarding locations by checking OSM entities...");
 
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
       // if the street is already linked there is no need to linked it again,
@@ -72,7 +56,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
       if (alreadyLinked) continue;
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
-        if (!connectVertexToStop(ts)) {
+        if (!connectVertexToStop(ts, graph.getStreetIndex())) {
           LOG.debug(
             "Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString()
           );
@@ -88,28 +72,27 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     //no inputs
   }
 
-  private boolean connectVertexToStop(TransitStopVertex ts) {
+  private boolean connectVertexToStop(TransitStopVertex ts, StreetVertexIndex index) {
     String stopCode = ts.getStop().getCode();
     if (stopCode == null) {
       return false;
     }
     Envelope envelope = new Envelope(ts.getCoordinate());
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
-    envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
+    envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
     Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
     // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
     for (Vertex v : vertices) {
-      if (!(v instanceof TransitStopStreetVertex)) {
+      if (!(v instanceof OsmBoardingLocationVertex tsv)) {
         continue;
       }
-      TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
 
       // Only use stop codes for linking TODO: find better method to connect stops without stop code
-      if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
+      if (tsv.reference != null && tsv.reference.equals(stopCode)) {
         new StreetTransitStopLink(ts, tsv);
         new StreetTransitStopLink(tsv, ts);
-        LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
+        LOG.debug("Connected " + ts + " to " + tsv.getLabel());
         return true;
       }
     }

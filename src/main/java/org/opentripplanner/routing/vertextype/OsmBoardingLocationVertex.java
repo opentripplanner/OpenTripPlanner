@@ -9,21 +9,20 @@ import org.opentripplanner.util.NonLocalizedString;
  * treat this as an authoritative statement on where the transit stop is located within the street
  * network, and the GTFS stop vertex will be linked to exactly this location.
  */
-public class TransitStopStreetVertex extends OsmVertex {
+public class OsmBoardingLocationVertex extends OsmVertex {
 
-  public String stopCode;
+  public final String reference;
 
-  public TransitStopStreetVertex(
+  public OsmBoardingLocationVertex(
     Graph g,
     String label,
     double x,
     double y,
     long nodeId,
     @Nullable String name,
-    String stopCode
+    String reference
   ) {
-    //Stop code is always non localized
     super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
-    this.stopCode = stopCode;
+    this.reference = reference;
   }
 }

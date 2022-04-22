@@ -21,9 +21,9 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GraphCoherencyCheckerModule;
 import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -32,7 +32,7 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -80,9 +80,9 @@ public class GraphBuilder implements Runnable {
     graphBuilder.hasTransitData = hasTransitData;
 
     if (hasOsm) {
-      List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
+      List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
       for (DataSource osmFile : dataSources.get(OSM)) {
-        osmProviders.add(new BinaryOpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
+        osmProviders.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
       }
       OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
       osmModule.customNamer = config.customNamer;
@@ -123,7 +123,7 @@ public class GraphBuilder implements Runnable {
       if (config.matchBusRoutesToStreets) {
         graphBuilder.addModule(new BusRouteStreetMatcher());
       }
-      graphBuilder.addModule(new TransitToTaggedStopsModule());
+      graphBuilder.addModule(new OsmBoardingLocationsModule());
     }
 
     // This module is outside the hasGTFS conditional block because it also links things like bike rental

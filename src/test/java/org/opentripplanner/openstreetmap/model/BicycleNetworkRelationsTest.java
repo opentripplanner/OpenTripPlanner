@@ -7,7 +7,7 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 
 public class BicycleNetworkRelationsTest {
 
@@ -19,7 +19,7 @@ public class BicycleNetworkRelationsTest {
   public void testBicycleRouteRelations() {
     var issueStore = new DataImportIssueStore(false);
     var osmdb = new OSMDatabase(issueStore);
-    var provider = new BinaryOpenStreetMapProvider(
+    var provider = new OpenStreetMapProvider(
       new File("src/test/resources/germany/ehningen-minimal.osm.pbf"),
       true
     );

@@ -6,7 +6,6 @@ import gnu.trove.list.TLongList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,7 +35,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -67,8 +66,8 @@ import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedStringFormat;
@@ -91,7 +90,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * Providers of OSM data.
    */
-  private final List<BinaryOpenStreetMapProvider> providers = new ArrayList<>();
+  private final List<OpenStreetMapProvider> providers;
   private DataImportIssueStore issueStore;
   public boolean skipVisibility = false;
 
@@ -135,32 +134,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * Construct and set providers all at once.
    */
-  public OpenStreetMapModule(List<BinaryOpenStreetMapProvider> providers) {
-    this.setProviders(providers);
+  public OpenStreetMapModule(List<OpenStreetMapProvider> providers) {
+    this.providers = List.copyOf(providers);
   }
 
-  public OpenStreetMapModule() {}
-
-  public List<String> provides() {
-    return Arrays.asList("streets", "turns");
-  }
-
-  public List<String> getPrerequisites() {
-    return Collections.emptyList();
-  }
-
-  /**
-   * The source for OSM map data
-   */
-  public void setProvider(BinaryOpenStreetMapProvider provider) {
-    providers.add(provider);
-  }
-
-  /**
-   * Multiple sources for OSM map data
-   */
-  public void setProviders(List<BinaryOpenStreetMapProvider> providers) {
-    this.providers.addAll(providers);
+  public OpenStreetMapModule(OpenStreetMapProvider provider) {
+    this(List.of(provider));
   }
 
   /**
@@ -183,7 +162,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     OSMDatabase osmdb = new OSMDatabase(issueStore);
     Handler handler = new Handler(graph, osmdb);
-    for (BinaryOpenStreetMapProvider provider : providers) {
+    for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: " + provider);
       provider.readOSM(osmdb);
     }
@@ -208,7 +187,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void checkInputs() {
-    for (BinaryOpenStreetMapProvider provider : providers) {
+    for (OpenStreetMapProvider provider : providers) {
       provider.checkInputs();
     }
   }
@@ -361,10 +340,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      *
      * @param node The node to fetch a label for.
      * @param way  The way it is connected to (for fetching level information).
-     * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
-     * TransitStopStreetVertex.
+     * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a {@link OsmBoardingLocationVertex}
      */
-    // TODO Set this to private once WalkableAreaBuilder is gone
     protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
       // If the node should be decomposed to multiple levels,
       // use the numeric level because it is unique, the human level may not be (although
@@ -396,7 +373,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           String name = node.getTag("name");
           if (ref != null) {
             iv =
-              new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, nid, name, ref);
+              new OsmBoardingLocationVertex(
+                graph,
+                label,
+                coordinate.x,
+                coordinate.y,
+                nid,
+                name,
+                ref
+              );
           }
         }
 

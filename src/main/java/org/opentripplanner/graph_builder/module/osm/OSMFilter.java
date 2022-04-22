@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
  */
 public class OSMFilter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OSMFilter.class);
-
   /**
    * Determines whether this OSM way is considered routable. The majority of routable ways are those
    * with a highway= tag (which includes everything from motorways to hiking trails). Anything with

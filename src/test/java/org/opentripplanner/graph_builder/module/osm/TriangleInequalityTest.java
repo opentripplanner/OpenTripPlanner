@@ -1,21 +1,20 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -36,13 +35,10 @@ public class TriangleInequalityTest {
   private Vertex start;
   private Vertex end;
 
-  @BeforeClass
+  @BeforeAll
   public static void onlyOnce() {
     HashMap<Class<?>, Object> extra = new HashMap<>();
     graph = new Graph();
-
-    OpenStreetMapModule loader = new OpenStreetMapModule();
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     File file = new File(
       URLDecoder.decode(
@@ -51,13 +47,14 @@ public class TriangleInequalityTest {
       )
     );
     DataSource source = new FileDataSource(file, FileType.OSM);
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(source, true);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(source, true);
 
-    loader.setProvider(provider);
+    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     loader.buildGraph(graph, extra);
   }
 
-  @Before
+  @BeforeEach
   public void before() {
     start = graph.getVertex("osm:node:1919595913");
     end = graph.getVertex("osm:node:42448554");
@@ -167,8 +164,8 @@ public class TriangleInequalityTest {
   }
 
   private void checkTriangleInequality(TraverseModeSet traverseModes) {
-    assertNotNull(start);
-    assertNotNull(end);
+    Assertions.assertNotNull(start);
+    Assertions.assertNotNull(end);
 
     RoutingRequest prototypeOptions = new RoutingRequest();
 
@@ -195,7 +192,7 @@ public class TriangleInequalityTest {
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(end);
-    assertNotNull(path);
+    Assertions.assertNotNull(path);
 
     double startEndWeight = path.getWeight();
     int startEndDuration = path.getDuration();
@@ -246,6 +243,6 @@ public class TriangleInequalityTest {
       //        startEndDuration);
     }
 
-    assertFalse(violated);
+    Assertions.assertFalse(violated);
   }
 }

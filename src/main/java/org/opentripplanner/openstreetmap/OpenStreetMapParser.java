@@ -18,13 +18,13 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
  *
  * @since 0.4
  */
-public class BinaryOpenStreetMapParser extends BinaryParser {
+public class OpenStreetMapParser extends BinaryParser {
 
   private final OSMDatabase osmdb;
   private final Map<String, String> stringTable = new HashMap<>();
   private OsmParserPhase parsePhase;
 
-  public BinaryOpenStreetMapParser(OSMDatabase osmdb) {
+  public OpenStreetMapParser(OSMDatabase osmdb) {
     this.osmdb = osmdb;
   }
 
