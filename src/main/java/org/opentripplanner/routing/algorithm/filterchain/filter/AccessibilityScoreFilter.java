@@ -21,7 +21,7 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
  * calculating them on the backend makes life a little easier and changes are automatically
  * applied to all frontends.
  */
-public class ExperimentalAccessibilityScoreFilter implements ItineraryListFilter {
+public class AccessibilityScoreFilter implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
@@ -59,7 +59,7 @@ public class ExperimentalAccessibilityScoreFilter implements ItineraryListFilter
     var values = List.of(trip, fromStop, toStop);
     var sum = (float) values
       .stream()
-      .mapToDouble(ExperimentalAccessibilityScoreFilter::accessibilityScore)
+      .mapToDouble(AccessibilityScoreFilter::accessibilityScore)
       .sum();
     return sum / values.size();
   }

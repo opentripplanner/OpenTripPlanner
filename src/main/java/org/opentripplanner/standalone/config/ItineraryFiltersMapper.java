@@ -27,7 +27,7 @@ public class ItineraryFiltersMapper {
         "filterItinerariesWithSameFirstOrLastTrip",
         dft.filterItinerariesWithSameFirstOrLastTrip
       ),
-      c.asBoolean("experimentalAccessibilityScore", dft.experimentalAccessibilityScore)
+      c.asBoolean("accessibilityScore", dft.accessibilityScore)
     );
   }
 }
