@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -31,7 +32,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
     ConstrainedTransfer transferFromPreviousLeg,
     ConstrainedTransfer transferToNextLeg,
     int generalizedCost,
-    int frequencyHeadwayInSeconds
+    int frequencyHeadwayInSeconds,
+    @Nullable Float accessibilityScore
   ) {
     super(
       tripTimes,
@@ -45,7 +47,7 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
       transferFromPreviousLeg,
       transferToNextLeg,
       generalizedCost,
-      null
+      accessibilityScore
     );
     this.frequencyHeadwayInSeconds = frequencyHeadwayInSeconds;
   }
@@ -80,5 +82,24 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
       visits.add(visit);
     }
     return visits;
+  }
+
+  @Override
+  public ScheduledTransitLeg withAccessibilityScore(Float score) {
+    return new FrequencyTransitLeg(
+      tripTimes,
+      tripPattern,
+      boardStopPosInPattern,
+      alightStopPosInPattern,
+      getStartTime(),
+      getEndTime(),
+      serviceDate.toLocalDate(),
+      zoneId,
+      getTransferFromPrevLeg(),
+      getTransferToNextLeg(),
+      getGeneralizedCost(),
+      frequencyHeadwayInSeconds,
+      score
+    );
   }
 }

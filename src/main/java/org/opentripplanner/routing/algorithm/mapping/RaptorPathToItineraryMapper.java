@@ -189,7 +189,8 @@ public class RaptorPathToItineraryMapper {
           (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
           (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
           toOtpDomainCost(pathLeg.generalizedCost()),
-          frequencyHeadwayInSeconds
+          frequencyHeadwayInSeconds,
+          null
         );
     } else {
       leg =
