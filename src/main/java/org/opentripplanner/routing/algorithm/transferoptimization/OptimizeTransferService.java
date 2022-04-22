@@ -10,6 +10,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 public class OptimizeTransferService<T extends RaptorTripSchedule> {
 
   private static final Logger LOG = LoggerFactory.getLogger(OptimizeTransferService.class);
+  private static final Logger OPTIMIZATION_FAILED_LOG = ThrottleLogger.throttle(LOG);
 
   private final OptimizePathDomainService<T> optimizePathDomainService;
   private final MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator;
@@ -79,6 +81,16 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
     if (path.numberOfTransfersExAccessEgress() == 0) {
       return List.of(new OptimizedPath<>(path));
     }
-    return optimizePathDomainService.findBestTransitPath(path);
+    try {
+      return optimizePathDomainService.findBestTransitPath(path);
+    } catch (RuntimeException e) {
+      OPTIMIZATION_FAILED_LOG.error(
+        "Unable to optimize transfers in path. Details: {}, path: {}",
+        e.getMessage(),
+        path,
+        e
+      );
+      return List.of(new OptimizedPath<>(path));
+    }
   }
 }
