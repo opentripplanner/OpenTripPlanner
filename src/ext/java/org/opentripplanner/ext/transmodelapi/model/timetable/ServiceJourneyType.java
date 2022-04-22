@@ -14,7 +14,9 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -64,16 +66,16 @@ public class ServiceJourneyType {
           .name("activeDates")
           .withDirective(gqlUtil.timingData)
           .type(new GraphQLNonNull(new GraphQLList(gqlUtil.dateScalar)))
-          .dataFetcher(environment -> {
-            return GqlUtil
+          .dataFetcher(environment ->
+            GqlUtil
               .getRoutingService(environment)
               .getCalendarService()
               .getServiceDatesForServiceId(((trip(environment)).getServiceId()))
               .stream()
-              .map(gqlUtil.serviceDateMapper::serviceDateToSecondsSinceEpoch)
+              .map(ServiceDate::toLocalDate)
               .sorted()
-              .collect(Collectors.toList());
-          })
+              .collect(Collectors.toList())
+          )
           .build()
       )
       //                .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -264,9 +266,11 @@ public class ServiceJourneyType {
           .dataFetcher(environment -> {
             final Trip trip = trip(environment);
 
-            final ServiceDate serviceDate = gqlUtil.serviceDateMapper.secondsSinceEpochToServiceDate(
-              environment.getArgument("date")
-            );
+            var serviceDate = Optional
+              .ofNullable(environment.getArgument("date"))
+              .map(LocalDate.class::cast)
+              .map(ServiceDate::new)
+              .orElse(null);
             return GqlUtil.getRoutingService(environment).getTripTimesShort(trip, serviceDate);
           })
           .build()

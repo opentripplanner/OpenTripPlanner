@@ -13,7 +13,6 @@ import graphql.schema.GraphQLScalarType;
 import java.util.List;
 import java.util.TimeZone;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
-import org.opentripplanner.ext.transmodelapi.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
@@ -33,18 +32,16 @@ public class GqlUtil {
   public final GraphQLScalarType doubleFunctionScalar;
   public final GraphQLScalarType localTimeScalar;
   public final GraphQLObjectType timeScalar;
-  public final ServiceDateMapper serviceDateMapper;
   public final GraphQLDirective timingData;
 
   /** private to prevent util class from instantiation */
   public GqlUtil(TimeZone timeZone) {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
-    this.dateScalar = DateScalarFactory.createSecondsSinceEpochAsDateStringScalar(timeZone);
+    this.dateScalar = DateScalarFactory.createDateScalar();
     this.doubleFunctionScalar = DoubleFunctionScalarFactory.createDoubleFunctionScalar();
     this.localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();
     this.timeScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
-    this.serviceDateMapper = new ServiceDateMapper(timeZone);
     this.timingData =
       GraphQLDirective
         .newDirective()
