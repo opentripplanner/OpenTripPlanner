@@ -2,62 +2,63 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class WheelchairCostCalculatorTest {
 
-  final int UNKNOWN_ACCESSIBILITY_COST = 500;
-  final int INACCESSIBLE_TRIP_COST = 10000;
+  static final int UNKNOWN_ACCESSIBILITY_COST = 500;
+  static final int INACCESSIBLE_TRIP_COST = 10000;
+  private static final int BOARD_COST_SEC = 5;
+  private static final int TRANSFER_COST_SEC = 2;
+  private static final double WAIT_RELUCTANCE_FACTOR = 0.5;
 
-  private final WheelchairCostCalculator subject = new WheelchairCostCalculator(
-    new DummyCostCalculator(),
+  private final DefaultCostCalculator defaultCostCalculator = new DefaultCostCalculator(
+    BOARD_COST_SEC,
+    TRANSFER_COST_SEC,
+    WAIT_RELUCTANCE_FACTOR,
+    null,
+    null
+  );
+
+  private final WheelchairCostCalculator wheelchairCostCalculator = new WheelchairCostCalculator(
+    defaultCostCalculator,
     new WheelchairAccessibilityRequest(
       true,
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST)
     )
   );
+  private final TestTripSchedule.Builder scheduleBuilder = TestTripSchedule.schedule("12:00 12:01");
 
-  @Test
-  public void boardAccessibleTrip() {
-    var schedule = TestTripSchedule
-      .schedule("10:00 10:05")
-      .wheelchairBoarding(WheelChairBoarding.POSSIBLE)
-      .build();
-    assertEquals(DummyCostCalculator.COST, board(schedule));
+  static Stream<Arguments> testCases = Stream.of(
+    Arguments.of(WheelChairBoarding.POSSIBLE, 0),
+    Arguments.of(WheelChairBoarding.NO_INFORMATION, UNKNOWN_ACCESSIBILITY_COST),
+    Arguments.of(WheelChairBoarding.NOT_POSSIBLE, INACCESSIBLE_TRIP_COST)
+  );
+
+  @ParameterizedTest(name = "accessibility of {0} should add an extra cost of {1}")
+  @VariableSource("testCases")
+  public void calculateExtraBoardingCost(WheelChairBoarding wcb, int expectedExtraCost) {
+    var schedule = scheduleBuilder.wheelchairBoarding(wcb).build();
+
+    int defaultCost = calculateBoardingCost(schedule, defaultCostCalculator);
+
+    int wheelchairBoardCost = calculateBoardingCost(schedule, wheelchairCostCalculator);
+    int expected = defaultCost + RaptorCostConverter.toRaptorCost(expectedExtraCost);
+
+    assertEquals(expected, wheelchairBoardCost);
   }
 
-  @Test
-  public void boardTripWithUnknownAccessibility() {
-    var schedule = TestTripSchedule
-      .schedule("10:00 10:05")
-      .wheelchairBoarding(WheelChairBoarding.NO_INFORMATION)
-      .build();
-    assertEquals(DummyCostCalculator.COST + UNKNOWN_ACCESSIBILITY_COST * 100, board(schedule));
-  }
-
-  @Test
-  public void boardInaccessibleTrip() {
-    var schedule = TestTripSchedule
-      .schedule("10:00 10:05")
-      .wheelchairBoarding(WheelChairBoarding.NOT_POSSIBLE)
-      .build();
-    assertEquals(DummyCostCalculator.COST + (INACCESSIBLE_TRIP_COST * 100), board(schedule));
-  }
-
-  private int board(TestTripSchedule schedule) {
-    return subject.boardingCost(
-      true,
-      0,
-      5,
-      100,
-      schedule,
-      RaptorTransferConstraint.REGULAR_TRANSFER
-    );
+  private int calculateBoardingCost(TestTripSchedule schedule, CostCalculator calc) {
+    return calc.boardingCost(true, 0, 5, 100, schedule, RaptorTransferConstraint.REGULAR_TRANSFER);
   }
 }
