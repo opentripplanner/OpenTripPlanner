@@ -7,14 +7,6 @@ import org.opentripplanner.model.calendar.ServiceDate;
  * Class to use as key in HashMap containing feed id, trip id and service date
  */
 public record TripIdAndServiceDate(FeedScopedId tripId, ServiceDate serviceDate) {
-  public FeedScopedId getTripId() {
-    return tripId;
-  }
-
-  public ServiceDate getServiceDate() {
-    return serviceDate;
-  }
-
   @Override
   public int hashCode() {
     return Objects.hash(tripId, serviceDate);

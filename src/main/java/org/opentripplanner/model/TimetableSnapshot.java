@@ -327,7 +327,7 @@ public class TimetableSnapshot {
       iterator.hasNext();
     ) {
       TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
-      if (serviceDate.compareTo(tripIdAndServiceDate.getServiceDate()) >= 0) {
+      if (serviceDate.compareTo(tripIdAndServiceDate.serviceDate()) >= 0) {
         iterator.remove();
         modified = true;
       }
@@ -396,8 +396,7 @@ public class TimetableSnapshot {
   protected boolean clearLastAddedTripPattern(String feedId) {
     return lastAddedTripPattern
       .keySet()
-      .removeIf(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.getTripId().getFeedId())
-      );
+      .removeIf(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.tripId().getFeedId()));
   }
 
   /**
