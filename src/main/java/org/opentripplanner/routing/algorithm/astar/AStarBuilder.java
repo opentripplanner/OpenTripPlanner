@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.astar;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
@@ -10,6 +11,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationS
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -25,6 +27,7 @@ public class AStarBuilder {
   private DominanceFunction dominanceFunction;
   private Duration timeout;
   private Edge originBackEdge;
+  private Collection<State> initialStates;
 
   public AStarBuilder(
     RemainingWeightHeuristic remainingWeightHeuristic,
@@ -84,6 +87,11 @@ public class AStarBuilder {
     return this;
   }
 
+  public AStarBuilder setInitialStates(Collection<State> initialStates) {
+    this.initialStates = initialStates;
+    return this;
+  }
+
   public ShortestPathTree getShortestPathTree() {
     return build().getShortestPathTree();
   }
@@ -93,6 +101,20 @@ public class AStarBuilder {
   }
 
   private AStar build() {
+    Collection<State> initialStates;
+
+    if (this.initialStates != null) {
+      initialStates = this.initialStates;
+    } else {
+      initialStates = State.getInitialStates(routingContext);
+
+      if (originBackEdge != null) {
+        for (var state : initialStates) {
+          state.backEdge = originBackEdge;
+        }
+      }
+    }
+
     return new AStar(
       heuristic,
       skipEdgeStrategy,
@@ -101,7 +123,7 @@ public class AStarBuilder {
       terminationStrategy,
       Optional.ofNullable(dominanceFunction).orElseGet(DominanceFunction.Pareto::new),
       timeout,
-      originBackEdge
+      initialStates
     );
   }
 }

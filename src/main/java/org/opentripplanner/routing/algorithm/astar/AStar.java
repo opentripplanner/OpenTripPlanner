@@ -53,7 +53,7 @@ public class AStar {
     SearchTerminationStrategy terminationStrategy,
     DominanceFunction dominanceFunction,
     Duration timeout,
-    Edge originBackEdge
+    Collection<State> initialStates
   ) {
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
@@ -76,12 +76,9 @@ public class AStar {
     this.nVisited = 0;
     this.targetAcceptedStates = Lists.newArrayList();
 
-    for (State initialState : State.getInitialStates(rctx)) {
-      if (originBackEdge != null) {
-        initialState.backEdge = originBackEdge;
-      }
+    for (State initialState : initialStates) {
       spt.add(initialState);
-      pq.insert(initialState, 0);
+      pq.insert(initialState, initialState.weight);
     }
   }
 
