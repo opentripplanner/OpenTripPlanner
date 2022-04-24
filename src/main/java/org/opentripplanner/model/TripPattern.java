@@ -1,9 +1,9 @@
 package org.opentripplanner.model;
 
-import com.beust.jcommander.internal.Maps;
-import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
