@@ -4,8 +4,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.linked.TDoubleLinkedList;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,7 +29,6 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -781,24 +778,14 @@ public class Graph implements Serializable {
    */
   public void calculateTransitCenter() {
     if (hasTransit) {
-      TDoubleList latitudes = new TDoubleLinkedList();
-      TDoubleList longitudes = new TDoubleLinkedList();
-      Median median = new Median();
+      Envelope tempEnvelope = new Envelope();
 
       getVerticesOfType(TransitStopVertex.class)
-        .stream()
         .forEach(v -> {
-          latitudes.add(v.getLat());
-          longitudes.add(v.getLon());
+          tempEnvelope.expandToInclude(v.getLon(), v.getLat());
         });
 
-      median.setData(latitudes.toArray());
-      double medianLatitude = median.evaluate();
-      median = new Median();
-      median.setData(longitudes.toArray());
-      double medianLongitude = median.evaluate();
-
-      this.center = new Coordinate(medianLongitude, medianLatitude);
+      this.center = tempEnvelope.centre();
     }
   }
 

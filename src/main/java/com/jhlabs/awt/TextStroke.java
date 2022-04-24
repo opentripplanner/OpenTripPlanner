@@ -14,7 +14,6 @@ import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import org.apache.commons.math3.util.FastMath;
 
 /**
  * Stroke that paint a text.
@@ -86,10 +85,10 @@ public class TextStroke implements Stroke {
           thisY = points[1];
           float dx = thisX - lastX;
           float dy = thisY - lastY;
-          float distance = (float) FastMath.sqrt(dx * dx + dy * dy);
+          float distance = (float) Math.sqrt(dx * dx + dy * dy);
           if (distance >= next) {
             float r = 1.0f / distance;
-            float angle = (float) FastMath.atan2(dy, dx);
+            float angle = (float) Math.atan2(dy, dx);
             while (currentChar < length && distance >= next) {
               Shape glyph = glyphVector.getGlyphOutline(currentChar);
               Point2D p = glyphVector.getGlyphPosition(currentChar);

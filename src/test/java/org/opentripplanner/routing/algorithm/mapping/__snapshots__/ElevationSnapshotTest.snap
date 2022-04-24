@@ -276,7 +276,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.4275918538026,
+          "distance": 1629.427591853719,
           "endTime": "2009-10-21T23:30:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:20:25.000+00:00",
@@ -586,7 +586,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2804.1297859664874,
+          "distance": 2804.129785965508,
           "endTime": "2009-10-21T23:39:32.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:26:21.000+00:00",
@@ -1070,7 +1070,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.4275918538026,
+          "distance": 1629.427591853719,
           "endTime": "2009-10-21T23:43:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:33:25.000+00:00",
@@ -1541,7 +1541,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.4275918538026,
+          "distance": 1629.427591853719,
           "endTime": "2009-10-21T23:52:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:42:25.000+00:00",
@@ -1851,7 +1851,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2804.1297859664874,
+          "distance": 2804.129785965508,
           "endTime": "2009-10-21T23:55:32.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:42:21.000+00:00",
@@ -2335,7 +2335,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.4275918538026,
+          "distance": 1629.427591853719,
           "endTime": "2009-10-22T00:01:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:51:25.000+00:00",
@@ -3244,7 +3244,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1631.0313510234191,
+          "distance": 1631.0313510226179,
           "endTime": "2009-10-21T23:23:32.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:14:50.000+00:00",
@@ -3619,7 +3619,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1942.2498485359197,
+          "distance": 1942.2498485359536,
           "endTime": "2009-10-21T23:28:03.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:18:00.000+00:00",
@@ -4033,7 +4033,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2232.3107878360292,
+          "distance": 2232.3107878389246,
           "endTime": "2009-10-21T23:29:50.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:21:53.000+00:00",
@@ -4408,7 +4408,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2504.4167988693757,
+          "distance": 2504.4167988683976,
           "endTime": "2009-10-21T23:42:47.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:29:00.000+00:00",
@@ -4848,7 +4848,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1631.0313510234191,
+          "distance": 1631.0313510226179,
           "endTime": "2009-10-21T23:38:32.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:29:50.000+00:00",
@@ -5223,7 +5223,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1942.2498485359197,
+          "distance": 1942.2498485359536,
           "endTime": "2009-10-21T23:44:03.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:33:00.000+00:00",
