@@ -19,7 +19,7 @@ public enum OTPFeature {
   APIGraphInspectorTile(true),
   APIUpdaterStatus(true),
   MinimumTransferTimeIsDefinitive(false),
-  OptimizeTransfers(false),
+  OptimizeTransfers(true),
   ParallelRouting(false),
   TransferConstraints(true),
   FloatingBike(true),
@@ -33,7 +33,7 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false),
   SandboxAPILegacyGraphQLApi(false),
   SandboxAPIMapboxVectorTilesApi(false),
-  SandboxAPITransmodelApi(true),
+  SandboxAPITransmodelApi(false),
   SandboxAPIParkAndRideApi(false),
   TransferAnalyzer(false),
   VehicleToStopHeuristics(false);
