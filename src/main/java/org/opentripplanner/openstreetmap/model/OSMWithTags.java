@@ -1,8 +1,11 @@
 package org.opentripplanner.openstreetmap.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
 import org.opentripplanner.util.I18NString;
@@ -321,8 +324,12 @@ public class OSMWithTags {
       "station".equals(getTag("railway")) ||
       "halt".equals(getTag("railway")) ||
       "bus_station".equals(getTag("amenity")) ||
-      "platform".equals(getTag("public_transport"))
+      isPlatform()
     );
+  }
+
+  public boolean isPlatform() {
+    return "platform".equals(getTag("public_transport")) || "platform".equals(getTag("railway"));
   }
 
   /**
@@ -340,6 +347,16 @@ public class OSMWithTags {
 
   public String getOpenStreetMapLink() {
     return null;
+  }
+
+  public List<String> getTagValues(Set<String> refTags) {
+    return refTags
+      .stream()
+      .map(this::getTag)
+      .filter(Objects::nonNull)
+      .map(String::strip)
+      .filter(v -> !v.isBlank())
+      .toList();
   }
 
   /**

@@ -106,6 +106,6 @@ public class OSMWay extends OSMWithTags {
 
   @Override
   public String getOpenStreetMapLink() {
-    return String.format("http://www.openstreetmap.org/way/%d", getId());
+    return String.format("https://www.openstreetmap.org/way/%d", getId());
   }
 }

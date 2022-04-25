@@ -2,10 +2,15 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -43,6 +48,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   ) {
     LOG.info("Improving boarding locations by checking OSM entities...");
 
+    int successes = 0;
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
       // if the street is already linked there is no need to linked it again,
       // could happened if using the prune isolated island
@@ -56,15 +62,16 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (alreadyLinked) continue;
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
-        if (!connectVertexToStop(ts, graph.getStreetIndex())) {
+        if (!connectVertexToStop(ts, graph.getStreetIndex(), graph.getLinker())) {
           LOG.debug(
             "Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString()
           );
-          // TODO OTP2 - Why is this commented out? Is it not a problem or is it to nosey?
-          //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
+        } else {
+          successes++;
         }
       }
     }
+    LOG.info("Found {} entities in OSM which match stop id or stop code", successes);
   }
 
   @Override
@@ -72,12 +79,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     //no inputs
   }
 
-  private boolean connectVertexToStop(TransitStopVertex ts, StreetVertexIndex index) {
-    String stopCode = ts.getStop().getCode();
-    if (stopCode == null) {
-      return false;
-    }
+  private boolean connectVertexToStop(
+    TransitStopVertex ts,
+    StreetVertexIndex index,
+    VertexLinker linker
+  ) {
+    var stopCode = ts.getStop().getCode();
+    var stopId = ts.getStop().getId().getId();
     Envelope envelope = new Envelope(ts.getCoordinate());
+
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
     Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
@@ -88,11 +98,26 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         continue;
       }
 
-      // Only use stop codes for linking TODO: find better method to connect stops without stop code
-      if (tsv.reference != null && tsv.reference.equals(stopCode)) {
-        new StreetTransitStopLink(ts, tsv);
-        new StreetTransitStopLink(tsv, ts);
-        LOG.debug("Connected " + ts + " to " + tsv.getLabel());
+      if (
+        (stopCode != null && tsv.references.contains(stopCode)) || tsv.references.contains(stopId)
+      ) {
+        if (tsv.isAreaCentroid) {
+          linker.linkVertexPermanently(
+            tsv,
+            new TraverseModeSet(TraverseMode.WALK),
+            LinkingDirection.BOTH_WAYS,
+            (vertex, streetVertex) ->
+              List.of(
+                new StreetTransitStopLink(ts, streetVertex),
+                new StreetTransitStopLink(streetVertex, ts)
+              )
+          );
+        } else {
+          new StreetTransitStopLink(ts, tsv);
+          new StreetTransitStopLink(tsv, ts);
+        }
+
+        LOG.error("Connected " + ts + " to " + tsv.getLabel());
         return true;
       }
     }

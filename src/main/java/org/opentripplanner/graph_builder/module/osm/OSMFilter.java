@@ -27,7 +27,7 @@ public class OSMFilter {
     if (osmEntity.hasTag("highway")) {
       return true;
     }
-    if (osmEntity.isTag("public_transport", "platform") || osmEntity.isTag("railway", "platform")) {
+    if (osmEntity.isPlatform()) {
       return !("tourism".equals(osmEntity.getTag("usage")));
     }
     return false;

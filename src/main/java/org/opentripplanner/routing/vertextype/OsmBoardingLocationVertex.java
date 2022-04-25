@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
+import java.util.Collection;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.NonLocalizedString;
@@ -11,7 +13,12 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 public class OsmBoardingLocationVertex extends OsmVertex {
 
-  public final String reference;
+  public final Set<String> references;
+
+  /**
+   * area centroids need to be linked separately
+   */
+  public final boolean isAreaCentroid;
 
   public OsmBoardingLocationVertex(
     Graph g,
@@ -20,9 +27,11 @@ public class OsmBoardingLocationVertex extends OsmVertex {
     double y,
     long nodeId,
     @Nullable String name,
-    String reference
+    Collection<String> references,
+    boolean isAreaCentroid
   ) {
     super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
-    this.reference = reference;
+    this.references = Set.copyOf(references);
+    this.isAreaCentroid = isAreaCentroid;
   }
 }

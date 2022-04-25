@@ -10,7 +10,6 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,6 +82,11 @@ public class OSMDatabase {
 
   /* All bike parking areas */
   private final List<Area> bikeParkingAreas = new ArrayList<>();
+
+  /**
+   * Boarding location ways where passengers wait for transit
+   */
+  private final List<Area> boardingLocationAreas = new ArrayList<>();
 
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
@@ -176,6 +180,10 @@ public class OSMDatabase {
     return Collections.unmodifiableCollection(bikeParkingAreas);
   }
 
+  public Collection<Area> getBoardingLocationAreas() {
+    return List.copyOf(boardingLocationAreas);
+  }
+
   public Collection<Long> getTurnRestrictionWayIds() {
     return Collections.unmodifiableCollection(turnRestrictionsByFromWay.keySet());
   }
@@ -249,7 +257,14 @@ public class OSMDatabase {
     }
 
     /* filter out ways that are not relevant for routing */
-    if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide() || way.isBikeParking())) {
+    if (
+      !(
+        OSMFilter.isWayRoutable(way) ||
+        way.isParkAndRide() ||
+        way.isBikeParking() ||
+        way.isBoardingLocation()
+      )
+    ) {
       return;
     }
 
@@ -260,7 +275,8 @@ public class OSMDatabase {
       (
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
-        way.isTag("amenity", "bicycle_parking")
+        way.isTag("amenity", "bicycle_parking") ||
+        way.isBoardingLocation()
       ) &&
       way.getNodeRefs().size() > 2
     ) {
@@ -742,7 +758,7 @@ public class OSMDatabase {
         }
       }
       try {
-        newArea(new Area(way, Arrays.asList(way), Collections.emptyList(), nodesById));
+        newArea(new Area(way, List.of(way), Collections.emptyList(), nodesById));
       } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
@@ -835,7 +851,7 @@ public class OSMDatabase {
         if (relation.isTag("railway", "platform") && !way.hasTag("railway")) {
           way.addTag("railway", "platform");
         }
-        if (relation.isTag("public_transport", "platform") && !way.hasTag("public_transport")) {
+        if (relation.isPlatform() && !way.hasTag("public_transport")) {
           way.addTag("public_transport", "platform");
         }
       }
@@ -861,6 +877,10 @@ public class OSMDatabase {
     }
     if (area.parent.isBikeParking()) {
       bikeParkingAreas.add(area);
+    }
+    if (area.parent.isBoardingLocation()) {
+      System.out.println(area.parent.getOpenStreetMapLink());
+      boardingLocationAreas.add(area);
     }
   }
 

@@ -252,6 +252,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         buildBikeParkAndRideAreas();
       }
 
+      extractPlatformCentroids();
+
       buildElevatorEdges(graph);
 
       unifyTurnRestrictions();
@@ -340,7 +342,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      *
      * @param node The node to fetch a label for.
      * @param way  The way it is connected to (for fetching level information).
-     * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a {@link OsmBoardingLocationVertex}
+     * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
+     * {@link OsmBoardingLocationVertex}
      */
     protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
       // If the node should be decomposed to multiple levels,
@@ -380,7 +383,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 coordinate.y,
                 nid,
                 name,
-                ref
+                Set.of(ref),
+                false
               );
           }
         }
@@ -488,6 +492,32 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         graph.hasBikeRide = true;
       }
       LOG.info("Created {} bike P+R areas.", n);
+    }
+
+    private void extractPlatformCentroids() {
+      LOG.info("Extracting centroids from platforms");
+      var refTags = Set.of("ref", "ref:ifopt");
+
+      osmdb
+        .getBoardingLocationAreas()
+        .forEach(bl -> {
+          var references = bl.parent.getTagValues(refTags);
+          var centroid = bl.jtsMultiPolygon.getCentroid();
+          if (!references.isEmpty() && !centroid.isEmpty()) {
+            var label = "platform-centroid/osm/%s".formatted(bl.parent.getId());
+
+            new OsmBoardingLocationVertex(
+              graph,
+              label,
+              centroid.getX(),
+              centroid.getY(),
+              bl.parent.getId(),
+              bl.parent.getTag("name"),
+              references,
+              true
+            );
+          }
+        });
     }
 
     private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {
