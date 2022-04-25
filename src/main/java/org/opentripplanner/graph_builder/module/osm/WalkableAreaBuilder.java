@@ -74,6 +74,19 @@ public class WalkableAreaBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
+  public interface WalkableAreaBuilderHandler {
+    OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags areaEntity);
+
+    I18NString getNameForWay(OSMWithTags areaEntity, String label);
+
+    void applyWayProperties(
+      StreetEdge street,
+      StreetEdge backStreet,
+      WayProperties wayData,
+      OSMWithTags way
+    );
+  }
+
   private final DataImportIssueStore issueStore;
 
   private final int maxAreaNodes;
@@ -87,7 +100,7 @@ public class WalkableAreaBuilder {
   private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
   // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
-  private final Handler handler;
+  private final WalkableAreaBuilderHandler handler;
 
   private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<>();
 
@@ -99,7 +112,7 @@ public class WalkableAreaBuilder {
     Graph graph,
     RelationalOSMEntityStore osmdb,
     WayPropertySet wayPropertySet,
-    Handler handler,
+    WalkableAreaBuilderHandler handler,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
     boolean platformEntriesLinking

@@ -228,7 +228,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     );
   }
 
-  protected class Handler {
+  protected class Handler implements WalkableAreaBuilder.WalkableAreaBuilderHandler {
 
     private static final String nodeLabelFormat = "osm:node:%d";
 
@@ -294,7 +294,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     } // END buildGraph()
 
     // TODO Set this to private once WalkableAreaBuilder is gone
-    protected void applyWayProperties(
+    public void applyWayProperties(
       StreetEdge street,
       StreetEdge backStreet,
       WayProperties wayData,
@@ -347,7 +347,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
 
     // TODO Set this to private once WalkableAreaBuilder is gone
-    protected I18NString getNameForWay(OSMWithTags way, String id) {
+    public I18NString getNameForWay(OSMWithTags way, String id) {
       I18NString name = way.getAssumedName();
 
       if (customNamer != null && name != null) {
@@ -371,7 +371,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * TransitStopStreetVertex.
      */
     // TODO Set this to private once WalkableAreaBuilder is gone
-    protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
+    public OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
       // If the node should be decomposed to multiple levels,
       // use the numeric level because it is unique, the human level may not be (although
       // it will likely lead to some head-scratching if it is not).
