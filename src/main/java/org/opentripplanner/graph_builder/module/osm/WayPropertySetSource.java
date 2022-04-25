@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 
 /**

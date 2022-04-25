@@ -1,4 +1,4 @@
-package org.opentripplanner.openstreetmap.model;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

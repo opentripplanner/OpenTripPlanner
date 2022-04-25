@@ -18,9 +18,9 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.graph_builder.module.osm.model.OSMLevel;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

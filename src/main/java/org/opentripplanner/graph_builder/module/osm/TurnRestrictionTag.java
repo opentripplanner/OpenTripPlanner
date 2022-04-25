@@ -23,7 +23,12 @@ public class TurnRestrictionTag {
   public List<StreetEdge> possibleTo = new ArrayList<>();
   public TraverseModeSet modes;
 
-  public TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOSMID) {
+  public TurnRestrictionTag(
+    long via,
+    TurnRestrictionType type,
+    Direction direction,
+    long relationOSMID
+  ) {
     this.via = via;
     this.type = type;
     this.direction = direction;

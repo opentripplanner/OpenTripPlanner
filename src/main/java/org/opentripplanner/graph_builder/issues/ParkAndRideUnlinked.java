@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
 
 public class ParkAndRideUnlinked implements DataImportIssue {
 

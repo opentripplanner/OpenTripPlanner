@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.exception;
 
 public class OSMProcessingException extends RuntimeException {
+
   public OSMProcessingException() {
     super();
   }

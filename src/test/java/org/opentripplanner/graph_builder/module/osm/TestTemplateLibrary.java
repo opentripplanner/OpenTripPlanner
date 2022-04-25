@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.HashMap;
 import java.util.Map;
 import junit.framework.TestCase;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
 
 /**
  * @author laurent

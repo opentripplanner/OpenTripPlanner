@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module.osm.contract;
 
 import java.util.Collection;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMRelation;
-import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
+import org.opentripplanner.graph_builder.module.osm.model.OSMRelation;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWay;
 
 public interface OSMEntityStore {
   void addNode(OSMNode node);

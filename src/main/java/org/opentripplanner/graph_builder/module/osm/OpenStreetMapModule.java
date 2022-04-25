@@ -24,7 +24,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
 import org.opentripplanner.graph_builder.issues.Graphwide;
@@ -33,17 +32,17 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapProvider;
 import org.opentripplanner.graph_builder.module.osm.contract.PhaseAwareOSMEntityStore;
 import org.opentripplanner.graph_builder.module.osm.contract.RelationalOSMEntityStore;
+import org.opentripplanner.graph_builder.module.osm.model.OSMLevel;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWay;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -94,7 +93,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * Providers of OSM data.
    */
-  private final List<BinaryOpenStreetMapProvider> providers = new ArrayList<>();
+  private final List<OpenStreetMapProvider> providers = new ArrayList<>();
   private DataImportIssueStore issueStore;
   public boolean skipVisibility = false;
 
@@ -190,7 +189,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     PhaseAwareOSMEntityStore osmdb = createEntityStore(issueStore);
     Handler handler = new Handler(graph, osmdb);
-    for (BinaryOpenStreetMapProvider provider : providers) {
+    for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
       provider.readOSM(osmdb);
     }
@@ -215,7 +214,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void checkInputs() {
-    for (BinaryOpenStreetMapProvider provider : providers) {
+    for (OpenStreetMapProvider provider : providers) {
       provider.checkInputs();
     }
   }

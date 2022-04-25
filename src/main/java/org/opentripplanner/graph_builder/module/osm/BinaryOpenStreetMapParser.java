@@ -1,25 +1,25 @@
-package org.opentripplanner.openstreetmap;
+package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
-import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.graph_builder.module.osm.contract.OSMEntityStore;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMNodeRef;
-import org.opentripplanner.openstreetmap.model.OSMRelation;
-import org.opentripplanner.openstreetmap.model.OSMRelationMember;
-import org.opentripplanner.openstreetmap.model.OSMTag;
-import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapParser;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNodeRef;
+import org.opentripplanner.graph_builder.module.osm.model.OSMRelation;
+import org.opentripplanner.graph_builder.module.osm.model.OSMRelationMember;
+import org.opentripplanner.graph_builder.module.osm.model.OSMTag;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWay;
 
 /**
  * Parser for the OpenStreetMap PBF Format.
  *
  * @since 0.4
  */
-public class BinaryOpenStreetMapParser extends BinaryParser {
+public class BinaryOpenStreetMapParser extends BinaryParser implements OpenStreetMapParser {
 
   private final OSMEntityStore osmdb;
   private final Map<String, String> stringTable = new HashMap<>();
@@ -33,13 +33,8 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
   // but there appears to be a separate string table per 8k-entry PBF file block.
   // String.intern grinds to a halt on large PBF files (as it did on GTFS import), so
   // we implement our own.
-  public String internalize(String s) {
-    String fromTable = stringTable.get(s);
-    if (fromTable == null) {
-      stringTable.put(s, s);
-      return s;
-    }
-    return fromTable;
+  protected String internalize(String s) {
+    return stringTable.computeIfAbsent(s, key -> s);
   }
 
   @Override
@@ -50,13 +45,14 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
   /**
    * Set the phase to be parsed
    */
+  @Override
   public void setPhase(OsmParserPhase phase) {
     this.parsePhase = phase;
   }
 
   @Override
   protected void parseRelations(List<Osmformat.Relation> rels) {
-    if (parsePhase != OsmParserPhase.Relations) {
+    if (parsePhase != OsmParserPhase.RELATIONS) {
       return;
     }
 
@@ -102,10 +98,12 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
   @Override
   protected void parseDense(Osmformat.DenseNodes nodes) {
-    long lastId = 0, lastLat = 0, lastLon = 0;
+    long lastId = 0;
+    long lastLat = 0;
+    long lastLon = 0;
     int j = 0; // Index into the keysvals array.
 
-    if (parsePhase != OsmParserPhase.Nodes) {
+    if (parsePhase != OsmParserPhase.NODES) {
       return;
     }
 
@@ -118,7 +116,8 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
       lastLon = lon;
       long id = nodes.getId(i) + lastId;
       lastId = id;
-      double latf = parseLat(lat), lonf = parseLon(lon);
+      double latf = parseLat(lat);
+      double lonf = parseLon(lon);
 
       tmp.setId(id);
       tmp.lat = latf;
@@ -146,7 +145,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
   @Override
   protected void parseNodes(List<Osmformat.Node> nodes) {
-    if (parsePhase != OsmParserPhase.Nodes) {
+    if (parsePhase != OsmParserPhase.NODES) {
       return;
     }
 
@@ -172,7 +171,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
   @Override
   protected void parseWays(List<Osmformat.Way> ways) {
-    if (parsePhase != OsmParserPhase.Ways) {
+    if (parsePhase != OsmParserPhase.WAYS) {
       return;
     }
 

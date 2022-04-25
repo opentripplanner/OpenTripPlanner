@@ -1,4 +1,4 @@
-package org.opentripplanner.openstreetmap.model;
+package org.opentripplanner.graph_builder.module.osm.model;
 
 public class OSMNodeRef {
 

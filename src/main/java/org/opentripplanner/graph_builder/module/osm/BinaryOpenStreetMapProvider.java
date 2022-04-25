@@ -1,4 +1,4 @@
-package org.opentripplanner.openstreetmap;
+package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.base.MoreObjects;
 import java.io.ByteArrayInputStream;
@@ -9,6 +9,8 @@ import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapParser;
+import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapProvider;
 import org.opentripplanner.graph_builder.module.osm.contract.PhaseAwareOSMEntityStore;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
@@ -18,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * Parser for the OpenStreetMap PBF format. Parses files in three passes: First the relations, then
  * the ways, then the nodes are also loaded.
  */
-public class BinaryOpenStreetMapProvider {
+public class BinaryOpenStreetMapProvider implements OpenStreetMapProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(BinaryOpenStreetMapProvider.class);
 
@@ -38,15 +40,15 @@ public class BinaryOpenStreetMapProvider {
 
   public void readOSM(PhaseAwareOSMEntityStore osmdb) {
     try {
-      BinaryOpenStreetMapParser parser = new BinaryOpenStreetMapParser(osmdb);
+      OpenStreetMapParser parser = new BinaryOpenStreetMapParser(osmdb);
 
-      parsePhase(parser, OsmParserPhase.Relations);
+      parsePhase(parser, OsmParserPhase.RELATIONS);
       osmdb.doneFirstPhaseRelations();
 
-      parsePhase(parser, OsmParserPhase.Ways);
+      parsePhase(parser, OsmParserPhase.WAYS);
       osmdb.doneSecondPhaseWays();
 
-      parsePhase(parser, OsmParserPhase.Nodes);
+      parsePhase(parser, OsmParserPhase.NODES);
       osmdb.doneThirdPhaseNodes();
     } catch (Exception ex) {
       throw new IllegalStateException("error loading OSM from path " + source.path(), ex);
@@ -76,7 +78,7 @@ public class BinaryOpenStreetMapProvider {
     return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, LOG::info);
   }
 
-  private void parsePhase(BinaryOpenStreetMapParser parser, OsmParserPhase phase)
+  private void parsePhase(OpenStreetMapParser parser, OsmParserPhase phase)
     throws IOException {
     parser.setPhase(phase);
     BlockInputStream in = null;

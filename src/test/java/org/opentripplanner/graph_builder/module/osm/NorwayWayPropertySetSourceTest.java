@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 public class NorwayWayPropertySetSourceTest {

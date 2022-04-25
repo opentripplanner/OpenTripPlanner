@@ -17,7 +17,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.exception.OSMProcessingException;
-import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
 
 public class Ring {
 

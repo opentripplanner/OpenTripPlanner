@@ -9,9 +9,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWay;
 
 public class OpenStreetMapParserTest {
 

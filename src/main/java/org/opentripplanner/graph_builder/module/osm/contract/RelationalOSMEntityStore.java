@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.graph_builder.module.osm.Area;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.graph_builder.module.osm.model.OSMLevel;
+import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWay;
+import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
 
 public interface RelationalOSMEntityStore extends OSMEntityStore {
   boolean isAreaWay(Long wayId);
