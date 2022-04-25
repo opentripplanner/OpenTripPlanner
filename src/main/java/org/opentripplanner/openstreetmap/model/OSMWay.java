@@ -11,10 +11,6 @@ public class OSMWay extends OSMWithTags {
     nodes.add(nodeRef.getRef());
   }
 
-  public void addNodeRef(long nodeRef) {
-    nodes.add(nodeRef);
-  }
-
   public void addNodeRef(long nodeRef, int index) {
     nodes.insert(index, nodeRef);
   }

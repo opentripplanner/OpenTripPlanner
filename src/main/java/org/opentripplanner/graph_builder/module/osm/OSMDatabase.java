@@ -217,7 +217,11 @@ public class OSMDatabase {
       carParkingNodes.put(node.getId(), node);
     }
     if (
-      !(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node.isStop())
+      !(
+        waysNodeIds.contains(node.getId()) ||
+        areaNodeIds.contains(node.getId()) ||
+        node.isBoardingLocation()
+      )
     ) {
       return;
     }

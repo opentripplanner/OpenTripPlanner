@@ -306,6 +306,26 @@ public class OSMWithTags {
   }
 
   /**
+   * Is this a public transport boarding location where passengers wait for transti and that can be
+   * linked to a transit stop vertex later on.
+   * <p>
+   * This intentionally excludes railway=stop and public_transport=stop because these are supposed
+   * to be placed on the tracks not on the platform.
+   *
+   * @return whether the node is a transit stop
+   */
+  public boolean isBoardingLocation() {
+    return (
+      "bus_stop".equals(getTag("highway")) ||
+      "tram_stop".equals(getTag("railway")) ||
+      "station".equals(getTag("railway")) ||
+      "halt".equals(getTag("railway")) ||
+      "bus_station".equals(getTag("amenity")) ||
+      "platform".equals(getTag("public_transport"))
+    );
+  }
+
+  /**
    * @return True if this node / area is a bike parking.
    */
   public boolean isBikeParking() {

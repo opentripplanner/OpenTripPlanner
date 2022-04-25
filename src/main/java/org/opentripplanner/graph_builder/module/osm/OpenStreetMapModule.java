@@ -368,7 +368,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
-        if (node.isStop()) {
+        if (node.isBoardingLocation()) {
           String ref = node.getTag("ref");
           String name = node.getTag("name");
           if (ref != null) {
@@ -924,7 +924,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             i == nodes.size() - 2 ||
             nodes.subList(0, i).contains(nodes.get(i)) ||
             osmEndNode.hasTag("ele") ||
-            osmEndNode.isStop() ||
+            osmEndNode.isBoardingLocation() ||
             osmEndNode.isBarrier()
           ) {
             segmentCoordinates.add(getCoordinate(osmEndNode));
