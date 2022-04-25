@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graphfinder;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
