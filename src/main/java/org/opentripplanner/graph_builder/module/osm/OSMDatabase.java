@@ -883,6 +883,7 @@ public class OSMDatabase {
     if (
       area.parent.isBoardingLocation() && !area.parent.getTagValues(boardingAreaRefTags).isEmpty()
     ) {
+      System.out.println(area.parent.getOpenStreetMapLink());
       boardingLocationAreas.add(area);
     }
   }

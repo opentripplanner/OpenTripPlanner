@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -349,14 +351,21 @@ public class OSMWithTags {
     return null;
   }
 
-  public List<String> getTagValues(Set<String> refTags) {
+  /**
+   * Returns all non-empty values of the tags passed in as input values.
+   *
+   * Values are split by semicolons.
+   *
+   */
+  public Set<String> getTagValues(Set<String> refTags) {
     return refTags
       .stream()
       .map(this::getTag)
       .filter(Objects::nonNull)
+      .flatMap(v -> Arrays.stream(v.split(";")))
       .map(String::strip)
       .filter(v -> !v.isBlank())
-      .toList();
+      .collect(Collectors.toSet());
   }
 
   /**
