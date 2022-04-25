@@ -131,9 +131,11 @@ public class OSMDatabase {
    * the United States. This does not affect floor names from level maps.
    */
   public boolean noZeroLevels = true;
+  private final Set<String> boardingAreaRefTags;
 
-  public OSMDatabase(DataImportIssueStore issueStore) {
+  public OSMDatabase(DataImportIssueStore issueStore, Set<String> boardingAreaRefTags) {
     this.issueStore = issueStore;
+    this.boardingAreaRefTags = boardingAreaRefTags;
   }
 
   public OSMNode getNode(Long nodeId) {
@@ -878,8 +880,9 @@ public class OSMDatabase {
     if (area.parent.isBikeParking()) {
       bikeParkingAreas.add(area);
     }
-    if (area.parent.isBoardingLocation()) {
-      System.out.println(area.parent.getOpenStreetMapLink());
+    if (
+      area.parent.isBoardingLocation() && !area.parent.getTagValues(boardingAreaRefTags).isEmpty()
+    ) {
       boardingLocationAreas.add(area);
     }
   }

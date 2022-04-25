@@ -7,9 +7,13 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
- * A vertex for an OSM node that represents a transit stop and has a ref=(stop_code) tag. OTP will
- * treat this as an authoritative statement on where the transit stop is located within the street
- * network, and the GTFS stop vertex will be linked to exactly this location.
+ * A vertex for an OSM node that represents a transit stop and has a tag to cross-reference this to
+ * a stop. OTP will treat this as an authoritative statement on where the transit stop is located
+ * within the street network.
+ *
+ * The source of this location can be an OSM node (point) in which case the precise location is used.
+ *
+ * If the source is an area (way) then the centroid is computed and used.
  */
 public class OsmBoardingLocationVertex extends OsmVertex {
 
@@ -18,7 +22,7 @@ public class OsmBoardingLocationVertex extends OsmVertex {
   /**
    * area centroids need to be linked separately
    */
-  public final boolean isAreaCentroid;
+  public final boolean isAlreadyLinked;
 
   public OsmBoardingLocationVertex(
     Graph g,
@@ -28,10 +32,10 @@ public class OsmBoardingLocationVertex extends OsmVertex {
     long nodeId,
     @Nullable String name,
     Collection<String> references,
-    boolean isAreaCentroid
+    boolean isAlreadyLinked
   ) {
     super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
     this.references = Set.copyOf(references);
-    this.isAreaCentroid = isAreaCentroid;
+    this.isAlreadyLinked = isAlreadyLinked;
   }
 }

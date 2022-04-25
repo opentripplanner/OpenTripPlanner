@@ -131,15 +131,21 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
 
+  private final Set<String> boardingAreaRefTags;
+
   /**
    * Construct and set providers all at once.
    */
-  public OpenStreetMapModule(List<OpenStreetMapProvider> providers) {
+  public OpenStreetMapModule(
+    List<OpenStreetMapProvider> providers,
+    Set<String> boardingAreaRefTags
+  ) {
     this.providers = List.copyOf(providers);
+    this.boardingAreaRefTags = boardingAreaRefTags;
   }
 
   public OpenStreetMapModule(OpenStreetMapProvider provider) {
-    this(List.of(provider));
+    this(List.of(provider), Set.of());
   }
 
   /**
@@ -160,7 +166,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     DataImportIssueStore issueStore
   ) {
     this.issueStore = issueStore;
-    OSMDatabase osmdb = new OSMDatabase(issueStore);
+    OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: " + provider);
@@ -496,12 +502,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private void extractPlatformCentroids() {
       LOG.info("Extracting centroids from platforms");
-      var refTags = Set.of("ref", "ref:ifopt");
 
       osmdb
         .getBoardingLocationAreas()
         .forEach(bl -> {
-          var references = bl.parent.getTagValues(refTags);
+          var references = bl.parent.getTagValues(boardingAreaRefTags);
           var centroid = bl.jtsMultiPolygon.getCentroid();
           if (!references.isEmpty() && !centroid.isEmpty()) {
             var label = "platform-centroid/osm/%s".formatted(bl.parent.getId());

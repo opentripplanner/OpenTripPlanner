@@ -7,6 +7,7 @@ import gnu.trove.list.TLongList;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
@@ -21,7 +22,7 @@ public class OpenStreetMapParserTest {
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), StandardCharsets.UTF_8)
     );
     OpenStreetMapProvider pr = new OpenStreetMapProvider(osmFile, true);
-    OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false));
+    OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false), Set.of());
 
     pr.readOSM(osmdb);
 

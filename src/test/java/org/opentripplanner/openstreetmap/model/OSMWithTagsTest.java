@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class OSMWithTagsTest {
@@ -108,5 +110,40 @@ public class OSMWithTagsTest {
 
     o.addTag("access", "no");
     assertTrue(o.isGeneralAccessDenied());
+  }
+
+  @Test
+  public void getReferenceTags() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref", "A");
+
+    assertEquals(List.of("A"), osm.getTagValues(Set.of("ref", "test")));
+    assertEquals(List.of(), osm.getTagValues(Set.of("test")));
+  }
+
+  @Test
+  public void getEmptyRefList() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref", "A");
+
+    assertEquals(List.of(), osm.getTagValues(Set.of()));
+  }
+
+  @Test
+  public void ignoreRefCase() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref:IFOPT", "A");
+
+    assertEquals(List.of("A"), osm.getTagValues(Set.of("ref:ifopt")));
+  }
+
+  @Test
+  public void removeBlankRef() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref1", " ");
+    osm.addTag("ref2", "");
+
+    assertEquals(List.of(), osm.getTagValues(Set.of("ref1")));
+    assertEquals(List.of(), osm.getTagValues(Set.of("ref2")));
   }
 }

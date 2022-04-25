@@ -46,8 +46,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
+    var streetIndex = graph.getStreetIndex();
     LOG.info("Improving boarding locations by checking OSM entities...");
-
     int successes = 0;
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
       // if the street is already linked there is no need to linked it again,
@@ -62,7 +62,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (alreadyLinked) continue;
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
-        if (!connectVertexToStop(ts, graph.getStreetIndex(), graph.getLinker())) {
+        if (!connectVertexToStop(ts, streetIndex, graph.getLinker())) {
           LOG.debug(
             "Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString()
           );
@@ -71,7 +71,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         }
       }
     }
-    LOG.info("Found {} entities in OSM which match stop id or stop code", successes);
+    LOG.info("Found {} OSM references which match a stop's id or code", successes);
   }
 
   @Override
@@ -101,7 +101,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (
         (stopCode != null && tsv.references.contains(stopCode)) || tsv.references.contains(stopId)
       ) {
-        if (tsv.isAreaCentroid) {
+        if (tsv.isAlreadyLinked) {
           linker.linkVertexPermanently(
             tsv,
             new TraverseModeSet(TraverseMode.WALK),
@@ -115,9 +115,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         } else {
           new StreetTransitStopLink(ts, tsv);
           new StreetTransitStopLink(tsv, ts);
+          LOG.trace("Connected " + ts + " to " + tsv.getLabel());
         }
-
-        LOG.error("Connected " + ts + " to " + tsv.getLabel());
         return true;
       }
     }

@@ -84,7 +84,10 @@ public class GraphBuilder implements Runnable {
       for (DataSource osmFile : dataSources.get(OSM)) {
         osmProviders.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
       }
-      OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
+      OpenStreetMapModule osmModule = new OpenStreetMapModule(
+        osmProviders,
+        config.boardingLocationTags
+      );
       osmModule.customNamer = config.customNamer;
       osmModule.setDefaultWayPropertySetSource(config.osmWayPropertySet);
       osmModule.skipVisibility = !config.areaVisibility;
