@@ -6,6 +6,7 @@ import java.util.Map;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
+import org.opentripplanner.graph_builder.module.osm.contract.OSMEntityStore;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMNodeRef;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
@@ -20,11 +21,11 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
  */
 public class BinaryOpenStreetMapParser extends BinaryParser {
 
-  private final OSMDatabase osmdb;
+  private final OSMEntityStore osmdb;
   private final Map<String, String> stringTable = new HashMap<>();
   private OsmParserPhase parsePhase;
 
-  public BinaryOpenStreetMapParser(OSMDatabase osmdb) {
+  public BinaryOpenStreetMapParser(OSMEntityStore osmdb) {
     this.osmdb = osmdb;
   }
 

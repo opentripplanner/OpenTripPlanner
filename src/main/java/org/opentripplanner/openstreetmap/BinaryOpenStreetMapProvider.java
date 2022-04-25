@@ -9,7 +9,7 @@ import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
+import org.opentripplanner.graph_builder.module.osm.contract.PhaseAwareOSMEntityStore;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class BinaryOpenStreetMapProvider {
     this.cacheDataInMem = cacheDataInMem;
   }
 
-  public void readOSM(OSMDatabase osmdb) {
+  public void readOSM(PhaseAwareOSMEntityStore osmdb) {
     try {
       BinaryOpenStreetMapParser parser = new BinaryOpenStreetMapParser(osmdb);
 
@@ -73,7 +73,7 @@ public class BinaryOpenStreetMapProvider {
   private static InputStream track(OsmParserPhase phase, long size, InputStream inputStream) {
     // Keep logging lambda, replacing it with a method-ref will cause the
     // logging to report incorrect class and line number
-    return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, m -> LOG.info(m));
+    return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, LOG::info);
   }
 
   private void parsePhase(BinaryOpenStreetMapParser parser, OsmParserPhase phase)

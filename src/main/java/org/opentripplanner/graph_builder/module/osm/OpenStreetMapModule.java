@@ -24,6 +24,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
 import org.opentripplanner.graph_builder.issues.Graphwide;
@@ -32,6 +33,8 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.module.osm.contract.PhaseAwareOSMEntityStore;
+import org.opentripplanner.graph_builder.module.osm.contract.RelationalOSMEntityStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.FeedScopedId;
@@ -174,6 +177,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     wayPropertySetSource = source;
   }
 
+  protected PhaseAwareOSMEntityStore createEntityStore(DataImportIssueStore issueStore) {
+    return new OSMDatabase(issueStore);
+  }
+
   @Override
   public void buildGraph(
     Graph graph,
@@ -181,10 +188,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     DataImportIssueStore issueStore
   ) {
     this.issueStore = issueStore;
-    OSMDatabase osmdb = new OSMDatabase(issueStore);
+    PhaseAwareOSMEntityStore osmdb = createEntityStore(issueStore);
     Handler handler = new Handler(graph, osmdb);
     for (BinaryOpenStreetMapProvider provider : providers) {
-      LOG.info("Gathering OSM from provider: " + provider);
+      LOG.info("Gathering OSM from provider: {}", provider);
       provider.readOSM(osmdb);
     }
     osmdb.postLoad();
@@ -230,7 +237,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private final Graph graph;
 
-    private final OSMDatabase osmdb;
+    private final RelationalOSMEntityStore osmdb;
     // track OSM nodes which are decomposed into multiple graph vertices because they are
     // elevators. later they will be iterated over to build ElevatorEdges between them.
     private final HashMap<Long, HashMap<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
@@ -241,7 +248,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     private float bestBikeSafety = 1.0f;
 
-    public Handler(Graph graph, OSMDatabase osmdb) {
+    public Handler(Graph graph, RelationalOSMEntityStore osmdb) {
       this.graph = graph;
       this.osmdb = osmdb;
     }

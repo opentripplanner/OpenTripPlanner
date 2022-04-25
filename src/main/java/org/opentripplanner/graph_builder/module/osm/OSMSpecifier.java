@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.module.osm.exception.OSMProcessingException;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -34,14 +35,14 @@ public class OSMSpecifier {
 
   public OSMSpecifier(String spec) {
     if (spec.contains("|") && spec.contains(";")) {
-      throw new RuntimeException(
+      throw new OSMProcessingException(
         String.format(
           "You cannot mix logical AND (';') and logical OR ('|') in same OSM spec: '%s'",
           spec
         )
       );
     } else if (spec.contains("|") && spec.contains("*")) {
-      throw new RuntimeException(
+      throw new OSMProcessingException(
         String.format(
           "You cannot mix logical OR ('|') and wildcards ('*') in the same OSM spec: '%s'",
           spec

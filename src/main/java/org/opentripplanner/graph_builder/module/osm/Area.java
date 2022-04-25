@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.module.osm.exception.OSMProcessingException;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -21,14 +22,14 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * http://wiki.openstreetmap.org/wiki/Relation:multipolygon/Algorithm but generally done in a
  * quick/dirty way.
  */
-class Area {
+public class Area {
 
   final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
   OSMWithTags parent;
-  public MultiPolygon jtsMultiPolygon;
+  public final MultiPolygon jtsMultiPolygon;
 
-  Area(
+  public Area(
     OSMWithTags parent,
     List<OSMWay> outerRingWays,
     List<OSMWay> innerRingWays,
@@ -85,7 +86,7 @@ class Area {
   }
 
   public List<TLongList> constructRings(List<OSMWay> ways) {
-    if (ways.size() == 0) {
+    if (ways.isEmpty()) {
       // no rings is no rings
       return Collections.emptyList();
     }
@@ -237,7 +238,7 @@ class Area {
     return false;
   }
 
-  public static class AreaConstructionException extends RuntimeException {
+  public static class AreaConstructionException extends OSMProcessingException {
 
     private static final long serialVersionUID = 1L;
   }

@@ -36,6 +36,8 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
+import org.opentripplanner.graph_builder.module.osm.contract.PhaseAwareOSMEntityStore;
+import org.opentripplanner.graph_builder.module.osm.contract.RelationalOSMEntityStore;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -51,7 +53,7 @@ import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OSMDatabase {
+public class OSMDatabase implements RelationalOSMEntityStore, PhaseAwareOSMEntityStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
@@ -132,71 +134,102 @@ public class OSMDatabase {
     this.issueStore = issueStore;
   }
 
+  @Override
   public OSMNode getNode(Long nodeId) {
     return nodesById.get(nodeId);
   }
 
-  public OSMWay getWay(Long nodeId) {
-    return waysById.get(nodeId);
+  @Override
+  public Collection<OSMNode> getNodes() {
+    return Collections.unmodifiableCollection(nodesById.valueCollection());
   }
 
+  @Override
+  public OSMWay getWay(Long wayId) {
+    return waysById.get(wayId);
+  }
+
+  @Override
   public Collection<OSMWay> getWays() {
     return Collections.unmodifiableCollection(waysById.valueCollection());
   }
 
+  @Override
   public boolean isAreaWay(Long wayId) {
     return areaWayIds.contains(wayId);
   }
 
+  @Override
+  public Collection<OSMRelation> getRelations() {
+    return Collections.unmodifiableCollection(relationsById.valueCollection());
+  }
+
+  @Override
   public int nodeCount() {
     return nodesById.size();
   }
 
+  @Override
   public int wayCount() {
     return waysById.size();
+  }
+
+  @Override
+  public int relationCount() {
+    return relationsById.size();
   }
 
   public Collection<OSMNode> getBikeParkingNodes() {
     return Collections.unmodifiableCollection(bikeParkingNodes.valueCollection());
   }
 
+  @Override
   public Collection<OSMNode> getCarParkingNodes() {
     return Collections.unmodifiableCollection(carParkingNodes.valueCollection());
   }
 
+  @Override
   public Collection<Area> getWalkableAreas() {
     return Collections.unmodifiableCollection(walkableAreas);
   }
 
+  @Override
   public Collection<Area> getParkAndRideAreas() {
     return Collections.unmodifiableCollection(parkAndRideAreas);
   }
 
+  @Override
   public Collection<Area> getBikeParkingAreas() {
     return Collections.unmodifiableCollection(bikeParkingAreas);
   }
 
+  @Override
   public Collection<Long> getTurnRestrictionWayIds() {
     return Collections.unmodifiableCollection(turnRestrictionsByFromWay.keySet());
   }
 
+  @Override
   public Collection<TurnRestrictionTag> getFromWayTurnRestrictions(Long fromWayId) {
     return turnRestrictionsByFromWay.get(fromWayId);
   }
 
+  @Override
   public Collection<TurnRestrictionTag> getToWayTurnRestrictions(Long toWayId) {
     return turnRestrictionsByToWay.get(toWayId);
   }
 
+  @Override
   public Collection<OSMNode> getStopsInArea(OSMWithTags areaParent) {
     return stopsInAreas.get(areaParent);
   }
 
+  @Override
   public OSMLevel getLevelForWay(OSMWithTags way) {
     OSMLevel level = wayLevels.get(way);
     return level != null ? level : OSMLevel.DEFAULT;
   }
 
+  @Override
   public Set<OSMWay> getAreasForNode(Long nodeId) {
     Set<OSMWay> areas = areasForNode.get(nodeId);
     if (areas == null) {
@@ -205,10 +238,12 @@ public class OSMDatabase {
     return areas;
   }
 
+  @Override
   public boolean isNodeBelongsToWay(Long nodeId) {
     return waysNodeIds.contains(nodeId);
   }
 
+  @Override
   public void addNode(OSMNode node) {
     if (node.isBikeParking()) {
       bikeParkingNodes.put(node.getId(), node);
@@ -229,10 +264,11 @@ public class OSMDatabase {
     nodesById.put(node.getId(), node);
 
     if (nodesById.size() % 100000 == 0) {
-      LOG.debug("nodes=" + nodesById.size());
+      LOG.debug("nodes={}", nodesById.size());
     }
   }
 
+  @Override
   public void addWay(OSMWay way) {
     /* only add ways once */
     long wayId = way.getId();
@@ -279,10 +315,11 @@ public class OSMDatabase {
     waysById.put(wayId, way);
 
     if (waysById.size() % 10000 == 0) {
-      LOG.debug("ways=" + waysById.size());
+      LOG.debug("ways={}", waysById.size());
     }
   }
 
+  @Override
   public void addRelation(OSMRelation relation) {
     if (relationsById.containsKey(relation.getId())) {
       return;
@@ -326,7 +363,7 @@ public class OSMDatabase {
     relationsById.put(relation.getId(), relation);
 
     if (relationsById.size() % 100 == 0) {
-      LOG.debug("relations=" + relationsById.size());
+      LOG.debug("relations={}", relationsById.size());
     }
   }
 
@@ -426,7 +463,7 @@ public class OSMDatabase {
 
         Envelope env = new Envelope(nA.lon, nB.lon, nA.lat, nB.lat);
         List<RingSegment> ringSegments = spndx.query(env);
-        if (ringSegments.size() == 0) {
+        if (ringSegments.isEmpty()) {
           continue;
         }
         LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
@@ -801,7 +838,7 @@ public class OSMDatabase {
         } else if (role.equals("outer")) {
           outerWays.add(way);
         } else {
-          LOG.warn("Unexpected role " + role + " in multipolygon");
+          LOG.warn("Unexpected role {} in multipolygon", role);
         }
       }
       processedAreas.add(relation);

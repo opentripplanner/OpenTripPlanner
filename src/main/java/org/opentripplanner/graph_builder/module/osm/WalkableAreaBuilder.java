@@ -24,6 +24,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
+import org.opentripplanner.graph_builder.module.osm.contract.RelationalOSMEntityStore;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -79,7 +80,7 @@ public class WalkableAreaBuilder {
 
   private final Graph graph;
 
-  private final OSMDatabase osmdb;
+  private final RelationalOSMEntityStore osmdb;
 
   private final WayPropertySet wayPropertySet;
 
@@ -96,7 +97,7 @@ public class WalkableAreaBuilder {
 
   public WalkableAreaBuilder(
     Graph graph,
-    OSMDatabase osmdb,
+    RelationalOSMEntityStore osmdb,
     WayPropertySet wayPropertySet,
     Handler handler,
     DataImportIssueStore issueStore,

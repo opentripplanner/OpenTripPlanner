@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A group of possibly-contiguous areas sharing the same level
  */
-class AreaGroup {
+public class AreaGroup {
 
   private static final Logger LOG = LoggerFactory.getLogger(AreaGroup.class);
 
@@ -73,7 +73,7 @@ class AreaGroup {
       for (int i = 0; i < mp.getNumGeometries(); ++i) {
         Geometry poly = mp.getGeometryN(i);
         if (!(poly instanceof Polygon)) {
-          LOG.warn("Unexpected non-polygon when merging areas: " + poly);
+          LOG.warn("Unexpected non-polygon when merging areas: {}", poly);
           continue;
         }
         outermostRings.add(toRing((Polygon) poly, nodeMap));
@@ -81,7 +81,7 @@ class AreaGroup {
     } else if (u instanceof Polygon) {
       outermostRings.add(toRing((Polygon) u, nodeMap));
     } else {
-      LOG.warn("Unexpected non-polygon when merging areas: " + u);
+      LOG.warn("Unexpected non-polygon when merging areas: {}", u);
     }
   }
 
@@ -121,9 +121,8 @@ class AreaGroup {
       } catch (RingConstructionException e) {
         for (Area area : areaSet) {
           LOG.debug(
-            "Failed to create merged area for " +
-            area +
-            ".  This area might not be at fault; it might be one of the other areas in this list."
+            "Failed to create merged area for {}.  This area might not be at fault; it might be one of the other areas in this list.",
+            area
           );
           out.add(new AreaGroup(Arrays.asList(area)));
         }

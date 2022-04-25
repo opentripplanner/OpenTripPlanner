@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.module.osm.exception.OSMProcessingException;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 
 public class Ring {
@@ -130,7 +131,7 @@ public class Ring {
     return factory.createPolygon(shell, lrholes);
   }
 
-  public static class RingConstructionException extends RuntimeException {
+  public static class RingConstructionException extends OSMProcessingException {
 
     private static final long serialVersionUID = 1L;
   }

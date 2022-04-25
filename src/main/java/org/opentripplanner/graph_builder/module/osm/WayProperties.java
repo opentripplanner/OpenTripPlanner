@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.module.osm.exception.OSMProcessingException;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -59,7 +60,7 @@ public class WayProperties implements Cloneable {
       return result;
     } catch (CloneNotSupportedException e) {
       // unreached
-      throw new RuntimeException(e);
+      throw new OSMProcessingException(e);
     }
   }
 }

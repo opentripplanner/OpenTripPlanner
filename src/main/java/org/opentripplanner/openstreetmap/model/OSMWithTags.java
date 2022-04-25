@@ -148,7 +148,7 @@ public class OSMWithTags {
   /**
    * Checks is a tag contains the specified value.
    */
-  public Boolean isTag(String tag, String value) {
+  public boolean isTag(String tag, String value) {
     tag = tag.toLowerCase();
     if (tags != null && tags.containsKey(tag) && value != null) {
       return value.equals(tags.get(tag));

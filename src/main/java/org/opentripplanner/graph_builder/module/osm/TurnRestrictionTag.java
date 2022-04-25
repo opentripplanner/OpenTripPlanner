@@ -11,7 +11,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
  * A temporary holder for turn restrictions while we have only way/node ids but not yet edge
  * objects
  */
-class TurnRestrictionTag {
+public class TurnRestrictionTag {
 
   long via;
   //Used only for issues so that it can be visualized in a map
@@ -23,7 +23,7 @@ class TurnRestrictionTag {
   public List<StreetEdge> possibleTo = new ArrayList<>();
   public TraverseModeSet modes;
 
-  TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOSMID) {
+  public TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOSMID) {
     this.via = via;
     this.type = type;
     this.direction = direction;

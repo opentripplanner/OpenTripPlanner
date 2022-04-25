@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.graph_builder.module.osm.exception.OSMProcessingException;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -235,7 +236,7 @@ public class WayPropertySet {
 
   public void addProperties(OSMSpecifier spec, WayProperties properties, boolean mixin) {
     if (!mixin && spec.containsLogicalOr()) {
-      throw new RuntimeException(
+      throw new OSMProcessingException(
         String.format(
           "The logical OR operator ('|') is only implemented for mixins. Spec %s",
           spec.toString()
