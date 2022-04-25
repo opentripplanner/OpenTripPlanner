@@ -19,7 +19,7 @@ public class OpenStreetMapParserTest {
     File osmFile = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), StandardCharsets.UTF_8)
     );
-    BinaryOpenStreetMapProvider pr = new BinaryOpenStreetMapProvider(osmFile, true);
+    BinaryOSMProvider pr = new BinaryOSMProvider(osmFile, true);
     OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false));
 
     pr.readOSM(osmdb);

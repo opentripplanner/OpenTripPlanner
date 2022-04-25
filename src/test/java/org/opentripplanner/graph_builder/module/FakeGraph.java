@@ -9,7 +9,7 @@ import java.util.List;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.osm.BinaryOpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.BinaryOSMProvider;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.model.Stop;
@@ -34,7 +34,7 @@ public class FakeGraph {
     loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     File file = getFileForResource("columbus.osm.pbf");
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+    BinaryOSMProvider provider = new BinaryOSMProvider(file, false);
     loader.setProvider(provider);
 
     loader.buildGraph(gg, new HashMap<>());

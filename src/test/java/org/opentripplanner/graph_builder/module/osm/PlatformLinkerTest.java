@@ -35,7 +35,7 @@ public class PlatformLinkerTest {
       )
     );
 
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+    BinaryOSMProvider provider = new BinaryOSMProvider(file, false);
 
     loader.setProvider(provider);
     loader.buildGraph(gg, new HashMap<>());

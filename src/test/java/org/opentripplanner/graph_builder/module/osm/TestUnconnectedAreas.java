@@ -154,7 +154,7 @@ public class TestUnconnectedAreas {
     assertNotNull(fileUrl);
     File file = new File(fileUrl.getFile());
 
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+    BinaryOSMProvider provider = new BinaryOSMProvider(file, false);
     loader.setProvider(provider);
     loader.buildGraph(graph, new HashMap<>(), issueStore);
 

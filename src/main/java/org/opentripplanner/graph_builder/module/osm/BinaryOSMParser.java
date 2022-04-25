@@ -6,7 +6,7 @@ import java.util.Map;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.contract.OSMEntityStore;
-import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapParser;
+import org.opentripplanner.graph_builder.module.osm.contract.OSMParser;
 import org.opentripplanner.graph_builder.module.osm.model.OSMNode;
 import org.opentripplanner.graph_builder.module.osm.model.OSMNodeRef;
 import org.opentripplanner.graph_builder.module.osm.model.OSMRelation;
@@ -19,13 +19,13 @@ import org.opentripplanner.graph_builder.module.osm.model.OSMWay;
  *
  * @since 0.4
  */
-public class BinaryOpenStreetMapParser extends BinaryParser implements OpenStreetMapParser {
+public class BinaryOSMParser extends BinaryParser implements OSMParser {
 
   private final OSMEntityStore osmdb;
   private final Map<String, String> stringTable = new HashMap<>();
-  private OsmParserPhase parsePhase;
+  private OSMParserPhase parsePhase;
 
-  public BinaryOpenStreetMapParser(OSMEntityStore osmdb) {
+  public BinaryOSMParser(OSMEntityStore osmdb) {
     this.osmdb = osmdb;
   }
 
@@ -46,13 +46,13 @@ public class BinaryOpenStreetMapParser extends BinaryParser implements OpenStree
    * Set the phase to be parsed
    */
   @Override
-  public void setPhase(OsmParserPhase phase) {
+  public void setPhase(OSMParserPhase phase) {
     this.parsePhase = phase;
   }
 
   @Override
   protected void parseRelations(List<Osmformat.Relation> rels) {
-    if (parsePhase != OsmParserPhase.RELATIONS) {
+    if (parsePhase != OSMParserPhase.RELATIONS) {
       return;
     }
 
@@ -103,7 +103,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser implements OpenStree
     long lastLon = 0;
     int j = 0; // Index into the keysvals array.
 
-    if (parsePhase != OsmParserPhase.NODES) {
+    if (parsePhase != OSMParserPhase.NODES) {
       return;
     }
 
@@ -145,7 +145,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser implements OpenStree
 
   @Override
   protected void parseNodes(List<Osmformat.Node> nodes) {
-    if (parsePhase != OsmParserPhase.NODES) {
+    if (parsePhase != OSMParserPhase.NODES) {
       return;
     }
 
@@ -171,7 +171,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser implements OpenStree
 
   @Override
   protected void parseWays(List<Osmformat.Way> ways) {
-    if (parsePhase != OsmParserPhase.WAYS) {
+    if (parsePhase != OSMParserPhase.WAYS) {
       return;
     }
 

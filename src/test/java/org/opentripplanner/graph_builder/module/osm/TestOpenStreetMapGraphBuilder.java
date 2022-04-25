@@ -52,7 +52,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
     File file = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
     );
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
+    BinaryOSMProvider provider = new BinaryOSMProvider(file, true);
 
     loader.setProvider(provider);
 
@@ -116,7 +116,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         StandardCharsets.UTF_8
       )
     );
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
+    BinaryOSMProvider provider = new BinaryOSMProvider(file, true);
 
     loader.setProvider(provider);
 
@@ -297,7 +297,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         StandardCharsets.UTF_8
       )
     );
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+    BinaryOSMProvider provider = new BinaryOSMProvider(file, false);
 
     loader.setProvider(provider);
 

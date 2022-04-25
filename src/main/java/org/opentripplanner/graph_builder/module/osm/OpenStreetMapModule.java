@@ -32,7 +32,7 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.contract.OSMProvider;
 import org.opentripplanner.graph_builder.module.osm.contract.PhaseAwareOSMEntityStore;
 import org.opentripplanner.graph_builder.module.osm.contract.RelationalOSMEntityStore;
 import org.opentripplanner.graph_builder.module.osm.model.OSMLevel;
@@ -93,7 +93,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * Providers of OSM data.
    */
-  private final List<OpenStreetMapProvider> providers = new ArrayList<>();
+  private final List<OSMProvider> providers = new ArrayList<>();
   private DataImportIssueStore issueStore;
   public boolean skipVisibility = false;
 
@@ -137,7 +137,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * Construct and set providers all at once.
    */
-  public OpenStreetMapModule(List<BinaryOpenStreetMapProvider> providers) {
+  public OpenStreetMapModule(List<BinaryOSMProvider> providers) {
     this.setProviders(providers);
   }
 
@@ -154,14 +154,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * The source for OSM map data
    */
-  public void setProvider(BinaryOpenStreetMapProvider provider) {
+  public void setProvider(BinaryOSMProvider provider) {
     providers.add(provider);
   }
 
   /**
    * Multiple sources for OSM map data
    */
-  public void setProviders(List<BinaryOpenStreetMapProvider> providers) {
+  public void setProviders(List<BinaryOSMProvider> providers) {
     this.providers.addAll(providers);
   }
 
@@ -189,7 +189,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     PhaseAwareOSMEntityStore osmdb = createEntityStore(issueStore);
     Handler handler = new Handler(graph, osmdb);
-    for (OpenStreetMapProvider provider : providers) {
+    for (OSMProvider provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
       provider.readOSM(osmdb);
     }
@@ -214,7 +214,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void checkInputs() {
-    for (OpenStreetMapProvider provider : providers) {
+    for (OSMProvider provider : providers) {
       provider.checkInputs();
     }
   }

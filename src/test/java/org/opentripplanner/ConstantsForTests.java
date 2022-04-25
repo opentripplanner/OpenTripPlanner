@@ -22,7 +22,7 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.BinaryOpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.BinaryOSMProvider;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -129,7 +129,7 @@ public class ConstantsForTests {
       // Add street data from OSM
       {
         File osmFile = new File(PORTLAND_CENTRAL_OSM);
-        BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
+        BinaryOSMProvider osmProvider = new BinaryOSMProvider(osmFile, false);
         OpenStreetMapModule osmModule = new OpenStreetMapModule(List.of(osmProvider));
         osmModule.staticBikeParkAndRide = true;
         osmModule.staticParkAndRide = true;
@@ -170,7 +170,7 @@ public class ConstantsForTests {
       var graph = new Graph();
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, true);
+      BinaryOSMProvider osmProvider = new BinaryOSMProvider(osmFile, true);
       OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
       osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
       osmModule.skipVisibility = true;
@@ -209,7 +209,7 @@ public class ConstantsForTests {
       {
         File osmFile = new File(OSLO_EAST_OSM);
 
-        BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
+        BinaryOSMProvider osmProvider = new BinaryOSMProvider(osmFile, false);
         OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
         osmModule.skipVisibility = true;
         osmModule.buildGraph(graph, new HashMap<>());

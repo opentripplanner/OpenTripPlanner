@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.module.osm.BinaryOpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.BinaryOSMProvider;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.model.OSMWithTags;
@@ -68,7 +68,7 @@ public class PruneNoThruIslandsTest {
       var graph = new Graph();
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, true);
+      BinaryOSMProvider osmProvider = new BinaryOSMProvider(osmFile, true);
       OpenStreetMapModule osmModule = new OpenStreetMapModule(
         com.google.common.collect.Lists.newArrayList(osmProvider)
       );

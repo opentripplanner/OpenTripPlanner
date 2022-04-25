@@ -9,46 +9,53 @@ import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapParser;
-import org.opentripplanner.graph_builder.module.osm.contract.OpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.contract.OSMParser;
+import org.opentripplanner.graph_builder.module.osm.contract.OSMProvider;
 import org.opentripplanner.graph_builder.module.osm.contract.PhaseAwareOSMEntityStore;
+import org.opentripplanner.graph_builder.module.osm.exception.OSMProcessingException;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Parser for the OpenStreetMap PBF format. Parses files in three passes: First the relations, then
- * the ways, then the nodes are also loaded.
- */
-public class BinaryOpenStreetMapProvider implements OpenStreetMapProvider {
+public abstract class AbstractOSMProvider implements OSMProvider {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BinaryOpenStreetMapProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractOSMProvider.class);
 
   private final DataSource source;
   private final boolean cacheDataInMem;
   private byte[] cachedBytes = null;
 
   /** For tests */
-  public BinaryOpenStreetMapProvider(File file, boolean cacheDataInMem) {
+  protected AbstractOSMProvider(File file, boolean cacheDataInMem) {
     this(new FileDataSource(file, FileType.OSM), cacheDataInMem);
   }
 
-  public BinaryOpenStreetMapProvider(DataSource source, boolean cacheDataInMem) {
+  protected AbstractOSMProvider(DataSource source, boolean cacheDataInMem) {
     this.source = source;
     this.cacheDataInMem = cacheDataInMem;
   }
 
+  public DataSource getSource() {
+    return source;
+  }
+
+  public boolean shouldCacheDataInMem() {
+    return cacheDataInMem;
+  }
+
+  protected abstract OSMParser createParser(PhaseAwareOSMEntityStore osmdb);
+
   public void readOSM(PhaseAwareOSMEntityStore osmdb) {
     try {
-      OpenStreetMapParser parser = new BinaryOpenStreetMapParser(osmdb);
+      OSMParser parser = createParser(osmdb);
 
-      parsePhase(parser, OsmParserPhase.RELATIONS);
+      parsePhase(parser, OSMParserPhase.RELATIONS);
       osmdb.doneFirstPhaseRelations();
 
-      parsePhase(parser, OsmParserPhase.WAYS);
+      parsePhase(parser, OSMParserPhase.WAYS);
       osmdb.doneSecondPhaseWays();
 
-      parsePhase(parser, OsmParserPhase.NODES);
+      parsePhase(parser, OSMParserPhase.NODES);
       osmdb.doneThirdPhaseNodes();
     } catch (Exception ex) {
       throw new IllegalStateException("error loading OSM from path " + source.path(), ex);
@@ -67,19 +74,18 @@ public class BinaryOpenStreetMapProvider implements OpenStreetMapProvider {
 
   public void checkInputs() {
     if (!source.exists()) {
-      throw new RuntimeException("Can't read OSM path: " + source.path());
+      throw new OSMProcessingException("Can't read OSM path: " + source.path());
     }
   }
 
   @SuppressWarnings("Convert2MethodRef")
-  private static InputStream track(OsmParserPhase phase, long size, InputStream inputStream) {
+  private static InputStream track(OSMParserPhase phase, long size, InputStream inputStream) {
     // Keep logging lambda, replacing it with a method-ref will cause the
     // logging to report incorrect class and line number
     return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, LOG::info);
   }
 
-  private void parsePhase(OpenStreetMapParser parser, OsmParserPhase phase)
-    throws IOException {
+  private void parsePhase(OSMParser parser, OSMParserPhase phase) throws IOException {
     parser.setPhase(phase);
     BlockInputStream in = null;
     try {
@@ -97,7 +103,7 @@ public class BinaryOpenStreetMapProvider implements OpenStreetMapProvider {
     }
   }
 
-  private InputStream createInputStream(OsmParserPhase phase) {
+  private InputStream createInputStream(OSMParserPhase phase) {
     if (cacheDataInMem) {
       if (cachedBytes == null) {
         cachedBytes = source.asBytes();

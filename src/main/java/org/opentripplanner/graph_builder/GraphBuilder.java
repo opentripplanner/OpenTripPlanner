@@ -29,7 +29,7 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.BinaryOpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.BinaryOSMProvider;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
@@ -80,9 +80,9 @@ public class GraphBuilder implements Runnable {
     graphBuilder.hasTransitData = hasTransitData;
 
     if (hasOsm) {
-      List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
+      List<BinaryOSMProvider> osmProviders = Lists.newArrayList();
       for (DataSource osmFile : dataSources.get(OSM)) {
-        osmProviders.add(new BinaryOpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
+        osmProviders.add(new BinaryOSMProvider(osmFile, config.osmCacheDataInMem));
       }
       OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
       osmModule.customNamer = config.customNamer;
