@@ -25,7 +25,7 @@ public final class ConstrainedBoardingSearch
    * these trips are probably a better match. We abort to avoid stepping through all trips, possibly
    * a large number (several days).
    */
-  private static final int ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS = 5;
+  private static final int ABORT_SEARCH_AFTER_N_VALID_NORMAL_TRIPS = 5;
 
   private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY = new ConstrainedBoardingSearchForward();
   private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
@@ -211,7 +211,7 @@ public final class ConstrainedBoardingSearch
         onTripTxConstraint = TransferConstraint.REGULAR_TRANSFER;
         return true;
       }
-      if (nAllowedBoardings == ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS) {
+      if (nAllowedBoardings == ABORT_SEARCH_AFTER_N_VALID_NORMAL_TRIPS) {
         return false;
       }
     }

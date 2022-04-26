@@ -17,6 +17,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This class is responsible for finding all possible transfers between each pair of transit legs
@@ -125,11 +127,8 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       return List.of();
     }
 
-    final int earliestDepartureTime = earliestDepartureTime(
-      from.time(),
-      SAME_STOP_TRANSFER_TIME,
-      tx
-    );
+    final int earliestDepartureTime =
+      from.time() + calculateTransferDuration(SAME_STOP_TRANSFER_TIME, tx);
 
     final int toTripStopPos = toTrip.findDepartureStopPosition(earliestDepartureTime, stop);
 
@@ -161,7 +160,8 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
         continue;
       }
 
-      int earliestDepartureTime = earliestDepartureTime(from.time(), it.durationInSeconds(), tx);
+      int earliestDepartureTime =
+        from.time() + calculateTransferDuration(it.durationInSeconds(), tx);
       int toTripStopPos = toTrip.findDepartureStopPosition(earliestDepartureTime, toStop);
 
       if (toTripStopPos < 0) {
@@ -179,33 +179,49 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     return result;
   }
 
-  private int earliestDepartureTime(
-    int fromTime,
+  /**
+   * This code duplicates the logic in
+   * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch},
+   * see the {@code findTimetableTripInfo(RaptorTimeTable, Iterable, int, int, int)}) method.
+   */
+  private int calculateTransferDuration(
     int transferDurationInSeconds,
     @Nullable ConstrainedTransfer tx
   ) {
-    // Ignore slack and walking-time for guaranteed and stay-seated transfers
-    if (tx != null && tx.getTransferConstraint().isFacilitated()) {
-      return fromTime;
-      // Ignore board and alight slack for min transfer time, but keep transfer slack
-    } else if (tx != null && tx.getTransferConstraint().isMinTransferTimeSet()) {
-      var minTransferTime = tx.getTransferConstraint().getMinTransferTime();
-      int transferDuration;
-      if (OTPFeature.MinimumTransferTimeIsDefinitive.isOn()) {
-        transferDuration = minTransferTime;
-      } else {
-        transferDuration = Math.max(minTransferTime, transferDurationInSeconds);
-      }
-      return fromTime + transferDuration + slackProvider.transferSlack();
-    } else {
-      return (
-        fromTime +
-        slackProvider.alightSlack(fromTrip.pattern().slackIndex()) +
-        transferDurationInSeconds +
-        slackProvider.transferSlack() +
-        slackProvider.boardSlack(toTrip.pattern().slackIndex())
-      );
+    if (tx == null) {
+      return calcRegularTransferDusrationIncSlack(transferDurationInSeconds);
     }
+
+    // Ignore slack and walking-time for guaranteed and stay-seated transfers
+    if (tx.getTransferConstraint().isFacilitated()) {
+      return 0;
+    }
+    // Ignore transfer, board and alight slack for min-transfer-time
+    else if (tx.getTransferConstraint().isMinTransferTimeSet()) {
+      var minTransferTime = tx.getTransferConstraint().getMinTransferTime();
+      return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
+        ? minTransferTime
+        : Math.max(
+          minTransferTime,
+          calcRegularTransferDusrationIncSlack(transferDurationInSeconds)
+        );
+    } else if (tx.getTransferConstraint().isRegularTransfer()) {
+      return calcRegularTransferDusrationIncSlack(transferDurationInSeconds);
+    }
+    throw new IllegalStateException(
+      "The constrained transfer is not correct processed in the optimized transfer service. " +
+      "Transfer: " +
+      tx
+    );
+  }
+
+  private int calcRegularTransferDusrationIncSlack(int transferDurationInSeconds) {
+    return (
+      slackProvider.alightSlack(fromTrip.pattern().slackIndex()) +
+      transferDurationInSeconds +
+      slackProvider.transferSlack() +
+      slackProvider.boardSlack(toTrip.pattern().slackIndex())
+    );
   }
 
   @Nonnull
