@@ -141,6 +141,7 @@ public class LegMapper {
 
     api.rentedBike = domain.getRentedVehicle();
     api.walkingBike = domain.getWalkingBike();
+    api.accessibilityScore = domain.accessibilityScore();
 
     return api;
   }

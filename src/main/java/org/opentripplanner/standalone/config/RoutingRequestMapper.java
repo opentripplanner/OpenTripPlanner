@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
+
 import java.time.Duration;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -141,7 +143,8 @@ public class RoutingRequestMapper {
     request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
     request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
     request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
-    request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
+
+    request.wheelchairAccessibility = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
 
     mapTransferOptimization(
       (TransferOptimizationRequest) request.transferOptimization,

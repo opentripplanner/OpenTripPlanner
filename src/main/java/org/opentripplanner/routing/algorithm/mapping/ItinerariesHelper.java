@@ -14,7 +14,7 @@ public class ItinerariesHelper {
     RoutingRequest routingRequest
   ) {
     for (Itinerary it : itineraries) {
-      if (routingRequest.wheelchairAccessible) {
+      if (routingRequest.wheelchairAccessibility.enabled()) {
         // Communicate the fact that the only way we were able to get a response
         // was by removing a slope limit.
         OptionalDouble maxSlope = getMaxSlope(it);

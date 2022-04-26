@@ -2,9 +2,9 @@ package org.opentripplanner.routing.street;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
+import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;

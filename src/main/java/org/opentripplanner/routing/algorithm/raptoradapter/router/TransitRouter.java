@@ -37,12 +37,8 @@ import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.util.OTPFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TransitRouter {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TransitRouter.class);
 
   public static final int NOT_SET = -1;
 

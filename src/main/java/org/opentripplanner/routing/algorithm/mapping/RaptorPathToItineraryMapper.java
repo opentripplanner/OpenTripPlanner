@@ -189,7 +189,8 @@ public class RaptorPathToItineraryMapper {
           (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
           (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
           toOtpDomainCost(pathLeg.generalizedCost()),
-          frequencyHeadwayInSeconds
+          frequencyHeadwayInSeconds,
+          null
         );
     } else {
       leg =
@@ -204,7 +205,8 @@ public class RaptorPathToItineraryMapper {
           transitSearchTimeZero.getZone().normalized(),
           (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
           (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
-          toOtpDomainCost(pathLeg.generalizedCost())
+          toOtpDomainCost(pathLeg.generalizedCost()),
+          null
         );
     }
 
@@ -272,7 +274,12 @@ public class RaptorPathToItineraryMapper {
       // may be re-traversed to create the leg(s) from the list of edges.
       RoutingRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
       traverseRequest.arriveBy = false;
-      RoutingContext routingContext = new RoutingContext(request, graph, (Vertex) null, null);
+      RoutingContext routingContext = new RoutingContext(
+        traverseRequest,
+        graph,
+        (Vertex) null,
+        null
+      );
 
       StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
       se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());

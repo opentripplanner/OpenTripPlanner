@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module;
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;

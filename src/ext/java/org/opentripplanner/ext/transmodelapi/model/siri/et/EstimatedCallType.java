@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
@@ -269,7 +270,14 @@ public class EstimatedCallType {
           .name("date")
           .type(gqlUtil.dateScalar)
           .description("The date the estimated call is valid for.")
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
+          .dataFetcher(environment ->
+            Optional
+              .of(environment.getSource())
+              .map(TripTimeOnDate.class::cast)
+              .map(TripTimeOnDate::getServiceDay)
+              .map(ServiceDate::toLocalDate)
+              .orElse(null)
+          )
           .build()
       )
       .field(

@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
+
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -17,17 +20,20 @@ public class TestTripSchedule implements RaptorTripSchedule {
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
+  private final WheelChairBoarding wheelchairBoarding;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
     int[] arrivalTimes,
     int[] departureTimes,
-    int transitReluctanceIndex
+    int transitReluctanceIndex,
+    WheelChairBoarding wheelchairBoarding
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
     this.departureTimes = departureTimes;
     this.transitReluctanceIndex = transitReluctanceIndex;
+    this.wheelchairBoarding = wheelchairBoarding;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -68,6 +74,11 @@ public class TestTripSchedule implements RaptorTripSchedule {
     return transitReluctanceIndex;
   }
 
+  @Override
+  public WheelChairBoarding wheelchairBoarding() {
+    return wheelchairBoarding;
+  }
+
   public int size() {
     return arrivalTimes.length;
   }
@@ -95,6 +106,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
     private int transitReluctanceIndex = 0;
+    private WheelChairBoarding wheelchairBoarding = NO_INFORMATION;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -160,6 +172,11 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return this;
     }
 
+    public TestTripSchedule.Builder wheelchairBoarding(WheelChairBoarding wcb) {
+      this.wheelchairBoarding = wcb;
+      return this;
+    }
+
     public TestTripSchedule build() {
       if (arrivalTimes == null) {
         arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
@@ -187,7 +204,13 @@ public class TestTripSchedule implements RaptorTripSchedule {
           pattern.numberOfStopsInPattern()
         );
       }
-      return new TestTripSchedule(pattern, arrivalTimes, departureTimes, transitReluctanceIndex);
+      return new TestTripSchedule(
+        pattern,
+        arrivalTimes,
+        departureTimes,
+        transitReluctanceIndex,
+        wheelchairBoarding
+      );
     }
 
     private static int[] copyWithOffset(int[] source, int offset) {

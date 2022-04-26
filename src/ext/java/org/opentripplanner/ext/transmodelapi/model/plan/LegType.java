@@ -15,11 +15,13 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
@@ -315,6 +317,23 @@ public class LegType {
               .getRoutingService(env)
               .getTripOnServiceDateForTripAndDay(tripId, serviceDate);
           })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("serviceDate")
+          .description(
+            "For transit legs, the service date of the trip. For non-transit legs, null."
+          )
+          .type(gqlUtil.dateScalar)
+          .dataFetcher(environment ->
+            Optional
+              .of((Leg) environment.getSource())
+              .map(Leg::getServiceDate)
+              .map(ServiceDate::toLocalDate)
+              .orElse(null)
+          )
           .build()
       )
       .field(
