@@ -83,6 +83,12 @@ public class NodeAdapterTest {
     assertEquals(-1, subject.asLong("missingField", -1));
   }
 
+  @Test(expected = OtpAppException.class)
+  public void requiredAsLong() {
+    NodeAdapter subject = newNodeAdapterForTest("{ }");
+    subject.asLong("missingField");
+  }
+
   @Test
   public void asText() {
     NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
@@ -221,6 +227,12 @@ public class NodeAdapterTest {
     assertEquals("PT1S", subject.asDuration("key1", null).toString());
     assertEquals("PT99H2M1S", subject.asDuration("key2", null).toString());
     assertEquals("PT3H", subject.asDuration("missing-key", D3h).toString());
+  }
+
+  @Test(expected = OtpAppException.class)
+  public void requiredAsDuration() {
+    NodeAdapter subject = newNodeAdapterForTest("{ }");
+    subject.asDuration("missingField");
   }
 
   @Test

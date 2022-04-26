@@ -173,6 +173,11 @@ public class NodeAdapter {
     return param(paramName).asLong(defaultValue);
   }
 
+  public long asLong(String paramName) {
+    assertRequiredFieldExist(paramName);
+    return param(paramName).asLong();
+  }
+
   public String asText(String paramName, String defaultValue) {
     return param(paramName).asText(defaultValue);
   }
@@ -350,6 +355,11 @@ public class NodeAdapter {
 
   public Duration asDuration(String paramName, Duration defaultValue) {
     return exist(paramName) ? DurationUtils.duration(param(paramName).asText()) : defaultValue;
+  }
+
+  public Duration asDuration(String paramName) {
+    assertRequiredFieldExist(paramName);
+    return DurationUtils.duration(param(paramName).asText());
   }
 
   public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {

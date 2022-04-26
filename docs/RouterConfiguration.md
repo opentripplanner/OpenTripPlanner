@@ -186,20 +186,35 @@ search-window. To set the street routing timeout use the following config:
 This specifies a timeout in (optionally fractional) seconds. The search abort after this many
 seconds and any paths found are returned to the client.
 
-## maxAccessEgressDurationSecondsForMode
+## maxAccessEgressDurationForMode
 
-Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done
-because some street modes searches are much more resource intensive than others.
+Override the settings in maxAccessEgressDuration for specific street modes. This is done because 
+some street modes searches are much more resource intensive than others.
 
 ```JSON
 // router-config.json
-"maxAccessEgressDurationSecondsForMode": {
-  "BIKE_RENTAL": 1200
+"maxAccessEgressDurationForMode": {
+  "BIKE_RENTAL": "20m"
 }
 ```
 
 This will limit only the BIKE_RENTAL mode to 1200 seconds, while keeping the default limit for all
 other access/egress modes.
+
+## maxDirectStreetDurationForMode
+
+Override the settings in maxDirectStreetDurationForMode for specific street modes. This is done 
+because some street modes searches are much more resource intensive than others.
+
+```JSON
+// router-config.json
+"maxDirectStreetDurationForMode": {
+  "CAR": "12h"
+}
+```
+
+This will limit extend the CAR mode to 12 hours, while keeping the default limit for all other 
+direct street modes.
 
 ## Logging incoming requests
 
