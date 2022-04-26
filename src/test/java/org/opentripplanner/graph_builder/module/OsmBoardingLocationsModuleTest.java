@@ -47,7 +47,7 @@ class OsmBoardingLocationsModuleTest {
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size());
 
-    assertEquals(1, stopVertex.getIncoming().size());
-    assertEquals(1, stopVertex.getOutgoing().size());
+    assertEquals(4, stopVertex.getIncoming().size());
+    assertEquals(4, stopVertex.getOutgoing().size());
   }
 }

@@ -103,6 +103,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         osmVertex.references.contains(stopId)
       ) {
         if (osmVertex.isConnectedToStreetNetwork()) {
+          new StreetTransitStopLink(ts, osmVertex);
+          new StreetTransitStopLink(osmVertex, ts);
+        } else {
           linker.linkVertexPermanently(
             osmVertex,
             new TraverseModeSet(TraverseMode.WALK),
@@ -113,9 +116,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
                 new StreetTransitStopLink(streetVertex, ts)
               )
           );
-        } else {
-          new StreetTransitStopLink(ts, osmVertex);
-          new StreetTransitStopLink(osmVertex, ts);
         }
         return true;
       }
