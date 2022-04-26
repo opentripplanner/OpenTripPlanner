@@ -24,7 +24,7 @@ public class TranslatedString implements I18NString, Serializable {
    * Store all translations, so we don't get memory overhead for identical strings As this is
    * static, it isn't serialized when saving the graph.
    */
-  private static final HashMap<Map<String, String>, I18NString> intern = new HashMap<>();
+  private static final HashMap<Map<String, String>, I18NString> translationCache = new HashMap<>();
 
   private final Map<String, String> translations = new HashMap<>();
 
@@ -49,28 +49,49 @@ public class TranslatedString implements I18NString, Serializable {
     for (int i = 0; i < translations.length - 1; i += 2) {
       map.put(translations[i], translations[i + 1]);
     }
-    return getI18NString(map);
+    return getI18NString(map, false, false);
   }
 
   /**
-   * Gets an interned I18NString. If the translations only have a single value, return a
-   * NonTranslatedString, otherwise a TranslatedString
+   * Gets an I18NString. If the translations only have a single value, return a NonTranslatedString,
+   * otherwise a TranslatedString
    *
    * @param translations A Map of languages and translations, a null language is the default
    *                     translation
+   * @param intern Should the resulting I18NString be interned. This should be used when calling
+   *               this method during graph building, or when the string will be retained until the
+   *               instance is shut down, as it will cause a memory leak otherwise.
+   * @param forceTranslatedString Should the language information be kept, even when only a single
+   *                              translation is provided. This is useful when the language
+   *                              information is important or is presented to the user.
    */
-  public static I18NString getI18NString(Map<String, String> translations) {
-    if (intern.containsKey(translations)) {
-      return intern.get(translations);
+  public static I18NString getI18NString(
+    Map<String, String> translations,
+    boolean intern,
+    boolean forceTranslatedString
+  ) {
+    if (translations.isEmpty()) {
+      throw new IllegalArgumentException("At least one translation must be provided");
+    }
+    if (translationCache.containsKey(translations)) {
+      return translationCache.get(translations);
     } else {
       I18NString ret;
       // Check if we only have one name, even under multiple languages
-      if (new HashSet<>(translations.values()).size() < 2) {
+      boolean allValuesEqual = new HashSet<>(translations.values()).size() == 1;
+      var firstLanguage = translations.keySet().iterator().next();
+      boolean onlySingleUntranslatedLanguage =
+        translations.size() == 1 && (firstLanguage == null || firstLanguage.isBlank());
+      if (forceTranslatedString && !onlySingleUntranslatedLanguage) {
+        ret = new TranslatedString(translations);
+      } else if (allValuesEqual) {
         ret = new NonLocalizedString(translations.values().iterator().next());
       } else {
         ret = new TranslatedString(translations);
       }
-      intern.put(translations, ret);
+      if (intern) {
+        translationCache.put(translations, ret);
+      }
       return ret;
     }
   }

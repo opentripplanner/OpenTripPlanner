@@ -37,7 +37,7 @@ public class VehicleParkingsLayerTest {
       VehicleParking
         .builder()
         .id(new FeedScopedId("id", "id"))
-        .name(TranslatedString.getI18NString(Map.of("", "name", "de", "DE")))
+        .name(TranslatedString.getI18NString(Map.of("", "name", "de", "DE"), false, false))
         .x(1)
         .y(2)
         .bicyclePlaces(true)

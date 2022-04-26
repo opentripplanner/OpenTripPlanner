@@ -166,7 +166,11 @@ public class OSMWithTags {
       return null;
     }
     if (tags.containsKey("name")) {
-      return TranslatedString.getI18NString(TemplateLibrary.generateI18N("{name}", this));
+      return TranslatedString.getI18NString(
+        TemplateLibrary.generateI18N("{name}", this),
+        true,
+        false
+      );
     }
     if (tags.containsKey("otp:route_name")) {
       return new NonLocalizedString(tags.get("otp:route_name"));

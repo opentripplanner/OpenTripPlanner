@@ -38,7 +38,7 @@ class StationMapper {
         }
       }
 
-      name = TranslatedString.getI18NString(translations);
+      name = TranslatedString.getI18NString(translations, true, false);
     } else {
       name = new NonLocalizedString(stopPlace.getName().getValue());
     }
