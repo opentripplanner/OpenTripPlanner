@@ -232,7 +232,7 @@
                         --add-opens java.xml/org.xml.sax.helpers=ALL-UNNAMED
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
-                    <disableXmlReport>false</disableXmlReport>
+                    <disableXmlReport>true</disableXmlReport>
                     <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
