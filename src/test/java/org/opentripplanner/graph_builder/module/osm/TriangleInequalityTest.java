@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -164,8 +166,8 @@ public class TriangleInequalityTest {
   }
 
   private void checkTriangleInequality(TraverseModeSet traverseModes) {
-    Assertions.assertNotNull(start);
-    Assertions.assertNotNull(end);
+    assertNotNull(start);
+    assertNotNull(end);
 
     RoutingRequest prototypeOptions = new RoutingRequest();
 
@@ -192,7 +194,7 @@ public class TriangleInequalityTest {
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(end);
-    Assertions.assertNotNull(path);
+    assertNotNull(path);
 
     double startEndWeight = path.getWeight();
     int startEndDuration = path.getDuration();
@@ -243,6 +245,6 @@ public class TriangleInequalityTest {
       //        startEndDuration);
     }
 
-    Assertions.assertFalse(violated);
+    assertFalse(violated);
   }
 }

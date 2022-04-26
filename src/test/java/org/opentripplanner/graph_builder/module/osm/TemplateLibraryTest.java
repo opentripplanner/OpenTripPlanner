@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ public class TemplateLibraryTest {
     osmTags.addTag("wheelchair:description", "Wheelchair description EN");
     osmTags.addTag("wheelchair:description:fr", "Wheelchair description FR");
 
-    Assertions.assertNull(TemplateLibrary.generate(null, osmTags));
+    assertNull(TemplateLibrary.generate(null, osmTags));
     assertEquals("", TemplateLibrary.generate("", osmTags));
     assertEquals("Static text", TemplateLibrary.generate("Static text", osmTags));
     assertEquals("Note: Note EN", TemplateLibrary.generate("Note: {note}", osmTags));
@@ -34,7 +35,7 @@ public class TemplateLibraryTest {
       TemplateLibrary.generate("Wheelchair note: {wheelchair:description}", osmTags)
     );
 
-    Assertions.assertNull(TemplateLibrary.generateI18N(null, osmTags));
+    assertNull(TemplateLibrary.generateI18N(null, osmTags));
     Map<String, String> expected = new HashMap<>();
 
     expected.put(null, "");
