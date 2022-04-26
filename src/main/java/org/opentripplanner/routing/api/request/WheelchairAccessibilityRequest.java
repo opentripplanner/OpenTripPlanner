@@ -5,14 +5,14 @@ public record WheelchairAccessibilityRequest(
   WheelchairAccessibilityFeature trips,
   WheelchairAccessibilityFeature stops
 ) {
-  public static final WheelchairAccessibilityRequest DEFAULTS = new WheelchairAccessibilityRequest(
+  public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
     false,
     WheelchairAccessibilityFeature.ofOnlyAccessible(),
     WheelchairAccessibilityFeature.ofOnlyAccessible()
   );
 
   public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {
-    return DEFAULTS.withEnabled(enabled);
+    return DEFAULT.withEnabled(enabled);
   }
 
   public WheelchairAccessibilityRequest withEnabled(boolean enabled) {

@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest.DEFAULTS;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.opentripplanner.model.TransitMode;
@@ -8,8 +7,6 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -32,7 +32,7 @@ public class McCostParams {
     this.transferCost = 0;
     this.transitReluctanceFactors = null;
     this.waitReluctanceFactor = 1.0;
-    this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULTS;
+    this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULT;
   }
 
   McCostParams(McCostParamsBuilder builder) {

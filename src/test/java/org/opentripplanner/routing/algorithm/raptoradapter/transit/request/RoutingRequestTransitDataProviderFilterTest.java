@@ -42,7 +42,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
   private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
 
   private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
-    WheelchairAccessibilityRequest.DEFAULTS;
+    WheelchairAccessibilityRequest.DEFAULT;
 
   /**
    * Test filter for wheelchair access.
