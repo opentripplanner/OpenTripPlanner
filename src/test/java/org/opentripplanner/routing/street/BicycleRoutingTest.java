@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.street;
 
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
+import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
@@ -45,7 +45,7 @@ public class BicycleRoutingTest {
   }
 
   /**
-   * Tests that that https://www.openstreetmap.org/way/35097400 is allowed for cars due to
+   * Tests that https://www.openstreetmap.org/way/35097400 is allowed for cars due to
    * motor_vehicle=destination being meant for cars only.
    */
   @Test

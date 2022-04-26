@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
+
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -95,6 +97,8 @@ public class RoutingRequestMapper {
       c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
     request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
     request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
+    request.wheelchairSlopeTooSteepCostFactor =
+      c.asDouble("wheelchairSlopeTooSteepCostFactor", dft.wheelchairSlopeTooSteepCostFactor);
     request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes);
     request.nonpreferredTransferCost =
       c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
@@ -136,7 +140,8 @@ public class RoutingRequestMapper {
     request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
     request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
     request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
-    request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
+
+    request.wheelchairAccessibility = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
 
     mapTransferOptimization(
       (TransferOptimizationRequest) request.transferOptimization,

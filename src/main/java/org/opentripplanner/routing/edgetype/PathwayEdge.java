@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -83,32 +84,39 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
       return null;
     }
 
+    RoutingRequest options = s0.getOptions();
+
     /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     int time = traversalTime;
-    if (s0.getOptions().wheelchairAccessible) {
+    if (options.wheelchairAccessibility.enabled()) {
       if (!this.wheelchairAccessible) {
-        return null;
-      }
-      if (this.slope > s0.getOptions().maxWheelchairSlope) {
         return null;
       }
     }
 
     if (time == 0) {
       if (distance > 0) {
-        time = (int) (distance * s0.getOptions().walkSpeed);
+        time = (int) (distance * options.walkSpeed);
       } else if (steps > 0) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time = (int) (0.4 * Math.abs(steps) * s0.getOptions().walkSpeed);
+        time = (int) (0.4 * Math.abs(steps) * options.walkSpeed);
       }
     }
 
     if (time > 0) {
       double weight =
         time *
-        s0
-          .getOptions()
-          .getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
+        options.getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
+
+      if (options.wheelchairAccessibility.enabled()) {
+        if (this.slope > options.maxWheelchairSlope) {
+          double tooSteepCostFactor = options.wheelchairSlopeTooSteepCostFactor;
+          if (tooSteepCostFactor < 0) {
+            return null;
+          }
+          weight *= tooSteepCostFactor;
+        }
+      }
 
       s1.incrementTimeInSeconds(time);
       s1.incrementWeight(weight);

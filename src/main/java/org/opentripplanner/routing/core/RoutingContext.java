@@ -34,12 +34,6 @@ public class RoutingContext {
   public final Set<Vertex> toVertices;
 
   /**
-   * Indicates that a maximum slope constraint was specified but was removed during routing to
-   * produce a result.
-   */
-  public boolean slopeRestrictionRemoved = false;
-
-  /**
    * DataOverlay Sandbox module context.
    */
   public DataOverlayContext dataOverlayContext;

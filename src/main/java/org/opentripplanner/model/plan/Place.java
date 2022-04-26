@@ -126,7 +126,9 @@ public class Place {
 
     boolean realTime =
       request.useVehicleParkingAvailabilityInformation &&
-      vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchairAccessible);
+      vertex
+        .getVehicleParking()
+        .hasRealTimeDataForMode(traverseMode, request.wheelchairAccessibility.enabled());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

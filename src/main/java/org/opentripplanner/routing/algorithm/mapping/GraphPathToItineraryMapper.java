@@ -40,8 +40,6 @@ import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.OTPFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
@@ -50,8 +48,6 @@ import org.slf4j.LoggerFactory;
  * RaptorPathToItineraryMapper}.
  */
 public class GraphPathToItineraryMapper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(GraphPathToItineraryMapper.class);
 
   private final ZoneId timeZone;
   private final AlertToLegMapper alertToLegMapper;

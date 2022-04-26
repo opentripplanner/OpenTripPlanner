@@ -1,0 +1,8 @@
+{
+  "otpFeatures" : {
+    "FlexRouting": true,
+    "SandboxAPILegacyGraphQLApi": true,
+    "VehicleToStopHeuristics": true,
+    "ParallelRouting": true
+  }
+}

@@ -73,14 +73,25 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     }
 
     RoutingRequest req = s0.getOptions();
-    if (s0.getOptions().wheelchairAccessible && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
-      return null;
-    }
 
     // Do not check here whether any transit modes are selected. A check for the presence of
     // transit modes will instead be done in the following PreBoard edge.
     // This allows searching for nearby transit stops using walk-only options.
     StateEditor s1 = s0.edit(this);
+
+    var accessibility = s0.getOptions().wheelchairAccessibility;
+    if (accessibility.enabled()) {
+      if (
+        accessibility.stops().onlyConsiderAccessible() &&
+        wheelchairBoarding != WheelChairBoarding.POSSIBLE
+      ) {
+        return null;
+      } else if (wheelchairBoarding == WheelChairBoarding.NO_INFORMATION) {
+        s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
+      } else if (wheelchairBoarding == WheelChairBoarding.NOT_POSSIBLE) {
+        s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
+      }
+    }
 
     switch (s0.getNonTransitMode()) {
       case BICYCLE:

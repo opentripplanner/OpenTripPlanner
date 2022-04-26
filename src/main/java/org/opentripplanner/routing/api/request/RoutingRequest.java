@@ -241,9 +241,10 @@ public class RoutingRequest implements Cloneable, Serializable {
    */
   public boolean arriveBy = false;
   /**
-   * Whether the trip must be wheelchair accessible.
+   * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
    */
-  public boolean wheelchairAccessible = false;
+  public WheelchairAccessibilityRequest wheelchairAccessibility =
+    WheelchairAccessibilityRequest.DEFAULT;
   /**
    * The maximum number of itineraries to return. In OTP1 this parameter terminates the search, but
    * in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is a post
@@ -257,6 +258,13 @@ public class RoutingRequest implements Cloneable, Serializable {
   public int numItineraries = 50;
   /** The maximum slope of streets for wheelchair trips. */
   public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+
+  /**
+   * What penalty factor should be given to street edges, which are over the max slope.
+   * Set to negative for disable routing on too steep edges.
+   */
+  public double wheelchairSlopeTooSteepCostFactor = 10.0;
+
   /** Whether the planner should return intermediate stops lists for transit legs. */
   public boolean showIntermediateStops = false;
   /**
@@ -714,10 +722,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.modes = modes;
   }
 
-  public boolean transitAllowed() {
-    return streetSubRequestModes.isTransit();
-  }
-
   public void setArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
   }
@@ -734,8 +738,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.bicycleOptimizeType = bicycleOptimizeType;
   }
 
-  public void setWheelchairAccessible(boolean wheelchairAccessible) {
-    this.wheelchairAccessible = wheelchairAccessible;
+  public void setWheelchairAccessible(boolean wheelchair) {
+    this.wheelchairAccessibility = this.wheelchairAccessibility.withEnabled(wheelchair);
   }
 
   public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {

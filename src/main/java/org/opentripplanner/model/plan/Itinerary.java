@@ -56,7 +56,26 @@ public class Itinerary {
    * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6,
    * then walks to their destination, has four legs.
    */
-  public final List<Leg> legs;
+  public List<Leg> legs;
+
+  /**
+   * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
+   * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
+   * guidance that expresses certainty or uncertainty about the accessibility.
+   * <p>
+   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the
+   * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
+   * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
+   * street traversal.
+   * <p>
+   * The intended audience for this score are frontend developers wanting to show a simple UI rather
+   * than having to iterate over all the stops and trips.
+   * <p>
+   * Note: the information to calculate this score are all available to the frontend, however
+   * calculating them on the backend makes life a little easier and changes are automatically
+   * applied to all frontends.
+   */
+  public Float accessibilityScore;
   /**
    * How much time is spent walking/biking/driving, in seconds.
    */
@@ -101,11 +120,17 @@ public class Itinerary {
    * -1 indicate that the cost is not set/computed.
    */
   public int transferPriorityCost = -1;
+
   /**
-   * This itinerary has a greater slope than the user requested (but there are no possible
-   * itineraries with a good slope).
+   * This itinerary has a greater slope than the user requested.
    */
   public boolean tooSloped = false;
+
+  /**
+   * The maximum slope for any part of the itinerary.
+   */
+  public Double maxSlope = null;
+
   /**
    * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.
@@ -242,7 +267,9 @@ public class Itinerary {
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
-    return new Itinerary(timeShiftedLegs);
+    var newItin = new Itinerary(timeShiftedLegs);
+    newItin.generalizedCost = generalizedCost;
+    return newItin;
   }
 
   /** @see #equals(Object) */

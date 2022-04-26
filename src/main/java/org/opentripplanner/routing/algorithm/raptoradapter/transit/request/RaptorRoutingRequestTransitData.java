@@ -10,6 +10,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransfe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.WheelchairCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -70,6 +71,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transferService = transferService;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
+    var accessibility = routingContext.opt.wheelchairAccessibility;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
@@ -86,11 +88,23 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       );
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(patternIndex);
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
-    this.generalizedCostCalculator =
-      new DefaultCostCalculator(
-        McCostParamsMapper.map(routingContext.opt),
-        transitLayer.getStopIndex().stopBoardAlightCosts
-      );
+
+    var mcCostParams = McCostParamsMapper.map(routingContext.opt);
+    var defaultCostCalculator = new DefaultCostCalculator(
+      mcCostParams,
+      transitLayer.getStopIndex().stopBoardAlightCosts
+    );
+
+    if (accessibility.enabled()) {
+      this.generalizedCostCalculator =
+        new WheelchairCostCalculator(
+          defaultCostCalculator,
+          mcCostParams.accessibilityRequirements()
+        );
+    } else {
+      this.generalizedCostCalculator = defaultCostCalculator;
+    }
+
     this.validTransitDataStartTime =
       DateMapper.secondsSinceStartOfTime(
         this.transitSearchTimeZero,

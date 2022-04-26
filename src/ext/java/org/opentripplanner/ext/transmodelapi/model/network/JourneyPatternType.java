@@ -9,12 +9,16 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.LocalDate;
 import java.util.BitSet;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class JourneyPatternType {
@@ -82,15 +86,17 @@ public class JourneyPatternType {
             BitSet services = GqlUtil
               .getRoutingService(environment)
               .getServicesRunningForDate(
-                gqlUtil.serviceDateMapper.secondsSinceEpochToServiceDate(
-                  environment.getArgument("date")
-                )
+                Optional
+                  .ofNullable((LocalDate) environment.getArgument("date"))
+                  .map(ServiceDate::new)
+                  .orElse(new ServiceDate(LocalDate.now()))
               );
+
             return ((TripPattern) environment.getSource()).getScheduledTimetable()
               .getTripTimes()
               .stream()
               .filter(times -> services.get(times.getServiceCode()))
-              .map(times -> times.getTrip())
+              .map(TripTimes::getTrip)
               .collect(Collectors.toList());
           })
           .build()

@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
+import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
