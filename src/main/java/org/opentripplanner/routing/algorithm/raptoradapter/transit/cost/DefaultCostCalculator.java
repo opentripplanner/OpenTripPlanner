@@ -205,10 +205,8 @@ public final class DefaultCostCalculator implements CostCalculator {
 
       int cost = waitFactor * boardWaitTime;
 
-      // If it's first boarding event then it is not a transfer
-      if (stopTransferCost != null && !firstBoarding) {
-        cost += stopTransferCost[boardStop];
-      }
+// StopTransferCost is NOT added to the cost here. This is because a trip-to-trip constrained transfer take
+// precedence over stop-to-stop transfer priority (NeTEx station transfer priority).  
       return cost;
     }
     // fallback to regular transfer
