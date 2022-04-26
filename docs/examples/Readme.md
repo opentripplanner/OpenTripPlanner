@@ -5,9 +5,10 @@ share just add it here.
 
 ## Examples
 
-| Name  | Organisation  | Description                                    |
-|-------|---------------|------------------------------------------------|
-| entur | Entur, Norway | Deployment Configuration with NeTEX input data |
+| Name  | Organisation   | Description                                                                 |
+|-------|----------------|-----------------------------------------------------------------------------|
+| entur | Entur, Norway  | Deployment Configuration with NeTEX input data                              |
+| ibi   | IBI Group, USA | Allow routing for wheelchair users even if accessibility data is incomplete |
 
 ## Support
 

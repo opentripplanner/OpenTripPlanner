@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -84,7 +85,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       rr -> {
         rr.from = new GenericLocation(47.5010, 19.03);
         rr.to = new GenericLocation(47.5010, 19.03);
-        rr.wheelchairAccessible = true;
+        rr.wheelchairAccessibility = WheelchairAccessibilityRequest.makeDefault(true);
       },
       "C1C2 street",
       "C1C2 street",

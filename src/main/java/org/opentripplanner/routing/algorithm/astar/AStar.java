@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.astar;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;

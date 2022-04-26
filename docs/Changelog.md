@@ -41,6 +41,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix problem with submode filter [#4093](https://github.com/opentripplanner/OpenTripPlanner/pull/4093)
 - Make maxWheelchairSlope not a hard cut-off, but apply a cost instead [#4088](https://github.com/opentripplanner/OpenTripPlanner/pull/4088)
 - Expose Leg.serviceDate in trip end-point [#4096](https://github.com/opentripplanner/OpenTripPlanner/pull/4096)
+- Add cost-based wheelchair-accessible routing [#4045](https://github.com/opentripplanner/OpenTripPlanner/pull/4045)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

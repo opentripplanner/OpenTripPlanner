@@ -1,6 +1,6 @@
 package org.opentripplanner.api.parameter;
 
-import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.Sets;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
