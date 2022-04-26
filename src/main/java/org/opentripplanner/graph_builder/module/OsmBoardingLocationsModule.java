@@ -94,16 +94,17 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
     for (Vertex v : vertices) {
-      if (!(v instanceof OsmBoardingLocationVertex tsv)) {
+      if (!(v instanceof OsmBoardingLocationVertex osmVertex)) {
         continue;
       }
 
       if (
-        (stopCode != null && tsv.references.contains(stopCode)) || tsv.references.contains(stopId)
+        (stopCode != null && osmVertex.references.contains(stopCode)) ||
+        osmVertex.references.contains(stopId)
       ) {
-        if (tsv.isAlreadyLinked) {
+        if (osmVertex.isConnectedToStreetNetwork()) {
           linker.linkVertexPermanently(
-            tsv,
+            osmVertex,
             new TraverseModeSet(TraverseMode.WALK),
             LinkingDirection.BOTH_WAYS,
             (vertex, streetVertex) ->
@@ -113,9 +114,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
               )
           );
         } else {
-          new StreetTransitStopLink(ts, tsv);
-          new StreetTransitStopLink(tsv, ts);
-          LOG.trace("Connected " + ts + " to " + tsv.getLabel());
+          new StreetTransitStopLink(ts, osmVertex);
+          new StreetTransitStopLink(osmVertex, ts);
         }
         return true;
       }

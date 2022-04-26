@@ -20,11 +20,6 @@ public class OsmBoardingLocationVertex extends OsmVertex {
 
   public final Set<String> references;
 
-  /**
-   * area centroids need to be linked separately
-   */
-  public final boolean isAlreadyLinked;
-
   public OsmBoardingLocationVertex(
     Graph g,
     String label,
@@ -32,12 +27,14 @@ public class OsmBoardingLocationVertex extends OsmVertex {
     double y,
     long nodeId,
     @Nullable String name,
-    Collection<String> references,
-    boolean isAlreadyLinked
+    Collection<String> references
   ) {
     super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
     this.references = Set.copyOf(references);
-    this.isAlreadyLinked = isAlreadyLinked;
+  }
+
+  public boolean isConnectedToStreetNetwork() {
+    return (getOutgoing().size() + getIncoming().size()) > 0;
   }
 
   @Override

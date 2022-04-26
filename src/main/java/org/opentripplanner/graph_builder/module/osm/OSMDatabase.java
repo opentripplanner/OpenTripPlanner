@@ -881,9 +881,9 @@ public class OSMDatabase {
       bikeParkingAreas.add(area);
     }
     if (
-      area.parent.isBoardingLocation() && !area.parent.getTagValues(boardingAreaRefTags).isEmpty()
+      area.parent.isBoardingLocation() &&
+      !area.parent.getMultiTagValues(boardingAreaRefTags).isEmpty()
     ) {
-      System.out.println(area.parent.getOpenStreetMapLink());
       boardingLocationAreas.add(area);
     }
   }

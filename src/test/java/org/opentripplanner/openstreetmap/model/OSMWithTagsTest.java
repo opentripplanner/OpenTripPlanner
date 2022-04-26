@@ -117,8 +117,8 @@ public class OSMWithTagsTest {
     var osm = new OSMWithTags();
     osm.addTag("ref", "A");
 
-    assertEquals(List.of("A"), osm.getTagValues(Set.of("ref", "test")));
-    assertEquals(List.of(), osm.getTagValues(Set.of("test")));
+    assertEquals(Set.of("A"), osm.getMultiTagValues(Set.of("ref", "test")));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("test")));
   }
 
   @Test
@@ -126,7 +126,7 @@ public class OSMWithTagsTest {
     var osm = new OSMWithTags();
     osm.addTag("ref", "A");
 
-    assertEquals(List.of(), osm.getTagValues(Set.of()));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of()));
   }
 
   @Test
@@ -134,7 +134,15 @@ public class OSMWithTagsTest {
     var osm = new OSMWithTags();
     osm.addTag("ref:IFOPT", "A");
 
-    assertEquals(List.of("A"), osm.getTagValues(Set.of("ref:ifopt")));
+    assertEquals(Set.of("A"), osm.getMultiTagValues(Set.of("ref:ifopt")));
+  }
+
+  @Test
+  public void readSemicolonSeparated() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref:A", "A;A;B");
+
+    assertEquals(Set.of("A", "B"), osm.getMultiTagValues(Set.of("ref:A")));
   }
 
   @Test
@@ -143,7 +151,7 @@ public class OSMWithTagsTest {
     osm.addTag("ref1", " ");
     osm.addTag("ref2", "");
 
-    assertEquals(List.of(), osm.getTagValues(Set.of("ref1")));
-    assertEquals(List.of(), osm.getTagValues(Set.of("ref2")));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref1")));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref2")));
   }
 }

@@ -2,7 +2,6 @@ package org.opentripplanner.openstreetmap.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -355,9 +354,8 @@ public class OSMWithTags {
    * Returns all non-empty values of the tags passed in as input values.
    *
    * Values are split by semicolons.
-   *
    */
-  public Set<String> getTagValues(Set<String> refTags) {
+  public Set<String> getMultiTagValues(Set<String> refTags) {
     return refTags
       .stream()
       .map(this::getTag)

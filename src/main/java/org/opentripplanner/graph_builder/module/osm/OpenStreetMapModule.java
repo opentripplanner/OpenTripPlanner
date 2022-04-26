@@ -389,8 +389,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 coordinate.y,
                 nid,
                 name,
-                Set.of(ref),
-                false
+                Set.of(ref)
               );
           }
         }
@@ -506,7 +505,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       osmdb
         .getBoardingLocationAreas()
         .forEach(bl -> {
-          var references = bl.parent.getTagValues(boardingAreaRefTags);
+          var references = bl.parent.getMultiTagValues(boardingAreaRefTags);
           var centroid = bl.jtsMultiPolygon.getCentroid();
           if (!references.isEmpty() && !centroid.isEmpty()) {
             var label = "platform-centroid/osm/%s".formatted(bl.parent.getId());
@@ -518,8 +517,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               centroid.getY(),
               bl.parent.getId(),
               bl.parent.getTag("name"),
-              references,
-              true
+              references
             );
           }
         });
