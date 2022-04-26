@@ -172,7 +172,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
     .arrivals(VERY_EARLY, L31_END)
     .departures(L31_START, VERY_LATE)
     .build();
-
   public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
