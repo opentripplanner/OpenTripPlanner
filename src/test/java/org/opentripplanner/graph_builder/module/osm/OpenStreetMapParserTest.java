@@ -35,7 +35,7 @@ public class OpenStreetMapParserTest {
     assertTrue(nodeA.hasTag("railway"));
     assertEquals("level_crossing", nodeA.getTag("railway"));
 
-    assertEquals(545, osmdb.wayCount());
+    assertEquals(544, osmdb.wayCount());
 
     OSMWay wayA = osmdb.getWay(13490353L);
     assertEquals(13490353, wayA.getId());
