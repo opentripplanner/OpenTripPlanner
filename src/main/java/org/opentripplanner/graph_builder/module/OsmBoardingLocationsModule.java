@@ -135,12 +135,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   private void linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
+    var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
     new StreetEdge(
       from,
       to,
-      GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate())),
+      line,
       "link",
-      100,
+      SphericalDistanceLibrary.length(line),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       false
     );
