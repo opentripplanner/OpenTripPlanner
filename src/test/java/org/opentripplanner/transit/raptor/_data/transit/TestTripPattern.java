@@ -1,21 +1,30 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 public class TestTripPattern implements RaptorTripPattern {
-  public static final byte BOARDING_MASK   = 0b0001;
-  public static final byte ALIGHTING_MASK  = 0b0010;
+
+  public static final byte BOARDING_MASK = 0b0001;
+  public static final byte ALIGHTING_MASK = 0b0010;
   public static final byte WHEELCHAIR_MASK = 0b0100;
 
   private final String name;
   private final int[] stopIndexes;
+  /**
+   * By caching the index, we avoid looking up the pattern during routing, this reduces memory lookups and
+   * improves the performance.
+   */
+  private int slackIndex = 0;
 
   /**
+   * <pre>
    * 0 - 000 : No restriction
-   * 1 - 001 : No Boarding.
-   * 2 - 010 : No Alighting.
-   * 4 - 100 : No wheelchair.
+   * 1 - 001 : No Boarding
+   * 2 - 010 : No Alighting
+   * 4 - 100 : No wheelchair
+   * </pre>
    */
   private final int[] restrictions;
 
@@ -25,16 +34,22 @@ public class TestTripPattern implements RaptorTripPattern {
     this.restrictions = restrictions;
   }
 
-  public static TestTripPattern pattern(String name, int ... stopIndexes) {
+  public static TestTripPattern pattern(String name, int... stopIndexes) {
     return new TestTripPattern(name, stopIndexes, new int[stopIndexes.length]);
   }
 
   /** Create a pattern with name 'R1' and given stop indexes */
-  public static TestTripPattern pattern(int ... stopIndexes) {
+  public static TestTripPattern pattern(int... stopIndexes) {
     return new TestTripPattern("R1", stopIndexes, new int[stopIndexes.length]);
   }
 
+  public TestTripPattern withSlackIndex(int index) {
+    this.slackIndex = index;
+    return this;
+  }
+
   /**
+   * <pre>
    * Codes:
    *   B : Board
    *   A : Alight
@@ -42,6 +57,7 @@ public class TestTripPattern implements RaptorTripPattern {
    *   * : Board, Alight, Wheelchair
    *
    * Example:   B BA * AW
+   * </pre>
    */
   public void restrictions(String codes) {
     String[] split = codes.split(" ");
@@ -67,7 +83,8 @@ public class TestTripPattern implements RaptorTripPattern {
     return name;
   }
 
-  @Override public int stopIndex(int stopPositionInPattern) {
+  @Override
+  public int stopIndex(int stopPositionInPattern) {
     return stopIndexes[stopPositionInPattern];
   }
 
@@ -82,18 +99,28 @@ public class TestTripPattern implements RaptorTripPattern {
   }
 
   @Override
-  public int numberOfStopsInPattern() { return stopIndexes.length; }
+  public int slackIndex() {
+    return slackIndex;
+  }
 
   @Override
-  public String debugInfo() { return "BUS " + name; }
+  public int numberOfStopsInPattern() {
+    return stopIndexes.length;
+  }
+
+  @Override
+  public String debugInfo() {
+    return "BUS " + name;
+  }
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(TestTripPattern.class)
-            .addStr("name", name)
-            .addInts("stops", stopIndexes)
-            .addInts("restrictions", restrictions)
-            .toString();
+    return ToStringBuilder
+      .of(TestTripPattern.class)
+      .addStr("name", name)
+      .addInts("stops", stopIndexes)
+      .addInts("restrictions", restrictions)
+      .toString();
   }
 
   private boolean isNotRestricted(int index, int mask) {

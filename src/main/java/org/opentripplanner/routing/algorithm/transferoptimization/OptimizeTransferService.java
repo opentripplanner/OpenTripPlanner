@@ -10,25 +10,26 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class OptimizeTransferService<T extends RaptorTripSchedule> {
 
   private static final Logger LOG = LoggerFactory.getLogger(OptimizeTransferService.class);
+  private static final Logger OPTIMIZATION_FAILED_LOG = ThrottleLogger.throttle(LOG);
 
   private final OptimizePathDomainService<T> optimizePathDomainService;
   private final MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator;
   private final TransferWaitTimeCostCalculator transferWaitTimeCostCalculator;
 
   public OptimizeTransferService(
-          OptimizePathDomainService<T> optimizePathDomainService,
-          MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator,
-          TransferWaitTimeCostCalculator transferWaitTimeCostCalculator
+    OptimizePathDomainService<T> optimizePathDomainService,
+    MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator,
+    TransferWaitTimeCostCalculator transferWaitTimeCostCalculator
   ) {
     this.optimizePathDomainService = optimizePathDomainService;
     this.minSafeTransferTimeCalculator = minSafeTransferTimeCalculator;
@@ -52,7 +53,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
       results.addAll(optimize(path));
     }
 
-    if(LOG.isDebugEnabled()) {
+    if (LOG.isDebugEnabled()) {
       LOG.debug("Optimized transfers done in {} ms.", System.currentTimeMillis() - start);
       PathDiff.logDiff("RAPTOR", paths, "OPT", results, false, false, LOG::debug);
     }
@@ -66,7 +67,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
   private void setup(Collection<Path<T>> paths) {
     if (transferWaitTimeCostCalculator != null) {
       transferWaitTimeCostCalculator.setMinSafeTransferTime(
-              minSafeTransferTimeCalculator.minSafeTransferTime(paths)
+        minSafeTransferTimeCalculator.minSafeTransferTime(paths)
       );
     }
   }
@@ -80,6 +81,16 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
     if (path.numberOfTransfersExAccessEgress() == 0) {
       return List.of(new OptimizedPath<>(path));
     }
-    return optimizePathDomainService.findBestTransitPath(path);
+    try {
+      return optimizePathDomainService.findBestTransitPath(path);
+    } catch (RuntimeException e) {
+      OPTIMIZATION_FAILED_LOG.error(
+        "Unable to optimize transfers in path. Details: {}, path: {}",
+        e.getMessage(),
+        path,
+        e
+      );
+      return List.of(new OptimizedPath<>(path));
+    }
   }
 }

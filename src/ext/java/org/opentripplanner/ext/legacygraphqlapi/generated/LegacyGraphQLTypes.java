@@ -7,2335 +7,3009 @@ import java.util.stream.Collectors;
 
 public class LegacyGraphQLTypes {
 
-    public static class LegacyGraphQLAgencyAlertsArgs {
-
-        private Iterable<LegacyGraphQLAgencyAlertType> types;
-
-        public LegacyGraphQLAgencyAlertsArgs(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("types") != null) {
-                    this.types = ((List<Object>) args.get("types")).stream()
-                            .map(item -> item instanceof LegacyGraphQLAgencyAlertType
-                                    ? item
-                                    : LegacyGraphQLAgencyAlertType.valueOf((String) item))
-                            .map(LegacyGraphQLAgencyAlertType.class::cast)
-                            .collect(Collectors.toList());
-                }
-            }
-        }
+  /**
+   * Entities, which are relevant for an agency and can contain alerts
+   */
+  public enum LegacyGraphQLAgencyAlertType {
+    AGENCY,
+    ROUTES,
+    ROUTE_TYPES,
+  }
+
+  /**
+   * Cause of a alert
+   */
+  public enum LegacyGraphQLAlertCauseType {
+    ACCIDENT,
+    CONSTRUCTION,
+    DEMONSTRATION,
+    HOLIDAY,
+    MAINTENANCE,
+    MEDICAL_EMERGENCY,
+    OTHER_CAUSE,
+    POLICE_ACTIVITY,
+    STRIKE,
+    TECHNICAL_PROBLEM,
+    UNKNOWN_CAUSE,
+    WEATHER,
+  }
+
+  /**
+   * Effect of a alert
+   */
+  public enum LegacyGraphQLAlertEffectType {
+    ACCESSIBILITY_ISSUE,
+    ADDITIONAL_SERVICE,
+    DETOUR,
+    MODIFIED_SERVICE,
+    NO_EFFECT,
+    NO_SERVICE,
+    OTHER_EFFECT,
+    REDUCED_SERVICE,
+    SIGNIFICANT_DELAYS,
+    STOP_MOVED,
+    UNKNOWN_EFFECT,
+  }
+
+  /**
+   * Severity level of a alert
+   */
+  public enum LegacyGraphQLAlertSeverityLevelType {
+    INFO,
+    SEVERE,
+    UNKNOWN_SEVERITY,
+    WARNING,
+  }
+
+  public enum LegacyGraphQLBikesAllowed {
+    ALLOWED,
+    NOT_ALLOWED,
+    NO_INFORMATION,
+  }
+
+  /**
+   * Entities, which are relevant for a feed and can contain alerts
+   */
+  public enum LegacyGraphQLFeedAlertType {
+    AGENCIES,
+    ROUTE_TYPES,
+  }
+
+  public enum LegacyGraphQLFilterPlaceType {
+    BICYCLE_RENT,
+    BIKE_PARK,
+    CAR_PARK,
+    DEPARTURE_ROW,
+    STOP,
+  }
+
+  public enum LegacyGraphQLFormFactor {
+    BICYCLE,
+    CAR,
+    MOPED,
+    OTHER,
+    SCOOTER,
+  }
+
+  /**
+   * Identifies whether this stop represents a stop or station.
+   */
+  public enum LegacyGraphQLLocationType {
+    ENTRANCE,
+    STATION,
+    STOP,
+  }
+
+  public enum LegacyGraphQLMode {
+    AIRPLANE,
+    BICYCLE,
+    BUS,
+    CABLE_CAR,
+    CAR,
+    COACH,
+    FERRY,
+    FLEX,
+    FLEXIBLE,
+    FUNICULAR,
+    GONDOLA,
+    LEG_SWITCH,
+    RAIL,
+    SCOOTER,
+    SUBWAY,
+    TRAM,
+    TRANSIT,
+    WALK,
+  }
+
+  /**
+   * Optimization type for bicycling legs
+   */
+  public enum LegacyGraphQLOptimizeType {
+    FLAT,
+    GREENWAYS,
+    QUICK,
+    SAFE,
+    TRIANGLE,
+  }
+
+  /**
+   * Entities, which are relevant for a pattern and can contain alerts
+   */
+  public enum LegacyGraphQLPatternAlertType {
+    AGENCY,
+    PATTERN,
+    ROUTE,
+    ROUTE_TYPE,
+    STOPS_ON_PATTERN,
+    STOPS_ON_TRIPS,
+    TRIPS,
+  }
+
+  public enum LegacyGraphQLPickupDropoffType {
+    CALL_AGENCY,
+    COORDINATE_WITH_DRIVER,
+    NONE,
+    SCHEDULED,
+  }
+
+  public enum LegacyGraphQLPropulsionType {
+    COMBUSTION,
+    ELECTRIC,
+    ELECTRIC_ASSIST,
+    HUMAN,
+  }
+
+  /**
+   * Additional qualifier for a transport mode. Note that qualifiers can only be used with certain
+   * transport modes.
+   */
+  public enum LegacyGraphQLQualifier {
+    ACCESS,
+    DIRECT,
+    DROPOFF,
+    EGRESS,
+    HAVE,
+    KEEP,
+    PARK,
+    PICKUP,
+    RENT,
+  }
+
+  public enum LegacyGraphQLRealtimeState {
+    ADDED,
+    CANCELED,
+    MODIFIED,
+    SCHEDULED,
+    UPDATED,
+  }
+
+  /**
+   * Entities that are relevant for routes that can contain alerts
+   */
+  public enum LegacyGraphQLRouteAlertType {
+    AGENCY,
+    PATTERNS,
+    ROUTE,
+    ROUTE_TYPE,
+    STOPS_ON_ROUTE,
+    STOPS_ON_TRIPS,
+    TRIPS,
+  }
+
+  /**
+   * Entities, which are relevant for a stop and can contain alerts
+   */
+  public enum LegacyGraphQLStopAlertType {
+    AGENCIES_OF_ROUTES,
+    PATTERNS,
+    ROUTES,
+    STOP,
+    STOP_ON_ROUTES,
+    STOP_ON_TRIPS,
+    TRIPS,
+  }
+
+  /**
+   * Entities, which are relevant for a trip and can contain alerts
+   */
+  public enum LegacyGraphQLTripAlertType {
+    AGENCY,
+    PATTERN,
+    ROUTE,
+    ROUTE_TYPE,
+    STOPS_ON_TRIP,
+    TRIP,
+  }
+
+  /**
+   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that
+   * they may be represented differently to the user.
+   */
+  public enum LegacyGraphQLVehicleParkingState {
+    CLOSED,
+    OPERATIONAL,
+    TEMPORARILY_CLOSED,
+  }
+
+  public enum LegacyGraphQLVehicleStopStatus {
+    INCOMING_AT,
+    IN_TRANSIT_TO,
+    STOPPED_AT,
+  }
+
+  public enum LegacyGraphQLVertexType {
+    BIKEPARK,
+    BIKESHARE,
+    NORMAL,
+    PARKANDRIDE,
+    TRANSIT,
+  }
+
+  public enum LegacyGraphQLWheelchairBoarding {
+    NOT_POSSIBLE,
+    NO_INFORMATION,
+    POSSIBLE,
+  }
+
+  public static class LegacyGraphQLAgencyAlertsArgs {
+
+    private Iterable<LegacyGraphQLAgencyAlertType> types;
+
+    public LegacyGraphQLAgencyAlertsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("types") != null) {
+          this.types =
+            ((List<Object>) args.get("types")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLAgencyAlertType
+                  ? item
+                  : LegacyGraphQLAgencyAlertType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLAgencyAlertType.class::cast)
+              .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public Iterable<LegacyGraphQLAgencyAlertType> getLegacyGraphQLTypes() {
+      return this.types;
+    }
+
+    public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLAgencyAlertType> types) {
+      this.types = types;
+    }
+  }
+
+  public static class LegacyGraphQLBikeParkOpeningHoursArgs {
+
+    private Iterable<String> dates;
+
+    public LegacyGraphQLBikeParkOpeningHoursArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.dates = (Iterable<String>) args.get("dates");
+      }
+    }
+
+    public Iterable<String> getLegacyGraphQLDates() {
+      return this.dates;
+    }
+
+    public void setLegacyGraphQLDates(Iterable<String> dates) {
+      this.dates = dates;
+    }
+  }
+
+  public static class LegacyGraphQLCarParkOpeningHoursArgs {
+
+    private Iterable<String> dates;
+
+    public LegacyGraphQLCarParkOpeningHoursArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.dates = (Iterable<String>) args.get("dates");
+      }
+    }
+
+    public Iterable<String> getLegacyGraphQLDates() {
+      return this.dates;
+    }
+
+    public void setLegacyGraphQLDates(Iterable<String> dates) {
+      this.dates = dates;
+    }
+  }
+
+  public static class LegacyGraphQLDepartureRowStoptimesArgs {
+
+    private Integer numberOfDepartures;
+    private Boolean omitCanceled;
+    private Boolean omitNonPickups;
+    private Long startTime;
+    private Integer timeRange;
+
+    public LegacyGraphQLDepartureRowStoptimesArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
+        this.omitCanceled = (Boolean) args.get("omitCanceled");
+        this.omitNonPickups = (Boolean) args.get("omitNonPickups");
+        this.startTime = (Long) args.get("startTime");
+        this.timeRange = (Integer) args.get("timeRange");
+      }
+    }
+
+    public Integer getLegacyGraphQLNumberOfDepartures() {
+      return this.numberOfDepartures;
+    }
 
-        public Iterable<LegacyGraphQLAgencyAlertType> getLegacyGraphQLTypes() {return this.types;}
+    public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
+      this.numberOfDepartures = numberOfDepartures;
+    }
 
-        public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLAgencyAlertType> types) {
-            this.types = types;
-        }
+    public Boolean getLegacyGraphQLOmitCanceled() {
+      return this.omitCanceled;
     }
 
-    /**
-     * Entities, which are relevant for an agency and can contain alerts
-     */
-    public enum LegacyGraphQLAgencyAlertType {
-        AGENCY,
-        ROUTES,
-        ROUTE_TYPES
-
-    }
-
-
-    /**
-     * Cause of a alert
-     */
-    public enum LegacyGraphQLAlertCauseType {
-        ACCIDENT,
-        CONSTRUCTION,
-        DEMONSTRATION,
-        HOLIDAY,
-        MAINTENANCE,
-        MEDICAL_EMERGENCY,
-        OTHER_CAUSE,
-        POLICE_ACTIVITY,
-        STRIKE,
-        TECHNICAL_PROBLEM,
-        UNKNOWN_CAUSE,
-        WEATHER
-
-    }
-
-    /**
-     * Effect of a alert
-     */
-    public enum LegacyGraphQLAlertEffectType {
-        ACCESSIBILITY_ISSUE,
-        ADDITIONAL_SERVICE,
-        DETOUR,
-        MODIFIED_SERVICE,
-        NO_EFFECT,
-        NO_SERVICE,
-        OTHER_EFFECT,
-        REDUCED_SERVICE,
-        SIGNIFICANT_DELAYS,
-        STOP_MOVED,
-        UNKNOWN_EFFECT
-
-    }
-
-    /**
-     * Severity level of a alert
-     */
-    public enum LegacyGraphQLAlertSeverityLevelType {
-        INFO,
-        SEVERE,
-        UNKNOWN_SEVERITY,
-        WARNING
-
-    }
-
-    public static class LegacyGraphQLBikeParkOpeningHoursArgs {
-
-        private Iterable<String> dates;
-
-        public LegacyGraphQLBikeParkOpeningHoursArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.dates = (Iterable<String>) args.get("dates");
-            }
-        }
+    public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
+      this.omitCanceled = omitCanceled;
+    }
 
-        public Iterable<String> getLegacyGraphQLDates() {return this.dates;}
+    public Boolean getLegacyGraphQLOmitNonPickups() {
+      return this.omitNonPickups;
+    }
 
-        public void setLegacyGraphQLDates(Iterable<String> dates) {this.dates = dates;}
+    public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
+      this.omitNonPickups = omitNonPickups;
     }
 
+    public Long getLegacyGraphQLStartTime() {
+      return this.startTime;
+    }
 
-    public enum LegacyGraphQLBikesAllowed {
-        ALLOWED,
-        NOT_ALLOWED,
-        NO_INFORMATION
+    public void setLegacyGraphQLStartTime(Long startTime) {
+      this.startTime = startTime;
+    }
 
+    public Integer getLegacyGraphQLTimeRange() {
+      return this.timeRange;
     }
 
+    public void setLegacyGraphQLTimeRange(Integer timeRange) {
+      this.timeRange = timeRange;
+    }
+  }
 
-    public static class LegacyGraphQLCarParkOpeningHoursArgs {
+  public static class LegacyGraphQLFeedAlertsArgs {
 
-        private Iterable<String> dates;
+    private Iterable<LegacyGraphQLFeedAlertType> types;
 
-        public LegacyGraphQLCarParkOpeningHoursArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.dates = (Iterable<String>) args.get("dates");
-            }
+    public LegacyGraphQLFeedAlertsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("types") != null) {
+          this.types =
+            ((List<Object>) args.get("types")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLFeedAlertType
+                  ? item
+                  : LegacyGraphQLFeedAlertType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLFeedAlertType.class::cast)
+              .collect(Collectors.toList());
         }
-
-        public Iterable<String> getLegacyGraphQLDates() {return this.dates;}
+      }
+    }
 
-        public void setLegacyGraphQLDates(Iterable<String> dates) {this.dates = dates;}
+    public Iterable<LegacyGraphQLFeedAlertType> getLegacyGraphQLTypes() {
+      return this.types;
     }
 
+    public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLFeedAlertType> types) {
+      this.types = types;
+    }
+  }
 
-    public static class LegacyGraphQLDepartureRowStoptimesArgs {
+  public static class LegacyGraphQLInputBannedInput {
 
-        private Integer numberOfDepartures;
-        private Boolean omitCanceled;
-        private Boolean omitNonPickups;
-        private Long startTime;
-        private Integer timeRange;
+    private String agencies;
+    private String routes;
+    private String stops;
+    private String stopsHard;
+    private String trips;
 
-        public LegacyGraphQLDepartureRowStoptimesArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
-                this.omitCanceled = (Boolean) args.get("omitCanceled");
-                this.omitNonPickups = (Boolean) args.get("omitNonPickups");
-                this.startTime = (Long) args.get("startTime");
-                this.timeRange = (Integer) args.get("timeRange");
-            }
-        }
+    public LegacyGraphQLInputBannedInput(Map<String, Object> args) {
+      if (args != null) {
+        this.agencies = (String) args.get("agencies");
+        this.routes = (String) args.get("routes");
+        this.stops = (String) args.get("stops");
+        this.stopsHard = (String) args.get("stopsHard");
+        this.trips = (String) args.get("trips");
+      }
+    }
 
-        public Integer getLegacyGraphQLNumberOfDepartures() {return this.numberOfDepartures;}
+    public String getLegacyGraphQLAgencies() {
+      return this.agencies;
+    }
 
-        public Boolean getLegacyGraphQLOmitCanceled() {return this.omitCanceled;}
+    public void setLegacyGraphQLAgencies(String agencies) {
+      this.agencies = agencies;
+    }
 
-        public Boolean getLegacyGraphQLOmitNonPickups() {return this.omitNonPickups;}
+    public String getLegacyGraphQLRoutes() {
+      return this.routes;
+    }
 
-        public Long getLegacyGraphQLStartTime() {return this.startTime;}
+    public void setLegacyGraphQLRoutes(String routes) {
+      this.routes = routes;
+    }
 
-        public Integer getLegacyGraphQLTimeRange() {return this.timeRange;}
+    public String getLegacyGraphQLStops() {
+      return this.stops;
+    }
 
-        public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
-            this.numberOfDepartures = numberOfDepartures;
-        }
+    public void setLegacyGraphQLStops(String stops) {
+      this.stops = stops;
+    }
 
-        public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
-            this.omitCanceled = omitCanceled;
-        }
+    public String getLegacyGraphQLStopsHard() {
+      return this.stopsHard;
+    }
 
-        public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
-            this.omitNonPickups = omitNonPickups;
-        }
+    public void setLegacyGraphQLStopsHard(String stopsHard) {
+      this.stopsHard = stopsHard;
+    }
 
-        public void setLegacyGraphQLStartTime(Long startTime) {this.startTime = startTime;}
+    public String getLegacyGraphQLTrips() {
+      return this.trips;
+    }
 
-        public void setLegacyGraphQLTimeRange(Integer timeRange) {this.timeRange = timeRange;}
+    public void setLegacyGraphQLTrips(String trips) {
+      this.trips = trips;
     }
+  }
 
-    public static class LegacyGraphQLFeedAlertsArgs {
+  public static class LegacyGraphQLInputCoordinatesInput {
 
-        private Iterable<LegacyGraphQLFeedAlertType> types;
+    private String address;
+    private Double lat;
+    private Integer locationSlack;
+    private Double lon;
 
-        public LegacyGraphQLFeedAlertsArgs(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("types") != null) {
-                    this.types = ((List<Object>) args.get("types")).stream()
-                            .map(item -> item instanceof LegacyGraphQLFeedAlertType
-                                    ? item
-                                    : LegacyGraphQLFeedAlertType.valueOf((String) item))
-                            .map(LegacyGraphQLFeedAlertType.class::cast)
-                            .collect(Collectors.toList());
-                }
-            }
-        }
+    public LegacyGraphQLInputCoordinatesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.address = (String) args.get("address");
+        this.lat = (Double) args.get("lat");
+        this.locationSlack = (Integer) args.get("locationSlack");
+        this.lon = (Double) args.get("lon");
+      }
+    }
 
-        public Iterable<LegacyGraphQLFeedAlertType> getLegacyGraphQLTypes() {return this.types;}
+    public String getLegacyGraphQLAddress() {
+      return this.address;
+    }
 
-        public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLFeedAlertType> types) {
-            this.types = types;
-        }
+    public void setLegacyGraphQLAddress(String address) {
+      this.address = address;
     }
 
-    /**
-     * Entities, which are relevant for a feed and can contain alerts
-     */
-    public enum LegacyGraphQLFeedAlertType {
-        AGENCIES,
-        ROUTE_TYPES
+    public Double getLegacyGraphQLLat() {
+      return this.lat;
+    }
 
+    public void setLegacyGraphQLLat(Double lat) {
+      this.lat = lat;
     }
 
-    public enum LegacyGraphQLFilterPlaceType {
-        BICYCLE_RENT,
-        BIKE_PARK,
-        CAR_PARK,
-        DEPARTURE_ROW,
-        STOP
+    public Integer getLegacyGraphQLLocationSlack() {
+      return this.locationSlack;
+    }
 
+    public void setLegacyGraphQLLocationSlack(Integer locationSlack) {
+      this.locationSlack = locationSlack;
     }
 
+    public Double getLegacyGraphQLLon() {
+      return this.lon;
+    }
 
-    public static class LegacyGraphQLInputBannedInput {
+    public void setLegacyGraphQLLon(Double lon) {
+      this.lon = lon;
+    }
+  }
 
-        private String agencies;
-        private String routes;
-        private String stops;
-        private String stopsHard;
-        private String trips;
+  public static class LegacyGraphQLInputFiltersInput {
 
-        public LegacyGraphQLInputBannedInput(Map<String, Object> args) {
-            if (args != null) {
-                this.agencies = (String) args.get("agencies");
-                this.routes = (String) args.get("routes");
-                this.stops = (String) args.get("stops");
-                this.stopsHard = (String) args.get("stopsHard");
-                this.trips = (String) args.get("trips");
-            }
-        }
+    private Iterable<String> bikeParks;
+    private Iterable<String> bikeRentalStations;
+    private Iterable<String> carParks;
+    private Iterable<String> routes;
+    private Iterable<String> stops;
 
-        public String getLegacyGraphQLAgencies() {return this.agencies;}
+    public LegacyGraphQLInputFiltersInput(Map<String, Object> args) {
+      if (args != null) {
+        this.bikeParks = (Iterable<String>) args.get("bikeParks");
+        this.bikeRentalStations = (Iterable<String>) args.get("bikeRentalStations");
+        this.carParks = (Iterable<String>) args.get("carParks");
+        this.routes = (Iterable<String>) args.get("routes");
+        this.stops = (Iterable<String>) args.get("stops");
+      }
+    }
 
-        public String getLegacyGraphQLRoutes() {return this.routes;}
+    public Iterable<String> getLegacyGraphQLBikeParks() {
+      return this.bikeParks;
+    }
 
-        public String getLegacyGraphQLStops() {return this.stops;}
+    public void setLegacyGraphQLBikeParks(Iterable<String> bikeParks) {
+      this.bikeParks = bikeParks;
+    }
 
-        public String getLegacyGraphQLStopsHard() {return this.stopsHard;}
+    public Iterable<String> getLegacyGraphQLBikeRentalStations() {
+      return this.bikeRentalStations;
+    }
 
-        public String getLegacyGraphQLTrips() {return this.trips;}
+    public void setLegacyGraphQLBikeRentalStations(Iterable<String> bikeRentalStations) {
+      this.bikeRentalStations = bikeRentalStations;
+    }
 
-        public void setLegacyGraphQLAgencies(String agencies) {this.agencies = agencies;}
+    public Iterable<String> getLegacyGraphQLCarParks() {
+      return this.carParks;
+    }
 
-        public void setLegacyGraphQLRoutes(String routes) {this.routes = routes;}
+    public void setLegacyGraphQLCarParks(Iterable<String> carParks) {
+      this.carParks = carParks;
+    }
 
-        public void setLegacyGraphQLStops(String stops) {this.stops = stops;}
+    public Iterable<String> getLegacyGraphQLRoutes() {
+      return this.routes;
+    }
 
-        public void setLegacyGraphQLStopsHard(String stopsHard) {this.stopsHard = stopsHard;}
+    public void setLegacyGraphQLRoutes(Iterable<String> routes) {
+      this.routes = routes;
+    }
 
-        public void setLegacyGraphQLTrips(String trips) {this.trips = trips;}
+    public Iterable<String> getLegacyGraphQLStops() {
+      return this.stops;
     }
 
-    public static class LegacyGraphQLInputCoordinatesInput {
+    public void setLegacyGraphQLStops(Iterable<String> stops) {
+      this.stops = stops;
+    }
+  }
 
-        private String address;
-        private Double lat;
-        private Integer locationSlack;
-        private Double lon;
+  public static class LegacyGraphQLInputModeWeightInput {
 
-        public LegacyGraphQLInputCoordinatesInput(Map<String, Object> args) {
-            if (args != null) {
-                this.address = (String) args.get("address");
-                this.lat = (Double) args.get("lat");
-                this.locationSlack = (Integer) args.get("locationSlack");
-                this.lon = (Double) args.get("lon");
-            }
-        }
+    private Double AIRPLANE;
+    private Double BUS;
+    private Double CABLE_CAR;
+    private Double FERRY;
+    private Double FUNICULAR;
+    private Double GONDOLA;
+    private Double RAIL;
+    private Double SUBWAY;
+    private Double TRAM;
 
-        public String getLegacyGraphQLAddress() {return this.address;}
+    public LegacyGraphQLInputModeWeightInput(Map<String, Object> args) {
+      if (args != null) {
+        this.AIRPLANE = (Double) args.get("AIRPLANE");
+        this.BUS = (Double) args.get("BUS");
+        this.CABLE_CAR = (Double) args.get("CABLE_CAR");
+        this.FERRY = (Double) args.get("FERRY");
+        this.FUNICULAR = (Double) args.get("FUNICULAR");
+        this.GONDOLA = (Double) args.get("GONDOLA");
+        this.RAIL = (Double) args.get("RAIL");
+        this.SUBWAY = (Double) args.get("SUBWAY");
+        this.TRAM = (Double) args.get("TRAM");
+      }
+    }
 
-        public Double getLegacyGraphQLLat() {return this.lat;}
+    public Double getLegacyGraphQLAirplane() {
+      return this.AIRPLANE;
+    }
 
-        public Integer getLegacyGraphQLLocationSlack() {return this.locationSlack;}
+    public void setLegacyGraphQLAirplane(Double AIRPLANE) {
+      this.AIRPLANE = AIRPLANE;
+    }
 
-        public Double getLegacyGraphQLLon() {return this.lon;}
+    public Double getLegacyGraphQLBus() {
+      return this.BUS;
+    }
 
-        public void setLegacyGraphQLAddress(String address) {this.address = address;}
+    public void setLegacyGraphQLBus(Double BUS) {
+      this.BUS = BUS;
+    }
 
-        public void setLegacyGraphQLLat(Double lat) {this.lat = lat;}
+    public Double getLegacyGraphQLCable_Car() {
+      return this.CABLE_CAR;
+    }
 
-        public void setLegacyGraphQLLocationSlack(Integer locationSlack) {
-            this.locationSlack = locationSlack;
-        }
+    public void setLegacyGraphQLCable_Car(Double CABLE_CAR) {
+      this.CABLE_CAR = CABLE_CAR;
+    }
 
-        public void setLegacyGraphQLLon(Double lon) {this.lon = lon;}
+    public Double getLegacyGraphQLFerry() {
+      return this.FERRY;
     }
 
-    public static class LegacyGraphQLInputFiltersInput {
+    public void setLegacyGraphQLFerry(Double FERRY) {
+      this.FERRY = FERRY;
+    }
 
-        private Iterable<String> bikeParks;
-        private Iterable<String> bikeRentalStations;
-        private Iterable<String> carParks;
-        private Iterable<String> routes;
-        private Iterable<String> stops;
+    public Double getLegacyGraphQLFunicular() {
+      return this.FUNICULAR;
+    }
 
-        public LegacyGraphQLInputFiltersInput(Map<String, Object> args) {
-            if (args != null) {
-                this.bikeParks = (Iterable<String>) args.get("bikeParks");
-                this.bikeRentalStations = (Iterable<String>) args.get("bikeRentalStations");
-                this.carParks = (Iterable<String>) args.get("carParks");
-                this.routes = (Iterable<String>) args.get("routes");
-                this.stops = (Iterable<String>) args.get("stops");
-            }
-        }
+    public void setLegacyGraphQLFunicular(Double FUNICULAR) {
+      this.FUNICULAR = FUNICULAR;
+    }
 
-        public Iterable<String> getLegacyGraphQLBikeParks() {return this.bikeParks;}
+    public Double getLegacyGraphQLGondola() {
+      return this.GONDOLA;
+    }
 
-        public Iterable<String> getLegacyGraphQLBikeRentalStations() {return this.bikeRentalStations;}
+    public void setLegacyGraphQLGondola(Double GONDOLA) {
+      this.GONDOLA = GONDOLA;
+    }
 
-        public Iterable<String> getLegacyGraphQLCarParks() {return this.carParks;}
+    public Double getLegacyGraphQLRail() {
+      return this.RAIL;
+    }
 
-        public Iterable<String> getLegacyGraphQLRoutes() {return this.routes;}
+    public void setLegacyGraphQLRail(Double RAIL) {
+      this.RAIL = RAIL;
+    }
 
-        public Iterable<String> getLegacyGraphQLStops() {return this.stops;}
+    public Double getLegacyGraphQLSubway() {
+      return this.SUBWAY;
+    }
 
-        public void setLegacyGraphQLBikeParks(Iterable<String> bikeParks) {
-            this.bikeParks = bikeParks;
-        }
+    public void setLegacyGraphQLSubway(Double SUBWAY) {
+      this.SUBWAY = SUBWAY;
+    }
 
-        public void setLegacyGraphQLBikeRentalStations(Iterable<String> bikeRentalStations) {
-            this.bikeRentalStations = bikeRentalStations;
-        }
+    public Double getLegacyGraphQLTram() {
+      return this.TRAM;
+    }
 
-        public void setLegacyGraphQLCarParks(Iterable<String> carParks) {this.carParks = carParks;}
-
-        public void setLegacyGraphQLRoutes(Iterable<String> routes) {this.routes = routes;}
-
-        public void setLegacyGraphQLStops(Iterable<String> stops) {this.stops = stops;}
-    }
-
-    public static class LegacyGraphQLInputModeWeightInput {
-
-        private Double AIRPLANE;
-        private Double BUS;
-        private Double CABLE_CAR;
-        private Double FERRY;
-        private Double FUNICULAR;
-        private Double GONDOLA;
-        private Double RAIL;
-        private Double SUBWAY;
-        private Double TRAM;
-
-        public LegacyGraphQLInputModeWeightInput(Map<String, Object> args) {
-            if (args != null) {
-                this.AIRPLANE = (Double) args.get("AIRPLANE");
-                this.BUS = (Double) args.get("BUS");
-                this.CABLE_CAR = (Double) args.get("CABLE_CAR");
-                this.FERRY = (Double) args.get("FERRY");
-                this.FUNICULAR = (Double) args.get("FUNICULAR");
-                this.GONDOLA = (Double) args.get("GONDOLA");
-                this.RAIL = (Double) args.get("RAIL");
-                this.SUBWAY = (Double) args.get("SUBWAY");
-                this.TRAM = (Double) args.get("TRAM");
-            }
-        }
+    public void setLegacyGraphQLTram(Double TRAM) {
+      this.TRAM = TRAM;
+    }
+  }
 
-        public Double getLegacyGraphQLAirplane() {return this.AIRPLANE;}
+  public static class LegacyGraphQLInputPreferredInput {
 
-        public Double getLegacyGraphQLBus() {return this.BUS;}
+    private String agencies;
+    private Integer otherThanPreferredRoutesPenalty;
+    private String routes;
 
-        public Double getLegacyGraphQLCable_Car() {return this.CABLE_CAR;}
+    public LegacyGraphQLInputPreferredInput(Map<String, Object> args) {
+      if (args != null) {
+        this.agencies = (String) args.get("agencies");
+        this.otherThanPreferredRoutesPenalty =
+          (Integer) args.get("otherThanPreferredRoutesPenalty");
+        this.routes = (String) args.get("routes");
+      }
+    }
 
-        public Double getLegacyGraphQLFerry() {return this.FERRY;}
+    public String getLegacyGraphQLAgencies() {
+      return this.agencies;
+    }
 
-        public Double getLegacyGraphQLFunicular() {return this.FUNICULAR;}
+    public void setLegacyGraphQLAgencies(String agencies) {
+      this.agencies = agencies;
+    }
 
-        public Double getLegacyGraphQLGondola() {return this.GONDOLA;}
+    public Integer getLegacyGraphQLOtherThanPreferredRoutesPenalty() {
+      return this.otherThanPreferredRoutesPenalty;
+    }
 
-        public Double getLegacyGraphQLRail() {return this.RAIL;}
+    public void setLegacyGraphQLOtherThanPreferredRoutesPenalty(
+      Integer otherThanPreferredRoutesPenalty
+    ) {
+      this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
+    }
 
-        public Double getLegacyGraphQLSubway() {return this.SUBWAY;}
+    public String getLegacyGraphQLRoutes() {
+      return this.routes;
+    }
 
-        public Double getLegacyGraphQLTram() {return this.TRAM;}
+    public void setLegacyGraphQLRoutes(String routes) {
+      this.routes = routes;
+    }
+  }
 
-        public void setLegacyGraphQLAirplane(Double AIRPLANE) {this.AIRPLANE = AIRPLANE;}
+  public static class LegacyGraphQLInputTriangleInput {
 
-        public void setLegacyGraphQLBus(Double BUS) {this.BUS = BUS;}
+    private Double safetyFactor;
+    private Double slopeFactor;
+    private Double timeFactor;
 
-        public void setLegacyGraphQLCable_Car(Double CABLE_CAR) {this.CABLE_CAR = CABLE_CAR;}
+    public LegacyGraphQLInputTriangleInput(Map<String, Object> args) {
+      if (args != null) {
+        this.safetyFactor = (Double) args.get("safetyFactor");
+        this.slopeFactor = (Double) args.get("slopeFactor");
+        this.timeFactor = (Double) args.get("timeFactor");
+      }
+    }
 
-        public void setLegacyGraphQLFerry(Double FERRY) {this.FERRY = FERRY;}
+    public Double getLegacyGraphQLSafetyFactor() {
+      return this.safetyFactor;
+    }
 
-        public void setLegacyGraphQLFunicular(Double FUNICULAR) {this.FUNICULAR = FUNICULAR;}
+    public void setLegacyGraphQLSafetyFactor(Double safetyFactor) {
+      this.safetyFactor = safetyFactor;
+    }
 
-        public void setLegacyGraphQLGondola(Double GONDOLA) {this.GONDOLA = GONDOLA;}
+    public Double getLegacyGraphQLSlopeFactor() {
+      return this.slopeFactor;
+    }
 
-        public void setLegacyGraphQLRail(Double RAIL) {this.RAIL = RAIL;}
+    public void setLegacyGraphQLSlopeFactor(Double slopeFactor) {
+      this.slopeFactor = slopeFactor;
+    }
 
-        public void setLegacyGraphQLSubway(Double SUBWAY) {this.SUBWAY = SUBWAY;}
+    public Double getLegacyGraphQLTimeFactor() {
+      return this.timeFactor;
+    }
 
-        public void setLegacyGraphQLTram(Double TRAM) {this.TRAM = TRAM;}
+    public void setLegacyGraphQLTimeFactor(Double timeFactor) {
+      this.timeFactor = timeFactor;
     }
+  }
 
-    public static class LegacyGraphQLInputPreferredInput {
+  public static class LegacyGraphQLInputUnpreferredInput {
 
-        private String agencies;
-        private Integer otherThanPreferredRoutesPenalty;
-        private String routes;
+    private String agencies;
+    private String routes;
+    private Integer useUnpreferredRoutesPenalty;
 
-        public LegacyGraphQLInputPreferredInput(Map<String, Object> args) {
-            if (args != null) {
-                this.agencies = (String) args.get("agencies");
-                this.otherThanPreferredRoutesPenalty =
-                        (Integer) args.get("otherThanPreferredRoutesPenalty");
-                this.routes = (String) args.get("routes");
-            }
-        }
+    public LegacyGraphQLInputUnpreferredInput(Map<String, Object> args) {
+      if (args != null) {
+        this.agencies = (String) args.get("agencies");
+        this.routes = (String) args.get("routes");
+        this.useUnpreferredRoutesPenalty = (Integer) args.get("useUnpreferredRoutesPenalty");
+      }
+    }
 
-        public String getLegacyGraphQLAgencies() {return this.agencies;}
+    public String getLegacyGraphQLAgencies() {
+      return this.agencies;
+    }
 
-        public Integer getLegacyGraphQLOtherThanPreferredRoutesPenalty() {return this.otherThanPreferredRoutesPenalty;}
+    public void setLegacyGraphQLAgencies(String agencies) {
+      this.agencies = agencies;
+    }
 
-        public String getLegacyGraphQLRoutes() {return this.routes;}
+    public String getLegacyGraphQLRoutes() {
+      return this.routes;
+    }
 
-        public void setLegacyGraphQLAgencies(String agencies) {this.agencies = agencies;}
+    public void setLegacyGraphQLRoutes(String routes) {
+      this.routes = routes;
+    }
 
-        public void setLegacyGraphQLOtherThanPreferredRoutesPenalty(Integer otherThanPreferredRoutesPenalty) {
-            this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
-        }
+    public Integer getLegacyGraphQLUseUnpreferredRoutesPenalty() {
+      return this.useUnpreferredRoutesPenalty;
+    }
 
-        public void setLegacyGraphQLRoutes(String routes) {this.routes = routes;}
+    public void setLegacyGraphQLUseUnpreferredRoutesPenalty(Integer useUnpreferredRoutesPenalty) {
+      this.useUnpreferredRoutesPenalty = useUnpreferredRoutesPenalty;
     }
+  }
 
-    public static class LegacyGraphQLInputTriangleInput {
+  public static class LegacyGraphQLPatternAlertsArgs {
 
-        private Double safetyFactor;
-        private Double slopeFactor;
-        private Double timeFactor;
+    private Iterable<LegacyGraphQLPatternAlertType> types;
 
-        public LegacyGraphQLInputTriangleInput(Map<String, Object> args) {
-            if (args != null) {
-                this.safetyFactor = (Double) args.get("safetyFactor");
-                this.slopeFactor = (Double) args.get("slopeFactor");
-                this.timeFactor = (Double) args.get("timeFactor");
-            }
+    public LegacyGraphQLPatternAlertsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("types") != null) {
+          this.types =
+            ((List<Object>) args.get("types")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLPatternAlertType
+                  ? item
+                  : LegacyGraphQLPatternAlertType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLPatternAlertType.class::cast)
+              .collect(Collectors.toList());
         }
+      }
+    }
 
-        public Double getLegacyGraphQLSafetyFactor() {return this.safetyFactor;}
+    public Iterable<LegacyGraphQLPatternAlertType> getLegacyGraphQLTypes() {
+      return this.types;
+    }
 
-        public Double getLegacyGraphQLSlopeFactor() {return this.slopeFactor;}
+    public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLPatternAlertType> types) {
+      this.types = types;
+    }
+  }
 
-        public Double getLegacyGraphQLTimeFactor() {return this.timeFactor;}
+  public static class LegacyGraphQLPatternTripsForDateArgs {
 
-        public void setLegacyGraphQLSafetyFactor(Double safetyFactor) {
-            this.safetyFactor = safetyFactor;
-        }
+    private String serviceDate;
 
-        public void setLegacyGraphQLSlopeFactor(Double slopeFactor) {
-            this.slopeFactor = slopeFactor;
-        }
+    public LegacyGraphQLPatternTripsForDateArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDate = (String) args.get("serviceDate");
+      }
+    }
 
-        public void setLegacyGraphQLTimeFactor(Double timeFactor) {this.timeFactor = timeFactor;}
+    public String getLegacyGraphQLServiceDate() {
+      return this.serviceDate;
     }
 
-    public static class LegacyGraphQLInputUnpreferredInput {
+    public void setLegacyGraphQLServiceDate(String serviceDate) {
+      this.serviceDate = serviceDate;
+    }
+  }
 
-        private String agencies;
-        private String routes;
-        private Integer useUnpreferredRoutesPenalty;
+  public static class LegacyGraphQLQueryTypeAgencyArgs {
 
-        public LegacyGraphQLInputUnpreferredInput(Map<String, Object> args) {
-            if (args != null) {
-                this.agencies = (String) args.get("agencies");
-                this.routes = (String) args.get("routes");
-                this.useUnpreferredRoutesPenalty =
-                        (Integer) args.get("useUnpreferredRoutesPenalty");
-            }
-        }
+    private String id;
 
-        public String getLegacyGraphQLAgencies() {return this.agencies;}
+    public LegacyGraphQLQueryTypeAgencyArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public String getLegacyGraphQLRoutes() {return this.routes;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public Integer getLegacyGraphQLUseUnpreferredRoutesPenalty() {return this.useUnpreferredRoutesPenalty;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public void setLegacyGraphQLAgencies(String agencies) {this.agencies = agencies;}
+  public static class LegacyGraphQLQueryTypeAlertsArgs {
 
-        public void setLegacyGraphQLRoutes(String routes) {this.routes = routes;}
+    private Iterable<LegacyGraphQLAlertCauseType> cause;
+    private Iterable<LegacyGraphQLAlertEffectType> effect;
+    private Iterable<String> feeds;
+    private Iterable<String> route;
+    private Iterable<LegacyGraphQLAlertSeverityLevelType> severityLevel;
+    private Iterable<String> stop;
 
-        public void setLegacyGraphQLUseUnpreferredRoutesPenalty(Integer useUnpreferredRoutesPenalty) {
-            this.useUnpreferredRoutesPenalty = useUnpreferredRoutesPenalty;
+    public LegacyGraphQLQueryTypeAlertsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("cause") != null) {
+          this.cause =
+            ((List<Object>) args.get("cause")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLAlertCauseType
+                  ? item
+                  : LegacyGraphQLAlertCauseType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLAlertCauseType.class::cast)
+              .collect(Collectors.toList());
+        }
+        if (args.get("effect") != null) {
+          this.effect =
+            ((List<Object>) args.get("effect")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLAlertEffectType
+                  ? item
+                  : LegacyGraphQLAlertEffectType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLAlertEffectType.class::cast)
+              .collect(Collectors.toList());
         }
+        this.feeds = (Iterable<String>) args.get("feeds");
+        this.route = (Iterable<String>) args.get("route");
+        if (args.get("severityLevel") != null) {
+          this.severityLevel =
+            ((List<Object>) args.get("severityLevel")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLAlertSeverityLevelType
+                  ? item
+                  : LegacyGraphQLAlertSeverityLevelType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLAlertSeverityLevelType.class::cast)
+              .collect(Collectors.toList());
+        }
+        this.stop = (Iterable<String>) args.get("stop");
+      }
     }
-
 
-    /**
-     * Identifies whether this stop represents a stop or station.
-     */
-    public enum LegacyGraphQLLocationType {
-        ENTRANCE,
-        STATION,
-        STOP
-
-    }
-
-    public enum LegacyGraphQLMode {
-        AIRPLANE,
-        BICYCLE,
-        BUS,
-        CABLE_CAR,
-        CAR,
-        COACH,
-        FERRY,
-        FLEX,
-        FLEXIBLE,
-        FUNICULAR,
-        GONDOLA,
-        LEG_SWITCH,
-        RAIL,
-        SCOOTER,
-        SUBWAY,
-        TRAM,
-        TRANSIT,
-        WALK
-
-    }
-
-    /**
-     * Optimization type for bicycling legs
-     */
-    public enum LegacyGraphQLOptimizeType {
-        FLAT,
-        GREENWAYS,
-        QUICK,
-        SAFE,
-        TRIANGLE
-
-    }
-
-
-    public static class LegacyGraphQLPatternAlertsArgs {
-
-        private Iterable<LegacyGraphQLPatternAlertType> types;
-
-        public LegacyGraphQLPatternAlertsArgs(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("types") != null) {
-                    this.types = ((List<Object>) args.get("types")).stream()
-                            .map(item -> item instanceof LegacyGraphQLPatternAlertType
-                                    ? item
-                                    : LegacyGraphQLPatternAlertType.valueOf((String) item))
-                            .map(LegacyGraphQLPatternAlertType.class::cast)
-                            .collect(Collectors.toList());
-                }
-            }
-        }
+    public Iterable<LegacyGraphQLAlertCauseType> getLegacyGraphQLCause() {
+      return this.cause;
+    }
 
-        public Iterable<LegacyGraphQLPatternAlertType> getLegacyGraphQLTypes() {return this.types;}
+    public void setLegacyGraphQLCause(Iterable<LegacyGraphQLAlertCauseType> cause) {
+      this.cause = cause;
+    }
 
-        public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLPatternAlertType> types) {
-            this.types = types;
-        }
+    public Iterable<LegacyGraphQLAlertEffectType> getLegacyGraphQLEffect() {
+      return this.effect;
     }
 
-    public static class LegacyGraphQLPatternTripsForDateArgs {
+    public void setLegacyGraphQLEffect(Iterable<LegacyGraphQLAlertEffectType> effect) {
+      this.effect = effect;
+    }
 
-        private String serviceDate;
+    public Iterable<String> getLegacyGraphQLFeeds() {
+      return this.feeds;
+    }
 
-        public LegacyGraphQLPatternTripsForDateArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.serviceDate = (String) args.get("serviceDate");
-            }
-        }
+    public void setLegacyGraphQLFeeds(Iterable<String> feeds) {
+      this.feeds = feeds;
+    }
 
-        public String getLegacyGraphQLServiceDate() {return this.serviceDate;}
+    public Iterable<String> getLegacyGraphQLRoute() {
+      return this.route;
+    }
 
-        public void setLegacyGraphQLServiceDate(String serviceDate) {
-            this.serviceDate = serviceDate;
-        }
+    public void setLegacyGraphQLRoute(Iterable<String> route) {
+      this.route = route;
     }
 
-    /**
-     * Entities, which are relevant for a pattern and can contain alerts
-     */
-    public enum LegacyGraphQLPatternAlertType {
-        AGENCY,
-        PATTERN,
-        ROUTE,
-        ROUTE_TYPE,
-        STOPS_ON_PATTERN,
-        STOPS_ON_TRIPS,
-        TRIPS
+    public Iterable<LegacyGraphQLAlertSeverityLevelType> getLegacyGraphQLSeverityLevel() {
+      return this.severityLevel;
+    }
 
+    public void setLegacyGraphQLSeverityLevel(
+      Iterable<LegacyGraphQLAlertSeverityLevelType> severityLevel
+    ) {
+      this.severityLevel = severityLevel;
     }
 
-    public enum LegacyGraphQLPickupDropoffType {
-        CALL_AGENCY,
-        COORDINATE_WITH_DRIVER,
-        NONE,
-        SCHEDULED
+    public Iterable<String> getLegacyGraphQLStop() {
+      return this.stop;
+    }
 
+    public void setLegacyGraphQLStop(Iterable<String> stop) {
+      this.stop = stop;
     }
+  }
 
+  public static class LegacyGraphQLQueryTypeBikeParkArgs {
 
-    /**
-     * Additional qualifier for a transport mode. Note that qualifiers can only be used with certain
-     * transport modes.
-     */
-    public enum LegacyGraphQLQualifier {
-        ACCESS,
-        DIRECT,
-        DROPOFF,
-        EGRESS,
-        HAVE,
-        KEEP,
-        PARK,
-        PICKUP,
-        RENT
+    private String id;
 
+    public LegacyGraphQLQueryTypeBikeParkArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
     }
 
-    public static class LegacyGraphQLQueryTypeAgencyArgs {
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        private String id;
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public LegacyGraphQLQueryTypeAgencyArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+  public static class LegacyGraphQLQueryTypeBikeRentalStationArgs {
 
-        public String getLegacyGraphQLId() {return this.id;}
-
-        public void setLegacyGraphQLId(String id) {this.id = id;}
-    }
-
-    public static class LegacyGraphQLQueryTypeAlertsArgs {
-
-        private Iterable<LegacyGraphQLAlertCauseType> cause;
-        private Iterable<LegacyGraphQLAlertEffectType> effect;
-        private Iterable<String> feeds;
-        private Iterable<String> route;
-        private Iterable<LegacyGraphQLAlertSeverityLevelType> severityLevel;
-        private Iterable<String> stop;
-
-        public LegacyGraphQLQueryTypeAlertsArgs(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("cause") != null) {
-                    this.cause = ((List<Object>) args.get("cause")).stream()
-                            .map(item -> item instanceof LegacyGraphQLAlertCauseType
-                                    ? item
-                                    : LegacyGraphQLAlertCauseType.valueOf((String) item))
-                            .map(LegacyGraphQLAlertCauseType.class::cast)
-                            .collect(Collectors.toList());
-                }
-                if (args.get("effect") != null) {
-                    this.effect = ((List<Object>) args.get("effect")).stream()
-                            .map(item -> item instanceof LegacyGraphQLAlertEffectType
-                                    ? item
-                                    : LegacyGraphQLAlertEffectType.valueOf((String) item))
-                            .map(LegacyGraphQLAlertEffectType.class::cast)
-                            .collect(Collectors.toList());
-                }
-                this.feeds = (Iterable<String>) args.get("feeds");
-                this.route = (Iterable<String>) args.get("route");
-                if (args.get("severityLevel") != null) {
-                    this.severityLevel = ((List<Object>) args.get("severityLevel")).stream()
-                            .map(item -> item instanceof LegacyGraphQLAlertSeverityLevelType
-                                    ? item
-                                    : LegacyGraphQLAlertSeverityLevelType.valueOf((String) item))
-                            .map(LegacyGraphQLAlertSeverityLevelType.class::cast)
-                            .collect(Collectors.toList());
-                }
-                this.stop = (Iterable<String>) args.get("stop");
-            }
-        }
+    private String id;
 
-        public Iterable<LegacyGraphQLAlertCauseType> getLegacyGraphQLCause() {return this.cause;}
+    public LegacyGraphQLQueryTypeBikeRentalStationArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public Iterable<LegacyGraphQLAlertEffectType> getLegacyGraphQLEffect() {return this.effect;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public Iterable<String> getLegacyGraphQLFeeds() {return this.feeds;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public Iterable<String> getLegacyGraphQLRoute() {return this.route;}
+  public static class LegacyGraphQLQueryTypeBikeRentalStationsArgs {
 
-        public Iterable<LegacyGraphQLAlertSeverityLevelType> getLegacyGraphQLSeverityLevel() {return this.severityLevel;}
+    private Iterable<String> ids;
 
-        public Iterable<String> getLegacyGraphQLStop() {return this.stop;}
+    public LegacyGraphQLQueryTypeBikeRentalStationsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (Iterable<String>) args.get("ids");
+      }
+    }
 
-        public void setLegacyGraphQLCause(Iterable<LegacyGraphQLAlertCauseType> cause) {
-            this.cause = cause;
-        }
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
+    }
 
-        public void setLegacyGraphQLEffect(Iterable<LegacyGraphQLAlertEffectType> effect) {
-            this.effect = effect;
-        }
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
+    }
+  }
 
-        public void setLegacyGraphQLFeeds(Iterable<String> feeds) {this.feeds = feeds;}
+  public static class LegacyGraphQLQueryTypeCancelledTripTimesArgs {
 
-        public void setLegacyGraphQLRoute(Iterable<String> route) {this.route = route;}
+    private Iterable<String> feeds;
+    private Integer maxArrivalTime;
+    private String maxDate;
+    private Integer maxDepartureTime;
+    private Integer minArrivalTime;
+    private String minDate;
+    private Integer minDepartureTime;
+    private Iterable<String> patterns;
+    private Iterable<String> routes;
+    private Iterable<String> trips;
 
-        public void setLegacyGraphQLSeverityLevel(Iterable<LegacyGraphQLAlertSeverityLevelType> severityLevel) {
-            this.severityLevel = severityLevel;
-        }
+    public LegacyGraphQLQueryTypeCancelledTripTimesArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.feeds = (Iterable<String>) args.get("feeds");
+        this.maxArrivalTime = (Integer) args.get("maxArrivalTime");
+        this.maxDate = (String) args.get("maxDate");
+        this.maxDepartureTime = (Integer) args.get("maxDepartureTime");
+        this.minArrivalTime = (Integer) args.get("minArrivalTime");
+        this.minDate = (String) args.get("minDate");
+        this.minDepartureTime = (Integer) args.get("minDepartureTime");
+        this.patterns = (Iterable<String>) args.get("patterns");
+        this.routes = (Iterable<String>) args.get("routes");
+        this.trips = (Iterable<String>) args.get("trips");
+      }
+    }
 
-        public void setLegacyGraphQLStop(Iterable<String> stop) {this.stop = stop;}
+    public Iterable<String> getLegacyGraphQLFeeds() {
+      return this.feeds;
     }
 
-    public static class LegacyGraphQLQueryTypeBikeParkArgs {
+    public void setLegacyGraphQLFeeds(Iterable<String> feeds) {
+      this.feeds = feeds;
+    }
 
-        private String id;
+    public Integer getLegacyGraphQLMaxArrivalTime() {
+      return this.maxArrivalTime;
+    }
 
-        public LegacyGraphQLQueryTypeBikeParkArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public void setLegacyGraphQLMaxArrivalTime(Integer maxArrivalTime) {
+      this.maxArrivalTime = maxArrivalTime;
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public String getLegacyGraphQLMaxDate() {
+      return this.maxDate;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public void setLegacyGraphQLMaxDate(String maxDate) {
+      this.maxDate = maxDate;
     }
 
-    public static class LegacyGraphQLQueryTypeBikeRentalStationArgs {
+    public Integer getLegacyGraphQLMaxDepartureTime() {
+      return this.maxDepartureTime;
+    }
 
-        private String id;
+    public void setLegacyGraphQLMaxDepartureTime(Integer maxDepartureTime) {
+      this.maxDepartureTime = maxDepartureTime;
+    }
 
-        public LegacyGraphQLQueryTypeBikeRentalStationArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public Integer getLegacyGraphQLMinArrivalTime() {
+      return this.minArrivalTime;
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public void setLegacyGraphQLMinArrivalTime(Integer minArrivalTime) {
+      this.minArrivalTime = minArrivalTime;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public String getLegacyGraphQLMinDate() {
+      return this.minDate;
     }
 
-    public static class LegacyGraphQLQueryTypeBikeRentalStationsArgs {
+    public void setLegacyGraphQLMinDate(String minDate) {
+      this.minDate = minDate;
+    }
 
-        private Iterable<String> ids;
+    public Integer getLegacyGraphQLMinDepartureTime() {
+      return this.minDepartureTime;
+    }
 
-        public LegacyGraphQLQueryTypeBikeRentalStationsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.ids = (Iterable<String>) args.get("ids");
-            }
-        }
+    public void setLegacyGraphQLMinDepartureTime(Integer minDepartureTime) {
+      this.minDepartureTime = minDepartureTime;
+    }
 
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
-
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
-    }
-
-    public static class LegacyGraphQLQueryTypeCancelledTripTimesArgs {
-
-        private Iterable<String> feeds;
-        private Integer maxArrivalTime;
-        private String maxDate;
-        private Integer maxDepartureTime;
-        private Integer minArrivalTime;
-        private String minDate;
-        private Integer minDepartureTime;
-        private Iterable<String> patterns;
-        private Iterable<String> routes;
-        private Iterable<String> trips;
-
-        public LegacyGraphQLQueryTypeCancelledTripTimesArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.feeds = (Iterable<String>) args.get("feeds");
-                this.maxArrivalTime = (Integer) args.get("maxArrivalTime");
-                this.maxDate = (String) args.get("maxDate");
-                this.maxDepartureTime = (Integer) args.get("maxDepartureTime");
-                this.minArrivalTime = (Integer) args.get("minArrivalTime");
-                this.minDate = (String) args.get("minDate");
-                this.minDepartureTime = (Integer) args.get("minDepartureTime");
-                this.patterns = (Iterable<String>) args.get("patterns");
-                this.routes = (Iterable<String>) args.get("routes");
-                this.trips = (Iterable<String>) args.get("trips");
-            }
-        }
+    public Iterable<String> getLegacyGraphQLPatterns() {
+      return this.patterns;
+    }
 
-        public Iterable<String> getLegacyGraphQLFeeds() {return this.feeds;}
+    public void setLegacyGraphQLPatterns(Iterable<String> patterns) {
+      this.patterns = patterns;
+    }
 
-        public Integer getLegacyGraphQLMaxArrivalTime() {return this.maxArrivalTime;}
+    public Iterable<String> getLegacyGraphQLRoutes() {
+      return this.routes;
+    }
 
-        public String getLegacyGraphQLMaxDate() {return this.maxDate;}
+    public void setLegacyGraphQLRoutes(Iterable<String> routes) {
+      this.routes = routes;
+    }
 
-        public Integer getLegacyGraphQLMaxDepartureTime() {return this.maxDepartureTime;}
+    public Iterable<String> getLegacyGraphQLTrips() {
+      return this.trips;
+    }
 
-        public Integer getLegacyGraphQLMinArrivalTime() {return this.minArrivalTime;}
+    public void setLegacyGraphQLTrips(Iterable<String> trips) {
+      this.trips = trips;
+    }
+  }
 
-        public String getLegacyGraphQLMinDate() {return this.minDate;}
+  public static class LegacyGraphQLQueryTypeCarParkArgs {
 
-        public Integer getLegacyGraphQLMinDepartureTime() {return this.minDepartureTime;}
+    private String id;
 
-        public Iterable<String> getLegacyGraphQLPatterns() {return this.patterns;}
+    public LegacyGraphQLQueryTypeCarParkArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public Iterable<String> getLegacyGraphQLRoutes() {return this.routes;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public Iterable<String> getLegacyGraphQLTrips() {return this.trips;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public void setLegacyGraphQLFeeds(Iterable<String> feeds) {this.feeds = feeds;}
+  public static class LegacyGraphQLQueryTypeCarParksArgs {
 
-        public void setLegacyGraphQLMaxArrivalTime(Integer maxArrivalTime) {
-            this.maxArrivalTime = maxArrivalTime;
-        }
+    private Iterable<String> ids;
 
-        public void setLegacyGraphQLMaxDate(String maxDate) {this.maxDate = maxDate;}
+    public LegacyGraphQLQueryTypeCarParksArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (Iterable<String>) args.get("ids");
+      }
+    }
 
-        public void setLegacyGraphQLMaxDepartureTime(Integer maxDepartureTime) {
-            this.maxDepartureTime = maxDepartureTime;
-        }
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
+    }
 
-        public void setLegacyGraphQLMinArrivalTime(Integer minArrivalTime) {
-            this.minArrivalTime = minArrivalTime;
-        }
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
+    }
+  }
 
-        public void setLegacyGraphQLMinDate(String minDate) {this.minDate = minDate;}
+  public static class LegacyGraphQLQueryTypeClusterArgs {
 
-        public void setLegacyGraphQLMinDepartureTime(Integer minDepartureTime) {
-            this.minDepartureTime = minDepartureTime;
-        }
+    private String id;
 
-        public void setLegacyGraphQLPatterns(Iterable<String> patterns) {this.patterns = patterns;}
+    public LegacyGraphQLQueryTypeClusterArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public void setLegacyGraphQLRoutes(Iterable<String> routes) {this.routes = routes;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLTrips(Iterable<String> trips) {this.trips = trips;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeCarParkArgs {
+  public static class LegacyGraphQLQueryTypeDepartureRowArgs {
 
-        private String id;
+    private String id;
 
-        public LegacyGraphQLQueryTypeCarParkArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public LegacyGraphQLQueryTypeDepartureRowArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeCarParksArgs {
+  public static class LegacyGraphQLQueryTypeFuzzyTripArgs {
 
-        private Iterable<String> ids;
+    private String date;
+    private Integer direction;
+    private String route;
+    private Integer time;
 
-        public LegacyGraphQLQueryTypeCarParksArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.ids = (Iterable<String>) args.get("ids");
-            }
-        }
+    public LegacyGraphQLQueryTypeFuzzyTripArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.date = (String) args.get("date");
+        this.direction = (Integer) args.get("direction");
+        this.route = (String) args.get("route");
+        this.time = (Integer) args.get("time");
+      }
+    }
 
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
+    public String getLegacyGraphQLDate() {
+      return this.date;
+    }
 
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
+    public void setLegacyGraphQLDate(String date) {
+      this.date = date;
     }
 
-    public static class LegacyGraphQLQueryTypeClusterArgs {
+    public Integer getLegacyGraphQLDirection() {
+      return this.direction;
+    }
 
-        private String id;
+    public void setLegacyGraphQLDirection(Integer direction) {
+      this.direction = direction;
+    }
 
-        public LegacyGraphQLQueryTypeClusterArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public String getLegacyGraphQLRoute() {
+      return this.route;
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public void setLegacyGraphQLRoute(String route) {
+      this.route = route;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public Integer getLegacyGraphQLTime() {
+      return this.time;
     }
 
-    public static class LegacyGraphQLQueryTypeDepartureRowArgs {
+    public void setLegacyGraphQLTime(Integer time) {
+      this.time = time;
+    }
+  }
 
-        private String id;
+  public static class LegacyGraphQLQueryTypeNearestArgs {
 
-        public LegacyGraphQLQueryTypeDepartureRowArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    private String after;
+    private String before;
+    private LegacyGraphQLInputFiltersInput filterByIds;
+    private Iterable<LegacyGraphQLMode> filterByModes;
+    private Iterable<LegacyGraphQLFilterPlaceType> filterByPlaceTypes;
+    private Integer first;
+    private Integer last;
+    private Double lat;
+    private Double lon;
+    private Integer maxDistance;
+    private Integer maxResults;
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public LegacyGraphQLQueryTypeNearestArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.after = (String) args.get("after");
+        this.before = (String) args.get("before");
+        this.filterByIds =
+          new LegacyGraphQLInputFiltersInput((Map<String, Object>) args.get("filterByIds"));
+        if (args.get("filterByModes") != null) {
+          this.filterByModes =
+            ((List<Object>) args.get("filterByModes")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLMode ? item : LegacyGraphQLMode.valueOf((String) item)
+              )
+              .map(LegacyGraphQLMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        if (args.get("filterByPlaceTypes") != null) {
+          this.filterByPlaceTypes =
+            ((List<Object>) args.get("filterByPlaceTypes")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLFilterPlaceType
+                  ? item
+                  : LegacyGraphQLFilterPlaceType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLFilterPlaceType.class::cast)
+              .collect(Collectors.toList());
+        }
+        this.first = (Integer) args.get("first");
+        this.last = (Integer) args.get("last");
+        this.lat = (Double) args.get("lat");
+        this.lon = (Double) args.get("lon");
+        this.maxDistance = (Integer) args.get("maxDistance");
+        this.maxResults = (Integer) args.get("maxResults");
+      }
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public String getLegacyGraphQLAfter() {
+      return this.after;
     }
 
-    public static class LegacyGraphQLQueryTypeFuzzyTripArgs {
+    public void setLegacyGraphQLAfter(String after) {
+      this.after = after;
+    }
 
-        private String date;
-        private Integer direction;
-        private String route;
-        private Integer time;
+    public String getLegacyGraphQLBefore() {
+      return this.before;
+    }
 
-        public LegacyGraphQLQueryTypeFuzzyTripArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.date = (String) args.get("date");
-                this.direction = (Integer) args.get("direction");
-                this.route = (String) args.get("route");
-                this.time = (Integer) args.get("time");
-            }
-        }
+    public void setLegacyGraphQLBefore(String before) {
+      this.before = before;
+    }
 
-        public String getLegacyGraphQLDate() {return this.date;}
-
-        public Integer getLegacyGraphQLDirection() {return this.direction;}
-
-        public String getLegacyGraphQLRoute() {return this.route;}
-
-        public Integer getLegacyGraphQLTime() {return this.time;}
-
-        public void setLegacyGraphQLDate(String date) {this.date = date;}
-
-        public void setLegacyGraphQLDirection(Integer direction) {this.direction = direction;}
-
-        public void setLegacyGraphQLRoute(String route) {this.route = route;}
-
-        public void setLegacyGraphQLTime(Integer time) {this.time = time;}
-    }
-
-    public static class LegacyGraphQLQueryTypeNearestArgs {
-
-        private String after;
-        private String before;
-        private LegacyGraphQLInputFiltersInput filterByIds;
-        private Iterable<LegacyGraphQLMode> filterByModes;
-        private Iterable<LegacyGraphQLFilterPlaceType> filterByPlaceTypes;
-        private Integer first;
-        private Integer last;
-        private Double lat;
-        private Double lon;
-        private Integer maxDistance;
-        private Integer maxResults;
-
-        public LegacyGraphQLQueryTypeNearestArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.after = (String) args.get("after");
-                this.before = (String) args.get("before");
-                this.filterByIds = new LegacyGraphQLInputFiltersInput(
-                        (Map<String, Object>) args.get("filterByIds"));
-                if (args.get("filterByModes") != null) {
-                    this.filterByModes = ((List<Object>) args.get("filterByModes")).stream()
-                            .map(item -> item instanceof LegacyGraphQLMode
-                                    ? item
-                                    : LegacyGraphQLMode.valueOf((String) item))
-                            .map(LegacyGraphQLMode.class::cast)
-                            .collect(Collectors.toList());
-                }
-                if (args.get("filterByPlaceTypes") != null) {
-                    this.filterByPlaceTypes =
-                            ((List<Object>) args.get("filterByPlaceTypes")).stream()
-                                    .map(item -> item instanceof LegacyGraphQLFilterPlaceType
-                                            ? item
-                                            : LegacyGraphQLFilterPlaceType.valueOf((String) item))
-                                    .map(LegacyGraphQLFilterPlaceType.class::cast)
-                                    .collect(Collectors.toList());
-                }
-                this.first = (Integer) args.get("first");
-                this.last = (Integer) args.get("last");
-                this.lat = (Double) args.get("lat");
-                this.lon = (Double) args.get("lon");
-                this.maxDistance = (Integer) args.get("maxDistance");
-                this.maxResults = (Integer) args.get("maxResults");
-            }
-        }
+    public LegacyGraphQLInputFiltersInput getLegacyGraphQLFilterByIds() {
+      return this.filterByIds;
+    }
 
-        public String getLegacyGraphQLAfter() {return this.after;}
+    public void setLegacyGraphQLFilterByIds(LegacyGraphQLInputFiltersInput filterByIds) {
+      this.filterByIds = filterByIds;
+    }
 
-        public String getLegacyGraphQLBefore() {return this.before;}
+    public Iterable<LegacyGraphQLMode> getLegacyGraphQLFilterByModes() {
+      return this.filterByModes;
+    }
 
-        public LegacyGraphQLInputFiltersInput getLegacyGraphQLFilterByIds() {return this.filterByIds;}
+    public void setLegacyGraphQLFilterByModes(Iterable<LegacyGraphQLMode> filterByModes) {
+      this.filterByModes = filterByModes;
+    }
 
-        public Iterable<LegacyGraphQLMode> getLegacyGraphQLFilterByModes() {return this.filterByModes;}
+    public Iterable<LegacyGraphQLFilterPlaceType> getLegacyGraphQLFilterByPlaceTypes() {
+      return this.filterByPlaceTypes;
+    }
 
-        public Iterable<LegacyGraphQLFilterPlaceType> getLegacyGraphQLFilterByPlaceTypes() {return this.filterByPlaceTypes;}
+    public void setLegacyGraphQLFilterByPlaceTypes(
+      Iterable<LegacyGraphQLFilterPlaceType> filterByPlaceTypes
+    ) {
+      this.filterByPlaceTypes = filterByPlaceTypes;
+    }
 
-        public Integer getLegacyGraphQLFirst() {return this.first;}
+    public Integer getLegacyGraphQLFirst() {
+      return this.first;
+    }
 
-        public Integer getLegacyGraphQLLast() {return this.last;}
+    public void setLegacyGraphQLFirst(Integer first) {
+      this.first = first;
+    }
 
-        public Double getLegacyGraphQLLat() {return this.lat;}
+    public Integer getLegacyGraphQLLast() {
+      return this.last;
+    }
 
-        public Double getLegacyGraphQLLon() {return this.lon;}
+    public void setLegacyGraphQLLast(Integer last) {
+      this.last = last;
+    }
 
-        public Integer getLegacyGraphQLMaxDistance() {return this.maxDistance;}
+    public Double getLegacyGraphQLLat() {
+      return this.lat;
+    }
 
-        public Integer getLegacyGraphQLMaxResults() {return this.maxResults;}
+    public void setLegacyGraphQLLat(Double lat) {
+      this.lat = lat;
+    }
 
-        public void setLegacyGraphQLAfter(String after) {this.after = after;}
+    public Double getLegacyGraphQLLon() {
+      return this.lon;
+    }
 
-        public void setLegacyGraphQLBefore(String before) {this.before = before;}
+    public void setLegacyGraphQLLon(Double lon) {
+      this.lon = lon;
+    }
 
-        public void setLegacyGraphQLFilterByIds(LegacyGraphQLInputFiltersInput filterByIds) {
-            this.filterByIds = filterByIds;
-        }
+    public Integer getLegacyGraphQLMaxDistance() {
+      return this.maxDistance;
+    }
 
-        public void setLegacyGraphQLFilterByModes(Iterable<LegacyGraphQLMode> filterByModes) {
-            this.filterByModes = filterByModes;
-        }
+    public void setLegacyGraphQLMaxDistance(Integer maxDistance) {
+      this.maxDistance = maxDistance;
+    }
 
-        public void setLegacyGraphQLFilterByPlaceTypes(Iterable<LegacyGraphQLFilterPlaceType> filterByPlaceTypes) {
-            this.filterByPlaceTypes = filterByPlaceTypes;
-        }
+    public Integer getLegacyGraphQLMaxResults() {
+      return this.maxResults;
+    }
 
-        public void setLegacyGraphQLFirst(Integer first) {this.first = first;}
+    public void setLegacyGraphQLMaxResults(Integer maxResults) {
+      this.maxResults = maxResults;
+    }
+  }
 
-        public void setLegacyGraphQLLast(Integer last) {this.last = last;}
+  public static class LegacyGraphQLQueryTypeNodeArgs {
 
-        public void setLegacyGraphQLLat(Double lat) {this.lat = lat;}
+    private graphql.relay.Relay.ResolvedGlobalId id;
 
-        public void setLegacyGraphQLLon(Double lon) {this.lon = lon;}
+    public LegacyGraphQLQueryTypeNodeArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (graphql.relay.Relay.ResolvedGlobalId) args.get("id");
+      }
+    }
 
-        public void setLegacyGraphQLMaxDistance(Integer maxDistance) {
-            this.maxDistance = maxDistance;
-        }
+    public graphql.relay.Relay.ResolvedGlobalId getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLMaxResults(Integer maxResults) {this.maxResults = maxResults;}
+    public void setLegacyGraphQLId(graphql.relay.Relay.ResolvedGlobalId id) {
+      this.id = id;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeNodeArgs {
+  public static class LegacyGraphQLQueryTypePatternArgs {
 
-        private graphql.relay.Relay.ResolvedGlobalId id;
+    private String id;
 
-        public LegacyGraphQLQueryTypeNodeArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (graphql.relay.Relay.ResolvedGlobalId) args.get("id");
-            }
-        }
+    public LegacyGraphQLQueryTypePatternArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public graphql.relay.Relay.ResolvedGlobalId getLegacyGraphQLId() {return this.id;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLId(graphql.relay.Relay.ResolvedGlobalId id) {this.id = id;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypePatternArgs {
+  public static class LegacyGraphQLQueryTypePlanArgs {
 
-        private String id;
+    private Integer alightSlack;
+    private Boolean allowBikeRental;
+    private Boolean allowKeepingRentedBicycleAtDestination;
+    private Iterable<String> allowedBikeRentalNetworks;
+    private Iterable<String> allowedTicketTypes;
+    private Boolean arriveBy;
+    private LegacyGraphQLInputBannedInput banned;
+    private Boolean batch;
+    private Integer bikeBoardCost;
+    private Double bikeReluctance;
+    private Double bikeSpeed;
+    private Integer bikeSwitchCost;
+    private Integer bikeSwitchTime;
+    private Double bikeWalkingReluctance;
+    private Integer boardSlack;
+    private Double carParkCarLegWeight;
+    private Double carReluctance;
+    private Long claimInitialWait;
+    private Boolean compactLegsByReversedSearch;
+    private String date;
+    private Boolean debugItineraryFilter;
+    private Boolean disableRemainingWeightHeuristic;
+    private LegacyGraphQLInputCoordinatesInput from;
+    private String fromPlace;
+    private Integer heuristicStepsPerMainStep;
+    private Boolean ignoreRealtimeUpdates;
+    private Iterable<LegacyGraphQLInputCoordinatesInput> intermediatePlaces;
+    private Double itineraryFiltering;
+    private Integer keepingRentedBicycleAtDestinationCost;
+    private String locale;
+    private Integer maxPreTransitTime;
+    private Integer maxTransfers;
+    private Double maxWalkDistance;
+    private Integer minTransferTime;
+    private LegacyGraphQLInputModeWeightInput modeWeight;
+    private Integer nonpreferredTransferPenalty;
+    private Integer numItineraries;
+    private Boolean omitCanceled;
+    private LegacyGraphQLOptimizeType optimize;
+    private String pageCursor;
+    private LegacyGraphQLInputPreferredInput preferred;
+    private Boolean reverseOptimizeOnTheFly;
+    private Long searchWindow;
+    private String startTransitStopId;
+    private String startTransitTripId;
+    private String time;
+    private LegacyGraphQLInputCoordinatesInput to;
+    private String toPlace;
+    private Integer transferPenalty;
+    private Iterable<LegacyGraphQLTransportModeInput> transportModes;
+    private LegacyGraphQLInputTriangleInput triangle;
+    private LegacyGraphQLInputUnpreferredInput unpreferred;
+    private Double waitAtBeginningFactor;
+    private Double waitReluctance;
+    private Integer walkBoardCost;
+    private Double walkOnStreetReluctance;
+    private Double walkReluctance;
+    private Double walkSpeed;
+    private Boolean wheelchair;
 
-        public LegacyGraphQLQueryTypePatternArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
+    public LegacyGraphQLQueryTypePlanArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.alightSlack = (Integer) args.get("alightSlack");
+        this.allowBikeRental = (Boolean) args.get("allowBikeRental");
+        this.allowKeepingRentedBicycleAtDestination =
+          (Boolean) args.get("allowKeepingRentedBicycleAtDestination");
+        this.allowedBikeRentalNetworks = (Iterable<String>) args.get("allowedBikeRentalNetworks");
+        this.allowedTicketTypes = (Iterable<String>) args.get("allowedTicketTypes");
+        this.arriveBy = (Boolean) args.get("arriveBy");
+        this.banned = new LegacyGraphQLInputBannedInput((Map<String, Object>) args.get("banned"));
+        this.batch = (Boolean) args.get("batch");
+        this.bikeBoardCost = (Integer) args.get("bikeBoardCost");
+        this.bikeReluctance = (Double) args.get("bikeReluctance");
+        this.bikeSpeed = (Double) args.get("bikeSpeed");
+        this.bikeSwitchCost = (Integer) args.get("bikeSwitchCost");
+        this.bikeSwitchTime = (Integer) args.get("bikeSwitchTime");
+        this.bikeWalkingReluctance = (Double) args.get("bikeWalkingReluctance");
+        this.boardSlack = (Integer) args.get("boardSlack");
+        this.carParkCarLegWeight = (Double) args.get("carParkCarLegWeight");
+        this.carReluctance = (Double) args.get("carReluctance");
+        this.claimInitialWait = (Long) args.get("claimInitialWait");
+        this.compactLegsByReversedSearch = (Boolean) args.get("compactLegsByReversedSearch");
+        this.date = (String) args.get("date");
+        this.debugItineraryFilter = (Boolean) args.get("debugItineraryFilter");
+        this.disableRemainingWeightHeuristic =
+          (Boolean) args.get("disableRemainingWeightHeuristic");
+        this.from = new LegacyGraphQLInputCoordinatesInput((Map<String, Object>) args.get("from"));
+        this.fromPlace = (String) args.get("fromPlace");
+        this.heuristicStepsPerMainStep = (Integer) args.get("heuristicStepsPerMainStep");
+        this.ignoreRealtimeUpdates = (Boolean) args.get("ignoreRealtimeUpdates");
+        if (args.get("intermediatePlaces") != null) {
+          this.intermediatePlaces =
+            (Iterable<LegacyGraphQLInputCoordinatesInput>) args.get("intermediatePlaces");
         }
-
-        public String getLegacyGraphQLId() {return this.id;}
-
-        public void setLegacyGraphQLId(String id) {this.id = id;}
-    }
-
-    public static class LegacyGraphQLQueryTypePlanArgs {
-
-        private Integer alightSlack;
-        private Boolean allowBikeRental;
-        private Boolean allowKeepingRentedBicycleAtDestination;
-        private Iterable<String> allowedBikeRentalNetworks;
-        private Iterable<String> allowedTicketTypes;
-        private Boolean arriveBy;
-        private LegacyGraphQLInputBannedInput banned;
-        private Boolean batch;
-        private Integer bikeBoardCost;
-        private Double bikeReluctance;
-        private Double bikeSpeed;
-        private Integer bikeSwitchCost;
-        private Integer bikeSwitchTime;
-        private Double bikeWalkingReluctance;
-        private Integer boardSlack;
-        private Double carParkCarLegWeight;
-        private Double carReluctance;
-        private Long claimInitialWait;
-        private Boolean compactLegsByReversedSearch;
-        private String date;
-        private Boolean debugItineraryFilter;
-        private Boolean disableRemainingWeightHeuristic;
-        private LegacyGraphQLInputCoordinatesInput from;
-        private String fromPlace;
-        private Integer heuristicStepsPerMainStep;
-        private Boolean ignoreRealtimeUpdates;
-        private Iterable<LegacyGraphQLInputCoordinatesInput> intermediatePlaces;
-        private Double itineraryFiltering;
-        private Integer keepingRentedBicycleAtDestinationCost;
-        private String locale;
-        private Integer maxPreTransitTime;
-        private Integer maxTransfers;
-        private Double maxWalkDistance;
-        private Integer minTransferTime;
-        private LegacyGraphQLInputModeWeightInput modeWeight;
-        private Integer nonpreferredTransferPenalty;
-        private Integer numItineraries;
-        private Boolean omitCanceled;
-        private LegacyGraphQLOptimizeType optimize;
-        private String pageCursor;
-        private LegacyGraphQLInputPreferredInput preferred;
-        private Boolean reverseOptimizeOnTheFly;
-        private Long searchWindow;
-        private String startTransitStopId;
-        private String startTransitTripId;
-        private String time;
-        private LegacyGraphQLInputCoordinatesInput to;
-        private String toPlace;
-        private Integer transferPenalty;
-        private Iterable<LegacyGraphQLTransportModeInput> transportModes;
-        private LegacyGraphQLInputTriangleInput triangle;
-        private LegacyGraphQLInputUnpreferredInput unpreferred;
-        private Double waitAtBeginningFactor;
-        private Double waitReluctance;
-        private Integer walkBoardCost;
-        private Double walkOnStreetReluctance;
-        private Double walkReluctance;
-        private Double walkSpeed;
-        private Boolean wheelchair;
-
-        public LegacyGraphQLQueryTypePlanArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.alightSlack = (Integer) args.get("alightSlack");
-                this.allowBikeRental = (Boolean) args.get("allowBikeRental");
-                this.allowKeepingRentedBicycleAtDestination =
-                        (Boolean) args.get("allowKeepingRentedBicycleAtDestination");
-                this.allowedBikeRentalNetworks =
-                        (Iterable<String>) args.get("allowedBikeRentalNetworks");
-                this.allowedTicketTypes = (Iterable<String>) args.get("allowedTicketTypes");
-                this.arriveBy = (Boolean) args.get("arriveBy");
-                this.banned =
-                        new LegacyGraphQLInputBannedInput((Map<String, Object>) args.get("banned"));
-                this.batch = (Boolean) args.get("batch");
-                this.bikeBoardCost = (Integer) args.get("bikeBoardCost");
-                this.bikeReluctance = (Double) args.get("bikeReluctance");
-                this.bikeSpeed = (Double) args.get("bikeSpeed");
-                this.bikeSwitchCost = (Integer) args.get("bikeSwitchCost");
-                this.bikeSwitchTime = (Integer) args.get("bikeSwitchTime");
-                this.bikeWalkingReluctance = (Double) args.get("bikeWalkingReluctance");
-                this.boardSlack = (Integer) args.get("boardSlack");
-                this.carParkCarLegWeight = (Double) args.get("carParkCarLegWeight");
-                this.carReluctance = (Double) args.get("carReluctance");
-                this.claimInitialWait = (Long) args.get("claimInitialWait");
-                this.compactLegsByReversedSearch =
-                        (Boolean) args.get("compactLegsByReversedSearch");
-                this.date = (String) args.get("date");
-                this.debugItineraryFilter = (Boolean) args.get("debugItineraryFilter");
-                this.disableRemainingWeightHeuristic =
-                        (Boolean) args.get("disableRemainingWeightHeuristic");
-                this.from = new LegacyGraphQLInputCoordinatesInput(
-                        (Map<String, Object>) args.get("from"));
-                this.fromPlace = (String) args.get("fromPlace");
-                this.heuristicStepsPerMainStep = (Integer) args.get("heuristicStepsPerMainStep");
-                this.ignoreRealtimeUpdates = (Boolean) args.get("ignoreRealtimeUpdates");
-                if (args.get("intermediatePlaces") != null) {
-                    this.intermediatePlaces =
-                            (Iterable<LegacyGraphQLInputCoordinatesInput>) args.get(
-                                    "intermediatePlaces");
-                }
-                this.itineraryFiltering = (Double) args.get("itineraryFiltering");
-                this.keepingRentedBicycleAtDestinationCost =
-                        (Integer) args.get("keepingRentedBicycleAtDestinationCost");
-                this.locale = (String) args.get("locale");
-                this.maxPreTransitTime = (Integer) args.get("maxPreTransitTime");
-                this.maxTransfers = (Integer) args.get("maxTransfers");
-                this.maxWalkDistance = (Double) args.get("maxWalkDistance");
-                this.minTransferTime = (Integer) args.get("minTransferTime");
-                this.modeWeight = new LegacyGraphQLInputModeWeightInput(
-                        (Map<String, Object>) args.get("modeWeight"));
-                this.nonpreferredTransferPenalty =
-                        (Integer) args.get("nonpreferredTransferPenalty");
-                this.numItineraries = (Integer) args.get("numItineraries");
-                this.omitCanceled = (Boolean) args.get("omitCanceled");
-                if (args.get("optimize") instanceof LegacyGraphQLOptimizeType) {
-                    this.optimize = (LegacyGraphQLOptimizeType) args.get("optimize");
-                }
-                else {
-                    this.optimize =
-                            LegacyGraphQLOptimizeType.valueOf((String) args.get("optimize"));
-                }
-                this.pageCursor = (String) args.get("pageCursor");
-                this.preferred = new LegacyGraphQLInputPreferredInput(
-                        (Map<String, Object>) args.get("preferred"));
-                this.reverseOptimizeOnTheFly = (Boolean) args.get("reverseOptimizeOnTheFly");
-                this.searchWindow = (Long) args.get("searchWindow");
-                this.startTransitStopId = (String) args.get("startTransitStopId");
-                this.startTransitTripId = (String) args.get("startTransitTripId");
-                this.time = (String) args.get("time");
-                this.to = new LegacyGraphQLInputCoordinatesInput(
-                        (Map<String, Object>) args.get("to"));
-                this.toPlace = (String) args.get("toPlace");
-                this.transferPenalty = (Integer) args.get("transferPenalty");
-                if (args.get("transportModes") != null) {
-                    this.transportModes =
-                            (Iterable<LegacyGraphQLTransportModeInput>) args.get("transportModes");
-                }
-                this.triangle = new LegacyGraphQLInputTriangleInput(
-                        (Map<String, Object>) args.get("triangle"));
-                this.unpreferred = new LegacyGraphQLInputUnpreferredInput(
-                        (Map<String, Object>) args.get("unpreferred"));
-                this.waitAtBeginningFactor = (Double) args.get("waitAtBeginningFactor");
-                this.waitReluctance = (Double) args.get("waitReluctance");
-                this.walkBoardCost = (Integer) args.get("walkBoardCost");
-                this.walkOnStreetReluctance = (Double) args.get("walkOnStreetReluctance");
-                this.walkReluctance = (Double) args.get("walkReluctance");
-                this.walkSpeed = (Double) args.get("walkSpeed");
-                this.wheelchair = (Boolean) args.get("wheelchair");
-            }
+        this.itineraryFiltering = (Double) args.get("itineraryFiltering");
+        this.keepingRentedBicycleAtDestinationCost =
+          (Integer) args.get("keepingRentedBicycleAtDestinationCost");
+        this.locale = (String) args.get("locale");
+        this.maxPreTransitTime = (Integer) args.get("maxPreTransitTime");
+        this.maxTransfers = (Integer) args.get("maxTransfers");
+        this.maxWalkDistance = (Double) args.get("maxWalkDistance");
+        this.minTransferTime = (Integer) args.get("minTransferTime");
+        this.modeWeight =
+          new LegacyGraphQLInputModeWeightInput((Map<String, Object>) args.get("modeWeight"));
+        this.nonpreferredTransferPenalty = (Integer) args.get("nonpreferredTransferPenalty");
+        this.numItineraries = (Integer) args.get("numItineraries");
+        this.omitCanceled = (Boolean) args.get("omitCanceled");
+        if (args.get("optimize") instanceof LegacyGraphQLOptimizeType) {
+          this.optimize = (LegacyGraphQLOptimizeType) args.get("optimize");
+        } else {
+          this.optimize = LegacyGraphQLOptimizeType.valueOf((String) args.get("optimize"));
         }
+        this.pageCursor = (String) args.get("pageCursor");
+        this.preferred =
+          new LegacyGraphQLInputPreferredInput((Map<String, Object>) args.get("preferred"));
+        this.reverseOptimizeOnTheFly = (Boolean) args.get("reverseOptimizeOnTheFly");
+        this.searchWindow = (Long) args.get("searchWindow");
+        this.startTransitStopId = (String) args.get("startTransitStopId");
+        this.startTransitTripId = (String) args.get("startTransitTripId");
+        this.time = (String) args.get("time");
+        this.to = new LegacyGraphQLInputCoordinatesInput((Map<String, Object>) args.get("to"));
+        this.toPlace = (String) args.get("toPlace");
+        this.transferPenalty = (Integer) args.get("transferPenalty");
+        if (args.get("transportModes") != null) {
+          this.transportModes =
+            (Iterable<LegacyGraphQLTransportModeInput>) args.get("transportModes");
+        }
+        this.triangle =
+          new LegacyGraphQLInputTriangleInput((Map<String, Object>) args.get("triangle"));
+        this.unpreferred =
+          new LegacyGraphQLInputUnpreferredInput((Map<String, Object>) args.get("unpreferred"));
+        this.waitAtBeginningFactor = (Double) args.get("waitAtBeginningFactor");
+        this.waitReluctance = (Double) args.get("waitReluctance");
+        this.walkBoardCost = (Integer) args.get("walkBoardCost");
+        this.walkOnStreetReluctance = (Double) args.get("walkOnStreetReluctance");
+        this.walkReluctance = (Double) args.get("walkReluctance");
+        this.walkSpeed = (Double) args.get("walkSpeed");
+        this.wheelchair = (Boolean) args.get("wheelchair");
+      }
+    }
 
-        public Integer getLegacyGraphQLAlightSlack() {return this.alightSlack;}
+    public Integer getLegacyGraphQLAlightSlack() {
+      return this.alightSlack;
+    }
 
-        public Boolean getLegacyGraphQLAllowBikeRental() {return this.allowBikeRental;}
+    public void setLegacyGraphQLAlightSlack(Integer alightSlack) {
+      this.alightSlack = alightSlack;
+    }
 
-        public Boolean getLegacyGraphQLAllowKeepingRentedBicycleAtDestination() {return this.allowKeepingRentedBicycleAtDestination;}
+    public Boolean getLegacyGraphQLAllowBikeRental() {
+      return this.allowBikeRental;
+    }
 
-        public Iterable<String> getLegacyGraphQLAllowedBikeRentalNetworks() {return this.allowedBikeRentalNetworks;}
+    public void setLegacyGraphQLAllowBikeRental(Boolean allowBikeRental) {
+      this.allowBikeRental = allowBikeRental;
+    }
 
-        public Iterable<String> getLegacyGraphQLAllowedTicketTypes() {return this.allowedTicketTypes;}
+    public Boolean getLegacyGraphQLAllowKeepingRentedBicycleAtDestination() {
+      return this.allowKeepingRentedBicycleAtDestination;
+    }
 
-        public Boolean getLegacyGraphQLArriveBy() {return this.arriveBy;}
+    public void setLegacyGraphQLAllowKeepingRentedBicycleAtDestination(
+      Boolean allowKeepingRentedBicycleAtDestination
+    ) {
+      this.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
+    }
 
-        public LegacyGraphQLInputBannedInput getLegacyGraphQLBanned() {return this.banned;}
+    public Iterable<String> getLegacyGraphQLAllowedBikeRentalNetworks() {
+      return this.allowedBikeRentalNetworks;
+    }
 
-        public Boolean getLegacyGraphQLBatch() {return this.batch;}
+    public void setLegacyGraphQLAllowedBikeRentalNetworks(
+      Iterable<String> allowedBikeRentalNetworks
+    ) {
+      this.allowedBikeRentalNetworks = allowedBikeRentalNetworks;
+    }
 
-        public Integer getLegacyGraphQLBikeBoardCost() {return this.bikeBoardCost;}
+    public Iterable<String> getLegacyGraphQLAllowedTicketTypes() {
+      return this.allowedTicketTypes;
+    }
 
-        public Double getLegacyGraphQLBikeReluctance() {return this.bikeReluctance;}
+    public void setLegacyGraphQLAllowedTicketTypes(Iterable<String> allowedTicketTypes) {
+      this.allowedTicketTypes = allowedTicketTypes;
+    }
 
-        public Double getLegacyGraphQLBikeSpeed() {return this.bikeSpeed;}
+    public Boolean getLegacyGraphQLArriveBy() {
+      return this.arriveBy;
+    }
 
-        public Integer getLegacyGraphQLBikeSwitchCost() {return this.bikeSwitchCost;}
+    public void setLegacyGraphQLArriveBy(Boolean arriveBy) {
+      this.arriveBy = arriveBy;
+    }
 
-        public Integer getLegacyGraphQLBikeSwitchTime() {return this.bikeSwitchTime;}
+    public LegacyGraphQLInputBannedInput getLegacyGraphQLBanned() {
+      return this.banned;
+    }
 
-        public Double getLegacyGraphQLBikeWalkingReluctance() {return this.bikeWalkingReluctance;}
+    public void setLegacyGraphQLBanned(LegacyGraphQLInputBannedInput banned) {
+      this.banned = banned;
+    }
 
-        public Integer getLegacyGraphQLBoardSlack() {return this.boardSlack;}
+    public Boolean getLegacyGraphQLBatch() {
+      return this.batch;
+    }
 
-        public Double getLegacyGraphQLCarParkCarLegWeight() {return this.carParkCarLegWeight;}
+    public void setLegacyGraphQLBatch(Boolean batch) {
+      this.batch = batch;
+    }
 
-        public Double getLegacyGraphQLCarReluctance() {return this.carReluctance;}
+    public Integer getLegacyGraphQLBikeBoardCost() {
+      return this.bikeBoardCost;
+    }
 
-        public Long getLegacyGraphQLClaimInitialWait() {return this.claimInitialWait;}
+    public void setLegacyGraphQLBikeBoardCost(Integer bikeBoardCost) {
+      this.bikeBoardCost = bikeBoardCost;
+    }
 
-        public Boolean getLegacyGraphQLCompactLegsByReversedSearch() {return this.compactLegsByReversedSearch;}
+    public Double getLegacyGraphQLBikeReluctance() {
+      return this.bikeReluctance;
+    }
 
-        public String getLegacyGraphQLDate() {return this.date;}
+    public void setLegacyGraphQLBikeReluctance(Double bikeReluctance) {
+      this.bikeReluctance = bikeReluctance;
+    }
 
-        public Boolean getLegacyGraphQLDebugItineraryFilter() {return this.debugItineraryFilter;}
+    public Double getLegacyGraphQLBikeSpeed() {
+      return this.bikeSpeed;
+    }
 
-        public Boolean getLegacyGraphQLDisableRemainingWeightHeuristic() {return this.disableRemainingWeightHeuristic;}
+    public void setLegacyGraphQLBikeSpeed(Double bikeSpeed) {
+      this.bikeSpeed = bikeSpeed;
+    }
 
-        public LegacyGraphQLInputCoordinatesInput getLegacyGraphQLFrom() {return this.from;}
+    public Integer getLegacyGraphQLBikeSwitchCost() {
+      return this.bikeSwitchCost;
+    }
 
-        public String getLegacyGraphQLFromPlace() {return this.fromPlace;}
+    public void setLegacyGraphQLBikeSwitchCost(Integer bikeSwitchCost) {
+      this.bikeSwitchCost = bikeSwitchCost;
+    }
 
-        public Integer getLegacyGraphQLHeuristicStepsPerMainStep() {return this.heuristicStepsPerMainStep;}
+    public Integer getLegacyGraphQLBikeSwitchTime() {
+      return this.bikeSwitchTime;
+    }
 
-        public Boolean getLegacyGraphQLIgnoreRealtimeUpdates() {return this.ignoreRealtimeUpdates;}
+    public void setLegacyGraphQLBikeSwitchTime(Integer bikeSwitchTime) {
+      this.bikeSwitchTime = bikeSwitchTime;
+    }
 
-        public Iterable<LegacyGraphQLInputCoordinatesInput> getLegacyGraphQLIntermediatePlaces() {return this.intermediatePlaces;}
+    public Double getLegacyGraphQLBikeWalkingReluctance() {
+      return this.bikeWalkingReluctance;
+    }
 
-        public Double getLegacyGraphQLItineraryFiltering() {return this.itineraryFiltering;}
+    public void setLegacyGraphQLBikeWalkingReluctance(Double bikeWalkingReluctance) {
+      this.bikeWalkingReluctance = bikeWalkingReluctance;
+    }
 
-        public Integer getLegacyGraphQLKeepingRentedBicycleAtDestinationCost() {return this.keepingRentedBicycleAtDestinationCost;}
+    public Integer getLegacyGraphQLBoardSlack() {
+      return this.boardSlack;
+    }
 
-        public String getLegacyGraphQLLocale() {return this.locale;}
+    public void setLegacyGraphQLBoardSlack(Integer boardSlack) {
+      this.boardSlack = boardSlack;
+    }
 
-        public Integer getLegacyGraphQLMaxPreTransitTime() {return this.maxPreTransitTime;}
+    public Double getLegacyGraphQLCarParkCarLegWeight() {
+      return this.carParkCarLegWeight;
+    }
 
-        public Integer getLegacyGraphQLMaxTransfers() {return this.maxTransfers;}
+    public void setLegacyGraphQLCarParkCarLegWeight(Double carParkCarLegWeight) {
+      this.carParkCarLegWeight = carParkCarLegWeight;
+    }
 
-        public Double getLegacyGraphQLMaxWalkDistance() {return this.maxWalkDistance;}
+    public Double getLegacyGraphQLCarReluctance() {
+      return this.carReluctance;
+    }
 
-        public Integer getLegacyGraphQLMinTransferTime() {return this.minTransferTime;}
+    public void setLegacyGraphQLCarReluctance(Double carReluctance) {
+      this.carReluctance = carReluctance;
+    }
 
-        public LegacyGraphQLInputModeWeightInput getLegacyGraphQLModeWeight() {return this.modeWeight;}
+    public Long getLegacyGraphQLClaimInitialWait() {
+      return this.claimInitialWait;
+    }
 
-        public Integer getLegacyGraphQLNonpreferredTransferPenalty() {return this.nonpreferredTransferPenalty;}
+    public void setLegacyGraphQLClaimInitialWait(Long claimInitialWait) {
+      this.claimInitialWait = claimInitialWait;
+    }
 
-        public Integer getLegacyGraphQLNumItineraries() {return this.numItineraries;}
+    public Boolean getLegacyGraphQLCompactLegsByReversedSearch() {
+      return this.compactLegsByReversedSearch;
+    }
 
-        public Boolean getLegacyGraphQLOmitCanceled() {return this.omitCanceled;}
+    public void setLegacyGraphQLCompactLegsByReversedSearch(Boolean compactLegsByReversedSearch) {
+      this.compactLegsByReversedSearch = compactLegsByReversedSearch;
+    }
 
-        public LegacyGraphQLOptimizeType getLegacyGraphQLOptimize() {return this.optimize;}
+    public String getLegacyGraphQLDate() {
+      return this.date;
+    }
 
-        public String getLegacyGraphQLPageCursor() {return this.pageCursor;}
+    public void setLegacyGraphQLDate(String date) {
+      this.date = date;
+    }
 
-        public LegacyGraphQLInputPreferredInput getLegacyGraphQLPreferred() {return this.preferred;}
+    public Boolean getLegacyGraphQLDebugItineraryFilter() {
+      return this.debugItineraryFilter;
+    }
 
-        public Boolean getLegacyGraphQLReverseOptimizeOnTheFly() {return this.reverseOptimizeOnTheFly;}
+    public void setLegacyGraphQLDebugItineraryFilter(Boolean debugItineraryFilter) {
+      this.debugItineraryFilter = debugItineraryFilter;
+    }
 
-        public Long getLegacyGraphQLSearchWindow() {return this.searchWindow;}
+    public Boolean getLegacyGraphQLDisableRemainingWeightHeuristic() {
+      return this.disableRemainingWeightHeuristic;
+    }
 
-        public String getLegacyGraphQLStartTransitStopId() {return this.startTransitStopId;}
+    public void setLegacyGraphQLDisableRemainingWeightHeuristic(
+      Boolean disableRemainingWeightHeuristic
+    ) {
+      this.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
+    }
 
-        public String getLegacyGraphQLStartTransitTripId() {return this.startTransitTripId;}
+    public LegacyGraphQLInputCoordinatesInput getLegacyGraphQLFrom() {
+      return this.from;
+    }
 
-        public String getLegacyGraphQLTime() {return this.time;}
+    public void setLegacyGraphQLFrom(LegacyGraphQLInputCoordinatesInput from) {
+      this.from = from;
+    }
 
-        public LegacyGraphQLInputCoordinatesInput getLegacyGraphQLTo() {return this.to;}
+    public String getLegacyGraphQLFromPlace() {
+      return this.fromPlace;
+    }
 
-        public String getLegacyGraphQLToPlace() {return this.toPlace;}
+    public void setLegacyGraphQLFromPlace(String fromPlace) {
+      this.fromPlace = fromPlace;
+    }
 
-        public Integer getLegacyGraphQLTransferPenalty() {return this.transferPenalty;}
+    public Integer getLegacyGraphQLHeuristicStepsPerMainStep() {
+      return this.heuristicStepsPerMainStep;
+    }
 
-        public Iterable<LegacyGraphQLTransportModeInput> getLegacyGraphQLTransportModes() {return this.transportModes;}
+    public void setLegacyGraphQLHeuristicStepsPerMainStep(Integer heuristicStepsPerMainStep) {
+      this.heuristicStepsPerMainStep = heuristicStepsPerMainStep;
+    }
 
-        public LegacyGraphQLInputTriangleInput getLegacyGraphQLTriangle() {return this.triangle;}
+    public Boolean getLegacyGraphQLIgnoreRealtimeUpdates() {
+      return this.ignoreRealtimeUpdates;
+    }
 
-        public LegacyGraphQLInputUnpreferredInput getLegacyGraphQLUnpreferred() {return this.unpreferred;}
+    public void setLegacyGraphQLIgnoreRealtimeUpdates(Boolean ignoreRealtimeUpdates) {
+      this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
+    }
 
-        public Double getLegacyGraphQLWaitAtBeginningFactor() {return this.waitAtBeginningFactor;}
+    public Iterable<LegacyGraphQLInputCoordinatesInput> getLegacyGraphQLIntermediatePlaces() {
+      return this.intermediatePlaces;
+    }
 
-        public Double getLegacyGraphQLWaitReluctance() {return this.waitReluctance;}
+    public void setLegacyGraphQLIntermediatePlaces(
+      Iterable<LegacyGraphQLInputCoordinatesInput> intermediatePlaces
+    ) {
+      this.intermediatePlaces = intermediatePlaces;
+    }
 
-        public Integer getLegacyGraphQLWalkBoardCost() {return this.walkBoardCost;}
+    public Double getLegacyGraphQLItineraryFiltering() {
+      return this.itineraryFiltering;
+    }
 
-        public Double getLegacyGraphQLWalkOnStreetReluctance() {return this.walkOnStreetReluctance;}
+    public void setLegacyGraphQLItineraryFiltering(Double itineraryFiltering) {
+      this.itineraryFiltering = itineraryFiltering;
+    }
 
-        public Double getLegacyGraphQLWalkReluctance() {return this.walkReluctance;}
+    public Integer getLegacyGraphQLKeepingRentedBicycleAtDestinationCost() {
+      return this.keepingRentedBicycleAtDestinationCost;
+    }
 
-        public Double getLegacyGraphQLWalkSpeed() {return this.walkSpeed;}
+    public void setLegacyGraphQLKeepingRentedBicycleAtDestinationCost(
+      Integer keepingRentedBicycleAtDestinationCost
+    ) {
+      this.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+    }
 
-        public Boolean getLegacyGraphQLWheelchair() {return this.wheelchair;}
+    public String getLegacyGraphQLLocale() {
+      return this.locale;
+    }
 
-        public void setLegacyGraphQLAlightSlack(Integer alightSlack) {
-            this.alightSlack = alightSlack;
-        }
+    public void setLegacyGraphQLLocale(String locale) {
+      this.locale = locale;
+    }
 
-        public void setLegacyGraphQLAllowBikeRental(Boolean allowBikeRental) {
-            this.allowBikeRental = allowBikeRental;
-        }
+    public Integer getLegacyGraphQLMaxPreTransitTime() {
+      return this.maxPreTransitTime;
+    }
 
-        public void setLegacyGraphQLAllowKeepingRentedBicycleAtDestination(Boolean allowKeepingRentedBicycleAtDestination) {
-            this.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
-        }
+    public void setLegacyGraphQLMaxPreTransitTime(Integer maxPreTransitTime) {
+      this.maxPreTransitTime = maxPreTransitTime;
+    }
 
-        public void setLegacyGraphQLAllowedBikeRentalNetworks(Iterable<String> allowedBikeRentalNetworks) {
-            this.allowedBikeRentalNetworks = allowedBikeRentalNetworks;
-        }
+    public Integer getLegacyGraphQLMaxTransfers() {
+      return this.maxTransfers;
+    }
 
-        public void setLegacyGraphQLAllowedTicketTypes(Iterable<String> allowedTicketTypes) {
-            this.allowedTicketTypes = allowedTicketTypes;
-        }
+    public void setLegacyGraphQLMaxTransfers(Integer maxTransfers) {
+      this.maxTransfers = maxTransfers;
+    }
 
-        public void setLegacyGraphQLArriveBy(Boolean arriveBy) {this.arriveBy = arriveBy;}
+    public Double getLegacyGraphQLMaxWalkDistance() {
+      return this.maxWalkDistance;
+    }
 
-        public void setLegacyGraphQLBanned(LegacyGraphQLInputBannedInput banned) {
-            this.banned = banned;
-        }
+    public void setLegacyGraphQLMaxWalkDistance(Double maxWalkDistance) {
+      this.maxWalkDistance = maxWalkDistance;
+    }
 
-        public void setLegacyGraphQLBatch(Boolean batch) {this.batch = batch;}
+    public Integer getLegacyGraphQLMinTransferTime() {
+      return this.minTransferTime;
+    }
 
-        public void setLegacyGraphQLBikeBoardCost(Integer bikeBoardCost) {
-            this.bikeBoardCost = bikeBoardCost;
-        }
+    public void setLegacyGraphQLMinTransferTime(Integer minTransferTime) {
+      this.minTransferTime = minTransferTime;
+    }
 
-        public void setLegacyGraphQLBikeReluctance(Double bikeReluctance) {
-            this.bikeReluctance = bikeReluctance;
-        }
+    public LegacyGraphQLInputModeWeightInput getLegacyGraphQLModeWeight() {
+      return this.modeWeight;
+    }
 
-        public void setLegacyGraphQLBikeSpeed(Double bikeSpeed) {this.bikeSpeed = bikeSpeed;}
+    public void setLegacyGraphQLModeWeight(LegacyGraphQLInputModeWeightInput modeWeight) {
+      this.modeWeight = modeWeight;
+    }
 
-        public void setLegacyGraphQLBikeSwitchCost(Integer bikeSwitchCost) {
-            this.bikeSwitchCost = bikeSwitchCost;
-        }
+    public Integer getLegacyGraphQLNonpreferredTransferPenalty() {
+      return this.nonpreferredTransferPenalty;
+    }
 
-        public void setLegacyGraphQLBikeSwitchTime(Integer bikeSwitchTime) {
-            this.bikeSwitchTime = bikeSwitchTime;
-        }
+    public void setLegacyGraphQLNonpreferredTransferPenalty(Integer nonpreferredTransferPenalty) {
+      this.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
+    }
 
-        public void setLegacyGraphQLBikeWalkingReluctance(Double bikeWalkingReluctance) {
-            this.bikeWalkingReluctance = bikeWalkingReluctance;
-        }
+    public Integer getLegacyGraphQLNumItineraries() {
+      return this.numItineraries;
+    }
 
-        public void setLegacyGraphQLBoardSlack(Integer boardSlack) {this.boardSlack = boardSlack;}
+    public void setLegacyGraphQLNumItineraries(Integer numItineraries) {
+      this.numItineraries = numItineraries;
+    }
 
-        public void setLegacyGraphQLCarParkCarLegWeight(Double carParkCarLegWeight) {
-            this.carParkCarLegWeight = carParkCarLegWeight;
-        }
+    public Boolean getLegacyGraphQLOmitCanceled() {
+      return this.omitCanceled;
+    }
 
-        public void setLegacyGraphQLCarReluctance(Double carReluctance) {
-            this.carReluctance = carReluctance;
-        }
+    public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
+      this.omitCanceled = omitCanceled;
+    }
 
-        public void setLegacyGraphQLClaimInitialWait(Long claimInitialWait) {
-            this.claimInitialWait = claimInitialWait;
-        }
+    public LegacyGraphQLOptimizeType getLegacyGraphQLOptimize() {
+      return this.optimize;
+    }
 
-        public void setLegacyGraphQLCompactLegsByReversedSearch(Boolean compactLegsByReversedSearch) {
-            this.compactLegsByReversedSearch = compactLegsByReversedSearch;
-        }
+    public void setLegacyGraphQLOptimize(LegacyGraphQLOptimizeType optimize) {
+      this.optimize = optimize;
+    }
 
-        public void setLegacyGraphQLDate(String date) {this.date = date;}
+    public String getLegacyGraphQLPageCursor() {
+      return this.pageCursor;
+    }
 
-        public void setLegacyGraphQLDebugItineraryFilter(Boolean debugItineraryFilter) {
-            this.debugItineraryFilter = debugItineraryFilter;
-        }
+    public void setLegacyGraphQLPageCursor(String pageCursor) {
+      this.pageCursor = pageCursor;
+    }
 
-        public void setLegacyGraphQLDisableRemainingWeightHeuristic(Boolean disableRemainingWeightHeuristic) {
-            this.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
-        }
+    public LegacyGraphQLInputPreferredInput getLegacyGraphQLPreferred() {
+      return this.preferred;
+    }
 
-        public void setLegacyGraphQLFrom(LegacyGraphQLInputCoordinatesInput from) {
-            this.from = from;
-        }
+    public void setLegacyGraphQLPreferred(LegacyGraphQLInputPreferredInput preferred) {
+      this.preferred = preferred;
+    }
 
-        public void setLegacyGraphQLFromPlace(String fromPlace) {this.fromPlace = fromPlace;}
+    public Boolean getLegacyGraphQLReverseOptimizeOnTheFly() {
+      return this.reverseOptimizeOnTheFly;
+    }
 
-        public void setLegacyGraphQLHeuristicStepsPerMainStep(Integer heuristicStepsPerMainStep) {
-            this.heuristicStepsPerMainStep = heuristicStepsPerMainStep;
-        }
+    public void setLegacyGraphQLReverseOptimizeOnTheFly(Boolean reverseOptimizeOnTheFly) {
+      this.reverseOptimizeOnTheFly = reverseOptimizeOnTheFly;
+    }
 
-        public void setLegacyGraphQLIgnoreRealtimeUpdates(Boolean ignoreRealtimeUpdates) {
-            this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
-        }
+    public Long getLegacyGraphQLSearchWindow() {
+      return this.searchWindow;
+    }
 
-        public void setLegacyGraphQLIntermediatePlaces(Iterable<LegacyGraphQLInputCoordinatesInput> intermediatePlaces) {
-            this.intermediatePlaces = intermediatePlaces;
-        }
+    public void setLegacyGraphQLSearchWindow(Long searchWindow) {
+      this.searchWindow = searchWindow;
+    }
 
-        public void setLegacyGraphQLItineraryFiltering(Double itineraryFiltering) {
-            this.itineraryFiltering = itineraryFiltering;
-        }
+    public String getLegacyGraphQLStartTransitStopId() {
+      return this.startTransitStopId;
+    }
 
-        public void setLegacyGraphQLKeepingRentedBicycleAtDestinationCost(Integer keepingRentedBicycleAtDestinationCost) {
-            this.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
-        }
+    public void setLegacyGraphQLStartTransitStopId(String startTransitStopId) {
+      this.startTransitStopId = startTransitStopId;
+    }
 
-        public void setLegacyGraphQLLocale(String locale) {this.locale = locale;}
+    public String getLegacyGraphQLStartTransitTripId() {
+      return this.startTransitTripId;
+    }
 
-        public void setLegacyGraphQLMaxPreTransitTime(Integer maxPreTransitTime) {
-            this.maxPreTransitTime = maxPreTransitTime;
-        }
+    public void setLegacyGraphQLStartTransitTripId(String startTransitTripId) {
+      this.startTransitTripId = startTransitTripId;
+    }
 
-        public void setLegacyGraphQLMaxTransfers(Integer maxTransfers) {
-            this.maxTransfers = maxTransfers;
-        }
+    public String getLegacyGraphQLTime() {
+      return this.time;
+    }
 
-        public void setLegacyGraphQLMaxWalkDistance(Double maxWalkDistance) {
-            this.maxWalkDistance = maxWalkDistance;
-        }
+    public void setLegacyGraphQLTime(String time) {
+      this.time = time;
+    }
 
-        public void setLegacyGraphQLMinTransferTime(Integer minTransferTime) {
-            this.minTransferTime = minTransferTime;
-        }
+    public LegacyGraphQLInputCoordinatesInput getLegacyGraphQLTo() {
+      return this.to;
+    }
 
-        public void setLegacyGraphQLModeWeight(LegacyGraphQLInputModeWeightInput modeWeight) {
-            this.modeWeight = modeWeight;
-        }
+    public void setLegacyGraphQLTo(LegacyGraphQLInputCoordinatesInput to) {
+      this.to = to;
+    }
 
-        public void setLegacyGraphQLNonpreferredTransferPenalty(Integer nonpreferredTransferPenalty) {
-            this.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
-        }
+    public String getLegacyGraphQLToPlace() {
+      return this.toPlace;
+    }
 
-        public void setLegacyGraphQLNumItineraries(Integer numItineraries) {
-            this.numItineraries = numItineraries;
-        }
+    public void setLegacyGraphQLToPlace(String toPlace) {
+      this.toPlace = toPlace;
+    }
 
-        public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
-            this.omitCanceled = omitCanceled;
-        }
+    public Integer getLegacyGraphQLTransferPenalty() {
+      return this.transferPenalty;
+    }
 
-        public void setLegacyGraphQLOptimize(LegacyGraphQLOptimizeType optimize) {
-            this.optimize = optimize;
-        }
+    public void setLegacyGraphQLTransferPenalty(Integer transferPenalty) {
+      this.transferPenalty = transferPenalty;
+    }
 
-        public void setLegacyGraphQLPageCursor(String pageCursor) {this.pageCursor = pageCursor;}
+    public Iterable<LegacyGraphQLTransportModeInput> getLegacyGraphQLTransportModes() {
+      return this.transportModes;
+    }
 
-        public void setLegacyGraphQLPreferred(LegacyGraphQLInputPreferredInput preferred) {
-            this.preferred = preferred;
-        }
+    public void setLegacyGraphQLTransportModes(
+      Iterable<LegacyGraphQLTransportModeInput> transportModes
+    ) {
+      this.transportModes = transportModes;
+    }
 
-        public void setLegacyGraphQLReverseOptimizeOnTheFly(Boolean reverseOptimizeOnTheFly) {
-            this.reverseOptimizeOnTheFly = reverseOptimizeOnTheFly;
-        }
+    public LegacyGraphQLInputTriangleInput getLegacyGraphQLTriangle() {
+      return this.triangle;
+    }
 
-        public void setLegacyGraphQLSearchWindow(Long searchWindow) {
-            this.searchWindow = searchWindow;
-        }
+    public void setLegacyGraphQLTriangle(LegacyGraphQLInputTriangleInput triangle) {
+      this.triangle = triangle;
+    }
 
-        public void setLegacyGraphQLStartTransitStopId(String startTransitStopId) {
-            this.startTransitStopId = startTransitStopId;
-        }
+    public LegacyGraphQLInputUnpreferredInput getLegacyGraphQLUnpreferred() {
+      return this.unpreferred;
+    }
 
-        public void setLegacyGraphQLStartTransitTripId(String startTransitTripId) {
-            this.startTransitTripId = startTransitTripId;
-        }
+    public void setLegacyGraphQLUnpreferred(LegacyGraphQLInputUnpreferredInput unpreferred) {
+      this.unpreferred = unpreferred;
+    }
 
-        public void setLegacyGraphQLTime(String time) {this.time = time;}
+    public Double getLegacyGraphQLWaitAtBeginningFactor() {
+      return this.waitAtBeginningFactor;
+    }
 
-        public void setLegacyGraphQLTo(LegacyGraphQLInputCoordinatesInput to) {this.to = to;}
+    public void setLegacyGraphQLWaitAtBeginningFactor(Double waitAtBeginningFactor) {
+      this.waitAtBeginningFactor = waitAtBeginningFactor;
+    }
 
-        public void setLegacyGraphQLToPlace(String toPlace) {this.toPlace = toPlace;}
+    public Double getLegacyGraphQLWaitReluctance() {
+      return this.waitReluctance;
+    }
 
-        public void setLegacyGraphQLTransferPenalty(Integer transferPenalty) {
-            this.transferPenalty = transferPenalty;
-        }
+    public void setLegacyGraphQLWaitReluctance(Double waitReluctance) {
+      this.waitReluctance = waitReluctance;
+    }
 
-        public void setLegacyGraphQLTransportModes(Iterable<LegacyGraphQLTransportModeInput> transportModes) {
-            this.transportModes = transportModes;
-        }
+    public Integer getLegacyGraphQLWalkBoardCost() {
+      return this.walkBoardCost;
+    }
 
-        public void setLegacyGraphQLTriangle(LegacyGraphQLInputTriangleInput triangle) {
-            this.triangle = triangle;
-        }
+    public void setLegacyGraphQLWalkBoardCost(Integer walkBoardCost) {
+      this.walkBoardCost = walkBoardCost;
+    }
 
-        public void setLegacyGraphQLUnpreferred(LegacyGraphQLInputUnpreferredInput unpreferred) {
-            this.unpreferred = unpreferred;
-        }
+    public Double getLegacyGraphQLWalkOnStreetReluctance() {
+      return this.walkOnStreetReluctance;
+    }
 
-        public void setLegacyGraphQLWaitAtBeginningFactor(Double waitAtBeginningFactor) {
-            this.waitAtBeginningFactor = waitAtBeginningFactor;
-        }
+    public void setLegacyGraphQLWalkOnStreetReluctance(Double walkOnStreetReluctance) {
+      this.walkOnStreetReluctance = walkOnStreetReluctance;
+    }
 
-        public void setLegacyGraphQLWaitReluctance(Double waitReluctance) {
-            this.waitReluctance = waitReluctance;
-        }
+    public Double getLegacyGraphQLWalkReluctance() {
+      return this.walkReluctance;
+    }
 
-        public void setLegacyGraphQLWalkBoardCost(Integer walkBoardCost) {
-            this.walkBoardCost = walkBoardCost;
-        }
+    public void setLegacyGraphQLWalkReluctance(Double walkReluctance) {
+      this.walkReluctance = walkReluctance;
+    }
 
-        public void setLegacyGraphQLWalkOnStreetReluctance(Double walkOnStreetReluctance) {
-            this.walkOnStreetReluctance = walkOnStreetReluctance;
-        }
+    public Double getLegacyGraphQLWalkSpeed() {
+      return this.walkSpeed;
+    }
 
-        public void setLegacyGraphQLWalkReluctance(Double walkReluctance) {
-            this.walkReluctance = walkReluctance;
-        }
+    public void setLegacyGraphQLWalkSpeed(Double walkSpeed) {
+      this.walkSpeed = walkSpeed;
+    }
 
-        public void setLegacyGraphQLWalkSpeed(Double walkSpeed) {this.walkSpeed = walkSpeed;}
+    public Boolean getLegacyGraphQLWheelchair() {
+      return this.wheelchair;
+    }
 
-        public void setLegacyGraphQLWheelchair(Boolean wheelchair) {this.wheelchair = wheelchair;}
+    public void setLegacyGraphQLWheelchair(Boolean wheelchair) {
+      this.wheelchair = wheelchair;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeRentalVehicleArgs {
+  public static class LegacyGraphQLQueryTypeRentalVehicleArgs {
 
-        private String id;
+    private String id;
 
-        public LegacyGraphQLQueryTypeRentalVehicleArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public LegacyGraphQLQueryTypeRentalVehicleArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeRentalVehiclesArgs {
+  public static class LegacyGraphQLQueryTypeRentalVehiclesArgs {
 
-        private Iterable<String> ids;
+    private Iterable<LegacyGraphQLFormFactor> formFactors;
+    private Iterable<String> ids;
 
-        public LegacyGraphQLQueryTypeRentalVehiclesArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.ids = (Iterable<String>) args.get("ids");
-            }
+    public LegacyGraphQLQueryTypeRentalVehiclesArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("formFactors") != null) {
+          this.formFactors =
+            ((List<Object>) args.get("formFactors")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLFormFactor
+                  ? item
+                  : LegacyGraphQLFormFactor.valueOf((String) item)
+              )
+              .map(LegacyGraphQLFormFactor.class::cast)
+              .collect(Collectors.toList());
         }
-
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
-
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
+        this.ids = (Iterable<String>) args.get("ids");
+      }
     }
 
-    public static class LegacyGraphQLQueryTypeRouteArgs {
+    public Iterable<LegacyGraphQLFormFactor> getLegacyGraphQLFormFactors() {
+      return this.formFactors;
+    }
 
-        private String id;
+    public void setLegacyGraphQLFormFactors(Iterable<LegacyGraphQLFormFactor> formFactors) {
+      this.formFactors = formFactors;
+    }
 
-        public LegacyGraphQLQueryTypeRouteArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
-
-        public void setLegacyGraphQLId(String id) {this.id = id;}
-    }
-
-    public static class LegacyGraphQLQueryTypeRoutesArgs {
-
-        private Iterable<String> feeds;
-        private Iterable<String> ids;
-        private String name;
-        private Iterable<LegacyGraphQLMode> transportModes;
-
-        public LegacyGraphQLQueryTypeRoutesArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.feeds = (Iterable<String>) args.get("feeds");
-                this.ids = (Iterable<String>) args.get("ids");
-                this.name = (String) args.get("name");
-                if (args.get("transportModes") != null) {
-                    this.transportModes = ((List<Object>) args.get("transportModes")).stream()
-                            .map(item -> item instanceof LegacyGraphQLMode
-                                    ? item
-                                    : LegacyGraphQLMode.valueOf((String) item))
-                            .map(LegacyGraphQLMode.class::cast)
-                            .collect(Collectors.toList());
-                }
-            }
-        }
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
+    }
+  }
 
-        public Iterable<String> getLegacyGraphQLFeeds() {return this.feeds;}
+  public static class LegacyGraphQLQueryTypeRouteArgs {
 
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
+    private String id;
 
-        public String getLegacyGraphQLName() {return this.name;}
+    public LegacyGraphQLQueryTypeRouteArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public Iterable<LegacyGraphQLMode> getLegacyGraphQLTransportModes() {return this.transportModes;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLFeeds(Iterable<String> feeds) {this.feeds = feeds;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
+  public static class LegacyGraphQLQueryTypeRoutesArgs {
 
-        public void setLegacyGraphQLName(String name) {this.name = name;}
+    private Iterable<String> feeds;
+    private Iterable<String> ids;
+    private String name;
+    private Iterable<LegacyGraphQLMode> transportModes;
 
-        public void setLegacyGraphQLTransportModes(Iterable<LegacyGraphQLMode> transportModes) {
-            this.transportModes = transportModes;
+    public LegacyGraphQLQueryTypeRoutesArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.feeds = (Iterable<String>) args.get("feeds");
+        this.ids = (Iterable<String>) args.get("ids");
+        this.name = (String) args.get("name");
+        if (args.get("transportModes") != null) {
+          this.transportModes =
+            ((List<Object>) args.get("transportModes")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLMode ? item : LegacyGraphQLMode.valueOf((String) item)
+              )
+              .map(LegacyGraphQLMode.class::cast)
+              .collect(Collectors.toList());
         }
+      }
     }
 
-    public static class LegacyGraphQLQueryTypeStationArgs {
-
-        private String id;
+    public Iterable<String> getLegacyGraphQLFeeds() {
+      return this.feeds;
+    }
 
-        public LegacyGraphQLQueryTypeStationArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public void setLegacyGraphQLFeeds(Iterable<String> feeds) {
+      this.feeds = feeds;
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
     }
 
-    public static class LegacyGraphQLQueryTypeStationsArgs {
+    public String getLegacyGraphQLName() {
+      return this.name;
+    }
 
-        private Iterable<String> ids;
-        private String name;
+    public void setLegacyGraphQLName(String name) {
+      this.name = name;
+    }
 
-        public LegacyGraphQLQueryTypeStationsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.ids = (Iterable<String>) args.get("ids");
-                this.name = (String) args.get("name");
-            }
-        }
+    public Iterable<LegacyGraphQLMode> getLegacyGraphQLTransportModes() {
+      return this.transportModes;
+    }
 
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
+    public void setLegacyGraphQLTransportModes(Iterable<LegacyGraphQLMode> transportModes) {
+      this.transportModes = transportModes;
+    }
+  }
 
-        public String getLegacyGraphQLName() {return this.name;}
+  public static class LegacyGraphQLQueryTypeStationArgs {
 
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
+    private String id;
 
-        public void setLegacyGraphQLName(String name) {this.name = name;}
+    public LegacyGraphQLQueryTypeStationArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
     }
 
-    public static class LegacyGraphQLQueryTypeStopArgs {
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        private String id;
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public LegacyGraphQLQueryTypeStopArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+  public static class LegacyGraphQLQueryTypeStationsArgs {
 
-        public String getLegacyGraphQLId() {return this.id;}
+    private Iterable<String> ids;
+    private String name;
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public LegacyGraphQLQueryTypeStationsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (Iterable<String>) args.get("ids");
+        this.name = (String) args.get("name");
+      }
     }
 
-    public static class LegacyGraphQLQueryTypeStopsArgs {
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
+    }
 
-        private Iterable<String> ids;
-        private String name;
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
+    }
 
-        public LegacyGraphQLQueryTypeStopsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.ids = (Iterable<String>) args.get("ids");
-                this.name = (String) args.get("name");
-            }
-        }
+    public String getLegacyGraphQLName() {
+      return this.name;
+    }
 
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
+    public void setLegacyGraphQLName(String name) {
+      this.name = name;
+    }
+  }
 
-        public String getLegacyGraphQLName() {return this.name;}
+  public static class LegacyGraphQLQueryTypeStopArgs {
 
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
+    private String id;
 
-        public void setLegacyGraphQLName(String name) {this.name = name;}
+    public LegacyGraphQLQueryTypeStopArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
     }
-
-    public static class LegacyGraphQLQueryTypeStopsByBboxArgs {
 
-        private Iterable<String> feeds;
-        private Double maxLat;
-        private Double maxLon;
-        private Double minLat;
-        private Double minLon;
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public LegacyGraphQLQueryTypeStopsByBboxArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.feeds = (Iterable<String>) args.get("feeds");
-                this.maxLat = (Double) args.get("maxLat");
-                this.maxLon = (Double) args.get("maxLon");
-                this.minLat = (Double) args.get("minLat");
-                this.minLon = (Double) args.get("minLon");
-            }
-        }
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public Iterable<String> getLegacyGraphQLFeeds() {return this.feeds;}
+  public static class LegacyGraphQLQueryTypeStopsArgs {
 
-        public Double getLegacyGraphQLMaxLat() {return this.maxLat;}
+    private Iterable<String> ids;
+    private String name;
 
-        public Double getLegacyGraphQLMaxLon() {return this.maxLon;}
+    public LegacyGraphQLQueryTypeStopsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (Iterable<String>) args.get("ids");
+        this.name = (String) args.get("name");
+      }
+    }
 
-        public Double getLegacyGraphQLMinLat() {return this.minLat;}
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
+    }
 
-        public Double getLegacyGraphQLMinLon() {return this.minLon;}
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
+    }
 
-        public void setLegacyGraphQLFeeds(Iterable<String> feeds) {this.feeds = feeds;}
+    public String getLegacyGraphQLName() {
+      return this.name;
+    }
 
-        public void setLegacyGraphQLMaxLat(Double maxLat) {this.maxLat = maxLat;}
+    public void setLegacyGraphQLName(String name) {
+      this.name = name;
+    }
+  }
 
-        public void setLegacyGraphQLMaxLon(Double maxLon) {this.maxLon = maxLon;}
+  public static class LegacyGraphQLQueryTypeStopsByBboxArgs {
 
-        public void setLegacyGraphQLMinLat(Double minLat) {this.minLat = minLat;}
+    private Iterable<String> feeds;
+    private Double maxLat;
+    private Double maxLon;
+    private Double minLat;
+    private Double minLon;
 
-        public void setLegacyGraphQLMinLon(Double minLon) {this.minLon = minLon;}
+    public LegacyGraphQLQueryTypeStopsByBboxArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.feeds = (Iterable<String>) args.get("feeds");
+        this.maxLat = (Double) args.get("maxLat");
+        this.maxLon = (Double) args.get("maxLon");
+        this.minLat = (Double) args.get("minLat");
+        this.minLon = (Double) args.get("minLon");
+      }
     }
 
-    public static class LegacyGraphQLQueryTypeStopsByRadiusArgs {
+    public Iterable<String> getLegacyGraphQLFeeds() {
+      return this.feeds;
+    }
 
-        private String after;
-        private String before;
-        private Iterable<String> feeds;
-        private Integer first;
-        private Integer last;
-        private Double lat;
-        private Double lon;
-        private Integer radius;
+    public void setLegacyGraphQLFeeds(Iterable<String> feeds) {
+      this.feeds = feeds;
+    }
 
-        public LegacyGraphQLQueryTypeStopsByRadiusArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.after = (String) args.get("after");
-                this.before = (String) args.get("before");
-                this.feeds = (Iterable<String>) args.get("feeds");
-                this.first = (Integer) args.get("first");
-                this.last = (Integer) args.get("last");
-                this.lat = (Double) args.get("lat");
-                this.lon = (Double) args.get("lon");
-                this.radius = (Integer) args.get("radius");
-            }
-        }
+    public Double getLegacyGraphQLMaxLat() {
+      return this.maxLat;
+    }
 
-        public String getLegacyGraphQLAfter() {return this.after;}
+    public void setLegacyGraphQLMaxLat(Double maxLat) {
+      this.maxLat = maxLat;
+    }
 
-        public String getLegacyGraphQLBefore() {return this.before;}
+    public Double getLegacyGraphQLMaxLon() {
+      return this.maxLon;
+    }
 
-        public Iterable<String> getLegacyGraphQLFeeds() {return this.feeds;}
+    public void setLegacyGraphQLMaxLon(Double maxLon) {
+      this.maxLon = maxLon;
+    }
 
-        public Integer getLegacyGraphQLFirst() {return this.first;}
+    public Double getLegacyGraphQLMinLat() {
+      return this.minLat;
+    }
 
-        public Integer getLegacyGraphQLLast() {return this.last;}
+    public void setLegacyGraphQLMinLat(Double minLat) {
+      this.minLat = minLat;
+    }
 
-        public Double getLegacyGraphQLLat() {return this.lat;}
+    public Double getLegacyGraphQLMinLon() {
+      return this.minLon;
+    }
 
-        public Double getLegacyGraphQLLon() {return this.lon;}
+    public void setLegacyGraphQLMinLon(Double minLon) {
+      this.minLon = minLon;
+    }
+  }
 
-        public Integer getLegacyGraphQLRadius() {return this.radius;}
+  public static class LegacyGraphQLQueryTypeStopsByRadiusArgs {
 
-        public void setLegacyGraphQLAfter(String after) {this.after = after;}
+    private String after;
+    private String before;
+    private Iterable<String> feeds;
+    private Integer first;
+    private Integer last;
+    private Double lat;
+    private Double lon;
+    private Integer radius;
 
-        public void setLegacyGraphQLBefore(String before) {this.before = before;}
+    public LegacyGraphQLQueryTypeStopsByRadiusArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.after = (String) args.get("after");
+        this.before = (String) args.get("before");
+        this.feeds = (Iterable<String>) args.get("feeds");
+        this.first = (Integer) args.get("first");
+        this.last = (Integer) args.get("last");
+        this.lat = (Double) args.get("lat");
+        this.lon = (Double) args.get("lon");
+        this.radius = (Integer) args.get("radius");
+      }
+    }
 
-        public void setLegacyGraphQLFeeds(Iterable<String> feeds) {this.feeds = feeds;}
+    public String getLegacyGraphQLAfter() {
+      return this.after;
+    }
 
-        public void setLegacyGraphQLFirst(Integer first) {this.first = first;}
+    public void setLegacyGraphQLAfter(String after) {
+      this.after = after;
+    }
 
-        public void setLegacyGraphQLLast(Integer last) {this.last = last;}
+    public String getLegacyGraphQLBefore() {
+      return this.before;
+    }
 
-        public void setLegacyGraphQLLat(Double lat) {this.lat = lat;}
+    public void setLegacyGraphQLBefore(String before) {
+      this.before = before;
+    }
 
-        public void setLegacyGraphQLLon(Double lon) {this.lon = lon;}
+    public Iterable<String> getLegacyGraphQLFeeds() {
+      return this.feeds;
+    }
 
-        public void setLegacyGraphQLRadius(Integer radius) {this.radius = radius;}
+    public void setLegacyGraphQLFeeds(Iterable<String> feeds) {
+      this.feeds = feeds;
     }
 
-    public static class LegacyGraphQLQueryTypeTripArgs {
+    public Integer getLegacyGraphQLFirst() {
+      return this.first;
+    }
 
-        private String id;
+    public void setLegacyGraphQLFirst(Integer first) {
+      this.first = first;
+    }
 
-        public LegacyGraphQLQueryTypeTripArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public Integer getLegacyGraphQLLast() {
+      return this.last;
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public void setLegacyGraphQLLast(Integer last) {
+      this.last = last;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public Double getLegacyGraphQLLat() {
+      return this.lat;
     }
 
-    public static class LegacyGraphQLQueryTypeTripsArgs {
+    public void setLegacyGraphQLLat(Double lat) {
+      this.lat = lat;
+    }
 
-        private Iterable<String> feeds;
+    public Double getLegacyGraphQLLon() {
+      return this.lon;
+    }
 
-        public LegacyGraphQLQueryTypeTripsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.feeds = (Iterable<String>) args.get("feeds");
-            }
-        }
+    public void setLegacyGraphQLLon(Double lon) {
+      this.lon = lon;
+    }
 
-        public Iterable<String> getLegacyGraphQLFeeds() {return this.feeds;}
+    public Integer getLegacyGraphQLRadius() {
+      return this.radius;
+    }
 
-        public void setLegacyGraphQLFeeds(Iterable<String> feeds) {this.feeds = feeds;}
+    public void setLegacyGraphQLRadius(Integer radius) {
+      this.radius = radius;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeVehicleParkingArgs {
+  public static class LegacyGraphQLQueryTypeTripArgs {
 
-        private String id;
+    private String id;
 
-        public LegacyGraphQLQueryTypeVehicleParkingArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public LegacyGraphQLQueryTypeTripArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeVehicleParkingsArgs {
+  public static class LegacyGraphQLQueryTypeTripsArgs {
 
-        private Iterable<String> ids;
+    private Iterable<String> feeds;
 
-        public LegacyGraphQLQueryTypeVehicleParkingsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.ids = (Iterable<String>) args.get("ids");
-            }
-        }
+    public LegacyGraphQLQueryTypeTripsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.feeds = (Iterable<String>) args.get("feeds");
+      }
+    }
 
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
+    public Iterable<String> getLegacyGraphQLFeeds() {
+      return this.feeds;
+    }
 
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
+    public void setLegacyGraphQLFeeds(Iterable<String> feeds) {
+      this.feeds = feeds;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeVehicleRentalStationArgs {
+  public static class LegacyGraphQLQueryTypeVehicleParkingArgs {
 
-        private String id;
+    private String id;
 
-        public LegacyGraphQLQueryTypeVehicleRentalStationArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-            }
-        }
+    public LegacyGraphQLQueryTypeVehicleParkingArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
     }
+  }
 
-    public static class LegacyGraphQLQueryTypeVehicleRentalStationsArgs {
+  public static class LegacyGraphQLQueryTypeVehicleParkingsArgs {
 
-        private Iterable<String> ids;
+    private Iterable<String> ids;
 
-        public LegacyGraphQLQueryTypeVehicleRentalStationsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.ids = (Iterable<String>) args.get("ids");
-            }
-        }
+    public LegacyGraphQLQueryTypeVehicleParkingsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (Iterable<String>) args.get("ids");
+      }
+    }
 
-        public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
+    }
 
-        public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
     }
+  }
 
-    public enum LegacyGraphQLRealtimeState {
-        ADDED,
-        CANCELED,
-        MODIFIED,
-        SCHEDULED,
-        UPDATED
+  public static class LegacyGraphQLQueryTypeVehicleRentalStationArgs {
 
-    }
+    private String id;
 
+    public LegacyGraphQLQueryTypeVehicleRentalStationArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
 
-    public static class LegacyGraphQLRouteAlertsArgs {
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        private Iterable<LegacyGraphQLRouteAlertType> types;
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
+  }
 
-        public LegacyGraphQLRouteAlertsArgs(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("types") != null) {
-                    this.types = ((List<Object>) args.get("types")).stream()
-                            .map(item -> item instanceof LegacyGraphQLRouteAlertType
-                                    ? item
-                                    : LegacyGraphQLRouteAlertType.valueOf((String) item))
-                            .map(LegacyGraphQLRouteAlertType.class::cast)
-                            .collect(Collectors.toList());
-                }
-            }
-        }
+  public static class LegacyGraphQLQueryTypeVehicleRentalStationsArgs {
 
-        public Iterable<LegacyGraphQLRouteAlertType> getLegacyGraphQLTypes() {return this.types;}
+    private Iterable<String> ids;
 
-        public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLRouteAlertType> types) {
-            this.types = types;
-        }
+    public LegacyGraphQLQueryTypeVehicleRentalStationsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (Iterable<String>) args.get("ids");
+      }
     }
 
-    /**
-     * Entities that are relevant for routes that can contain alerts
-     */
-    public enum LegacyGraphQLRouteAlertType {
-        AGENCY,
-        PATTERNS,
-        ROUTE,
-        ROUTE_TYPE,
-        STOPS_ON_ROUTE,
-        STOPS_ON_TRIPS,
-        TRIPS
-
+    public Iterable<String> getLegacyGraphQLIds() {
+      return this.ids;
     }
 
+    public void setLegacyGraphQLIds(Iterable<String> ids) {
+      this.ids = ids;
+    }
+  }
 
-    public static class LegacyGraphQLStopAlertsArgs {
+  public static class LegacyGraphQLRouteAlertsArgs {
 
-        private Iterable<LegacyGraphQLStopAlertType> types;
+    private Iterable<LegacyGraphQLRouteAlertType> types;
 
-        public LegacyGraphQLStopAlertsArgs(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("types") != null) {
-                    this.types = ((List<Object>) args.get("types")).stream()
-                            .map(item -> item instanceof LegacyGraphQLStopAlertType
-                                    ? item
-                                    : LegacyGraphQLStopAlertType.valueOf((String) item))
-                            .map(LegacyGraphQLStopAlertType.class::cast)
-                            .collect(Collectors.toList());
-                }
-            }
+    public LegacyGraphQLRouteAlertsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("types") != null) {
+          this.types =
+            ((List<Object>) args.get("types")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLRouteAlertType
+                  ? item
+                  : LegacyGraphQLRouteAlertType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLRouteAlertType.class::cast)
+              .collect(Collectors.toList());
         }
+      }
+    }
 
-        public Iterable<LegacyGraphQLStopAlertType> getLegacyGraphQLTypes() {return this.types;}
+    public Iterable<LegacyGraphQLRouteAlertType> getLegacyGraphQLTypes() {
+      return this.types;
+    }
 
-        public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLStopAlertType> types) {
-            this.types = types;
-        }
+    public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLRouteAlertType> types) {
+      this.types = types;
     }
+  }
 
-    public static class LegacyGraphQLStopNameArgs {
+  public static class LegacyGraphQLStopAlertsArgs {
 
-        private String language;
+    private Iterable<LegacyGraphQLStopAlertType> types;
 
-        public LegacyGraphQLStopNameArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.language = (String) args.get("language");
-            }
+    public LegacyGraphQLStopAlertsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("types") != null) {
+          this.types =
+            ((List<Object>) args.get("types")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLStopAlertType
+                  ? item
+                  : LegacyGraphQLStopAlertType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLStopAlertType.class::cast)
+              .collect(Collectors.toList());
         }
-
-        public String getLegacyGraphQLLanguage() {return this.language;}
+      }
+    }
 
-        public void setLegacyGraphQLLanguage(String language) {this.language = language;}
+    public Iterable<LegacyGraphQLStopAlertType> getLegacyGraphQLTypes() {
+      return this.types;
     }
 
-    public static class LegacyGraphQLStopStopTimesForPatternArgs {
+    public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLStopAlertType> types) {
+      this.types = types;
+    }
+  }
 
-        private String id;
-        private Integer numberOfDepartures;
-        private Boolean omitCanceled;
-        private Boolean omitNonPickups;
-        private Long startTime;
-        private Integer timeRange;
+  public static class LegacyGraphQLStopNameArgs {
 
-        public LegacyGraphQLStopStopTimesForPatternArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.id = (String) args.get("id");
-                this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
-                this.omitCanceled = (Boolean) args.get("omitCanceled");
-                this.omitNonPickups = (Boolean) args.get("omitNonPickups");
-                this.startTime = (Long) args.get("startTime");
-                this.timeRange = (Integer) args.get("timeRange");
-            }
-        }
+    private String language;
 
-        public String getLegacyGraphQLId() {return this.id;}
+    public LegacyGraphQLStopNameArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
 
-        public Integer getLegacyGraphQLNumberOfDepartures() {return this.numberOfDepartures;}
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
 
-        public Boolean getLegacyGraphQLOmitCanceled() {return this.omitCanceled;}
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
 
-        public Boolean getLegacyGraphQLOmitNonPickups() {return this.omitNonPickups;}
+  public static class LegacyGraphQLStopStopTimesForPatternArgs {
 
-        public Long getLegacyGraphQLStartTime() {return this.startTime;}
+    private String id;
+    private Integer numberOfDepartures;
+    private Boolean omitCanceled;
+    private Boolean omitNonPickups;
+    private Long startTime;
+    private Integer timeRange;
 
-        public Integer getLegacyGraphQLTimeRange() {return this.timeRange;}
+    public LegacyGraphQLStopStopTimesForPatternArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+        this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
+        this.omitCanceled = (Boolean) args.get("omitCanceled");
+        this.omitNonPickups = (Boolean) args.get("omitNonPickups");
+        this.startTime = (Long) args.get("startTime");
+        this.timeRange = (Integer) args.get("timeRange");
+      }
+    }
 
-        public void setLegacyGraphQLId(String id) {this.id = id;}
+    public String getLegacyGraphQLId() {
+      return this.id;
+    }
 
-        public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
-            this.numberOfDepartures = numberOfDepartures;
-        }
+    public void setLegacyGraphQLId(String id) {
+      this.id = id;
+    }
 
-        public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
-            this.omitCanceled = omitCanceled;
-        }
+    public Integer getLegacyGraphQLNumberOfDepartures() {
+      return this.numberOfDepartures;
+    }
 
-        public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
-            this.omitNonPickups = omitNonPickups;
-        }
+    public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
+      this.numberOfDepartures = numberOfDepartures;
+    }
 
-        public void setLegacyGraphQLStartTime(Long startTime) {this.startTime = startTime;}
+    public Boolean getLegacyGraphQLOmitCanceled() {
+      return this.omitCanceled;
+    }
 
-        public void setLegacyGraphQLTimeRange(Integer timeRange) {this.timeRange = timeRange;}
+    public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
+      this.omitCanceled = omitCanceled;
     }
 
-    public static class LegacyGraphQLStopStoptimesForPatternsArgs {
+    public Boolean getLegacyGraphQLOmitNonPickups() {
+      return this.omitNonPickups;
+    }
 
-        private Integer numberOfDepartures;
-        private Boolean omitCanceled;
-        private Boolean omitNonPickups;
-        private Long startTime;
-        private Integer timeRange;
+    public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
+      this.omitNonPickups = omitNonPickups;
+    }
 
-        public LegacyGraphQLStopStoptimesForPatternsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
-                this.omitCanceled = (Boolean) args.get("omitCanceled");
-                this.omitNonPickups = (Boolean) args.get("omitNonPickups");
-                this.startTime = (Long) args.get("startTime");
-                this.timeRange = (Integer) args.get("timeRange");
-            }
-        }
+    public Long getLegacyGraphQLStartTime() {
+      return this.startTime;
+    }
 
-        public Integer getLegacyGraphQLNumberOfDepartures() {return this.numberOfDepartures;}
+    public void setLegacyGraphQLStartTime(Long startTime) {
+      this.startTime = startTime;
+    }
 
-        public Boolean getLegacyGraphQLOmitCanceled() {return this.omitCanceled;}
+    public Integer getLegacyGraphQLTimeRange() {
+      return this.timeRange;
+    }
 
-        public Boolean getLegacyGraphQLOmitNonPickups() {return this.omitNonPickups;}
+    public void setLegacyGraphQLTimeRange(Integer timeRange) {
+      this.timeRange = timeRange;
+    }
+  }
 
-        public Long getLegacyGraphQLStartTime() {return this.startTime;}
+  public static class LegacyGraphQLStopStoptimesForPatternsArgs {
 
-        public Integer getLegacyGraphQLTimeRange() {return this.timeRange;}
+    private Integer numberOfDepartures;
+    private Boolean omitCanceled;
+    private Boolean omitNonPickups;
+    private Long startTime;
+    private Integer timeRange;
 
-        public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
-            this.numberOfDepartures = numberOfDepartures;
-        }
+    public LegacyGraphQLStopStoptimesForPatternsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
+        this.omitCanceled = (Boolean) args.get("omitCanceled");
+        this.omitNonPickups = (Boolean) args.get("omitNonPickups");
+        this.startTime = (Long) args.get("startTime");
+        this.timeRange = (Integer) args.get("timeRange");
+      }
+    }
 
-        public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
-            this.omitCanceled = omitCanceled;
-        }
+    public Integer getLegacyGraphQLNumberOfDepartures() {
+      return this.numberOfDepartures;
+    }
 
-        public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
-            this.omitNonPickups = omitNonPickups;
-        }
+    public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
+      this.numberOfDepartures = numberOfDepartures;
+    }
 
-        public void setLegacyGraphQLStartTime(Long startTime) {this.startTime = startTime;}
+    public Boolean getLegacyGraphQLOmitCanceled() {
+      return this.omitCanceled;
+    }
 
-        public void setLegacyGraphQLTimeRange(Integer timeRange) {this.timeRange = timeRange;}
+    public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
+      this.omitCanceled = omitCanceled;
     }
 
-    public static class LegacyGraphQLStopStoptimesForServiceDateArgs {
+    public Boolean getLegacyGraphQLOmitNonPickups() {
+      return this.omitNonPickups;
+    }
 
-        private String date;
-        private Boolean omitCanceled;
-        private Boolean omitNonPickups;
+    public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
+      this.omitNonPickups = omitNonPickups;
+    }
 
-        public LegacyGraphQLStopStoptimesForServiceDateArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.date = (String) args.get("date");
-                this.omitCanceled = (Boolean) args.get("omitCanceled");
-                this.omitNonPickups = (Boolean) args.get("omitNonPickups");
-            }
-        }
+    public Long getLegacyGraphQLStartTime() {
+      return this.startTime;
+    }
 
-        public String getLegacyGraphQLDate() {return this.date;}
+    public void setLegacyGraphQLStartTime(Long startTime) {
+      this.startTime = startTime;
+    }
 
-        public Boolean getLegacyGraphQLOmitCanceled() {return this.omitCanceled;}
+    public Integer getLegacyGraphQLTimeRange() {
+      return this.timeRange;
+    }
 
-        public Boolean getLegacyGraphQLOmitNonPickups() {return this.omitNonPickups;}
+    public void setLegacyGraphQLTimeRange(Integer timeRange) {
+      this.timeRange = timeRange;
+    }
+  }
 
-        public void setLegacyGraphQLDate(String date) {this.date = date;}
+  public static class LegacyGraphQLStopStoptimesForServiceDateArgs {
 
-        public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
-            this.omitCanceled = omitCanceled;
-        }
+    private String date;
+    private Boolean omitCanceled;
+    private Boolean omitNonPickups;
 
-        public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
-            this.omitNonPickups = omitNonPickups;
-        }
+    public LegacyGraphQLStopStoptimesForServiceDateArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.date = (String) args.get("date");
+        this.omitCanceled = (Boolean) args.get("omitCanceled");
+        this.omitNonPickups = (Boolean) args.get("omitNonPickups");
+      }
     }
 
-    public static class LegacyGraphQLStopStoptimesWithoutPatternsArgs {
-
-        private Integer numberOfDepartures;
-        private Boolean omitCanceled;
-        private Boolean omitNonPickups;
-        private Long startTime;
-        private Integer timeRange;
-
-        public LegacyGraphQLStopStoptimesWithoutPatternsArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
-                this.omitCanceled = (Boolean) args.get("omitCanceled");
-                this.omitNonPickups = (Boolean) args.get("omitNonPickups");
-                this.startTime = (Long) args.get("startTime");
-                this.timeRange = (Integer) args.get("timeRange");
-            }
-        }
+    public String getLegacyGraphQLDate() {
+      return this.date;
+    }
 
-        public Integer getLegacyGraphQLNumberOfDepartures() {return this.numberOfDepartures;}
+    public void setLegacyGraphQLDate(String date) {
+      this.date = date;
+    }
 
-        public Boolean getLegacyGraphQLOmitCanceled() {return this.omitCanceled;}
+    public Boolean getLegacyGraphQLOmitCanceled() {
+      return this.omitCanceled;
+    }
 
-        public Boolean getLegacyGraphQLOmitNonPickups() {return this.omitNonPickups;}
+    public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
+      this.omitCanceled = omitCanceled;
+    }
 
-        public Long getLegacyGraphQLStartTime() {return this.startTime;}
+    public Boolean getLegacyGraphQLOmitNonPickups() {
+      return this.omitNonPickups;
+    }
 
-        public Integer getLegacyGraphQLTimeRange() {return this.timeRange;}
+    public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
+      this.omitNonPickups = omitNonPickups;
+    }
+  }
 
-        public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
-            this.numberOfDepartures = numberOfDepartures;
-        }
+  public static class LegacyGraphQLStopStoptimesWithoutPatternsArgs {
 
-        public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
-            this.omitCanceled = omitCanceled;
-        }
+    private Integer numberOfDepartures;
+    private Boolean omitCanceled;
+    private Boolean omitNonPickups;
+    private Long startTime;
+    private Integer timeRange;
 
-        public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
-            this.omitNonPickups = omitNonPickups;
-        }
+    public LegacyGraphQLStopStoptimesWithoutPatternsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.numberOfDepartures = (Integer) args.get("numberOfDepartures");
+        this.omitCanceled = (Boolean) args.get("omitCanceled");
+        this.omitNonPickups = (Boolean) args.get("omitNonPickups");
+        this.startTime = (Long) args.get("startTime");
+        this.timeRange = (Integer) args.get("timeRange");
+      }
+    }
 
-        public void setLegacyGraphQLStartTime(Long startTime) {this.startTime = startTime;}
+    public Integer getLegacyGraphQLNumberOfDepartures() {
+      return this.numberOfDepartures;
+    }
 
-        public void setLegacyGraphQLTimeRange(Integer timeRange) {this.timeRange = timeRange;}
+    public void setLegacyGraphQLNumberOfDepartures(Integer numberOfDepartures) {
+      this.numberOfDepartures = numberOfDepartures;
     }
 
-    public static class LegacyGraphQLStopTransfersArgs {
+    public Boolean getLegacyGraphQLOmitCanceled() {
+      return this.omitCanceled;
+    }
 
-        private Integer maxDistance;
+    public void setLegacyGraphQLOmitCanceled(Boolean omitCanceled) {
+      this.omitCanceled = omitCanceled;
+    }
 
-        public LegacyGraphQLStopTransfersArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.maxDistance = (Integer) args.get("maxDistance");
-            }
-        }
+    public Boolean getLegacyGraphQLOmitNonPickups() {
+      return this.omitNonPickups;
+    }
 
-        public Integer getLegacyGraphQLMaxDistance() {return this.maxDistance;}
+    public void setLegacyGraphQLOmitNonPickups(Boolean omitNonPickups) {
+      this.omitNonPickups = omitNonPickups;
+    }
 
-        public void setLegacyGraphQLMaxDistance(Integer maxDistance) {
-            this.maxDistance = maxDistance;
-        }
+    public Long getLegacyGraphQLStartTime() {
+      return this.startTime;
     }
 
-    public static class LegacyGraphQLStopUrlArgs {
+    public void setLegacyGraphQLStartTime(Long startTime) {
+      this.startTime = startTime;
+    }
 
-        private String language;
+    public Integer getLegacyGraphQLTimeRange() {
+      return this.timeRange;
+    }
 
-        public LegacyGraphQLStopUrlArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.language = (String) args.get("language");
-            }
-        }
+    public void setLegacyGraphQLTimeRange(Integer timeRange) {
+      this.timeRange = timeRange;
+    }
+  }
 
-        public String getLegacyGraphQLLanguage() {return this.language;}
-
-        public void setLegacyGraphQLLanguage(String language) {this.language = language;}
-    }
-
-    /**
-     * Entities, which are relevant for a stop and can contain alerts
-     */
-    public enum LegacyGraphQLStopAlertType {
-        AGENCIES_OF_ROUTES,
-        PATTERNS,
-        ROUTES,
-        STOP,
-        STOP_ON_ROUTES,
-        STOP_ON_TRIPS,
-        TRIPS
-
-    }
-
-
-    public static class LegacyGraphQLTransportModeInput {
-
-        private LegacyGraphQLMode mode;
-        private LegacyGraphQLQualifier qualifier;
-
-        public LegacyGraphQLTransportModeInput(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("mode") instanceof LegacyGraphQLMode) {
-                    this.mode = (LegacyGraphQLMode) args.get("mode");
-                }
-                else {
-                    this.mode = LegacyGraphQLMode.valueOf((String) args.get("mode"));
-                }
-                if (args.get("qualifier") instanceof LegacyGraphQLQualifier) {
-                    this.qualifier = (LegacyGraphQLQualifier) args.get("qualifier");
-                }
-                else {
-                    this.qualifier = LegacyGraphQLQualifier.valueOf((String) args.get("qualifier"));
-                }
-            }
-        }
+  public static class LegacyGraphQLStopTransfersArgs {
 
-        public LegacyGraphQLMode getLegacyGraphQLMode() {return this.mode;}
+    private Integer maxDistance;
 
-        public LegacyGraphQLQualifier getLegacyGraphQLQualifier() {return this.qualifier;}
+    public LegacyGraphQLStopTransfersArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.maxDistance = (Integer) args.get("maxDistance");
+      }
+    }
 
-        public void setLegacyGraphQLMode(LegacyGraphQLMode mode) {this.mode = mode;}
+    public Integer getLegacyGraphQLMaxDistance() {
+      return this.maxDistance;
+    }
 
-        public void setLegacyGraphQLQualifier(LegacyGraphQLQualifier qualifier) {
-            this.qualifier = qualifier;
-        }
+    public void setLegacyGraphQLMaxDistance(Integer maxDistance) {
+      this.maxDistance = maxDistance;
     }
+  }
 
-    public static class LegacyGraphQLTripAlertsArgs {
-
-        private Iterable<LegacyGraphQLTripAlertType> types;
-
-        public LegacyGraphQLTripAlertsArgs(Map<String, Object> args) {
-            if (args != null) {
-                if (args.get("types") != null) {
-                    this.types = ((List<Object>) args.get("types")).stream()
-                            .map(item -> item instanceof LegacyGraphQLTripAlertType
-                                    ? item
-                                    : LegacyGraphQLTripAlertType.valueOf((String) item))
-                            .map(LegacyGraphQLTripAlertType.class::cast)
-                            .collect(Collectors.toList());
-                }
-            }
-        }
+  public static class LegacyGraphQLStopUrlArgs {
 
-        public Iterable<LegacyGraphQLTripAlertType> getLegacyGraphQLTypes() {return this.types;}
+    private String language;
 
-        public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLTripAlertType> types) {
-            this.types = types;
-        }
+    public LegacyGraphQLStopUrlArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
     }
 
-    public static class LegacyGraphQLTripArrivalStoptimeArgs {
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
 
-        private String serviceDate;
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
 
-        public LegacyGraphQLTripArrivalStoptimeArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.serviceDate = (String) args.get("serviceDate");
-            }
-        }
+  public static class LegacyGraphQLTransportModeInput {
 
-        public String getLegacyGraphQLServiceDate() {return this.serviceDate;}
+    private LegacyGraphQLMode mode;
+    private LegacyGraphQLQualifier qualifier;
 
-        public void setLegacyGraphQLServiceDate(String serviceDate) {
-            this.serviceDate = serviceDate;
+    public LegacyGraphQLTransportModeInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("mode") instanceof LegacyGraphQLMode) {
+          this.mode = (LegacyGraphQLMode) args.get("mode");
+        } else {
+          this.mode = LegacyGraphQLMode.valueOf((String) args.get("mode"));
         }
+        if (args.get("qualifier") instanceof LegacyGraphQLQualifier) {
+          this.qualifier = (LegacyGraphQLQualifier) args.get("qualifier");
+        } else {
+          this.qualifier = LegacyGraphQLQualifier.valueOf((String) args.get("qualifier"));
+        }
+      }
     }
-
-    public static class LegacyGraphQLTripDepartureStoptimeArgs {
 
-        private String serviceDate;
+    public LegacyGraphQLMode getLegacyGraphQLMode() {
+      return this.mode;
+    }
 
-        public LegacyGraphQLTripDepartureStoptimeArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.serviceDate = (String) args.get("serviceDate");
-            }
-        }
+    public void setLegacyGraphQLMode(LegacyGraphQLMode mode) {
+      this.mode = mode;
+    }
 
-        public String getLegacyGraphQLServiceDate() {return this.serviceDate;}
+    public LegacyGraphQLQualifier getLegacyGraphQLQualifier() {
+      return this.qualifier;
+    }
 
-        public void setLegacyGraphQLServiceDate(String serviceDate) {
-            this.serviceDate = serviceDate;
-        }
+    public void setLegacyGraphQLQualifier(LegacyGraphQLQualifier qualifier) {
+      this.qualifier = qualifier;
     }
+  }
 
-    public static class LegacyGraphQLTripStoptimesForDateArgs {
+  public static class LegacyGraphQLTripAlertsArgs {
 
-        private String serviceDate;
+    private Iterable<LegacyGraphQLTripAlertType> types;
 
-        public LegacyGraphQLTripStoptimesForDateArgs(Map<String, Object> args) {
-            if (args != null) {
-                this.serviceDate = (String) args.get("serviceDate");
-            }
+    public LegacyGraphQLTripAlertsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("types") != null) {
+          this.types =
+            ((List<Object>) args.get("types")).stream()
+              .map(item ->
+                item instanceof LegacyGraphQLTripAlertType
+                  ? item
+                  : LegacyGraphQLTripAlertType.valueOf((String) item)
+              )
+              .map(LegacyGraphQLTripAlertType.class::cast)
+              .collect(Collectors.toList());
         }
+      }
+    }
 
-        public String getLegacyGraphQLServiceDate() {return this.serviceDate;}
+    public Iterable<LegacyGraphQLTripAlertType> getLegacyGraphQLTypes() {
+      return this.types;
+    }
 
-        public void setLegacyGraphQLServiceDate(String serviceDate) {
-            this.serviceDate = serviceDate;
-        }
+    public void setLegacyGraphQLTypes(Iterable<LegacyGraphQLTripAlertType> types) {
+      this.types = types;
     }
+  }
 
-    /**
-     * Entities, which are relevant for a trip and can contain alerts
-     */
-    public enum LegacyGraphQLTripAlertType {
-        AGENCY,
-        PATTERN,
-        ROUTE,
-        ROUTE_TYPE,
-        STOPS_ON_TRIP,
-        TRIP
+  public static class LegacyGraphQLTripArrivalStoptimeArgs {
 
-    }
+    private String serviceDate;
 
+    public LegacyGraphQLTripArrivalStoptimeArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDate = (String) args.get("serviceDate");
+      }
+    }
 
-    /**
-     * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that
-     * they may be represented differently to the user.
-     */
-    public enum LegacyGraphQLVehicleParkingState {
-        CLOSED,
-        OPERATIONAL,
-        TEMPORARILY_CLOSED
+    public String getLegacyGraphQLServiceDate() {
+      return this.serviceDate;
+    }
 
+    public void setLegacyGraphQLServiceDate(String serviceDate) {
+      this.serviceDate = serviceDate;
     }
+  }
 
+  public static class LegacyGraphQLTripDepartureStoptimeArgs {
 
-    public enum LegacyGraphQLVehicleStopStatus {
-        INCOMING_AT,
-        IN_TRANSIT_TO,
-        STOPPED_AT
+    private String serviceDate;
 
+    public LegacyGraphQLTripDepartureStoptimeArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDate = (String) args.get("serviceDate");
+      }
     }
 
-    public enum LegacyGraphQLVertexType {
-        BIKEPARK,
-        BIKESHARE,
-        NORMAL,
-        PARKANDRIDE,
-        TRANSIT
+    public String getLegacyGraphQLServiceDate() {
+      return this.serviceDate;
+    }
 
+    public void setLegacyGraphQLServiceDate(String serviceDate) {
+      this.serviceDate = serviceDate;
     }
+  }
 
-    public enum LegacyGraphQLWheelchairBoarding {
-        NOT_POSSIBLE,
-        NO_INFORMATION,
-        POSSIBLE
+  public static class LegacyGraphQLTripStoptimesForDateArgs {
 
+    private String serviceDate;
+
+    public LegacyGraphQLTripStoptimesForDateArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDate = (String) args.get("serviceDate");
+      }
     }
 
+    public String getLegacyGraphQLServiceDate() {
+      return this.serviceDate;
+    }
 
+    public void setLegacyGraphQLServiceDate(String serviceDate) {
+      this.serviceDate = serviceDate;
+    }
+  }
 }

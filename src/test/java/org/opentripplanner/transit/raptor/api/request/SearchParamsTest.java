@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class SearchParamsTest {
 
@@ -47,7 +47,10 @@ public class SearchParamsTest {
 
     p.preferLateArrival(true);
 
-    assertParamNotValid(p, "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set.");
+    assertParamNotValid(
+      p,
+      "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."
+    );
   }
 
   @Test
@@ -60,7 +63,10 @@ public class SearchParamsTest {
     p.timetableEnabled(true);
     p.preferLateArrival(true);
 
-    assertParamNotValid(p, "The 'departAsLateAsPossible' is not allowed together with 'timetableEnabled'.");
+    assertParamNotValid(
+      p,
+      "The 'departAsLateAsPossible' is not allowed together with 'timetableEnabled'."
+    );
   }
 
   public void assertParamNotValid(SearchParamsBuilder<TestTripSchedule> p, String msg) {
@@ -68,7 +74,7 @@ public class SearchParamsTest {
       p.build();
       Assert.fail("Test case failed: " + msg);
     } catch (IllegalArgumentException e) {
-      assertEquals(msg , e.getMessage());
+      assertEquals(msg, e.getMessage());
     }
   }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.util.I18NString;
 
@@ -25,20 +26,21 @@ public abstract class StationElement extends TransitEntity {
   private Station parentStation;
 
   public StationElement(
-      FeedScopedId id,
-      I18NString name,
-      String code,
-      String description,
-      WgsCoordinate coordinate,
-      WheelChairBoarding wheelchairBoarding,
-      StopLevel level
+    FeedScopedId id,
+    I18NString name,
+    String code,
+    String description,
+    WgsCoordinate coordinate,
+    WheelChairBoarding wheelchairBoarding,
+    StopLevel level
   ) {
     super(id);
     this.name = name;
     this.code = code;
     this.description = description;
     this.coordinate = coordinate;
-    this.wheelchairBoarding = wheelchairBoarding;
+    this.wheelchairBoarding =
+      Objects.requireNonNullElse(wheelchairBoarding, WheelChairBoarding.NO_INFORMATION);
     this.level = level;
   }
 
@@ -79,18 +81,9 @@ public abstract class StationElement extends TransitEntity {
   }
 
   /**
-   * The coordinate for the given stop element exist. The {@link #getCoordinate()}
-   * will use the parent station coordinate if not set, but this method will return
-   * based on this instance; Hence the {@link #getCoordinate()} might return a coordinate,
-   * while this method return {@code false}.
-   */
-  boolean isCoordinateSet() {
-    return coordinate != null;
-  }
-
-  /**
    * Returns whether this station element is accessible for wheelchair users.
    */
+  @Nonnull
   public WheelChairBoarding getWheelchairBoarding() {
     return wheelchairBoarding;
   }
@@ -110,6 +103,10 @@ public abstract class StationElement extends TransitEntity {
     return parentStation;
   }
 
+  public void setParentStation(Station parentStation) {
+    this.parentStation = parentStation;
+  }
+
   /** Return {@code true} if this stop (element) is part of a station, have a parent station. */
   public boolean isPartOfStation() {
     return parentStation != null;
@@ -127,7 +124,13 @@ public abstract class StationElement extends TransitEntity {
     return isPartOfStation() && parentStation.equals(other.getParentStation());
   }
 
-  public void setParentStation(Station parentStation) {
-    this.parentStation = parentStation;
+  /**
+   * The coordinate for the given stop element exist. The {@link #getCoordinate()} will use the
+   * parent station coordinate if not set, but this method will return based on this instance; Hence
+   * the {@link #getCoordinate()} might return a coordinate, while this method return {@code
+   * false}.
+   */
+  boolean isCoordinateSet() {
+    return coordinate != null;
   }
 }

@@ -23,51 +23,51 @@ public class VehicleParkingUpdaterConfig {
     CONFIG_MAPPING.put("bicycle-park-api", DataSourceType.BICYCLE_PARK_API);
   }
 
-  private static DataSourceType mapStringToSourceType(String typeKey) {
-    DataSourceType type = CONFIG_MAPPING.get(typeKey);
-    if (type == null) {
-      throw new OtpAppException("The updater source type is unknown: " + typeKey);
-    }
-    return type;
-  }
-
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
     var sourceType = mapStringToSourceType(c.asText("sourceType"));
     var feedId = c.asText("feedId", null);
     switch (sourceType) {
       case HSL_PARK:
         return new HslParkUpdaterParameters(
-                updaterRef, 
-                c.asInt("facilitiesFrequencySec", 3600),
-                c.asText("facilitiesUrl", null),
-                feedId,
-                sourceType,
-                c.asInt("utilizationsFrequencySec", 600),
-                c.asText("utilizationsUrl", null)
+          updaterRef,
+          c.asInt("facilitiesFrequencySec", 3600),
+          c.asText("facilitiesUrl", null),
+          feedId,
+          sourceType,
+          c.asInt("utilizationsFrequencySec", 600),
+          c.asText("utilizationsUrl", null)
         );
       case KML:
         return new KmlUpdaterParameters(
-                updaterRef,
-                c.asText("url", null),
-                feedId,
-                c.asText("namePrefix", null),
-                c.asInt("frequencySec", 60),
-                c.asBoolean("zip", false),
-                sourceType
+          updaterRef,
+          c.asText("url", null),
+          feedId,
+          c.asText("namePrefix", null),
+          c.asInt("frequencySec", 60),
+          c.asBoolean("zip", false),
+          sourceType
         );
       case PARK_API:
       case BICYCLE_PARK_API:
         return new ParkAPIUpdaterParameters(
-                updaterRef,
-                c.asText("url", null),
-                feedId,
-                c.asInt("frequencySec", 60),
-                c.asMap("headers", NodeAdapter::asText),
-                new ArrayList<>(c.asTextSet("tags", Set.of())),
-                sourceType
+          updaterRef,
+          c.asText("url", null),
+          feedId,
+          c.asInt("frequencySec", 60),
+          c.asMap("headers", NodeAdapter::asText),
+          new ArrayList<>(c.asTextSet("tags", Set.of())),
+          sourceType
         );
       default:
         throw new OtpAppException("The updater source type is unhandled: " + sourceType);
     }
+  }
+
+  private static DataSourceType mapStringToSourceType(String typeKey) {
+    DataSourceType type = CONFIG_MAPPING.get(typeKey);
+    if (type == null) {
+      throw new OtpAppException("The updater source type is unknown: " + typeKey);
+    }
+    return type;
   }
 }

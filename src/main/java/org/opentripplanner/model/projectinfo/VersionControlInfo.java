@@ -1,12 +1,12 @@
 package org.opentripplanner.model.projectinfo;
 
-import org.opentripplanner.model.base.ToStringBuilder;
-
-import java.io.Serializable;
-
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.UNKNOWN;
 
+import java.io.Serializable;
+import org.opentripplanner.model.base.ToStringBuilder;
+
 public class VersionControlInfo implements Serializable {
+
   private static final long serialVersionUID = 1L;
 
   public final String commit;
@@ -20,11 +20,11 @@ public class VersionControlInfo implements Serializable {
   }
 
   public VersionControlInfo(
-      String commit,
-      String branch,
-      String commitTime,
-      String buildTime,
-      boolean dirty
+    String commit,
+    String branch,
+    String commitTime,
+    String buildTime,
+    boolean dirty
   ) {
     this.commit = commit;
     this.branch = branch;
@@ -35,12 +35,13 @@ public class VersionControlInfo implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(VersionControlInfo.class)
-        .addStr("commit", commit)
-        .addStr("branch", branch)
-        .addStr("commitTime", commitTime)
-        .addStr("buildTime", buildTime)
-        .addBool("dirty", dirty)
-        .toString();
+    return ToStringBuilder
+      .of(VersionControlInfo.class)
+      .addStr("commit", commit)
+      .addStr("branch", branch)
+      .addStr("commitTime", commitTime)
+      .addStr("buildTime", buildTime)
+      .addBool("dirty", dirty)
+      .toString();
   }
 }

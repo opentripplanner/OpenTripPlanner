@@ -17,22 +17,22 @@ public class FlexServiceDate {
   /**
    * How many seconds does this date's "midnight" (12 hours before noon) differ from the "midnight"
    * of the date for the search.
-   * */
+   */
   public final int secondsFromStartOfTime;
 
-  /** Which services are running on the date.*/
+  /** Which services are running on the date. */
   public final TIntSet servicesRunning;
 
-  FlexServiceDate(
-      ServiceDate serviceDate, int secondsFromStartOfTime, TIntSet servicesRunning
-  ) {
+  FlexServiceDate(ServiceDate serviceDate, int secondsFromStartOfTime, TIntSet servicesRunning) {
     this.serviceDate = serviceDate;
     this.secondsFromStartOfTime = secondsFromStartOfTime;
     this.servicesRunning = servicesRunning;
   }
 
   boolean isFlexTripRunning(FlexTrip flexTrip, Graph graph) {
-    return servicesRunning != null
-        && servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()));
+    return (
+      servicesRunning != null &&
+      servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()))
+    );
   }
 }

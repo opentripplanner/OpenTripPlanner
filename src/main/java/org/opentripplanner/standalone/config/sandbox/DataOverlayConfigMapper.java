@@ -11,46 +11,46 @@ import org.opentripplanner.standalone.config.NodeAdapter;
 
 public class DataOverlayConfigMapper {
 
-    public static DataOverlayConfig map(NodeAdapter c) {
-        if(c.isEmpty()) {
-            return null;
-        }
-        return new DataOverlayConfig(
-                c.asText("fileName"),
-                c.asText("latitudeVariable"),
-                c.asText("longitudeVariable"),
-                c.asText("timeVariable"),
-                c.asEnum("timeFormat", TimeUnit.class),
-                mapIndexVariables(c.path("indexVariables")),
-                mapRequestParameters(c.path("requestParameters"))
-        );
+  public static DataOverlayConfig map(NodeAdapter c) {
+    if (c.isEmpty()) {
+      return null;
     }
+    return new DataOverlayConfig(
+      c.asText("fileName"),
+      c.asText("latitudeVariable"),
+      c.asText("longitudeVariable"),
+      c.asText("timeVariable"),
+      c.asEnum("timeFormat", TimeUnit.class),
+      mapIndexVariables(c.path("indexVariables")),
+      mapRequestParameters(c.path("requestParameters"))
+    );
+  }
 
-    private static List<IndexVariable> mapIndexVariables(NodeAdapter c) {
-        return c.asList().stream()
-                .map(DataOverlayConfigMapper::mapIndexVariable)
-                .collect(Collectors.toList());
-    }
+  private static List<IndexVariable> mapIndexVariables(NodeAdapter c) {
+    return c
+      .asList()
+      .stream()
+      .map(DataOverlayConfigMapper::mapIndexVariable)
+      .collect(Collectors.toList());
+  }
 
-    private static IndexVariable mapIndexVariable(NodeAdapter c) {
-        return new IndexVariable(
-                c.asText("name"),
-                c.asText("displayName"),
-                c.asText("variable")
-        );
-    }
+  private static IndexVariable mapIndexVariable(NodeAdapter c) {
+    return new IndexVariable(c.asText("name"), c.asText("displayName"), c.asText("variable"));
+  }
 
-    private static List<ParameterBinding> mapRequestParameters(NodeAdapter c) {
-        return c.asList().stream()
-                .map(DataOverlayConfigMapper::mapRequestParameter)
-                .collect(Collectors.toList());
-    }
+  private static List<ParameterBinding> mapRequestParameters(NodeAdapter c) {
+    return c
+      .asList()
+      .stream()
+      .map(DataOverlayConfigMapper::mapRequestParameter)
+      .collect(Collectors.toList());
+  }
 
-    private static ParameterBinding mapRequestParameter(NodeAdapter c) {
-        return new ParameterBinding(
-                c.asEnum("name", ParameterName.class),
-                c.asText("variable"),
-                c.asText("formula")
-        );
-    }
+  private static ParameterBinding mapRequestParameter(NodeAdapter c) {
+    return new ParameterBinding(
+      c.asEnum("name", ParameterName.class),
+      c.asText("variable"),
+      c.asText("formula")
+    );
+  }
 }

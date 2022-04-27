@@ -31,19 +31,24 @@ public final class RouteStationTransferPoint implements TransferPoint, Serializa
   }
 
   @Override
-  public int getSpecificityRanking() { return 2; }
+  public int getSpecificityRanking() {
+    return 2;
+  }
 
   @Override
-  public boolean isRouteStationTransferPoint() { return true; }
+  public boolean isRouteStationTransferPoint() {
+    return true;
+  }
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder.of()
-            .addText("<Route ")
-            .addObj(route.getId())
-            .addText(", station ")
-            .addObj(station.getId())
-            .addText(">")
-            .toString();
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("<Route ")
+      .addObj(route.getId())
+      .addText(", station ")
+      .addObj(station.getId())
+      .addText(">")
+      .toString();
   }
 }

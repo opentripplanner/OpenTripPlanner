@@ -1,51 +1,48 @@
 package org.opentripplanner.ext.dataoverlay.routing;
 
-
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.configuration.ParameterBinding;
 import org.opentripplanner.model.base.ToStringBuilder;
 
 public class Parameter {
-    private final ParameterBinding binding;
-    private final double threshold;
-    private final double penalty;
 
-    public Parameter(
-            ParameterBinding binding,
-            double threshold,
-            double penalty
-    ) {
-        this.binding = binding;
-        this.threshold = threshold;
-        this.penalty = penalty;
-    }
+  private final ParameterBinding binding;
+  private final double threshold;
+  private final double penalty;
 
-    public ParameterName getName() {
-        return binding.getName();
-    }
+  public Parameter(ParameterBinding binding, double threshold, double penalty) {
+    this.binding = binding;
+    this.threshold = threshold;
+    this.penalty = penalty;
+  }
 
-    public String getVariable() {
-        return binding.getVariable();
-    }
+  public ParameterName getName() {
+    return binding.getName();
+  }
 
-    public double getThreshold() {
-        return threshold;
-    }
+  public String getVariable() {
+    return binding.getVariable();
+  }
 
-    public double getPenalty() {
-        return penalty;
-    }
+  public double getThreshold() {
+    return threshold;
+  }
 
-    public String getFormula() {
-        return binding.getFormula();
-    }
+  public double getPenalty() {
+    return penalty;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(Parameter.class)
-                .addObj("binding", binding)
-                .addNum("threshold", threshold)
-                .addNum("penalty", penalty)
-                .toString();
-    }
+  public String getFormula() {
+    return binding.getFormula();
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(Parameter.class)
+      .addObj("binding", binding)
+      .addNum("threshold", threshold)
+      .addNum("penalty", penalty)
+      .toString();
+  }
 }

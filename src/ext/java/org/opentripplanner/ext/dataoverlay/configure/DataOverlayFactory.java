@@ -11,23 +11,24 @@ import org.slf4j.LoggerFactory;
 
 public class DataOverlayFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataOverlayFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataOverlayFactory.class);
 
-    @Nullable
-    public static GraphBuilderModule create(DataOverlayConfig config) {
-        if(config == null) { return null; }
-
-        File dataFile = new File(config.getFileName());
-        if (dataFile.exists()) {
-            return new EdgeUpdaterModule(
-                    new GenericDataFile(dataFile, config),
-                    config.getTimeFormat(),
-                    config.getParameterBindings()
-            );
-        }
-        else {
-            LOG.error("No data input {} found!", dataFile);
-            return null;
-        }
+  @Nullable
+  public static GraphBuilderModule create(DataOverlayConfig config) {
+    if (config == null) {
+      return null;
     }
+
+    File dataFile = new File(config.getFileName());
+    if (dataFile.exists()) {
+      return new EdgeUpdaterModule(
+        new GenericDataFile(dataFile, config),
+        config.getTimeFormat(),
+        config.getParameterBindings()
+      );
+    } else {
+      LOG.error("No data input {} found!", dataFile);
+      return null;
+    }
+  }
 }

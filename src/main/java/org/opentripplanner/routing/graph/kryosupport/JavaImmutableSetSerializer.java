@@ -9,20 +9,28 @@ import java.util.Set;
 
 @SuppressWarnings("rawtypes")
 class JavaImmutableSetSerializer extends Serializer<Set> {
-    @Override
-    public void write(Kryo kryo, Output output, Set set) {
-        kryo.writeObject(output, new ImmSerList(set.toArray()));
+
+  @Override
+  public void write(Kryo kryo, Output output, Set set) {
+    kryo.writeObject(output, new ImmSerList(set.toArray()));
+  }
+
+  @Override
+  public Set read(Kryo kryo, Input input, Class<? extends Set> type) {
+    return kryo.readObject(input, ImmSerList.class).toSet();
+  }
+
+  private static class ImmSerList implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    private final Object[] array;
+
+    private ImmSerList(Object[] array) {
+      this.array = array;
     }
 
-    @Override
-    public Set read(Kryo kryo, Input input, Class<? extends Set> type) {
-        return kryo.readObject(input, ImmSerList.class).toSet();
+    private Set toSet() {
+      return Set.of(array);
     }
-
-    private static class ImmSerList implements Serializable  {
-        private static final long serialVersionUID = 1L;
-        private final Object[] array;
-        private ImmSerList(Object[] array) { this.array = array; }
-        private Set toSet() { return Set.of(array); }
-    }
+  }
 }

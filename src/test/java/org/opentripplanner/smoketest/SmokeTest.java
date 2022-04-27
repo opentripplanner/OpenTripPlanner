@@ -40,112 +40,108 @@ import org.slf4j.LoggerFactory;
  */
 public class SmokeTest {
 
-    static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
-    static HttpClient client = HttpClient.newHttpClient();
-    static final ObjectMapper mapper;
+  static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
+  static HttpClient client = HttpClient.newHttpClient();
+  static final ObjectMapper mapper;
 
-    /**
-     * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
-     * run any assertions against the fares. (That is done during unit tests.)
-     */
-    static class FareDeserializer extends JsonDeserializer<Fare> {
+  /**
+   * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
+   * run any assertions against the fares. (That is done during unit tests.)
+   */
+  static class FareDeserializer extends JsonDeserializer<Fare> {
 
-        @Override
-        public Fare deserialize(
-                JsonParser jsonParser, DeserializationContext deserializationContext
-        ) throws IOException, JsonProcessingException {
-            return null;
-        }
+    @Override
+    public Fare deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+      throws IOException, JsonProcessingException {
+      return null;
+    }
+  }
+
+  static {
+    var provider = new JSONObjectMapperProvider();
+
+    SimpleModule module = new SimpleModule("SmokeTests");
+    module.addDeserializer(Fare.class, new FareDeserializer());
+
+    mapper = provider.getContext(null);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+    mapper.registerModule(module);
+  }
+
+  /**
+   * In order to have somewhat predictable results we get the route for the next Monday.
+   * <p>
+   * When we approach the end of the validity of the GTFS feed there might be days when this logic
+   * results in failures as the next Monday is after the end of the service period.
+   * <p>
+   * This is a problem in particular in the case of MARTA as they only publish new data about 2
+   * days before the expiration date of the old one.
+   */
+  static LocalDate nextMonday() {
+    var today = LocalDate.now();
+    return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+  }
+
+  /**
+   * Builds an HTTP request for sending to an OTP instance.
+   */
+  static HttpRequest buildPlanRequest(Map<String, String> params) {
+    var urlParams = params
+      .entrySet()
+      .stream()
+      .map(kv -> kv.getKey() + "=" + kv.getValue())
+      .collect(Collectors.joining("&"));
+
+    var uri = URI.create("http://localhost:8080/otp/routers/default/plan?" + urlParams);
+
+    return HttpRequest.newBuilder().uri(uri).GET().build();
+  }
+
+  /**
+   * Sends an HTTP request to the OTP plan endpoint and deserializes the response.
+   */
+  static TripPlannerResponse sendPlanRequest(Map<String, String> params) {
+    var request = SmokeTest.buildPlanRequest(params);
+    LOG.info("Sending request to {}", request.uri());
+    TripPlannerResponse otpResponse;
+    try {
+      var response = client.send(request, BodyHandlers.ofInputStream());
+
+      assertEquals(200, response.statusCode(), "Status code returned by OTP server was not 200");
+      otpResponse = SmokeTest.mapper.readValue(response.body(), TripPlannerResponse.class);
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
     }
 
-    static {
-        var provider = new JSONObjectMapperProvider();
+    LOG.info(
+      "Request to {} returned {} itineraries",
+      request.uri(),
+      otpResponse.getPlan().itineraries.size()
+    );
 
-        SimpleModule module = new SimpleModule("SmokeTests");
-        module.addDeserializer(Fare.class, new FareDeserializer());
+    return otpResponse;
+  }
 
-        mapper = provider.getContext(null);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
-        mapper.registerModule(module);
-    }
-
-    /**
-     * In order to have somewhat predictable results we get the route for the next Monday.
-     * <p>
-     * When we approach the end of the validity of the GTFS feed there might be days when this logic
-     * results in failures as the next Monday is after the end of the service period.
-     * <p>
-     * This is a problem in particular in the case of MARTA as they only publish new data about 2
-     * days before the expiration date of the old one.
-     */
-    static LocalDate nextMonday() {
-        var today = LocalDate.now();
-        return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-    }
-
-    /**
-     * Builds an HTTP request for sending to an OTP instance.
-     */
-    static HttpRequest buildPlanRequest(Map<String, String> params) {
-        var urlParams = params.entrySet()
-                .stream()
-                .map(kv -> kv.getKey() + "=" + kv.getValue())
-                .collect(Collectors.joining("&"));
-
-        var uri = URI.create("http://localhost:8080/otp/routers/default/plan?" + urlParams);
-
-        return HttpRequest.newBuilder()
-                .uri(uri)
-                .GET()
-                .build();
-    }
-
-    /**
-     * Sends an HTTP request to the OTP plan endpoint and deserializes the response.
-     */
-    static TripPlannerResponse sendPlanRequest(Map<String, String> params) {
-        var request = SmokeTest.buildPlanRequest(params);
-        LOG.info("Sending request to {}", request.uri());
-        TripPlannerResponse otpResponse;
-        try {
-            var response = client.send(request, BodyHandlers.ofInputStream());
-
-            assertEquals(
-                    200, response.statusCode(), "Status code returned by OTP server was not 200");
-            otpResponse = SmokeTest.mapper.readValue(response.body(), TripPlannerResponse.class);
-        }
-        catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        LOG.info(
-                "Request to {} returned {} itineraries",
-                request.uri(),
-                otpResponse.getPlan().itineraries.size()
-        );
-
-        return otpResponse;
-    }
-
-    /**
-     * Given a list of itineraries assert that at least one of them has legs that have the expected
-     * modes.
-     */
-    static void assertThatItineraryHasModes(
-            List<ApiItinerary> itineraries,
-            List<String> expectedModes
-    ) {
-        var itineraryModes = itineraries.stream()
-                .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
-                .collect(Collectors.toList());
-        assertTrue(
-                itineraryModes.contains(expectedModes),
-                String.format(
-                        "Could not find a mode combination '%s' in itineraries %s",
-                        expectedModes,
-                        itineraryModes
-                )
-        );
-    }
+  /**
+   * Given a list of itineraries assert that at least one of them has legs that have the expected
+   * modes.
+   */
+  static void assertThatItineraryHasModes(
+    List<ApiItinerary> itineraries,
+    List<String> expectedModes
+  ) {
+    var itineraryModes = itineraries
+      .stream()
+      .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
+      .collect(Collectors.toList());
+    assertTrue(
+      itineraryModes.contains(expectedModes),
+      String.format(
+        "Could not find a mode combination '%s' in itineraries %s",
+        expectedModes,
+        itineraryModes
+      )
+    );
+  }
 }

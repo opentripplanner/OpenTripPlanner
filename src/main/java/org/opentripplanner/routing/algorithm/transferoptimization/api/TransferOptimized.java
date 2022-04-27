@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 
 /**
@@ -31,32 +30,30 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
  * describe the different costs for transfer optimizing. Two classes implement this interface.
  */
 public interface TransferOptimized {
+  int NEUTRAL_COST = 0;
 
-    int NEUTRAL_COST = 0;
+  /**
+   * Return the total transfer priority cost. This is completely separate from the generalized cost.
+   * Return {@code 0}(zero) if cost is neutral/no "special" transfer characteristics are present.
+   * <p>
+   * Precedence: first
+   */
+  int transferPriorityCost();
 
-    /**
-     * Return the total transfer priority cost. This is completely separate from the
-     * generalized cost. Return {@code 0}(zero) if cost is neutral/no "special" transfer
-     * characteristics are present.
-     * <p>
-     * Precedence: first
-     */
-    int transferPriorityCost();
+  /**
+   * The generalized cost adjusted with a better wait time calculation.
+   * <p>
+   * Precedence: second
+   *
+   * @see TransferWaitTimeCostCalculator
+   */
+  int generalizedCostWaitTimeOptimized();
 
-    /**
-     * The generalized cost adjusted with a better wait time calculation.
-     * <p>
-     * Precedence: second
-     *
-     * @see TransferWaitTimeCostCalculator
-     */
-    int generalizedCostWaitTimeOptimized();
-
-    /**
-     * Optimize so that the transfers happens as early as possible. This is normally the case when
-     * two trips visit the same stops - and two or more stops are possible transfer points.
-     * <p>
-     * Precedence: third
-     */
-    int breakTieCost();
+  /**
+   * Optimize so that the transfers happens as early as possible. This is normally the case when two
+   * trips visit the same stops - and two or more stops are possible transfer points.
+   * <p>
+   * Precedence: third
+   */
+  int breakTieCost();
 }

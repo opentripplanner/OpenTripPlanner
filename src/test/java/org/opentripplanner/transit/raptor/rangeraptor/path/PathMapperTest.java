@@ -30,156 +30,138 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 public class PathMapperTest implements RaptorTestConstants {
 
-    private static final RaptorSlackProvider FLEX_SLACK_PROVIDER =
-            FlexAccessAndEgressPathTestCase.SLACK_PROVIDER;
-    private static final DefaultCostCalculator FLEX_COST_CALCULATOR =
-            FlexAccessAndEgressPathTestCase.COST_CALCULATOR;
+  private static final RaptorSlackProvider FLEX_SLACK_PROVIDER =
+    FlexAccessAndEgressPathTestCase.SLACK_PROVIDER;
+  private static final DefaultCostCalculator FLEX_COST_CALCULATOR =
+    FlexAccessAndEgressPathTestCase.COST_CALCULATOR;
 
+  /* BASIC CASES */
 
-    /* BASIC CASES */
+  @Test
+  public void mapToPathBasicForwardSearch() {
+    // Given:
+    var destArrival = basicTripByForwardSearch();
+    var mapper = new ForwardPathMapper<TestTripSchedule>(
+      null,
+      SLACK_PROVIDER,
+      COST_CALCULATOR,
+      this::stopIndexToName,
+      lifeCycle(),
+      false
+    );
 
-    @Test
-    public void mapToPathBasicForwardSearch() {
-        // Given:
-        var destArrival = basicTripByForwardSearch();
-        var mapper = new ForwardPathMapper<TestTripSchedule>(
-                null,
-                SLACK_PROVIDER,
-                COST_CALCULATOR,
-                this::stopIndexToName,
-                lifeCycle(),
-                false
-        );
+    //When:
+    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
-        //When:
-        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    // Then: verify path - should be the same for reverse and forward mapper
+    assertPath(path);
+  }
 
-        // Then: verify path - should be the same for reverse and forward mapper
-        assertPath(path);
-    }
+  @Test
+  public void mapToPathBasicReverseSearch() {
+    // Given:
+    var destArrival = basicTripByReverseSearch();
+    var mapper = new ReversePathMapper<TestTripSchedule>(
+      null,
+      SLACK_PROVIDER,
+      COST_CALCULATOR,
+      this::stopIndexToName,
+      lifeCycle(),
+      false
+    );
 
-    @Test
-    public void mapToPathBasicReverseSearch() {
-        // Given:
-        var destArrival = basicTripByReverseSearch();
-        var mapper = new ReversePathMapper<TestTripSchedule>(
-                null,
-                SLACK_PROVIDER,
-                COST_CALCULATOR,
-                this::stopIndexToName,
-                lifeCycle(),
-                false
-        );
+    //When:
+    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
 
-        //When:
-        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    // Then: verify path - should be the same for reverse and forward mapper
+    assertPath(path);
+  }
 
-        // Then: verify path - should be the same for reverse and forward mapper
-        assertPath(path);
-    }
+  /* FLEX CASES - FORWARD SEARCH */
 
+  @Test
+  public void mapToPathForFlexCaseAForwardSearch() {
+    runTestFlexForward(flexCaseAForwardSearch(), flexCaseAText());
+  }
 
-    /* FLEX CASES - FORWARD SEARCH */
+  @Test
+  public void mapToPathForFlexCaseAWOpeningHoursForwardSearch() {
+    runTestFlexForward(flexCaseAWithOpeningHoursForwardSearch(), flexCaseAWithOpeningHoursText());
+  }
 
-    @Test
-    public void mapToPathForFlexCaseAForwardSearch() {
-        runTestFlexForward(flexCaseAForwardSearch(), flexCaseAText());
-    }
+  @Test
+  public void mapToPathForFlexCaseBForwardSearch() {
+    runTestFlexForward(flexCaseBForwardSearch(), flexCaseBText());
+  }
 
-    @Test
-    public void mapToPathForFlexCaseAWOpeningHoursForwardSearch() {
-        runTestFlexForward(
-                flexCaseAWithOpeningHoursForwardSearch(),
-                flexCaseAWithOpeningHoursText()
-        );
-    }
+  @Test
+  public void mapToPathForFlexCaseBWOpeningHoursForwardSearch() {
+    runTestFlexForward(flexCaseBWithOpeningHoursForwardSearch(), flexCaseBWithOpeningHoursText());
+  }
 
-    @Test
-    public void mapToPathForFlexCaseBForwardSearch() {
-        runTestFlexForward(flexCaseBForwardSearch(), flexCaseBText());
-    }
+  /* FLEX CASES - REVERSE SEARCH */
 
-    @Test
-    public void mapToPathForFlexCaseBWOpeningHoursForwardSearch() {
-        runTestFlexForward(
-                flexCaseBWithOpeningHoursForwardSearch(),
-                flexCaseBWithOpeningHoursText()
-        );
-    }
+  @Test
+  public void mapToPathForFlexCaseAReverseSearch() {
+    runTestFlexReverse(flexCaseAReverseSearch(), flexCaseAText());
+  }
 
-    /* FLEX CASES - REVERSE SEARCH */
+  @Test
+  public void mapToPathForFlexCaseAWOpeningHoursReverseSearch() {
+    runTestFlexReverse(flexCaseAWithOpeningHoursReverseSearch(), flexCaseAWithOpeningHoursText());
+  }
 
-    @Test
-    public void mapToPathForFlexCaseAReverseSearch() {
-        runTestFlexReverse(flexCaseAReverseSearch(), flexCaseAText());
-    }
+  @Test
+  public void mapToPathForFlexCaseBReverseSearch() {
+    runTestFlexReverse(flexCaseBReverseSearch(), flexCaseBText());
+  }
 
-    @Test
-    public void mapToPathForFlexCaseAWOpeningHoursReverseSearch() {
-        runTestFlexReverse(
-                flexCaseAWithOpeningHoursReverseSearch(),
-                flexCaseAWithOpeningHoursText()
-        );
-    }
+  @Test
+  public void mapToPathForFlexCaseBWOpeningHoursReverseSearch() {
+    runTestFlexReverse(flexCaseBWithOpeningHoursReverseSearch(), flexCaseBWithOpeningHoursText());
+  }
 
-    @Test
-    public void mapToPathForFlexCaseBReverseSearch() {
-        runTestFlexReverse(flexCaseBReverseSearch(), flexCaseBText());
-    }
+  /* private helper methods */
 
-    @Test
-    public void mapToPathForFlexCaseBWOpeningHoursReverseSearch() {
-        runTestFlexReverse(
-                flexCaseBWithOpeningHoursReverseSearch(),
-                flexCaseBWithOpeningHoursText()
-        );
-    }
+  private void assertPath(Path<TestTripSchedule> path) {
+    assertEquals(BASIC_PATH_AS_DETAILED_STRING, path.toStringDetailed(this::stopIndexToName));
+  }
 
+  private void runTestFlexForward(
+    DestinationArrival<TestTripSchedule> destArrival,
+    String expected
+  ) {
+    // Given:
+    var mapper = new ForwardPathMapper<TestTripSchedule>(
+      null,
+      FLEX_SLACK_PROVIDER,
+      FLEX_COST_CALCULATOR,
+      this::stopIndexToName,
+      lifeCycle(),
+      false
+    );
+    // When:
+    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    // Then:
+    assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
+  }
 
-    /* private helper methods */
-
-    private void assertPath(Path<TestTripSchedule> path) {
-        assertEquals(
-                BASIC_PATH_AS_DETAILED_STRING,
-                path.toStringDetailed(this::stopIndexToName)
-        );
-    }
-
-    private void runTestFlexForward(
-            DestinationArrival<TestTripSchedule> destArrival,
-            String expected
-    ) {
-        // Given:
-        var mapper = new ForwardPathMapper<TestTripSchedule>(
-                null,
-                FLEX_SLACK_PROVIDER,
-                FLEX_COST_CALCULATOR,
-                this::stopIndexToName,
-                lifeCycle(),
-                false
-        );
-        // When:
-        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
-        // Then:
-        assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
-    }
-
-    private void runTestFlexReverse(
-            DestinationArrival<TestTripSchedule> destArrival,
-            String expected
-    ) {
-        // Given:
-        var mapper = new ReversePathMapper<TestTripSchedule>(
-                null,
-                FLEX_SLACK_PROVIDER,
-                FLEX_COST_CALCULATOR,
-                this::stopIndexToName,
-                lifeCycle(),
-                false
-        );
-        // When:
-        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
-        // Then:
-        assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
-    }
+  private void runTestFlexReverse(
+    DestinationArrival<TestTripSchedule> destArrival,
+    String expected
+  ) {
+    // Given:
+    var mapper = new ReversePathMapper<TestTripSchedule>(
+      null,
+      FLEX_SLACK_PROVIDER,
+      FLEX_COST_CALCULATOR,
+      this::stopIndexToName,
+      lifeCycle(),
+      false
+    );
+    // When:
+    Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+    // Then:
+    assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
+  }
 }

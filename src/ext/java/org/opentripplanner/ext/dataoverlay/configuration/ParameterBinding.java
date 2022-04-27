@@ -19,36 +19,37 @@ import org.opentripplanner.model.base.ToStringBuilder;
  */
 public class ParameterBinding implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final ParameterName name;
-    private final String variable;
-    private final String formula;
+  private final ParameterName name;
+  private final String variable;
+  private final String formula;
 
-    public ParameterBinding(ParameterName name, String variable, String formula) {
-        this.name = name;
-        this.variable = variable;
-        this.formula = formula;
-    }
+  public ParameterBinding(ParameterName name, String variable, String formula) {
+    this.name = name;
+    this.variable = variable;
+    this.formula = formula;
+  }
 
-    public ParameterName getName() {
-        return name;
-    }
+  public ParameterName getName() {
+    return name;
+  }
 
-    public String getVariable() {
-        return variable;
-    }
+  public String getVariable() {
+    return variable;
+  }
 
-    public String getFormula() {
-        return formula;
-    }
+  public String getFormula() {
+    return formula;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(Parameter.class)
-                .addEnum("name", name)
-                .addStr("variable", variable)
-                .addStr("formula", formula)
-                .toString();
-    }
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(Parameter.class)
+      .addEnum("name", name)
+      .addStr("variable", variable)
+      .addStr("formula", formula)
+      .toString();
+  }
 }

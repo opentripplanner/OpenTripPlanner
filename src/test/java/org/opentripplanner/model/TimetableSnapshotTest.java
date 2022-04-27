@@ -1,119 +1,102 @@
 package org.opentripplanner.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripTimes;
-
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class TimetableSnapshotTest {
-    private static Map<FeedScopedId, TripPattern> patternIndex;
-    private static final TimeZone timeZone = TimeZone.getTimeZone("GMT");
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        Graph graph = new Graph();
-        GtfsContext context = GtfsContextBuilder
-                .contextBuilder(ConstantsForTests.FAKE_GTFS)
-                .withIssueStoreAndDeduplicator(graph)
-                .build();
+  private static final TimeZone timeZone = TimeZone.getTimeZone("GMT");
+  private static Map<FeedScopedId, TripPattern> patternIndex;
+  static String feedId;
 
-        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-        factory.run(graph);
-        graph.putService(CalendarServiceData.class,
-                context.getCalendarServiceData());
+  @BeforeAll
+  public static void setUp() throws Exception {
+    Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
 
-        patternIndex = new HashMap<>();
-        for (TripPattern tripPattern : graph.tripPatternForId.values()) {
-            tripPattern.scheduledTripsAsStream().forEach(trip ->
-                patternIndex.put(trip.getId(), tripPattern)
-            );
-        }
+    feedId = graph.getFeedIds().iterator().next();
+
+    patternIndex = new HashMap<>();
+    for (TripPattern tripPattern : graph.tripPatternForId.values()) {
+      tripPattern
+        .scheduledTripsAsStream()
+        .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
     }
+  }
 
-    @Test
-    public void testCompare() {
-        Timetable orig = new Timetable(null);
-        Timetable a = new Timetable(orig, new ServiceDate().previous());
-        Timetable b = new Timetable(orig, new ServiceDate());
-        assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
-    }
+  @Test
+  public void testCompare() {
+    Timetable orig = new Timetable(null);
+    Timetable a = new Timetable(orig, new ServiceDate().previous());
+    Timetable b = new Timetable(orig, new ServiceDate());
+    assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
+  }
 
-    private boolean updateResolver(TimetableSnapshot resolver, TripPattern pattern, TripUpdate tripUpdate, ServiceDate serviceDate) {
-        TripTimesPatch tripTimesPatch =
-                pattern.getScheduledTimetable().createUpdatedTripTimes(
-                        tripUpdate,
-                        timeZone,
-                        serviceDate
-                );
-        TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
-        return resolver.update(pattern, updatedTripTimes, serviceDate);
-    }
+  @Test
+  public void testResolve() {
+    ServiceDate today = new ServiceDate();
+    ServiceDate yesterday = today.previous();
+    ServiceDate tomorrow = today.next();
+    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+    TimetableSnapshot resolver = new TimetableSnapshot();
 
-    @Test
-    public void testResolve() {
+    Timetable scheduled = resolver.resolve(pattern, today);
+    assertEquals(scheduled, resolver.resolve(pattern, null));
+
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    // add a new timetable for today
+    updateResolver(resolver, pattern, tripUpdate, today);
+    Timetable forNow = resolver.resolve(pattern, today);
+    assertEquals(scheduled, resolver.resolve(pattern, yesterday));
+    assertNotSame(scheduled, forNow);
+    assertEquals(scheduled, resolver.resolve(pattern, tomorrow));
+    assertEquals(scheduled, resolver.resolve(pattern, null));
+
+    // add a new timetable for yesterday
+    updateResolver(resolver, pattern, tripUpdate, yesterday);
+    Timetable forYesterday = resolver.resolve(pattern, yesterday);
+    assertNotSame(scheduled, forYesterday);
+    assertNotSame(scheduled, forNow);
+    assertEquals(scheduled, resolver.resolve(pattern, tomorrow));
+    assertEquals(scheduled, resolver.resolve(pattern, null));
+  }
+
+  @Test
+  public void testUpdate() {
+    Assertions.assertThrows(
+      ConcurrentModificationException.class,
+      () -> {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        ServiceDate tomorrow = today.next();
-        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
-        TimetableSnapshot resolver = new TimetableSnapshot();
-
-        Timetable scheduled = resolver.resolve(pattern, today);
-        assertEquals(scheduled, resolver.resolve(pattern, null));
-
-        TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
-
-        tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
-
-        TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-        TripUpdate tripUpdate = tripUpdateBuilder.build();
-
-        // add a new timetable for today
-        updateResolver(resolver, pattern, tripUpdate, today);
-        Timetable forNow = resolver.resolve(pattern, today);
-        assertEquals(scheduled, resolver.resolve(pattern, yesterday));
-        assertNotSame(scheduled, forNow);
-        assertEquals(scheduled, resolver.resolve(pattern, tomorrow));
-        assertEquals(scheduled, resolver.resolve(pattern, null));
-
-        // add a new timetable for yesterday
-        updateResolver(resolver, pattern, tripUpdate, yesterday);
-        Timetable forYesterday = resolver.resolve(pattern, yesterday);
-        assertNotSame(scheduled, forYesterday);
-        assertNotSame(scheduled, forNow);
-        assertEquals(scheduled, resolver.resolve(pattern, tomorrow));
-        assertEquals(scheduled, resolver.resolve(pattern, null));
-    }
-
-    @Test(expected=ConcurrentModificationException.class)
-    public void testUpdate() {
-        ServiceDate today = new ServiceDate();
-        ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
         Timetable origNow = resolver.resolve(pattern, today);
@@ -146,13 +129,18 @@ public class TimetableSnapshotTest {
         // exception if we try to modify a snapshot
         TimetableSnapshot snapshot = resolver.commit();
         updateResolver(snapshot, pattern, tripUpdate, yesterday);
-    }
+      }
+    );
+  }
 
-    @Test(expected=ConcurrentModificationException.class)
-    public void testCommit() {
+  @Test
+  public void testCommit() {
+    Assertions.assertThrows(
+      ConcurrentModificationException.class,
+      () -> {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
 
@@ -193,42 +181,57 @@ public class TimetableSnapshotTest {
 
         // exception if we try to commit to a snapshot
         snapshot.commit();
-    }
+      }
+    );
+  }
 
-    @Test
-    public void testPurge() {
-        ServiceDate today = new ServiceDate();
-        ServiceDate yesterday = today.previous();
-        TripPattern pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
+  @Test
+  public void testPurge() {
+    ServiceDate today = new ServiceDate();
+    ServiceDate yesterday = today.previous();
+    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
-        TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
-        tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
 
-        TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
-        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
 
-        TripUpdate tripUpdate = tripUpdateBuilder.build();
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        TimetableSnapshot resolver = new TimetableSnapshot();
-        updateResolver(resolver, pattern, tripUpdate, today);
-        updateResolver(resolver, pattern, tripUpdate, yesterday);
+    TimetableSnapshot resolver = new TimetableSnapshot();
+    updateResolver(resolver, pattern, tripUpdate, today);
+    updateResolver(resolver, pattern, tripUpdate, yesterday);
 
-        assertNotSame(resolver.resolve(pattern, yesterday), resolver.resolve(pattern, null));
-        assertNotSame(resolver.resolve(pattern, today), resolver.resolve(pattern, null));
+    assertNotSame(resolver.resolve(pattern, yesterday), resolver.resolve(pattern, null));
+    assertNotSame(resolver.resolve(pattern, today), resolver.resolve(pattern, null));
 
-        assertNotNull(resolver.commit());
-        assertFalse(resolver.isDirty());
+    assertNotNull(resolver.commit());
+    assertFalse(resolver.isDirty());
 
-        assertTrue(resolver.purgeExpiredData(yesterday));
-        assertFalse(resolver.purgeExpiredData(yesterday));
+    assertTrue(resolver.purgeExpiredData(yesterday));
+    assertFalse(resolver.purgeExpiredData(yesterday));
 
-        assertEquals(resolver.resolve(pattern, yesterday), resolver.resolve(pattern, null));
-        assertNotSame(resolver.resolve(pattern, today), resolver.resolve(pattern, null));
+    assertEquals(resolver.resolve(pattern, yesterday), resolver.resolve(pattern, null));
+    assertNotSame(resolver.resolve(pattern, today), resolver.resolve(pattern, null));
 
-        assertNull(resolver.commit());
-        assertFalse(resolver.isDirty());
-    }
+    assertNull(resolver.commit());
+    assertFalse(resolver.isDirty());
+  }
+
+  private boolean updateResolver(
+    TimetableSnapshot resolver,
+    TripPattern pattern,
+    TripUpdate tripUpdate,
+    ServiceDate serviceDate
+  ) {
+    TripTimesPatch tripTimesPatch = pattern
+      .getScheduledTimetable()
+      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
+    return resolver.update(pattern, updatedTripTimes, serviceDate);
+  }
 }

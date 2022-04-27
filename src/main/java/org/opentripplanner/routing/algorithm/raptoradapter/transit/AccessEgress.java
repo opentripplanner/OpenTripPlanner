@@ -44,7 +44,9 @@ public class AccessEgress implements RaptorTransfer {
   }
 
   @Override
-  public boolean hasOpeningHours() { return false; }
+  public boolean hasOpeningHours() {
+    return false;
+  }
 
   public State getLastState() {
     return lastState;
@@ -53,9 +55,9 @@ public class AccessEgress implements RaptorTransfer {
   @Override
   public String toString() {
     return ToStringBuilder
-        .of(AccessEgress.class)
-        .addStr("transfer", asString())
-        .addObj("state", lastState)
-        .toString();
+      .of(AccessEgress.class)
+      .addStr("transfer", asString())
+      .addObj("state", lastState)
+      .toString();
   }
 }

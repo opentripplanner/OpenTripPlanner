@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class VehicleParkingService implements Serializable {
+
   private static final long serialVersionUID = 1L;
 
   private final Set<VehicleParking> vehicleParkings = new HashSet<>();

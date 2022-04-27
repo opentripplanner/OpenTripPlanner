@@ -21,318 +21,367 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveP
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
-
 
 /**
  * Create a filter chain based on the given config.
  */
 public class ItineraryListFilterChainBuilder {
-    private static final int NOT_SET = -1;
 
-    private final SortOrder sortOrder;
-    private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
+  private static final int NOT_SET = -1;
 
-    private boolean debug = false;
-    private int maxNumberOfItineraries = NOT_SET;
-    private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
-    private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
-    private boolean removeWalkAllTheWayResults;
-    private DoubleFunction<Double> transitGeneralizedCostLimit;
-    private double bikeRentalDistanceRatio;
-    private double parkAndRideDurationRatio;
-    private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
-    private Instant latestDepartureTimeLimit = null;
-    private Consumer<Itinerary> maxLimitReachedSubscriber;
+  private final SortOrder sortOrder;
+  private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
 
+  private boolean debug = false;
+  private int maxNumberOfItineraries = NOT_SET;
+  private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
+  private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
+  private boolean removeWalkAllTheWayResults;
+  private boolean sameFirstOrLastTripFilter;
+  private DoubleFunction<Double> transitGeneralizedCostLimit;
+  private double bikeRentalDistanceRatio;
+  private double parkAndRideDurationRatio;
+  private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
+  private Instant latestDepartureTimeLimit = null;
+  private Consumer<Itinerary> maxLimitReachedSubscriber;
+  private boolean accessibilityScore;
 
-    public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
-        this.sortOrder = sortOrder;
+  public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
+    this.sortOrder = sortOrder;
+  }
+
+  /**
+   * The maximum number of itineraries returned. This will remove all itineraries at the end of the
+   * list AFTER the final sort of the itineraries.
+   * <p>
+   * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which end of the
+   * list is cropped.
+   * <p>
+   * Use {@code -1} to disable.
+   */
+  public ItineraryListFilterChainBuilder withMaxNumberOfItineraries(int value) {
+    this.maxNumberOfItineraries = value;
+    return this;
+  }
+
+  /**
+   * Remove itineraries from the tail or head of the list in the final filtering. The {@link
+   * #maxNumberOfItineraries} is used together with this parameter to reduce the number of
+   * itineraries down to the requested size.
+   * <p>
+   * The default is to crop the tail. But, we need to crop the head to be able to paginate in the
+   * opposite direction of the main sort-order of the original search.
+   */
+  public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
+    this.maxNumberOfItinerariesCrop = section;
+    return this;
+  }
+
+  /**
+   * Group itineraries by the main legs and keeping approximately the given total number of
+   * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
+   * total distance.
+   *
+   * @see GroupBySimilarity for more details.
+   */
+  public ItineraryListFilterChainBuilder addGroupBySimilarity(GroupBySimilarity groupBySimilarity) {
+    this.groupBySimilarity.add(groupBySimilarity);
+    return this;
+  }
+
+  /**
+   * This function is used to compute a max-limit for generalized-cost. The limit is applied to
+   * itineraries with at least one transit leg. Street-only itineraries are not considered.
+   * <p>
+   * The smallest transit leg generalized-cost value is used as input to the function. For example
+   * if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, then all
+   * transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   */
+  public ItineraryListFilterChainBuilder withTransitGeneralizedCostLimit(
+    DoubleFunction<Double> value
+  ) {
+    this.transitGeneralizedCostLimit = value;
+    return this;
+  }
+
+  /**
+   * This is a a bit similar to {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, with a few
+   * important differences.
+   * <p>
+   * This function is used to compute a max-limit for generalized-cost. The limit is applied to
+   * itineraries with no transit legs, however ALL itineraries (including those with transit legs)
+   * are considered when calculating the minimum cost.
+   * <p>
+   * The smallest generalized-cost value is used as input to the function. For example if the
+   * function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, then all
+   * non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   */
+  public ItineraryListFilterChainBuilder withNonTransitGeneralizedCostLimit(
+    DoubleFunction<Double> value
+  ) {
+    this.nonTransitGeneralizedCostLimit = value;
+    return this;
+  }
+
+  /**
+   * This is used to filter out bike rental itineraries that contain mostly walking. The value
+   * describes the ratio of the total itinerary that has to consist of bike rental to allow the
+   * itinerary.
+   */
+  public ItineraryListFilterChainBuilder withBikeRentalDistanceRatio(double value) {
+    this.bikeRentalDistanceRatio = value;
+    return this;
+  }
+
+  /**
+   * This is used to filter out park and ride itineraries that contain only driving and a very long
+   * walking leg. The value describes the amount of driving vs. walking to allow the itinerary.
+   */
+  public ItineraryListFilterChainBuilder withParkAndRideDurationRatio(double value) {
+    this.parkAndRideDurationRatio = value;
+    return this;
+  }
+
+  /**
+   * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
+   * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
+   * with a on-street-all-the-way itinerary. Use this method to turn this filter on/off.
+   * <p>
+   * The filter remove all itineraries with a generalized-cost that is higher than the best
+   * on-street-all-the-way itinerary.
+   * <p>
+   * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
+   * exist.
+   */
+  public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+    boolean value
+  ) {
+    this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
+    return this;
+  }
+
+  /**
+   * This will NOT delete itineraries, but tag them as deleted using the {@link
+   * Itinerary#systemNotices}.
+   */
+  public ItineraryListFilterChainBuilder withDebugEnabled(boolean value) {
+    this.debug = value;
+    return this;
+  }
+
+  /**
+   * Max departure time. This is a absolute filter on the itinerary departure time from the origin.
+   * The filter is ignored if the value is {@code null}.
+   */
+  public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(
+    Instant latestDepartureTimeLimit
+  ) {
+    this.latestDepartureTimeLimit = latestDepartureTimeLimit;
+    return this;
+  }
+
+  /**
+   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed. To
+   * get notified about this a subscriber can be added. The first itinerary removed by the {@code
+   * maxLimit} is returned. The 'maxLimit' check is the last thing happening in the filter-chain
+   * after the final sort. So, if another filter remove an itinerary, the itinerary is not
+   * considered with the respect to this the {@link #withMaxNumberOfItineraries(int)} limit.
+   *
+   * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
+   *                                  Only the first element removed is passed to the subscriber.
+   */
+  public ItineraryListFilterChainBuilder withMaxLimitReachedSubscriber(
+    Consumer<Itinerary> maxLimitReachedSubscriber
+  ) {
+    this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
+    return this;
+  }
+
+  /**
+   * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by and
+   * remove-transit-with-higher-cost-than-best-on-street-only filter. This make sure that poor
+   * transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
+   */
+  public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
+    this.removeWalkAllTheWayResults = enable;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withSameFirstOrLastTripFilter(boolean enable) {
+    this.sameFirstOrLastTripFilter = enable;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withAccessibilityScore(boolean enable) {
+    this.accessibilityScore = enable;
+    return this;
+  }
+
+  @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
+  public ItineraryListFilterChain build() {
+    List<ItineraryListFilter> filters = new ArrayList<>();
+
+    filters.addAll(buildGroupByTripIdAndDistanceFilters());
+
+    if (sameFirstOrLastTripFilter) {
+      filters.add(new SortingFilter(generalizedCostComparator()));
+      filters.add(new SameFirstOrLastTripFilter());
     }
 
-    /**
-     * The maximum number of itineraries returned. This will remove all itineraries at the
-     * end of the list AFTER the final sort of the itineraries.
-     * <p>
-     * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which
-     * end of the list is cropped.
-     *
-     * Use {@code -1} to disable.
-     */
-    public ItineraryListFilterChainBuilder withMaxNumberOfItineraries(int value) {
-        this.maxNumberOfItineraries = value;
-        return this;
+    if (accessibilityScore) {
+      filters.add(new AccessibilityScoreFilter());
     }
 
-    /**
-     * Remove itineraries from the tail or head of the list in the final filtering. The
-     * {@link #maxNumberOfItineraries} is used together with this parameter to reduce the
-     * number of itineraries down to the requested size.
-     * <p>
-     * The default is to crop the tail. But, we need to crop the head to be able to paginate
-     * in the opposite direction of the main sort-order of the original search.
-     */
-    public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
-        this.maxNumberOfItinerariesCrop = section;
-        return this;
+    // Filter transit itineraries on generalized-cost
+    if (transitGeneralizedCostLimit != null) {
+      filters.add(
+        new DeletionFlaggingFilter(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit))
+      );
     }
 
-    /**
-     * Group itineraries by the main legs and keeping approximately the given total number of
-     * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
-     * total distance.
-     *
-     * @see GroupBySimilarity for more details.
-     */
-    public ItineraryListFilterChainBuilder addGroupBySimilarity(GroupBySimilarity groupBySimilarity) {
-        this.groupBySimilarity.add(groupBySimilarity);
-        return this;
+    // Filter non-transit itineraries on generalized-cost
+    if (nonTransitGeneralizedCostLimit != null) {
+      filters.add(
+        new DeletionFlaggingFilter(
+          new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit)
+        )
+      );
     }
 
-    /**
-     * This function is used to compute a max-limit for generalized-cost. The limit
-     * is applied to itineraries with at least one transit leg. Street-only itineraries are not
-     * considered.
-     * <p>
-     * The smallest transit leg generalized-cost value is used as input to the function.
-     * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
-     * {@code 5000}, then all transit itineraries with a cost larger than
-     * {@code 1800 + 2 * 5000 = 11 800} is dropped.
-     */
-    public ItineraryListFilterChainBuilder withTransitGeneralizedCostLimit(DoubleFunction<Double> value){
-        this.transitGeneralizedCostLimit = value;
-        return this;
+    // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
+    // remove elements/ based on the given itinerary properties - not considering other
+    // itineraries. This may remove itineraries in the "groupBy" filters that are considered
+    // worse than the itineraries removed here. Let take an example, 2 itineraries, A and B, are
+    // returned. A have a significant higher cost than B, but share the same long last transit
+    // leg. B depart AFTER the latest-departure-time (this may happen if the access is
+    // time-shifted). Then, A will be removed by the "group-by" filters(similar to B, but cost
+    // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
+    // what we want, since both itineraries are none optimal.
+    {
+      if (removeTransitWithHigherCostThanBestOnStreetOnly) {
+        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfStreetOnlyIsBetterFilter()));
+      }
+
+      if (removeWalkAllTheWayResults) {
+        filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
+      }
+
+      if (latestDepartureTimeLimit != null) {
+        filters.add(
+          new DeletionFlaggingFilter(new LatestDepartureTimeFilter(latestDepartureTimeLimit))
+        );
+      }
+
+      if (bikeRentalDistanceRatio > 0) {
+        filters.add(
+          new DeletionFlaggingFilter(
+            new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio)
+          )
+        );
+      }
+
+      if (parkAndRideDurationRatio > 0) {
+        filters.add(
+          new DeletionFlaggingFilter(
+            new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)
+          )
+        );
+      }
     }
 
-    /**
-     * This is a a bit similar to {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, with
-     * a few important differences.
-     *
-     * This function is used to compute a max-limit for generalized-cost. The limit
-     * is applied to itineraries with no transit legs, however ALL itineraries (including those with
-     * transit legs) are considered when calculating the minimum cost.
-     * <p>
-     * The smallest generalized-cost value is used as input to the function.
-     * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
-     * {@code 5000}, then all non-transit itineraries with a cost larger than
-     * {@code 1800 + 2 * 5000 = 11 800} is dropped.
-     */
-    public ItineraryListFilterChainBuilder withNonTransitGeneralizedCostLimit(DoubleFunction<Double> value){
-        this.nonTransitGeneralizedCostLimit = value;
-        return this;
+    // Remove itineraries if max limit is set
+    if (maxNumberOfItineraries > 0) {
+      filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+      filters.add(
+        new DeletionFlaggingFilter(
+          new MaxLimitFilter(
+            "number-of-itineraries-filter",
+            maxNumberOfItineraries,
+            maxNumberOfItinerariesCrop,
+            maxLimitReachedSubscriber
+          )
+        )
+      );
     }
 
-    /**
-     * This is used to filter out bike rental itineraries that contain mostly walking. The value
-     * describes the ratio of the total itinerary that has to consist of bike rental to allow the
-     * itinerary.
-     */
-    public ItineraryListFilterChainBuilder withBikeRentalDistanceRatio(double value){
-        this.bikeRentalDistanceRatio = value;
-        return this;
+    // Do the final itineraries sort
+    filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+
+    return new ItineraryListFilterChain(filters, debug);
+  }
+
+  /**
+   * These filters will group the itineraries by the main-legs and reduce the number of itineraries
+   * in each group. The main legs is the legs that together constitute more than a given　percentage
+   * of the total travel distance.
+   * <p>
+   * Each group is filtered using generalized-cost, keeping only the itineraries with the lowest
+   * cost. If there is a tie, the filter look at the number-of-transfers as a tie breaker.
+   * <p>
+   * The filter name is dynamically created: similar-legs-filter-68p-1
+   */
+  private List<ItineraryListFilter> buildGroupByTripIdAndDistanceFilters() {
+    List<GroupBySimilarity> groupBy = groupBySimilarity
+      .stream()
+      .sorted(Comparator.comparingDouble(o -> o.groupByP))
+      .collect(Collectors.toList());
+
+    List<ItineraryListFilter> groupByFilters = new ArrayList<>();
+
+    for (GroupBySimilarity it : groupBy) {
+      String name =
+        "similar-legs-filter-" +
+        (int) (100d * it.groupByP) +
+        "p-" +
+        it.maxNumOfItinerariesPerGroup +
+        "x";
+
+      List<ItineraryListFilter> nested = new ArrayList<>();
+
+      if (it.nestedGroupingByAllSameStations) {
+        final String innerGroupName = name + "-group-by-all-same-stations";
+        nested.add(
+          new GroupByFilter<>(
+            GroupByAllSameStations::new,
+            List.of(
+              new SortingFilter(generalizedCostComparator()),
+              new DeletionFlaggingFilter(new MaxLimitFilter(innerGroupName, 1))
+            )
+          )
+        );
+      }
+
+      if (it.maxCostOtherLegsFactor > 1.0) {
+        nested.add(
+          new DeletionFlaggingFilter(
+            new OtherThanSameLegsMaxGeneralizedCostFilter(it.maxCostOtherLegsFactor)
+          )
+        );
+      }
+
+      nested.add(new SortingFilter(generalizedCostComparator()));
+      nested.add(
+        new DeletionFlaggingFilter(new MaxLimitFilter(name, it.maxNumOfItinerariesPerGroup))
+      );
+
+      nested.add(new RemoveDeletionFlagForLeastTransfersItinerary());
+
+      groupByFilters.add(
+        new GroupByFilter<>(
+          itinerary -> new GroupByTripIdAndDistance(itinerary, it.groupByP),
+          nested
+        )
+      );
     }
 
-    /**
-     * This is used to filter out park and ride itineraries that contain only driving and a
-     * very long walking leg.
-     * The value describes the amount of driving vs. walking to allow the itinerary.
-     */
-    public ItineraryListFilterChainBuilder withParkAndRideDurationRatio(double value){
-        this.parkAndRideDurationRatio = value;
-        return this;
-    }
-
-    /**
-     * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
-     * cases we get "silly" transit itineraries that is marginally better on travel-duration
-     * compared with a on-street-all-the-way itinerary. Use this method to turn this filter
-     * on/off.
-     * <p>
-     * The filter remove all itineraries with a generalized-cost that is higher than the best
-     * on-street-all-the-way itinerary.
-     * <p>
-     * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
-     * exist.
-     */
-    public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(boolean value) {
-        this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
-        return this;
-    }
-
-    /**
-     * This will NOT delete itineraries, but tag them as deleted using the
-     * {@link Itinerary#systemNotices}.
-     */
-    public ItineraryListFilterChainBuilder withDebugEnabled(boolean value) {
-        this.debug = value;
-        return this;
-    }
-
-    /**
-     * Max departure time. This is a absolute filter on the itinerary departure time from the
-     * origin. The filter is ignored if the value is {@code null}.
-     */
-    public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(Instant latestDepartureTimeLimit) {
-        this.latestDepartureTimeLimit = latestDepartureTimeLimit;
-        return this;
-    }
-
-    /**
-     * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
-     * To get notified about this a subscriber can be added. The first itinerary removed by the
-     * {@code maxLimit} is returned. The 'maxLimit' check is the last thing happening in the
-     * filter-chain after the final sort. So, if another filter remove an itinerary, the itinerary
-     * is not considered with the respect to this the {@link #withMaxNumberOfItineraries(int)}
-     * limit.
-     *
-     * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
-     *                                  Only the first element removed is passed to the subscriber.
-     */
-    public ItineraryListFilterChainBuilder withMaxLimitReachedSubscriber(Consumer<Itinerary> maxLimitReachedSubscriber) {
-        this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
-        return this;
-    }
-
-    /**
-     * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by
-     * and remove-transit-with-higher-cost-than-best-on-street-only filter. This make sure that
-     * poor transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
-     */
-    public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
-        this.removeWalkAllTheWayResults = enable;
-        return this;
-    }
-
-    @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
-    public ItineraryListFilterChain build() {
-        List<ItineraryListFilter> filters = new ArrayList<>();
-
-        filters.addAll(buildGroupByTripIdAndDistanceFilters());
-
-        // Filter transit itineraries on generalized-cost
-        if(transitGeneralizedCostLimit != null) {
-            filters.add(new DeletionFlaggingFilter(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit)));
-        }
-
-        // Filter non-transit itineraries on generalized-cost
-        if(nonTransitGeneralizedCostLimit != null) {
-            filters.add(new DeletionFlaggingFilter(new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit)));
-        }
-
-        // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
-        // remove elements/ based on the given itinerary properties - not considering other
-        // itineraries. This may remove itineraries in the "groupBy" filters that are considered
-        // worse than the itineraries removed here. Let take an example, 2 itineraries, A and B, are
-        // returned. A have a significant higher cost than B, but share the same long last transit
-        // leg. B depart AFTER the latest-departure-time (this may happen if the access is
-        // time-shifted). Then, A will be removed by the "group-by" filters(similar to B, but cost
-        // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
-        // what we want, since both itineraries are none optimal.
-        {
-            if (removeTransitWithHigherCostThanBestOnStreetOnly) {
-                filters.add(new DeletionFlaggingFilter(new RemoveTransitIfStreetOnlyIsBetterFilter()));
-            }
-
-            if(removeWalkAllTheWayResults) {
-                filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
-            }
-
-            if (latestDepartureTimeLimit != null) {
-                filters.add(new DeletionFlaggingFilter(new LatestDepartureTimeFilter(latestDepartureTimeLimit)));
-            }
-
-            if (bikeRentalDistanceRatio > 0) {
-                filters.add(new DeletionFlaggingFilter(new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio)));
-            }
-
-            if (parkAndRideDurationRatio > 0) {
-                filters.add(new DeletionFlaggingFilter(new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)));
-            }
-        }
-
-        // Remove itineraries if max limit is set
-        if (maxNumberOfItineraries > 0) {
-            filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
-            filters.add(
-                    new DeletionFlaggingFilter(
-                            new MaxLimitFilter(
-                                    "number-of-itineraries-filter",
-                                    maxNumberOfItineraries,
-                                    maxNumberOfItinerariesCrop,
-                                    maxLimitReachedSubscriber
-                            )
-                    )
-            );
-        }
-
-        // Do the final itineraries sort
-        filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
-
-        return new ItineraryListFilterChain(filters, debug);
-    }
-
-    /**
-     * These filters will group the itineraries by the main-legs and reduce the number of
-     * itineraries in each group. The main legs is the legs that together constitute more than a
-     * given　percentage of the total travel distance.
-     * <p>
-     * Each group is filtered using generalized-cost, keeping only the itineraries with the lowest
-     * cost. If there is a tie, the filter look at the number-of-transfers as a tie breaker.
-     * <p>
-     * The filter name is dynamically created: similar-legs-filter-68p-1
-     */
-    private List<ItineraryListFilter> buildGroupByTripIdAndDistanceFilters() {
-        List<GroupBySimilarity> groupBy = groupBySimilarity
-            .stream()
-            .sorted(Comparator.comparingDouble(o -> o.groupByP))
-            .collect(Collectors.toList());
-
-        List<ItineraryListFilter> groupByFilters = new ArrayList<>();
-
-        for (GroupBySimilarity it : groupBy) {
-            String name = "similar-legs-filter-" +
-                    (int)(100d * it.groupByP) + "p-" + it.maxNumOfItinerariesPerGroup + "x";
-
-            List<ItineraryListFilter> nested = new ArrayList<>();
-
-            if (it.nestedGroupingByAllSameStations) {
-                final String innerGroupName = name + "-group-by-all-same-stations";
-                nested.add(new GroupByFilter<>(
-                    GroupByAllSameStations::new,
-                    List.of(
-                        new SortingFilter(generalizedCostComparator()),
-                        new DeletionFlaggingFilter( new MaxLimitFilter(innerGroupName, 1))
-                    )
-                ));
-            }
-
-            if (it.maxCostOtherLegsFactor > 1.0) {
-                nested.add(new DeletionFlaggingFilter(new OtherThanSameLegsMaxGeneralizedCostFilter(
-                    it.maxCostOtherLegsFactor
-                )));
-            }
-
-            nested.add(new SortingFilter(generalizedCostComparator()));
-            nested.add(new DeletionFlaggingFilter(new MaxLimitFilter(
-                name,
-                it.maxNumOfItinerariesPerGroup
-            )));
-
-            nested.add(new RemoveDeletionFlagForLeastTransfersItinerary());
-
-            groupByFilters.add(
-                new GroupByFilter<>(
-                    itinerary -> new GroupByTripIdAndDistance(itinerary, it.groupByP),
-                    nested
-                )
-            );
-        }
-
-        return groupByFilters;
-    }
+    return groupByFilters;
+  }
 }

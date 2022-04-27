@@ -23,86 +23,81 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should support combining multiple features, like Flexible access paths and constrained
-* transfers. This test has only one path available, and it is expected that it should be returned
+ * transfers. This test has only one path available, and it is expected that it should be returned
  * irrespective of the profile.
  */
 public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
-    private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
 
-    private final TestTransitData data = new TestTransitData();
-    private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
-            new RaptorRequestBuilder<>();
-    private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-            RaptorConfig.defaultConfigForTest()
+  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
+
+  private final TestTransitData data = new TestTransitData();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
+    RaptorConfig.defaultConfigForTest()
+  );
+
+  @BeforeEach
+  public void setup() {
+    var r1 = route("R1", STOP_B, STOP_C).withTimetable(schedule("0:30 0:45"));
+    var r2 = route("R2", STOP_C, STOP_D).withTimetable(schedule("0:45 0:55"));
+
+    var tripA = r1.timetable().getTripSchedule(0);
+    var tripB = r2.timetable().getTripSchedule(0);
+
+    data.withRoutes(r1, r2);
+    data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
+    data.withTransfer(STOP_A, walk(STOP_B, D10m));
+    data.mcCostParamsBuilder().transferCost(100);
+
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
+      .addEgressPaths(walk(STOP_D, D1m));
+
+    requestBuilder
+      .searchParams()
+      .earliestDepartureTime(T00_00)
+      .latestArrivalTime(T01_00)
+      .constrainedTransfersEnabled(true);
+
+    ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
+  }
+
+  @Test
+  public void standard() {
+    requestBuilder.profile(RaptorProfile.STANDARD);
+    requestBuilder.searchParams().searchOneIterationOnly();
+
+    var response = raptorService.route(requestBuilder.build(), data);
+
+    assertEquals(
+      "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
+      pathsToString(response)
     );
+  }
 
-    @BeforeEach
-    public void setup() {
-        var r1 = route("R1", STOP_B, STOP_C)
-                .withTimetable(schedule("0:30 0:45"));
-        var r2 = route("R2", STOP_C, STOP_D)
-                .withTimetable(schedule("0:45 0:55"));
+  @Test
+  public void standardReverse() {
+    requestBuilder.profile(RaptorProfile.STANDARD).searchDirection(SearchDirection.REVERSE);
+    requestBuilder.searchParams().searchOneIterationOnly();
 
-        var tripA = r1.timetable().getTripSchedule(0);
-        var tripB = r2.timetable().getTripSchedule(0);
+    var response = raptorService.route(requestBuilder.build(), data);
 
-        data.withRoutes(r1, r2);
-        data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
-        data.withTransfer(STOP_A, walk(STOP_B, D10m));
-        data.mcCostParamsBuilder().transferCost(100);
+    assertEquals(
+      "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
+      pathsToString(response)
+    );
+  }
 
-        requestBuilder.searchParams()
-                .addAccessPaths(
-                        flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP)
-                )
-                .addEgressPaths(walk(STOP_D, D1m));
+  @Test
+  public void multiCriteria() {
+    requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
 
-        requestBuilder.searchParams()
-                .earliestDepartureTime(T00_00)
-                .latestArrivalTime(T01_00)
-                .constrainedTransfersEnabled(true);
+    var response = raptorService.route(requestBuilder.build(), data);
 
-        ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
-    }
-
-    @Test
-    public void standard() {
-        requestBuilder.profile(RaptorProfile.STANDARD);
-        requestBuilder.searchParams().searchOneIterationOnly();
-
-        var response = raptorService.route(requestBuilder.build(), data);
-
-        assertEquals(
-                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
-                pathsToString(response)
-        );
-    }
-
-    @Test
-    public void standardReverse() {
-        requestBuilder
-                .profile(RaptorProfile.STANDARD)
-                .searchDirection(SearchDirection.REVERSE);
-        requestBuilder.searchParams().searchOneIterationOnly();
-
-        var response = raptorService.route(requestBuilder.build(), data);
-
-        assertEquals(
-                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
-                pathsToString(response)
-        );
-    }
-
-    @Test
-    public void multiCriteria() {
-        requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
-
-        var response = raptorService.route(requestBuilder.build(), data);
-
-        assertEquals(
-                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]",
-                pathsToString(response)
-        );
-    }
+    assertEquals(
+      "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]",
+      pathsToString(response)
+    );
+  }
 }
-

@@ -1,10 +1,9 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
-import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
-import org.opentripplanner.routing.graphfinder.PlaceType;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
+import org.opentripplanner.routing.graphfinder.PlaceType;
 
 /**
  * Map to/from {@link TransmodelPlaceType}
@@ -12,12 +11,16 @@ import java.util.stream.Collectors;
 public class PlaceMapper {
 
   public static List<PlaceType> mapToDomain(List<TransmodelPlaceType> api) {
-    if (api == null) {  return null;  }
+    if (api == null) {
+      return null;
+    }
     return api.stream().map(PlaceMapper::mapToDomain).distinct().collect(Collectors.toList());
   }
 
-  private static PlaceType mapToDomain(TransmodelPlaceType api){
-    if (api == null) {  return null;  }
+  private static PlaceType mapToDomain(TransmodelPlaceType api) {
+    if (api == null) {
+      return null;
+    }
 
     switch (api) {
       case QUAY:

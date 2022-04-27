@@ -1,8 +1,7 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
-
 import java.util.Map;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 public class GbfsDataSourceParameters extends GbfsVehicleRentalDataSourceParameters {
 

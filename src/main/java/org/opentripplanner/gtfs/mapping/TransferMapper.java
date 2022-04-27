@@ -82,7 +82,6 @@ class TransferMapper {
    */
   private static final int STAY_SEATED_NOT_ALLOWED = 5;
 
-
   private final RouteMapper routeMapper;
 
   private final StationMapper stationMapper;
@@ -96,14 +95,13 @@ class TransferMapper {
 
   private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
 
-
   TransferMapper(
-          RouteMapper routeMapper,
-          StationMapper stationMapper,
-          StopMapper stopMapper,
-          TripMapper tripMapper,
-          TripStopTimes stopTimesByTrip,
-          DataImportIssueStore issueStore
+    RouteMapper routeMapper,
+    StationMapper stationMapper,
+    StopMapper stopMapper,
+    TripMapper tripMapper,
+    TripStopTimes stopTimesByTrip,
+    DataImportIssueStore issueStore
   ) {
     this.routeMapper = routeMapper;
     this.stationMapper = stationMapper;
@@ -131,9 +129,11 @@ class TransferMapper {
   Collection<ConstrainedTransfer> map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
     setup(!allTransfers.isEmpty());
 
-    return allTransfers.stream().map(this::map)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+    return allTransfers
+      .stream()
+      .map(this::map)
+      .filter(Objects::nonNull)
+      .collect(Collectors.toList());
   }
 
   ConstrainedTransfer map(org.onebusaway.gtfs.model.Transfer rhs) {
@@ -143,17 +143,24 @@ class TransferMapper {
     TransferConstraint constraint = mapConstraint(rhs, fromTrip, toTrip);
 
     // If this transfer do not give any advantages in the routing, then drop it
-    if(constraint.isRegularTransfer()) {
+    if (constraint.isRegularTransfer()) {
       issueStore.add(new IgnoredGtfsTransfer(rhs));
       return null;
     }
 
     if (constraint.isStaySeated() && (fromTrip == null || toTrip == null)) {
-      issueStore.add(new InvalidGtfsTransfer("from_trip_id and to_trip_id must exist for in-seat transfer", rhs));
+      issueStore.add(
+        new InvalidGtfsTransfer("from_trip_id and to_trip_id must exist for in-seat transfer", rhs)
+      );
       return null;
     }
 
-    TransferPoint fromPoint = mapTransferPoint(rhs.getFromStop(), rhs.getFromRoute(), fromTrip, false);
+    TransferPoint fromPoint = mapTransferPoint(
+      rhs.getFromStop(),
+      rhs.getFromRoute(),
+      fromTrip,
+      false
+    );
     TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
 
     if (fromPoint == null || toPoint == null) {
@@ -165,7 +172,9 @@ class TransferMapper {
   }
 
   private void setup(boolean run) {
-    if(!run) { return; }
+    if (!run) {
+      return;
+    }
 
     for (Trip trip : tripMapper.getMappedTrips()) {
       tripsByRoute.put(trip.getRoute(), trip);
@@ -180,14 +189,13 @@ class TransferMapper {
     // A transfer is stay seated, if it is either explicitly mapped as such, or in the same block
     // and not explicitly disallowed.
     builder.staySeated(
-            rhs.getTransferType() == STAY_SEATED ||
-            (rhs.getTransferType() != STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip))
-
+      rhs.getTransferType() == STAY_SEATED ||
+      (rhs.getTransferType() != STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip))
     );
 
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
 
-    if(rhs.isMinTransferTimeSet()) {
+    if (rhs.isMinTransferTimeSet()) {
       builder.minTransferTime(rhs.getMinTransferTime());
     }
 
@@ -195,10 +203,10 @@ class TransferMapper {
   }
 
   private TransferPoint mapTransferPoint(
-          org.onebusaway.gtfs.model.Stop rhsStopOrStation,
-          org.onebusaway.gtfs.model.Route rhsRoute,
-          Trip trip,
-          boolean boardTrip
+    org.onebusaway.gtfs.model.Stop rhsStopOrStation,
+    org.onebusaway.gtfs.model.Route rhsRoute,
+    Trip trip,
+    boolean boardTrip
   ) {
     Route route = routeMapper.map(rhsRoute);
     Station station = null;
@@ -212,25 +220,24 @@ class TransferMapper {
     // Source: https://developers.google.com/transit/gtfs/reference/transfers-file
 
     if (rhsStopOrStation.getLocationType() == 0) {
-      stop  = stopMapper.map(rhsStopOrStation);
-    }
-    else {
+      stop = stopMapper.map(rhsStopOrStation);
+    } else {
       station = stationMapper.map(rhsStopOrStation);
     }
-    if(trip != null) {
+    if (trip != null) {
       // A trip may visit the same stop twice, but we ignore that and only add the first stop
       // we find. Pattern that start and end at the same stop is supported.
       int stopPositionInPattern = stopPosition(trip, stop, station, boardTrip);
       return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
-    }
-    else if(route != null) {
-      if(stop != null) { return new RouteStopTransferPoint(route, stop); }
-      else if(station != null) { return new RouteStationTransferPoint(route, station); }
-    }
-    else if(stop != null) {
+    } else if (route != null) {
+      if (stop != null) {
+        return new RouteStopTransferPoint(route, stop);
+      } else if (station != null) {
+        return new RouteStationTransferPoint(route, station);
+      }
+    } else if (stop != null) {
       return new StopTransferPoint(stop);
-    }
-    else if(station != null) {
+    } else if (station != null) {
       return new StationTransferPoint(station);
     }
 
@@ -243,18 +250,22 @@ class TransferMapper {
     // We can board at the first stop, but not alight.
     final int firstStopPos = boardTrip ? 0 : 1;
     // We can alight at the last stop, but not board, the lastStopPos is exclusive
-    final int lastStopPos =  stopTimes.size() - (boardTrip ? 1 : 0);
+    final int lastStopPos = stopTimes.size() - (boardTrip ? 1 : 0);
 
     Predicate<StopLocation> stopMatches = station != null
-            ? (s) -> (s instanceof Stop && ((Stop)s).getParentStation() == station)
-            : (s) -> s == stop;
+      ? s -> (s instanceof Stop && ((Stop) s).getParentStation() == station)
+      : s -> s == stop;
 
     for (int i = firstStopPos; i < lastStopPos; i++) {
       StopTime stopTime = stopTimes.get(i);
-      if(boardTrip && stopTime.getPickupType().isNotRoutable()) { continue; }
-      if(!boardTrip && stopTime.getDropOffType().isNotRoutable()) { continue; }
+      if (boardTrip && stopTime.getPickupType().isNotRoutable()) {
+        continue;
+      }
+      if (!boardTrip && stopTime.getDropOffType().isNotRoutable()) {
+        continue;
+      }
 
-      if(stopMatches.test(stopTime.getStop())) {
+      if (stopMatches.test(stopTime.getStop())) {
         return i;
       }
     }

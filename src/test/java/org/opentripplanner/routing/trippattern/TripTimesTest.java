@@ -1,151 +1,159 @@
 package org.opentripplanner.routing.trippattern;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+import java.util.LinkedList;
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 public class TripTimesTest {
-    private static final FeedScopedId TRIP_ID = new FeedScopedId("agency", "testTripId");
-    private static final FeedScopedId ROUTE_ID = new FeedScopedId("agency", "testRrouteId");
 
-    private static final FeedScopedId STOP_A = new FeedScopedId("agency", "A"); // 0
-    private static final FeedScopedId STOP_B = new FeedScopedId("agency", "B"); // 1
-    private static final FeedScopedId STOP_C = new FeedScopedId("agency", "C"); // 2
-    private static final FeedScopedId STOP_D = new FeedScopedId("agency", "D"); // 3
-    private static final FeedScopedId STOP_E = new FeedScopedId("agency", "E"); // 4
-    private static final FeedScopedId STOP_F = new FeedScopedId("agency", "F"); // 5
-    private static final FeedScopedId STOP_G = new FeedScopedId("agency", "G"); // 6
-    private static final FeedScopedId STOP_H = new FeedScopedId("agency", "H"); // 7
+  private static final FeedScopedId TRIP_ID = new FeedScopedId("agency", "testTripId");
+  private static final FeedScopedId ROUTE_ID = new FeedScopedId("agency", "testRrouteId");
 
-    private static final FeedScopedId[] stops =
-        {STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H};
+  private static final FeedScopedId STOP_A = new FeedScopedId("agency", "A"); // 0
+  private static final FeedScopedId STOP_B = new FeedScopedId("agency", "B"); // 1
+  private static final FeedScopedId STOP_C = new FeedScopedId("agency", "C"); // 2
+  private static final FeedScopedId STOP_D = new FeedScopedId("agency", "D"); // 3
+  private static final FeedScopedId STOP_E = new FeedScopedId("agency", "E"); // 4
+  private static final FeedScopedId STOP_F = new FeedScopedId("agency", "F"); // 5
+  private static final FeedScopedId STOP_G = new FeedScopedId("agency", "G"); // 6
+  private static final FeedScopedId STOP_H = new FeedScopedId("agency", "H"); // 7
 
-    private static final TripTimes originalTripTimes;
+  private static final FeedScopedId[] stops = {
+    STOP_A,
+    STOP_B,
+    STOP_C,
+    STOP_D,
+    STOP_E,
+    STOP_F,
+    STOP_G,
+    STOP_H,
+  };
 
-    static {
-        Trip trip = new Trip(TRIP_ID);
+  private static final TripTimes originalTripTimes;
 
-        List<StopTime> stopTimes = new LinkedList<>();
+  static {
+    Trip trip = new Trip(TRIP_ID);
 
-        for(int i =  0; i < stops.length; ++i) {
-            StopTime stopTime = new StopTime();
+    List<StopTime> stopTimes = new LinkedList<>();
 
-            Stop stop = Stop.stopForTest(stops[i].getId(), 0.0, 0.0);
-            stopTime.setStop(stop);
-            stopTime.setArrivalTime(i * 60);
-            stopTime.setDepartureTime(i * 60);
-            stopTime.setStopSequence(i);
-            stopTimes.add(stopTime);
-        }
+    for (int i = 0; i < stops.length; ++i) {
+      StopTime stopTime = new StopTime();
 
-        originalTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+      Stop stop = Stop.stopForTest(stops[i].getId(), 0.0, 0.0);
+      stopTime.setStop(stop);
+      stopTime.setArrivalTime(i * 60);
+      stopTime.setDepartureTime(i * 60);
+      stopTime.setStopSequence(i);
+      stopTimes.add(stopTime);
     }
 
-    @Test
-    public void testStopUpdate() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    originalTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+  }
 
-        updatedTripTimesA.updateArrivalTime(3, 190);
-        updatedTripTimesA.updateDepartureTime(3, 190);
-        updatedTripTimesA.updateArrivalTime(5, 311);
-        updatedTripTimesA.updateDepartureTime(5, 312);
+  @Test
+  public void testStopUpdate() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        assertEquals(3 * 60 + 10, updatedTripTimesA.getArrivalTime(3));
-        assertEquals(3 * 60 + 10, updatedTripTimesA.getDepartureTime(3));
-        assertEquals(5 * 60 + 11, updatedTripTimesA.getArrivalTime(5));
-        assertEquals(5 * 60 + 12, updatedTripTimesA.getDepartureTime(5));
-    }
+    updatedTripTimesA.updateArrivalTime(3, 190);
+    updatedTripTimesA.updateDepartureTime(3, 190);
+    updatedTripTimesA.updateArrivalTime(5, 311);
+    updatedTripTimesA.updateDepartureTime(5, 312);
 
-    @Test
-    public void testPassedUpdate() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    assertEquals(3 * 60 + 10, updatedTripTimesA.getArrivalTime(3));
+    assertEquals(3 * 60 + 10, updatedTripTimesA.getDepartureTime(3));
+    assertEquals(5 * 60 + 11, updatedTripTimesA.getArrivalTime(5));
+    assertEquals(5 * 60 + 12, updatedTripTimesA.getDepartureTime(5));
+  }
 
-        updatedTripTimesA.updateDepartureTime(0, 30);
+  @Test
+  public void testPassedUpdate() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        assertEquals(30, updatedTripTimesA.getDepartureTime(0));
-        assertEquals(60, updatedTripTimesA.getArrivalTime(1));
-    }
+    updatedTripTimesA.updateDepartureTime(0, 30);
 
-    @Test
-    public void testNonIncreasingUpdate() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    assertEquals(30, updatedTripTimesA.getDepartureTime(0));
+    assertEquals(60, updatedTripTimesA.getArrivalTime(1));
+  }
 
-        updatedTripTimesA.updateArrivalTime(1, 60);
-        updatedTripTimesA.updateDepartureTime(1, 59);
+  @Test
+  public void testNonIncreasingUpdate() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        assertFalse(updatedTripTimesA.timesIncreasing());
+    updatedTripTimesA.updateArrivalTime(1, 60);
+    updatedTripTimesA.updateDepartureTime(1, 59);
 
-        TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
+    assertFalse(updatedTripTimesA.timesIncreasing());
 
-        updatedTripTimesB.updateDepartureTime(6, 421);
-        updatedTripTimesB.updateArrivalTime(7, 420);
+    TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
 
-        assertFalse(updatedTripTimesB.timesIncreasing());
-    }
+    updatedTripTimesB.updateDepartureTime(6, 421);
+    updatedTripTimesB.updateArrivalTime(7, 420);
 
-    @Test
-    public void testDelay() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
-        updatedTripTimesA.updateDepartureDelay(0, 10);
-        updatedTripTimesA.updateArrivalDelay(6, 13);
+    assertFalse(updatedTripTimesB.timesIncreasing());
+  }
 
-        assertEquals(10, updatedTripTimesA.getDepartureTime(0));
-        assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(6));
-    }
+  @Test
+  public void testDelay() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    updatedTripTimesA.updateDepartureDelay(0, 10);
+    updatedTripTimesA.updateArrivalDelay(6, 13);
 
-    @Test
-    public void testCancel() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
-        updatedTripTimesA.cancelTrip();
-        assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
-    }
+    assertEquals(10, updatedTripTimesA.getDepartureTime(0));
+    assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(6));
+  }
 
-    @Test
-    public void testApply() {
-        Trip trip = new Trip(TRIP_ID);
+  @Test
+  public void testCancel() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    updatedTripTimesA.cancelTrip();
+    assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
+  }
 
-        List<StopTime> stopTimes = new LinkedList<>();
+  @Test
+  public void testApply() {
+    Trip trip = new Trip(TRIP_ID);
 
-        StopTime stopTime0 = new StopTime();
-        StopTime stopTime1 = new StopTime();
-        StopTime stopTime2 = new StopTime();
+    List<StopTime> stopTimes = new LinkedList<>();
 
-        Stop stop0 = Stop.stopForTest(stops[0].getId(), 0.0, 0.0);
-        Stop stop1 = Stop.stopForTest(stops[1].getId(), 0.0, 0.0);
-        Stop stop2 = Stop.stopForTest(stops[2].getId(), 0.0, 0.0);
+    StopTime stopTime0 = new StopTime();
+    StopTime stopTime1 = new StopTime();
+    StopTime stopTime2 = new StopTime();
 
-        stopTime0.setStop(stop0);
-        stopTime0.setDepartureTime(0);
-        stopTime0.setStopSequence(0);
+    Stop stop0 = Stop.stopForTest(stops[0].getId(), 0.0, 0.0);
+    Stop stop1 = Stop.stopForTest(stops[1].getId(), 0.0, 0.0);
+    Stop stop2 = Stop.stopForTest(stops[2].getId(), 0.0, 0.0);
 
-        stopTime1.setStop(stop1);
-        stopTime1.setArrivalTime(30);
-        stopTime1.setDepartureTime(60);
-        stopTime1.setStopSequence(1);
+    stopTime0.setStop(stop0);
+    stopTime0.setDepartureTime(0);
+    stopTime0.setStopSequence(0);
 
-        stopTime2.setStop(stop2);
-        stopTime2.setArrivalTime(90);
-        stopTime2.setStopSequence(2);
+    stopTime1.setStop(stop1);
+    stopTime1.setArrivalTime(30);
+    stopTime1.setDepartureTime(60);
+    stopTime1.setStopSequence(1);
 
-        stopTimes.add(stopTime0);
-        stopTimes.add(stopTime1);
-        stopTimes.add(stopTime2);
+    stopTime2.setStop(stop2);
+    stopTime2.setArrivalTime(90);
+    stopTime2.setStopSequence(2);
 
-        TripTimes differingTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    stopTimes.add(stopTime0);
+    stopTimes.add(stopTime1);
+    stopTimes.add(stopTime2);
 
-        TripTimes updatedTripTimesA = new TripTimes(differingTripTimes);
+    TripTimes differingTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
-        updatedTripTimesA.updateArrivalTime(1, 89);
-        updatedTripTimesA.updateDepartureTime(1, 98);
+    TripTimes updatedTripTimesA = new TripTimes(differingTripTimes);
 
-        assertFalse(updatedTripTimesA.timesIncreasing());
-    }
+    updatedTripTimesA.updateArrivalTime(1, 89);
+    updatedTripTimesA.updateDepartureTime(1, 98);
+
+    assertFalse(updatedTripTimesA.timesIncreasing());
+  }
 }

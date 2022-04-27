@@ -1,28 +1,25 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.plan.Itinerary.toStr;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RequestFunctions;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.plan.Itinerary.toStr;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
 
   // Create a filter with f(x) = 600 + 2x
   // Remove itineraries with a cost equivalent of 10 minutes and twice the min itinerary cost.
   private final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
-      RequestFunctions.createLinearFunction(600, 2.0)
+    RequestFunctions.createLinearFunction(600, 2.0)
   );
 
   @Test
   public void filter() {
-
-
     // Walk all the way, not touched by the filter even if cost(7200) is higher than transit limit.
     Itinerary i1 = newItinerary(A, T11_06).walk(60, E).build();
 
@@ -38,6 +35,9 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     var all = List.of(i1, i2, i3, i4);
 
     // Expect - i4 to be dropped
-    assertEquals(toStr(List.of(i1, i2, i3)), toStr(DeletionFlaggerTestHelper.process(all, subject)));
+    assertEquals(
+      toStr(List.of(i1, i2, i3)),
+      toStr(DeletionFlaggerTestHelper.process(all, subject))
+    );
   }
 }

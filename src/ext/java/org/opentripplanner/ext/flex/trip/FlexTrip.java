@@ -32,24 +32,48 @@ public abstract class FlexTrip extends TransitEntity {
     this.trip = trip;
   }
 
+  public static boolean containsFlexStops(List<StopTime> stopTimes) {
+    return stopTimes.stream().map(StopTime::getStop).anyMatch(FlexTrip::isFlexStop);
+  }
+
+  public static boolean isFlexStop(StopLocation stop) {
+    return stop instanceof FlexLocationGroup || stop instanceof FlexStopLocation;
+  }
+
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
+    NearbyStop access,
+    FlexServiceDate date,
+    FlexPathCalculator calculator,
+    FlexParameters params
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
+    NearbyStop egress,
+    FlexServiceDate date,
+    FlexPathCalculator calculator,
+    FlexParameters params
   );
 
-  public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);
+  public abstract int earliestDepartureTime(
+    int departureTime,
+    int fromStopIndex,
+    int toStopIndex,
+    int flexTime
+  );
 
-  public abstract int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime);
+  public abstract int latestArrivalTime(
+    int arrivalTime,
+    int fromStopIndex,
+    int toStopIndex,
+    int flexTime
+  );
 
   /**
    * Returns all the stops that are in this trip.
-   *
+   * <p>
    * Note that they are in no specific order and don't correspond 1-to-1 to the stop times of the
    * trip.
-   *
+   * <p>
    * Location groups are expanded into their constituent stops.
    */
   public abstract Set<StopLocation> getStops();
@@ -69,13 +93,4 @@ public abstract class FlexTrip extends TransitEntity {
   public abstract boolean isBoardingPossible(NearbyStop stop);
 
   public abstract boolean isAlightingPossible(NearbyStop stop);
-
-  public static boolean containsFlexStops(List<StopTime> stopTimes) {
-    return stopTimes.stream().map(StopTime::getStop).anyMatch(FlexTrip::isFlexStop);
-  }
-
-  public static boolean isFlexStop(StopLocation stop) {
-    return stop instanceof FlexLocationGroup || stop instanceof FlexStopLocation;
-  }
-
 }

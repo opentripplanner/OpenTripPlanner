@@ -15,7 +15,7 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TripPatternMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 
 public class TransitLayer {
 
@@ -51,31 +51,31 @@ public class TransitLayer {
 
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
-   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace
-   * entire keys and their values in the map.
+   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace entire
+   * keys and their values in the map.
    */
   public TransitLayer(TransitLayer transitLayer) {
     this(
-        transitLayer.tripPatternsRunningOnDate,
-        transitLayer.transfersByStopIndex,
-        transitLayer.transferService,
-        transitLayer.stopIndex,
-        transitLayer.transitDataZoneId,
-        transitLayer.transferCache,
-        transitLayer.tripPatternMapper,
-        transitLayer.transferIndexGenerator
+      transitLayer.tripPatternsRunningOnDate,
+      transitLayer.transfersByStopIndex,
+      transitLayer.transferService,
+      transitLayer.stopIndex,
+      transitLayer.transitDataZoneId,
+      transitLayer.transferCache,
+      transitLayer.tripPatternMapper,
+      transitLayer.transferIndexGenerator
     );
   }
 
   public TransitLayer(
-      Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
-      List<List<Transfer>> transfersByStopIndex,
-      TransferService transferService,
-      StopIndexForRaptor stopIndex,
-      ZoneId transitDataZoneId,
-      RaptorRequestTransferCache transferCache,
-      TripPatternMapper tripPatternMapper,
-      TransferIndexGenerator transferIndexGenerator
+    Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
+    List<List<Transfer>> transfersByStopIndex,
+    TransferService transferService,
+    StopIndexForRaptor stopIndex,
+    ZoneId transitDataZoneId,
+    RaptorRequestTransferCache transferCache,
+    TripPatternMapper tripPatternMapper,
+    TransferIndexGenerator transferIndexGenerator
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -105,11 +105,10 @@ public class TransitLayer {
   }
 
   /**
-   * This is the time zone which is used for interpreting all local "service" times
-   * (in transfers, trip schedules and so on). This is the time zone of the internal OTP
-   * time - which is used in logging and debugging. This is independent of the time zone
-   * of imported data and of the time zone used on any API - it can be the same, but it does
-   * not need to.
+   * This is the time zone which is used for interpreting all local "service" times (in transfers,
+   * trip schedules and so on). This is the time zone of the internal OTP time - which is used in
+   * logging and debugging. This is independent of the time zone of imported data and of the time
+   * zone used on any API - it can be the same, but it does not need to.
    */
   public ZoneId getTransitDataZoneId() {
     return transitDataZoneId;
@@ -128,18 +127,20 @@ public class TransitLayer {
   @Nullable
   public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {
     List<TripPatternForDate> tripPatternsRunningOnDate = getTripPatternsRunningOnDateCopy(date);
-    return tripPatternsRunningOnDate != null ? tripPatternsRunningOnDate
+    return tripPatternsRunningOnDate != null
+      ? tripPatternsRunningOnDate
         .stream()
         .filter(t -> t.getLocalDate().equals(date))
-        .collect(Collectors.toList()) : null;
+        .collect(Collectors.toList())
+      : null;
   }
 
   public TransferService getTransferService() {
     return transferService;
   }
 
-  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingRequest routingRequest) {
-    return transferCache.get(transfersByStopIndex, routingRequest);
+  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingContext routingContext) {
+    return transferCache.get(transfersByStopIndex, routingContext);
   }
 
   public RaptorRequestTransferCache getTransferCache() {
@@ -154,14 +155,13 @@ public class TransitLayer {
     return transferIndexGenerator;
   }
 
-
   /**
    * Replaces all the TripPatternForDates for a single date. This is an atomic operation according
    * to the HashMap implementation.
    */
   public void replaceTripPatternsForDate(
-      LocalDate date,
-      List<TripPatternForDate> tripPatternForDates
+    LocalDate date,
+    List<TripPatternForDate> tripPatternForDates
   ) {
     this.tripPatternsRunningOnDate.replace(date, tripPatternForDates);
   }

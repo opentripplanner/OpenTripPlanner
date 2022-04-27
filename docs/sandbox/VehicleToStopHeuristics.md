@@ -6,7 +6,8 @@
 
 ## Changelog
 
-- Create initial implementation [#3906](https://github.com/opentripplanner/OpenTripPlanner/pull/3906)
+- Create initial
+  implementation [#3906](https://github.com/opentripplanner/OpenTripPlanner/pull/3906)
 
 ## Documentation
 
@@ -29,7 +30,7 @@ maximum, but we want it to scale with the density of well-connected stops.
 
 ### Vehicle-to-stop heuristic
 
-In order to improve the Park+Ride and Bike+Ride results we reduced the number of candidate stops 
+In order to improve the Park+Ride and Bike+Ride results we reduced the number of candidate stops
 with the following heuristic:
 
 1. When a stop is encountered check which routes depart from it
@@ -42,8 +43,8 @@ The code for this is located in `VehicleToStopSkipEdgeStrategy.java`.
 ### Bicycle-on-transit heuristic
 
 This heuristic works slightly differently in that it doesn't assign a score but simply stops the
-access search when a certain number of routes were encountered that allow you to take your bike
-onto transit.
+access search when a certain number of routes were encountered that allow you to take your bike onto
+transit.
 
 The code for this is located in `BikeToStopSkipEdgeStrategy.java`.
 
@@ -70,5 +71,7 @@ These are some the goals for the future:
 - make the scores that are assigned for routes of a certain mode configurable in JSON
 - pre-calculate stop importance scores during the graph build
 
-If you want to help making this feature more flexible, please contact [Leonard Ehrenfried](mailto:mail@leonard.io)
-or use the regular channels of communication outlined in [CONTRIBUTING.md](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md#primary-channels-of-communication)
+If you want to help making this feature more flexible, please
+contact [Leonard Ehrenfried](mailto:mail@leonard.io)
+or use the regular channels of communication outlined
+in [CONTRIBUTING.md](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md#primary-channels-of-communication)

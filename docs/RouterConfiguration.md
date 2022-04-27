@@ -14,12 +14,14 @@ These options can be applied by the OTP server without rebuilding the graph.
 
 ## Routing defaults
 
-There are many trip planning options used in the OTP web API, and more exist
-internally that are not exposed via the API. You may want to change the default value for some of these parameters,
-i.e. the value which will be applied unless it is overridden in a web API request.
+There are many trip planning options used in the OTP web API, and more exist internally that are not
+exposed via the API. You may want to change the default value for some of these parameters, i.e. the
+value which will be applied unless it is overridden in a web API request.
 
-A full list of them can be found in the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java).
-Any public field or setter method in this class can be given a default value using the routingDefaults section of
+A full list of them can be found in
+the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
+. Any public field or setter method in this class can be given a default value using the
+routingDefaults section of
 `router-config.json` as follows:
 
 ```JSON
@@ -33,17 +35,24 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
-
 ### Tuning transfer optimization
 
-The main purpose of transfer optimization is to handle cases where it is possible to transfer between two routes at more than one point (pair of stops). The transfer optimization ensures that transfers occur at the best possible location. By post-processing all paths returned by the router, OTP can apply sophisticated calculations that are too slow or not algorithmically valid within Raptor. Transfers are optimized before the paths are passed to the itinerary-filter-chain.
+The main purpose of transfer optimization is to handle cases where it is possible to transfer
+between two routes at more than one point (pair of stops). The transfer optimization ensures that
+transfers occur at the best possible location. By post-processing all paths returned by the router,
+OTP can apply sophisticated calculations that are too slow or not algorithmically valid within
+Raptor. Transfers are optimized before the paths are passed to the itinerary-filter-chain.
 
-For a detailed description of the design and the optimization calculations see the [design documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md) (dev-2.x latest).
+For a detailed description of the design and the optimization calculations see
+the [design documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md) (
+dev-2.x latest).
 
 #### Transfer optimization configuration
 
 To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on).
-You should leave this on unless there is a critical issue with it. The OTPFeature `GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
+You should leave this on unless there is a critical issue with it. The
+OTPFeature `GuaranteedTransfers` will toggle on and off the priority optimization (part of
+OptimizeTransfers).
 
 The optimized transfer service will try to, in order:
 
@@ -74,10 +83,13 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
   }
 }
 ```
-See the [TransferOptimizationParameters](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/api/TransferOptimizationParameters.java) (dev-2.x latest) for a description of these parameters.
 
+See
+the [TransferOptimizationParameters](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/api/TransferOptimizationParameters.java) (
+dev-2.x latest) for a description of these parameters.
 
 ### Tuning itinerary filtering
+
 Nested inside `routingDefaults { itineraryFilters{...} }` in `router-config.json`.
 
 The purpose of the itinerary filter chain is to post process the result returned by the routing
@@ -99,6 +111,8 @@ filter debugging.
 | `nonTransitGeneralizedCostLimit`            | A relative maximum limit for the generalized cost for non-transit itineraries. The max limit is calculated using ALL itineraries, but only non-transit itineraries will be filtered out. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Non-transit itineraries with a cost higher than the max-limit is dropped from the result set. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x` | linear function | `3600 + 2.0 x`  |
 | `bikeRentalDistanceRatio`                   | For routes that consist only of bike rental and walking what is the minimum fraction of _distance_ of the bike rental leg. This filters out results that consist of a long walk plus a relatively short bike rental leg. A value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order for the result to be included.                                                                                                                                                                                                                                      | double          | `0.0`           |
 | `parkAndRideDurationRatio`                  | For P+R routes that consist only of driving and walking what is the minimum fraction of _time_ of the driving leg. This filters out results that consist of driving plus a very long walk leg at the end. A value of `0.3` means that a minimum of 30% of the total time must be spent in the car in order for the result to be included. However, if there is only a single result, it is never filtered.                                                                                                                                                                                         | double          | `0.0`           |
+| `filterItinerariesWithSameFirstOrLastTrip`  | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains. Trips are considered equal if they have same id and same service day. Non-transit legs are skipped during comparison. Before filtering, trips are sorted by their generalized cost. Algorithm loops through list from top to bottom. If itinerary matches from any other itinerary from above, it is removed from list.                                                                                                                                                    | boolean         | `false`         |
+| `accessibilityScore`                        | A experimental feature contributed by IBI which adds an accessibility "score" between 0 and 1 for each leg and itinerary. This can be used by by frontend developers to implement a simple traffic light UI.                                                                                                                                                                                                                                                                                                                                                                                       | boolean         | `false`         | 
 
 #### Group by similarity filters
 
@@ -110,9 +124,9 @@ The group-by-filter work by grouping itineraries together and then reducing the 
 itineraries in each group, keeping the itinerary/itineraries with the best itinerary
 _generalized-cost_. The group-by function first pick all transit legs that account for more than N%
 of the itinerary based on distance traveled. This become the group-key. Two keys are the same if all
-legs in one of the keys also exist in the other. Note, one key may have a lager set of legs than
-the other, but they can still be the same. When comparing two legs we compare the `tripId` and make
-sure the legs overlap in place and time. Two legs are the same if both legs ride at least a common
+legs in one of the keys also exist in the other. Note, one key may have a lager set of legs than the
+other, but they can still be the same. When comparing two legs we compare the `tripId` and make sure
+the legs overlap in place and time. Two legs are the same if both legs ride at least a common
 subsection of the same trip. The `keepOne` filter will keep ONE itinerary in each group. The
 `keepThree` keeps 3 itineraries for each group.
 
@@ -121,21 +135,21 @@ This parameter filters out itineraries, where the legs that are not common for a
 itineraries have a much higher cost, than the lowest in the group. By default, it filters out
 itineraries that are at least double in cost for the non-grouped legs.
 
-
 ### Drive-to-transit routing defaults
 
-When using the "park and ride" or "kiss and ride" modes (drive to transit), the initial driving time to reach a transit
-stop or park and ride facility is constrained. You can set a drive time limit in seconds by adding a line like
-`maxPreTransitTime = 1200` to the routingDefaults section. If the limit is too high on a very large street graph, routing
-performance may suffer.
-
+When using the "park and ride" or "kiss and ride" modes (drive to transit), the initial driving time
+to reach a transit stop or park and ride facility is constrained. You can set a drive time limit in
+seconds by adding a line like
+`maxPreTransitTime = 1200` to the routingDefaults section. If the limit is too high on a very large
+street graph, routing performance may suffer.
 
 ## Boarding and alighting times
 
-Sometimes there is a need to configure a longer ride or alighting times for specific modes, such as airplanes or ferries,
-where the check-in process needs to be done in good time before ride. The ride time is added to the time when going
-from the stop (offboard) vertex to the onboard vertex, and the alight time is added vice versa. The times are configured as
-seconds needed for the ride and alighting processes in `router-config.json` as follows:
+Sometimes there is a need to configure a longer ride or alighting times for specific modes, such as
+airplanes or ferries, where the check-in process needs to be done in good time before ride. The ride
+time is added to the time when going from the stop (offboard) vertex to the onboard vertex, and the
+alight time is added vice versa. The times are configured as seconds needed for the ride and
+alighting processes in `router-config.json` as follows:
 
 ```JSON
 // router-config.json
@@ -169,12 +183,13 @@ search-window. To set the street routing timeout use the following config:
 }
 ```
 
-This specifies a timeout in (optionally fractional) seconds. The search abort after this many seconds and any paths found are returned to the client.
+This specifies a timeout in (optionally fractional) seconds. The search abort after this many
+seconds and any paths found are returned to the client.
 
-##maxAccessEgressDurationSecondsForMode
+## maxAccessEgressDurationSecondsForMode
 
-Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done because
-some street modes searches are much more resource intensive than others.
+Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done
+because some street modes searches are much more resource intensive than others.
 
 ```JSON
 // router-config.json
@@ -188,9 +203,10 @@ other access/egress modes.
 
 ## Logging incoming requests
 
-You can log some characteristics of trip planning requests in a file for later analysis. Some transit agencies and
-operators find this information useful for identifying existing or unmet transportation demand. Logging will be
-performed only if you specify a log file name in the router config:
+You can log some characteristics of trip planning requests in a file for later analysis. Some
+transit agencies and operators find this information useful for identifying existing or unmet
+transportation demand. Logging will be performed only if you specify a log file name in the router
+config:
 
 ```JSON
 // router-config.json
@@ -213,13 +229,16 @@ The fields separated by whitespace are (in order):
 6. Origin latitude and longitude
 7. Destination latitude and longitude
 
-Finally, for each itinerary returned to the user, there is a travel duration in seconds and the number of transit vehicles used in that itinerary.
-
+Finally, for each itinerary returned to the user, there is a travel duration in seconds and the
+number of transit vehicles used in that itinerary.
 
 ## Tuning transit routing
+
 Nested inside `transit {...}` in `router-config.json`.
 
-Some of these parameters for tuning transit routing is only available through configuration and cannot be set in the routing request. These parameters work together with the default routing request and the actual routing request.
+Some of these parameters for tuning transit routing is only available through configuration and
+cannot be set in the routing request. These parameters work together with the default routing
+request and the actual routing request.
 
 | config key                           | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | value type | value default                             |
 |--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|-------------------------------------------|
@@ -233,6 +252,7 @@ Some of these parameters for tuning transit routing is only available through co
 | `pagingSearchWindowAdjustments`      | The provided array of durations is used to increase the search-window for the next/previous page when the current page return few options. If ZERO results is returned the first duration in the list is used, if ONE result is returned then the second duration is used and so on. The duration is added to the existing search-window and inserted into the next and previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java) for more info. | duration[] | `["4h", "2h", "1h", "30m", "20m", "10m"]` |
 
 ### Tuning transit routing - Dynamic search window
+
 Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.
 
 | config key                  | description                                                                                                                                                                                                                                                                       | value type | value default   |
@@ -244,9 +264,12 @@ Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.js
 | `stepMinutes`               | The search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes.                                      | int        | `10`            |
 
 ### Tuning transit routing - Stop transfer cost
+
 Nested inside `transit : { stopTransferCost : { ... } }` in `router-config.json`.
 
-This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
+This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (
+board-/alight-/transfer slack). You should account for this when you tune the routing search
+parameters.
 
 If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
 
@@ -259,10 +282,11 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
 | `RECOMMENDED` | Use a small cost penalty like `60`.                                                            | int        |
 | `PREFERRED`   | The best place to do transfers. Should be set to `0`(zero).                                    | int        |
 
-Use values in a range from `0` to `100 000`. **All key/value pairs are required if the `stopTransferCost` is listed.**
-
+Use values in a range from `0` to `100 000`. **All key/value pairs are required if
+the `stopTransferCost` is listed.**
 
 ### Transit example
+
 ```JSON
 // router-config.json
 {
@@ -290,43 +314,51 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
 
 ## Real-time data
 
-GTFS feeds contain *schedule* data that is is published by an agency or operator in advance. The feed does not account
-for unexpected service changes or traffic disruptions that occur from day to day. Thus, this kind of data is also
-referred to as 'static' data or 'theoretical' arrival and departure times.
+GTFS feeds contain *schedule* data that is is published by an agency or operator in advance. The
+feed does not account for unexpected service changes or traffic disruptions that occur from day to
+day. Thus, this kind of data is also referred to as 'static' data or 'theoretical' arrival and
+departure times.
 
 ### GTFS-Realtime
 
-The [GTFS-RT spec](https://developers.google.com/transit/gtfs-realtime/) complements GTFS with three additional kinds of
-feeds. In contrast to the base GTFS schedule feed, they provide *real-time* updates (*'dynamic'* data) and are are
-updated from minute to minute.
+The [GTFS-RT spec](https://developers.google.com/transit/gtfs-realtime/) complements GTFS with three
+additional kinds of feeds. In contrast to the base GTFS schedule feed, they provide *real-time*
+updates (*'dynamic'* data) and are are updated from minute to minute.
 
-- **Alerts** are text messages attached to GTFS objects, informing riders of disruptions and changes.
+- **Alerts** are text messages attached to GTFS objects, informing riders of disruptions and
+  changes.
 
-- **TripUpdates** report on the status of scheduled trips as they happen, providing observed and predicted arrival and
-  departure times for the remainder of the trip.
+- **TripUpdates** report on the status of scheduled trips as they happen, providing observed and
+  predicted arrival and departure times for the remainder of the trip.
 
-- **VehiclePositions** give the location of some or all vehicles currently in service, in terms of geographic coordinates
-  or position relative to their scheduled stops.
+- **VehiclePositions** give the location of some or all vehicles currently in service, in terms of
+  geographic coordinates or position relative to their scheduled stops.
 
 ### Vehicle rental systems using GBFS
 
-Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks including the number
-of bikes and free parking spaces at each station. We support vehicle rental systems from using GBFS feed format.
+Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks
+including the number of bikes and free parking spaces at each station. We support vehicle rental
+systems from using GBFS feed format.
 
 ### Vehicle parking (sandbox feature)
 
-Vehicle parking options and configuration is documented in its [sandbox documentation](sandbox/VehicleParking.md).
+Vehicle parking options and configuration is documented in
+its [sandbox documentation](sandbox/VehicleParking.md).
 
 ### Configuring real-time updaters
 
-Real-time data can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer polls the
-real-time provider over HTTP. That is to say, OTP fetches a file from a web server every few minutes. In the push
-configuration, the consumer opens a persistent connection to the GTFS-RT provider, which then sends incremental updates
-immediately as they become available. OTP can use both approaches. The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter) provides this kind of streaming, incremental updates over a websocket rather than a single large file.
+Real-time data can be provided using either a pull or push system. In a pull configuration, the
+GTFS-RT consumer polls the real-time provider over HTTP. That is to say, OTP fetches a file from a
+web server every few minutes. In the push configuration, the consumer opens a persistent connection
+to the GTFS-RT provider, which then sends incremental updates immediately as they become available.
+OTP can use both approaches.
+The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter)
+provides this kind of streaming, incremental updates over a websocket rather than a single large
+file.
 
-Real-time data sources are configured in `router-config.json`. The `updaters` section is an array of JSON objects, each
-of which has a `type` field and other configuration fields specific to that type. Common to all updater entries that
-connect to a network resource is the `url` field.
+Real-time data sources are configured in `router-config.json`. The `updaters` section is an array of
+JSON objects, each of which has a `type` field and other configuration fields specific to that type.
+Common to all updater entries that connect to a network resource is the `url` field.
 
 ```JSON
 // router-config.json
@@ -392,9 +424,12 @@ connect to a network resource is the `url` field.
 
 #### GBFS Configuration
 
-[GBFS](https://github.com/NABSA/gbfs) is used for a variety of shared mobility services, with partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)).
+[GBFS](https://github.com/NABSA/gbfs) is used for a variety of shared mobility services, with
+partial support for both v1 and
+v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)).
 
-To add a GBFS feed to the router add one entry in the `updater` field of `router-config.json` in the format:
+To add a GBFS feed to the router add one entry in the `updater` field of `router-config.json` in the
+format:
 
 ```JSON
 // router-config.json
@@ -431,7 +466,8 @@ For this to be possible three things need to be configured:
 
 #### Vehicle Rental Service Directory configuration (sandbox feature)
 
-To configure and url for the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
+To configure and url for
+the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
 
 ```JSON
 // router-config.json
@@ -444,4 +480,7 @@ To configure and url for the [VehicleRentalServiceDirectory](sandbox/VehicleRent
 
 # Configure using command-line arguments
 
-Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java).
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See
+the `CommandLineParameters` class
+for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
+.

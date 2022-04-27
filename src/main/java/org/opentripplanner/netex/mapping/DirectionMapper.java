@@ -4,8 +4,11 @@ import org.opentripplanner.model.Direction;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
 
 class DirectionMapper {
+
   static Direction map(DirectionTypeEnumeration direction) {
-    if (direction == null) { return Direction.UNKNOWN; }
+    if (direction == null) {
+      return Direction.UNKNOWN;
+    }
     switch (direction) {
       case INBOUND:
         return Direction.INBOUND;

@@ -7,10 +7,14 @@ import org.opentripplanner.model.plan.Itinerary;
 
 public class DeletionFlaggerTestHelper {
 
-    protected static List<Itinerary> process(List<Itinerary> itineraries, ItineraryDeletionFlagger flagger) {
-        List<Itinerary> filtered = flagger.getFlaggedItineraries(itineraries);
-        return itineraries.stream()
-                .filter(Predicate.not(filtered::contains))
-                .collect(Collectors.toList());
-    }
+  protected static List<Itinerary> process(
+    List<Itinerary> itineraries,
+    ItineraryDeletionFlagger flagger
+  ) {
+    List<Itinerary> filtered = flagger.getFlaggedItineraries(itineraries);
+    return itineraries
+      .stream()
+      .filter(Predicate.not(filtered::contains))
+      .collect(Collectors.toList());
+  }
 }

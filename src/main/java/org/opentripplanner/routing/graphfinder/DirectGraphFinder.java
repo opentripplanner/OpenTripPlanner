@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.graphfinder;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
+import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
@@ -9,8 +10,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-
-import java.util.List;
 
 /**
  * A Graph finder used in conjunction with a graph, which does not have a street network included.
@@ -25,22 +24,19 @@ public class DirectGraphFinder implements GraphFinder {
   }
 
   /**
-   * Return all stops within a certain radius of the given vertex, using straight-line distance independent of streets.
-   * If the origin vertex is a StopVertex, the result will include it.
+   * Return all stops within a certain radius of the given vertex, using straight-line distance
+   * independent of streets. If the origin vertex is a StopVertex, the result will include it.
    */
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
     List<NearbyStop> stopsFound = Lists.newArrayList();
     Coordinate coordinate = new Coordinate(lon, lat);
     for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
-      double distance = Math.round(SphericalDistanceLibrary.distance(coordinate, it.getCoordinate()));
+      double distance = Math.round(
+        SphericalDistanceLibrary.distance(coordinate, it.getCoordinate())
+      );
       if (distance < radiusMeters) {
-        NearbyStop sd = new NearbyStop(
-            it,
-            distance,
-            null,
-            null
-        );
+        NearbyStop sd = new NearbyStop(it, distance, null, null);
         stopsFound.add(sd);
       }
     }
