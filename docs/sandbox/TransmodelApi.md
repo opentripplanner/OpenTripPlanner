@@ -41,6 +41,8 @@
   ServiceJourney [#3846](https://github.com/opentripplanner/OpenTripPlanner/pull/3846)
 - Make language nullable in MultilingualString, as it is not set in NonLocalizedString
   [#4074](https://github.com/opentripplanner/OpenTripPlanner/pull/4074)
+- Transmodel API transport mode not present or null is all transport modes
+  [#4123](https://github.com/opentripplanner/OpenTripPlanner/pull/4123)
 
 ## Documentation
 
