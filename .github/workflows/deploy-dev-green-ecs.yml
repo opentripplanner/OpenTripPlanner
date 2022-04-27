@@ -26,6 +26,7 @@ jobs:
           ecs-cluster: open-trip-planner
           ecs-service: open-trip-planner-dev-green
           docker-tag: ${{ steps.build-push.outputs.docker-tag }}
+          requires-secrets: 'false'
       
       - uses: mbta/actions/notify-slack-deploy@v1
         if: ${{ !cancelled() }}
