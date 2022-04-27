@@ -45,6 +45,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Enable overriding maxDirectStreetDuration per mode [#4104](https://github.com/opentripplanner/OpenTripPlanner/pull/4104)
 - Preserve language in SIRI/GTFS-RT alert messages [#4117](https://github.com/opentripplanner/OpenTripPlanner/pull/4117)
 - Upgrade siri-protobuf-mapper [#4121](https://github.com/opentripplanner/OpenTripPlanner/pull/4121)
+- Use board/aligh cost only for transits [#4079](https://github.com/opentripplanner/OpenTripPlanner/pull/4079)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
