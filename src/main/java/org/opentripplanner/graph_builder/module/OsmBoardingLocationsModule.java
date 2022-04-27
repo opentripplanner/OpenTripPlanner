@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
@@ -11,12 +12,15 @@ import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,16 +114,35 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             osmVertex,
             new TraverseModeSet(TraverseMode.WALK),
             LinkingDirection.BOTH_WAYS,
-            (vertex, streetVertex) ->
-              List.of(
-                new StreetTransitStopLink(ts, streetVertex),
-                new StreetTransitStopLink(streetVertex, ts)
-              )
+            (osmBoardingLocationVertex, splitVertex) -> {
+              // the OSM boarding location vertex is not connected to the street network, so we
+              // need to link it to the platform
+              linkBoardingLocationToStreetNetwork(osmVertex, splitVertex);
+              linkBoardingLocationToStreetNetwork(splitVertex, osmVertex);
+
+              // and then link the TransitStopVertex to the BoardingLocationVertex
+              return List.of(
+                new StreetTransitStopLink(ts, osmVertex),
+                new StreetTransitStopLink(osmVertex, ts)
+              );
+            }
           );
         }
         return true;
       }
     }
     return false;
+  }
+
+  private void linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
+    new StreetEdge(
+      from,
+      to,
+      GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate())),
+      "link",
+      100,
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      false
+    );
   }
 }

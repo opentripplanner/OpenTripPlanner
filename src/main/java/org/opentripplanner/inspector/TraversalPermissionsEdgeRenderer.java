@@ -11,6 +11,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
@@ -39,12 +40,13 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
   private static final Color PARK_AND_RIDE_COLOR_VERTEX = Color.RED;
 
+  private static final Color OSM_BOARDING_LOCATION_VERTEX_COLOR = new Color(23, 160, 234);
+
   private static final Color BARRIER_COLOR_VERTEX = new Color(0.5803922f, 0.21568628f, 0.24313726f);
 
   @Override
   public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-    if (e instanceof StreetEdge) {
-      StreetEdge pse = (StreetEdge) e;
+    if (e instanceof StreetEdge pse) {
       if (pse.isStairs()) {
         attrs.color = STAIRS_COLOR_EDGE;
         attrs.label = "stairs";
@@ -61,8 +63,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       if (pse.isWalkNoThruTraffic()) {
         attrs.label += " walk NTT";
       }
-    } else if (e instanceof ElevatorHopEdge) {
-      ElevatorHopEdge ehe = (ElevatorHopEdge) e;
+    } else if (e instanceof ElevatorHopEdge ehe) {
       attrs.color = ELEVATOR_COLOR_EDGE;
       attrs.label = "elevator";
       if (ehe.wheelchairAccessible) {
@@ -83,7 +84,10 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
   public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
-    if (v instanceof IntersectionVertex) {
+    if (v instanceof OsmBoardingLocationVertex osmV) {
+      attrs.color = OSM_BOARDING_LOCATION_VERTEX_COLOR;
+      attrs.label = "OSM " + osmV.references;
+    } else if (v instanceof IntersectionVertex) {
       attrs.color = STREET_COLOR_VERTEX;
       if (v instanceof BarrierVertex) {
         attrs.color = BARRIER_COLOR_VERTEX;
