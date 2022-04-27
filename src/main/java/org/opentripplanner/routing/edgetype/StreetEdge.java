@@ -1113,7 +1113,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
 
     if (!traverseMode.isDriving()) {
-      s1.incrementWalkDistance(getEffectiveBikeDistance());
+      s1.incrementWalkDistance(getDistanceMeters());
     }
 
     if (costExtension != null) {
