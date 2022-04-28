@@ -3,6 +3,7 @@ package org.opentripplanner.ext.vectortiles.layers.stops;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
@@ -47,19 +48,9 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
       patternsForStop
         .stream()
         .map(tripPattern -> {
-          int stopPos = tripPattern.findStopPosition(stop);
-          Timetable scheduledTimetable = tripPattern.getScheduledTimetable();
-          String headsign;
-          if (stopPos > -1 && !scheduledTimetable.getTripTimes().isEmpty()) {
-            headsign = scheduledTimetable.getTripTimes().get(0).getHeadsign(stopPos);
-          } else if (stopPos > -1 && !scheduledTimetable.getFrequencyEntries().isEmpty()) {
-            headsign =
-              scheduledTimetable.getFrequencyEntries().get(0).tripTimes.getHeadsign(stopPos);
-          } else {
-            headsign = "Not Available";
-          }
+          String headsign = tripPattern.getStopHeadsign(tripPattern.findStopPosition(stop));
           JSONObject pattern = new JSONObject();
-          pattern.put("headsign", headsign);
+          pattern.put("headsign", Optional.ofNullable(headsign).orElse("Not Available"));
           pattern.put("type", tripPattern.getRoute().getMode().name());
           pattern.put("shortName", tripPattern.getRoute().getShortName());
           return pattern;
