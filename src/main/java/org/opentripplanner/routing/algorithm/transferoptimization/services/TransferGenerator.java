@@ -204,7 +204,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       return calcRegularTransferDurationIncSlack(transferDurationInSeconds);
     }
     throw new IllegalStateException(
-      "The constrained transfer is not correct processed in the optimized transfer service. " +
+      "The constrained transfer is not correctly processed in the optimized transfer service. " +
       "Transfer: " +
       tx
     );
