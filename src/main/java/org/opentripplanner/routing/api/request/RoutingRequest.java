@@ -323,10 +323,13 @@ public class RoutingRequest implements Cloneable, Serializable {
   public int nonpreferredTransferCost = 180;
 
   /**
-   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
-   * Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept of
-   * not wanting to walk too much without asking for totally ridiculous itineraries, but this
-   * observation should in no way be taken as scientific or definitive. Your mileage may vary.
+   * A multiplier for how bad walking is, compared to being in transit for equal
+   * lengths of time. Empirically, values between 2 and 4 seem to correspond
+   * well to the concept of not wanting to walk too much without asking for
+   * totally ridiculous itineraries, but this observation should in no way be
+   * taken as scientific or definitive. Your mileage may vary. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
+   * performance with high values. Default value: 2.0
    */
   public double walkReluctance = 2.0;
   public double bikeWalkingReluctance = 5.0;
