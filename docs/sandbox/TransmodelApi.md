@@ -41,6 +41,8 @@
   ServiceJourney [#3846](https://github.com/opentripplanner/OpenTripPlanner/pull/3846)
 - Make language nullable in MultilingualString, as it is not set in NonLocalizedString
   [#4074](https://github.com/opentripplanner/OpenTripPlanner/pull/4074)
+- Expose datedServiceJourney from EstimatedCall 
+  [#4128](https://github.com/opentripplanner/OpenTripPlanner/pull/4128)
 
 ## Documentation
 
