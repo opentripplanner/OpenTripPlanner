@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
@@ -118,10 +119,11 @@ public class GenerateTripPatternsOperation {
       return; // Invalid trip, skip it, it will break later
     }
 
-    Collection<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
+    List<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
 
     // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
-    if (stopTimes.size() < 2) {
+    // flex trips are allowed to have a single stop because that can be an area or a group of stops
+    if (!FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2) {
       issueStore.add(new TripDegenerate(trip));
       return;
     }
