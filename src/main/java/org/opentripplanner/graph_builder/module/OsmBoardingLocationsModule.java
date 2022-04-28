@@ -12,6 +12,7 @@ import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -122,8 +123,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
               // and then link the TransitStopVertex to the BoardingLocationVertex
               return List.of(
-                new StreetTransitStopLink(ts, osmVertex),
-                new StreetTransitStopLink(osmVertex, ts)
+                new BoardingLocationToStopLink(ts, osmVertex),
+                new BoardingLocationToStopLink(osmVertex, ts)
               );
             }
           );
@@ -140,7 +141,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       from,
       to,
       line,
-      "link",
+      from.getName(),
       SphericalDistanceLibrary.length(line),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       false
