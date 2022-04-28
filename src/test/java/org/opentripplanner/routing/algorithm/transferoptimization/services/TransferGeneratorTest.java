@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
@@ -7,10 +8,18 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
@@ -21,7 +30,6 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TransferGeneratorTest implements RaptorTestConstants {
@@ -328,6 +336,80 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   void findTransferWithLongMinTimeTransfer() {
     // a very long minimum time is effectively the same thing as a not-allowed transfer
     testThatThereIsNoTransferAtStopB(TestTransitData.TX_LONG_MIN_TIME);
+  }
+
+  // TODO: here we check that minimum transfer time and slack are NOT added up, but perhaps that is
+  // asserting the wrong behaviour
+  static Stream<Arguments> minTransferTimeSlackCases = Stream.of(
+    // transfer takes 1 min plus 0 slack, passenger will make it
+    Arguments.of(ofMinutes(1), ofMinutes(0), true),
+    // slack is 30 minutes, passenger won't make the connection
+    Arguments.of(ofMinutes(1), ofMinutes(30), false),
+    // tight since 8 minutes slack + 1 min transfer time but still less than the 10 minutes required
+    Arguments.of(ofMinutes(1), ofMinutes(8), true),
+    // transfer slack is ignored since minimumTransferTime is short
+    Arguments.of(ofMinutes(1), ofMinutes(10), true),
+    Arguments.of(ofMinutes(11), ofMinutes(1), false),
+    Arguments.of(ofMinutes(9), ofMinutes(9), true)
+  );
+
+  @ParameterizedTest(
+    name = "minimum transfer time of {0}, transfer slack of {1} should expectTransfer={2} on 10 min transfer window"
+  )
+  @VariableSource("minTransferTimeSlackCases")
+  void includeTransferSlackInMinimumTransferTime(
+    Duration minTransferTime,
+    Duration transferSlack,
+    boolean expectTransfer
+  ) {
+    TestRoute l1 = route("L1", STOP_A, STOP_B).withTimetable(schedule("10:00 10:10"));
+    TestRoute l2 = route("L2", STOP_B, STOP_C).withTimetable(schedule("10:20 10:30"));
+
+    // S
+    data.withRoutes(l1, l2);
+
+    var tripA = l1.getTripSchedule(0);
+    var tripB = l2.getTripSchedule(0);
+    var constraint = TransferConstraint
+      .create()
+      .minTransferTime((int) minTransferTime.getSeconds())
+      .build();
+    data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, constraint);
+
+    // The only possible place to transfer between A and C is stop B (no extra transfers):
+    var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
+
+    RaptorSlackProvider slackProvider = new RaptorSlackProvider() {
+      @Override
+      public int transferSlack() {
+        return (int) transferSlack.toSeconds();
+      }
+
+      @Override
+      public int boardSlack(int slackIndex) {
+        return 0;
+      }
+
+      @Override
+      public int alightSlack(int slackIndex) {
+        return 0;
+      }
+    };
+
+    var subject = new TransferGenerator<>(TS_ADAPTOR, slackProvider, data);
+
+    if (expectTransfer) {
+      var result = subject.findAllPossibleTransfers(transitLegs);
+      assertEquals(
+        "[[" + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}" + "]]",
+        result.toString()
+      );
+    } else {
+      Assertions.assertThrows(
+        RuntimeException.class,
+        () -> subject.findAllPossibleTransfers(transitLegs)
+      );
+    }
   }
 
   @Test

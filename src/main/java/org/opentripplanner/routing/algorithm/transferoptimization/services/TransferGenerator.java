@@ -17,8 +17,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This class is responsible for finding all possible transfers between each pair of transit legs
@@ -189,7 +187,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     @Nullable ConstrainedTransfer tx
   ) {
     if (tx == null) {
-      return calcRegularTransferDusrationIncSlack(transferDurationInSeconds);
+      return calcRegularTransferDurationIncSlack(transferDurationInSeconds);
     }
 
     // Ignore slack and walking-time for guaranteed and stay-seated transfers
@@ -201,12 +199,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       var minTransferTime = tx.getTransferConstraint().getMinTransferTime();
       return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
         ? minTransferTime
-        : Math.max(
-          minTransferTime,
-          calcRegularTransferDusrationIncSlack(transferDurationInSeconds)
-        );
+        : Math.max(minTransferTime, calcRegularTransferDurationIncSlack(transferDurationInSeconds));
     } else if (tx.getTransferConstraint().isRegularTransfer()) {
-      return calcRegularTransferDusrationIncSlack(transferDurationInSeconds);
+      return calcRegularTransferDurationIncSlack(transferDurationInSeconds);
     }
     throw new IllegalStateException(
       "The constrained transfer is not correct processed in the optimized transfer service. " +
@@ -215,7 +210,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     );
   }
 
-  private int calcRegularTransferDusrationIncSlack(int transferDurationInSeconds) {
+  private int calcRegularTransferDurationIncSlack(int transferDurationInSeconds) {
     return (
       slackProvider.alightSlack(fromTrip.pattern().slackIndex()) +
       transferDurationInSeconds +
