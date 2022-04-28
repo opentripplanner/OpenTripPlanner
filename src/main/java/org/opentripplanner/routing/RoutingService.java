@@ -223,10 +223,6 @@ public class RoutingService {
       : tripPattern.getScheduledTimetable();
   }
 
-  public List<TripTimeOnDate> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
-    return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
-  }
-
   /** {@link Graph#getTimetableSnapshot()} */
   public TimetableSnapshot getTimetableSnapshot() {
     return this.graph.getTimetableSnapshot();

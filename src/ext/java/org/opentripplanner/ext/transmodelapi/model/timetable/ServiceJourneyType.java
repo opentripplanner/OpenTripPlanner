@@ -27,6 +27,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.TripTimesShortHelper;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class ServiceJourneyType {
@@ -264,14 +265,16 @@ public class ServiceJourneyType {
               .build()
           )
           .dataFetcher(environment -> {
-            final Trip trip = trip(environment);
-
             var serviceDate = Optional
               .ofNullable(environment.getArgument("date"))
               .map(LocalDate.class::cast)
               .map(ServiceDate::new)
-              .orElse(null);
-            return GqlUtil.getRoutingService(environment).getTripTimesShort(trip, serviceDate);
+              .orElse(new ServiceDate());
+            return TripTimesShortHelper.getTripTimesShort(
+              GqlUtil.getRoutingService(environment),
+              trip(environment),
+              serviceDate
+            );
           })
           .build()
       )
