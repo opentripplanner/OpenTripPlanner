@@ -188,15 +188,17 @@ public class TransitLayerUpdater {
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
         if (tripPatternForDate.getLocalDate().equals(date)) {
           var oldTimeTable = timetables.get(tripPatternForDate.getTripPattern().getPattern());
-          var toRemove = oldTimeTable
-            .stream()
-            .filter(tt -> tt.getServiceDate().equals(new ServiceDate(date)))
-            .findFirst()
-            .map(tt -> tt.getTripTimes().isEmpty())
-            .orElse(false);
+          if (oldTimeTable != null) {
+            var toRemove = oldTimeTable
+              .stream()
+              .filter(tt -> tt.getServiceDate().equals(new ServiceDate(date)))
+              .findFirst()
+              .map(tt -> tt.getTripTimes().isEmpty())
+              .orElse(false);
 
-          if (toRemove) {
-            patternsForDate.remove(tripPatternForDate);
+            if (toRemove) {
+              patternsForDate.remove(tripPatternForDate);
+            }
           }
         }
       }
