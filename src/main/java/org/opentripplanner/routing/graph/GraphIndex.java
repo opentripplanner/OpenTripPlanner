@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
@@ -29,6 +28,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -57,7 +57,7 @@ public class GraphIndex {
   private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new HashMap<>();
-  private final Map<T2<FeedScopedId, ServiceDate>, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
+  private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
   private FlexIndex flexIndex = null;
 
   public GraphIndex(Graph graph) {
@@ -111,7 +111,10 @@ public class GraphIndex {
     for (TripOnServiceDate tripOnServiceDate : graph.tripOnServiceDates.values()) {
       tripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
       tripOnServiceDateForTripAndDay.put(
-        new T2<>(tripOnServiceDate.getTrip().getId(), tripOnServiceDate.getServiceDate()),
+        new TripIdAndServiceDate(
+          tripOnServiceDate.getTrip().getId(),
+          tripOnServiceDate.getServiceDate()
+        ),
         tripOnServiceDate
       );
     }
@@ -213,7 +216,7 @@ public class GraphIndex {
     return tripOnServiceDateById;
   }
 
-  public Map<T2<FeedScopedId, ServiceDate>, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
+  public Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
     return tripOnServiceDateForTripAndDay;
   }
 
