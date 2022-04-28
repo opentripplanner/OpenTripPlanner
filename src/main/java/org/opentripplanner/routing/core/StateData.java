@@ -14,7 +14,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 public class StateData implements Cloneable {
 
   // the time at which the search started
-  protected Instant startTime;
+  public Instant startTime;
 
   // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
@@ -163,7 +163,7 @@ public class StateData implements Cloneable {
     return res;
   }
 
-  protected StateData clone() {
+  public StateData clone() {
     try {
       return (StateData) super.clone();
     } catch (CloneNotSupportedException e1) {

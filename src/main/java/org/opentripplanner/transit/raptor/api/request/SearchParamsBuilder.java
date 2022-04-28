@@ -29,6 +29,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private double relaxCostAtDestination;
   private boolean timetableEnabled;
   private boolean constrainedTransfersEnabled;
+  private boolean allowEmptyEgressPaths;
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
     this.parent = parent;
@@ -43,6 +44,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.constrainedTransfersEnabled = defaults.constrainedTransfersEnabled();
     this.accessPaths.addAll(defaults.accessPaths());
     this.egressPaths.addAll(defaults.egressPaths());
+    this.allowEmptyEgressPaths = defaults.allowEmptyEgressPaths();
   }
 
   public int earliestDepartureTime() {
@@ -164,6 +166,15 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
   public SearchParamsBuilder<T> addEgressPaths(RaptorTransfer... egressPaths) {
     return addEgressPaths(Arrays.asList(egressPaths));
+  }
+
+  public SearchParamsBuilder<T> allowEmptyEgressPaths(boolean allowEmptyEgressPaths) {
+    this.allowEmptyEgressPaths = allowEmptyEgressPaths;
+    return this;
+  }
+
+  public boolean allowEmptyEgressPaths() {
+    return allowEmptyEgressPaths;
   }
 
   public RaptorRequest<T> build() {
