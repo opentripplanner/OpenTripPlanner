@@ -29,15 +29,15 @@ import org.slf4j.LoggerFactory;
  * This module takes advantage of the fact that in some cities, an authoritative linking location
  * for GTFS stops is provided by tags in the OSM data.
  * <p>
- * When OSM data is being loaded, certain OSM nodes that represent transit stops are made into
+ * When OSM data is being loaded, certain entities that represent transit stops are made into
  * {@link OsmBoardingLocationVertex} instances. In some cities, these nodes have a ref=* tag which
- * gives the corresponding GFTS stop ID for the stop. See
- * <a href="http://wiki.openstreetmap.org/wiki/Tag:highway%3Dbus_stop">the OSM wiki page</a>.
+ * gives the corresponding GFTS stop ID for the stop but the exact tag name is configurable. See
+ * <a href="https://wiki.openstreetmap.org/wiki/Key:public_transport">the OSM wiki page</a>.
  * <p>
- * This module will attempt to link all transit stops to such nodes in the OSM data, based on the
- * stop ID or stop code and ref tag. It is run before the main transit stop linker, and if no
- * linkage was created here, the main linker should create one based on distance or other
- * heuristics.
+ * This module will attempt to link all transit stops and platforms to such nodes or way centroids
+ * in the OSM data, based on the stop ID or stop code and ref tag. It is run before the main transit
+ * stop linker, and if no linkage was created here, the main linker should create one based on
+ * distance or other heuristics.
  */
 public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
