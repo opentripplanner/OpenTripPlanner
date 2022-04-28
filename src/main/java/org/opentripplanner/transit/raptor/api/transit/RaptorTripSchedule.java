@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.opentripplanner.model.WheelchairBoarding;
 
 /**
@@ -112,6 +114,40 @@ public interface RaptorTripSchedule {
       }
     }
     return p.findStopPositionAfter(i, stop);
+  }
+
+  /**
+   * Find all departure-stop-positions for a stop index after given earliest-departure-time. This is
+   * useful because trip can pass through the same stop more than once.
+   * This is basically on upgraded version of {@link #findDepartureStopPosition} that does not return
+   * only first stop position but all of them.
+   * @param earliestDepartureTime earliest departure time
+   * @param stop stop index
+   * @return list of all valid stop positions for a given stop index
+   */
+  default List<Integer> findStopPositionsForStopIndex(int earliestDepartureTime, int stop) {
+    var p = pattern();
+    final int size = p.numberOfStopsInPattern();
+    int i = 0;
+
+    while (departure(i) < earliestDepartureTime) {
+      ++i;
+      if (i == size) {
+        return new ArrayList<>();
+      }
+    }
+
+    var stops = new ArrayList<Integer>();
+
+    while (i < size) {
+      if (stop == p.stopIndex(i)) {
+        stops.add(i);
+      }
+
+      i++;
+    }
+
+    return stops;
   }
 
   /**
