@@ -86,7 +86,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
   public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
     if (v instanceof OsmBoardingLocationVertex osmV) {
       attrs.color = OSM_BOARDING_LOCATION_VERTEX_COLOR;
-      attrs.label = "OSM " + osmV.references;
+      attrs.label = "OSM refs" + osmV.references;
     } else if (v instanceof IntersectionVertex) {
       attrs.color = STREET_COLOR_VERTEX;
       if (v instanceof BarrierVertex) {

@@ -25,6 +25,7 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
@@ -375,8 +376,12 @@ public class GraphPathToItineraryMapper {
       .stream()
       // The first back edge is part of the previous leg, skip it
       .skip(1)
+      // when linking an OSM boarding location, like a platform centroid, we create a link edge
+      // so we can see it in the debug UI's traversal permission layer but we don't want to show the
+      // link to the user so we remove it here
+      .filter(e -> !(e.backEdge instanceof BoardingLocationToStopLink))
       .map(State::getBackEdge)
-      .collect(Collectors.toList());
+      .toList();
 
     State firstState = states.get(0);
     State lastState = states.get(states.size() - 1);

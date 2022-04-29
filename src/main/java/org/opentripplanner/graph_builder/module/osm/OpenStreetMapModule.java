@@ -378,9 +378,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
         if (node.isBoardingLocation()) {
-          String ref = node.getTag("ref");
-          String name = node.getTag("name");
-          if (ref != null) {
+          var refs = node.getMultiTagValues(boardingAreaRefTags);
+          if (!refs.isEmpty()) {
+            String name = node.getTag("name");
             iv =
               new OsmBoardingLocationVertex(
                 graph,
@@ -389,7 +389,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 coordinate.y,
                 nid,
                 name,
-                Set.of(ref)
+                refs
               );
           }
         }

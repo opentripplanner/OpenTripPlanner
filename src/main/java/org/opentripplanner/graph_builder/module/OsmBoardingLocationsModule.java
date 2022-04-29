@@ -95,22 +95,22 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
-    Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
-    // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
+    var vertices = index
+      .getVerticesForEnvelope(envelope)
+      .stream()
+      .filter(OsmBoardingLocationVertex.class::isInstance)
+      .map(OsmBoardingLocationVertex.class::cast)
+      .toList();
+    // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or di
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
-    for (Vertex v : vertices) {
-      if (!(v instanceof OsmBoardingLocationVertex osmVertex)) {
-        continue;
-      }
-
+    for (var osmVertex : vertices) {
       if (
         (stopCode != null && osmVertex.references.contains(stopCode)) ||
         osmVertex.references.contains(stopId)
       ) {
-        if (osmVertex.isConnectedToStreetNetwork()) {
-          new StreetTransitStopLink(ts, osmVertex);
-          new StreetTransitStopLink(osmVertex, ts);
-        } else {
+        new BoardingLocationToStopLink(ts, osmVertex);
+        new BoardingLocationToStopLink(osmVertex, ts);
+        if (!osmVertex.isConnectedToStreetNetwork()) {
           linker.linkVertexPermanently(
             osmVertex,
             new TraverseModeSet(TraverseMode.WALK),
@@ -118,13 +118,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             (osmBoardingLocationVertex, splitVertex) -> {
               // the OSM boarding location vertex is not connected to the street network, so we
               // need to link it to the platform
-              linkBoardingLocationToStreetNetwork(osmVertex, splitVertex);
-              linkBoardingLocationToStreetNetwork(splitVertex, osmVertex);
-
-              // and then link the TransitStopVertex to the BoardingLocationVertex
               return List.of(
-                new BoardingLocationToStopLink(ts, osmVertex),
-                new BoardingLocationToStopLink(osmVertex, ts)
+                linkBoardingLocationToStreetNetwork(osmVertex, splitVertex),
+                linkBoardingLocationToStreetNetwork(splitVertex, osmVertex)
               );
             }
           );
@@ -135,9 +131,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     return false;
   }
 
-  private void linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
+  private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    new StreetEdge(
+    return new StreetEdge(
       from,
       to,
       line,

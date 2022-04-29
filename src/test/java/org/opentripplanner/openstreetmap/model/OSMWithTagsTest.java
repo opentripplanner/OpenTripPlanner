@@ -154,4 +154,14 @@ public class OSMWithTagsTest {
     assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref1")));
     assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref2")));
   }
+
+  @Test
+  public void shouldNotReturnNull() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref1", " ");
+    osm.addTag("ref2", "");
+
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of()));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref3")));
+  }
 }

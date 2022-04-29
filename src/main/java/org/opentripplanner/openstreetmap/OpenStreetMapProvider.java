@@ -59,7 +59,6 @@ public class OpenStreetMapProvider {
       .toStringHelper(this)
       .add("source", source)
       .add("cacheDataInMem", cacheDataInMem)
-      .add("cachedBytes", cachedBytes)
       .toString();
   }
 
