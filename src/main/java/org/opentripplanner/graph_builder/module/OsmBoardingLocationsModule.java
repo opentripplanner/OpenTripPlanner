@@ -108,8 +108,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         (stopCode != null && osmVertex.references.contains(stopCode)) ||
         osmVertex.references.contains(stopId)
       ) {
-        new BoardingLocationToStopLink(ts, osmVertex);
-        new BoardingLocationToStopLink(osmVertex, ts);
         if (!osmVertex.isConnectedToStreetNetwork()) {
           linker.linkVertexPermanently(
             osmVertex,
@@ -125,6 +123,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             }
           );
         }
+        new BoardingLocationToStopLink(ts, osmVertex);
+        new BoardingLocationToStopLink(osmVertex, ts);
         return true;
       }
     }
