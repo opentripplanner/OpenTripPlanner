@@ -8,11 +8,14 @@ confidentiality.
 
 ### NeTEx
 
-We are using NeTEx for transport data inside Sweden. Each night we are building new file based on data from our SQL database. At the moment those files are not accessible through any public endpoint. 
+We are using NeTEx for transport data inside Sweden. Each night we are building new file based on
+data from our SQL database. At the moment those files are not accessible through any public
+endpoint.
 
-### GTFS 
+### GTFS
 
-We are using GTFS data for traffic inside Denmark. GTFS for danish public transport can be downloaded [here](https://transitfeeds.com/p/rejseplanen/705?p=1).
+We are using GTFS data for traffic inside Denmark. GTFS for danish public transport can be
+downloaded [here](https://transitfeeds.com/p/rejseplanen/705?p=1).
 
 ### OSM
 
@@ -59,7 +62,7 @@ echo "Created filtered OSM for skanetrafiken region ($filterFile)"
 rm -rf /tmp/osm-skanetrafiken
 ```
 
-#### Danmark
+#### Denmark
 
 We download OSM data for whole Denmark, and then we clip southern part to reduce file size.
 
@@ -100,15 +103,59 @@ rm -rf /tmp/osm-denmark
 
 ## Realtime
 
-We are using **Azure Service Bus** to propagate SIRI SX and ET realtime messages to OTP. 
-This is solved through Siri Azure updaters that we had implemented in OTP. We have separate updaters for SIRI SX and ET.
-Except for the **Service Bus**we do also fetch old messages through a http endpoint on startup. 
-This ensures that all OTP instance that we are running in the cluster does have exact same realtime data. 
-So no matter which instance client is hitting it will always get the same search results.
-See the `updaters` section of `router-config.json` file provided in this folder. This is an example
-configuration for the updaters. 
+The **Azure Service Bus** is used to propagate SIRI SX and ET realtime messages to OTP.
+This is solved through Siri Azure updaters that we had implemented in OTP. We have separate updaters
+for SIRI SX and ET.
+Those updaters are used to provide data for Swedish traffic (NeTEx). Right now, there is no
+connection
+to any realtime source for GTFS.
 
-Those updaters are used to provide data for Swedish traffic (NeTEx). Right now we are 
-not connected to any realtime source for traffic inside Denmark (GTFS).
+Except for receiving messages from **Service Bus** we do also implement endpoints through which we
+fetch old messages on startup.
+We have two separate endpoint for respectively SX and ET history.
+The updater will first create new subscription on ServiceBus topic and then send request to the
+history endpoint.
+For Us, it takes some time get a response from the endpoint, so we tend to set timeout quite high.
+Once OTP is done with processing of history messages the updater will start querying messages from
+the subscription.
+This ensures that no realtime message is omitted and all OTP instance that we are running in the
+cluster does have exact same realtime data.
+
+Once the updaters are done with processing of history messages they will change their status to
+primed,
+and we will start channeling request to this OTP instance.
+This ensures that all OTP instances does have identical realtime state and no matter which instance
+the client is hitting it will always get the same search results.
+
+### History endpoint contract
+
+See the `updaters` section of `router-config.json` file provided in this folder. This is an example
+configuration for the updaters. The `history` configuration is optional. It can be skipped so that
+OTP does not fetch any old messages on startup.
+
+There are two separate endpoints for respectively SX and ET. They are basic GET endpoints with
+following query parameters:
+
+| parameters   | format      |
+|--------------|-------------|
+| fromDateTime | ISO 8601    |
+| toDateTime   | ISO 8601    |
+
+Those two parameters are used to define time boundaries for the messages.
+
+Both endpoints generate XML response which is an SIRI object containing SX or ET messages. Messages
+are
+formatted according to Siri Nordic Profile.
+Since in SIRI ET standard each messages contains all necessary data, our implementation of the
+endpoint returns only the last message
+for each DatedServiceJourney ID (sending multiple messages would be pointless since they will
+override each other).
+The messages are processed in the same order as they came in (in the list) so it would still work
+to include multiple messages on same DatedServiceJourney as long as they are sorted in correct order
+and the newest message is the last one in the list.
+
+
+
+
 
 
