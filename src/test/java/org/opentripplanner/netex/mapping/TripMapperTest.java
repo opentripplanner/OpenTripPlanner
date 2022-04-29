@@ -13,7 +13,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
@@ -72,7 +72,7 @@ public class TripMapperTest {
     assertNotNull(trip, "trip must not be null");
     assertEquals(
       trip.getWheelchairBoarding(),
-      WheelChairBoarding.POSSIBLE,
+      WheelchairBoarding.POSSIBLE,
       "Wheelchair accessibility not possible on trip"
     );
   }

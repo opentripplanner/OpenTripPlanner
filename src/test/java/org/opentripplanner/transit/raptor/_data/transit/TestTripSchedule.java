@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
+import static org.opentripplanner.model.WheelchairBoarding.NO_INFORMATION;
 
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -20,14 +20,14 @@ public class TestTripSchedule implements RaptorTripSchedule {
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
-  private final WheelChairBoarding wheelchairBoarding;
+  private final WheelchairBoarding wheelchairBoarding;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
     int[] arrivalTimes,
     int[] departureTimes,
     int transitReluctanceIndex,
-    WheelChairBoarding wheelchairBoarding
+    WheelchairBoarding wheelchairBoarding
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -75,7 +75,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
   }
 
   @Override
-  public WheelChairBoarding wheelchairBoarding() {
+  public WheelchairBoarding wheelchairBoarding() {
     return wheelchairBoarding;
   }
 
@@ -106,7 +106,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
     private int transitReluctanceIndex = 0;
-    private WheelChairBoarding wheelchairBoarding = NO_INFORMATION;
+    private WheelchairBoarding wheelchairBoarding = NO_INFORMATION;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -172,7 +172,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return this;
     }
 
-    public TestTripSchedule.Builder wheelchairBoarding(WheelChairBoarding wcb) {
+    public TestTripSchedule.Builder wheelchairBoarding(WheelchairBoarding wcb) {
       this.wheelchairBoarding = wcb;
       return this;
     }

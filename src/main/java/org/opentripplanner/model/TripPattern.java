@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -223,16 +224,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
           sb.append(" express");
         } else {
           // The final fallback: reference a specific trip ID.
-          Trip trip = null;
-          if (!pattern.scheduledTimetable.getTripTimes().isEmpty()) {
-            trip = pattern.scheduledTimetable.getTripTimes().get(0).getTrip();
-          } else if (!pattern.scheduledTimetable.getFrequencyEntries().isEmpty()) {
-            trip = pattern.scheduledTimetable.getFrequencyEntries().get(0).tripTimes.getTrip();
-          }
-
-          if (trip != null) {
-            sb.append(" like trip ").append(trip.getId());
-          }
+          Optional
+            .ofNullable(pattern.scheduledTimetable.getRepresentativeTripTimes())
+            .map(TripTimes::getTrip)
+            .ifPresent(value -> sb.append(" like trip ").append(value.getId()));
         }
         pattern.setName((sb.toString()));
       } // END foreach PATTERN
@@ -489,7 +484,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
   /** Returns whether a given stop is wheelchair-accessible. */
   public boolean wheelchairAccessible(int stopIndex) {
-    return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
+    return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelchairBoarding.POSSIBLE;
   }
 
   public PickDrop getAlightType(int stopIndex) {
@@ -655,7 +650,19 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
   }
 
   public String getTripHeadsign() {
-    return scheduledTimetable.getTripTimes(0).getTrip().getTripHeadsign();
+    var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
+    if (tripTimes == null) {
+      return null;
+    }
+    return tripTimes.getTrip().getTripHeadsign();
+  }
+
+  public String getStopHeadsign(int stopIndex) {
+    var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
+    if (tripTimes == null) {
+      return null;
+    }
+    return tripTimes.getHeadsign(stopIndex);
   }
 
   public boolean matchesModeOrSubMode(TransitMode mode, String transportSubmode) {

@@ -1,18 +1,18 @@
 package org.opentripplanner.model;
 
-public enum WheelChairBoarding {
+public enum WheelchairBoarding {
   NO_INFORMATION(0),
   POSSIBLE(1),
   NOT_POSSIBLE(2);
 
   public final int gtfsCode;
 
-  WheelChairBoarding(int gtfsCode) {
+  WheelchairBoarding(int gtfsCode) {
     this.gtfsCode = gtfsCode;
   }
 
-  public static WheelChairBoarding valueOfGtfsCode(int gtfsCode) {
-    for (WheelChairBoarding value : values()) {
+  public static WheelchairBoarding valueOfGtfsCode(int gtfsCode) {
+    for (WheelchairBoarding value : values()) {
       if (value.gtfsCode == gtfsCode) {
         return value;
       }

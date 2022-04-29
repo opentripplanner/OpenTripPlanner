@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Optional;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -11,19 +11,19 @@ public class WheelChairMapper {
 
   /**
    * If input and containing objects are not null, get the LimitationStatusEnumeration and map to
-   * internal {@link WheelChairBoarding} enumeration.
+   * internal {@link WheelchairBoarding} enumeration.
    *
    * @param accessibilityAssessment NeTEx object wrapping information regarding WheelChairBoarding
    * @param defaultValue            If no {@link AccessibilityAssessment} is defined, default to
    *                                this value
-   * @return Mapped enumerator, {@link WheelChairBoarding#NO_INFORMATION} if no value is found
+   * @return Mapped enumerator, {@link WheelchairBoarding#NO_INFORMATION} if no value is found
    */
-  public static WheelChairBoarding wheelChairBoarding(
+  public static WheelchairBoarding wheelChairBoarding(
     AccessibilityAssessment accessibilityAssessment,
-    WheelChairBoarding defaultValue
+    WheelchairBoarding defaultValue
   ) {
     if (defaultValue == null) {
-      defaultValue = WheelChairBoarding.NO_INFORMATION;
+      defaultValue = WheelchairBoarding.NO_INFORMATION;
     }
 
     return Optional
@@ -35,20 +35,20 @@ public class WheelChairMapper {
       .orElse(defaultValue);
   }
 
-  public static WheelChairBoarding fromLimitationStatusEnumeration(
+  public static WheelchairBoarding fromLimitationStatusEnumeration(
     LimitationStatusEnumeration wheelChairLimitation
   ) {
     if (wheelChairLimitation == null) {
-      return WheelChairBoarding.NO_INFORMATION;
+      return WheelchairBoarding.NO_INFORMATION;
     }
 
     switch (wheelChairLimitation.value()) {
       case "true":
-        return WheelChairBoarding.POSSIBLE;
+        return WheelchairBoarding.POSSIBLE;
       case "false":
-        return WheelChairBoarding.NOT_POSSIBLE;
+        return WheelchairBoarding.NOT_POSSIBLE;
       default:
-        return WheelChairBoarding.NO_INFORMATION;
+        return WheelchairBoarding.NO_INFORMATION;
     }
   }
 }
