@@ -122,8 +122,11 @@ public class GenerateTripPatternsOperation {
     List<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
 
     // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
+    var staticTripWithFewerThan2Stops =
+      !FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2;
     // flex trips are allowed to have a single stop because that can be an area or a group of stops
-    if (!FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2) {
+    var flexTripWithZeroStops = FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 1;
+    if (staticTripWithFewerThan2Stops || flexTripWithZeroStops) {
       issueStore.add(new TripDegenerate(trip));
       return;
     }
