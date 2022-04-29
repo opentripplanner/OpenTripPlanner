@@ -2,7 +2,7 @@ package org.opentripplanner.inspector;
 
 import java.awt.Color;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -58,13 +58,13 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
     if (v instanceof TransitStopVertex) {
       if (
         ((TransitStopVertex) v).getStop().getWheelchairBoarding() ==
-        WheelChairBoarding.NO_INFORMATION
+        WheelchairBoarding.NO_INFORMATION
       ) attrs.color = NO_WHEELCHAIR_INFORMATION_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() == WheelChairBoarding.POSSIBLE
+        ((TransitStopVertex) v).getStop().getWheelchairBoarding() == WheelchairBoarding.POSSIBLE
       ) attrs.color = YES_WHEELCHAIR_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() == WheelChairBoarding.NOT_POSSIBLE
+        ((TransitStopVertex) v).getStop().getWheelchairBoarding() == WheelchairBoarding.NOT_POSSIBLE
       ) attrs.color = NO_WHEELCHAIR_COLOR;
       attrs.label = v.getDefaultName();
     } else {

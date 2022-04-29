@@ -5,7 +5,7 @@ import java.util.Set;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -21,7 +21,7 @@ public class TransitStopVertex extends Vertex {
   // Do we actually need a set of modes for each stop?
   // It's nice to have for the index web API but can be generated on demand.
   private final Set<TransitMode> modes;
-  private final WheelChairBoarding wheelchairBoarding;
+  private final WheelchairBoarding wheelchairBoarding;
 
   private final Stop stop;
 
@@ -46,7 +46,7 @@ public class TransitStopVertex extends Vertex {
     graph.expandToInclude(stop.getLon(), stop.getLat());
   }
 
-  public WheelChairBoarding getWheelchairBoarding() {
+  public WheelchairBoarding getWheelchairBoarding() {
     return wheelchairBoarding;
   }
 
