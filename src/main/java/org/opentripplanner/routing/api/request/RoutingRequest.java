@@ -263,12 +263,6 @@ public class RoutingRequest implements Cloneable, Serializable {
    */
   public int numItineraries = 50;
 
-  /**
-   * What penalty factor should be given to street edges, which are over the max slope.
-   * Set to negative for disable routing on too steep edges.
-   */
-  public double wheelchairSlopeTooSteepCostFactor = 10.0;
-
   /** Whether the planner should return intermediate stops lists for transit legs. */
   public boolean showIntermediateStops = false;
   /**
