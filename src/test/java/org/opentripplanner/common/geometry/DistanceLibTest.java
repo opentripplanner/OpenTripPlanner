@@ -1,12 +1,16 @@
 package org.opentripplanner.common.geometry;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 
-public class TestDistanceLib extends TestCase {
+public class DistanceLibTest {
 
+  @Test
   public void testMetersToDegree() {
     // Note: 111194.926644559 is 1 degree at the equator, given the earth radius used in the lib
     double degree;
@@ -29,6 +33,7 @@ public class TestDistanceLib extends TestCase {
     assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(44.999)) / 1000) < 1e-5);
   }
 
+  @Test
   public void testPointToLineStringFastDistance() {
     // Note: the meridian length of 1 degree of latitude on the sphere is around 111.2 km
     runOneTestPointToLineStringFastDistance(0, 0, 45, 0, 44.9, 0, 45.1, 0);
@@ -55,6 +60,7 @@ public class TestDistanceLib extends TestCase {
     runOneTestPointToLineStringFastDistance(785, 786, 45.05, -0.01, 45, -0.1, 45, 0, 45.1, 0);
   }
 
+  @Test
   public void testLineStringFastLenght() {
     // Note: the meridian length of 1 degree of latitude on the sphere is around 111.2 km
     // a ~= 111.2 km

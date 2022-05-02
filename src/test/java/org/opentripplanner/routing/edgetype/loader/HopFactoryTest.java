@@ -1,13 +1,17 @@
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import com.google.common.collect.Lists;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import junit.framework.TestCase;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -26,8 +30,8 @@ import org.opentripplanner.util.TestUtils;
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
-@Ignore
-public class TestHopFactory extends TestCase {
+@Disabled
+public class HopFactoryTest {
 
   private final ZoneId zoneId = ZoneId.of("America/New_York");
 
@@ -35,6 +39,7 @@ public class TestHopFactory extends TestCase {
 
   private String feedId;
 
+  @BeforeEach
   public void setUp() throws Exception {
     GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
     graph = new Graph();
@@ -45,6 +50,7 @@ public class TestHopFactory extends TestCase {
     feedId = context.getFeedId().getId();
   }
 
+  @Test
   public void testDwell() {
     Vertex stop_a = graph.getVertex(feedId + ":A_depart");
     Vertex stop_c = graph.getVertex(feedId + ":C_arrive");
@@ -63,6 +69,7 @@ public class TestHopFactory extends TestCase {
     assertEquals(endTime, path.getEndTime());
   }
 
+  @Test
   public void testRouting() throws Exception {
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_b = graph.getVertex(feedId + ":B");

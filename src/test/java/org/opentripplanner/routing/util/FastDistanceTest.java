@@ -1,16 +1,19 @@
 package org.opentripplanner.routing.util;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Random;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 
-public class TestFastDistance extends TestCase {
+public class FastDistanceTest {
 
   private static final int N_TEST = 100000;
   private static final double MAX_LAT = 70.0;
   private static final double MAX_DELTA_LAT = 6.0;
   private static final double MAX_DELTA_LON = 6.0;
 
+  @Test
   public void testFastDistance() {
     // Seed the random generator, if we have a failure
     // we'd like to be able to reproduce it...

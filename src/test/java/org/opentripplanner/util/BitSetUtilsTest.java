@@ -1,9 +1,13 @@
 package org.opentripplanner.util;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BitSetUtilsTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class BitSetUtilsTest {
+
+  @Test
   public void testBitSetUtils() {
     byte bflags = 0;
     short sflags = 0;
