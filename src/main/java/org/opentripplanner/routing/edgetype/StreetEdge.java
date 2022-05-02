@@ -1016,7 +1016,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
           time = getEffectiveWalkDistance() / speed;
           weight = getEffectiveBikeDistance() / speed;
 
-          if (getMaxSlope() > options.maxWheelchairSlope) {
+          if (getMaxSlope() > options.wheelchairAccessibility.maxSlope()) {
             double tooSteepCostFactor = options.wheelchairSlopeTooSteepCostFactor;
             if (tooSteepCostFactor < 0) {
               return null;

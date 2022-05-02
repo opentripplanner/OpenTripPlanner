@@ -10,11 +10,13 @@ public class WheelchairAccessibilityRequestMapper {
   static WheelchairAccessibilityRequest mapAccessibilityRequest(NodeAdapter a) {
     var trips = mapAccessibilityFeature(a.path("trips"), DEFAULT.trips());
     var stops = mapAccessibilityFeature(a.path("stops"), DEFAULT.stops());
+    var maxSlope = (float) a.asDouble("maxSlope", DEFAULT.maxSlope());
 
     return new WheelchairAccessibilityRequest(
       a.asBoolean("enabled", DEFAULT.enabled()),
       trips,
-      stops
+      stops,
+      maxSlope
     );
   }
 

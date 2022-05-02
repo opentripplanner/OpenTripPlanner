@@ -3,12 +3,14 @@ package org.opentripplanner.routing.api.request;
 public record WheelchairAccessibilityRequest(
   boolean enabled,
   WheelchairAccessibilityFeature trips,
-  WheelchairAccessibilityFeature stops
+  WheelchairAccessibilityFeature stops,
+  float maxSlope
 ) {
   public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
     false,
     WheelchairAccessibilityFeature.ofOnlyAccessible(),
-    WheelchairAccessibilityFeature.ofOnlyAccessible()
+    WheelchairAccessibilityFeature.ofOnlyAccessible(),
+    0.0833333333333f // ADA max wheelchair ramp slope is a good default.
   );
 
   public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {
@@ -16,6 +18,6 @@ public record WheelchairAccessibilityRequest(
   }
 
   public WheelchairAccessibilityRequest withEnabled(boolean enabled) {
-    return new WheelchairAccessibilityRequest(enabled, this.trips, this.stops);
+    return new WheelchairAccessibilityRequest(enabled, this.trips, this.stops, maxSlope);
   }
 }

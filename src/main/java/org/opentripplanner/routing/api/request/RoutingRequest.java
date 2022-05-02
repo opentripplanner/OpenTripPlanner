@@ -262,8 +262,6 @@ public class RoutingRequest implements Cloneable, Serializable {
    * be returned. Consider tuning the search-window instead of setting this to a small value.
    */
   public int numItineraries = 50;
-  /** The maximum slope of streets for wheelchair trips. */
-  public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
   /**
    * What penalty factor should be given to street edges, which are over the max slope.

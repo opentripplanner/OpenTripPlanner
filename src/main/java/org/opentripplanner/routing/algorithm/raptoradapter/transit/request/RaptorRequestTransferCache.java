@@ -95,7 +95,6 @@ public class RaptorRequestTransferCache {
     private final double bikeTriangleSlopeFactor;
     private final double bikeTriangleTimeFactor;
     private final boolean wheelchairAccessible;
-    private final double maxWheelchairSlope;
     private final double wheelchairSlopeTooSteepCostFactor;
     private final double walkSpeed;
     private final double bikeSpeed;
@@ -121,7 +120,6 @@ public class RaptorRequestTransferCache {
       this.bikeSwitchTime = routingRequest.bikeSwitchTime;
 
       this.wheelchairAccessible = routingRequest.wheelchairAccessibility.enabled();
-      this.maxWheelchairSlope = routingRequest.maxWheelchairSlope;
       this.wheelchairSlopeTooSteepCostFactor = routingRequest.wheelchairSlopeTooSteepCostFactor;
 
       this.walkSpeed = routingRequest.walkSpeed;
@@ -147,7 +145,6 @@ public class RaptorRequestTransferCache {
         bikeTriangleSlopeFactor,
         bikeTriangleTimeFactor,
         wheelchairAccessible,
-        maxWheelchairSlope,
         wheelchairSlopeTooSteepCostFactor,
         walkSpeed,
         bikeSpeed,
@@ -177,7 +174,6 @@ public class RaptorRequestTransferCache {
         Double.compare(that.bikeTriangleSafetyFactor, bikeTriangleSafetyFactor) == 0 &&
         Double.compare(that.bikeTriangleSlopeFactor, bikeTriangleSlopeFactor) == 0 &&
         Double.compare(that.bikeTriangleTimeFactor, bikeTriangleTimeFactor) == 0 &&
-        Double.compare(that.maxWheelchairSlope, maxWheelchairSlope) == 0 &&
         Double.compare(that.wheelchairSlopeTooSteepCostFactor, wheelchairSlopeTooSteepCostFactor) ==
         0 &&
         Double.compare(that.walkSpeed, walkSpeed) == 0 &&

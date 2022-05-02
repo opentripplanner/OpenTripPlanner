@@ -32,7 +32,8 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600
-      }
+      },
+      "maxSlope": 8.333
     }
   },
   "updaters": []
@@ -46,6 +47,10 @@ The parameters for `stops` and `trips` mean the following:
 | `onlyConsiderAccessible` | Whether to include unknown accessibility and inaccessible stops/trips in the search. | `false` |
 | `unknownCost`            | The cost to add if a stop/trip has unknown wheelchair accessibility                  | 600     |
 | `inaccessibleCost`       | The cost to add if a stop/trip is known to be inaccessible                           | 3600    |
+
+Other parameters are:
+
+- `maxSlope`: the maximum slope that a wheelchair user can use without incurring routing penalties (leading to those ways being avoided)
 
 **Note**: Unless your accessibility data coverage is complete you will receive much better results by setting `onlyConsiderAccessible=true`, because
 otherwise you receive barely any results.

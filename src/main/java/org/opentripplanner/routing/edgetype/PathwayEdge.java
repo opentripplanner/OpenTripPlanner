@@ -109,7 +109,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         options.getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
 
       if (options.wheelchairAccessibility.enabled()) {
-        if (this.slope > options.maxWheelchairSlope) {
+        if (this.slope > options.wheelchairAccessibility.maxSlope()) {
           double tooSteepCostFactor = options.wheelchairSlopeTooSteepCostFactor;
           if (tooSteepCostFactor < 0) {
             return null;

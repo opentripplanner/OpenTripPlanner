@@ -75,7 +75,7 @@ class StreetTransitEntityLinkTest {
     } else {
       feature = WheelchairAccessibilityFeature.ofCost(100, 100);
     }
-    req.wheelchairAccessibility = new WheelchairAccessibilityRequest(true, feature, feature);
+    req.wheelchairAccessibility = new WheelchairAccessibilityRequest(true, feature, feature, 8);
 
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);
