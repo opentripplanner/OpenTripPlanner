@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filter;
+package org.opentripplanner.ext.accessibilityscore;
 
 import java.util.Comparator;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filter;
+package org.opentripplanner.ext.accessibilityscore;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
