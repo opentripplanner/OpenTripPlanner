@@ -9,6 +9,9 @@ import org.opentripplanner.routing.util.SlopeCosts;
 
 public class StreetElevationExtension implements Serializable {
 
+  /**
+   * Distance of the edge projected on a 2d plane.
+   */
   private final double distanceMeters;
 
   private final byte[] compactedElevationProfile;
@@ -23,6 +26,8 @@ public class StreetElevationExtension implements Serializable {
 
   private final double effectiveWalkDistance;
 
+  private final double distanceWithElevation;
+
   private final float maxSlope;
 
   private final boolean flattened;
@@ -35,6 +40,7 @@ public class StreetElevationExtension implements Serializable {
     double effectiveBikeDistanceFactor,
     double effectiveBikeWorkFactor,
     double effectiveWalkDistanceFactor,
+    double lengthMultiplier,
     float maxSlope,
     boolean flattened
   ) {
@@ -43,6 +49,7 @@ public class StreetElevationExtension implements Serializable {
     this.effectiveBikeDistance = effectiveBikeDistanceFactor * distanceMeters;
     this.effectiveBikeWorkCost = effectiveBikeWorkFactor * distanceMeters;
     this.effectiveWalkDistance = effectiveWalkDistanceFactor * distanceMeters;
+    this.distanceWithElevation = lengthMultiplier * distanceMeters;
     this.maxSlope = maxSlope;
     this.flattened = flattened;
 
@@ -80,20 +87,43 @@ public class StreetElevationExtension implements Serializable {
     }
   }
 
+  /**
+   * The distance multiplied by the {@link StreetEdge#bicycleSafetyFactor}, but also considering the
+   * increased length caused by the slope.
+   */
   public double getEffectiveBicycleSafetyDistance() {
     return effectiveBicycleSafetyDistance;
   }
 
+  /**
+   * The distance multiplied by a factor considering how much faster/slower it is to bile the edge,
+   * compared to if it was flat.
+   */
   public double getEffectiveBikeDistance() {
     return effectiveBikeDistance;
   }
 
+  /**
+   * The distance multiplied by a factor considering how much more/less convenient it is to bike
+   * the edge, compared to if it was flat. This is calculated form the energy usage of the cyclist.
+   */
   public double getEffectiveBikeWorkCost() {
     return effectiveBikeWorkCost;
   }
 
+  /**
+   * The distance multiplied by a factor considering how much faster/slower it is to walk the edge,
+   * compared to if it was flat.
+   */
   public double getEffectiveWalkDistance() {
     return effectiveWalkDistance;
+  }
+
+  /**
+   * Physical distance which takes the elevation into account. The distanceMeters is a 2d distance.
+   */
+  public double getDistanceWithElevation() {
+    return distanceWithElevation;
   }
 
   public float getMaxSlope() {
@@ -160,6 +190,7 @@ public class StreetElevationExtension implements Serializable {
       effectiveBikeDistanceFactor,
       effectiveBikeWorkFactor,
       effectiveWalkDistanceFactor,
+      costs.lengthMultiplier,
       maxSlope,
       flattened
     );

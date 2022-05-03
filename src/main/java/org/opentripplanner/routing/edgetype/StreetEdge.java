@@ -455,6 +455,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     return length_mm / 1000.0;
   }
 
+  private double getDistanceWithElevation() {
+    return hasElevationExtension()
+      ? elevationExtension.getDistanceWithElevation()
+      : getDistanceMeters();
+  }
+
   @Override
   public double getEffectiveWalkDistance() {
     return hasElevationExtension()
@@ -1113,7 +1119,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
 
     if (!traverseMode.isDriving()) {
-      s1.incrementWalkDistance(getDistanceMeters());
+      s1.incrementWalkDistance(getDistanceWithElevation());
     }
 
     if (costExtension != null) {
