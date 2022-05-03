@@ -8,22 +8,28 @@ confidentiality.
 
 ### NeTEx
 
-We are using NeTEx for transport data inside Sweden. Each night we are building new file based on
-data from our SQL database. At the moment those files are not accessible through any public
+NeTEx is used for transport data inside Sweden. Each night the system automatically builds new file
+based on
+data from SQL database. At the moment those files are not accessible through any public
 endpoint.
 
 ### GTFS
 
-We are using GTFS data for traffic inside Denmark. GTFS for danish public transport can be
-downloaded [here](https://transitfeeds.com/p/rejseplanen/705?p=1).
+GTFS data is used for traffic inside Denmark. GTFS for danish public transport can be
+downloaded [here](https://transitfeeds.com/p/rejseplanen/705?p=1). There is some processing applied
+to the original data so that unnecessary trips are filtered out and ID structure for journeys and
+stop point / stop places matches with the NeTEx. The modified GTFS is not accessible through any
+public
+endpoint either.
 
 ### OSM
 
-We are using two OSM files:
+Two different OSM files are used:
 
 #### Sweden
 
-We download OSM data for whole Sweden, and then we clip northern part of it to reduce file size.
+To reduced graph size, only data for southern part of Sweden is used. Script below downloads OSM
+for whole country and then clips out the northern part.
 
 ```
 #!/bin/bash
@@ -64,7 +70,8 @@ rm -rf /tmp/osm-skanetrafiken
 
 #### Denmark
 
-We download OSM data for whole Denmark, and then we clip southern part to reduce file size.
+To reduce graph size, only data for northern part of Denmark is used. Script below downloads OSM
+for whole country and then clips out the southern part.
 
 ```
 #!/bin/bash
@@ -104,34 +111,32 @@ rm -rf /tmp/osm-denmark
 ## Realtime
 
 The **Azure Service Bus** is used to propagate SIRI SX and ET realtime messages to OTP.
-This is solved through Siri Azure updaters that we had implemented in OTP. We have separate updaters
-for SIRI SX and ET.
+This is solved through Siri Azure updaters that Skånetrafiken had implemented in OTP. There are
+separate updaters for SIRI SX and ET.
 Those updaters are used to provide data for Swedish traffic (NeTEx). Right now, there is no
-connection
-to any realtime source for GTFS.
+connection to any realtime source for danish traffic (GTFS data).
 
-Except for receiving messages from **Service Bus** we do also implement endpoints through which we
-fetch old messages on startup.
-We have two separate endpoint for respectively SX and ET history.
+Except for receiving messages from **Service Bus** there are two endpoints through which historical
+ET and SX messages can be downloaded at OTP startup.
 The updater will first create new subscription on ServiceBus topic and then send request to the
 history endpoint.
-For Us, it takes some time get a response from the endpoint, so we tend to set timeout quite high.
+It can take some time get a response from the endpoint, so the timeout is set quite high.
 Once OTP is done with processing of history messages the updater will start querying messages from
 the subscription.
-This ensures that no realtime message is omitted and all OTP instance that we are running in the
-cluster does have exact same realtime data.
 
 Once the updaters are done with processing of history messages they will change their status to
 primed,
-and we will start channeling request to this OTP instance.
-This ensures that all OTP instances does have identical realtime state and no matter which instance
-the client is hitting it will always get the same search results.
+and the system will start channeling request to this OTP instance.
+This ensures that no realtime message is omitted and all OTP instance that ran in the
+cluster does have exact same realtime data.
+Thi means that no matter which instance the client is hitting it will always get the same search
+results.
 
 ### History endpoint contract
 
 See the `updaters` section of `router-config.json` file provided in this folder. This is an example
 configuration for the updaters. The `history` configuration is optional. It can be skipped so that
-OTP does not fetch any old messages on startup.
+OTP does not fetch any historical messages on startup.
 
 There are two separate endpoints for respectively SX and ET. They are basic GET endpoints with
 following query parameters:
@@ -146,7 +151,8 @@ Those two parameters are used to define time boundaries for the messages.
 Both endpoints generate XML response which is an SIRI object containing SX or ET messages. Messages
 are
 formatted according to Siri Nordic Profile.
-Since in SIRI ET standard each messages contains all necessary data, our implementation of the
+Since in SIRI ET standard each messages contains all necessary data, Skånetrafikens implementation
+of the
 endpoint returns only the last message
 for each DatedServiceJourney ID (sending multiple messages would be pointless since they will
 override each other).
