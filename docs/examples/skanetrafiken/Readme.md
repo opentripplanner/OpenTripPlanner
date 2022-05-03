@@ -28,85 +28,12 @@ Two different OSM files are used:
 
 #### Sweden
 
-To reduced graph size, only data for southern part of Sweden is used. Script below downloads OSM
-for whole country and then clips out the northern part.
-
-```
-#!/bin/bash
-
-bashdir=$(dirname "$(readlink -f "$0")")
-
-mapHost=http://download.geofabrik.de/europe
-downloadFile=sweden-latest.osm.pbf
-now=$(date +%Y-%m-%dT%H%M%S)
-skanetrafikenFile=skanetrafiken.osm.pbf
-filterFile=skanetrafiken-filtered-$now.osm.pbf
-
-
-if [ -d /tmp/osm-skanetrafiken ]; then
-        echo "Delete existing /tmp/osm-skanetrafiken"
-        rm -rf /tmp/osm-skanetrafiken
-fi
-
-mkdir /tmp/osm-skanetrafiken
-cd /tmp/osm-skanetrafiken
-
-
-echo "Start download"
-wget $mapHost/$downloadFile
-
-echo "Cut skanetrafiken region"
-osmium extract --strategy complete_ways --bbox 11.7807,55.3,17.2162,57.7941 $downloadFile -o $skanetrafikenFile
-
-echo "Filter OSM data"
-osmium tags-filter $skanetrafikenFile w/highway w/public_transport=platform w/railway=platform w/park_ride=yes r/type=restriction -o $filterFile -f pbf,add_metadata=false
-
-mv $filterFile $bashdir
-
-echo "Created filtered OSM for skanetrafiken region ($filterFile)"
-
-rm -rf /tmp/osm-skanetrafiken
-```
+OSM data is downloaded from `http://download.geofabrik.de/europe/sweden-latest.osm.pbf`.
+To reduced graph size, only data for southern part of Sweden is used.
 
 #### Denmark
-
-To reduce graph size, only data for northern part of Denmark is used. Script below downloads OSM
-for whole country and then clips out the southern part.
-
-```
-#!/bin/bash
-
-bashdir=$(dirname "$(readlink -f "$0")")
-
-mapHost=http://download.geofabrik.de/europe
-downloadFile=denmark-latest.osm.pbf
-now=$(date +%Y-%m-%dT%H%M%S)
-denmarkFile=denmark.osm.pbf
-filterFile=denmark-filtered-$now.osm.pbf
-
-if [ -d /tmp/osm-skanetrafiken ]; then
-        echo "Delete existing /tmp/osm-denmark"
-        rm -rf /tmp/osm-denmark
-fi
-
-mkdir /tmp/osm-denmark
-cd /tmp/osm-denmark
-
-echo "Start download"
-wget $mapHost/$downloadFile
-
-echo "Cut skanetrafiken region"
-osmium extract --strategy complete_ways --polygon oresund.json $downloadFile -o $denmarkFile
-
-echo "Filter OSM data"
-osmium tags-filter $denmarkFile w/highway w/public_transport=platform w/railway=platform w/park_ride=yes r/type=restriction -o $filterFile -f pbf,add_metadata=false
-
-mv $filterFile $bashdir
-
-echo "Created filtered OSM for skanetrafiken region ($filterFile)"
-
-rm -rf /tmp/osm-denmark
-```
+OSM data is downloaded from `http://download.geofabrik.de/europe/denmark-latest.osm.pbf`.
+To reduce graph size, only data for northern part of Denmark is used.
 
 ## Realtime
 
