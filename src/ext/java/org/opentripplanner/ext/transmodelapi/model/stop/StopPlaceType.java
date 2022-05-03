@@ -373,22 +373,14 @@ public class StopPlaceType {
       departuresPerLineAndDestinationDisplay > 0 &&
       departuresPerLineAndDestinationDisplay < numberOfDepartures;
 
-    int departuresPerTripPattern = limitOnDestinationDisplay
-      ? departuresPerLineAndDestinationDisplay
-      : numberOfDepartures;
-
     List<StopTimesInPattern> stopTimesInPatterns = routingService.stopTimesForStop(
       stop,
       startTimeSeconds,
       timeRage,
-      departuresPerTripPattern,
+      numberOfDepartures,
       arrivalDeparture,
       includeCancelledTrips
     );
-
-    // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used
-    //           - to limit the result, and using filters after that point may result in
-    //           - loosing valid results.
 
     Stream<StopTimesInPattern> stopTimesStream = stopTimesInPatterns.stream();
 
