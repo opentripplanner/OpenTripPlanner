@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -56,7 +57,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   }
 
   public String toString() {
-    return "StreetTransitLink(" + fromv + " -> " + tov + ")";
+    return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }
 
   public boolean isRoundabout() {

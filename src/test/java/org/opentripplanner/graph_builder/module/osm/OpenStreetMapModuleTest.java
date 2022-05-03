@@ -1,8 +1,13 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import io.micrometer.core.instrument.Metrics;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -10,11 +15,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import junit.framework.TestCase;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -34,28 +39,27 @@ import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
 
-public class TestOpenStreetMapGraphBuilder extends TestCase {
+public class OpenStreetMapModuleTest {
 
   private HashMap<Class<?>, Object> extra;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     extra = new HashMap<>();
   }
 
   @Test
-  public void testGraphBuilder() throws Exception {
+  public void testGraphBuilder() {
     Graph gg = new Graph();
-
-    OpenStreetMapModule loader = new OpenStreetMapModule();
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     File file = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
     );
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
-    loader.setProvider(provider);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
+
+    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     loader.buildGraph(gg, extra);
 
@@ -92,12 +96,12 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
     assertNotNull(e3);
 
     assertTrue(
-      "name of e1 must be like \"Kamiennog\u00F3rska\"; was " + e1.getDefaultName(),
-      e1.getDefaultName().contains("Kamiennog\u00F3rska")
+      e1.getDefaultName().contains("Kamiennog\u00F3rska"),
+      "name of e1 must be like \"Kamiennog\u00F3rska\"; was " + e1.getDefaultName()
     );
     assertTrue(
-      "name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getDefaultName(),
-      e2.getDefaultName().contains("Mariana Smoluchowskiego")
+      e2.getDefaultName().contains("Mariana Smoluchowskiego"),
+      "name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getDefaultName()
     );
   }
 
@@ -108,18 +112,15 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
   public void testBuildGraphDetailed() throws Exception {
     Graph gg = new Graph();
 
-    OpenStreetMapModule loader = new OpenStreetMapModule();
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-
     File file = new File(
       URLDecoder.decode(
         getClass().getResource("NYC_small.osm.pbf").getFile(),
         StandardCharsets.UTF_8
       )
     );
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
-
-    loader.setProvider(provider);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
+    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     loader.buildGraph(gg, extra);
 
@@ -285,12 +286,8 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
    *
    * @param skipVisibility if true visibility calculations are skipped
    */
-  private void testBuildingAreas(boolean skipVisibility) throws UnsupportedEncodingException {
+  private void testBuildingAreas(boolean skipVisibility) {
     Graph graph = new Graph();
-
-    OpenStreetMapModule loader = new OpenStreetMapModule();
-    loader.skipVisibility = skipVisibility;
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     File file = new File(
       URLDecoder.decode(
@@ -298,9 +295,11 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         StandardCharsets.UTF_8
       )
     );
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    loader.setProvider(provider);
+    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    loader.skipVisibility = skipVisibility;
+    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     loader.buildGraph(graph, extra);
     graph.getStreetIndex();

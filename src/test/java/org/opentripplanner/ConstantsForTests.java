@@ -30,7 +30,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
@@ -92,6 +92,8 @@ public class ConstantsForTests {
     "src/test/resources/germany/herrenberg-barrier-gates.osm.pbf";
   public static final String HERRENBERG_OSM =
     "src/test/resources/germany/herrenberg-minimal.osm.pbf";
+  public static final String STUTTGART_SCHWABSTR_OSM =
+    "src/test/resources/germany/stuttgart-schwabstrasse.osm.pbf";
   public static final String ISLAND_PRUNE_OSM =
     "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
 
@@ -129,8 +131,8 @@ public class ConstantsForTests {
       // Add street data from OSM
       {
         File osmFile = new File(PORTLAND_CENTRAL_OSM);
-        BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = new OpenStreetMapModule(List.of(osmProvider));
+        OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
+        OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProvider);
         osmModule.staticBikeParkAndRide = true;
         osmModule.staticParkAndRide = true;
         osmModule.skipVisibility = true;
@@ -170,8 +172,8 @@ public class ConstantsForTests {
       var graph = new Graph();
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
+      OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
+      OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProvider);
       osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
       osmModule.skipVisibility = true;
       osmModule.buildGraph(graph, new HashMap<>());
@@ -209,8 +211,8 @@ public class ConstantsForTests {
       {
         File osmFile = new File(OSLO_EAST_OSM);
 
-        BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
+        OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
+        OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProvider);
         osmModule.skipVisibility = true;
         osmModule.buildGraph(graph, new HashMap<>());
       }

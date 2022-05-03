@@ -11,7 +11,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
@@ -68,10 +68,8 @@ public class PruneNoThruIslandsTest {
       var graph = new Graph();
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = new OpenStreetMapModule(
-        com.google.common.collect.Lists.newArrayList(osmProvider)
-      );
+      OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
+      OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProvider);
       osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
       osmModule.customNamer =
         new CustomNamer() {

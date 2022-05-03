@@ -13,7 +13,7 @@ import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -30,12 +30,11 @@ public class FakeGraph {
   public static Graph buildGraphNoTransit() throws URISyntaxException {
     Graph gg = new Graph();
 
-    OpenStreetMapModule loader = new OpenStreetMapModule();
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-
     File file = getFileForResource("columbus.osm.pbf");
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
-    loader.setProvider(provider);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
+
+    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     loader.buildGraph(gg, new HashMap<>());
     return gg;

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class OSMWithTagsTest {
@@ -108,5 +110,58 @@ public class OSMWithTagsTest {
 
     o.addTag("access", "no");
     assertTrue(o.isGeneralAccessDenied());
+  }
+
+  @Test
+  public void getReferenceTags() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref", "A");
+
+    assertEquals(Set.of("A"), osm.getMultiTagValues(Set.of("ref", "test")));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("test")));
+  }
+
+  @Test
+  public void getEmptyRefList() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref", "A");
+
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of()));
+  }
+
+  @Test
+  public void ignoreRefCase() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref:IFOPT", "A");
+
+    assertEquals(Set.of("A"), osm.getMultiTagValues(Set.of("ref:ifopt")));
+  }
+
+  @Test
+  public void readSemicolonSeparated() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref:A", "A;A;B");
+
+    assertEquals(Set.of("A", "B"), osm.getMultiTagValues(Set.of("ref:A")));
+  }
+
+  @Test
+  public void removeBlankRef() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref1", " ");
+    osm.addTag("ref2", "");
+
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref1")));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref2")));
+  }
+
+  @Test
+  public void shouldNotReturnNull() {
+    var osm = new OSMWithTags();
+    osm.addTag("ref1", " ");
+    osm.addTag("ref2", "");
+
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of()));
+    assertEquals(Set.of(), osm.getMultiTagValues(Set.of("ref3")));
   }
 }
