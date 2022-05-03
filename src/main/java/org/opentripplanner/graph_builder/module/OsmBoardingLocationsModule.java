@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
@@ -18,11 +17,11 @@ import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.LocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,7 +136,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       from,
       to,
       line,
-      from.getName(),
+      new LocalizedString("name.platform"),
       SphericalDistanceLibrary.length(line),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       false
