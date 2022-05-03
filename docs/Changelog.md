@@ -47,6 +47,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Upgrade siri-protobuf-mapper [#4121](https://github.com/opentripplanner/OpenTripPlanner/pull/4121)
 - Use board/aligh cost only for transits [#4079](https://github.com/opentripplanner/OpenTripPlanner/pull/4079)
 - Improve SIRI realtime performance by reducing stopPattern duplicates [#4038](https://github.com/opentripplanner/OpenTripPlanner/pull/4038)
+- Improve stop linking by taking OSM platform polygons into account [#4116](https://github.com/opentripplanner/OpenTripPlanner/pull/4116)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
