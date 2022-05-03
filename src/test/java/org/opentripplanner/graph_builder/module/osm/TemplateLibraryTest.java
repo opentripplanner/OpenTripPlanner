@@ -1,15 +1,20 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.util.HashMap;
 import java.util.Map;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
  * @author laurent
  */
-public class TestTemplateLibrary extends TestCase {
+public class TemplateLibraryTest {
 
+  @Test
   public void testTemplate() {
     OSMWithTags osmTags = new OSMWithTags();
     osmTags.addTag("note", "Note EN");

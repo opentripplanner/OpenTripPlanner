@@ -9,7 +9,7 @@ import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -110,7 +110,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     if (wheelchairAccessibility.enabled()) {
       if (
         wheelchairAccessibility.trips().onlyConsiderAccessible() &&
-        trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE
+        trip.getWheelchairBoarding() != WheelchairBoarding.POSSIBLE
       ) {
         return false;
       }

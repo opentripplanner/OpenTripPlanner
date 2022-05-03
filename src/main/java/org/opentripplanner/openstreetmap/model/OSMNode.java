@@ -43,23 +43,6 @@ public class OSMNode extends OSMWithTags {
   }
 
   /**
-   * Is this a public transport stop that can be linked to a transit stop vertex later on.
-   *
-   * @return whether the node is a transit stop
-   * @author hannesj
-   */
-  public boolean isStop() {
-    return (
-      "bus_stop".equals(getTag("highway")) ||
-      "tram_stop".equals(getTag("railway")) ||
-      "station".equals(getTag("railway")) ||
-      "halt".equals(getTag("railway")) ||
-      "bus_station".equals(getTag("amenity")) ||
-      "platform".equals(getTag("public_transport"))
-    );
-  }
-
-  /**
    * Checks if this node is bollard
    *
    * @return true if it is

@@ -57,7 +57,7 @@ public class DefaultRoutingRequestType {
             "Use filters to limit what is presented to the client."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.maxDirectStreetDurationSeconds)
+          .dataFetcher(env -> request.maxDirectStreetDuration.toSeconds())
           .build()
       )
       .field(

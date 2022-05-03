@@ -115,26 +115,33 @@ public class RoutingRequest implements Cloneable, Serializable {
   public List<GenericLocation> intermediatePlaces;
 
   /**
-   * This is the maximum duration in seconds for a direct street search. This is a performance limit
-   * and should therefore be set high. Results close to the limit are not guaranteed to be optimal.
+   * This is the maximum duration for a direct street search. This is a performance limit and should
+   * therefore be set high. Results close to the limit are not guaranteed to be optimal.
    * Use filters to limit what is presented to the client.
    *
    * @see ItineraryListFilter
    */
-  public double maxDirectStreetDurationSeconds = Duration.ofHours(4).toSeconds();
+  public Duration maxDirectStreetDuration = Duration.ofHours(4);
+
   /**
-   * This is the maximum duration in seconds for access/egress street searches. This is a
-   * performance limit and should therefore be set high. Results close to the limit are not
-   * guaranteed to be optimal. Use filters to limit what is presented to the client.
+   * Override the settings in maxDirectStreetDuration for specific street modes. This is done
+   * because some street modes searches are much more resource intensive than others.
+   */
+  public Map<StreetMode, Duration> maxDirectStreetDurationForMode = new HashMap<>();
+
+  /**
+   * This is the maximum duration for access/egress street searches. This is a performance limit and
+   * should therefore be set high. Results close to the limit are not guaranteed to be optimal.
+   * Use filters to limit what is presented to the client.
    *
    * @see ItineraryListFilter
    */
-  public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
+  public Duration maxAccessEgressDuration = Duration.ofMinutes(45);
   /**
-   * Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done
+   * Override the settings in maxAccessEgressDuration for specific street modes. This is done
    * because some street modes searches are much more resource intensive than others.
    */
-  public Map<StreetMode, Double> maxAccessEgressDurationSecondsForMode = new HashMap<>();
+  public Map<StreetMode, Duration> maxAccessEgressDurationForMode = new HashMap<>();
   /**
    * The access/egress/direct/transit modes allowed for this main request. The parameter
    * "streetSubRequestModes" below is used for a single A Star sub request.
@@ -1260,11 +1267,11 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   public Duration getMaxAccessEgressDuration(StreetMode mode) {
-    Double seconds = maxAccessEgressDurationSecondsForMode.getOrDefault(
-      mode,
-      maxAccessEgressDurationSeconds
-    );
-    return Duration.ofSeconds(seconds.longValue());
+    return maxAccessEgressDurationForMode.getOrDefault(mode, maxAccessEgressDuration);
+  }
+
+  public Duration getMaxDirectStreetDuration(StreetMode mode) {
+    return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
   }
 
   /** Check if route is preferred according to this request. */

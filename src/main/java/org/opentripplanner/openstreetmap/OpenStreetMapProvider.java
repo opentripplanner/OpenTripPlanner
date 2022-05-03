@@ -18,27 +18,27 @@ import org.slf4j.LoggerFactory;
  * Parser for the OpenStreetMap PBF format. Parses files in three passes: First the relations, then
  * the ways, then the nodes are also loaded.
  */
-public class BinaryOpenStreetMapProvider {
+public class OpenStreetMapProvider {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BinaryOpenStreetMapProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OpenStreetMapProvider.class);
 
   private final DataSource source;
   private final boolean cacheDataInMem;
   private byte[] cachedBytes = null;
 
   /** For tests */
-  public BinaryOpenStreetMapProvider(File file, boolean cacheDataInMem) {
+  public OpenStreetMapProvider(File file, boolean cacheDataInMem) {
     this(new FileDataSource(file, FileType.OSM), cacheDataInMem);
   }
 
-  public BinaryOpenStreetMapProvider(DataSource source, boolean cacheDataInMem) {
+  public OpenStreetMapProvider(DataSource source, boolean cacheDataInMem) {
     this.source = source;
     this.cacheDataInMem = cacheDataInMem;
   }
 
   public void readOSM(OSMDatabase osmdb) {
     try {
-      BinaryOpenStreetMapParser parser = new BinaryOpenStreetMapParser(osmdb);
+      OpenStreetMapParser parser = new OpenStreetMapParser(osmdb);
 
       parsePhase(parser, OsmParserPhase.Relations);
       osmdb.doneFirstPhaseRelations();
@@ -59,7 +59,6 @@ public class BinaryOpenStreetMapProvider {
       .toStringHelper(this)
       .add("source", source)
       .add("cacheDataInMem", cacheDataInMem)
-      .add("cachedBytes", cachedBytes)
       .toString();
   }
 
@@ -76,8 +75,7 @@ public class BinaryOpenStreetMapProvider {
     return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, m -> LOG.info(m));
   }
 
-  private void parsePhase(BinaryOpenStreetMapParser parser, OsmParserPhase phase)
-    throws IOException {
+  private void parsePhase(OpenStreetMapParser parser, OsmParserPhase phase) throws IOException {
     parser.setPhase(phase);
     BlockInputStream in = null;
     try {

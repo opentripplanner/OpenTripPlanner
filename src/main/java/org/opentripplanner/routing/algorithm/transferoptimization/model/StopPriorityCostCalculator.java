@@ -6,15 +6,15 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
  */
 public class StopPriorityCostCalculator {
 
-  private final int[] stopVisitCost;
-  private final double extraStopVisitCostFactor;
+  private final int[] stopTransferCost;
+  private final double extraStopTransferCostFactor;
 
-  StopPriorityCostCalculator(double extraStopVisitCostFactor, int[] stopVisitCost) {
-    this.stopVisitCost = stopVisitCost;
-    this.extraStopVisitCostFactor = extraStopVisitCostFactor;
+  StopPriorityCostCalculator(double extraStopTransferCostFactor, int[] stopTransferCost) {
+    this.stopTransferCost = stopTransferCost;
+    this.extraStopTransferCostFactor = extraStopTransferCostFactor;
   }
 
   int extraStopPriorityCost(int stop) {
-    return (int) Math.round((double) stopVisitCost[stop] * extraStopVisitCostFactor);
+    return (int) Math.round((double) stopTransferCost[stop] * extraStopTransferCostFactor);
   }
 }

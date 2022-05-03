@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
@@ -56,7 +56,7 @@ public class TripPatternForDates
    */
   private final int[] departureTimes;
 
-  private final WheelChairBoarding[] wheelchairBoardings;
+  private final WheelchairBoarding[] wheelchairBoardings;
 
   // bit arrays with boarding/alighting information for all stops on trip pattern
   private final BitSet boardingPossible;
@@ -87,7 +87,7 @@ public class TripPatternForDates
     this.numberOfTripSchedules = numberOfTripSchedules;
     this.isFrequencyBased = hasFrequencies;
 
-    wheelchairBoardings = new WheelChairBoarding[numberOfTripSchedules];
+    wheelchairBoardings = new WheelchairBoarding[numberOfTripSchedules];
 
     final int nStops = tripPattern.getStopIndexes().length;
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
@@ -263,7 +263,7 @@ public class TripPatternForDates
       .toString();
   }
 
-  public WheelChairBoarding wheelchairBoardingForTrip(int index) {
+  public WheelchairBoarding wheelchairBoardingForTrip(int index) {
     return wheelchairBoardings[index];
   }
 }

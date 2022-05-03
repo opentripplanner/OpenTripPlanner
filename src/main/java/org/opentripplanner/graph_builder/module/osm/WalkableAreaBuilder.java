@@ -397,7 +397,7 @@ public class WalkableAreaBuilder {
         .getAreasForNode(node.getId())
         .stream()
         .allMatch(osmWay -> osmWayIds.contains(osmWay.getId())) ||
-      node.isStop()
+      node.isBoardingLocation()
     );
   }
 

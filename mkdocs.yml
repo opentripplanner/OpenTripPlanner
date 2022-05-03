@@ -4,7 +4,7 @@
 # at opentripplanner.readthedocs.org
 
 site_name: OpenTripPlanner 2
-site_url: http://docs.opentripplanner.org
+site_url: https://docs.opentripplanner.org
 repo_url: https://github.com/opentripplanner/OpenTripPlanner
 docs_dir: docs
 site_dir: target/mkdocs
@@ -29,6 +29,7 @@ pages:
     - Configuration:
         - Introduction: 'Configuration.md'
         - Build: 'BuildConfiguration.md'
+        - "Boarding locations": 'BoardingLocations.md'
         - Router: 'RouterConfiguration.md'
         - Accessibility: 'Accessibility.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
@@ -60,3 +61,4 @@ pages:
     - Data Overlay: 'sandbox/DataOverlay.md'
     - Vehicle Parking Updaters: 'sandbox/VehicleParking.md'
     - Vehicle-to-stop Heuristics: 'sandbox/VehicleToStopHeuristics.md'
+    - Geocoder API: 'sandbox/GeocoderAPI.md'

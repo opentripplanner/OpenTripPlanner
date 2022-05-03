@@ -68,9 +68,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     );
 
     var trip = getFlexTrip();
-    System.out.println(
-      trip.getStops().stream().map(s -> s.getId().getId()).collect(Collectors.toList())
-    );
     var stop = trip
       .getStops()
       .stream()
