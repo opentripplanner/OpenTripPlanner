@@ -78,7 +78,7 @@ public class FlexibleTransitLeg implements Leg {
 
   @Override
   public TraverseMode getMode() {
-    return TraverseMode.fromTransitMode(getTrip().getRoute().getMode());
+    return TraverseMode.fromTransitMode(getTrip().getMode());
   }
 
   @Override
