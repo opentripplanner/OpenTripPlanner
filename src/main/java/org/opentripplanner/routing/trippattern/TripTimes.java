@@ -349,7 +349,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   public boolean timesIncreasing() {
     final int nStops = scheduledArrivalTimes.length;
-    int prevDep = Integer.MIN_VALUE;
+    int prevDep = Integer.MIN_VALUE + 5; // +5 to protect against number underflow
     for (int s = 0; s < nStops; s++) {
       final int arr = getArrivalTime(s);
       final int dep = getDepartureTime(s);
