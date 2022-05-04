@@ -1,20 +1,18 @@
 package org.opentripplanner.routing.trippattern;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.LinkedList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class TripTimesTest {
 
@@ -105,16 +103,16 @@ public class TripTimesTest {
   }
 
   @Test
-    public void testNonIncreasingUpdateCrossingMidnight() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+  public void testNonIncreasingUpdateCrossingMidnight() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
-        updatedTripTimesA.updateDepartureTime(0, 50);
+    updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
+    updatedTripTimesA.updateDepartureTime(0, 50);
 
-        assertTrue(updatedTripTimesA.timesIncreasing());
-    }
+    assertTrue(updatedTripTimesA.timesIncreasing());
+  }
 
-    @Test
+  @Test
   public void testDelay() {
     TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
     updatedTripTimesA.updateDepartureDelay(0, 10);
