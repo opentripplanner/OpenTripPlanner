@@ -30,7 +30,7 @@ class StationMapper {
       Map<String, String> translations = new HashMap<>();
       translations.put(null, stopPlace.getName().getValue());
       for (var translation : stopPlace.getAlternativeNames().getAlternativeName()) {
-        if (translation.getNameType().equals(NameTypeEnumeration.TRANSLATION)) {
+        if (translation.getNameType() == NameTypeEnumeration.TRANSLATION) {
           String lang = translation.getLang() != null
             ? translation.getLang()
             : translation.getName().getLang();
