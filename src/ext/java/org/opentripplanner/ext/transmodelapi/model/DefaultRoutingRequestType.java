@@ -57,7 +57,7 @@ public class DefaultRoutingRequestType {
             "Use filters to limit what is presented to the client."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.maxDirectStreetDurationSeconds)
+          .dataFetcher(env -> request.maxDirectStreetDuration.toSeconds())
           .build()
       )
       .field(
@@ -66,7 +66,7 @@ public class DefaultRoutingRequestType {
           .name("wheelChairAccessible")
           .description("Whether the trip must be wheelchair accessible.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.wheelchairAccessible)
+          .dataFetcher(env -> request.wheelchairAccessibility.enabled())
           .build()
       )
       .field(

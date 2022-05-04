@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>22</otp.serialization.version.id>
+        <otp.serialization.version.id>23</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>26.2</geotools.version>
         <jackson.version>2.13.2</jackson.version>
@@ -232,7 +232,7 @@
                         --add-opens java.xml/org.xml.sax.helpers=ALL-UNNAMED
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
-                    <disableXmlReport>false</disableXmlReport>
+                    <disableXmlReport>true</disableXmlReport>
                     <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
@@ -240,7 +240,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.8</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -551,7 +551,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>siri-protobuf-mapper</artifactId>
-            <version>0.6</version>
+            <version>0.8</version>
         </dependency>
 
         <dependency>

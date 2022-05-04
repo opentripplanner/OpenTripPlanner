@@ -1,5 +1,8 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
+
+import java.time.Duration;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -69,8 +72,8 @@ public class RoutingRequestMapper {
     request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
     request.boardSlackForMode =
       c.asEnumMap("boardSlackForMode", TransitMode.class, NodeAdapter::asInt);
-    request.maxAccessEgressDurationSecondsForMode =
-      c.asEnumMap("maxAccessEgressDurationSecondsForMode", StreetMode.class, NodeAdapter::asDouble);
+    request.maxAccessEgressDurationForMode =
+      c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
     request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
     request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
@@ -91,8 +94,10 @@ public class RoutingRequestMapper {
     request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
     request.locale = c.asLocale("locale", dft.locale);
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
-    request.maxDirectStreetDurationSeconds =
-      c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
+    request.maxDirectStreetDuration =
+      c.asDuration("maxDirectStreetDuration", dft.maxDirectStreetDuration);
+    request.maxDirectStreetDurationForMode =
+      c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
     request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
     request.wheelchairSlopeTooSteepCostFactor =
@@ -138,7 +143,8 @@ public class RoutingRequestMapper {
     request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
     request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
     request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
-    request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
+
+    request.wheelchairAccessibility = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
 
     mapTransferOptimization(
       (TransferOptimizationRequest) request.transferOptimization,

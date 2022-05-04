@@ -178,7 +178,7 @@ public class AlertsUpdateHandler {
   }
 
   /**
-   * Convert a GTFS-RT Protobuf TranslatedString to a OTP TranslatedString or NonLocalizedString.
+   * Convert a GTFS-RT Protobuf TranslatedString to an TranslatedString.
    *
    * @return An OTP TranslatedString containing the same information as the input GTFS-RT Protobuf
    * TranslatedString.
@@ -190,6 +190,6 @@ public class AlertsUpdateHandler {
       String string = translation.getText();
       translations.put(language, string);
     }
-    return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
+    return translations.isEmpty() ? null : TranslatedString.getI18NString(translations, true, true);
   }
 }

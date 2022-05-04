@@ -30,7 +30,7 @@ public class NoteProperties {
     if (patternMatcher.matcher(notePattern).matches()) {
       //This gets language -> translation of notePattern and all tags (which can have translations name:en for example)
       Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
-      text = TranslatedString.getI18NString(noteText);
+      text = TranslatedString.getI18NString(noteText, true, false);
     } else {
       text = new LocalizedString(notePattern, way);
     }

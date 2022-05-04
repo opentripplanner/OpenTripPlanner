@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -28,18 +28,17 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
  *
  * @author abyrd
  */
-public class TestUnroutable {
+public class UnroutableTest {
 
   private final Graph graph = new Graph();
 
   @BeforeEach
   public void setUp() throws Exception {
-    OpenStreetMapModule osmBuilder = new OpenStreetMapModule();
-    osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(osmDataFile, true);
-    osmBuilder.setProvider(provider);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(osmDataFile, true);
+    OpenStreetMapModule osmBuilder = new OpenStreetMapModule(provider);
+    osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     HashMap<Class<?>, Object> extra = Maps.newHashMap();
     osmBuilder.buildGraph(graph, extra); // TODO get rid of this "extra" thing
   }

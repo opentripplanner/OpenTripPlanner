@@ -112,6 +112,7 @@ filter debugging.
 | `bikeRentalDistanceRatio`                   | For routes that consist only of bike rental and walking what is the minimum fraction of _distance_ of the bike rental leg. This filters out results that consist of a long walk plus a relatively short bike rental leg. A value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order for the result to be included.                                                                                                                                                                                                                                      | double          | `0.0`           |
 | `parkAndRideDurationRatio`                  | For P+R routes that consist only of driving and walking what is the minimum fraction of _time_ of the driving leg. This filters out results that consist of driving plus a very long walk leg at the end. A value of `0.3` means that a minimum of 30% of the total time must be spent in the car in order for the result to be included. However, if there is only a single result, it is never filtered.                                                                                                                                                                                         | double          | `0.0`           |
 | `filterItinerariesWithSameFirstOrLastTrip`  | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains. Trips are considered equal if they have same id and same service day. Non-transit legs are skipped during comparison. Before filtering, trips are sorted by their generalized cost. Algorithm loops through list from top to bottom. If itinerary matches from any other itinerary from above, it is removed from list.                                                                                                                                                    | boolean         | `false`         |
+| `accessibilityScore`                        | A experimental feature contributed by IBI which adds an accessibility "score" between 0 and 1 for each leg and itinerary. This can be used by by frontend developers to implement a simple traffic light UI.                                                                                                                                                                                                                                                                                                                                                                                       | boolean         | `false`         | 
 
 #### Group by similarity filters
 
@@ -185,20 +186,35 @@ search-window. To set the street routing timeout use the following config:
 This specifies a timeout in (optionally fractional) seconds. The search abort after this many
 seconds and any paths found are returned to the client.
 
-## maxAccessEgressDurationSecondsForMode
+## maxAccessEgressDurationForMode
 
-Override the settings in maxAccessEgressDurationSeconds for specific street modes. This is done
-because some street modes searches are much more resource intensive than others.
+Override the settings in maxAccessEgressDuration for specific street modes. This is done because 
+some street modes searches are much more resource intensive than others.
 
 ```JSON
 // router-config.json
-"maxAccessEgressDurationSecondsForMode": {
-  "BIKE_RENTAL": 1200
+"maxAccessEgressDurationForMode": {
+  "BIKE_RENTAL": "20m"
 }
 ```
 
 This will limit only the BIKE_RENTAL mode to 1200 seconds, while keeping the default limit for all
 other access/egress modes.
+
+## maxDirectStreetDurationForMode
+
+Override the settings in maxDirectStreetDurationForMode for specific street modes. This is done 
+because some street modes searches are much more resource intensive than others.
+
+```JSON
+// router-config.json
+"maxDirectStreetDurationForMode": {
+  "CAR": "12h"
+}
+```
+
+This will limit extend the CAR mode to 12 hours, while keeping the default limit for all other 
+direct street modes.
 
 ## Logging incoming requests
 

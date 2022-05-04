@@ -17,7 +17,7 @@ import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.util.NonLocalizedString;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
@@ -162,7 +162,7 @@ public class FlexStopLocationMapperTest {
       id,
       null,
       WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-      WheelChairBoarding.NO_INFORMATION,
+      WheelchairBoarding.NO_INFORMATION,
       null,
       null,
       null,

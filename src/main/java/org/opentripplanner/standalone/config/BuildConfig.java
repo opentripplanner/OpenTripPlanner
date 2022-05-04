@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
@@ -312,6 +313,7 @@ public class BuildConfig {
    * @see Period#parse(CharSequence) for period format accepted.
    */
   public LocalDate transitServiceEnd;
+  public final Set<String> boardingLocationTags;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -364,6 +366,7 @@ public class BuildConfig {
     writeCachedElevations = c.asBoolean("writeCachedElevations", false);
     maxAreaNodes = c.asInt("maxAreaNodes", 500);
     maxElevationPropagationMeters = c.asInt("maxElevationPropagationMeters", 2000);
+    boardingLocationTags = c.asTextSet("boardingLocationTags", Set.of("ref"));
 
     // List of complex parameters
     fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));

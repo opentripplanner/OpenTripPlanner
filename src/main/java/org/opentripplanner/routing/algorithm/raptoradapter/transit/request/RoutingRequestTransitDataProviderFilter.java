@@ -9,12 +9,13 @@ import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -22,7 +23,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean requireBikesAllowed;
 
-  private final boolean requireWheelchairAccessible;
+  private final WheelchairAccessibilityRequest wheelchairAccessibility;
 
   private final boolean includePlannedCancellations;
 
@@ -34,14 +35,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
     boolean requireBikesAllowed,
-    boolean requireWheelchairAccessible,
+    WheelchairAccessibilityRequest accessibility,
     boolean includePlannedCancellations,
     Set<AllowedTransitMode> allowedTransitModes,
     Set<FeedScopedId> bannedRoutes,
     Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
-    this.requireWheelchairAccessible = requireWheelchairAccessible;
+    this.wheelchairAccessibility = accessibility;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
@@ -70,7 +71,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   public RoutingRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {
     this(
       request.modes.transferMode == StreetMode.BIKE,
-      request.wheelchairAccessible,
+      request.wheelchairAccessibility,
       request.includePlannedCancellations,
       request.modes.transitModes,
       request.getBannedRoutes(graphIndex.getAllRoutes()),
@@ -106,10 +107,13 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (
-      requireWheelchairAccessible && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE
-    ) {
-      return false;
+    if (wheelchairAccessibility.enabled()) {
+      if (
+        wheelchairAccessibility.trips().onlyConsiderAccessible() &&
+        trip.getWheelchairBoarding() != WheelchairBoarding.POSSIBLE
+      ) {
+        return false;
+      }
     }
 
     //noinspection RedundantIfStatement
@@ -125,16 +129,19 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     TripPatternWithRaptorStopIndexes tripPattern,
     BitSet boardingPossible
   ) {
-    // Currently the function only checks wheelchair accessibility if requested, if not just return default (input) values
-    if (!requireWheelchairAccessible) {
-      return boardingPossible;
+    // if the user wants wheelchair-accessible routes and the configuration requires us to only
+    // consider those stops which have the correct accessibility values then use only this for
+    // checking whether to board/alight
+    if (
+      wheelchairAccessibility.enabled() && wheelchairAccessibility.stops().onlyConsiderAccessible()
+    ) {
+      var copy = (BitSet) boardingPossible.clone();
+      // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
+      copy.and(tripPattern.getWheelchairAccessible());
+
+      return copy;
     }
-
-    var copy = (BitSet) boardingPossible.clone();
-    // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
-    copy.and(tripPattern.getWheelchairAccessible());
-
-    return copy;
+    return boardingPossible;
   }
 
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
