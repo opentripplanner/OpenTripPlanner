@@ -67,6 +67,8 @@ public class GraphPathFinder {
 
     AStarBuilder aStar = AStarBuilder
       .oneToOneMaxDuration(options.getMaxDirectStreetDuration(options.modes.directMode))
+      // FORCING the dominance function to weight only
+      .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
       .setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
 
@@ -75,7 +77,6 @@ public class GraphPathFinder {
       aStar.setTraverseVisitor(router.graphVisualizer.traverseVisitor);
     }
 
-    options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
     LOG.debug("rreq={}", options);
 
     long searchBeginTime = System.currentTimeMillis();

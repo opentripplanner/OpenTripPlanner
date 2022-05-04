@@ -52,10 +52,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return null;
   }
 
-  public Trip getTrip() {
-    return null;
-  }
-
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }

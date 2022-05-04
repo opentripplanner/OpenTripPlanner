@@ -13,6 +13,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.time.DateUtils;
@@ -50,8 +51,9 @@ public class AStar {
     TraverseVisitor traverseVisitor,
     RoutingContext rctx,
     SearchTerminationStrategy terminationStrategy,
+    DominanceFunction dominanceFunction,
     Duration timeout,
-    Edge originBackEdge
+    Collection<State> initialStates
   ) {
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
@@ -61,7 +63,7 @@ public class AStar {
     this.timeout = timeout;
 
     this.rctx = rctx;
-    this.spt = rctx.opt.getNewShortestPathTree();
+    this.spt = new ShortestPathTree(dominanceFunction);
     this.heuristic.initialize(rctx);
 
     // Priority Queue.
@@ -74,12 +76,9 @@ public class AStar {
     this.nVisited = 0;
     this.targetAcceptedStates = Lists.newArrayList();
 
-    for (State initialState : State.getInitialStates(rctx)) {
-      if (originBackEdge != null) {
-        initialState.backEdge = originBackEdge;
-      }
+    for (State initialState : initialStates) {
       spt.add(initialState);
-      pq.insert(initialState, 0);
+      pq.insert(initialState, initialState.weight);
     }
   }
 
@@ -191,10 +190,10 @@ public class AStar {
        */
       if (timeout != null && System.currentTimeMillis() > abortTime) {
         LOG.warn("Search timeout. origin={} target={}", rctx.fromVertices, rctx.toVertices);
-        // Rather than returning null to indicate that the search was aborted/timed out,
-        // we instead set a flag in the routing context and return the SPT anyway. This
-        // allows returning a partial list results even when a timeout occurs.
-        rctx.aborted = true; // signal search cancellation up to higher stack frames
+        // Rather than returning null to indicate that the search was aborted/timed out, we instead
+        // set a flag in the SPT and return it anyway. This allows returning a partial list results
+        // even when a timeout occurs.
+        spt.setAborted();
 
         break;
       }
