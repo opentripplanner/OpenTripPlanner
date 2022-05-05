@@ -118,11 +118,10 @@ public interface RaptorTripSchedule {
 
   /**
    * Find all departure-stop-positions for a stop index after given earliest-departure-time. This is
-   * useful because trip can pass through the same stop more than once.
-   * This is basically on upgraded version of {@link #findDepartureStopPosition} that does not return
-   * only first stop position but all of them.
-   * @param earliestDepartureTime earliest departure time
-   * @param stop stop index
+   * useful because trip can pass through the same stop more than once - if the stop pattern is circular.
+   * This method returns all stop positions, while the {@link #findDepartureStopPosition} only returns the first 
+   * stop-position found.
+   *
    * @return list of all valid stop positions for a given stop index
    */
   default List<Integer> findStopPositionsForStopIndex(int earliestDepartureTime, int stop) {
