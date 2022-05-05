@@ -286,11 +286,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     if (!toTrip.pattern().boardingPossibleAt(stopPosition)) {
       return false;
     }
-    // Check whether this transfer is allowed
-    else if (tx != null && tx.getTransferConstraint().isNotAllowed()) {
-      return false;
-    } else {
-      return true;
+    // Transfer is allowed if no constrained transfer exist
+    if (tx == null) {
+      return true;    
     }
+    return !tx.getTransferConstraint().isNotAllowed();
   }
 }
