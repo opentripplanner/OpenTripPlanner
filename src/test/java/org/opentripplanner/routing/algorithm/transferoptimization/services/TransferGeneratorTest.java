@@ -348,9 +348,10 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // tight since 8 minutes slack + 1 min transfer time but still less than the 10 minutes required
     Arguments.of(ofMinutes(1), ofMinutes(8), true),
     // transfer slack is ignored since minimumTransferTime is short
-    Arguments.of(ofMinutes(1), ofMinutes(10), true),
-    Arguments.of(ofMinutes(11), ofMinutes(1), false),
-    Arguments.of(ofMinutes(9), ofMinutes(9), true)
+    Arguments.of(ofMinutes(1), ofMinutes(9), true),
+    Arguments.of(ofMinutes(11), ofMinutes(0), false),
+    Arguments.of(ofMinutes(9), ofMinutes(1), true),
+    Arguments.of(ofMinutes(0), ofMinutes(11), false)
   );
 
   @ParameterizedTest(
@@ -379,29 +380,18 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // The only possible place to transfer between A and C is stop B (no extra transfers):
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_C);
 
-    RaptorSlackProvider slackProvider = new RaptorSlackProvider() {
-      @Override
-      public int transferSlack() {
-        return (int) transferSlack.toSeconds();
-      }
-
-      @Override
-      public int boardSlack(int slackIndex) {
-        return 0;
-      }
-
-      @Override
-      public int alightSlack(int slackIndex) {
-        return 0;
-      }
-    };
+    RaptorSlackProvider slackProvider = RaptorSlackProvider.defaultSlackProvider(
+      (int) transferSlack.toSeconds(),
+      0,
+      0
+    );
 
     var subject = new TransferGenerator<>(TS_ADAPTOR, slackProvider, data);
 
     if (expectTransfer) {
       var result = subject.findAllPossibleTransfers(transitLegs);
       assertEquals(
-        "[[" + "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}" + "]]",
+        "[[TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}]]",
         result.toString()
       );
     } else {

@@ -34,6 +34,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.util.OTPFeature;
 
@@ -52,7 +53,7 @@ public class ConstrainedBoardingSearchTest {
     .create()
     .minTransferTime(600)
     .build();
-  private static final TransferConstraint MIN_TRANSFER_TIME_0MIN_CONSTRAINT = TransferConstraint
+  private static final TransferConstraint MIN_TRANSFER_TIME_0_MIN_CONSTRAINT = TransferConstraint
     .create()
     .minTransferTime(0)
     .build();
@@ -67,7 +68,9 @@ public class ConstrainedBoardingSearchTest {
    * 2 minutes alight slack is used in this test, no slack provider is involved - but the test pass
    * in times to the search with slack added.
    */
-  private static final int ALIGHT_SLACK = 120;
+  private static final int ALIGHT_BOARD_SLACK = 120;
+
+  private static final int TRANSFER_SLACK = 0;
 
   private TestRouteData route1;
   private TestRouteData route2;
@@ -320,7 +323,7 @@ public class ConstrainedBoardingSearchTest {
       ID,
       STOP_B_TX_POINT,
       STOP_B_TX_POINT,
-      MIN_TRANSFER_TIME_0MIN_CONSTRAINT
+      MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
     );
 
     testTransferSearch(
@@ -328,7 +331,7 @@ public class ConstrainedBoardingSearchTest {
       List.of(txMinTransferTime),
       TRIP_1_INDEX,
       TRIP_2_INDEX,
-      MIN_TRANSFER_TIME_0MIN_CONSTRAINT
+      MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
     );
     OTPFeature.enableFeatures(Map.of(OTPFeature.MinimumTransferTimeIsDefinitive, false));
   }
@@ -362,10 +365,11 @@ public class ConstrainedBoardingSearchTest {
 
     var boarding = subject.find(
       route2.getTimetable(),
+      TRANSFER_SLACK,
       route1.lastTrip().getTripSchedule(),
       stopIndex,
       sourceArrivalTime,
-      sourceArrivalTime + ALIGHT_SLACK
+      sourceArrivalTime + ALIGHT_BOARD_SLACK
     );
     assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);
   }
@@ -388,10 +392,11 @@ public class ConstrainedBoardingSearchTest {
 
     var boarding = subject.find(
       route1.getTimetable(),
+      TRANSFER_SLACK,
       route2.firstTrip().getTripSchedule(),
       stopIndex,
       sourceArrivalTime,
-      sourceArrivalTime + ALIGHT_SLACK
+      sourceArrivalTime - (2 * ALIGHT_BOARD_SLACK + TRANSFER_SLACK)
     );
 
     assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);
