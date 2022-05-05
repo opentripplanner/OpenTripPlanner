@@ -126,18 +126,12 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     final int stop = from.stop();
 
     // Find all possible transfers on given stop index, starting on from.time
-    var possibleTransfers = toTrip.findStopPositionsForStopIndex(from.time(), stop);
+    var possibleTransfers = toTrip.findDepartureStopPositions(from.time(), stop);
 
     // Loop through transfers and decide whether they are possible
     for (var stopPos : possibleTransfers) {
       // Find transfer constraint for stop position
-      var tx = transferServiceAdaptor.findTransfer(
-        from,
-        toTrip,
-        stop,
-        from.stopPosition(),
-        stopPos
-      );
+      var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop, stopPos);
 
       if (!isAllowedTransfer(stopPos, tx)) {
         continue;
@@ -175,17 +169,11 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       int toStop = it.stop();
 
       // Find all possible transfers on given stop index, starting on from.time
-      var possibleTransfers = toTrip.findStopPositionsForStopIndex(from.time(), toStop);
+      var possibleTransfers = toTrip.findDepartureStopPositions(from.time(), toStop);
 
       for (var stopPos : possibleTransfers) {
         // Find transfer constraint for stop position
-        var tx = transferServiceAdaptor.findTransfer(
-          from,
-          toTrip,
-          toStop,
-          from.stopPosition(),
-          stopPos
-        );
+        var tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop, stopPos);
 
         if (!isAllowedTransfer(stopPos, tx)) {
           continue;
@@ -288,7 +276,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     }
     // Transfer is allowed if no constrained transfer exist
     if (tx == null) {
-      return true;    
+      return true;
     }
     return !tx.getTransferConstraint().isNotAllowed();
   }

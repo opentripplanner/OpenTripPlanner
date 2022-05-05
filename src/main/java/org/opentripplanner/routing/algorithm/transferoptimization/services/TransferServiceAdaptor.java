@@ -47,7 +47,6 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
         TripStopTime<T> from,
         T toTrip,
         int toStop,
-        int fromStopPosition,
         int toStopPosition
       ) {
         return null;
@@ -64,12 +63,11 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
     TripStopTime<T> from,
     T toTrip,
     int toStop,
-    int fromStopPosition,
     int toStopPosition
   ) {
     return transferService.findTransfer(
       trip(from.trip()),
-      fromStopPosition,
+      from.stopPosition(),
       stop(from.stop()),
       trip(toTrip),
       toStopPosition,

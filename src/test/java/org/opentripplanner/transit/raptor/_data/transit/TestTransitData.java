@@ -274,13 +274,12 @@ public class TestTransitData
         TripStopTime<TestTripSchedule> from,
         TestTripSchedule toTrip,
         int toStop,
-        int fromStopPosition,
         int toStopPosition
       ) {
         return findConstrainedTransfer(
           from.trip(),
           from.stop(),
-          fromStopPosition,
+          from.stopPosition(),
           toTrip,
           toStop,
           toStopPosition
