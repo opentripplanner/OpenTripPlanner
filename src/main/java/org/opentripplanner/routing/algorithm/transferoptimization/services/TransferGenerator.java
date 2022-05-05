@@ -163,9 +163,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Find potential transfers where traveller has to walk between stops
-   * @param from initial trip
-   * @return list of potential transfers
+   * Find potential transfers where traveller has to "walk" between stops
    */
   private Collection<? extends TripToTripTransfer<T>> findStandardTransfers(TripStopTime<T> from) {
     final List<TripToTripTransfer<T>> result = new ArrayList<>();
