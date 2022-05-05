@@ -125,6 +125,17 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         }
         new BoardingLocationToStopLink(ts, osmVertex);
         new BoardingLocationToStopLink(osmVertex, ts);
+        LOG.debug(
+          "Connected " +
+          ts.toString() +
+          " (" +
+          stopCode +
+          ") to " +
+          osmVertex.getLabel() +
+          " at " +
+          osmVertex.getCoordinate().toString()
+        );
+
         return true;
       }
     }

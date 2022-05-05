@@ -63,4 +63,5 @@
   <!-- Suppress an inconsequential IOException that is logged at debug level. -->
   <logger name="org.glassfish.grizzly" level="info" />
 
+  <include optional="true" resource="customLog.xml" />
 </configuration>
