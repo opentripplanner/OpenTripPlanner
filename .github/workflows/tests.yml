@@ -45,6 +45,9 @@ jobs:
     name: Deploy to Production
 
     steps:
+      - uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/OTP
       - uses: ./.github/workflows/deploy.yml
         with:
           environment: prod
