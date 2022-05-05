@@ -38,6 +38,8 @@ public enum OTPFeature {
   TransferAnalyzer(false),
   VehicleToStopHeuristics(false);
 
+  private static final Object TEST_SEMAPHORE = new Object();
+
   private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
   private boolean enabled;
 
@@ -58,6 +60,30 @@ public enum OTPFeature {
   public static void logFeatureSetup() {
     LOG.info("Features turned on: \n\t" + valuesAsString(true));
     LOG.info("Features turned off: \n\t" + valuesAsString(false));
+  }
+
+  /**
+   * FOR TEST ONLY
+   *
+   * This method will run the given {@code task} with the feature turned ON. When the task complete
+   * the feature is set back to its original value.
+   * <p>
+   * This method is synchronized on the feature. This way calls to this method or the
+   * {@link #testOff(Runnable)} is prevented from running concurrent. It is safe to use these
+   * methods in a unit-test, but IT IS NOT SAFE TO USE IT IN GENERAL, because the main code is NOT
+   * synchronized.
+   */
+  public void testOn(Runnable task) {
+    testEnabled(true, task);
+  }
+
+  /**
+   * FOR TEST ONLY
+   *
+   * See {@link #testOn(Runnable)}
+   */
+  public void testOff(Runnable task) {
+    testEnabled(false, task);
   }
 
   /**
@@ -86,8 +112,20 @@ public enum OTPFeature {
   /**
    * Allow unit test and this class to enable/disable a feature.
    */
-  void set(boolean enabled) {
+  private void set(boolean enabled) {
     this.enabled = enabled;
+  }
+
+  private void testEnabled(boolean enabled, Runnable task) {
+    synchronized (TEST_SEMAPHORE) {
+      boolean originalValue = this.enabled;
+      try {
+        set(enabled);
+        task.run();
+      } finally {
+        set(originalValue);
+      }
+    }
   }
 
   private static String valuesAsString(boolean enabled) {
