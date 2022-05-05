@@ -118,9 +118,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Find potential transfers where traveller does not have to walk between stops
-   * @param from initial trip
-   * @return list of potential transfers
+   * Find potential transfers where traveller does not have to "walk" between stops
    */
   private Collection<TripToTripTransfer<T>> transferFromSameStop(TripStopTime<T> from) {
     var result = new ArrayList<TripToTripTransfer<T>>();
