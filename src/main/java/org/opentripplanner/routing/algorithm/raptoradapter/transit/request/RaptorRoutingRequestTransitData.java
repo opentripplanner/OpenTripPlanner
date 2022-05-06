@@ -92,10 +92,11 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
     var mcCostParams = McCostParamsMapper.map(routingContext.opt);
 
-    this.generalizedCostCalculator = CostCalculatorFactory.createCostCalculator(
-      mcCostParams,
-      transitLayer.getStopIndex().stopBoardAlightCosts
-    );
+    this.generalizedCostCalculator =
+      CostCalculatorFactory.createCostCalculator(
+        mcCostParams,
+        transitLayer.getStopIndex().stopBoardAlightCosts
+      );
 
     this.validTransitDataStartTime =
       DateMapper.secondsSinceStartOfTime(

@@ -4,14 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
 
 import java.util.List;
 import org.junit.Test;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class RoutingRequestTest {
 
@@ -56,12 +58,12 @@ public class RoutingRequestTest {
 
   @Test
   public void testPreferencesPenaltyForRoute() {
-    Agency agency = new Agency(AGENCY_ID, "A", TIMEZONE);
+    Agency agency = agency("A").mutate().setId(AGENCY_ID).setTimezone(TIMEZONE).build();
     Route route = new Route(ROUTE_ID);
     route.setShortName("R");
     route.setAgency(agency);
 
-    Agency otherAgency = new Agency(OTHER_ID, "OtherA", TIMEZONE);
+    Agency otherAgency = agency.mutate().setId(OTHER_ID).setName("OtherA").build();
     Route otherRoute = new Route(OTHER_ID);
     otherRoute.setShortName("OtherR");
     otherRoute.setAgency(otherAgency);

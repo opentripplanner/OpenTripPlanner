@@ -11,7 +11,8 @@ public class CostCalculatorFactory {
     CostCalculator calculator = new DefaultCostCalculator(mcCostParams, stopBoardAlightCosts);
 
     if (mcCostParams.accessibilityRequirements().enabled()) {
-      calculator = new WheelchairCostCalculator(calculator, mcCostParams.accessibilityRequirements());
+      calculator =
+        new WheelchairCostCalculator(calculator, mcCostParams.accessibilityRequirements());
     }
 
     return calculator;

@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.Entrance;
@@ -47,6 +46,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -19,6 +19,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 class StreetGraphFinderTest extends GraphRoutingTest {
 
@@ -36,7 +37,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
       new Builder() {
         @Override
         public void build() {
-          var a = agency("Agency");
+          var a = TransitModelForTest.agency("Agency");
 
           R1 = route("R1", TransitMode.BUS, a);
           R2 = route("R2", TransitMode.TRAM, a);

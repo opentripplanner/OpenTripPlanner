@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
@@ -35,6 +34,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.organization.Agency;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded

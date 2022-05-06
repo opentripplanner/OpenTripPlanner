@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
@@ -35,6 +34,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -595,11 +595,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       route = new Route(id);
       // Create dummy agency for added trips
-      Agency dummyAgency = new Agency(
-        new FeedScopedId(tripId.getFeedId(), "Dummy"),
-        "Dummy",
-        "Europe/Paris"
-      );
+      Agency dummyAgency = Agency
+        .of(new FeedScopedId(tripId.getFeedId(), "Dummy"))
+        .setName("Dummy")
+        .setTimezone("Europe/Paris")
+        .build();
       route.setAgency(dummyAgency);
       // Guess the route type as it doesn't exist yet in the specifications
       // Bus. Used for short- and long-distance bus routes.

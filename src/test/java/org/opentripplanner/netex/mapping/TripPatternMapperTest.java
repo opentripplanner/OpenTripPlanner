@@ -17,6 +17,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDay;
 
@@ -25,7 +26,7 @@ import org.rutebanken.netex.model.OperatingDay;
  */
 public class TripPatternMapperTest {
 
-  private static final FeedScopedId SERVICE_ID = new FeedScopedId("F", "S01");
+  private static final FeedScopedId SERVICE_ID = TransitModelForTest.id("S01");
 
   @Test
   public void testMapTripPattern() {

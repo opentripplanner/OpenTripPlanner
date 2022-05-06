@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PickDrop;
@@ -20,6 +19,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.organization.Agency;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

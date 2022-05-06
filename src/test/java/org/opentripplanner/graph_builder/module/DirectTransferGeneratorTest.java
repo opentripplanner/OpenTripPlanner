@@ -32,6 +32,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 /**
  * This creates a graph with trip patterns S0 - V0 | S11 - V11 --------> V21 - S21 |     \ S12 - V12
@@ -193,7 +194,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
           street(V11, V22, 110, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
           if (addPatterns) {
-            var agency = agency("Agency");
+            var agency = TransitModelForTest.agency("Agency");
 
             tripPattern(
               new TripPattern(

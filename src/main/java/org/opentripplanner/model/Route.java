@@ -4,6 +4,7 @@ package org.opentripplanner.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public final class Route extends TransitEntity {
 

@@ -9,7 +9,6 @@ import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
@@ -20,6 +19,7 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.organization.Agency;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)

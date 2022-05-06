@@ -25,7 +25,7 @@ config:
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
   mappers:
-    Agency: org.opentripplanner.model.Agency#Agency
+    Agency: org.opentripplanner.transit.model.organization.Agency#Agency
     RouteType: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel#LegacyGraphQLRouteTypeModel
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
     AlertCauseType: String

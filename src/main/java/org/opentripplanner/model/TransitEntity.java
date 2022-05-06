@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
@@ -25,6 +26,7 @@ public abstract class TransitEntity implements Serializable {
 
   public TransitEntity(FeedScopedId id) {
     this.id = id;
+    Objects.requireNonNull(this.id);
   }
 
   public final FeedScopedId getId() {

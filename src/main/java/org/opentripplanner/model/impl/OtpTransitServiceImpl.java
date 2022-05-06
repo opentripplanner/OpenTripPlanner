@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FareAttribute;
@@ -34,6 +33,7 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
