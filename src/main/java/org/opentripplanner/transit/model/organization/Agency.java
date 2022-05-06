@@ -25,7 +25,7 @@ public final class Agency extends TransitEntity {
 
   private final String brandingUrl;
 
-  public Agency(AgencyBuilder builder) {
+  Agency(AgencyBuilder builder) {
     super(builder.getId());
     this.name = builder.getName();
     this.timezone = builder.getTimezone();

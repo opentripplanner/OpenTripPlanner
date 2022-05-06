@@ -15,7 +15,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
@@ -30,6 +29,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

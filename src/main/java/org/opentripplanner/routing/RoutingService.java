@@ -29,7 +29,6 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
@@ -75,6 +74,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.WorldEnvelope;
 
 /**

@@ -25,7 +25,7 @@ public class AgencyBuilder {
   }
 
   AgencyBuilder(Agency agency) {
-    this.id = agency.getId();
+    this(agency.getId());
     this.name = agency.getName();
     this.timezone = agency.getTimezone();
     this.url = agency.getUrl();

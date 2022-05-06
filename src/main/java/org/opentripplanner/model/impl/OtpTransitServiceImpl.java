@@ -21,7 +21,6 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.PathwayNode;
@@ -34,6 +33,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
