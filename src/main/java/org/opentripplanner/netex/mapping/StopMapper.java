@@ -12,6 +12,9 @@ import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.TranslatedString;
 import org.rutebanken.netex.model.Quay;
 
 class StopMapper {
@@ -43,11 +46,18 @@ class StopMapper {
       return null;
     }
 
+    I18NString desc;
+    if (quay.getDescription().getValue() != null) {
+      desc = TranslatedString.getI18NString(quay.getDescription().getValue());
+    } else {
+      desc = new NonLocalizedString("N/A");
+    }
+
     Stop stop = new Stop(
       idFactory.createId(quay.getId()),
       parentStation.getName(),
       quay.getPublicCode(),
-      quay.getDescription() != null ? quay.getDescription().getValue() : null,
+      quay.getDescription() != null ? desc : null,
       WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
       wheelChairBoarding,
       null,

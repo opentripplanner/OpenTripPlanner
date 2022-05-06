@@ -52,11 +52,18 @@ class BoardingAreaMapper {
       Optional.ofNullable(base.getName()).orElse(DEFAULT_NAME)
     );
 
+    final I18NString description = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "desc",
+      base.getId().getId(),
+      Optional.ofNullable(base.getDescription()).orElse(DEFAULT_NAME)
+    );
+
     return new BoardingArea(
       base.getId(),
       name,
       base.getCode(),
-      base.getDescription(),
+      description,
       base.getCoordinate(),
       base.getWheelchairBoarding(),
       base.getLevel()

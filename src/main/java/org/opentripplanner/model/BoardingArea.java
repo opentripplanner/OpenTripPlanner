@@ -16,7 +16,7 @@ public final class BoardingArea extends StationElement {
     FeedScopedId id,
     I18NString name,
     String code,
-    String description,
+    I18NString description,
     WgsCoordinate coordinate,
     WheelChairBoarding wheelchairBoarding,
     StopLevel level
@@ -25,8 +25,8 @@ public final class BoardingArea extends StationElement {
   }
 
   /**
-   * Center point/location for the boarding area. Returns the coordinate of the parent stop, if the
-   * coordinate is not defined for this boarding area.
+   * Center point/location for the boarding area. Returns the coordinate of the parent stop,
+   * if the coordinate is not defined for this boarding area.
    */
   public WgsCoordinate getCoordinate() {
     return isCoordinateSet() ? super.getCoordinate() : parentStop.getCoordinate();

@@ -38,7 +38,7 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
   }
 
   @Override
-  public String getDescription() {
+  public I18NString getDescription() {
     return null;
   }
 

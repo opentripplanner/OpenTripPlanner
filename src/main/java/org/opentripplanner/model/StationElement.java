@@ -14,7 +14,7 @@ public abstract class StationElement extends TransitEntity {
 
   private final String code;
 
-  private final String description;
+  private final I18NString description;
 
   private final WgsCoordinate coordinate;
 
@@ -28,7 +28,7 @@ public abstract class StationElement extends TransitEntity {
     FeedScopedId id,
     I18NString name,
     String code,
-    String description,
+    I18NString description,
     WgsCoordinate coordinate,
     WheelChairBoarding wheelchairBoarding,
     StopLevel level
@@ -60,7 +60,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Additional information about the station element (if needed).
    */
-  public String getDescription() {
+  public I18NString getDescription() {
     return description;
   }
 

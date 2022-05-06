@@ -65,7 +65,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
       new T2<>("name", stop.getName().toString()),
       new T2<>("code", stop.getCode()),
       new T2<>("platform", stop.getPlatformCode()),
-      new T2<>("desc", stop.getDescription()),
+      new T2<>("desc", stop.getDescription().toString()),
       new T2<>(
         "parentStation",
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"

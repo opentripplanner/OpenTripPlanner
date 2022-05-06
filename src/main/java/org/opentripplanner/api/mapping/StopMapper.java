@@ -33,7 +33,7 @@ public class StopMapper {
     api.code = domain.getCode();
     api.name = domain.getName().toString();
     if (extended) {
-      api.desc = domain.getDescription();
+      api.desc = domain.getDescription().toString();
       api.zoneId = domain.getFirstZoneAsString();
       api.url = I18NStringMapper.mapToApi(domain.getUrl(), null);
       api.locationType = 0;

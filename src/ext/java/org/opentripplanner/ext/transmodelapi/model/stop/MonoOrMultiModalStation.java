@@ -24,7 +24,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
   /**
    * Additional information about the station (if needed)
    */
-  private final String description;
+  private final I18NString description;
 
   /**
    * URL to a web page containing information about this particular station
@@ -79,7 +79,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return code;
   }
 
-  public String getDescription() {
+  public I18NString getDescription() {
     return description;
   }
 

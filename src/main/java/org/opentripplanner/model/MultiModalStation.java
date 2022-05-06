@@ -24,7 +24,7 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
   private String code;
 
-  private String description;
+  private I18NString description;
 
   private I18NString url;
 
@@ -73,11 +73,11 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
   /**
    * Additional information about the station (if needed)
    */
-  public String getDescription() {
+  public I18NString getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(I18NString description) {
     this.description = description;
   }
 

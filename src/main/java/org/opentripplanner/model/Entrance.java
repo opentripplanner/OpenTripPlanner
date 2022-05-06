@@ -12,7 +12,7 @@ public final class Entrance extends StationElement {
     FeedScopedId id,
     I18NString name,
     String code,
-    String description,
+    I18NString description,
     WgsCoordinate coordinate,
     WheelChairBoarding wheelchairBoarding,
     StopLevel level

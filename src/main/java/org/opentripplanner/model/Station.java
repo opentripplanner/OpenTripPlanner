@@ -30,7 +30,7 @@ public class Station extends TransitEntity implements StopCollection {
 
   private final String code;
 
-  private final String description;
+  private final I18NString description;
 
   private final WgsCoordinate coordinate;
 
@@ -52,7 +52,7 @@ public class Station extends TransitEntity implements StopCollection {
     I18NString name,
     WgsCoordinate coordinate,
     String code,
-    String description,
+    I18NString description,
     I18NString url,
     TimeZone timezone,
     StopTransferPriority priority
@@ -79,7 +79,7 @@ public class Station extends TransitEntity implements StopCollection {
       new NonLocalizedString(idAndName),
       new WgsCoordinate(lat, lon),
       idAndName,
-      "Station " + idAndName,
+      new NonLocalizedString("Station " + idAndName),
       null,
       null,
       StopTransferPriority.ALLOWED
@@ -126,7 +126,7 @@ public class Station extends TransitEntity implements StopCollection {
   }
 
   /** Additional information about the station (if needed) */
-  public String getDescription() {
+  public I18NString getDescription() {
     return description;
   }
 
