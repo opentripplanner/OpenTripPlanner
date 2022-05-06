@@ -7,8 +7,8 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public class ItineraryTest implements PlanTestConstants {
 
@@ -54,7 +54,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(newTime(T11_00), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_10), result.firstLeg().getEndTime());
     assertEquals(TraverseMode.BUS, result.firstLeg().getMode());
-    assertEquals(new FeedScopedId("F", "55"), result.firstLeg().getTrip().getId());
+    assertEquals(TransitModelForTest.id("55"), result.firstLeg().getTrip().getId());
     assertEquals(7500, result.firstLeg().getDistanceMeters(), 1E-3);
 
     assertEquals("A ~ BUS 55 11:00 11:10 ~ B [ $720 ]", result.toStr());
@@ -78,7 +78,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(newTime(T11_05), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_15), result.firstLeg().getEndTime());
     assertEquals(TraverseMode.RAIL, result.firstLeg().getMode());
-    assertEquals(new FeedScopedId("F", "20"), result.firstLeg().getTrip().getId());
+    assertEquals(TransitModelForTest.id("20"), result.firstLeg().getTrip().getId());
     assertEquals(15_000, result.firstLeg().getDistanceMeters(), 1E-3);
 
     assertEquals("A ~ RAIL 20 11:05 11:15 ~ B [ $720 ]", result.toStr());

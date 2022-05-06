@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
@@ -198,7 +197,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
             tripPattern(
               new TripPattern(
-                new FeedScopedId("Test", "TP1"),
+                TransitModelForTest.id("TP1"),
                 route("R1", TransitMode.BUS, agency),
                 new StopPattern(List.of(st(S11), st(S12)))
               )
@@ -206,7 +205,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
             tripPattern(
               new TripPattern(
-                new FeedScopedId("Test", "TP2"),
+                TransitModelForTest.id("TP2"),
                 route("R2", TransitMode.BUS, agency),
                 new StopPattern(List.of(st(S21), st(S22)))
               )

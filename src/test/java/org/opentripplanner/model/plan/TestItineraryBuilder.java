@@ -4,6 +4,7 @@ import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 
 import java.time.LocalDate;
 import java.time.Month;

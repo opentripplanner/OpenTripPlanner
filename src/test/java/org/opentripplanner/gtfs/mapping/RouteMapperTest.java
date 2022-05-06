@@ -55,6 +55,7 @@ public class RouteMapperTest {
 
   static {
     AGENCY.setId("A");
+    AGENCY.setName("Agency Name");
 
     ROUTE.setId(AGENCY_AND_ID);
     ROUTE.setAgency(AGENCY);

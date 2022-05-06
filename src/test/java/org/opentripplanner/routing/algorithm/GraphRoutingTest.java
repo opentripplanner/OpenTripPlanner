@@ -54,6 +54,7 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -440,7 +441,7 @@ public abstract class GraphRoutingTest {
     }
 
     public Route route(String id, TransitMode mode, Agency agency) {
-      var route = new Route(new FeedScopedId("Test", id));
+      var route = new Route(TransitModelForTest.id(id));
       route.setAgency(agency);
       route.setMode(mode);
       return route;

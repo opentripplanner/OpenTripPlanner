@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TransitMode;
@@ -94,7 +93,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           tripPattern(
             TP1 =
               new TripPattern(
-                new FeedScopedId("F", "TP1"),
+                TransitModelForTest.id("TP1"),
                 R1,
                 new StopPattern(List.of(st(S1), st(S2)))
               )
@@ -102,7 +101,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           tripPattern(
             TP2 =
               new TripPattern(
-                new FeedScopedId("F", "TP2"),
+                TransitModelForTest.id("TP2"),
                 R2,
                 new StopPattern(List.of(st(S1), st(S3)))
               )

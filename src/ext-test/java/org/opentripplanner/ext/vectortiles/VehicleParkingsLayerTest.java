@@ -24,10 +24,13 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
 
 public class VehicleParkingsLayerTest {
+
+  private static final FeedScopedId ID = TransitModelForTest.id("id");
 
   private VehicleParking vehicleParking;
 
@@ -36,7 +39,7 @@ public class VehicleParkingsLayerTest {
     vehicleParking =
       VehicleParking
         .builder()
-        .id(new FeedScopedId("id", "id"))
+        .id(ID)
         .name(TranslatedString.getI18NString(Map.of("", "name", "de", "DE"), false, false))
         .x(1)
         .y(2)
@@ -122,7 +125,7 @@ public class VehicleParkingsLayerTest {
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
 
-    assertEquals("id:id", map.get("id").toString());
+    assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("name", map.get("name").toString());
     assertEquals("DE", map.get("name.de").toString());
     assertEquals("details", map.get("detailsUrl").toString());

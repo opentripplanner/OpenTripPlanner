@@ -19,15 +19,13 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.organization.Agency;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)
- */
 public class OtpTransitServiceBuilderTest {
 
-  private static final String FEED_ID = "F";
-  private static final FeedScopedId SERVICE_WEEKDAYS_ID = new FeedScopedId(FEED_ID, "weekdays");
+  private static final String FEED_ID = TransitModelForTest.FEED_ID;
+  private static final FeedScopedId SERVICE_WEEKDAYS_ID = TransitModelForTest.id("weekdays");
 
   private static OtpTransitServiceBuilder subject;
 
@@ -103,7 +101,7 @@ public class OtpTransitServiceBuilderTest {
   }
 
   private static FareAttribute createFareAttribute() {
-    return new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
+    return new FareAttribute(TransitModelForTest.id("FA"));
   }
 
   private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {

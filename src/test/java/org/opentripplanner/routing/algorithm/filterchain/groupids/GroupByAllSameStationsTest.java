@@ -10,6 +10,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.util.NonLocalizedString;
 
 class GroupByAllSameStationsTest implements PlanTestConstants {
@@ -66,7 +67,7 @@ class GroupByAllSameStationsTest implements PlanTestConstants {
 
   Station createStation(String name) {
     return new Station(
-      new FeedScopedId(FEED_ID, name),
+      new FeedScopedId(TransitModelForTest.FEED_ID, name),
       new NonLocalizedString(name),
       new WgsCoordinate(0, 0),
       null,

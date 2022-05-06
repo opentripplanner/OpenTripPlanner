@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,8 +30,8 @@ public class TestBanning {
     Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
 
     Assert.assertEquals(2, bannedRoutes.size());
-    Assert.assertTrue(bannedRoutes.contains(new FeedScopedId(FEED_ID, "RUT:Route:1")));
-    Assert.assertTrue(bannedRoutes.contains(new FeedScopedId(FEED_ID, "RUT:Route:3")));
+    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
+    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
   }
 
   @Test
@@ -46,27 +46,19 @@ public class TestBanning {
     Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
 
     Assert.assertEquals(1, bannedRoutes.size());
-    Assert.assertTrue(bannedRoutes.contains(new FeedScopedId(FEED_ID, "RUT:Route:2")));
+    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
   }
 
   private Collection<Route> getTestRoutes() {
-    Route route1 = new Route(new FeedScopedId(FEED_ID, "RUT:Route:1"));
+    Route route1 = new Route(id("RUT:Route:1"));
     route1.setLongName("");
-    Route route2 = new Route(new FeedScopedId(FEED_ID, "RUT:Route:2"));
+    Route route2 = new Route(id("RUT:Route:2"));
     route2.setLongName("");
-    Route route3 = new Route(new FeedScopedId(FEED_ID, "RUT:Route:3"));
+    Route route3 = new Route(id("RUT:Route:3"));
     route3.setLongName("");
 
-    Agency agency1 = TransitModelForTest
-      .agency("A")
-      .mutate()
-      .setId(TransitModelForTest.id("RUT:Agency:1"))
-      .build();
-    Agency agency2 = TransitModelForTest
-      .agency("B")
-      .mutate()
-      .setId(TransitModelForTest.id("RUT:Agency:2"))
-      .build();
+    Agency agency1 = TransitModelForTest.agency("A").mutate().setId(id("RUT:Agency:1")).build();
+    Agency agency2 = TransitModelForTest.agency("B").mutate().setId(id("RUT:Agency:2")).build();
 
     route1.setAgency(agency1);
     route2.setAgency(agency1);

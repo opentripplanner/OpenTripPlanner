@@ -17,11 +17,12 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class StopIndexForRaptorTest {
 
-  private final FeedScopedId ANY_ID = new FeedScopedId("F", "1");
+  private final FeedScopedId ANY_ID = TransitModelForTest.id("1");
 
   private final Stop STOP_0 = Stop.stopForTest("ID-" + 1, 0.0, 0.0);
   private final Stop STOP_1 = Stop.stopForTest("ID-" + 2, 0.0, 0.0);

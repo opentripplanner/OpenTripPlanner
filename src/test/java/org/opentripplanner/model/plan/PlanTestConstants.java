@@ -5,12 +5,11 @@ import static org.opentripplanner.util.time.TimeUtils.time;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.time.DurationUtils;
 
 public interface PlanTestConstants {
-  String FEED_ID = "F";
-
   int NOT_SET = -999_999;
   int BOARD_COST = 120;
   float WALK_RELUCTANCE_FACTOR = 2.0f;
@@ -69,7 +68,7 @@ public interface PlanTestConstants {
 
   private static Place place(String name, double lat, double lon) {
     var stop = new Stop(
-      new FeedScopedId(FEED_ID, name),
+      new FeedScopedId(TransitModelForTest.FEED_ID, name),
       new NonLocalizedString(name),
       null,
       null,

@@ -10,8 +10,8 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class ToStringBuilderTest {
@@ -72,7 +72,7 @@ public class ToStringBuilderTest {
 
   @Test
   public void addTransitEntity() {
-    Trip trip = new Trip(new FeedScopedId("F", "1"));
+    Trip trip = new Trip(TransitModelForTest.id("1"));
     assertEquals(
       "ToStringBuilderTest{tripId: F:1}",
       subject().addEntityId("tripId", trip).toString()

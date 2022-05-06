@@ -17,9 +17,9 @@ import org.opentripplanner.transit.model.organization.Agency;
 
 public class RoutingRequestTest {
 
-  private static final FeedScopedId AGENCY_ID = new FeedScopedId("F", "A1");
-  private static final FeedScopedId ROUTE_ID = new FeedScopedId("F", "R1");
-  private static final FeedScopedId OTHER_ID = new FeedScopedId("F", "X");
+  private static final FeedScopedId AGENCY_ID = TransitModelForTest.id("A1");
+  private static final FeedScopedId ROUTE_ID = TransitModelForTest.id("R1");
+  private static final FeedScopedId OTHER_ID = TransitModelForTest.id("X");
   public static final String TIMEZONE = "Europe/Paris";
 
   @Test
