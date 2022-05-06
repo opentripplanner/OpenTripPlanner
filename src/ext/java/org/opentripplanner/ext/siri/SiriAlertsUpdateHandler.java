@@ -317,11 +317,6 @@ public class SiriAlertsUpdateHandler {
       AffectsScopeStructure.VehicleJourneys vjs = affectsStructure.getVehicleJourneys();
       if (vjs != null && isNotEmpty(vjs.getAffectedVehicleJourneies())) {
         for (AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()) {
-          String lineRef = null;
-          if (affectedVehicleJourney.getLineRef() != null) {
-            lineRef = affectedVehicleJourney.getLineRef().getValue();
-          }
-
           List<AffectedStopPointStructure> affectedStops = new ArrayList<>();
 
           List<AffectedRouteStructure> routes = affectedVehicleJourney.getRoutes();
