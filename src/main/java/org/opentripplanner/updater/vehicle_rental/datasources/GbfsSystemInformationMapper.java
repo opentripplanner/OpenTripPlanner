@@ -7,7 +7,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystemAppInformat
 
 public class GbfsSystemInformationMapper {
 
-  public VehicleRentalSystem mapSystemInformation(GBFSData systemInformation) {
+  public VehicleRentalSystem mapSystemInformation(GBFSData systemInformation, String network) {
     VehicleRentalSystemAppInformation android = null;
     VehicleRentalSystemAppInformation ios = null;
 
@@ -28,8 +28,10 @@ public class GbfsSystemInformationMapper {
       }
     }
 
+    String systemId = network != null ? network : systemInformation.getSystemId();
+
     return new VehicleRentalSystem(
-      systemInformation.getSystemId(),
+      systemId,
       systemInformation.getLanguage(),
       systemInformation.getName(),
       systemInformation.getShortName(),

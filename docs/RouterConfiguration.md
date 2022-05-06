@@ -496,7 +496,10 @@ format:
    // Optionally specify the language version of the feed to use. If no language is set, the first language in the feed is used. 
    "language": "en",
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
-   "allowKeepingRentedBicycleAtDestination": true
+   "allowKeepingRentedBicycleAtDestination": true,
+   // Optionally, it's possible to override the system_id from the data to set the feed id for the network but
+   // it should be avoided if the system_id is sensible and there is no need to change it
+   "network": "socialbicycles_coast"
 }
 ```
 
