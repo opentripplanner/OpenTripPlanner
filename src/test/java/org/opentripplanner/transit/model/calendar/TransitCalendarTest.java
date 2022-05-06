@@ -33,23 +33,23 @@ class TransitCalendarTest {
   public static final int DEC_31 = 364;
 
   private static List<Arguments> testCases = List.of(
-      // "Time Zero" is 04:00  1. Jan 2022
-      tc("2022-01-01T04:00:00+01:00[Europe/Oslo]", JAN_1, T_ZERO),
-      // Offset 07:00 (+04:00) = 11:00
-      tc("2022-01-01T11:00:00+01:00[Europe/Oslo]", JAN_1, T07_00),
-      // Offset 26:30 (+04:00) = 30:30
-      tc("2022-01-02T06:30:00+01:00[Europe/Oslo]", JAN_1, T26_30),
-      // Day before DST adjustment (winter time)
-      tc("2022-03-26T04:00:00+01:00[Europe/Oslo]", MAR_26, T_ZERO),
-      // Day of DST adjustment (to summer time)
-      tc("2022-03-27T04:00:00+02:00[Europe/Oslo]", MAR_27, T_ZERO),
-      // Day before DST adjustment (summer time)
-      tc("2022-10-29T04:00:00+02:00[Europe/Oslo]", OCT_29, T_ZERO),
-      // Day of DST adjustment (to winter time)
-      tc("2022-10-30T04:00:00+01:00[Europe/Oslo]", OCT_30, T_ZERO),
-      // Last day in transit period (inclusive)
-      tc("2022-12-31T04:00:00+01:00[Europe/Oslo]", DEC_31, T_ZERO)
-    );
+    // "Time Zero" is 04:00  1. Jan 2022
+    tc("2022-01-01T04:00:00+01:00[Europe/Oslo]", JAN_1, T_ZERO),
+    // Offset 07:00 (+04:00) = 11:00
+    tc("2022-01-01T11:00:00+01:00[Europe/Oslo]", JAN_1, T07_00),
+    // Offset 26:30 (+04:00) = 30:30
+    tc("2022-01-02T06:30:00+01:00[Europe/Oslo]", JAN_1, T26_30),
+    // Day before DST adjustment (winter time)
+    tc("2022-03-26T04:00:00+01:00[Europe/Oslo]", MAR_26, T_ZERO),
+    // Day of DST adjustment (to summer time)
+    tc("2022-03-27T04:00:00+02:00[Europe/Oslo]", MAR_27, T_ZERO),
+    // Day before DST adjustment (summer time)
+    tc("2022-10-29T04:00:00+02:00[Europe/Oslo]", OCT_29, T_ZERO),
+    // Day of DST adjustment (to winter time)
+    tc("2022-10-30T04:00:00+01:00[Europe/Oslo]", OCT_30, T_ZERO),
+    // Last day in transit period (inclusive)
+    tc("2022-12-31T04:00:00+01:00[Europe/Oslo]", DEC_31, T_ZERO)
+  );
 
   private final TransitCalendar subject;
 
@@ -94,16 +94,14 @@ class TransitCalendarTest {
       .build();
   }
 
-
   static final Stream<Arguments> tcToZonedDateTime = testCases.stream();
 
   @ParameterizedTest(name = "Verify finding transit day and time from zoned date time.")
   @VariableSource("tcToZonedDateTime")
   public void timeForDayAndOffset(String text, ZonedDateTime time, int day, int seconds) {
-  // "Time Zero" is 04:00  1. Jan 2022
+    // "Time Zero" is 04:00  1. Jan 2022
     assertEquals(text, subject.time(day, seconds).format(ISO_DATE_TIME));
   }
-
 
   static final Stream<Arguments> tcParseTime = testCases.stream();
 
