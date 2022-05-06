@@ -29,6 +29,16 @@ public class GbfsStationInformationMapper {
 
   public VehicleRentalStation mapStationInformation(GBFSStation station) {
     VehicleRentalStation rentalStation = new VehicleRentalStation();
+    if (
+      station.getStationId() == null ||
+      station.getStationId().isBlank() ||
+      station.getName() == null ||
+      station.getName().isBlank() ||
+      station.getLon() == null ||
+      station.getLat() == null
+    ) {
+      return null;
+    }
     rentalStation.id = new FeedScopedId(system.systemId, station.getStationId());
     rentalStation.system = system;
     rentalStation.longitude = station.getLon();
@@ -81,7 +91,6 @@ public class GbfsStationInformationMapper {
       String webUri = rentalUris.getWeb();
       rentalStation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
     }
-
     return rentalStation;
   }
 }

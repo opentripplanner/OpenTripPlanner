@@ -72,12 +72,13 @@ class GbfsVehicleRentalDataSourceTest {
     assertTrue(dataSource.update());
 
     List<VehicleRentalPlace> stations = dataSource.getUpdates();
-    assertEquals(10, stations.size());
+    // There are 10 stations in the data but 5 are missing required data
+    assertEquals(5, stations.size());
     assertTrue(
       stations
         .stream()
         .anyMatch(vehicleRentalStation ->
-          vehicleRentalStation.getName().toString().equals("Kasarmitori")
+          vehicleRentalStation.getName().toString().equals("Viiskulma")
         )
     );
     assertTrue(
