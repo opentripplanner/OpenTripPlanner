@@ -1,10 +1,10 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.organization;
 
-import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.util.AssertUtils;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.
@@ -35,7 +35,7 @@ public final class Agency extends TransitEntity {
     this.fareUrl = builder.getFareUrl();
     this.brandingUrl = builder.getBrandingUrl();
 
-    Objects.requireNonNull(getName());
+    AssertUtils.assertHasValue(getName());
   }
 
   public static AgencyBuilder of(FeedScopedId id) {

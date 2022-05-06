@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
-import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.util.AssertUtils;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * A company which is responsible for operating public transport services. The operator will often
@@ -29,7 +29,7 @@ public class Operator extends TransitEntity {
     this.phone = builder.getPhone();
 
     // name is required
-    Objects.requireNonNull(this.name);
+    AssertUtils.assertHasValue(this.name);
   }
 
   public static OperatorBuilder of(FeedScopedId id) {

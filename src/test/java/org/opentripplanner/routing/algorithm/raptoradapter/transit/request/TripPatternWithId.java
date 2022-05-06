@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class TripPatternWithId extends TripPatternWithRaptorStopIndexes {
 

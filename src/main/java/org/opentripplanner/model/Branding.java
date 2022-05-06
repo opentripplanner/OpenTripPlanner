@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * OTP model for branding. Common for both NeTEx and GTFS.

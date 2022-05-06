@@ -6,11 +6,11 @@ import static org.junit.Assert.assertFalse;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class TripTimesTest {
 

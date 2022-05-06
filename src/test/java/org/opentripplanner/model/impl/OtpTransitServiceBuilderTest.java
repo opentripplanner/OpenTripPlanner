@@ -12,7 +12,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
@@ -20,6 +19,7 @@ import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public class OtpTransitServiceBuilderTest {

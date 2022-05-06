@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize

@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+
 /**
  * This class is used as a reference to a StopTime wrapping the {@link Trip#getId()} and {@code
  * stopSequence}. StopTimes instances do not exist in the graph as entities, they are represented by

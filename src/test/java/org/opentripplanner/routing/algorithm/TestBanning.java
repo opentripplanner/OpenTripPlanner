@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 
 /**

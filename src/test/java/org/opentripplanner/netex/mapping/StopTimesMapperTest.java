@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;

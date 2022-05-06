@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model._data;
 
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 
 /**

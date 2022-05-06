@@ -8,8 +8,8 @@ import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.Base64;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

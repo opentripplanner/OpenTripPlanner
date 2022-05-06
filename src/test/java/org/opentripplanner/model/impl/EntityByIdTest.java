@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class EntityByIdTest {
 

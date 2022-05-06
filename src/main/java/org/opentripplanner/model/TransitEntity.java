@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a

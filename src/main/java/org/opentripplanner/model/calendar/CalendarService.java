@@ -2,7 +2,7 @@ package org.opentripplanner.model.calendar;
 
 import java.util.Set;
 import java.util.TimeZone;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public interface CalendarService {

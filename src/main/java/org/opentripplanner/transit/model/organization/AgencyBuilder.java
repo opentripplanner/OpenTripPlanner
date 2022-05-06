@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.organization;
 
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class AgencyBuilder {
 
