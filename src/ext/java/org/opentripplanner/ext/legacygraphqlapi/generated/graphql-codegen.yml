@@ -41,7 +41,7 @@ config:
     BookingInfo: org.opentripplanner.model.BookingInfo
     BookingTime: org.opentripplanner.model.BookingTime
     CarPark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
-    ContactInfo: org.opentripplanner.model.ContactInfo
+    ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput

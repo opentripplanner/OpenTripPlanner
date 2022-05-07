@@ -3,7 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.model.ContactInfo;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class LegacyGraphQLContactInfoImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLContactInfo {

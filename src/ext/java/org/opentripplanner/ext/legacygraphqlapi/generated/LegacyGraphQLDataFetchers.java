@@ -37,6 +37,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class LegacyGraphQLDataFetchers {
 
@@ -188,7 +189,7 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLBookingInfo {
-    public DataFetcher<org.opentripplanner.model.ContactInfo> contactInfo();
+    public DataFetcher<ContactInfo> contactInfo();
 
     public DataFetcher<String> dropOffMessage();
 

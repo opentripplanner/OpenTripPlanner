@@ -15,9 +15,9 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.organization.Branding;
 
 public class RouteMapperTest {
 

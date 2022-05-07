@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.organization;
 
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.ToStringBuilder;
@@ -15,20 +15,21 @@ public class Branding extends TransitEntity {
   private final String description;
   private final String image;
 
-  public Branding(
-    FeedScopedId id,
-    String shortName,
-    String name,
-    String url,
-    String description,
-    String image
-  ) {
-    super(id);
-    this.shortName = shortName;
-    this.name = name;
-    this.url = url;
-    this.description = description;
-    this.image = image;
+  public Branding(BrandingBuilder builder) {
+    super(builder.getId());
+    this.shortName = builder.getShortName();
+    this.name = builder.getName();
+    this.url = builder.getUrl();
+    this.description = builder.getDescription();
+    this.image = builder.getImage();
+  }
+
+  public static BrandingBuilder of(FeedScopedId id) {
+    return new BrandingBuilder(id);
+  }
+
+  public BrandingBuilder copy() {
+    return new BrandingBuilder(this);
   }
 
   public String getShortName() {

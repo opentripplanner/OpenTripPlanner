@@ -14,7 +14,6 @@ import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.GroupOfRoutes;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.EntityById;
@@ -22,6 +21,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Branding;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.BrandingRefStructure;
@@ -188,9 +188,7 @@ public class RouteMapperTest {
 
     transitBuilder
       .getBrandingsById()
-      .add(
-        new Branding(MappingSupport.ID_FACTORY.createId(BRANDING_ID), null, null, null, null, null)
-      );
+      .add(Branding.of(MappingSupport.ID_FACTORY.createId(BRANDING_ID)).build());
 
     Line line = createExampleLine();
 
@@ -277,7 +275,7 @@ public class RouteMapperTest {
   private Agency createAgency() {
     return TransitModelForTest
       .agency("Ruter AS")
-      .mutate()
+      .copy()
       .setId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))
       .build();
   }

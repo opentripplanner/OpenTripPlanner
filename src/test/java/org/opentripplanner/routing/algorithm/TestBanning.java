@@ -57,8 +57,8 @@ public class TestBanning {
     Route route3 = new Route(id("RUT:Route:3"));
     route3.setLongName("");
 
-    Agency agency1 = TransitModelForTest.agency("A").mutate().setId(id("RUT:Agency:1")).build();
-    Agency agency2 = TransitModelForTest.agency("B").mutate().setId(id("RUT:Agency:2")).build();
+    Agency agency1 = TransitModelForTest.agency("A").copy().setId(id("RUT:Agency:1")).build();
+    Agency agency2 = TransitModelForTest.agency("B").copy().setId(id("RUT:Agency:2")).build();
 
     route1.setAgency(agency1);
     route2.setAgency(agency1);

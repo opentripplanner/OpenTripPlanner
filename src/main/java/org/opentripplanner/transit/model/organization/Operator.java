@@ -36,7 +36,7 @@ public class Operator extends TransitEntity {
     return new OperatorBuilder(id);
   }
 
-  public OperatorBuilder mutate() {
+  public OperatorBuilder copy() {
     return new OperatorBuilder(this);
   }
 

@@ -58,12 +58,12 @@ public class RoutingRequestTest {
 
   @Test
   public void testPreferencesPenaltyForRoute() {
-    Agency agency = agency("A").mutate().setId(AGENCY_ID).setTimezone(TIMEZONE).build();
+    Agency agency = agency("A").copy().setId(AGENCY_ID).setTimezone(TIMEZONE).build();
     Route route = new Route(ROUTE_ID);
     route.setShortName("R");
     route.setAgency(agency);
 
-    Agency otherAgency = agency.mutate().setId(OTHER_ID).setName("OtherA").build();
+    Agency otherAgency = agency.copy().setId(OTHER_ID).setName("OtherA").build();
     Route otherRoute = new Route(OTHER_ID);
     otherRoute.setShortName("OtherR");
     otherRoute.setAgency(otherAgency);

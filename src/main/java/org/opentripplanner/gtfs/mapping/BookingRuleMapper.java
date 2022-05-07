@@ -10,7 +10,7 @@ import org.onebusaway.gtfs.model.BookingRule;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.BookingTime;
-import org.opentripplanner.model.ContactInfo;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /** Responsible for mapping GTFS BookingRule into the OTP model. */
 class BookingRuleMapper {

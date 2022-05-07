@@ -34,7 +34,7 @@ public class TransmodelMappingUtilTest {
     // We use the test builder to make sure we get back an agency with all required fields
     return TransitModelForTest
       .agency("Agency " + id)
-      .mutate()
+      .copy()
       .setId(new FeedScopedId(feedScope, Integer.toString(id)))
       .build();
   }

@@ -42,7 +42,7 @@ public final class Agency extends TransitEntity {
     return new AgencyBuilder(id);
   }
 
-  public AgencyBuilder mutate() {
+  public AgencyBuilder copy() {
     return new AgencyBuilder(this);
   }
 

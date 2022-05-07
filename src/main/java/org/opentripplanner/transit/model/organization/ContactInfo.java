@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.organization;
 
 import java.io.Serializable;
 
@@ -34,6 +34,14 @@ public class ContactInfo implements Serializable {
     this.infoUrl = infoUrl;
     this.bookingUrl = bookingUrl;
     this.additionalDetails = additionalDetails;
+  }
+
+  public static ContactInfoBuilder of() {
+    return new ContactInfoBuilder();
+  }
+
+  public ContactInfoBuilder copy() {
+    return new ContactInfoBuilder(this);
   }
 
   public String getContactPerson() {
