@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;

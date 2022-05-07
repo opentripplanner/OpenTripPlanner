@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
+import org.opentripplanner.transit.model.basic.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.raptor.api.path.PathBuilder;
 import org.opentripplanner.transit.raptor.api.path.PathBuilderLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;

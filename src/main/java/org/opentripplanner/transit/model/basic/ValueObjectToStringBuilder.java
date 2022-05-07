@@ -1,7 +1,8 @@
-package org.opentripplanner.model.base;
+package org.opentripplanner.transit.model.basic;
 
 import java.time.Duration;
 import java.util.function.Function;
+import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 

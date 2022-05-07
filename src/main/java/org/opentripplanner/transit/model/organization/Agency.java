@@ -2,9 +2,9 @@
 package org.opentripplanner.transit.model.organization;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.util.AssertUtils;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.util.lang.AssertUtils;
 
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.

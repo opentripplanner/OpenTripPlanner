@@ -3,7 +3,7 @@ package org.opentripplanner.model.projectinfo;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.UNKNOWN;
 
 import java.io.Serializable;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 
 public class VersionControlInfo implements Serializable {
 

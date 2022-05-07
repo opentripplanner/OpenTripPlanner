@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**

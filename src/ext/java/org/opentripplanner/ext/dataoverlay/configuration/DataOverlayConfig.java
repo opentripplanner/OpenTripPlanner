@@ -2,7 +2,7 @@ package org.opentripplanner.ext.dataoverlay.configuration;
 
 import java.io.Serializable;
 import java.util.List;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 
 /**
  * POJO class describing expected data-overlay-config.json structure

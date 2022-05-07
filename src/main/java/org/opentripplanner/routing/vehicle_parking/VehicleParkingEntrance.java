@@ -2,9 +2,9 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.util.I18NString;
 
 public class VehicleParkingEntrance implements Serializable {

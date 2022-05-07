@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

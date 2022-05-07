@@ -1,9 +1,8 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.basic;
 
 import java.io.Serializable;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
@@ -21,8 +20,6 @@ import org.opentripplanner.transit.model.basic.FeedScopedId;
  * </ol>
  */
 public abstract class TransitEntity implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private final FeedScopedId id;
 

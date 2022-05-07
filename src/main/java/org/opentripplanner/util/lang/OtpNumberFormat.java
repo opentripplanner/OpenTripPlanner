@@ -1,4 +1,4 @@
-package org.opentripplanner.model.base;
+package org.opentripplanner.util.lang;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -29,7 +29,7 @@ public class OtpNumberFormat {
     return formatCost(cost) + unit;
   }
 
-  String formatCoordinate(Number value) {
+  public String formatCoordinate(Number value) {
     if (coordinateFormat == null) {
       coordinateFormat = new DecimalFormat("#0.0####", DECIMAL_SYMBOLS);
     }
@@ -38,11 +38,11 @@ public class OtpNumberFormat {
     return value == null ? "null" : coordinateFormat.format(value);
   }
 
-  String formatNumber(Number value, String unit) {
+  public String formatNumber(Number value, String unit) {
     return formatNumber(value) + unit;
   }
 
-  String formatNumber(Number value) {
+  public String formatNumber(Number value) {
     if (value == null) {
       return NULL_VALUE;
     }

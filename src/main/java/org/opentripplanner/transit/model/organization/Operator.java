@@ -2,9 +2,9 @@ package org.opentripplanner.transit.model.organization;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.util.AssertUtils;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.util.lang.AssertUtils;
 
 /**
  * A company which is responsible for operating public transport services. The operator will often

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.response;
 
 import java.util.Collection;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;

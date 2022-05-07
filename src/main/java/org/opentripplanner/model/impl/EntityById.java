@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 
 /**
  * The purpose of this class is to provide a map from id to the corresponding entity. It is simply

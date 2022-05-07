@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WheelchairBoarding;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 

@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.util.I18NString;
 
 /**

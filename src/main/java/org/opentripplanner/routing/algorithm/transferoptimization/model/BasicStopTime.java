@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import java.util.Objects;
-import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+import org.opentripplanner.transit.model.basic.ValueObjectToStringBuilder;
 
 /** Basic stop and time value object. */
 final class BasicStopTime implements StopTime {

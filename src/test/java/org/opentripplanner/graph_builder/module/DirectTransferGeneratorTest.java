@@ -21,7 +21,6 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -32,6 +31,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 
 /**
  * This creates a graph with trip patterns S0 - V0 | S11 - V11 --------> V21 - S21 |     \ S12 - V12

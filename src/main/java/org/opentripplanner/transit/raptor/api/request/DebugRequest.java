@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.api.request;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;

@@ -2,13 +2,13 @@ package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.util.I18NString;
 
 /**

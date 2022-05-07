@@ -2,9 +2,9 @@ package org.opentripplanner.updater.stoptime;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
