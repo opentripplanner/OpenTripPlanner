@@ -142,19 +142,23 @@ public class BookingInfoMapper {
       return null;
     }
 
-    ContactInfo contactInfo = new ContactInfo(
-      contactStructure.getContactPerson() != null
-        ? contactStructure.getContactPerson().getValue()
-        : null,
-      contactStructure.getPhone(),
-      contactStructure.getEmail(),
-      contactStructure.getFax(),
-      null,
-      contactStructure.getUrl(),
-      contactStructure.getFurtherDetails() != null
-        ? contactStructure.getFurtherDetails().getValue()
-        : null
-    );
+    ContactInfo contactInfo = ContactInfo
+      .of()
+      .setContactPerson(
+        contactStructure.getContactPerson() != null
+          ? contactStructure.getContactPerson().getValue()
+          : null
+      )
+      .setPhoneNumber(contactStructure.getPhone())
+      .seteMail(contactStructure.getEmail())
+      .setFaxNumber(contactStructure.getFax())
+      .setBookingUrl(contactStructure.getUrl())
+      .setAdditionalDetails(
+        contactStructure.getFurtherDetails() != null
+          ? contactStructure.getFurtherDetails().getValue()
+          : null
+      )
+      .build();
 
     EnumSet<BookingMethod> bookingMethods = bookingMethodEnum
       .stream()

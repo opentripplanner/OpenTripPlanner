@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.organization;
 
 import java.io.Serializable;
+import org.opentripplanner.transit.model.basic.ToStringBuilder;
 
 public class ContactInfo implements Serializable {
 
@@ -18,22 +19,14 @@ public class ContactInfo implements Serializable {
 
   private final String additionalDetails;
 
-  public ContactInfo(
-    String contactPerson,
-    String phoneNumber,
-    String eMail,
-    String faxNumber,
-    String infoUrl,
-    String bookingUrl,
-    String additionalDetails
-  ) {
-    this.contactPerson = contactPerson;
-    this.phoneNumber = phoneNumber;
-    this.eMail = eMail;
-    this.faxNumber = faxNumber;
-    this.infoUrl = infoUrl;
-    this.bookingUrl = bookingUrl;
-    this.additionalDetails = additionalDetails;
+  public ContactInfo(ContactInfoBuilder builder) {
+    this.contactPerson = builder.getContactPerson();
+    this.phoneNumber = builder.getPhoneNumber();
+    this.eMail = builder.geteMail();
+    this.faxNumber = builder.getFaxNumber();
+    this.infoUrl = builder.getInfoUrl();
+    this.bookingUrl = builder.getBookingUrl();
+    this.additionalDetails = builder.getAdditionalDetails();
   }
 
   public static ContactInfoBuilder of() {
@@ -70,5 +63,19 @@ public class ContactInfo implements Serializable {
 
   public String getAdditionalDetails() {
     return additionalDetails;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(ContactInfo.class)
+      .addStr("contactPerson", contactPerson)
+      .addStr("phoneNumber", phoneNumber)
+      .addStr("eMail", eMail)
+      .addStr("faxNumber", faxNumber)
+      .addStr("infoUrl", infoUrl)
+      .addStr("bookingUrl", bookingUrl)
+      .addStr("additionalDetails", additionalDetails)
+      .toString();
   }
 }

@@ -82,13 +82,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     return Arrays.stream(s.split(",")).map(FeedScopedId::parseId).collect(Collectors.toSet());
   }
 
-  /**
-   * Parses a string consisting of concatenated FeedScopedIds to a List
-   */
-  public static List<FeedScopedId> parseListOfIds(String s) {
-    return Arrays.stream(s.split(",")).map(FeedScopedId::parseId).collect(Collectors.toList());
-  }
-
   public String getFeedId() {
     return feedId;
   }
@@ -97,6 +90,11 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     return id;
   }
 
+  /**
+   * @deprecated Do not depend on the sort order of the ids.
+   */
+  @Deprecated
+  @Override
   public int compareTo(FeedScopedId o) {
     int c = this.feedId.compareTo(o.feedId);
     if (c == 0) {

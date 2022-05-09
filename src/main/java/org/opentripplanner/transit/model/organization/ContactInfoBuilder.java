@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.organization;
 
+import org.checkerframework.checker.units.qual.C;
+
 public class ContactInfoBuilder {
 
   private String contactPerson;
@@ -18,7 +20,7 @@ public class ContactInfoBuilder {
 
   public ContactInfoBuilder() {}
 
-  public ContactInfoBuilder(ContactInfo domain) {
+  ContactInfoBuilder(ContactInfo domain) {
     this.contactPerson = domain.getContactPerson();
     this.phoneNumber = domain.getPhoneNumber();
     this.eMail = domain.geteMail();
@@ -26,6 +28,10 @@ public class ContactInfoBuilder {
     this.infoUrl = domain.getInfoUrl();
     this.bookingUrl = domain.getBookingUrl();
     this.additionalDetails = domain.getAdditionalDetails();
+  }
+
+  public ContactInfo build() {
+    return new ContactInfo(this);
   }
 
   public String getContactPerson() {
