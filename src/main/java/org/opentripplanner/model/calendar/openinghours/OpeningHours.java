@@ -8,52 +8,61 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  */
 public class OpeningHours implements Comparable<OpeningHours> {
-    private final String periodDescription;
-    private final int startTime;
-    private final int endTime;
-    private final BitSet days;
 
-    /**
-     * @param periodDescription Describe the days this opening hours is defined
-     */
-    OpeningHours(String periodDescription, LocalTime startTime, LocalTime endTime, BitSet days) {
-        this.periodDescription = periodDescription;
-        this.startTime = startTime.toSecondOfDay();
-        this.endTime = endTime.toSecondOfDay();
-        this.days = days;
-    }
+  private final String periodDescription;
+  private final int startTime;
+  private final int endTime;
+  private final BitSet days;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {return true;}
-        if (!(o instanceof OpeningHours)) {return false;}
-        final OpeningHours that = (OpeningHours) o;
-        // periodDescription is not part of the equals and hashCode, so when deduplicated
-        // only the first instance is kept
-        return startTime == that.startTime && endTime == that.endTime && days.equals(that.days);
-    }
+  /**
+   * @param periodDescription Describe the days this opening hours is defined
+   */
+  OpeningHours(String periodDescription, LocalTime startTime, LocalTime endTime, BitSet days) {
+    this.periodDescription = periodDescription;
+    this.startTime = startTime.toSecondOfDay();
+    this.endTime = endTime.toSecondOfDay();
+    this.days = days;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(startTime, endTime, days);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (!(o instanceof OpeningHours)) {
+      return false;
+    }
+    final OpeningHours that = (OpeningHours) o;
+    // periodDescription is not part of the equals and hashCode, so when deduplicated
+    // only the first instance is kept
+    return startTime == that.startTime && endTime == that.endTime && days.equals(that.days);
+  }
 
-    @Override
-    public String toString() {
-        return periodDescription + " " +
-                TimeUtils.timeToStrShort(startTime) + "-" +
-                TimeUtils.timeToStrShort(endTime);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(startTime, endTime, days);
+  }
 
-    @Override
-    public int compareTo(OpeningHours other) {
-        return this.startTime == other.startTime
-            ? endTime - other.endTime
-            : startTime - other.startTime;
-    }
+  @Override
+  public String toString() {
+    return (
+      periodDescription +
+      " " +
+      TimeUtils.timeToStrShort(startTime) +
+      "-" +
+      TimeUtils.timeToStrShort(endTime)
+    );
+  }
 
-    /** return {@code true} if given opening hours is inside this. */
-    public boolean contains(OpeningHours other) {
-        return this.startTime <= other.startTime  && other.endTime <= endTime;
-    }
+  @Override
+  public int compareTo(OpeningHours other) {
+    return this.startTime == other.startTime
+      ? endTime - other.endTime
+      : startTime - other.startTime;
+  }
+
+  /** return {@code true} if given opening hours is inside this. */
+  public boolean contains(OpeningHours other) {
+    return this.startTime <= other.startTime && other.endTime <= endTime;
+  }
 }
