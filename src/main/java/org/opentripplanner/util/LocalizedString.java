@@ -44,7 +44,7 @@ public class LocalizedString implements I18NString, Serializable {
    * Creates String which can be localized
    *
    * @param key key of translation for this way set in {@link org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource}
-   *            and translations read from from properties Files
+   *            and translations read from properties Files
    */
   public LocalizedString(String key) {
     this.key = key;

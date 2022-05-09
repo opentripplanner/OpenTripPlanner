@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.util.HashMap;
@@ -72,5 +73,16 @@ class OsmBoardingLocationsModuleTest {
           edges.stream().map(Edge::getClass).collect(Collectors.toSet())
         )
       );
+
+    platformCentroids
+      .stream()
+      .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
+      .forEach(e -> assertNotNull(e.getName(), "Edge " + e + " returns null for getName()"));
+
+    platformCentroids
+      .stream()
+      .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
+      .filter(StreetEdge.class::isInstance)
+      .forEach(e -> assertEquals("platform", e.getName().toString()));
   }
 }

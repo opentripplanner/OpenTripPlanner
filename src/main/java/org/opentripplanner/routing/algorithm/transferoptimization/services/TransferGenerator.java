@@ -117,62 +117,80 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     return result;
   }
 
+  /**
+   * Find potential transfers where traveller does not have to "walk" between stops
+   */
   private Collection<TripToTripTransfer<T>> transferFromSameStop(TripStopTime<T> from) {
+    var result = new ArrayList<TripToTripTransfer<T>>();
+
     final int stop = from.stop();
-    var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop);
 
-    if (tx != null && tx.getTransferConstraint().isNotAllowed()) {
-      return List.of();
+    // Find all possible transfers on given stop index, starting on from.time
+    var possibleTransfers = toTrip.findDepartureStopPositions(from.time(), stop);
+
+    // Loop through transfers and decide whether they are possible
+    for (var stopPos : possibleTransfers) {
+      // Find transfer constraint for stop position
+      var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop, stopPos);
+
+      if (!isAllowedTransfer(stopPos, tx)) {
+        continue;
+      }
+
+      // Check whether traveller will have enough time to do the transfer
+      // We have to do it here because every stop position may have unique transfer constraint
+      // So it may be possible to transfer at stop position 2 but not on 1...
+      final int earliestBoardTime = calculateEarliestBoardTime(from, tx, SAME_STOP_TRANSFER_TIME);
+
+      if (earliestBoardTime > toTrip.departure(stopPos)) {
+        continue;
+      }
+
+      // Add as a possible result
+      result.add(new TripToTripTransfer<>(from, TripStopTime.departure(toTrip, stopPos), null, tx));
     }
 
-    final int earliestDepartureTime = calculateEarliestBoardTime(from, tx, SAME_STOP_TRANSFER_TIME);
-
-    final int toTripStopPos = toTrip.findDepartureStopPosition(earliestDepartureTime, stop);
-
-    if (toTripStopPos < 0) {
-      return List.of();
-    }
-
-    boolean boardingPossible = toTrip.pattern().boardingPossibleAt(toTripStopPos);
-
-    if (!boardingPossible) {
-      return List.of();
-    }
-
-    return List.of(
-      new TripToTripTransfer<>(from, TripStopTime.departure(toTrip, toTripStopPos), null, tx)
-    );
+    return result;
   }
 
+  /**
+   * Find potential transfers where traveller has to "walk" between stops
+   */
   private Collection<? extends TripToTripTransfer<T>> findStandardTransfers(TripStopTime<T> from) {
     final List<TripToTripTransfer<T>> result = new ArrayList<>();
     Iterator<? extends RaptorTransfer> transfers = stdTransfers.getTransfersFromStop(from.stop());
 
+    // Loop through transfers and decide whether they are possible
     while (transfers.hasNext()) {
       var it = transfers.next();
       int toStop = it.stop();
 
-      ConstrainedTransfer tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop);
-      if (tx != null && tx.getTransferConstraint().isNotAllowed()) {
-        continue;
-      }
+      // Find all possible transfers on given stop index, starting on from.time
+      var possibleTransfers = toTrip.findDepartureStopPositions(from.time(), toStop);
 
-      int earliestBoardTime = calculateEarliestBoardTime(from, tx, it.durationInSeconds());
+      for (var stopPos : possibleTransfers) {
+        // Find transfer constraint for stop position
+        var tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop, stopPos);
 
-      int toTripStopPos = toTrip.findDepartureStopPosition(earliestBoardTime, toStop);
+        if (!isAllowedTransfer(stopPos, tx)) {
+          continue;
+        }
 
-      if (toTripStopPos < 0) {
-        continue;
-      }
+        // Check whether traveller will have enough time to do the transfer
+        // We have to do it here because every stopPos may have unique transfer constraint
+        // So it may be possible to transfer at stop position 2 but not on 1 etc...
+        int earliestBoardTime = calculateEarliestBoardTime(from, tx, it.durationInSeconds());
 
-      var to = TripStopTime.departure(toTrip, toTripStopPos);
+        if (earliestBoardTime > toTrip.departure(stopPos)) {
+          continue;
+        }
 
-      boolean boardingPossible = to.trip().pattern().boardingPossibleAt(to.stopPosition());
-
-      if (boardingPossible) {
+        var to = TripStopTime.departure(toTrip, stopPos);
+        // Add as a possible result
         result.add(new TripToTripTransfer<>(from, to, it, tx));
       }
     }
+
     return result;
   }
 
@@ -244,5 +262,23 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       latestArrivalStopPos = nextLatestArrivalStopPos;
       result.set(i, filteredTransfers);
     }
+  }
+
+  /**
+   * Based on trip pattern and transfer constraint check whether transfer at this point is possible
+   * @param stopPosition stop position in destination trip pattern
+   * @param tx optional transfer constraint
+   * @return whether this transfer is possible
+   */
+  private boolean isAllowedTransfer(int stopPosition, ConstrainedTransfer tx) {
+    // Check in trip pattern whether boarding is possible
+    if (!toTrip.pattern().boardingPossibleAt(stopPosition)) {
+      return false;
+    }
+    // Transfer is allowed if no constrained transfer exist
+    if (tx == null) {
+      return true;
+    }
+    return !tx.getTransferConstraint().isNotAllowed();
   }
 }
