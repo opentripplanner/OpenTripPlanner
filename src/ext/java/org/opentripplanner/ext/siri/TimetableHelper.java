@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri;
 
-import static java.util.Collections.EMPTY_LIST;
 import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
@@ -12,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.xml.datatype.Duration;
 import org.opentripplanner.model.FeedScopedId;
@@ -21,9 +21,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -56,10 +55,12 @@ public class TimetableHelper {
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static TripTimes createUpdatedTripTimes(
-    final Graph graph,
     Timetable timetable,
     EstimatedVehicleJourney journey,
-    FeedScopedId tripId
+    FeedScopedId tripId,
+    Function<FeedScopedId, StopLocation> getStopById,
+    ZoneId zoneId,
+    Deduplicator deduplicator
   ) {
     if (journey == null) {
       return null;
@@ -79,28 +80,16 @@ public class TimetableHelper {
       return oldTimes;
     }
 
-    EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
-    EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
+    List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
+    List<RecordedCall> recordedCalls = getRecordedCalls(journey);
 
-    List<EstimatedCall> estimatedCalls;
-    EstimatedCall lastEstimatedCall;
-    if (journeyEstimatedCalls != null && !journeyEstimatedCalls.getEstimatedCalls().isEmpty()) {
-      estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
-      lastEstimatedCall = estimatedCalls.get(estimatedCalls.size() - 1);
-    } else {
-      estimatedCalls = List.of();
-      lastEstimatedCall = null;
-    }
+    EstimatedCall lastEstimatedCall = estimatedCalls.isEmpty()
+      ? null
+      : estimatedCalls.get(estimatedCalls.size() - 1);
 
-    List<RecordedCall> recordedCalls;
-    RecordedCall lastRecordedCall;
-    if (journeyRecordedCalls != null && !journeyRecordedCalls.getRecordedCalls().isEmpty()) {
-      recordedCalls = journeyRecordedCalls.getRecordedCalls();
-      lastRecordedCall = recordedCalls.get(recordedCalls.size() - 1);
-    } else {
-      recordedCalls = List.of();
-      lastRecordedCall = null;
-    }
+    RecordedCall lastRecordedCall = recordedCalls.isEmpty()
+      ? null
+      : recordedCalls.get(recordedCalls.size() - 1);
 
     boolean stopPatternChanged = false;
 
@@ -111,17 +100,15 @@ public class TimetableHelper {
       oldTimes,
       journey,
       trip,
-      new RoutingService(graph)
+      getStopById
     );
     if (modifiedStopTimes == null) {
       return null;
     }
-    TripTimes newTimes = new TripTimes(trip, modifiedStopTimes, graph.deduplicator);
+    TripTimes newTimes = new TripTimes(trip, modifiedStopTimes, deduplicator);
 
     //Populate missing data from existing TripTimes
     newTimes.setServiceCode(oldTimes.getServiceCode());
-
-    ZoneId zoneId = graph.getTimeZone().toZoneId();
 
     int callCounter = 0;
     ZonedDateTime departureDate = null;
@@ -144,7 +131,7 @@ public class TimetableHelper {
         foundMatch = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
         if (!foundMatch && stop.isPartOfStation()) {
-          var alternativeStop = graph.index.getStopForId(
+          var alternativeStop = getStopById.apply(
             new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue())
           );
           if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -241,7 +228,7 @@ public class TimetableHelper {
           foundMatch = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
           if (!foundMatch && stop.isPartOfStation()) {
-            var alternativeStop = graph.index.getStopForId(
+            var alternativeStop = getStopById.apply(
               new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue())
             );
             if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -401,28 +388,14 @@ public class TimetableHelper {
   public static List<StopLocation> createModifiedStops(
     Timetable timetable,
     EstimatedVehicleJourney journey,
-    RoutingService routingService
+    Function<FeedScopedId, StopLocation> getStopForId
   ) {
     if (journey == null) {
       return null;
     }
 
-    EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
-    EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
-
-    List<EstimatedCall> estimatedCalls;
-    if (journeyEstimatedCalls != null) {
-      estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
-    } else {
-      estimatedCalls = EMPTY_LIST;
-    }
-
-    List<RecordedCall> recordedCalls;
-    if (journeyRecordedCalls != null) {
-      recordedCalls = journeyRecordedCalls.getRecordedCalls();
-    } else {
-      recordedCalls = EMPTY_LIST;
-    }
+    List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
+    List<RecordedCall> recordedCalls = getRecordedCalls(journey);
 
     //Get all scheduled stops
     var pattern = timetable.getPattern();
@@ -448,7 +421,7 @@ public class TimetableHelper {
             .equals(recordedCall.getStopPointRef().getValue());
 
           if (!stopsMatchById && stop.isPartOfStation()) {
-            var alternativeStop = routingService.getStopForId(
+            var alternativeStop = getStopForId.apply(
               new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue())
             );
             if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -476,7 +449,7 @@ public class TimetableHelper {
             .equals(estimatedCall.getStopPointRef().getValue());
 
           if (!stopsMatchById && stop.isPartOfStation()) {
-            var alternativeStop = routingService.getStopForId(
+            var alternativeStop = getStopForId.apply(
               new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue())
             );
             if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -514,36 +487,21 @@ public class TimetableHelper {
     TripTimes oldTimes,
     EstimatedVehicleJourney journey,
     Trip trip,
-    RoutingService routingService
+    Function<FeedScopedId, StopLocation> getStopForId
   ) {
     if (journey == null) {
       return null;
     }
 
-    List<EstimatedCall> estimatedCalls;
-    List<RecordedCall> recordedCalls;
-    if (journey.getEstimatedCalls() != null) {
-      estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
-    } else {
-      estimatedCalls = EMPTY_LIST;
-    }
+    List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
+    List<RecordedCall> recordedCalls = getRecordedCalls(journey);
 
-    if (journey.getRecordedCalls() != null) {
-      recordedCalls = journey.getRecordedCalls().getRecordedCalls();
-    } else {
-      recordedCalls = EMPTY_LIST;
-    }
-
-    var stops = createModifiedStops(timetable, journey, routingService);
+    var stops = createModifiedStops(timetable, journey, getStopForId);
 
     List<StopTime> modifiedStops = new ArrayList<>();
 
     ZonedDateTime departureDate = null;
-    int numberOfRecordedCalls = (
-        journey.getRecordedCalls() != null && journey.getRecordedCalls().getRecordedCalls() != null
-      )
-      ? journey.getRecordedCalls().getRecordedCalls().size()
-      : 0;
+    int numberOfRecordedCalls = recordedCalls.size();
     Set<Object> alreadyVisited = new HashSet<>();
     // modify updated stop-times
     for (int i = 0; i < stops.size(); i++) {
@@ -576,7 +534,7 @@ public class TimetableHelper {
           boolean stopsMatchById = stop.getId().getId().equals(callStopRef);
 
           if (!stopsMatchById && stop.isPartOfStation()) {
-            var alternativeStop = routingService.getStopForId(
+            var alternativeStop = getStopForId.apply(
               new FeedScopedId(stop.getId().getFeedId(), callStopRef)
             );
             if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -618,7 +576,7 @@ public class TimetableHelper {
             .equals(estimatedCall.getStopPointRef().getValue());
 
           if (!stopsMatchById && stop.isPartOfStation()) {
-            var alternativeStop = routingService.getStopForId(
+            var alternativeStop = getStopForId.apply(
               new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue())
             );
             if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -693,9 +651,9 @@ public class TimetableHelper {
    */
   public static TripTimes createUpdatedTripTimes(
     Timetable timetable,
-    Graph graph,
     VehicleActivityStructure activity,
-    FeedScopedId tripId
+    FeedScopedId tripId,
+    Function<FeedScopedId, StopLocation> getStopById
   ) {
     if (activity == null) {
       return null;
@@ -749,7 +707,7 @@ public class TimetableHelper {
                 stop.getId().getFeedId(),
                 monitoredCall.getStopPointRef().getValue()
               );
-              var alternativeStop = graph.index.getStopForId(alternativeId);
+              var alternativeStop = getStopById.apply(alternativeId);
               if (alternativeStop != null && alternativeStop.isPartOfStation()) {
                 matchFound = stop.isPartOfSameStationAs(alternativeStop);
               }
@@ -805,6 +763,32 @@ public class TimetableHelper {
       }
     }
     return null;
+  }
+
+  /**
+   * Get the list of recorded calls for a EstimatedVehicleJourney. Return an empty list if no
+   * recorded calls exist.
+   */
+  private static List<RecordedCall> getRecordedCalls(EstimatedVehicleJourney journey) {
+    EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
+    if (journeyRecordedCalls != null) {
+      return journeyRecordedCalls.getRecordedCalls();
+    } else {
+      return List.of();
+    }
+  }
+
+  /**
+   * Get the list of estimated calls for a EstimatedVehicleJourney. Return an empty list if no
+   * estimated calls exist.
+   */
+  private static List<EstimatedCall> getEstimatedCalls(EstimatedVehicleJourney journey) {
+    EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
+    if (journeyEstimatedCalls != null) {
+      return journeyEstimatedCalls.getEstimatedCalls();
+    } else {
+      return List.of();
+    }
   }
 
   /**

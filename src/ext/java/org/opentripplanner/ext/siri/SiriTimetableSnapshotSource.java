@@ -437,9 +437,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     final TripTimes updatedTripTimes = createUpdatedTripTimes(
       currentTimetable,
-      graph,
       activity,
-      trip.getId()
+      trip.getId(),
+      graph::getStopLocationById
     );
     if (updatedTripTimes == null) {
       return false;
@@ -853,10 +853,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (exactPattern != null) {
         Timetable currentTimetable = getCurrentTimetable(exactPattern, serviceDate);
         TripTimes exactUpdatedTripTimes = createUpdatedTripTimes(
-          graph,
           currentTimetable,
           estimatedVehicleJourney,
-          tripMatchedByServiceJourneyId.getId()
+          tripMatchedByServiceJourneyId.getId(),
+          graph::getStopLocationById,
+          timeZone.toZoneId(),
+          graph.deduplicator
         );
         if (exactUpdatedTripTimes != null) {
           times.add(exactUpdatedTripTimes);
@@ -905,10 +907,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         if (pattern != null) {
           Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
           TripTimes updatedTripTimes = createUpdatedTripTimes(
-            graph,
             currentTimetable,
             estimatedVehicleJourney,
-            matchingTrip.getId()
+            matchingTrip.getId(),
+            graph::getStopLocationById,
+            timeZone.toZoneId(),
+            graph.deduplicator
           );
           if (updatedTripTimes != null) {
             patterns.add(pattern);
@@ -955,14 +959,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             var modifiedStops = createModifiedStops(
               currentTimetable,
               estimatedVehicleJourney,
-              routingService
+              graph::getStopLocationById
             );
             List<StopTime> modifiedStopTimes = createModifiedStopTimes(
               currentTimetable,
               tripTimes,
               estimatedVehicleJourney,
               trip,
-              routingService
+              graph::getStopLocationById
             );
 
             if (modifiedStops != null && modifiedStops.isEmpty()) {
