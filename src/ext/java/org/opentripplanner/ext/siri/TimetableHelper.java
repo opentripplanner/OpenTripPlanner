@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.xml.datatype.Duration;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
@@ -166,87 +167,50 @@ public class TimetableHelper {
             newTimes.setCancelled(callCounter);
           }
 
+          ZonedDateTime startOfService = DateMapper.asStartOfService(
+            departureDate.toLocalDate(),
+            zoneId
+          );
+
           int arrivalTime = newTimes.getArrivalTime(callCounter);
-          int realtimeArrivalTime = arrivalTime;
-          if (recordedCall.getActualArrivalTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getActualArrivalTime(),
-                zoneId
-              );
-            //Flag as recorded
-            newTimes.setRecorded(callCounter, true);
-          } else if (recordedCall.getActualDepartureTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getActualDepartureTime(),
-                zoneId
-              );
-            //Flag as recorded
-            newTimes.setRecorded(callCounter, true);
-          } else if (recordedCall.getExpectedArrivalTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getExpectedArrivalTime(),
-                zoneId
-              );
-          } else if (recordedCall.getExpectedDepartureTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getExpectedDepartureTime(),
-                zoneId
-              );
-          } else if (recordedCall.getAimedArrivalTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getAimedArrivalTime(),
-                zoneId
-              );
+
+          Integer realtimeArrivalTime = getAvailableTime(
+            startOfService,
+            recordedCall::getActualArrivalTime,
+            recordedCall::getActualDepartureTime,
+            recordedCall::getExpectedArrivalTime,
+            recordedCall::getExpectedDepartureTime,
+            recordedCall::getAimedArrivalTime
+          );
+
+          if (realtimeArrivalTime == null) {
+            realtimeArrivalTime = arrivalTime;
           }
+
           int arrivalDelay = realtimeArrivalTime - arrivalTime;
           newTimes.updateArrivalDelay(callCounter, arrivalDelay);
           lastArrivalDelay = arrivalDelay;
 
           int departureTime = newTimes.getDepartureTime(callCounter);
-          int realtimeDepartureTime = departureTime;
-          if (recordedCall.getActualDepartureTime() != null) {
-            realtimeDepartureTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getActualDepartureTime(),
-                zoneId
-              );
-            //Flag as recorded
-            newTimes.setRecorded(callCounter, true);
+
+          Integer realtimeDepartureTime = getAvailableTime(
+            startOfService,
+            recordedCall::getActualDepartureTime,
+            // Do not use actual arrival time for departure time, as the vehicle can be currently at the stop
+            recordedCall::getExpectedDepartureTime,
+            recordedCall::getExpectedArrivalTime,
+            recordedCall::getAimedDepartureTime
+          );
+
+          if (realtimeDepartureTime == null) {
+            realtimeDepartureTime = departureTime;
           }
-          // Do not use actual arrival time for departure time, as the vehicle can be currently at the stop
-          else if (recordedCall.getExpectedDepartureTime() != null) {
-            realtimeDepartureTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getExpectedDepartureTime(),
-                zoneId
-              );
-          } else if (recordedCall.getExpectedArrivalTime() != null) {
-            realtimeDepartureTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getExpectedArrivalTime(),
-                zoneId
-              );
-          } else if (recordedCall.getAimedDepartureTime() != null) {
-            realtimeDepartureTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getAimedDepartureTime(),
-                zoneId
-              );
-          }
+
+          newTimes.setRecorded(
+            callCounter,
+            recordedCall.getActualArrivalTime() != null ||
+            recordedCall.getActualDepartureTime() != null
+          );
 
           int departureDelay = realtimeDepartureTime - departureTime;
 
@@ -310,57 +274,34 @@ public class TimetableHelper {
               modifiedStopTimes.get(callCounter).cancelPickup();
             }
 
+            ZonedDateTime startOfService = DateMapper.asStartOfService(
+              departureDate.toLocalDate(),
+              zoneId
+            );
+
             int arrivalTime = newTimes.getArrivalTime(callCounter);
-            int realtimeArrivalTime = -1;
-            if (estimatedCall.getExpectedArrivalTime() != null) {
-              realtimeArrivalTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getExpectedArrivalTime(),
-                  zoneId
-                );
-            } else if (estimatedCall.getExpectedDepartureTime() != null) {
-              realtimeArrivalTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getExpectedDepartureTime(),
-                  zoneId
-                );
-            } else if (estimatedCall.getAimedArrivalTime() != null) {
-              realtimeArrivalTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getAimedArrivalTime(),
-                  zoneId
-                );
-            }
+
+            Integer realtimeArrivalTime = getAvailableTime(
+              startOfService,
+              estimatedCall::getExpectedArrivalTime,
+              estimatedCall::getExpectedDepartureTime,
+              estimatedCall::getAimedArrivalTime
+            );
 
             int departureTime = newTimes.getDepartureTime(callCounter);
-            int realtimeDepartureTime = departureTime;
-            if (estimatedCall.getExpectedDepartureTime() != null) {
-              realtimeDepartureTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getExpectedDepartureTime(),
-                  zoneId
-                );
-            } else if (estimatedCall.getExpectedArrivalTime() != null) {
-              realtimeDepartureTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getExpectedArrivalTime(),
-                  zoneId
-                );
-            } else if (estimatedCall.getAimedDepartureTime() != null) {
-              realtimeDepartureTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getAimedDepartureTime(),
-                  zoneId
-                );
+
+            Integer realtimeDepartureTime = getAvailableTime(
+              startOfService,
+              estimatedCall::getExpectedDepartureTime,
+              estimatedCall::getExpectedArrivalTime,
+              estimatedCall::getAimedDepartureTime
+            );
+
+            if (realtimeDepartureTime == null) {
+              realtimeDepartureTime = departureTime;
             }
 
-            if (realtimeArrivalTime == -1) {
+            if (realtimeArrivalTime == null) {
               realtimeArrivalTime = realtimeDepartureTime;
             }
 
@@ -832,6 +773,24 @@ public class TimetableHelper {
     }
 
     return newTimes;
+  }
+
+  /**
+   * Get the first non-null time from a list of suppliers, and convert that to seconds past start of
+   * service time. If none of the suppliers provide a time, return null.
+   */
+  @SafeVarargs
+  private static Integer getAvailableTime(
+    ZonedDateTime startOfService,
+    Supplier<ZonedDateTime>... timeSuppliers
+  ) {
+    for (var supplier : timeSuppliers) {
+      final ZonedDateTime time = supplier.get();
+      if (time != null) {
+        return DateMapper.secondsSinceStartOfService(startOfService, time);
+      }
+    }
+    return null;
   }
 
   /**
