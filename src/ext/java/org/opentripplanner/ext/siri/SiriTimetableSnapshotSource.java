@@ -327,7 +327,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     final long now = System.currentTimeMillis();
     if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
       if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer.toString());
+        LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
       } else {
         LOG.debug("Buffer was unchanged, keeping old snapshot.");
@@ -783,7 +783,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     if (replacedRoute != null) {
       TransitMode replacedRouteMode = replacedRoute.getMode();
 
-      if (replacedRouteMode != null && replacedRouteMode.equals(TransitMode.RAIL)) { // Replaced-route is RAIL
+      if (TransitMode.RAIL.equals(replacedRouteMode)) {
         if (transitMode.equals(TransitMode.RAIL)) {
           // Replacement-route is also RAIL
           return RailSubmodeEnumeration.REPLACEMENT_RAIL_SERVICE.value();
@@ -1549,28 +1549,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     } else {
       return null;
     }
-  }
-
-  /**
-   * Retrieve route given a route id without an agency
-   *
-   * @param feedId  feed id for the route id
-   * @param routeId route id without the agency
-   * @return route or null if route can't be found in graph index
-   */
-  private Route getRouteForRouteId(String feedId, String routeId) {
-    return routingService.getRouteForId(new FeedScopedId(feedId, routeId));
-  }
-
-  /**
-   * Retrieve trip given a trip id without an agency
-   *
-   * @param feedId feed id for the trip id
-   * @param tripId trip id without the agency
-   * @return trip or null if trip can't be found in graph index
-   */
-  private Trip getTripForTripId(String feedId, String tripId) {
-    return routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
   }
 
   /**
