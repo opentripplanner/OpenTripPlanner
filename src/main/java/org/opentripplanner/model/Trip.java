@@ -33,7 +33,7 @@ public final class Trip extends TransitEntity {
 
   private FeedScopedId shapeId;
 
-  private WheelChairBoarding wheelchairBoarding = WheelChairBoarding.NO_INFORMATION;
+  private WheelchairBoarding wheelchairBoarding = WheelchairBoarding.NO_INFORMATION;
 
   /**
    * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
@@ -228,13 +228,13 @@ public final class Trip extends TransitEntity {
     this.shapeId = shapeId;
   }
 
-  public WheelChairBoarding getWheelchairBoarding() {
+  public WheelchairBoarding getWheelchairBoarding() {
     return wheelchairBoarding;
   }
 
-  public void setWheelchairBoarding(WheelChairBoarding boarding) {
+  public void setWheelchairBoarding(WheelchairBoarding boarding) {
     this.wheelchairBoarding =
-      Objects.requireNonNullElse(boarding, WheelChairBoarding.NO_INFORMATION);
+      Objects.requireNonNullElse(boarding, WheelchairBoarding.NO_INFORMATION);
   }
 
   public BikeAccess getBikesAllowed() {

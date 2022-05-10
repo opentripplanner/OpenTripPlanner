@@ -78,7 +78,6 @@ public class StreetGraphFinder implements GraphFinder {
     RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
     rr.from = new GenericLocation(null, null, lat, lon);
     rr.walkSpeed = 1;
-    rr.dominanceFunction = new DominanceFunction.LeastWalk();
     rr.setNumItineraries(1);
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
@@ -86,6 +85,7 @@ public class StreetGraphFinder implements GraphFinder {
       AStarBuilder
         .allDirections(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
+        .setDominanceFunction(new DominanceFunction.LeastWalk())
         .setContext(new RoutingContext(rr, graph, temporaryVertices))
         .getShortestPathTree();
     }

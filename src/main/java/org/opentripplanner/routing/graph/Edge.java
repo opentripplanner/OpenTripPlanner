@@ -75,18 +75,6 @@ public abstract class Edge implements Serializable {
     return null;
   }
 
-  /**
-   * This should only be called inside State; other methods should call
-   * org.opentripplanner.routing.core.State.getBackTrip()
-   *
-   * @author mattwigway
-   */
-  public Trip getTrip() {
-    return null;
-  }
-
-  // Notes are now handled by State
-
   @Override
   public int hashCode() {
     return Objects.hash(fromv, tov);

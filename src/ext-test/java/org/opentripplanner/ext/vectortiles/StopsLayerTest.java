@@ -5,8 +5,8 @@ import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
@@ -17,7 +17,7 @@ public class StopsLayerTest {
 
   private Stop stop;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     stop = Stop.stopForTest("name", "desc", 50, 10);
   }

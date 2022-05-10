@@ -19,7 +19,7 @@ public abstract class StationElement extends TransitEntity {
 
   private final WgsCoordinate coordinate;
 
-  private final WheelChairBoarding wheelchairBoarding;
+  private final WheelchairBoarding wheelchairBoarding;
 
   private final StopLevel level;
 
@@ -31,7 +31,7 @@ public abstract class StationElement extends TransitEntity {
     String code,
     String description,
     WgsCoordinate coordinate,
-    WheelChairBoarding wheelchairBoarding,
+    WheelchairBoarding wheelchairBoarding,
     StopLevel level
   ) {
     super(id);
@@ -40,7 +40,7 @@ public abstract class StationElement extends TransitEntity {
     this.description = description;
     this.coordinate = coordinate;
     this.wheelchairBoarding =
-      Objects.requireNonNullElse(wheelchairBoarding, WheelChairBoarding.NO_INFORMATION);
+      Objects.requireNonNullElse(wheelchairBoarding, WheelchairBoarding.NO_INFORMATION);
     this.level = level;
   }
 
@@ -84,7 +84,7 @@ public abstract class StationElement extends TransitEntity {
    * Returns whether this station element is accessible for wheelchair users.
    */
   @Nonnull
-  public WheelChairBoarding getWheelchairBoarding() {
+  public WheelchairBoarding getWheelchairBoarding() {
     return wheelchairBoarding;
   }
 

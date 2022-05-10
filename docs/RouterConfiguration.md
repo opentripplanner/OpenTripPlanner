@@ -432,7 +432,45 @@ Common to all updater entries that connect to a network resource is the `url` fi
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
             "type": "websocket-gtfs-rt-updater"
-        }
+        },
+
+        // SIRI SX updater for Azure Service Bus
+        {
+          "type": "siri-azure-sx-updater",
+          "topic": "some_topic",
+          "servicebus-url": "service_bus_url",
+          "feedId": "feed_id",
+          // Set custom hour for when operating day date breaks
+          // In this case 04:00 every night, 
+          // so that 2022-04-21 03:00 will still be operating day date 2022-04-20
+          "customMidnight":  4,
+          // This is used to fetch old messages from http endpoint on startup
+          "history": { 
+            "url": "endpoint_url",
+            // Previous operating day date
+            "fromDateTime": "-P1D",
+            // Next operating day date
+            "toDateTime": "P1D",
+            // timeout in miliseconds
+            "timeout": 300000
+          }
+        },
+
+        // SIRI ET updater for Azure Service Bus
+        // Configs are the same as in SX updater
+        {
+          "type": "siri-azure-sx-updater",
+          "topic": "some_topic",
+          "servicebus-url": "service_bus_url",
+          "feedId": "feed_id",
+          "customMidnight":  4,
+          "history": {
+            "url": "endpoint_url", 
+            // Current operating day date
+            "fromDateTime": "-P0D",
+            "timeout": 300000
+         }
+      },
     ]
 }
 ```

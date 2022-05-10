@@ -323,10 +323,13 @@ public class RoutingRequest implements Cloneable, Serializable {
   public int nonpreferredTransferCost = 180;
 
   /**
-   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
-   * Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept of
-   * not wanting to walk too much without asking for totally ridiculous itineraries, but this
-   * observation should in no way be taken as scientific or definitive. Your mileage may vary.
+   * A multiplier for how bad walking is, compared to being in transit for equal
+   * lengths of time. Empirically, values between 2 and 4 seem to correspond
+   * well to the concept of not wanting to walk too much without asking for
+   * totally ridiculous itineraries, but this observation should in no way be
+   * taken as scientific or definitive. Your mileage may vary. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
+   * performance with high values. Default value: 2.0
    */
   public double walkReluctance = 2.0;
   public double bikeWalkingReluctance = 5.0;
@@ -645,11 +648,6 @@ public class RoutingRequest implements Cloneable, Serializable {
    * it exists.
    */
   public boolean useVehicleParkingAvailabilityInformation = false;
-  /**
-   * The function that compares paths converging on the same vertex to decide which ones continue to
-   * be explored.
-   */
-  public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
   /**
    * Accept only paths that use transit (no street-only paths).
@@ -1324,14 +1322,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.bikeTriangleSafetyFactor = safe;
     this.bikeTriangleSlopeFactor = slope;
     this.bikeTriangleTimeFactor = time;
-  }
-
-  /**
-   * Create a new ShortestPathTree instance using the DominanceFunction specified in this
-   * RoutingRequest.
-   */
-  public ShortestPathTree getNewShortestPathTree() {
-    return this.dominanceFunction.getNewShortestPathTree(this);
   }
 
   public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {

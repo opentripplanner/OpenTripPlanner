@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder.linking;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -32,7 +32,7 @@ public class LinkStopToPlatformTest {
 
   private Graph graph;
 
-  @Before
+  @BeforeEach
   public void before() {
     // Set up transit platform
 
@@ -94,7 +94,7 @@ public class LinkStopToPlatformTest {
   }
 
   @Test
-  @Ignore
+  @Disabled
   public void testLinkStopWithExtraEdges() {
     // TODO Reimplement this functionality #3152
     //        SimpleStreetSplitter splitter = SimpleStreetSplitter.createForTest(graph);
