@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -749,10 +749,16 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     var origin = getStop(index).getParentStation();
     var destionation = getStop(index + 1).getParentStation();
 
-    if (origin == null || destionation == null) {
-      return false;
-    }
+    var sameOrigin = Optional
+      .ofNullable(origin)
+      .map(o -> o.equals(otherOrigin))
+      .orElse(getStop(index).equals(other.getStop(index)));
 
-    return origin.equals(otherOrigin) && destionation.equals(otherDestination);
+    var sameDestination = Optional
+      .ofNullable(destionation)
+      .map(o -> o.equals(otherDestination))
+      .orElse(getStop(index + 1).equals(other.getStop(index + 1)));
+
+    return sameOrigin && sameDestination;
   }
 }
