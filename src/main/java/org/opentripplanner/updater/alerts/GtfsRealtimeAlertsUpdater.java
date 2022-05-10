@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * myalert.feedId = TA
  * </pre>
  */
-public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
+public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements TransitAlertProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
   private final String url;

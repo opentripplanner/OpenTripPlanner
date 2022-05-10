@@ -25,6 +25,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -42,6 +43,7 @@ public class EstimatedCallType {
     GraphQLOutputType destinationDisplayType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType serviceJourneyType,
+    GraphQLOutputType datedServiceJourneyType,
     GqlUtil gqlUtil
   ) {
     return GraphQLObjectType
@@ -286,6 +288,20 @@ public class EstimatedCallType {
           .name("serviceJourney")
           .type(serviceJourneyType)
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getTrip())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("datedServiceJourney")
+          .type(datedServiceJourneyType)
+          .dataFetcher(environment ->
+            DatedServiceJourneyHelper.getTripOnServiceDate(
+              GqlUtil.getRoutingService(environment),
+              environment.<TripTimeOnDate>getSource().getTrip().getId(),
+              environment.<TripTimeOnDate>getSource().getServiceDay()
+            )
+          )
           .build()
       )
       .field(

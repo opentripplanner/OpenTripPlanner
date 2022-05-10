@@ -10,6 +10,10 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.routing.graph.Graph;
@@ -144,6 +148,12 @@ public abstract class GraphUpdaterConfigurator {
     }
     for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
       updaters.add(new WinkkiPollingGraphUpdater(configItem));
+    }
+    for (SiriAzureETUpdaterParameters configItem : config.getSiriAzureETUpdaterParameters()) {
+      updaters.add(new SiriAzureETUpdater(configItem));
+    }
+    for (SiriAzureSXUpdaterParameters configItem : config.getSiriAzureSXUpdaterParameters()) {
+      updaters.add(new SiriAzureSXUpdater(configItem));
     }
 
     return updaters;

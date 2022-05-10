@@ -43,6 +43,8 @@
   [#4074](https://github.com/opentripplanner/OpenTripPlanner/pull/4074)
 - Transmodel API transport mode not present or null is all transport modes
   [#4123](https://github.com/opentripplanner/OpenTripPlanner/pull/4123)
+- Expose datedServiceJourney from EstimatedCall 
+  [#4128](https://github.com/opentripplanner/OpenTripPlanner/pull/4128)
 
 ## Documentation
 

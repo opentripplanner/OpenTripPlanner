@@ -1,14 +1,14 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.FakeGraph;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -20,14 +20,10 @@ public class PlatformLinkerTest {
    * data is from Skøyen station, Norway
    */
   @Test
-  public void testLinkEntriesToPlatforms() throws Exception {
+  public void testLinkEntriesToPlatforms() {
     String stairsEndpointLabel = "osm:node:1028861028";
 
     Graph gg = new Graph();
-    OpenStreetMapModule loader = new OpenStreetMapModule();
-    loader.platformEntriesLinking = true;
-    loader.skipVisibility = false;
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     File file = new File(
       URLDecoder.decode(
@@ -36,9 +32,13 @@ public class PlatformLinkerTest {
       )
     );
 
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    loader.setProvider(provider);
+    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    loader.platformEntriesLinking = true;
+    loader.skipVisibility = false;
+    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+
     loader.buildGraph(gg, new HashMap<>());
 
     Vertex stairsEndpoint = gg.getVertex(stairsEndpointLabel);

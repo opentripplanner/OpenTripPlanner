@@ -1,8 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -10,16 +9,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
-public class TestUnconnectedAreas {
+public class UnconnectedAreasTest {
 
   /**
    * The P+R.osm.gz file contains 2 park and ride, one a single way area and the other a
@@ -145,18 +145,16 @@ public class TestUnconnectedAreas {
 
   private Graph buildOSMGraph(String osmFileName, DataImportIssueStore issueStore) {
     Graph graph = new Graph();
+    var fileUrl = getClass().getResource(osmFileName);
+    Assertions.assertNotNull(fileUrl);
+    File file = new File(fileUrl.getFile());
 
-    OpenStreetMapModule loader = new OpenStreetMapModule();
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
+    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
     loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     loader.staticParkAndRide = true;
     loader.staticBikeParkAndRide = true;
 
-    var fileUrl = getClass().getResource(osmFileName);
-    assertNotNull(fileUrl);
-    File file = new File(fileUrl.getFile());
-
-    BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
-    loader.setProvider(provider);
     loader.buildGraph(graph, new HashMap<>(), issueStore);
 
     StreetLinkerModule streetLinkerModule = new StreetLinkerModule();

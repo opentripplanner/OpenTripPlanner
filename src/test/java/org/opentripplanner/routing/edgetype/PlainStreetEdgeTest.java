@@ -18,6 +18,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -259,7 +260,12 @@ public class PlainStreetEdgeTest {
     StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
     RoutingRequest routingRequest = proto.clone();
     RoutingContext routingContext = new RoutingContext(routingRequest, graph, v0, v2);
-    State state = new State(v2, Instant.EPOCH, routingRequest, routingContext);
+    State state = new State(
+      v2,
+      Instant.EPOCH,
+      routingContext,
+      StateData.getInitialStateData(routingRequest)
+    );
 
     state.getOptions().setArriveBy(true);
     e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));

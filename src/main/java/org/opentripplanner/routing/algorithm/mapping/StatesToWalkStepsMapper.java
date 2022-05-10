@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -11,6 +12,7 @@ import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -234,10 +236,9 @@ public class StatesToWalkStepsMapper {
         thisAngle,
         edge.isRoundabout()
       );
-      boolean optionsBefore = backState.multipleOptionsBefore();
       if (edge.isRoundabout()) {
         // we are on a roundabout, and have already traversed at least one edge of it.
-        if (optionsBefore) {
+        if (multipleTurnOptionsInPreviousState(backState)) {
           // increment exit count if we passed one.
           roundaboutExit += 1;
         }
@@ -426,6 +427,51 @@ public class StatesToWalkStepsMapper {
       !(java.util.Objects.equals(current.streetNameNoParens(), streetNameNoParens)) &&
       (!current.bogusName || !edge.hasBogusName())
     );
+  }
+
+  private static boolean multipleTurnOptionsInPreviousState(State state) {
+    boolean foundAlternatePaths = false;
+    TraverseMode requestedMode = state.getNonTransitMode();
+    for (Edge out : state.getBackState().getVertex().getOutgoing()) {
+      if (out == state.backEdge) {
+        continue;
+      }
+      if (!(out instanceof StreetEdge)) {
+        continue;
+      }
+      State outState = out.traverse(state.getBackState());
+      if (outState == null) {
+        continue;
+      }
+      if (!outState.getBackMode().equals(requestedMode)) {
+        //walking a bike, so, not really an exit
+        continue;
+      }
+      // this section handles the case of an option which is only an option if you walk your
+      // bike. It is complicated because you will not need to walk your bike until one
+      // edge after the current edge.
+
+      //now, from here, try a continuing path.
+      Vertex tov = outState.getVertex();
+      boolean found = false;
+      for (Edge out2 : tov.getOutgoing()) {
+        State outState2 = out2.traverse(outState);
+        if (outState2 != null && !Objects.equals(outState2.getBackMode(), requestedMode)) {
+          // walking a bike, so, not really an exit
+          continue;
+        }
+        found = true;
+        break;
+      }
+      if (!found) {
+        continue;
+      }
+
+      // there were paths we didn't take.
+      foundAlternatePaths = true;
+      break;
+    }
+    return foundAlternatePaths;
   }
 
   private void createFirstStep(State backState, State forwardState) {

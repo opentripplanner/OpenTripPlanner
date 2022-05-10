@@ -64,8 +64,8 @@ public interface StopLocation {
   }
 
   @Nonnull
-  default WheelChairBoarding getWheelchairBoarding() {
-    return WheelChairBoarding.NO_INFORMATION;
+  default WheelchairBoarding getWheelchairBoarding() {
+    return WheelchairBoarding.NO_INFORMATION;
   }
 
   /**

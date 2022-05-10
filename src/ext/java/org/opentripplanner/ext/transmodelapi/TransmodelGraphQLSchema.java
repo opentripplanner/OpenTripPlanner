@@ -294,6 +294,7 @@ public class TransmodelGraphQLSchema {
       destinationDisplayType,
       ptSituationElementType,
       ServiceJourneyType.REF,
+      DatedServiceJourneyType.REF,
       gqlUtil
     );
 

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -65,7 +65,7 @@ public class AccessibilityScoreFilter implements ItineraryListFilter {
     return sum / values.size();
   }
 
-  public static double accessibilityScore(WheelChairBoarding wheelchair) {
+  public static double accessibilityScore(WheelchairBoarding wheelchair) {
     return switch (wheelchair) {
       case NO_INFORMATION -> 0.5;
       case POSSIBLE -> 1;
