@@ -20,7 +20,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -93,19 +93,17 @@ public class TimetableHelper {
 
     boolean stopPatternChanged = false;
 
-    Trip trip = getTrip(tripId, timetable);
-
+    TripPattern pattern = timetable.getPattern();
     List<StopTime> modifiedStopTimes = createModifiedStopTimes(
-      timetable,
+      pattern,
       oldTimes,
       journey,
-      trip,
       getStopById
     );
     if (modifiedStopTimes == null) {
       return null;
     }
-    TripTimes newTimes = new TripTimes(trip, modifiedStopTimes, deduplicator);
+    TripTimes newTimes = new TripTimes(oldTimes.getTrip(), modifiedStopTimes, deduplicator);
 
     //Populate missing data from existing TripTimes
     newTimes.setServiceCode(oldTimes.getServiceCode());
@@ -120,7 +118,7 @@ public class TimetableHelper {
     int departureFromPreviousStop = 0;
     int lastArrivalDelay = 0;
     int lastDepartureDelay = 0;
-    for (var stop : timetable.getPattern().getStops()) {
+    for (var stop : pattern.getStops()) {
       boolean foundMatch = false;
 
       for (RecordedCall recordedCall : recordedCalls) {
@@ -322,7 +320,7 @@ public class TimetableHelper {
         }
       }
       if (!foundMatch) {
-        if (timetable.getPattern().isBoardAndAlightAt(callCounter, NONE)) {
+        if (pattern.isBoardAndAlightAt(callCounter, NONE)) {
           // When newTimes contains stops without pickup/dropoff - set both arrival/departure to previous stop's departure
           // This necessary to accommodate the case when delay is reduced/eliminated between to stops with pickup/dropoff, and
           // multiple non-pickup/dropoff stops are in between.
@@ -369,7 +367,7 @@ public class TimetableHelper {
       return null;
     }
 
-    if (newTimes.getNumStops() != timetable.getPattern().numberOfStops()) {
+    if (newTimes.getNumStops() != pattern.numberOfStops()) {
       return null;
     }
 
@@ -386,7 +384,7 @@ public class TimetableHelper {
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static List<StopLocation> createModifiedStops(
-    Timetable timetable,
+    TripPattern pattern,
     EstimatedVehicleJourney journey,
     Function<FeedScopedId, StopLocation> getStopForId
   ) {
@@ -396,9 +394,6 @@ public class TimetableHelper {
 
     List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
     List<RecordedCall> recordedCalls = getRecordedCalls(journey);
-
-    //Get all scheduled stops
-    var pattern = timetable.getPattern();
 
     // Keeping track of visited stop-objects to allow multiple visits to a stop.
     List<Object> alreadyVisited = new ArrayList<>();
@@ -483,10 +478,9 @@ public class TimetableHelper {
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
   public static List<StopTime> createModifiedStopTimes(
-    Timetable timetable,
+    TripPattern pattern,
     TripTimes oldTimes,
     EstimatedVehicleJourney journey,
-    Trip trip,
     Function<FeedScopedId, StopLocation> getStopForId
   ) {
     if (journey == null) {
@@ -496,7 +490,7 @@ public class TimetableHelper {
     List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
     List<RecordedCall> recordedCalls = getRecordedCalls(journey);
 
-    var stops = createModifiedStops(timetable, journey, getStopForId);
+    var stops = createModifiedStops(pattern, journey, getStopForId);
 
     List<StopTime> modifiedStops = new ArrayList<>();
 
@@ -509,10 +503,10 @@ public class TimetableHelper {
 
       final StopTime stopTime = new StopTime();
       stopTime.setStop(stop);
-      stopTime.setTrip(trip);
+      stopTime.setTrip(oldTimes.getTrip());
       stopTime.setStopSequence(i);
-      stopTime.setDropOffType(timetable.getPattern().getAlightType(i));
-      stopTime.setPickupType(timetable.getPattern().getBoardType(i));
+      stopTime.setDropOffType(pattern.getAlightType(i));
+      stopTime.setPickupType(pattern.getBoardType(i));
       stopTime.setArrivalTime(oldTimes.getScheduledArrivalTime(i));
       stopTime.setDepartureTime(oldTimes.getScheduledDepartureTime(i));
       stopTime.setStopHeadsign(oldTimes.getHeadsign(i));
@@ -839,17 +833,5 @@ public class TimetableHelper {
       case NO_BOARDING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
-  }
-
-  /**
-   * @return the matching Trip in this particular Timetable
-   */
-  public static Trip getTrip(FeedScopedId tripId, Timetable timetable) {
-    for (TripTimes tt : timetable.getTripTimes()) {
-      if (tt.getTrip().getId().equals(tripId)) {
-        return tt.getTrip();
-      }
-    }
-    return null;
   }
 }

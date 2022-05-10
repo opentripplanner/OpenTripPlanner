@@ -955,17 +955,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             removePreviousRealtimeUpdate(feedId, trip.getId().getId(), serviceDate);
 
             // Calculate modified stop-pattern
-            Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
             var modifiedStops = createModifiedStops(
-              currentTimetable,
+              pattern,
               estimatedVehicleJourney,
               graph::getStopLocationById
             );
             List<StopTime> modifiedStopTimes = createModifiedStopTimes(
-              currentTimetable,
+              pattern,
               tripTimes,
               estimatedVehicleJourney,
-              trip,
               graph::getStopLocationById
             );
 
@@ -1293,17 +1291,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           tripPattern.getScheduledTimetable().getTripTimes().get(0).getDepartureTime(0); // TODO does this line do anything?
           patterns.add(tripPattern);
         }
-      }
-    }
-    return patterns;
-  }
-
-  private Set<TripPattern> getPatternForTrip(Set<Trip> trips, EstimatedVehicleJourney journey) {
-    Set<TripPattern> patterns = new HashSet<>();
-    for (Trip trip : trips) {
-      TripPattern pattern = getPatternForTrip(trip, journey);
-      if (pattern != null) {
-        patterns.add(pattern);
       }
     }
     return patterns;
