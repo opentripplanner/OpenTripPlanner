@@ -13,21 +13,23 @@ public class TravelTimeRequest {
 
   public final List<Duration> cutoffs;
 
-  public boolean includeDebugGeometry;
+  public final boolean includeDebugGeometry = false;
 
-  public int precisionMeters = 200;
+  public final int precisionMeters = 200;
 
-  public int offRoadDistanceMeters = 150;
+  public final int offRoadDistanceMeters = 150;
 
   public final Duration maxCutoff;
 
-  public Duration maxAccessDuration = Duration.ofMinutes(45);
+  public final Duration maxAccessDuration;
 
-  public TravelTimeRequest(List<Duration> cutoffList) {
+  public TravelTimeRequest(List<Duration> cutoffList, Duration defaultAccessDuration) {
     this.cutoffs = cutoffList;
     this.maxCutoff = cutoffs.stream().max(Duration::compareTo).orElseThrow();
-    if (maxCutoff.compareTo(maxAccessDuration) < 0) {
+    if (maxCutoff.compareTo(defaultAccessDuration) < 0) {
       maxAccessDuration = maxCutoff;
+    } else {
+      maxAccessDuration = defaultAccessDuration;
     }
   }
 

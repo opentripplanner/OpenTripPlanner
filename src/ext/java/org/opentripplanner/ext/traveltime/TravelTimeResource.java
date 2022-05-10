@@ -43,6 +43,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.model.GenericLocation;
@@ -102,8 +103,7 @@ public class TravelTimeResource {
 
   public TravelTimeResource(
     @Context OTPServer otpServer,
-    @QueryParam("lat") String lat,
-    @QueryParam("lon") String lon,
+    @QueryParam("location") String location,
     @QueryParam("time") String time,
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
     @QueryParam("modes") String modes
@@ -113,12 +113,15 @@ public class TravelTimeResource {
     transitLayer = router.graph.getRealtimeTransitLayer();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
     routingRequest = router.copyDefaultRoutingRequest();
-    routingRequest.from = new GenericLocation(Double.parseDouble(lat), Double.parseDouble(lon));
+    routingRequest.from = LocationStringParser.fromOldStyleString(location);
     if (modes != null) {
       routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();
     }
     traveltimeRequest =
-      new TravelTimeRequest(cutoffs.stream().map(DurationUtils::duration).toList());
+      new TravelTimeRequest(
+        cutoffs.stream().map(DurationUtils::duration).toList(),
+        routingRequest.getMaxAccessEgressDuration(routingRequest.modes.accessMode)
+      );
 
     if (time != null) {
       startTime = Instant.parse(time);
