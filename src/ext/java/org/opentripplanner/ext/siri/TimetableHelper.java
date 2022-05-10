@@ -186,7 +186,8 @@ public class TimetableHelper {
             callCounter == 0 ? recordedCall::getActualDepartureTime : () -> null,
             recordedCall::getExpectedArrivalTime,
             callCounter == 0 ? recordedCall::getExpectedDepartureTime : () -> null,
-            recordedCall::getAimedArrivalTime
+            recordedCall::getAimedArrivalTime,
+            callCounter == 0 ? recordedCall::getAimedDepartureTime : () -> null
           );
 
           if (realtimeArrivalTime == null) {
@@ -207,7 +208,8 @@ public class TimetableHelper {
             // Do not use actual arrival time for departure time, as the vehicle can be currently at the stop
             recordedCall::getExpectedDepartureTime,
             isLastStop ? recordedCall::getExpectedArrivalTime : () -> null,
-            recordedCall::getAimedDepartureTime
+            recordedCall::getAimedDepartureTime,
+            isLastStop ? recordedCall::getAimedArrivalTime : () -> null
           );
 
           if (realtimeDepartureTime == null) {
@@ -293,7 +295,8 @@ public class TimetableHelper {
               startOfService,
               estimatedCall::getExpectedArrivalTime,
               callCounter == 0 ? estimatedCall::getExpectedDepartureTime : () -> null,
-              estimatedCall::getAimedArrivalTime
+              estimatedCall::getAimedArrivalTime,
+              callCounter == 0 ? estimatedCall::getAimedDepartureTime : () -> null
             );
 
             int departureTime = newTimes.getDepartureTime(callCounter);
@@ -304,7 +307,8 @@ public class TimetableHelper {
               startOfService,
               estimatedCall::getExpectedDepartureTime,
               isLastStop ? estimatedCall::getExpectedArrivalTime : () -> null,
-              estimatedCall::getAimedDepartureTime
+              estimatedCall::getAimedDepartureTime,
+              isLastStop ? estimatedCall::getAimedArrivalTime : () -> null
             );
 
             if (realtimeDepartureTime == null) {
