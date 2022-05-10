@@ -165,6 +165,15 @@ public class Timetable implements Serializable {
     return null;
   }
 
+  public TripTimes getTripTimes(FeedScopedId tripId) {
+    for (TripTimes tt : tripTimes) {
+      if (tt.getTrip().getId() == tripId) {
+        return tt;
+      }
+    }
+    return null;
+  }
+
   /**
    * Set new trip times for trip given a trip index
    *

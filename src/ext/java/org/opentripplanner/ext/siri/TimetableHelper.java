@@ -66,13 +66,12 @@ public class TimetableHelper {
       return null;
     }
 
-    int tripIndex = timetable.getTripIndex(tripId);
-    if (tripIndex == -1) {
+    final TripTimes existingTripTimes = timetable.getTripTimes(tripId);
+    if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", tripId);
       return null;
     }
 
-    final TripTimes existingTripTimes = timetable.getTripTimes(tripIndex);
     TripTimes oldTimes = new TripTimes(existingTripTimes);
 
     if (journey.isCancellation() != null && journey.isCancellation()) {
@@ -655,13 +654,12 @@ public class TimetableHelper {
 
     MonitoredVehicleJourneyStructure mvj = activity.getMonitoredVehicleJourney();
 
-    int tripIndex = timetable.getTripIndex(tripId);
-    if (tripIndex == -1) {
+    final TripTimes existingTripTimes = timetable.getTripTimes(tripId);
+    if (existingTripTimes == null) {
       LOG.trace("tripId {} not found in pattern.", tripId);
       return null;
     }
 
-    final TripTimes existingTripTimes = timetable.getTripTimes(tripIndex);
     TripTimes newTimes = new TripTimes(existingTripTimes);
 
     MonitoredCallStructure update = mvj.getMonitoredCall();

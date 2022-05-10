@@ -948,11 +948,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                           to replace previous update regardless of realtimestate
                          */
 
-            cancelScheduledTrip(feedId, trip.getId().getId(), serviceDate);
+            cancelScheduledTrip(trip, serviceDate);
 
             // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
             // previously created trip
-            removePreviousRealtimeUpdate(feedId, trip.getId().getId(), serviceDate);
+            removePreviousRealtimeUpdate(trip, serviceDate);
 
             // Calculate modified stop-pattern
             var modifiedStops = createModifiedStops(
@@ -1130,26 +1130,25 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Cancel scheduled trip in buffer given trip id (without agency id) on service date
+   * Cancel scheduled trip in buffer given trip on service date
    *
-   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
-  private boolean cancelScheduledTrip(String feedId, String tripId, final ServiceDate serviceDate) {
+  private boolean cancelScheduledTrip(Trip trip, final ServiceDate serviceDate) {
     boolean success = false;
 
-    final TripPattern pattern = getPatternForTripId(feedId, tripId);
+    final TripPattern pattern = routingService.getPatternForTrip().get(trip);
 
     if (pattern != null) {
       // Cancel scheduled trip times for this trip in this pattern
       final Timetable timetable = pattern.getScheduledTimetable();
-      final int tripIndex = timetable.getTripIndex(tripId);
+      final TripTimes tripTimes = timetable.getTripTimes(trip);
 
-      if (tripIndex == -1) {
-        LOG.warn("Could not cancel scheduled trip {}", tripId);
+      if (tripTimes == null) {
+        LOG.warn("Could not cancel scheduled trip {}", trip.getId());
       } else {
-        final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
+        final TripTimes newTripTimes = new TripTimes(tripTimes);
         newTripTimes.cancelTrip();
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;
@@ -1160,30 +1159,22 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Removes previous trip-update from buffer if there is an update with given trip id (without
-   * agency id) on service date
+   * Removes previous trip-update from buffer if there is an update with given trip on service date
    *
-   * @param feedId      feed id the trip id belongs to
-   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if a previously added trip was removed
    */
-  private boolean removePreviousRealtimeUpdate(
-    final String feedId,
-    final String tripId,
-    final ServiceDate serviceDate
-  ) {
+  private boolean removePreviousRealtimeUpdate(final Trip trip, final ServiceDate serviceDate) {
     boolean success = false;
 
-    FeedScopedId feedScopedTripId = new FeedScopedId(feedId, tripId);
-    final TripPattern pattern = buffer.getLastAddedTripPattern(feedScopedTripId, serviceDate);
+    final TripPattern pattern = buffer.getLastAddedTripPattern(trip.getId(), serviceDate);
     if (pattern != null) {
       /*
               Remove the previous realtime-added TripPattern from buffer.
               Only one version of the realtime-update should exist
              */
-      buffer.removeLastAddedTripPattern(feedScopedTripId, serviceDate);
-      buffer.removeRealtimeUpdatedTripTimes(pattern, feedScopedTripId, serviceDate);
+      buffer.removeLastAddedTripPattern(trip.getId(), serviceDate);
+      buffer.removeRealtimeUpdatedTripTimes(pattern, trip.getId(), serviceDate);
       success = true;
     }
 
@@ -1203,18 +1194,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     lastPurgeDate = previously;
 
     return buffer.purgeExpiredData(previously);
-  }
-
-  /**
-   * Retrieve a trip pattern given a feed id and trid id.
-   *
-   * @param feedId feed id for the trip id
-   * @param tripId trip id without agency
-   * @return trip pattern or null if no trip pattern was found
-   */
-  private TripPattern getPatternForTripId(String feedId, String tripId) {
-    Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
-    return routingService.getPatternForTrip().get(trip);
   }
 
   private Set<TripPattern> getPatternsForTrip(
@@ -1501,10 +1480,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           if (firstStopId.equals(stop.getId().getId())) {
             firstReportedStopIsFound = true;
           } else {
-            String agencyId = stop.getId().getFeedId();
             if (stop.isPartOfStation()) {
               var alternativeStop = routingService.getStopForId(
-                new FeedScopedId(agencyId, firstStopId)
+                new FeedScopedId(stop.getId().getFeedId(), firstStopId)
               );
               if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
                 firstReportedStopIsFound = true;

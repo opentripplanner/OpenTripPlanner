@@ -46,7 +46,7 @@ public class TripTimesShortHelper {
     }
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes
-    TripTimes times = timetable.getTripTimes(timetable.getTripIndex(trip.getId()));
+    TripTimes times = timetable.getTripTimes(trip);
     if (!serviceDay.serviceRunning(times.getServiceCode())) {
       return new ArrayList<>();
     } else {
