@@ -497,8 +497,9 @@ format:
    "language": "en",
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
    "allowKeepingRentedBicycleAtDestination": true,
-   // Optionally, it's possible to override the system_id from the data to set the feed id for the network but
-   // it should be avoided if the system_id is sensible and there is no need to change it
+   // The network is used to set the feedId for the GBFS imported data. It override the system_id from the data. 
+   // This parameter is optional - Avoid using the network config parameter if the system_id is sensible and 
+   // there is no need to change it.
    "network": "socialbicycles_coast"
 }
 ```
