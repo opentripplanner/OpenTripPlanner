@@ -10,8 +10,12 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
 import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GbfsStationInformationMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationInformationMapper.class);
 
   private final VehicleRentalSystem system;
   private final Map<String, RentalVehicleType> vehicleTypes;
@@ -37,6 +41,13 @@ public class GbfsStationInformationMapper {
       station.getLon() == null ||
       station.getLat() == null
     ) {
+      LOG.info(
+        String.format(
+          "GBFS station for %s system has issues with required fields: \n%s",
+          system.systemId,
+          station
+        )
+      );
       return null;
     }
     rentalStation.id = new FeedScopedId(system.systemId, station.getStationId());
