@@ -24,7 +24,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
   /**
    * Additional information about the station (if needed)
    */
-  private final I18NString description;
+  private final String description;
 
   /**
    * URL to a web page containing information about this particular station
@@ -43,7 +43,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     this.lat = station.getLat();
     this.lon = station.getLon();
     this.code = station.getCode();
-    this.description = station.getDescription();
+    this.description = station.getDescription().toString();
     this.url = station.getUrl();
     this.timezone = station.getTimezone();
     this.childStops = station.getChildStops();
@@ -56,7 +56,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     this.lat = multiModalStation.getLat();
     this.lon = multiModalStation.getLon();
     this.code = multiModalStation.getCode();
-    this.description = multiModalStation.getDescription();
+    this.description = multiModalStation.getDescription().toString();
     this.url = multiModalStation.getUrl();
     this.timezone = null;
     this.childStops = multiModalStation.getChildStops();
@@ -79,7 +79,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return code;
   }
 
-  public I18NString getDescription() {
+  public String getDescription() {
     return description;
   }
 
