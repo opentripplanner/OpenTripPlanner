@@ -56,7 +56,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     this.lat = multiModalStation.getLat();
     this.lon = multiModalStation.getLon();
     this.code = multiModalStation.getCode();
-    this.description = multiModalStation.getDescription().toString();
+    this.description = multiModalStation.getDescription();
     this.url = multiModalStation.getUrl();
     this.timezone = null;
     this.childStops = multiModalStation.getChildStops();
