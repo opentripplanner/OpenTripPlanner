@@ -1,6 +1,6 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class BikeAccessMapper {
 

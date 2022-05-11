@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.network;
 
 public enum BikeAccess {
   UNKNOWN,

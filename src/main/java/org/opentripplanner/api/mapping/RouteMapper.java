@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiRoute;
 import org.opentripplanner.api.model.ApiRouteShort;
-import org.opentripplanner.model.Route;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Branding;
 
 public class RouteMapper {

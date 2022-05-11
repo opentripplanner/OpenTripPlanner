@@ -1,9 +1,10 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.network;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.Test;
 import org.opentripplanner.netex.mapping.MappingSupport;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
 public class GroupOfRoutesTest {
 

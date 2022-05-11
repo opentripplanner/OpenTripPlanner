@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.organization;
 
 import java.io.Serializable;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class ContactInfo implements Serializable {
 

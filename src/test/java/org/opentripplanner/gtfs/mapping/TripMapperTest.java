@@ -13,8 +13,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class TripMapperTest {
 

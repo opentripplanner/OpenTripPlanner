@@ -9,7 +9,6 @@ import static org.opentripplanner.model.WheelchairBoarding.POSSIBLE;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
@@ -18,6 +17,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 class StreetTransitEntityLinkTest {
 

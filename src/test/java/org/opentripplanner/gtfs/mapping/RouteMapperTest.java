@@ -14,9 +14,9 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Branding;
 
 public class RouteMapperTest {
@@ -80,7 +80,7 @@ public class RouteMapperTest {
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.Route result = subject.map(ROUTE);
+    org.opentripplanner.transit.model.network.Route result = subject.map(ROUTE);
 
     assertEquals("A:1", result.getId().toString());
     assertNotNull(result.getAgency());
@@ -105,7 +105,7 @@ public class RouteMapperTest {
     Route input = new Route();
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.Route result = subject.map(input);
+    org.opentripplanner.transit.model.network.Route result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getAgency());
@@ -129,8 +129,8 @@ public class RouteMapperTest {
    */
   @Test
   public void testMapCache() throws Exception {
-    org.opentripplanner.model.Route result1 = subject.map(ROUTE);
-    org.opentripplanner.model.Route result2 = subject.map(ROUTE);
+    org.opentripplanner.transit.model.network.Route result1 = subject.map(ROUTE);
+    org.opentripplanner.transit.model.network.Route result2 = subject.map(ROUTE);
 
     assertSame(result1, result2);
   }

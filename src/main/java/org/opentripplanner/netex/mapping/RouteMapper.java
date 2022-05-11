@@ -8,13 +8,14 @@ import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.GroupOfRoutes;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -69,10 +70,8 @@ class RouteMapper {
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
   }
 
-  org.opentripplanner.model.Route mapRoute(Line_VersionStructure line) {
-    org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route(
-      idFactory.createId(line.getId())
-    );
+  Route mapRoute(Line_VersionStructure line) {
+    Route otpRoute = new Route(idFactory.createId(line.getId()));
 
     otpRoute.setGroupsOfRoutes(getGroupOfRoutes(line));
     otpRoute.setAgency(findOrCreateAuthority(line));

@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 
 /**
  * A RouteMatcher is a collection of routes based on IDs, short name and/or agency IDs.

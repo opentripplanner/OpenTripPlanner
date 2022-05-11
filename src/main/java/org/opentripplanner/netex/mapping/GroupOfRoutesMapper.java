@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.GroupOfRoutes;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.rutebanken.netex.model.GroupOfLines;
 
 /**
