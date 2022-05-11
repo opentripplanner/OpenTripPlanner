@@ -24,7 +24,6 @@ class StationMapper {
 
   Station map(StopPlace stopPlace) {
     final I18NString name;
-    final I18NString desc;
     if (stopPlace.getName() == null) {
       name = new NonLocalizedString("N/A");
     } else if (stopPlace.getAlternativeNames() != null) {
@@ -44,18 +43,14 @@ class StationMapper {
       name = new NonLocalizedString(stopPlace.getName().getValue());
     }
 
-    if (stopPlace.getDescription() == null) {
-      desc = new NonLocalizedString("N/A");
-    } else {
-      desc = TranslatedString.getI18NString(stopPlace.getDescription().getValue());
-    }
-
     Station station = new Station(
       idFactory.createId(stopPlace.getId()),
       name,
       WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid()),
       null,
-      stopPlace.getDescription() != null ? desc : null,
+      stopPlace.getDescription() != null
+        ? new NonLocalizedString(stopPlace.getDescription().getValue())
+        : null,
       null,
       null,
       StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting())

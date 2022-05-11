@@ -46,18 +46,13 @@ class StopMapper {
       return null;
     }
 
-    I18NString desc;
-    if (quay.getDescription().getValue() != null) {
-      desc = TranslatedString.getI18NString(quay.getDescription().getValue());
-    } else {
-      desc = new NonLocalizedString("N/A");
-    }
-
     Stop stop = new Stop(
       idFactory.createId(quay.getId()),
       parentStation.getName(),
       quay.getPublicCode(),
-      quay.getDescription() != null ? desc : null,
+      quay.getDescription() != null
+        ? new NonLocalizedString(quay.getDescription().getValue())
+        : null,
       WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
       wheelChairBoarding,
       null,

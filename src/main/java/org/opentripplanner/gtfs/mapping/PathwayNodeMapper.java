@@ -54,7 +54,7 @@ class PathwayNodeMapper {
       org.onebusaway.gtfs.model.Stop.class,
       "desc",
       base.getId().getId(),
-      Optional.ofNullable(base.getDescription()).orElse(DEFAULT_NAME)
+      base.getDescription()
     );
 
     return new PathwayNode(
