@@ -7,7 +7,7 @@ import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 

@@ -3,7 +3,7 @@ package org.opentripplanner.model.transfer;
 import java.io.Serializable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.transit.model.basic.ValueObjectToStringBuilder;
+import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 public final class RouteStopTransferPoint implements TransferPoint, Serializable {
 

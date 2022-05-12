@@ -10,7 +10,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place using

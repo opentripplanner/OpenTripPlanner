@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.organization;
 
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitEntity;
 
 /**

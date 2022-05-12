@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import java.util.Objects;
-import org.opentripplanner.transit.model.basic.ValueObjectToStringBuilder;
+import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**

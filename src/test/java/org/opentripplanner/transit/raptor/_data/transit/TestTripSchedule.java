@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor._data.transit;
 import static org.opentripplanner.model.WheelchairBoarding.NO_INFORMATION;
 
 import org.opentripplanner.model.WheelchairBoarding;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;

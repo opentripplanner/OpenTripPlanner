@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A system notice is used to tag elements with system information.

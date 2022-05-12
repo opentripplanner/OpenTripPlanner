@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.util.lang;
 
 import static java.lang.Boolean.TRUE;
 
@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
-import org.opentripplanner.util.lang.OtpNumberFormat;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 

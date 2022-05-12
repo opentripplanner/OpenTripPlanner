@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**

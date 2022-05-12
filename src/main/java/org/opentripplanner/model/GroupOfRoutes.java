@@ -2,7 +2,7 @@ package org.opentripplanner.model;
 
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitEntity;
 
 /**

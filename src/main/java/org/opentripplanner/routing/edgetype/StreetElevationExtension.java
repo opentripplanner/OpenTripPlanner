@@ -5,7 +5,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class StreetElevationExtension implements Serializable {
 

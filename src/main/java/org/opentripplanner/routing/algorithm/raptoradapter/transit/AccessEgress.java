@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class AccessEgress implements RaptorTransfer {

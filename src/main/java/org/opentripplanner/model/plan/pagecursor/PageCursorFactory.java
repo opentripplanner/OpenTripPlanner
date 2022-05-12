@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class PageCursorFactory {
 

@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class holds all the information needed to page to the next/previous page. It is serialized

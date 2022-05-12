@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
 import org.opentripplanner.model.transfer.TransferPoint;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestTransferPoint implements TransferPoint {
 

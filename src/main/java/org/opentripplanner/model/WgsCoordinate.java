@@ -2,7 +2,7 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.transit.model.basic.ValueObjectToStringBuilder;
+import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
  * This class represent a OTP coordinate.

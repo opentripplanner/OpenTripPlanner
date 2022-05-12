@@ -5,7 +5,7 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.asser
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 /**

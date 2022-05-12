@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
