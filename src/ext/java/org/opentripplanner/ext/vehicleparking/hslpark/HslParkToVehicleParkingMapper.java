@@ -70,7 +70,7 @@ public class HslParkToVehicleParkingMapper {
         });
       I18NString name = translations.isEmpty()
         ? new NonLocalizedString(vehicleParkId.getId())
-        : TranslatedString.getI18NString(translations);
+        : TranslatedString.getI18NString(translations, true, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
       double x = geometry.getCentroid().getX();
       double y = geometry.getCentroid().getY();

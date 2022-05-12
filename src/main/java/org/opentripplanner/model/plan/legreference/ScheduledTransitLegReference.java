@@ -69,7 +69,8 @@ public record ScheduledTransitLegReference(
       timeZone,
       null,
       null,
-      0 // TODO: What should we have here
+      0, // TODO: What should we have here
+      null
     );
   }
 }

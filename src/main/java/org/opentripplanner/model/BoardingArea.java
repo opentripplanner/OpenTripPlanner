@@ -18,7 +18,7 @@ public final class BoardingArea extends StationElement {
     String code,
     I18NString description,
     WgsCoordinate coordinate,
-    WheelChairBoarding wheelchairBoarding,
+    WheelchairBoarding wheelchairBoarding,
     StopLevel level
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);

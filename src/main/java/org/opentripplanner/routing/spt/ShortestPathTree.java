@@ -23,10 +23,11 @@ import org.slf4j.LoggerFactory;
  * also allows states to be retrieved for a given target vertex.
  * <p>
  * We no longer have different implementations of ShortestPathTree because the label-setting
- * (multi-state) approach used in public transit routing, turn restrictions, bike rental, etc. is a
- * generalization of the basic Dijkstra (single-state) approach. It is much more straightforward to
- * use the more general SPT implementation in all cases.
+ * (multi-state) approach used in turn restrictions, bike rental, etc. is a generalization of the
+ * basic Dijkstra (single-state) approach. It is much more straightforward to use the more general
+ * SPT implementation in all cases.
  * <p>
+ * TODO: Is this still accurate?
  * Note that turn restrictions make all searches multi-state; however turn restrictions do not apply
  * when walking. The turn restriction handling is done in the base dominance function
  * implementation, and applies to all subclasses. It essentially splits each vertex into N vertices
@@ -36,14 +37,14 @@ public class ShortestPathTree {
 
   private static final Logger LOG = LoggerFactory.getLogger(ShortestPathTree.class);
 
-  public final RoutingRequest options;
-
   public final DominanceFunction dominanceFunction;
 
   private final Map<Vertex, List<State>> stateSets;
 
-  public ShortestPathTree(RoutingRequest options, DominanceFunction dominanceFunction) {
-    this.options = options;
+  /** Indicates that the search timed out or was otherwise aborted. */
+  private boolean aborted = false;
+
+  public ShortestPathTree(DominanceFunction dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
     stateSets = new IdentityHashMap<>();
   }
@@ -71,11 +72,6 @@ public class ShortestPathTree {
     } else {
       return new GraphPath(s);
     }
-  }
-
-  /** @return the routing context for the search that produced this tree */
-  public RoutingRequest getOptions() {
-    return options;
   }
 
   /** Print out a summary of the number of states and vertices. */
@@ -236,6 +232,14 @@ public class ShortestPathTree {
       allStates.addAll(stateSet);
     }
     return allStates;
+  }
+
+  public void setAborted() {
+    aborted = true;
+  }
+
+  public boolean isAborted() {
+    return aborted;
   }
 
   public String toString() {

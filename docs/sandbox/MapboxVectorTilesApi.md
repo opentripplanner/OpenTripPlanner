@@ -14,6 +14,7 @@
 - 2021-10-13: Correctly serialize the vehicle rental
   name [#3648](https://github.com/opentripplanner/OpenTripPlanner/pull/3648)
 - 2022-01-03: Add support for VehicleParking entities
+- 2022-04-27: Read the headsign for frequency-only patterns correctly [#4122](https://github.com/opentripplanner/OpenTripPlanner/pull/4122)
 
 ## Documentation
 

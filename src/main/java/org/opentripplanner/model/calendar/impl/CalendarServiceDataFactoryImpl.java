@@ -210,9 +210,6 @@ public class CalendarServiceDataFactoryImpl {
     Set<ServiceDate> activeDates
   ) {
     ServiceDate serviceDate = calendarDate.getDate();
-    Date targetDate = calendarDate.getDate().getAsDate();
-    Calendar c = Calendar.getInstance();
-    c.setTime(targetDate);
 
     switch (calendarDate.getExceptionType()) {
       case ServiceCalendarDate.EXCEPTION_TYPE_ADD:

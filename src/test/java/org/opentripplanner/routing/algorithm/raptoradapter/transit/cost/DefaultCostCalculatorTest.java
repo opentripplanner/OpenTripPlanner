@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 
 public class DefaultCostCalculatorTest {
 
@@ -30,9 +31,10 @@ public class DefaultCostCalculatorTest {
     int oneSec = time0 + 1;
 
     assertEquals(500, subject.boardingCostRegularTransfer(true, time0, STOP_A, time0));
-    assertEquals(525, subject.boardingCostRegularTransfer(true, time0, STOP_B, time0));
+    assertEquals(500, subject.boardingCostRegularTransfer(true, time0, STOP_B, time0));
     assertEquals(550, subject.boardingCostRegularTransfer(true, time0, STOP_A, oneSec));
     assertEquals(700, subject.boardingCostRegularTransfer(false, time0, STOP_A, time0));
+    assertEquals(725, subject.boardingCostRegularTransfer(false, time0, STOP_B, time0));
     assertEquals(750, subject.boardingCostRegularTransfer(false, time0, STOP_A, oneSec));
   }
 
@@ -99,5 +101,33 @@ public class DefaultCostCalculatorTest {
       RaptorCostConverter.toRaptorCost(0.8 * 20 + BOARD_COST_SEC),
       subject.calculateMinCost(20, 0)
     );
+  }
+
+  @Test
+  public void testCostEgressWithoutRides() {
+    // Should be transfer generalized cost minus stop transfer cost
+
+    var GENERALIZED_COST = 100;
+
+    // transfer cost on stop index 0 is 0 - do not subtract anything
+    var t1 = TestTransfer.walk(0, 15, GENERALIZED_COST);
+    assertEquals(GENERALIZED_COST, subject.costEgress(t1));
+    // transfer cost on stop index 1 is 25 - subtract 25 from generalized cost
+    var t2 = TestTransfer.walk(1, 15, 100);
+    assertEquals(GENERALIZED_COST - 25, subject.costEgress(t2));
+  }
+
+  @Test
+  public void testCostEgressWithRides() {
+    // Should be generalized cost plus transfer cost
+
+    var GENERALIZED_COST = 100;
+    var DESIRED_COST = GENERALIZED_COST + TRANSFER_COST_SEC * 100;
+
+    // Should be the same on all stop indexes
+    var t1 = TestTransfer.flex(0, 15, 1, GENERALIZED_COST);
+    assertEquals(DESIRED_COST, subject.costEgress(t1));
+    var t2 = TestTransfer.flex(1, 15, 1, GENERALIZED_COST);
+    assertEquals(DESIRED_COST, subject.costEgress(t2));
   }
 }

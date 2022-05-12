@@ -45,6 +45,7 @@ public class ItineraryMapper {
     api.fare = domain.fare;
     api.legs = legMapper.mapLegs(domain.legs);
     api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.systemNotices);
+    api.accessibilityScore = domain.accessibilityScore;
 
     return api;
   }

@@ -157,7 +157,7 @@ public class TripQuery {
             "the search, not implemented for the transit jet."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.request.wheelchairAccessible)
+          .defaultValue(routing.request.wheelchairAccessibility.enabled())
           .build()
       )
       .argument(

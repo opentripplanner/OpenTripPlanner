@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public class TestWayPropertySet {
+public class WayPropertySetTest {
 
   WayPropertySet wps = new WayPropertySet();
   float epsilon = 0.01f;

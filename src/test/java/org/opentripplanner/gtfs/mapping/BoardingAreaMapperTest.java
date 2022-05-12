@@ -11,8 +11,7 @@ import java.util.Collections;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.util.TranslationHelper;
 
 public class BoardingAreaMapperTest {
@@ -37,7 +36,7 @@ public class BoardingAreaMapperTest {
 
   private static final int VEHICLE_TYPE = 5;
 
-  private static final WheelChairBoarding WHEELCHAIR_BOARDING = WheelChairBoarding.POSSIBLE;
+  private static final WheelchairBoarding WHEELCHAIR_BOARDING = WheelchairBoarding.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
@@ -94,7 +93,7 @@ public class BoardingAreaMapperTest {
     assertEquals(BoardingAreaMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
-    assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
   }
 
   @Test(expected = NullPointerException.class)

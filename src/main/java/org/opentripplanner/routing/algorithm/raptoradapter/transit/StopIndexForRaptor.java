@@ -38,7 +38,7 @@ public final class StopIndexForRaptor {
   ) {
     this.stopsByIndex = List.copyOf(stops);
     initializeIndexByStop();
-    this.stopBoardAlightCosts = createStopBoardAlightCosts(stopsByIndex, tuningParameters);
+    this.stopBoardAlightCosts = createStopTransferCosts(stopsByIndex, tuningParameters);
   }
 
   public StopLocation stopByIndex(int index) {
@@ -80,21 +80,21 @@ public final class StopIndexForRaptor {
   /**
    * Create static board/alight cost for Raptor to include for each stop.
    */
-  private static int[] createStopBoardAlightCosts(
+  private static int[] createStopTransferCosts(
     List<StopLocation> stops,
     TransitTuningParameters tuningParams
   ) {
     if (!tuningParams.enableStopTransferPriority()) {
       return null;
     }
-    int[] stopVisitCosts = new int[stops.size()];
+    int[] stopTransferCosts = new int[stops.size()];
 
     for (int i = 0; i < stops.size(); ++i) {
       StopTransferPriority priority = stops.get(i).getPriority();
       int domainCost = tuningParams.stopTransferCost(priority);
-      stopVisitCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
+      stopTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
     }
-    return stopVisitCosts;
+    return stopTransferCosts;
   }
 
   /**

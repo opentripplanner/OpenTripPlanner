@@ -26,6 +26,7 @@ import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 
 /**
@@ -62,11 +63,11 @@ public class TestPathBuilderTest implements RaptorTestConstants {
       STOP_B
     );
 
-    int accessEgressCost = TestTransfer.walkCost(D2m + D1m);
+    int accessEgressCost = COST_CALCULATOR.costEgress(TestTransfer.walk(STOP_B, D2m + D1m));
 
     assertEquals(accessEgressCost + transitCost, path.generalizedCost());
     assertEquals(
-      "Walk 1m ~ A ~ BUS L1 10:02 10:07 ~ B ~ Walk 2m [10:00:15 10:09:15 9m 0tx $798]",
+      "Walk 1m ~ A ~ BUS L1 10:02 10:07 ~ B ~ Walk 2m [10:00:15 10:09:15 9m 0tx $768]",
       path.toString(this::stopIndexToName)
     );
   }
