@@ -521,6 +521,26 @@ For this to be possible three things need to be configured:
    `keepingRentedBicycleAtDestinationCost` (default: `0`) may also be set in the
    [routing defaults](#routing-defaults).
 
+##### Header Settings
+Sometimes GBFS Feeds might need some headers e.g. for authentication. 
+For those use cases headers can be configured as a json.
+```JSON
+// router-config.json
+{
+  "type": "vehicle-rental",
+  "sourceType": "gbfs",
+  "frequencySec": 60,
+  "url": "<https://some-gbfs-feed/gbfs.json>",
+  "headers": {
+    // example for authentication headers
+    "Auth": "<any-token>",
+    // example for any header
+    "<key>": "<value>"
+  }
+}
+```
+Any header key, value can be inserted.
+
 #### Vehicle Rental Service Directory configuration (sandbox feature)
 
 To configure and url for
