@@ -79,7 +79,7 @@ public class StopAndStationMapperTest {
 
     assertEquals("A:1", result.getId().toString());
     assertEquals(CODE, result.getCode());
-    assertEquals(DESC, result.getDescription());
+    assertEquals(DESC, result.getDescription().toString());
     assertEquals(LAT, result.getLat(), 0.0001d);
     assertEquals(LON, result.getLon(), 0.0001d);
     assertEquals(NAME, result.getName().toString());

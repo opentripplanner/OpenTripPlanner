@@ -87,7 +87,7 @@ public final class Stop extends StationElement implements StopLocation {
   /**
    * @see #stopForTest(String, double, double, Station)
    */
-  public static Stop stopForTest(String idAndName, String desc, double lat, double lon) {
+  public static Stop stopForTest(String idAndName, I18NString desc, double lat, double lon) {
     return stopForTest(idAndName, desc, lat, lon, null);
   }
 
@@ -101,7 +101,7 @@ public final class Stop extends StationElement implements StopLocation {
 
   public static Stop stopForTest(
     String idAndName,
-    String desc,
+    I18NString desc,
     double lat,
     double lon,
     Station parent
@@ -115,17 +115,20 @@ public final class Stop extends StationElement implements StopLocation {
    */
   public static Stop stopForTest(
     String idAndName,
-    String desc,
+    I18NString desc,
     double lat,
     double lon,
     Station parent,
     WheelChairBoarding wheelChairBoarding
   ) {
+    NonLocalizedString nonLocalizedDesc = desc != null
+      ? new NonLocalizedString(desc.toString())
+      : null;
     var stop = new Stop(
       new FeedScopedId("F", idAndName),
       new NonLocalizedString(idAndName),
       idAndName,
-      new NonLocalizedString(desc),
+      nonLocalizedDesc,
       new WgsCoordinate(lat, lon),
       wheelChairBoarding,
       null,

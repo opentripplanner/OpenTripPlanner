@@ -12,6 +12,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class StopsLayerTest {
 
@@ -19,7 +20,8 @@ public class StopsLayerTest {
 
   @Before
   public void setUp() {
-    stop = Stop.stopForTest("name", "desc", 50, 10);
+    NonLocalizedString desc = new NonLocalizedString("desc");
+    stop = Stop.stopForTest("name", desc, 50, 10);
   }
 
   @Test

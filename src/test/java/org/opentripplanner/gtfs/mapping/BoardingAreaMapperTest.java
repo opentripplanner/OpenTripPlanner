@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 public class BoardingAreaMapperTest {
@@ -72,7 +73,7 @@ public class BoardingAreaMapperTest {
 
     assertEquals("A:B1", result.getId().toString());
     assertEquals(CODE, result.getCode());
-    assertEquals(DESC, result.getDescription());
+    assertEquals(DESC, result.getDescription().toString());
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
