@@ -317,11 +317,6 @@ public class SiriAlertsUpdateHandler {
       AffectsScopeStructure.VehicleJourneys vjs = affectsStructure.getVehicleJourneys();
       if (vjs != null && isNotEmpty(vjs.getAffectedVehicleJourneies())) {
         for (AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()) {
-          String lineRef = null;
-          if (affectedVehicleJourney.getLineRef() != null) {
-            lineRef = affectedVehicleJourney.getLineRef().getValue();
-          }
-
           List<AffectedStopPointStructure> affectedStops = new ArrayList<>();
 
           List<AffectedRouteStructure> routes = affectedVehicleJourney.getRoutes();
@@ -432,15 +427,6 @@ public class SiriAlertsUpdateHandler {
                 }
               } else {
                 alert.addEntity(new EntitySelector.Trip(tripId, serviceDate));
-              }
-            }
-          }
-
-          if (lineRef != null) {
-            Set<Route> affectedRoutes = siriFuzzyTripMatcher.getRoutes(lineRef);
-            if (affectedRoutes != null) {
-              for (Route route : affectedRoutes) {
-                alert.addEntity(new EntitySelector.Route(route.getId()));
               }
             }
           }

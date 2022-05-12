@@ -1,9 +1,12 @@
 package org.opentripplanner.routing.trippattern;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.LinkedList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.Stop;
@@ -98,6 +101,16 @@ public class TripTimesTest {
     updatedTripTimesB.updateArrivalTime(7, 420);
 
     assertFalse(updatedTripTimesB.timesIncreasing());
+  }
+
+  @Test
+  public void testNonIncreasingUpdateCrossingMidnight() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+
+    updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
+    updatedTripTimesA.updateDepartureTime(0, 50);
+
+    assertTrue(updatedTripTimesA.timesIncreasing());
   }
 
   @Test
