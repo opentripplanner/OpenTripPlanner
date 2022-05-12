@@ -121,7 +121,8 @@ public class RoutingWorker {
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults(),
       request.maxNumberOfItinerariesCropHead(),
-      it -> firstRemovedItinerary = it
+      it -> firstRemovedItinerary = it,
+      request.wheelchairAccessibility.enabled()
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);

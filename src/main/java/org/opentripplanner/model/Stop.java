@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import static org.opentripplanner.model.WheelchairBoarding.NO_INFORMATION;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,7 +52,7 @@ public final class Stop extends StationElement implements StopLocation {
     String code,
     String description,
     WgsCoordinate coordinate,
-    WheelChairBoarding wheelchairBoarding,
+    WheelchairBoarding wheelchairBoarding,
     StopLevel level,
     String platformCode,
     Collection<FareZone> fareZones,
@@ -70,7 +72,7 @@ public final class Stop extends StationElement implements StopLocation {
 
   public static Stop stopForTest(
     String idAndName,
-    WheelChairBoarding wheelChairBoarding,
+    WheelchairBoarding wheelChairBoarding,
     double lat,
     double lon
   ) {
@@ -81,14 +83,14 @@ public final class Stop extends StationElement implements StopLocation {
    * @see #stopForTest(String, double, double, Station)
    */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
-    return stopForTest(idAndName, null, lat, lon, null);
+    return stopForTest(idAndName, null, lat, lon, null, NO_INFORMATION);
   }
 
   /**
    * @see #stopForTest(String, double, double, Station)
    */
   public static Stop stopForTest(String idAndName, String desc, double lat, double lon) {
-    return stopForTest(idAndName, desc, lat, lon, null);
+    return stopForTest(idAndName, desc, lat, lon, null, NO_INFORMATION);
   }
 
   /**
@@ -96,7 +98,7 @@ public final class Stop extends StationElement implements StopLocation {
    * coordinate. The feedId is static set to "F"
    */
   public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
-    return stopForTest(idAndName, null, lat, lon, parent);
+    return stopForTest(idAndName, null, lat, lon, parent, NO_INFORMATION);
   }
 
   public static Stop stopForTest(
@@ -119,7 +121,7 @@ public final class Stop extends StationElement implements StopLocation {
     double lat,
     double lon,
     Station parent,
-    WheelChairBoarding wheelChairBoarding
+    WheelchairBoarding wheelChairBoarding
   ) {
     var stop = new Stop(
       new FeedScopedId("F", idAndName),

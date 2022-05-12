@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import static java.util.Collections.EMPTY_LIST;
+import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
@@ -9,9 +10,12 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.xml.datatype.Duration;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -79,17 +83,23 @@ public class TimetableHelper {
     EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
 
     List<EstimatedCall> estimatedCalls;
-    if (journeyEstimatedCalls != null) {
+    EstimatedCall lastEstimatedCall;
+    if (journeyEstimatedCalls != null && !journeyEstimatedCalls.getEstimatedCalls().isEmpty()) {
       estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
+      lastEstimatedCall = estimatedCalls.get(estimatedCalls.size() - 1);
     } else {
-      estimatedCalls = EMPTY_LIST;
+      estimatedCalls = List.of();
+      lastEstimatedCall = null;
     }
 
     List<RecordedCall> recordedCalls;
-    if (journeyRecordedCalls != null) {
+    RecordedCall lastRecordedCall;
+    if (journeyRecordedCalls != null && !journeyRecordedCalls.getRecordedCalls().isEmpty()) {
       recordedCalls = journeyRecordedCalls.getRecordedCalls();
+      lastRecordedCall = recordedCalls.get(recordedCalls.size() - 1);
     } else {
-      recordedCalls = EMPTY_LIST;
+      recordedCalls = List.of();
+      lastRecordedCall = null;
     }
 
     boolean stopPatternChanged = false;
@@ -163,62 +173,54 @@ public class TimetableHelper {
             newTimes.setCancelled(callCounter);
           }
 
+          ZonedDateTime startOfService = DateMapper.asStartOfService(
+            departureDate.toLocalDate(),
+            zoneId
+          );
+
           int arrivalTime = newTimes.getArrivalTime(callCounter);
-          int realtimeArrivalTime = arrivalTime;
-          if (recordedCall.getActualArrivalTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getActualArrivalTime(),
-                zoneId
-              );
-            //Flag as recorded
-            newTimes.setRecorded(callCounter, true);
-          } else if (recordedCall.getExpectedArrivalTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getExpectedArrivalTime(),
-                zoneId
-              );
-          } else if (recordedCall.getAimedArrivalTime() != null) {
-            realtimeArrivalTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getAimedArrivalTime(),
-                zoneId
-              );
+
+          Integer realtimeArrivalTime = getAvailableTime(
+            startOfService,
+            recordedCall::getActualArrivalTime,
+            callCounter == 0 ? recordedCall::getActualDepartureTime : () -> null,
+            recordedCall::getExpectedArrivalTime,
+            callCounter == 0 ? recordedCall::getExpectedDepartureTime : () -> null,
+            recordedCall::getAimedArrivalTime,
+            callCounter == 0 ? recordedCall::getAimedDepartureTime : () -> null
+          );
+
+          if (realtimeArrivalTime == null) {
+            realtimeArrivalTime = arrivalTime;
           }
+
           int arrivalDelay = realtimeArrivalTime - arrivalTime;
           newTimes.updateArrivalDelay(callCounter, arrivalDelay);
           lastArrivalDelay = arrivalDelay;
 
           int departureTime = newTimes.getDepartureTime(callCounter);
-          int realtimeDepartureTime = departureTime;
-          if (recordedCall.getActualDepartureTime() != null) {
-            realtimeDepartureTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getActualDepartureTime(),
-                zoneId
-              );
-            //Flag as recorded
-            newTimes.setRecorded(callCounter, true);
-          } else if (recordedCall.getExpectedDepartureTime() != null) {
-            realtimeDepartureTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getExpectedDepartureTime(),
-                zoneId
-              );
-          } else if (recordedCall.getAimedDepartureTime() != null) {
-            realtimeDepartureTime =
-              DateMapper.secondsSinceStartOfService(
-                departureDate,
-                recordedCall.getAimedDepartureTime(),
-                zoneId
-              );
+
+          boolean isLastStop = estimatedCalls.isEmpty() && lastRecordedCall == recordedCall;
+
+          Integer realtimeDepartureTime = getAvailableTime(
+            startOfService,
+            recordedCall::getActualDepartureTime,
+            // Do not use actual arrival time for departure time, as the vehicle can be currently at the stop
+            recordedCall::getExpectedDepartureTime,
+            isLastStop ? recordedCall::getExpectedArrivalTime : () -> null,
+            recordedCall::getAimedDepartureTime,
+            isLastStop ? recordedCall::getAimedArrivalTime : () -> null
+          );
+
+          if (realtimeDepartureTime == null) {
+            realtimeDepartureTime = departureTime;
           }
+
+          newTimes.setRecorded(
+            callCounter,
+            recordedCall.getActualArrivalTime() != null ||
+            recordedCall.getActualDepartureTime() != null
+          );
 
           int departureDelay = realtimeDepartureTime - departureTime;
 
@@ -282,43 +284,38 @@ public class TimetableHelper {
               modifiedStopTimes.get(callCounter).cancelPickup();
             }
 
+            ZonedDateTime startOfService = DateMapper.asStartOfService(
+              departureDate.toLocalDate(),
+              zoneId
+            );
+
             int arrivalTime = newTimes.getArrivalTime(callCounter);
-            int realtimeArrivalTime = -1;
-            if (estimatedCall.getExpectedArrivalTime() != null) {
-              realtimeArrivalTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getExpectedArrivalTime(),
-                  zoneId
-                );
-            } else if (estimatedCall.getAimedArrivalTime() != null) {
-              realtimeArrivalTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getAimedArrivalTime(),
-                  zoneId
-                );
-            }
+
+            Integer realtimeArrivalTime = getAvailableTime(
+              startOfService,
+              estimatedCall::getExpectedArrivalTime,
+              callCounter == 0 ? estimatedCall::getExpectedDepartureTime : () -> null,
+              estimatedCall::getAimedArrivalTime,
+              callCounter == 0 ? estimatedCall::getAimedDepartureTime : () -> null
+            );
 
             int departureTime = newTimes.getDepartureTime(callCounter);
-            int realtimeDepartureTime = departureTime;
-            if (estimatedCall.getExpectedDepartureTime() != null) {
-              realtimeDepartureTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getExpectedDepartureTime(),
-                  zoneId
-                );
-            } else if (estimatedCall.getAimedDepartureTime() != null) {
-              realtimeDepartureTime =
-                DateMapper.secondsSinceStartOfService(
-                  departureDate,
-                  estimatedCall.getAimedDepartureTime(),
-                  zoneId
-                );
+
+            boolean isLastStop = lastEstimatedCall == estimatedCall;
+
+            Integer realtimeDepartureTime = getAvailableTime(
+              startOfService,
+              estimatedCall::getExpectedDepartureTime,
+              isLastStop ? estimatedCall::getExpectedArrivalTime : () -> null,
+              estimatedCall::getAimedDepartureTime,
+              isLastStop ? estimatedCall::getAimedArrivalTime : () -> null
+            );
+
+            if (realtimeDepartureTime == null) {
+              realtimeDepartureTime = departureTime;
             }
 
-            if (realtimeArrivalTime == -1) {
+            if (realtimeArrivalTime == null) {
               realtimeArrivalTime = realtimeDepartureTime;
             }
 
@@ -636,40 +633,22 @@ public class TimetableHelper {
             CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
             if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelDropOff();
-            } else if (
-              estimatedCall.getArrivalBoardingActivity() ==
-              ArrivalBoardingActivityEnumeration.ALIGHTING
-            ) {
-              stopTime.setDropOffType(SCHEDULED);
-            } else if (
-              estimatedCall.getArrivalBoardingActivity() ==
-              ArrivalBoardingActivityEnumeration.NO_ALIGHTING
-            ) {
-              stopTime.setDropOffType(NONE);
-            } else if (estimatedCall.getArrivalBoardingActivity() == null && i == 0) {
-              //First stop - default no dropoff
-              stopTime.setDropOffType(NONE);
             }
+            var dropOffType = mapDropOffType(
+              stopTime.getDropOffType(),
+              estimatedCall.getArrivalBoardingActivity()
+            );
+            dropOffType.ifPresent(stopTime::setDropOffType);
 
             CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
             if (departureStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelPickup();
-            } else if (
-              estimatedCall.getDepartureBoardingActivity() ==
-              DepartureBoardingActivityEnumeration.BOARDING
-            ) {
-              stopTime.setPickupType(SCHEDULED);
-            } else if (
-              estimatedCall.getDepartureBoardingActivity() ==
-              DepartureBoardingActivityEnumeration.NO_BOARDING
-            ) {
-              stopTime.setPickupType(NONE);
-            } else if (
-              estimatedCall.getDepartureBoardingActivity() == null && i == (stops.size() - 1)
-            ) {
-              //Last stop - default no pickup
-              stopTime.setPickupType(NONE);
             }
+            var pickUpType = mapPickUpType(
+              stopTime.getPickupType(),
+              estimatedCall.getDepartureBoardingActivity()
+            );
+            pickUpType.ifPresent(stopTime::setPickupType);
 
             if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
               stopTime.cancel();
@@ -808,6 +787,74 @@ public class TimetableHelper {
     }
 
     return newTimes;
+  }
+
+  /**
+   * Get the first non-null time from a list of suppliers, and convert that to seconds past start of
+   * service time. If none of the suppliers provide a time, return null.
+   */
+  @SafeVarargs
+  private static Integer getAvailableTime(
+    ZonedDateTime startOfService,
+    Supplier<ZonedDateTime>... timeSuppliers
+  ) {
+    for (var supplier : timeSuppliers) {
+      final ZonedDateTime time = supplier.get();
+      if (time != null) {
+        return DateMapper.secondsSinceStartOfService(startOfService, time);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * This method maps an ArrivalBoardingActivity to a pick drop type.
+   *
+   * The Siri ArrivalBoardingActivity includes less information than the pick drop type, therefore is it only
+   * changed if routability has changed.
+   *
+   * @param currentValue The current pick drop value on a stopTime
+   * @param arrivalBoardingActivityEnumeration The incoming boardingActivity to be mapped
+   * @return Mapped PickDrop type, empty if routability is not changed.
+   */
+  public static Optional<PickDrop> mapDropOffType(
+    PickDrop currentValue,
+    ArrivalBoardingActivityEnumeration arrivalBoardingActivityEnumeration
+  ) {
+    if (arrivalBoardingActivityEnumeration == null) {
+      return Optional.empty();
+    }
+
+    return switch (arrivalBoardingActivityEnumeration) {
+      case ALIGHTING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
+      case NO_ALIGHTING -> Optional.of(NONE);
+      case PASS_THRU -> Optional.of(CANCELLED);
+    };
+  }
+
+  /**
+   * This method maps an departureBoardingActivity to a pick drop type.
+   *
+   * The Siri DepartureBoardingActivity includes less information than the planned data, therefore is it only
+   * changed if routability has changed.
+   *
+   * @param currentValue The current pick drop value on a stopTime
+   * @param departureBoardingActivityEnumeration The incoming departureBoardingActivityEnumeration to be mapped
+   * @return Mapped PickDrop type, empty if routability is not changed.
+   */
+  public static Optional<PickDrop> mapPickUpType(
+    PickDrop currentValue,
+    DepartureBoardingActivityEnumeration departureBoardingActivityEnumeration
+  ) {
+    if (departureBoardingActivityEnumeration == null) {
+      return Optional.empty();
+    }
+
+    return switch (departureBoardingActivityEnumeration) {
+      case BOARDING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
+      case NO_BOARDING -> Optional.of(NONE);
+      case PASS_THRU -> Optional.of(CANCELLED);
+    };
   }
 
   /**

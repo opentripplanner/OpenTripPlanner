@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import java.util.Collection;
 
 public class ApiPatternDetail extends ApiPatternShort {

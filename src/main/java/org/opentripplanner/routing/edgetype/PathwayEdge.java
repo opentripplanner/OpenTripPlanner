@@ -88,7 +88,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
     /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     int time = traversalTime;
-    if (options.wheelchairAccessible) {
+    if (options.wheelchairAccessibility.enabled()) {
       if (!this.wheelchairAccessible) {
         return null;
       }
@@ -108,7 +108,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         time *
         options.getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
 
-      if (options.wheelchairAccessible) {
+      if (options.wheelchairAccessibility.enabled()) {
         if (this.slope > options.maxWheelchairSlope) {
           double tooSteepCostFactor = options.wheelchairSlopeTooSteepCostFactor;
           if (tooSteepCostFactor < 0) {

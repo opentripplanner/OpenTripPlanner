@@ -268,7 +268,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
       UTC,
       null,
       null,
-      legCost
+      legCost,
+      null
     );
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));

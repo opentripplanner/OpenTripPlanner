@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -21,8 +22,13 @@ public class TestDominanceFunction extends TestCase {
 
     // Test if domination works in the general case
 
-    State stateA = new State(fromVertex, Instant.EPOCH, request, null);
-    State stateB = new State(toVertex, Instant.EPOCH, request, null);
+    State stateA = new State(
+      fromVertex,
+      Instant.EPOCH,
+      null,
+      StateData.getInitialStateData(request)
+    );
+    State stateB = new State(toVertex, Instant.EPOCH, null, StateData.getInitialStateData(request));
     stateA.weight = 1;
     stateB.weight = 2;
 

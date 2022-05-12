@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 
 public class DirectStreetRouter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DirectStreetRouter.class);
-
   public static List<Itinerary> route(Router router, RoutingRequest request) {
     if (request.modes.directMode == StreetMode.NOT_SET) {
       return Collections.emptyList();
@@ -69,14 +67,14 @@ public class DirectStreetRouter {
   }
 
   /**
-   * Calculates the maximum distance in meters based on the maxDirectStreetDurationSeconds and the
+   * Calculates the maximum distance in meters based on the maxDirectStreetDuration and the
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
    * RoutingRequest.
    */
   private static double calculateDistanceMaxLimit(RoutingRequest request) {
     double distanceLimit;
-    double durationLimit = request.maxDirectStreetDurationSeconds;
     StreetMode mode = request.modes.directMode;
+    double durationLimit = request.getMaxDirectStreetDuration(mode).toSeconds();
 
     if (mode.includesDriving()) {
       distanceLimit = durationLimit * request.carSpeed;

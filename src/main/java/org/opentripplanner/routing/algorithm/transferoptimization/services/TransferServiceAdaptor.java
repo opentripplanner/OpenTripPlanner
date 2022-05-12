@@ -43,23 +43,34 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
   public static <T extends RaptorTripSchedule> TransferServiceAdaptor<T> noop() {
     return new TransferServiceAdaptor<>(null, null) {
       @Override
-      protected ConstrainedTransfer findTransfer(TripStopTime<T> from, T toTrip, int toStop) {
+      protected ConstrainedTransfer findTransfer(
+        TripStopTime<T> from,
+        T toTrip,
+        int toStop,
+        int toStopPosition
+      ) {
         return null;
       }
     };
   }
 
   /**
-   * Find transfer in the same stop for the given from location and to trip/stop.
+   * @param toStopPosition First possible stop position in target trip. This is needed because trip pattern
+   *                         may visit same stop more than once.
    */
   @Nullable
-  protected ConstrainedTransfer findTransfer(TripStopTime<T> from, T toTrip, int toStop) {
+  protected ConstrainedTransfer findTransfer(
+    TripStopTime<T> from,
+    T toTrip,
+    int toStop,
+    int toStopPosition
+  ) {
     return transferService.findTransfer(
       trip(from.trip()),
       from.stopPosition(),
       stop(from.stop()),
       trip(toTrip),
-      toTrip.findDepartureStopPosition(from.time(), toStop),
+      toStopPosition,
       stop(toStop)
     );
   }

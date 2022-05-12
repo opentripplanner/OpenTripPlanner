@@ -4,6 +4,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -20,6 +21,7 @@ public class McCostParams {
   private final int transferCost;
   private final double[] transitReluctanceFactors;
   private final double waitReluctanceFactor;
+  private final WheelchairAccessibilityRequest accessibilityRequest;
 
   /**
    * Default constructor defines default values. These defaults are overridden by defaults in the
@@ -30,6 +32,7 @@ public class McCostParams {
     this.transferCost = 0;
     this.transitReluctanceFactors = null;
     this.waitReluctanceFactor = 1.0;
+    this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULT;
   }
 
   McCostParams(McCostParamsBuilder builder) {
@@ -37,6 +40,7 @@ public class McCostParams {
     this.transferCost = builder.transferCost();
     this.transitReluctanceFactors = builder.transitReluctanceFactors();
     this.waitReluctanceFactor = builder.waitReluctanceFactor();
+    this.accessibilityRequest = builder.wheelchairAccessibility();
   }
 
   public int boardCost() {
@@ -65,6 +69,10 @@ public class McCostParams {
 
   public double waitReluctanceFactor() {
     return waitReluctanceFactor;
+  }
+
+  public WheelchairAccessibilityRequest accessibilityRequirements() {
+    return accessibilityRequest;
   }
 
   @Override

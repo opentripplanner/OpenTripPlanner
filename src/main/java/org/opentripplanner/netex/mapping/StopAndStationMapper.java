@@ -19,7 +19,7 @@ import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -223,14 +223,14 @@ class StopAndStationMapper {
    * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */
-  private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
-    var defaultWheelChairBoarding = WheelChairBoarding.NO_INFORMATION;
+  private WheelchairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
+    var defaultWheelChairBoarding = WheelchairBoarding.NO_INFORMATION;
 
     if (stopPlace != null) {
       defaultWheelChairBoarding =
         WheelChairMapper.wheelChairBoarding(
           stopPlace.getAccessibilityAssessment(),
-          WheelChairBoarding.NO_INFORMATION
+          WheelchairBoarding.NO_INFORMATION
         );
     }
 

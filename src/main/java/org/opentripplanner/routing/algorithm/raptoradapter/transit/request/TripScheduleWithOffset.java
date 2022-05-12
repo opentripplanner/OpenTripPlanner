@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.time.LocalDate;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -70,8 +71,13 @@ public final class TripScheduleWithOffset implements TripSchedule {
     return transitReluctanceIndex;
   }
 
+  @Override
+  public WheelchairBoarding wheelchairBoarding() {
+    return pattern.wheelchairBoardingForTrip(tripIndexForDates);
+  }
+
   /*
-   * Following methods are only called in RaptorPathToItineraryMapper or debug/tests, these are not optimised for performance
+   * Following methods are only called in RaptorPathToItineraryMapper, instantiation or debug/tests, these are not optimised for performance
    */
   @Override
   public TripTimes getOriginalTripTimes() {

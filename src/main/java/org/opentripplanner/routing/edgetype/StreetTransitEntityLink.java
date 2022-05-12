@@ -4,7 +4,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -25,15 +26,15 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final T transitEntityVertex;
 
-  private final WheelChairBoarding wheelchairBoarding;
+  private final WheelchairBoarding wheelchairBoarding;
 
-  public StreetTransitEntityLink(StreetVertex fromv, T tov, WheelChairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(StreetVertex fromv, T tov, WheelchairBoarding wheelchairBoarding) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairBoarding = wheelchairBoarding;
   }
 
-  public StreetTransitEntityLink(T fromv, StreetVertex tov, WheelChairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(T fromv, StreetVertex tov, WheelchairBoarding wheelchairBoarding) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairBoarding = wheelchairBoarding;
@@ -51,12 +52,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return null;
   }
 
-  public Trip getTrip() {
-    return null;
-  }
-
   public String toString() {
-    return "StreetTransitLink(" + fromv + " -> " + tov + ")";
+    return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }
 
   public boolean isRoundabout() {
@@ -77,14 +74,25 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     }
 
     RoutingRequest req = s0.getOptions();
-    if (s0.getOptions().wheelchairAccessible && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
-      return null;
-    }
 
     // Do not check here whether any transit modes are selected. A check for the presence of
     // transit modes will instead be done in the following PreBoard edge.
     // This allows searching for nearby transit stops using walk-only options.
     StateEditor s1 = s0.edit(this);
+
+    var accessibility = s0.getOptions().wheelchairAccessibility;
+    if (accessibility.enabled()) {
+      if (
+        accessibility.stops().onlyConsiderAccessible() &&
+        wheelchairBoarding != WheelchairBoarding.POSSIBLE
+      ) {
+        return null;
+      } else if (wheelchairBoarding == WheelchairBoarding.NO_INFORMATION) {
+        s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
+      } else if (wheelchairBoarding == WheelchairBoarding.NOT_POSSIBLE) {
+        s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
+      }
+    }
 
     switch (s0.getNonTransitMode()) {
       case BICYCLE:

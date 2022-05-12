@@ -43,6 +43,7 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -220,10 +221,6 @@ public class RoutingService {
         serviceDate == null ? new ServiceDate(Calendar.getInstance().getTime()) : serviceDate
       )
       : tripPattern.getScheduledTimetable();
-  }
-
-  public List<TripTimeOnDate> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
-    return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
   }
 
   /** {@link Graph#getTimetableSnapshot()} */
@@ -803,7 +800,7 @@ public class RoutingService {
     return DatedServiceJourneyHelper.getTripOnServiceDate(this, datedServiceJourneyId);
   }
 
-  public Map<T2<FeedScopedId, ServiceDate>, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
+  public Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
     return graphIndex.getTripOnServiceDateForTripAndDay();
   }
 
