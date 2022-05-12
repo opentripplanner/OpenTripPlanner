@@ -56,11 +56,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeTy
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
 import org.opentripplanner.ext.transmodelapi.model.framework.SystemNoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ValidityPeriodType;
-import org.opentripplanner.ext.transmodelapi.model.network.DestinationDisplayType;
-import org.opentripplanner.ext.transmodelapi.model.network.GroupOfLinesType;
-import org.opentripplanner.ext.transmodelapi.model.network.JourneyPatternType;
-import org.opentripplanner.ext.transmodelapi.model.network.LineType;
-import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
+import org.opentripplanner.ext.transmodelapi.model.network.*;
 import org.opentripplanner.ext.transmodelapi.model.plan.LegType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PathGuidanceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PlanPlaceType;
@@ -245,6 +241,12 @@ public class TransmodelGraphQLSchema {
       tariffZoneType,
       gqlUtil
     );
+
+    GraphQLOutputType stopToStopGeometryType = StopToStopGeometryType.create(
+      linkGeometryType,
+      quayType
+    );
+
     GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(quayType, relay);
     GraphQLNamedOutputType placeAtDistanceType = PlaceAtDistanceType.create(relay, placeInterface);
 
@@ -284,6 +286,7 @@ public class TransmodelGraphQLSchema {
       quayType,
       lineType,
       ServiceJourneyType.REF,
+      stopToStopGeometryType,
       ptSituationElementType,
       gqlUtil
     );
