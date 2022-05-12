@@ -21,7 +21,8 @@ class GbfsVehicleRentalDataSourceTest {
         "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
         "nb",
         false,
-        new HashMap<>()
+        new HashMap<>(),
+        null
       )
     );
 
@@ -50,6 +51,13 @@ class GbfsVehicleRentalDataSourceTest {
     assertTrue(
       stations
         .stream()
+        .allMatch(vehicleRentalStation ->
+          vehicleRentalStation.getNetwork().equals("lillestrombysykkel")
+        )
+    );
+    assertTrue(
+      stations
+        .stream()
         .noneMatch(vehicleRentalStation ->
           vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed()
         )
@@ -58,12 +66,14 @@ class GbfsVehicleRentalDataSourceTest {
 
   @Test
   void makeStationFromV10() {
+    var network = "helsinki_gbfs";
     var dataSource = new GbfsVehicleRentalDataSource(
       new GbfsVehicleRentalDataSourceParameters(
         "file:src/test/resources/gbfs/helsinki/gbfs.json",
         "en",
         false,
-        new HashMap<>()
+        new HashMap<>(),
+        network
       )
     );
 
@@ -91,6 +101,11 @@ class GbfsVehicleRentalDataSourceTest {
     );
     assertTrue(
       stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation())
+    );
+    assertTrue(
+      stations
+        .stream()
+        .allMatch(vehicleRentalStation -> vehicleRentalStation.getNetwork() == network)
     );
     assertTrue(
       stations

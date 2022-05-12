@@ -496,7 +496,11 @@ format:
    // Optionally specify the language version of the feed to use. If no language is set, the first language in the feed is used. 
    "language": "en",
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
-   "allowKeepingRentedBicycleAtDestination": true
+   "allowKeepingRentedBicycleAtDestination": true,
+   // The network is used to set the feedId for the GBFS imported data. It override the system_id from the data. 
+   // This parameter is optional - Avoid using the network config parameter if the system_id is sensible and 
+   // there is no need to change it.
+   "network": "socialbicycles_coast"
 }
 ```
 
