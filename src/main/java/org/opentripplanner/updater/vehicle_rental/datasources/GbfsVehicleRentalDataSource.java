@@ -116,6 +116,7 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
           .getStations()
           .stream()
           .map(stationInformationMapper::mapStationInformation)
+          .filter(Objects::nonNull)
           .peek(stationStatusMapper::fillStationStatus)
           .collect(Collectors.toList())
       );
