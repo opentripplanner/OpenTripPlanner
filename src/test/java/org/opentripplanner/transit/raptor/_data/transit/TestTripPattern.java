@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestTripPattern implements RaptorTripPattern {
 

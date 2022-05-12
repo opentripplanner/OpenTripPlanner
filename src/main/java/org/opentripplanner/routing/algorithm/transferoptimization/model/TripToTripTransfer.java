@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.

@@ -8,8 +8,8 @@ import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class holds transfer constraint information.

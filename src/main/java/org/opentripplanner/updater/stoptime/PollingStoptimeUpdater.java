@@ -4,10 +4,10 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

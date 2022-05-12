@@ -17,9 +17,10 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -209,9 +210,9 @@ public class FlexibleTransitLeg implements Leg {
       .addTimeCal("endTime", endTime)
       .addNum("distance", getDistanceMeters(), "m")
       .addNum("cost", generalizedCost)
-      .addEntityId("agencyId", getAgency())
-      .addEntityId("routeId", getRoute())
-      .addEntityId("tripId", getTrip())
+      .addObjOp("agencyId", getAgency(), TransitEntity::getId)
+      .addObjOp("routeId", getRoute(), TransitEntity::getId)
+      .addObjOp("tripId", getTrip(), TransitEntity::getId)
       .addObj("serviceDate", getServiceDate())
       .addObj("legGeometry", getLegGeometry())
       .addCol("transitAlerts", transitAlerts)

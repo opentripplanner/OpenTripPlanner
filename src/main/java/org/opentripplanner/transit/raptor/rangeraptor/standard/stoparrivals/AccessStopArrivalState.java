@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class is responsible for adding access functionality, which the {@link

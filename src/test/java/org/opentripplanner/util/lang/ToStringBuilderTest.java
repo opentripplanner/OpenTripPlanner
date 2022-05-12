@@ -12,6 +12,7 @@ import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class ToStringBuilderTest {
@@ -71,15 +72,6 @@ public class ToStringBuilderTest {
   }
 
   @Test
-  public void addTransitEntity() {
-    Trip trip = new Trip(TransitModelForTest.id("1"));
-    assertEquals(
-      "ToStringBuilderTest{tripId: F:1}",
-      subject().addEntityId("tripId", trip).toString()
-    );
-  }
-
-  @Test
   public void addObj() {
     assertEquals(
       "ToStringBuilderTest{obj: Foo{a: 5, b: 'X'}}",
@@ -88,6 +80,19 @@ public class ToStringBuilderTest {
     assertEquals(
       "ToStringBuilderTest{obj: Foo{}}",
       subject().addObj("obj", new Foo(0, null)).toString()
+    );
+  }
+
+  @Test
+  public void addObjOp() {
+    Trip trip = new Trip(TransitModelForTest.id("1"));
+    assertEquals(
+      "ToStringBuilderTest{tripId: F:1}",
+      subject().addObjOp("tripId", trip, TransitEntity::getId).toString()
+    );
+    assertEquals(
+      "ToStringBuilderTest{}",
+      subject().addObjOp("tripId", null, TransitEntity::getId).toString()
     );
   }
 
@@ -209,6 +214,12 @@ public class ToStringBuilderTest {
       subject().addDuration("d", Duration.ofSeconds(125)).toString()
     );
     assertEquals("ToStringBuilderTest{}", subject().addDurationSec("d", 12, 12).toString());
+  }
+
+  @Test
+  public void nullSafeToString() {
+    assertEquals("null", ToStringBuilder.nullSafeToString(null));
+    assertEquals("PT55S", ToStringBuilder.nullSafeToString(Duration.ofSeconds(55)));
   }
 
   private ToStringBuilder subject() {

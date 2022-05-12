@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.pat
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -12,6 +11,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinat
 import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**

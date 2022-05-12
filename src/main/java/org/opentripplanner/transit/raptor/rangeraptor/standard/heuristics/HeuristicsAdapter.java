@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -14,6 +13,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.IntUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**

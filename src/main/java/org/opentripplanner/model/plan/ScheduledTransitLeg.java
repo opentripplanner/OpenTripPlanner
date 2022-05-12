@@ -27,9 +27,10 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -357,9 +358,9 @@ public class ScheduledTransitLeg implements Leg {
       .addNum("distance", distanceMeters, "m")
       .addNum("cost", generalizedCost)
       .addNum("routeType", getRouteType())
-      .addEntityId("agencyId", getAgency())
-      .addEntityId("routeId", getRoute())
-      .addEntityId("tripId", getTrip())
+      .addObjOp("agencyId", getAgency(), TransitEntity::getId)
+      .addObjOp("routeId", getRoute(), TransitEntity::getId)
+      .addObjOp("tripId", getTrip(), TransitEntity::getId)
       .addStr("headsign", getHeadsign())
       .addObj("serviceDate", serviceDate)
       .addObj("legGeometry", legGeometry)

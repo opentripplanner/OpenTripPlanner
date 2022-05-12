@@ -22,11 +22,11 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

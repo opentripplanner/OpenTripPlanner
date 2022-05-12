@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class VehicleParkingEntrance implements Serializable {
 

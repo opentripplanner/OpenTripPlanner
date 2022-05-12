@@ -8,8 +8,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A Place is where a journey starts or ends, or a transit stop along the way.

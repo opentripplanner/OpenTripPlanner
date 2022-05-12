@@ -10,7 +10,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -19,6 +18,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of

@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A vertex for an OSM node that represents a transit stop and has a tag to cross-reference this to
