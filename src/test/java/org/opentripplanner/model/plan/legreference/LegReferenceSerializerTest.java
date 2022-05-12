@@ -12,6 +12,8 @@ class LegReferenceSerializerTest {
   private static final ServiceDate SERVICE_DATE = new ServiceDate(2022, 1, 31);
   private static final int FROM_STOP_POS = 1;
   private static final int TO_STOP_POS = 3;
+  private static final String ENCODED_TOKEN =
+    "rO0ABXc0ABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEABkY6VHJpcAAIMjAyMjAxMzEAAAABAAAAAw==";
 
   @Test
   void testScheduledTransitLegReferenceRoundTrip() {
@@ -19,7 +21,7 @@ class LegReferenceSerializerTest {
 
     var out = LegReferenceSerializer.encode(ref);
 
-    System.out.println(out);
+    assertEquals(ENCODED_TOKEN, out);
 
     var ref2 = LegReferenceSerializer.decode(out);
 
@@ -28,9 +30,7 @@ class LegReferenceSerializerTest {
 
   @Test
   void testScheduledTransitLegReferenceDeserialize() {
-    var in = "rO0ABXc0ABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEABkY6VHJpcAAIMjAyMjAxMzEAAAABAAAAAw==";
-
-    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(in);
+    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_TOKEN);
 
     assertEquals(TRIP_ID, ref.tripId());
     assertEquals(SERVICE_DATE, ref.serviceDate());
