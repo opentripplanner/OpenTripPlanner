@@ -7,8 +7,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 
 public class QuayAtDistanceType {
 

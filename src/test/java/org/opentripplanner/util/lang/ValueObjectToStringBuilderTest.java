@@ -1,8 +1,9 @@
-package org.opentripplanner.model.base;
+package org.opentripplanner.util.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 public class ValueObjectToStringBuilderTest {
 

@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -23,6 +22,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import uk.org.ifopt.siri20.StopPlaceRef;
 import uk.org.siri.siri20.AffectedLineStructure;
@@ -706,7 +706,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-    final FeedScopedId stopId = new FeedScopedId("FEED", stopId0);
+    final FeedScopedId stopId = new FeedScopedId(FEED_ID, stopId0);
 
     Collection<TransitAlert> tripPatches = transitAlertService.getStopAlerts(stopId);
 
@@ -1140,7 +1140,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
      * Line and external stop-alerts should result in several AlertPatches. One for each routeId AND for each stop
      */
 
-    final FeedScopedId feedRouteId = new FeedScopedId("FEED", routeId);
+    final FeedScopedId feedRouteId = new FeedScopedId(FEED_ID, routeId);
     Collection<TransitAlert> tripPatches = transitAlertService.getRouteAlerts(feedRouteId);
 
     assertNotNull(tripPatches);
@@ -1149,7 +1149,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
     assertTrue(matchesEntity(transitAlert, feedRouteId));
 
-    FeedScopedId feedStopId = new FeedScopedId("FEED", stopId0);
+    FeedScopedId feedStopId = new FeedScopedId(FEED_ID, stopId0);
     tripPatches = transitAlertService.getStopAlerts(feedStopId);
 
     assertNotNull(tripPatches);
@@ -1158,7 +1158,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(situationNumber, transitAlert.getId());
     assertTrue(matchesEntity(transitAlert, feedStopId));
 
-    feedStopId = new FeedScopedId("FEED", stopId1);
+    feedStopId = new FeedScopedId(FEED_ID, stopId1);
     tripPatches = transitAlertService.getStopAlerts(feedStopId);
 
     assertNotNull(tripPatches);

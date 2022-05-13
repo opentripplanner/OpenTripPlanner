@@ -3,7 +3,7 @@ package org.opentripplanner.api.json;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import java.io.IOException;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 // Map key (de)serializers are always separate from value ones, because they must be strings.
 public class FeedScopedIdKeyDeserializer extends KeyDeserializer {

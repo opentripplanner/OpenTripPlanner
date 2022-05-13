@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
  * Info about how a trip might be booked at a particular stop. All of this is pass-through

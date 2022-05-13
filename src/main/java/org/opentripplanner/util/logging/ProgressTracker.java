@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.util.logging;
 
 import java.io.InputStream;
 import java.io.OutputStream;

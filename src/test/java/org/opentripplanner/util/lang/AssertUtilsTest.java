@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.util.lang;
 
 import static org.junit.Assert.fail;
 

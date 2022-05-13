@@ -1,4 +1,4 @@
-package org.opentripplanner.model.base;
+package org.opentripplanner.util.lang;
 
 import java.time.Duration;
 import java.util.function.Function;

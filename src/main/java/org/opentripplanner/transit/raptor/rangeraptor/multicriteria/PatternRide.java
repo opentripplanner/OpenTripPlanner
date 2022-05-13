@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class represent the STATE for one possible path up until the point where a given trip is

@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.calendar.impl;
 
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 class MultipleCalendarsForServiceIdException extends RuntimeException {
 

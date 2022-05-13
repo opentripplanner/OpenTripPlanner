@@ -11,7 +11,6 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.reques
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_B;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_C;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_D;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.id;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.stopIndex;
 
 import java.util.Collection;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -34,12 +32,14 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.util.OTPFeature;
 
 public class ConstrainedBoardingSearchTest {
 
-  private static final FeedScopedId ID = id("ID");
+  private static final FeedScopedId ID = TransitModelForTest.id("ID");
   private static final TransferConstraint GUARANTEED_CONSTRAINT = TransferConstraint
     .create()
     .guaranteed()

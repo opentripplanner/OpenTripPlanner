@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.alertpatch;
 
 import java.util.Objects;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public interface EntitySelector {
   class Agency implements EntitySelector {

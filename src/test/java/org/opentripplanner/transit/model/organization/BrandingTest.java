@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,14 +16,14 @@ public class BrandingTest {
 
   @Test
   public void testToString() {
-    Branding branding = new Branding(
-      MappingSupport.ID_FACTORY.createId(ID),
-      SHORT_NAME,
-      NAME,
-      URL,
-      DESCRIPTION,
-      IMAGE
-    );
+    Branding branding = Branding
+      .of(MappingSupport.ID_FACTORY.createId(ID))
+      .setShortName(SHORT_NAME)
+      .setName(NAME)
+      .setUrl(URL)
+      .setDescription(DESCRIPTION)
+      .setImage(IMAGE)
+      .build();
 
     assertEquals(
       "Branding{" +

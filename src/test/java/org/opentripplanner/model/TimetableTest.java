@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -23,8 +22,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.TestUtils;
 
 public class TimetableTest {

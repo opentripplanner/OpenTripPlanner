@@ -4,20 +4,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
 
 import java.util.List;
 import org.junit.Test;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class RoutingRequestTest {
 
-  private static final FeedScopedId AGENCY_ID = new FeedScopedId("F", "A1");
-  private static final FeedScopedId ROUTE_ID = new FeedScopedId("F", "R1");
-  private static final FeedScopedId OTHER_ID = new FeedScopedId("F", "X");
+  private static final FeedScopedId AGENCY_ID = TransitModelForTest.id("A1");
+  private static final FeedScopedId ROUTE_ID = TransitModelForTest.id("R1");
+  private static final FeedScopedId OTHER_ID = TransitModelForTest.id("X");
   public static final String TIMEZONE = "Europe/Paris";
 
   @Test
@@ -56,12 +58,12 @@ public class RoutingRequestTest {
 
   @Test
   public void testPreferencesPenaltyForRoute() {
-    Agency agency = new Agency(AGENCY_ID, "A", TIMEZONE);
+    Agency agency = agency("A").copy().setId(AGENCY_ID).setTimezone(TIMEZONE).build();
     Route route = new Route(ROUTE_ID);
     route.setShortName("R");
     route.setAgency(agency);
 
-    Agency otherAgency = new Agency(OTHER_ID, "OtherA", TIMEZONE);
+    Agency otherAgency = agency.copy().setId(OTHER_ID).setName("OtherA").build();
     Route otherRoute = new Route(OTHER_ID);
     otherRoute.setShortName("OtherR");
     otherRoute.setAgency(otherAgency);

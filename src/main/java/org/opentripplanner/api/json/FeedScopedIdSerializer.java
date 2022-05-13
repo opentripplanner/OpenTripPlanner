@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class FeedScopedIdSerializer extends JsonSerializer<FeedScopedId> {
 

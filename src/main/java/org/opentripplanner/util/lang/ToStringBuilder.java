@@ -1,4 +1,4 @@
-package org.opentripplanner.model.base;
+package org.opentripplanner.util.lang;
 
 import static java.lang.Boolean.TRUE;
 
@@ -12,8 +12,8 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
-import org.opentripplanner.model.TransitEntity;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -107,12 +107,21 @@ public class ToStringBuilder {
     return addObj(name, obj, null);
   }
 
-  public ToStringBuilder addObj(String name, Object value, Object ignoreValue) {
+  public ToStringBuilder addObj(String name, Object value, @Nullable Object ignoreValue) {
     return addIfNotIgnored(name, value, ignoreValue, Object::toString);
   }
 
-  public ToStringBuilder addEntityId(String name, TransitEntity entity) {
-    return addIfNotNull(name, entity, e -> e.getId().toString());
+  /**
+   * Use this if you would like a custom toString function to convert the value. If the given value
+   * is null, then the value is not printed. The "Op" (Operation) suffix is necessary to separate
+   * this from {@link #addObj(String, Object, Object)},  when the last argument is null.
+   */
+  public <T> ToStringBuilder addObjOp(
+    String name,
+    @Nullable T value,
+    Function<T, Object> toObjectOp
+  ) {
+    return addIfNotIgnored(name, value, null, v -> nullSafeToString(toObjectOp.apply(v)));
   }
 
   public ToStringBuilder addInts(String name, int[] intArray) {
@@ -282,7 +291,7 @@ public class ToStringBuilder {
     return addIt(name, mapToString.apply(value));
   }
 
-  private ToStringBuilder addIt(String name, @NotNull String value) {
+  private ToStringBuilder addIt(String name, @Nonnull String value) {
     addLabel(name);
     addValue(value);
     return this;
@@ -297,9 +306,20 @@ public class ToStringBuilder {
     sb.append(name);
   }
 
-  private void addValue(@NotNull String value) {
+  private void addValue(@Nonnull String value) {
     sb.append(FIELD_VALUE_SEP);
     sb.append(value);
+  }
+
+  /**
+   * Map the given object to a String. If the input object is {@code null} the string
+   * {@code "null"} is returned if not the {@link Object#toString()} method is called.
+   */
+  public static String nullSafeToString(@Nullable Object object) {
+    if (object == null) {
+      return NULL_VALUE;
+    }
+    return object.toString();
   }
 
   private String formatTime(ZonedDateTime time) {

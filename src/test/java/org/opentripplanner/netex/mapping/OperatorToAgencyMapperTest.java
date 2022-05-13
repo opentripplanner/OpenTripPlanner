@@ -24,7 +24,7 @@ public class OperatorToAgencyMapperTest {
       .withContactDetails(new ContactStructure().withUrl(URL).withPhone(PHONE));
 
     // When mapped
-    org.opentripplanner.model.Operator o;
+    org.opentripplanner.transit.model.organization.Operator o;
     o = new OperatorToAgencyMapper(MappingSupport.ID_FACTORY).mapOperator(operator);
 
     // Then expect
@@ -42,7 +42,7 @@ public class OperatorToAgencyMapperTest {
       .withName(new MultilingualString().withValue(NAME));
 
     // When mapped
-    org.opentripplanner.model.Operator o;
+    org.opentripplanner.transit.model.organization.Operator o;
     o = new OperatorToAgencyMapper(MappingSupport.ID_FACTORY).mapOperator(operator);
 
     // Then expect

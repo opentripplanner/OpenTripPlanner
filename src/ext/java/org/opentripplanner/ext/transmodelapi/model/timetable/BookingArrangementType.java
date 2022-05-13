@@ -10,7 +10,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingTime;
-import org.opentripplanner.model.ContactInfo;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class BookingArrangementType {
 

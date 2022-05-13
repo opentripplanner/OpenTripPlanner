@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -14,6 +13,7 @@ import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * Check that the correct alternative legs are found, and that the search traverses the date

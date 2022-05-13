@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.basic;
 
-import static org.opentripplanner.util.AssertUtils.assertHasValue;
+import static org.opentripplanner.util.lang.AssertUtils.assertHasValue;
 
 import java.io.Serial;
 import java.io.Serializable;

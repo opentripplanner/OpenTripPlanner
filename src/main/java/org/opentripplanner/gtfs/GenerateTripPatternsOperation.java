@@ -14,7 +14,6 @@ import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
@@ -25,6 +24,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

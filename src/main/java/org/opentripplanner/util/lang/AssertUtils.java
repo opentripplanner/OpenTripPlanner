@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.util.lang;
 
 public class AssertUtils {
 

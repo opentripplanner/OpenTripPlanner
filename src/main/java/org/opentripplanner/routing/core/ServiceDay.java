@@ -6,9 +6,9 @@ import java.util.BitSet;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * Represents a day of transit services. Intended for quickly checking whether a service is running

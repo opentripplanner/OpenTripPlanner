@@ -2,12 +2,12 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
@@ -39,7 +39,7 @@ public class VehicleParkingLinkingTest {
   public void entranceWithVertexLinkingTest() {
     var parking = VehicleParking
       .builder()
-      .entrance(builder -> builder.entranceId(new FeedScopedId("TEST", "1")).vertex(A))
+      .entrance(builder -> builder.entranceId(id("1")).vertex(A))
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
@@ -58,12 +58,7 @@ public class VehicleParkingLinkingTest {
     var parking = VehicleParking
       .builder()
       .entrance(builder ->
-        builder
-          .entranceId(new FeedScopedId("TEST", "1"))
-          .x(0.0001)
-          .y(0)
-          .carAccessible(true)
-          .walkAccessible(true)
+        builder.entranceId(id("1")).x(0.0001).y(0).carAccessible(true).walkAccessible(true)
       )
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
@@ -90,12 +85,7 @@ public class VehicleParkingLinkingTest {
     var parking = VehicleParking
       .builder()
       .entrance(builder ->
-        builder
-          .entranceId(new FeedScopedId("TEST", "1"))
-          .x(0.0001)
-          .y(0)
-          .carAccessible(true)
-          .walkAccessible(true)
+        builder.entranceId(id("1")).x(0.0001).y(0).carAccessible(true).walkAccessible(true)
       )
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
@@ -115,14 +105,10 @@ public class VehicleParkingLinkingTest {
   public void removeEntranceWithNonExistingVertexTest() {
     var vehicleParking = VehicleParking
       .builder()
-      .id(new FeedScopedId("TEST", "VP"))
+      .id(id("VP"))
       .bicyclePlaces(true)
-      .entrance(builder ->
-        builder.entranceId(new FeedScopedId("TEST", "Entrance-1")).vertex(A).walkAccessible(true)
-      )
-      .entrance(builder ->
-        builder.entranceId(new FeedScopedId("TEST", "Entrance-2")).vertex(B).walkAccessible(true)
-      )
+      .entrance(builder -> builder.entranceId(id("Entrance-1")).vertex(A).walkAccessible(true))
+      .entrance(builder -> builder.entranceId(id("Entrance-2")).vertex(B).walkAccessible(true))
       .build();
 
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
@@ -144,11 +130,9 @@ public class VehicleParkingLinkingTest {
   public void removeVehicleParkingWithOneEntranceAndNonExistingVertexTest() {
     var vehicleParking = VehicleParking
       .builder()
-      .id(new FeedScopedId("TEST", "VP"))
+      .id(id("VP"))
       .bicyclePlaces(true)
-      .entrance(builder ->
-        builder.entranceId(new FeedScopedId("TEST", "Entrance-1")).vertex(A).walkAccessible(true)
-      )
+      .entrance(builder -> builder.entranceId(id("Entrance-1")).vertex(A).walkAccessible(true))
       .build();
 
     var vehicleParkingService = graph.getService(VehicleParkingService.class, true);

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class TripPatternTest {
 

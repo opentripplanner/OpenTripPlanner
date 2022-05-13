@@ -26,7 +26,6 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopCollection;
@@ -37,6 +36,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class StopPlaceType {
 
