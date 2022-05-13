@@ -496,7 +496,11 @@ format:
    // Optionally specify the language version of the feed to use. If no language is set, the first language in the feed is used. 
    "language": "en",
    // if it should be possible to arrive at the destination with a rented bicycle, without dropping it off
-   "allowKeepingRentedBicycleAtDestination": true
+   "allowKeepingRentedBicycleAtDestination": true,
+   // The network is used to set the feedId for the GBFS imported data. It override the system_id from the data. 
+   // This parameter is optional - Avoid using the network config parameter if the system_id is sensible and 
+   // there is no need to change it.
+   "network": "socialbicycles_coast"
 }
 ```
 
@@ -516,6 +520,26 @@ For this to be possible three things need to be configured:
 3. If keeping the bicycle at the destination should be discouraged, then
    `keepingRentedBicycleAtDestinationCost` (default: `0`) may also be set in the
    [routing defaults](#routing-defaults).
+
+##### Header Settings
+Sometimes GBFS Feeds might need some headers e.g. for authentication. 
+For those use cases headers can be configured as a json.
+```JSON
+// router-config.json
+{
+  "type": "vehicle-rental",
+  "sourceType": "gbfs",
+  "frequencySec": 60,
+  "url": "<https://some-gbfs-feed/gbfs.json>",
+  "headers": {
+    // example for authentication headers
+    "Auth": "<any-token>",
+    // example for any header
+    "<key>": "<value>"
+  }
+}
+```
+Any header key, value can be inserted.
 
 #### Vehicle Rental Service Directory configuration (sandbox feature)
 

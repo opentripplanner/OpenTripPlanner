@@ -40,6 +40,8 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
 
   private final Map<String, String> httpHeaders;
 
+  private final String network;
+
   /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
   private final boolean allowKeepingRentedVehicleAtDestination;
 
@@ -50,6 +52,7 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
     language = parameters.language();
     httpHeaders = parameters.getHttpHeaders();
     allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
+    network = parameters.network();
   }
 
   @Override
@@ -66,7 +69,8 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
     GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);
     GbfsSystemInformationMapper systemInformationMapper = new GbfsSystemInformationMapper();
     VehicleRentalSystem system = systemInformationMapper.mapSystemInformation(
-      systemInformation.getData()
+      systemInformation.getData(),
+      network
     );
 
     // Get vehicle types
@@ -112,6 +116,7 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
           .getStations()
           .stream()
           .map(stationInformationMapper::mapStationInformation)
+          .filter(Objects::nonNull)
           .peek(stationStatusMapper::fillStationStatus)
           .collect(Collectors.toList())
       );
