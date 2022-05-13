@@ -35,6 +35,8 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 34,"Trondheim to Oslo",09:00,,12h,Trondheim,,63.4210307,10.50292,Oslo,,59.8889369,10.7885742,transit,TRANSIT|WALK
 35,"Oslo to Tromsø",09:00,,12h,Oslo,,59.9299041,9.9088,Tromsø,,69.6551766,18.9486,transit,TRANSIT|WALK
 36,"Drammen to Ålesund",10:00,,12h,Drammen,,59.7176376,10.2612305,Ålesund,,62.4869530,6.1303710,transit,TRANSIT|WALK
+40,"Carl Berners Plass to Kolbotn - arrive by",,19:00,,Carl Berners Plass,,59.9261, 10.7753,Kolbotn,,59.8112, 10.7986,transit,TRANSIT|WALK
+41,"Spikkestad to Gardemoen - arrive by",,17:00,,Spikkestad,NSR:StopPlace:694,59.7453,10.3417,Gardemoen,NSR:StopPlace:269,60.1931,11.0968,transit,RAIL|WALK
 101,"P+R into Oslo #1",10:00,,3h,Slemmestad,,59.779213,10.495719,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK|TRANSIT|WALK
 102,"P+R into Bergen",14:00,,3h,Norvik,,60.234250,5.3580665,Bergen,,60.3884160,5.321159,p-and-r,CAR_PARK|TRANSIT|WALK
 103,"P+R into Trondheim",14:00,,3h,Venn,,63.2510938,10.0528335,Trondheim,,63.4291709,10.40096,p-and-r,CAR_PARK|TRANSIT|WALK
