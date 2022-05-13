@@ -1,4 +1,4 @@
-testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon,destination,toPlace,toLat,toLon,tags,modes
+testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon,destination,toPlace,toLat,toLon,category,modes
 1,"Bus/Rail, Notodden - Oslo",08:00,12:00,2h,Notodden Skysstasjon,NSR:StopPlace:20762,59.556698,9.25651,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994,transit,TRANSIT|WALK
 2,"Rail, Gol - Oslo",11:00,15:00,1h,Gol,NSR:StopPlace:324,60.69917,8.97123,Billingstad,NSR:StopPlace:577,59.874783,10.483057,transit,TRANSIT|WALK
 3,"Medium long local - Oslo",15:00,17:00,1h30m,IKEA Slependen,NSR:StopPlace:4401,59.87577,10.500488,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994,transit,TRANSIT|WALK

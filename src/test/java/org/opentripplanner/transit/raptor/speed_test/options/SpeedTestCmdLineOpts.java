@@ -18,7 +18,7 @@ public class SpeedTestCmdLineOpts {
   private static final String ROOT_DIR = "d";
   private static final String PROFILES = "p";
   private static final String TEST_CASES = "c";
-  private static final String TAGS = "t";
+  private static final String CATEGORIES = "z";
   private static final String NUM_OF_ITINERARIES = "i";
   private static final String SAMPLE_TEST_N_TIMES = "n";
   private static final String SKIP_COST = "0";
@@ -97,8 +97,8 @@ public class SpeedTestCmdLineOpts {
     return parseCSVList(TEST_CASES);
   }
 
-  public List<String> includeTags() {
-    return parseCSVList(TAGS);
+  public List<String> includeCategories() {
+    return parseCSVList(CATEGORIES);
   }
 
   List<String> parseCSVList(String opt) {
@@ -135,10 +135,10 @@ public class SpeedTestCmdLineOpts {
       "A coma separated list of test case ids to run."
     );
     options.addOption(
-      TAGS,
-      "tags",
+      CATEGORIES,
+      "categories",
       true,
-      "A coma separated list of tags to filter the testcases by - all tags must match."
+      "A coma separated list of categories to filter the testcases by."
     );
     options.addOption(
       SAMPLE_TEST_N_TIMES,

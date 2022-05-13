@@ -14,7 +14,11 @@ public record TestCaseDefinition(
   int window,
   GenericLocation fromPlace,
   GenericLocation toPlace,
-  List<String> tags,
+  /**
+   * A test cases can be grouped into a category used to group similar cases, like "Flex" or
+   * "Long Distance".
+   */
+  String category,
   RequestModes modes
 ) {
   @Override

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -27,7 +28,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   private final Set<Optimization> optimizations;
   private final DebugRequest debug;
   private final RaptorSlackProvider slackProvider;
-  private final Set<String> timingTags;
+  private final Set<RoutingTag> tags;
 
   private RaptorRequest() {
     searchParams = SearchParams.defaults();
@@ -36,7 +37,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     optimizations = Collections.emptySet();
     // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
     slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
-    timingTags = Set.of();
+    tags = Set.of();
     debug = DebugRequest.defaults();
   }
 
@@ -46,7 +47,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     this.searchDirection = builder.searchDirection();
     this.optimizations = Set.copyOf(builder.optimizations());
     this.slackProvider = builder.slackProvider();
-    this.timingTags = builder.timingTags();
+    this.tags = Set.copyOf(builder.tags());
     this.debug = builder.debug().build();
     verify();
   }
@@ -122,8 +123,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     return optimizationEnabled(Optimization.PARALLEL);
   }
 
-  public Set<String> timingTags() {
-    return timingTags;
+  public Set<RoutingTag> tags() {
+    return tags;
   }
 
   /**
@@ -165,7 +166,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
       .addCol("optimizations", optimizations)
       .addObj("debug", debug, DebugRequest.defaults())
       .addObj("searchParams", searchParams)
-      .addCol("timingTags", timingTags)
+      .addCol("tags", tags)
       .toString();
   }
 
