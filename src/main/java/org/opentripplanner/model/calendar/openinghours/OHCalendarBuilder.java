@@ -1,5 +1,6 @@
 package org.opentripplanner.model.calendar.openinghours;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -72,6 +73,20 @@ public class OHCalendarBuilder {
       openingDays.set(
         (int) Duration.between(startOfPeriod.atStartOfDay(), date.atStartOfDay()).toDays()
       );
+      return this;
+    }
+
+    public OpeningHoursBuilder on(DayOfWeek dayOfWeek) {
+      // This counts how many days there are in between the startOfPeriod and
+      // when the specified dayOfWeek occurs for the first time. Maybe there is a cleaner way to do this.
+      int rawWeekDayDifference = dayOfWeek.compareTo(startOfPeriod.getDayOfWeek());
+      int firstOccurrenceDaysFromStart = rawWeekDayDifference >= 0
+        ? rawWeekDayDifference
+        : 7 - Math.abs(rawWeekDayDifference);
+
+      for (int i = firstOccurrenceDaysFromStart; i < daysInPeriod; i += 7) {
+        openingDays.set(i);
+      }
       return this;
     }
 

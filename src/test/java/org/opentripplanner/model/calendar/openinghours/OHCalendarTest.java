@@ -2,13 +2,13 @@ package org.opentripplanner.model.calendar.openinghours;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
@@ -83,6 +83,30 @@ class OHCalendarTest {
     // Open in hole period from enter to exit?
     boolean okToEnter = ctx.canEnter(c, time + 1234);
     boolean okToExit = ctx.canExit(c, time + 2345);
+  }
+
+  @Test
+  void openOnMondaysAndSundays() {
+    var service = new OpeningHoursCalendarService(
+      new Deduplicator(),
+      LocalDate.of(2022, Month.MARCH, 1),
+      LocalDate.of(2024, Month.JANUARY, 15)
+    );
+
+    var calBuilder = service.newBuilder(zoneId);
+
+    calBuilder
+      .openingHours("Mondays and Sundays", time(13, 0), time(17, 0))
+      .on(DayOfWeek.MONDAY)
+      .on(DayOfWeek.SATURDAY)
+      .add();
+
+    var c = calBuilder.build();
+
+    assertEquals(
+      "OHCalendar{" + "zoneId: Europe/Paris, " + "openingHours: [Mondays and Sundays 13:00-17:00]}",
+      c.toString()
+    );
   }
 
   private static LocalDate date(Month march, int i) {
