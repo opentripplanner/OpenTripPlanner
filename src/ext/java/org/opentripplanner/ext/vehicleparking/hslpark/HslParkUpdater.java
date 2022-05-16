@@ -1,8 +1,10 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
@@ -29,9 +31,14 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
 
   private List<VehicleParking> parks;
 
-  public HslParkUpdater(HslParkUpdaterParameters parameters) {
+  public HslParkUpdater(
+    HslParkUpdaterParameters parameters,
+    OpeningHoursCalendarService openingHoursCalendarService,
+    ZoneId zoneId
+  ) {
     String feedId = parameters.getFeedId();
-    vehicleParkingMapper = new HslParkToVehicleParkingMapper(feedId);
+    vehicleParkingMapper =
+      new HslParkToVehicleParkingMapper(feedId, openingHoursCalendarService, zoneId);
     parkPatchMapper = new HslParkUtilizationToPatchMapper(feedId);
     facilitiesDownloader =
       new JsonDataListDownloader<>(

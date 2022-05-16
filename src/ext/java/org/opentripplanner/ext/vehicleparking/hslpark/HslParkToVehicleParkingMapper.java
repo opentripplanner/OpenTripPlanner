@@ -3,6 +3,9 @@ package org.opentripplanner.ext.vehicleparking.hslpark;
 import com.bedatadriven.jackson.datatype.jts.parsers.GenericGeometryParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.calendar.openinghours.OHCalendar;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
@@ -33,8 +38,18 @@ public class HslParkToVehicleParkingMapper {
 
   private final String feedId;
 
-  public HslParkToVehicleParkingMapper(String feedId) {
+  private final OpeningHoursCalendarService openingHoursCalendarService;
+
+  private final ZoneId zoneId;
+
+  public HslParkToVehicleParkingMapper(
+    String feedId,
+    OpeningHoursCalendarService openingHoursCalendarService,
+    ZoneId zoneId
+  ) {
     this.feedId = feedId;
+    this.openingHoursCalendarService = openingHoursCalendarService;
+    this.zoneId = zoneId;
   }
 
   public static FeedScopedId createIdForNode(JsonNode jsonNode, String idName, String feedId) {
@@ -87,6 +102,8 @@ public class HslParkToVehicleParkingMapper {
       var wheelChairAccessiblePlaces = maybeCapacity
         .map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces()))
         .orElse(false);
+      var openingHoursByDayType = jsonNode.path("openingHours").path("byDayType");
+      var openingHoursCalendar = parseOpeningHours(openingHoursByDayType);
 
       return VehicleParking
         .builder()
@@ -100,6 +117,7 @@ public class HslParkToVehicleParkingMapper {
         .carPlaces(carPlaces)
         .wheelchairAccessibleCarPlaces(wheelChairAccessiblePlaces)
         .tags(tags)
+        .openingHoursCalendar(openingHoursCalendar)
         .entrance(builder ->
           builder
             .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
@@ -184,5 +202,59 @@ public class HslParkToVehicleParkingMapper {
       tagList.add(feedId + ":PRICING_METHOD_" + node.path("pricingMethod").asText());
     }
     return tagList;
+  }
+
+  private record DayTypeAndDays(String typeKey, String name, List<DayOfWeek> days) {}
+
+  private static final List<DayTypeAndDays> DAYS_FOR_DAY_TYPES = List.of(
+    new DayTypeAndDays(
+      "BUSINESS_DAY",
+      "Business days",
+      List.of(
+        DayOfWeek.MONDAY,
+        DayOfWeek.TUESDAY,
+        DayOfWeek.WEDNESDAY,
+        DayOfWeek.THURSDAY,
+        DayOfWeek.FRIDAY
+      )
+    ),
+    new DayTypeAndDays("SATURDAY", "Saturday", List.of(DayOfWeek.SATURDAY)),
+    new DayTypeAndDays("SUNDAY", "Sunday", List.of(DayOfWeek.SUNDAY))
+  );
+
+  private OHCalendar parseOpeningHours(JsonNode openingHoursByDayType) {
+    var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
+    for (DayTypeAndDays dayTypeAndDays : DAYS_FOR_DAY_TYPES) {
+      String key = dayTypeAndDays.typeKey();
+      if (openingHoursByDayType.has(key) && openingHoursByDayType.path(key).has("from")) {
+        LocalTime fromTime = convertTimeStringLocalTime(
+          openingHoursByDayType.path(key).path("from").asText()
+        );
+        LocalTime toTime = convertTimeStringLocalTime(
+          openingHoursByDayType.path(key).path("until").asText()
+        );
+        var openingHoursBuilder = calendarBuilder.openingHours(
+          dayTypeAndDays.name(),
+          fromTime,
+          toTime
+        );
+        for (DayOfWeek day : dayTypeAndDays.days()) {
+          openingHoursBuilder.on(day);
+        }
+        openingHoursBuilder.add();
+      }
+    }
+    return calendarBuilder.build();
+  }
+
+  /**
+   * Parses a string with format "05" or "05:30" to a {@link LocalTime}.
+   * If a park is open until 24h, the end time will be 24 but it should be
+   * adjusted to be 23:59 for opening hours.
+   */
+  private LocalTime convertTimeStringLocalTime(String timeString) {
+    int hours = Integer.parseInt(timeString.substring(0, 2));
+    int minutes = timeString.length() > 2 ? Integer.parseInt(timeString.substring(3, 5)) : 0;
+    return hours == 24 ? LocalTime.of(23, 59) : LocalTime.of(hours, minutes);
   }
 }

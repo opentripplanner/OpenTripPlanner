@@ -52,7 +52,7 @@ public class OHCalendarBuilder {
     );
   }
 
-  class OpeningHoursBuilder {
+  public class OpeningHoursBuilder {
 
     private final String periodDescription;
     private final LocalTime startTime;

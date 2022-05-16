@@ -5,8 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 
 public class HslParkUpdaterTest {
@@ -25,7 +30,16 @@ public class HslParkUpdaterTest {
       30,
       utilizationsUrl
     );
-    var updater = new HslParkUpdater(parameters);
+    var openingHoursCalendarService = new OpeningHoursCalendarService(
+      new Deduplicator(),
+      LocalDate.of(2022, Month.JANUARY, 1),
+      LocalDate.of(2023, Month.JANUARY, 1)
+    );
+    var updater = new HslParkUpdater(
+      parameters,
+      openingHoursCalendarService,
+      ZoneId.of("Europe/Helsinki")
+    );
 
     assertTrue(updater.update());
     var parkingLots = updater.getUpdates();
@@ -57,6 +71,15 @@ public class HslParkUpdaterTest {
     assertTrue(first.hasRealTimeData());
     assertEquals(600, first.getAvailability().getCarSpaces());
     assertNull(first.getAvailability().getBicycleSpaces());
+    assertEquals(
+      "OHCalendar{" +
+      "zoneId: Europe/Helsinki, " +
+      "openingHours: [Business days 00:00-23:59, " +
+      "Saturday 00:00-23:59, " +
+      "Sunday 00:00-23:59]" +
+      "}",
+      first.getOpeningHours().toString()
+    );
 
     var second = parkingLots.get(1);
     var name = second.getName();
@@ -72,6 +95,13 @@ public class HslParkUpdaterTest {
     assertNull(second.getCapacity().getBicycleSpaces());
     assertFalse(second.hasRealTimeData());
     assertNull(second.getAvailability());
+    assertEquals(
+      "OHCalendar{" +
+      "zoneId: Europe/Helsinki, " +
+      "openingHours: [Business days 06:00-17:30]" +
+      "}",
+      second.getOpeningHours().toString()
+    );
 
     var third = parkingLots.get(2);
     assertEquals("Alberganpromenadi", third.getName().toString());
@@ -88,5 +118,14 @@ public class HslParkUpdaterTest {
     var fourth = parkingLots.get(3);
     assertEquals(VehicleParkingState.TEMPORARILY_CLOSED, fourth.getState());
     assertEquals(0, fourth.getTags().size());
+    assertEquals(
+      "OHCalendar{" +
+      "zoneId: Europe/Helsinki, " +
+      "openingHours: [Saturday 07:00-18:00, " +
+      "Business days 07:00-21:00, " +
+      "Sunday 12:00-21:00]" +
+      "}",
+      fourth.getOpeningHours().toString()
+    );
   }
 }

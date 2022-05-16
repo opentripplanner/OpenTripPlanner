@@ -1,5 +1,6 @@
 package org.opentripplanner.updater;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
@@ -16,6 +17,7 @@ import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
@@ -51,7 +53,13 @@ public abstract class GraphUpdaterConfigurator {
   public static void setupGraph(Graph graph, UpdatersParameters updatersParameters) {
     List<GraphUpdater> updaters = new ArrayList<>();
 
-    updaters.addAll(createUpdatersFromConfig(updatersParameters));
+    updaters.addAll(
+      createUpdatersFromConfig(
+        updatersParameters,
+        graph.getOpeningHoursCalendarService(),
+        graph.getTimeZone().toZoneId()
+      )
+    );
     updaters.addAll(
       // Setup updaters using the VehicleRentalServiceDirectoryFetcher(Sandbox)
       fetchVehicleRentalServicesFromOnlineDirectory(
@@ -108,7 +116,11 @@ public abstract class GraphUpdaterConfigurator {
   /**
    * @return a list of GraphUpdaters created from the configuration
    */
-  private static List<GraphUpdater> createUpdatersFromConfig(UpdatersParameters config) {
+  private static List<GraphUpdater> createUpdatersFromConfig(
+    UpdatersParameters config,
+    OpeningHoursCalendarService openingHoursCalendarService,
+    ZoneId zoneId
+  ) {
     List<GraphUpdater> updaters = new ArrayList<>();
 
     for (VehicleRentalUpdaterParameters configItem : config.getVehicleRentalParameters()) {
@@ -143,7 +155,11 @@ public abstract class GraphUpdaterConfigurator {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem));
     }
     for (VehicleParkingUpdaterParameters configItem : config.getVehicleParkingUpdaterParameters()) {
-      var source = VehicleParkingDataSourceFactory.create(configItem);
+      var source = VehicleParkingDataSourceFactory.create(
+        configItem,
+        openingHoursCalendarService,
+        zoneId
+      );
       updaters.add(new VehicleParkingUpdater(configItem, source));
     }
     for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
