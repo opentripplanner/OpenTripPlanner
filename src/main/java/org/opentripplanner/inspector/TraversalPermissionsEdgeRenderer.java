@@ -66,7 +66,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     } else if (e instanceof ElevatorHopEdge ehe) {
       attrs.color = ELEVATOR_COLOR_EDGE;
       attrs.label = "elevator";
-      if (ehe.wheelchairAccessible) {
+      if (ehe.isWheelchairAccessible()) {
         attrs.label += " wheelchair";
       }
       if (ehe.getPermission().allows(StreetTraversalPermission.BICYCLE)) {

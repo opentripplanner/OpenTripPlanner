@@ -200,8 +200,8 @@ public abstract class GraphRoutingTest {
         var from = onboardVertices.get(i - 1);
         var to = onboardVertices.get(i);
 
-        edges.add(new ElevatorHopEdge(from, to, permission));
-        edges.add(new ElevatorHopEdge(to, from, permission));
+        edges.add(new ElevatorHopEdge(from, to, permission, WheelchairBoarding.POSSIBLE));
+        edges.add(new ElevatorHopEdge(to, from, permission, WheelchairBoarding.POSSIBLE));
       }
 
       return edges;

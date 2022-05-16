@@ -324,6 +324,7 @@ public class AddTransitModelEntitiesToGraph {
       fromOnboardVertex,
       toOnboardVertex,
       permission,
+      WheelchairBoarding.POSSIBLE,
       levels,
       pathway.getTraversalTime()
     );
@@ -337,6 +338,7 @@ public class AddTransitModelEntitiesToGraph {
         toOnboardVertex,
         fromOnboardVertex,
         permission,
+        WheelchairBoarding.POSSIBLE,
         levels,
         pathway.getTraversalTime()
       );

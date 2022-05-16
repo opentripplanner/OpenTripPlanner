@@ -30,8 +30,7 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
   public boolean renderEdge(Edge e, EdgeVertexTileRenderer.EdgeVisualAttributes attrs) {
-    if (e instanceof StreetEdge) {
-      StreetEdge pse = (StreetEdge) e;
+    if (e instanceof StreetEdge pse) {
       if (!pse.isWheelchairAccessible()) {
         attrs.color = NO_WHEELCHAIR_COLOR;
         attrs.label = "wheelchair=no";
@@ -39,9 +38,8 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
         attrs.color = slopePalette.getColor(pse.getMaxSlope());
         attrs.label = String.format("%.02f", pse.getMaxSlope());
       }
-    } else if (e instanceof ElevatorHopEdge) {
-      ElevatorHopEdge ehe = (ElevatorHopEdge) e;
-      if (!ehe.wheelchairAccessible) {
+    } else if (e instanceof ElevatorHopEdge ehe) {
+      if (!ehe.isWheelchairAccessible()) {
         attrs.color = NO_WHEELCHAIR_COLOR;
         attrs.label = "wheelchair=no";
       } else {
