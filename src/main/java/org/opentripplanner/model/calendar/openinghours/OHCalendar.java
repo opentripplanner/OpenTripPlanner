@@ -2,7 +2,7 @@ package org.opentripplanner.model.calendar.openinghours;
 
 import java.time.ZoneId;
 import java.util.List;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class OHCalendar {
 
