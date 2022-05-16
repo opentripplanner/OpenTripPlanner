@@ -110,7 +110,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
       if (options.wheelchairAccessibility.enabled()) {
         if (this.slope > options.wheelchairAccessibility.maxSlope()) {
-          double tooSteepCostFactor = options.wheelchairAccessibility.slopeTooSteepPenalty();
+          double tooSteepCostFactor = options.wheelchairAccessibility.slopeTooSteepReluctance();
           if (tooSteepCostFactor < 0) {
             return null;
           }

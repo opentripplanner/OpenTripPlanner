@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RoutingContext {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
-
   /* FINAL FIELDS */
 
   public final RoutingRequest opt;

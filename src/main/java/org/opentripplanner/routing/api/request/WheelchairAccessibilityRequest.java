@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
 /**
- * @param slopeTooSteepPenalty What penalty factor should be given to street edges, which are over
+ * @param slopeTooSteepReluctance What penalty factor should be given to street edges, which are over
  *                             the max slope. Set to negative for disable routing on too steep
  *                             edges.
  */
@@ -12,7 +12,7 @@ public record WheelchairAccessibilityRequest(
   WheelchairAccessibilityFeature elevators,
   WheelchairAccessibilityFeature streets,
   float maxSlope,
-  float slopeTooSteepPenalty,
+  float slopeTooSteepReluctance,
   float stairsReluctance
 ) {
   public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
@@ -25,7 +25,7 @@ public record WheelchairAccessibilityRequest(
     // since most streets have no accessibility information, we don't add a cost for that
     WheelchairAccessibilityFeature.ofCost(0, 3600),
     0.0833333333333f, // ADA max wheelchair ramp slope is a good default.
-    10,
+    1.1f,
     25
   );
 
@@ -41,7 +41,7 @@ public record WheelchairAccessibilityRequest(
       elevators,
       streets,
       maxSlope,
-      slopeTooSteepPenalty,
+      slopeTooSteepReluctance,
       stairsReluctance
     );
   }

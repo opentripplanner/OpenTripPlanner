@@ -14,8 +14,8 @@ public class WheelchairAccessibilityRequestMapper {
     var streets = mapAccessibilityFeature(a.path("streets"), DEFAULT.streets());
     var maxSlope = (float) a.asDouble("maxSlope", DEFAULT.maxSlope());
     var slopeTooSteepPenalty = (float) a.asDouble(
-      "slopeTooSteepPenalty",
-      DEFAULT.slopeTooSteepPenalty()
+      "slopeTooSteepReluctance",
+      DEFAULT.slopeTooSteepReluctance()
     );
     var stairsReluctance = (float) a.asDouble("stairsReluctance", DEFAULT.stairsReluctance());
 

@@ -2,21 +2,33 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature.ofOnlyAccessible;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.test.support.VariableSource;
 
 class StreetEdgeTest extends GraphRoutingTest {
 
@@ -182,6 +194,68 @@ class StreetEdgeTest extends GraphRoutingTest {
 
     disposableEdgeCollection.disposeEdges();
     assertOnlyOriginalRestrictionExists();
+  }
+
+  static Stream<Arguments> slopeCases = Stream.of(
+    Arguments.of(0.07f, 6908), // no extra cost
+    Arguments.of(0.08f, 6908), // no extra cost
+    Arguments.of(0.09f, 6908), // no extra cost
+    Arguments.of(0.091f, 7599), // 0.1 % above the max slope, tiny extra cost
+    Arguments.of(0.0915f, 11398), // 0.15 % above the max slope, will incur larger cost
+    Arguments.of(0.11f, 151982) // 2 % above max slope, will incur very large cost
+  );
+
+  /**
+   * This makes sure that when you exceed the max slope in a wheelchair there isn't a hard cut-off
+   * but rather the cost increases proportional to how much you go over the maximum.
+   * <p>
+   * In other words: 0.1 % over the limit only has a small cost but 2% over increases it
+   * dramatically to the point where it's only used as a last resort.
+   */
+  @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
+  @VariableSource("slopeCases")
+  public void shouldScaleCostWithMaxSlope(float maxSlope, long expectedCost) {
+    double length = 1000;
+    double slope = 0.09; // edge has a slope of 9 percent
+    var edge = new StreetEdge(
+      V1,
+      V2,
+      null,
+      "edge-with-elevation",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
+
+    Coordinate[] profile = new Coordinate[] {
+      new Coordinate(0, 0),
+      new Coordinate(length, slope * length),
+    };
+
+    PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
+    StreetElevationExtension.addToEdge(edge, elev, true);
+
+    assertEquals(slope, edge.getMaxSlope(), 0.0001);
+
+    var req = new RoutingRequest();
+    req.wheelchairAccessibility =
+      new WheelchairAccessibilityRequest(
+        true,
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        maxSlope,
+        1.1f,
+        10
+      );
+    var ctx = new RoutingContext(req, graph, V1, V2);
+    var state = new State(ctx);
+
+    assertEquals(0, state.weight);
+    var result = edge.traverse(state);
+    assertNotNull(result);
+    assertEquals(expectedCost, (long) result.weight);
   }
 
   private Graph graph() {

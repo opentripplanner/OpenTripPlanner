@@ -20,6 +20,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraversalCosts;
@@ -975,7 +976,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     var traversalCosts =
       switch (traverseMode) {
         case BICYCLE -> bicycleTraversalCost(options, speed);
-        case WALK -> walkingTraversalCosts(options, speed, walkingBike);
+        case WALK -> walkingTraversalCosts(options.wheelchairAccessibility, speed, walkingBike);
         default -> new TraversalCosts(defaultTimeAndCost, defaultTimeAndCost);
       };
 
@@ -1115,19 +1116,27 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
   @Nonnull
   private TraversalCosts walkingTraversalCosts(
-    RoutingRequest options,
+    WheelchairAccessibilityRequest wheelchair,
     double speed,
     boolean walkingBike
   ) {
     double time, weight;
-    if (options.wheelchairAccessibility.enabled()) {
+    if (wheelchair.enabled()) {
       time = getEffectiveWalkDistance() / speed;
       weight = getEffectiveBikeDistance() / speed;
 
-      if (getMaxSlope() > options.wheelchairAccessibility.maxSlope()) {
-        double tooSteepCostFactor = options.wheelchairAccessibility.slopeTooSteepPenalty();
-        if (tooSteepCostFactor > 0) {
-          weight *= tooSteepCostFactor;
+      float slopeExceededBy = 0;
+
+      if (hasElevationExtension()) {
+        slopeExceededBy = wheelchair.maxSlope() - Math.abs(getMaxSlope());
+      }
+
+      if (slopeExceededBy > 0) {
+        double reluctance = wheelchair.slopeTooSteepReluctance();
+        if (reluctance > 0) {
+          // if we exceed the max slope the cost increases quadratically
+          var excessMultiplier = (slopeExceededBy * 1000) * reluctance;
+          weight *= excessMultiplier;
         }
       }
     } else if (walkingBike) {
