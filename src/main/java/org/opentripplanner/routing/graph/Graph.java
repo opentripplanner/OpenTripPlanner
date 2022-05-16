@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -67,6 +68,7 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -146,6 +148,7 @@ public class Graph implements Serializable {
   private long transitServiceEnds = 0;
   private GraphBundle bundle;
   private transient CalendarService calendarService;
+  private transient OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
   public transient GraphIndex index;
   private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
@@ -591,6 +594,29 @@ public class Graph implements Serializable {
 
   public void clearCachedCalenderService() {
     this.calendarService = null;
+  }
+
+  public OpeningHoursCalendarService getOpeningHoursCalendarService() {
+    if (openingHoursCalendarService == null) {
+      if (transitServiceStarts == Long.MAX_VALUE) {
+        // transit start/end has not been set, default to -1 year and +3 years
+        this.openingHoursCalendarService =
+          new OpeningHoursCalendarService(
+            deduplicator,
+            LocalDate.now().minusYears(1),
+            LocalDate.now().plusYears(3)
+          );
+      } else {
+        // Use transitServiceStarts and transitServiceEnds to limit opening hours if defined
+        this.openingHoursCalendarService =
+          new OpeningHoursCalendarService(
+            deduplicator,
+            Instant.ofEpochSecond(transitServiceStarts).atZone(timeZone.toZoneId()).toLocalDate(),
+            Instant.ofEpochSecond(transitServiceEnds).atZone(timeZone.toZoneId()).toLocalDate()
+          );
+      }
+    }
+    return this.openingHoursCalendarService;
   }
 
   public StreetVertexIndex getStreetIndex() {
