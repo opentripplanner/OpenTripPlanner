@@ -976,40 +976,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     switch (traverseMode) {
       case BICYCLE:
         time = getEffectiveBikeDistance() / speed;
-        switch (options.bicycleOptimizeType) {
-          case GREENWAYS:
-            weight = bicycleSafetyFactor * getDistanceMeters() / speed;
-            if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
-              // greenways are treated as even safer than they really are
-              weight *= 0.66;
-            }
-            break;
-          case SAFE:
-            weight = getEffectiveBicycleSafetyDistance() / speed;
-            break;
-          case FLAT:
-            /* see notes in StreetVertex on speed overhead */
-            weight = getEffectiveBikeDistanceForWorkCost() / speed;
-            break;
-          case QUICK:
-            weight = getEffectiveBikeDistance() / speed;
-            break;
-          case TRIANGLE:
-            double quick = getEffectiveBikeDistance();
-            double safety = getEffectiveBicycleSafetyDistance();
-            double slope = getEffectiveBikeDistanceForWorkCost();
-            weight =
-              quick *
-              options.bikeTriangleTimeFactor +
-              slope *
-              options.bikeTriangleSlopeFactor +
-              safety *
-              options.bikeTriangleSafetyFactor;
-            weight /= speed;
-            break;
-          default:
-            weight = getDistanceMeters() / speed;
-        }
+        weight = bicycleTraversalCost(options, speed);
         break;
       case WALK:
         if (options.wheelchairAccessibility.enabled()) {
@@ -1131,6 +1098,38 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     s1.incrementWeight(weight);
 
     return s1;
+  }
+
+  private double bicycleTraversalCost(RoutingRequest req, double speed) {
+    double weight;
+    switch (req.bicycleOptimizeType) {
+      case GREENWAYS -> {
+        weight = bicycleSafetyFactor * getDistanceMeters() / speed;
+        if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
+          // greenways are treated as even safer than they really are
+          weight *= 0.66;
+        }
+      }
+      case SAFE -> weight = getEffectiveBicycleSafetyDistance() / speed;
+      case FLAT -> /* see notes in StreetVertex on speed overhead */weight =
+        getEffectiveBikeDistanceForWorkCost() / speed;
+      case QUICK -> weight = getEffectiveBikeDistance() / speed;
+      case TRIANGLE -> {
+        double quick = getEffectiveBikeDistance();
+        double safety = getEffectiveBicycleSafetyDistance();
+        double slope = getEffectiveBikeDistanceForWorkCost();
+        weight =
+          quick *
+          req.bikeTriangleTimeFactor +
+          slope *
+          req.bikeTriangleSlopeFactor +
+          safety *
+          req.bikeTriangleSafetyFactor;
+        weight /= speed;
+      }
+      default -> weight = getDistanceMeters() / speed;
+    }
+    return weight;
   }
 
   /* The no-thru traffic support works by not allowing a transition from a no-thru area out of it.
