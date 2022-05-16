@@ -4,14 +4,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.entur.gbfs.v2_2.station_information.GBFSRentalUris;
 import org.entur.gbfs.v2_2.station_information.GBFSStation;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GbfsStationInformationMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationInformationMapper.class);
 
   private final VehicleRentalSystem system;
   private final Map<String, RentalVehicleType> vehicleTypes;
@@ -29,6 +33,23 @@ public class GbfsStationInformationMapper {
 
   public VehicleRentalStation mapStationInformation(GBFSStation station) {
     VehicleRentalStation rentalStation = new VehicleRentalStation();
+    if (
+      station.getStationId() == null ||
+      station.getStationId().isBlank() ||
+      station.getName() == null ||
+      station.getName().isBlank() ||
+      station.getLon() == null ||
+      station.getLat() == null
+    ) {
+      LOG.info(
+        String.format(
+          "GBFS station for %s system has issues with required fields: \n%s",
+          system.systemId,
+          station
+        )
+      );
+      return null;
+    }
     rentalStation.id = new FeedScopedId(system.systemId, station.getStationId());
     rentalStation.system = system;
     rentalStation.longitude = station.getLon();
@@ -81,7 +102,6 @@ public class GbfsStationInformationMapper {
       String webUri = rentalUris.getWeb();
       rentalStation.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
     }
-
     return rentalStation;
   }
 }

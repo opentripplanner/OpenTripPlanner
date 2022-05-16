@@ -14,7 +14,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 
 public class TripMapperTest {
 
@@ -38,7 +38,7 @@ public class TripMapperTest {
 
   private static final String TRIP_SHORT_NAME = "Trip Short Name";
 
-  private static final WheelChairBoarding WHEELCHAIR_ACCESSIBLE = WheelChairBoarding.POSSIBLE;
+  private static final WheelchairBoarding WHEELCHAIR_ACCESSIBLE = WheelchairBoarding.POSSIBLE;
 
   private static final Trip TRIP = new Trip();
   private final TripMapper subject = new TripMapper(
@@ -104,7 +104,7 @@ public class TripMapperTest {
     assertNull(result.getTripHeadsign());
     assertNull(result.getTripShortName());
     assertEquals(-1, result.getDirection().gtfsCode);
-    assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
     assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
   }
 

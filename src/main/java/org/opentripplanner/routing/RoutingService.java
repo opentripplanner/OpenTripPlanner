@@ -23,14 +23,11 @@ import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
@@ -40,9 +37,9 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -74,6 +71,10 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.WorldEnvelope;
 
 /**
@@ -220,10 +221,6 @@ public class RoutingService {
         serviceDate == null ? new ServiceDate(Calendar.getInstance().getTime()) : serviceDate
       )
       : tripPattern.getScheduledTimetable();
-  }
-
-  public List<TripTimeOnDate> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
-    return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
   }
 
   /** {@link Graph#getTimetableSnapshot()} */
@@ -803,7 +800,7 @@ public class RoutingService {
     return DatedServiceJourneyHelper.getTripOnServiceDate(this, datedServiceJourneyId);
   }
 
-  public Map<T2<FeedScopedId, ServiceDate>, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
+  public Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
     return graphIndex.getTripOnServiceDateForTripAndDay();
   }
 

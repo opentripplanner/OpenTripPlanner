@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -27,10 +26,6 @@ public final class TestTransitCaseData {
   static {
     setupStationStopRelationship(STATION_A, STOP_A);
     setupStationStopRelationship(STATION_B, STOP_B);
-  }
-
-  public static FeedScopedId id(String id) {
-    return new FeedScopedId("F", id);
   }
 
   public static int stopIndex(StopLocation stop) {

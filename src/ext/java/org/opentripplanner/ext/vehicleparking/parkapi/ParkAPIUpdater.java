@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -45,7 +45,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
         var noteFiled = noteFieldIterator.next();
         noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asText());
       }
-      note = TranslatedString.getI18NString(noteLocalizations);
+      note = TranslatedString.getI18NString(noteLocalizations, true, false);
     }
 
     var vehicleParkId = createIdForNode(jsonNode);

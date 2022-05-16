@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -431,12 +433,21 @@ public class Timetable implements Serializable {
    * The direction for all the trips in this pattern.
    */
   public Direction getDirection() {
-    if (!tripTimes.isEmpty()) {
-      return tripTimes.get(0).getTrip().getDirection();
-    } else if (!frequencyEntries.isEmpty()) {
-      return frequencyEntries.get(0).tripTimes.getTrip().getDirection();
+    return Optional
+      .ofNullable(getRepresentativeTripTimes())
+      .map(TripTimes::getTrip)
+      .map(Trip::getDirection)
+      .orElse(Direction.UNKNOWN);
+  }
+
+  public TripTimes getRepresentativeTripTimes() {
+    if (!getTripTimes().isEmpty()) {
+      return getTripTimes(0);
+    } else if (!getFrequencyEntries().isEmpty()) {
+      return getFrequencyEntries().get(0).tripTimes;
     } else {
-      return Direction.UNKNOWN;
+      // Pattern is created only for real-time updates
+      return null;
     }
   }
 }

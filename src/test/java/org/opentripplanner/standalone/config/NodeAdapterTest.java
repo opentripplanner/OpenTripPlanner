@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 
@@ -81,6 +81,12 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 5 }");
     assertEquals(5, subject.asLong("key", -1));
     assertEquals(-1, subject.asLong("missingField", -1));
+  }
+
+  @Test(expected = OtpAppException.class)
+  public void requiredAsLong() {
+    NodeAdapter subject = newNodeAdapterForTest("{ }");
+    subject.asLong("missingField");
   }
 
   @Test
@@ -221,6 +227,12 @@ public class NodeAdapterTest {
     assertEquals("PT1S", subject.asDuration("key1", null).toString());
     assertEquals("PT99H2M1S", subject.asDuration("key2", null).toString());
     assertEquals("PT3H", subject.asDuration("missing-key", D3h).toString());
+  }
+
+  @Test(expected = OtpAppException.class)
+  public void requiredAsDuration() {
+    NodeAdapter subject = newNodeAdapterForTest("{ }");
+    subject.asDuration("missingField");
   }
 
   @Test

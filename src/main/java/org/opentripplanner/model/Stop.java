@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
+import static org.opentripplanner.model.WheelchairBoarding.NO_INFORMATION;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -52,7 +53,7 @@ public final class Stop extends StationElement implements StopLocation {
     String code,
     String description,
     WgsCoordinate coordinate,
-    WheelChairBoarding wheelchairBoarding,
+    WheelchairBoarding wheelchairBoarding,
     StopLevel level,
     String platformCode,
     Collection<FareZone> fareZones,
@@ -72,7 +73,7 @@ public final class Stop extends StationElement implements StopLocation {
 
   public static Stop stopForTest(
     String idAndName,
-    WheelChairBoarding wheelChairBoarding,
+    WheelchairBoarding wheelChairBoarding,
     double lat,
     double lon
   ) {
@@ -121,7 +122,7 @@ public final class Stop extends StationElement implements StopLocation {
     double lat,
     double lon,
     Station parent,
-    WheelChairBoarding wheelChairBoarding
+    WheelchairBoarding wheelChairBoarding
   ) {
     var stop = new Stop(
       new FeedScopedId("F", idAndName),

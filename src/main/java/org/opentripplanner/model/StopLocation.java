@@ -6,6 +6,7 @@ import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -64,8 +65,8 @@ public interface StopLocation {
   }
 
   @Nonnull
-  default WheelChairBoarding getWheelchairBoarding() {
-    return WheelChairBoarding.NO_INFORMATION;
+  default WheelchairBoarding getWheelchairBoarding() {
+    return WheelchairBoarding.NO_INFORMATION;
   }
 
   /**

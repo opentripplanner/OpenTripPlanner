@@ -11,7 +11,6 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -20,15 +19,16 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class EstimatedCallType {
 
@@ -42,6 +42,7 @@ public class EstimatedCallType {
     GraphQLOutputType destinationDisplayType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType serviceJourneyType,
+    GraphQLOutputType datedServiceJourneyType,
     GqlUtil gqlUtil
   ) {
     return GraphQLObjectType
@@ -286,6 +287,20 @@ public class EstimatedCallType {
           .name("serviceJourney")
           .type(serviceJourneyType)
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getTrip())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("datedServiceJourney")
+          .type(datedServiceJourneyType)
+          .dataFetcher(environment ->
+            DatedServiceJourneyHelper.getTripOnServiceDate(
+              GqlUtil.getRoutingService(environment),
+              environment.<TripTimeOnDate>getSource().getTrip().getId(),
+              environment.<TripTimeOnDate>getSource().getServiceDay()
+            )
+          )
           .build()
       )
       .field(

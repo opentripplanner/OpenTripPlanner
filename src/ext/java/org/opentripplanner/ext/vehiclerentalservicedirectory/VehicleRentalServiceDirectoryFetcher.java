@@ -64,7 +64,8 @@ public class VehicleRentalServiceDirectoryFetcher {
           new GbfsDataSourceParameters(
             updaterUrl.asText(),
             parameters.getLanguage(),
-            parameters.getHeaders()
+            parameters.getHeaders(),
+            parameters.getSourceNetworkName()
           )
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);

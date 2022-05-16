@@ -67,14 +67,14 @@ public class DirectStreetRouter {
   }
 
   /**
-   * Calculates the maximum distance in meters based on the maxDirectStreetDurationSeconds and the
+   * Calculates the maximum distance in meters based on the maxDirectStreetDuration and the
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
    * RoutingRequest.
    */
   private static double calculateDistanceMaxLimit(RoutingRequest request) {
     double distanceLimit;
-    double durationLimit = request.maxDirectStreetDurationSeconds;
     StreetMode mode = request.modes.directMode;
+    double durationLimit = request.getMaxDirectStreetDuration(mode).toSeconds();
 
     if (mode.includesDriving()) {
       distanceLimit = durationLimit * request.carSpeed;

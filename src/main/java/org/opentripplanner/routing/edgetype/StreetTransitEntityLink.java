@@ -3,8 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -12,6 +11,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This represents the connection between a street vertex and a transit vertex.
@@ -25,15 +25,15 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final T transitEntityVertex;
 
-  private final WheelChairBoarding wheelchairBoarding;
+  private final WheelchairBoarding wheelchairBoarding;
 
-  public StreetTransitEntityLink(StreetVertex fromv, T tov, WheelChairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(StreetVertex fromv, T tov, WheelchairBoarding wheelchairBoarding) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairBoarding = wheelchairBoarding;
   }
 
-  public StreetTransitEntityLink(T fromv, StreetVertex tov, WheelChairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(T fromv, StreetVertex tov, WheelchairBoarding wheelchairBoarding) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairBoarding = wheelchairBoarding;
@@ -51,12 +51,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return null;
   }
 
-  public Trip getTrip() {
-    return null;
-  }
-
   public String toString() {
-    return "StreetTransitLink(" + fromv + " -> " + tov + ")";
+    return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }
 
   public boolean isRoundabout() {
@@ -87,12 +83,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     if (accessibility.enabled()) {
       if (
         accessibility.stops().onlyConsiderAccessible() &&
-        wheelchairBoarding != WheelChairBoarding.POSSIBLE
+        wheelchairBoarding != WheelchairBoarding.POSSIBLE
       ) {
         return null;
-      } else if (wheelchairBoarding == WheelChairBoarding.NO_INFORMATION) {
+      } else if (wheelchairBoarding == WheelchairBoarding.NO_INFORMATION) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
-      } else if (wheelchairBoarding == WheelChairBoarding.NOT_POSSIBLE) {
+      } else if (wheelchairBoarding == WheelchairBoarding.NOT_POSSIBLE) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
       }
     }

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
@@ -28,8 +27,6 @@ public class StateEditor {
   private boolean traversingBackward;
 
   /* CONSTRUCTORS */
-
-  protected StateEditor() {}
 
   public StateEditor(RoutingContext routingContext, Vertex v) {
     child = new State(v, routingContext.opt, routingContext);
@@ -129,14 +126,6 @@ public class StateEditor {
   }
 
   /* PUBLIC METHODS TO MODIFY A STATE BEFORE IT IS USED */
-
-  /**
-   * Tell the stateEditor to return null when makeState() is called, no matter what other editing
-   * has been done. This allows graph patches to block traversals.
-   */
-  public void blockTraversal() {
-    this.defectiveTraversal = true;
-  }
 
   /* Incrementors */
 
@@ -318,13 +307,8 @@ public class StateEditor {
     cloneStateDataAsNeeded();
     child.stateData.carPickupState = carPickupState;
     switch (carPickupState) {
-      case WALK_TO_PICKUP:
-      case WALK_FROM_DROP_OFF:
-        child.stateData.currentMode = TraverseMode.WALK;
-        break;
-      case IN_CAR:
-        child.stateData.currentMode = TraverseMode.CAR;
-        break;
+      case WALK_TO_PICKUP, WALK_FROM_DROP_OFF -> child.stateData.currentMode = TraverseMode.WALK;
+      case IN_CAR -> child.stateData.currentMode = TraverseMode.CAR;
     }
   }
 
@@ -334,41 +318,11 @@ public class StateEditor {
 
   /* PUBLIC GETTER METHODS */
 
-  public long getElapsedTimeSeconds() {
-    return child.getElapsedTimeSeconds();
-  }
-
-  public boolean isRentingBike() {
-    return child.isRentingVehicle();
-  }
-
-  public double getWalkDistance() {
-    return child.getWalkDistance();
-  }
-
-  public void setWalkDistance(double walkDistance) {
-    child.walkDistance = walkDistance;
-  }
-
-  public Vertex getVertex() {
-    return child.getVertex();
-  }
-
-  /* PRIVATE METHODS */
-
-  public void setOptions(RoutingRequest options) {
-    cloneStateDataAsNeeded();
-    child.stateData.opt = options;
-  }
-
-  public void setBikeRentalNetwork(String network) {
-    cloneStateDataAsNeeded();
-    child.stateData.vehicleRentalNetwork = network;
-  }
-
   public State getBackState() {
     return child.getBackState();
   }
+
+  /* PRIVATE METHODS */
 
   /**
    * To be called before modifying anything in the child's StateData. Makes sure that changes are

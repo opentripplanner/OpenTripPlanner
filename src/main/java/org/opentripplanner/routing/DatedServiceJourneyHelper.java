@@ -1,10 +1,10 @@
 package org.opentripplanner.routing;
 
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class DatedServiceJourneyHelper {
 
@@ -17,7 +17,7 @@ public class DatedServiceJourneyHelper {
     FeedScopedId tripId,
     ServiceDate serviceDate
   ) {
-    var tuple = new T2<>(tripId, serviceDate);
+    var tuple = new TripIdAndServiceDate(tripId, serviceDate);
     if (routingService.getTimetableSnapshot() != null) {
       if (
         routingService

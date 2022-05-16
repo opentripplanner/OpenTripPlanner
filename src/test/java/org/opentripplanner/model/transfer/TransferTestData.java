@@ -1,14 +1,13 @@
 package org.opentripplanner.model.transfer;
 
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class TransferTestData {
-
-  static final String FEED_ID = "F";
 
   static final Station STATION = Station.stationForTest("Central Station", 60.0, 11.0);
 
@@ -66,6 +65,6 @@ public class TransferTestData {
   }
 
   private static FeedScopedId createId(int id) {
-    return new FeedScopedId(FEED_ID, String.valueOf(id));
+    return TransitModelForTest.id(String.valueOf(id));
   }
 }

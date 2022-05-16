@@ -25,9 +25,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
@@ -171,6 +171,11 @@ public class NodeAdapter {
 
   public long asLong(String paramName, long defaultValue) {
     return param(paramName).asLong(defaultValue);
+  }
+
+  public long asLong(String paramName) {
+    assertRequiredFieldExist(paramName);
+    return param(paramName).asLong();
   }
 
   public String asText(String paramName, String defaultValue) {
@@ -350,6 +355,11 @@ public class NodeAdapter {
 
   public Duration asDuration(String paramName, Duration defaultValue) {
     return exist(paramName) ? DurationUtils.duration(param(paramName).asText()) : defaultValue;
+  }
+
+  public Duration asDuration(String paramName) {
+    assertRequiredFieldExist(paramName);
+    return DurationUtils.duration(param(paramName).asText());
   }
 
   public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {

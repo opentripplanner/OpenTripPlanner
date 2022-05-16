@@ -1,27 +1,28 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gnu.trove.list.TLongList;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import org.junit.Test;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 
 public class OpenStreetMapParserTest {
 
   @Test
-  public void testBinaryParser() throws Exception {
+  public void testBinaryParser() {
     File osmFile = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), StandardCharsets.UTF_8)
     );
-    BinaryOpenStreetMapProvider pr = new BinaryOpenStreetMapProvider(osmFile, true);
-    OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false));
+    OpenStreetMapProvider pr = new OpenStreetMapProvider(osmFile, true);
+    OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false), Set.of());
 
     pr.readOSM(osmdb);
 
@@ -34,7 +35,7 @@ public class OpenStreetMapParserTest {
     assertTrue(nodeA.hasTag("railway"));
     assertEquals("level_crossing", nodeA.getTag("railway"));
 
-    assertEquals(545, osmdb.wayCount());
+    assertEquals(544, osmdb.wayCount());
 
     OSMWay wayA = osmdb.getWay(13490353L);
     assertEquals(13490353, wayA.getId());

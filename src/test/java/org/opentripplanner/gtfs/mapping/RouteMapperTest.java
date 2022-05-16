@@ -15,12 +15,11 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.organization.Branding;
 
 public class RouteMapperTest {
-
-  private static final String FEED_ID = "FEED";
 
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
@@ -50,12 +49,13 @@ public class RouteMapperTest {
 
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
-    new AgencyMapper(FEED_ID),
+    new AgencyMapper(TransitModelForTest.FEED_ID),
     new DataImportIssueStore(false)
   );
 
   static {
     AGENCY.setId("A");
+    AGENCY.setName("Agency Name");
 
     ROUTE.setId(AGENCY_AND_ID);
     ROUTE.setAgency(AGENCY);

@@ -3,10 +3,10 @@ package org.opentripplanner.routing.core;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Serializable;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * SpecificTransfer class used by Transfer. Represents a specific transfer between two stops. See

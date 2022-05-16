@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingTime;
-import org.opentripplanner.model.ContactInfo;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class LegacyGraphQLBookingInfoImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLBookingInfo {

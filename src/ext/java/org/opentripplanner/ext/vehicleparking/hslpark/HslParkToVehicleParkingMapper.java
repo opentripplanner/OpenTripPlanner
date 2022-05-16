@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
@@ -70,7 +70,7 @@ public class HslParkToVehicleParkingMapper {
         });
       I18NString name = translations.isEmpty()
         ? new NonLocalizedString(vehicleParkId.getId())
-        : TranslatedString.getI18NString(translations);
+        : TranslatedString.getI18NString(translations, true, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
       double x = geometry.getCentroid().getX();
       double y = geometry.getCentroid().getY();

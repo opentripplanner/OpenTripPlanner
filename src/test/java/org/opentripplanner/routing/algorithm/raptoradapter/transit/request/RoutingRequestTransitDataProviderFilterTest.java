@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.WheelChairBoarding.NOT_POSSIBLE;
-import static org.opentripplanner.model.WheelChairBoarding.POSSIBLE;
+import static org.opentripplanner.model.WheelchairBoarding.NOT_POSSIBLE;
+import static org.opentripplanner.model.WheelchairBoarding.POSSIBLE;
 
 import java.time.LocalDate;
 import java.util.BitSet;
@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -25,19 +24,21 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.WheelchairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class RoutingRequestTransitDataProviderFilterTest {
 
-  private static final FeedScopedId TEST_ROUTE_ID = new FeedScopedId("TEST", "ROUTE");
+  private static final FeedScopedId TEST_ROUTE_ID = TransitModelForTest.id("R1");
 
-  private static final FeedScopedId TEST_TRIP_ID = new FeedScopedId("TEST", "TRIP");
+  private static final FeedScopedId TEST_TRIP_ID = TransitModelForTest.id("T1");
 
   private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
 
@@ -64,7 +65,11 @@ public class RoutingRequestTransitDataProviderFilterTest {
     stopTimeEnd.setStop(lastStop);
 
     var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
-    var pattern = new TripPattern(null, new Route(TEST_ROUTE_ID), stopPattern);
+    var pattern = new TripPattern(
+      TransitModelForTest.id("P1"),
+      new Route(TEST_ROUTE_ID),
+      stopPattern
+    );
 
     var tripPattern = new TripPatternWithRaptorStopIndexes(pattern, new int[2]);
 
@@ -241,7 +246,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       NOT_POSSIBLE,
       null
     );
-    tripTimes.getTrip().setWheelchairBoarding(WheelChairBoarding.NOT_POSSIBLE);
+    tripTimes.getTrip().setWheelchairBoarding(WheelchairBoarding.NOT_POSSIBLE);
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
@@ -347,9 +352,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void testBikesAllowed() {
-    String FEED_ID = "F";
-    Trip trip = new Trip(new FeedScopedId(FEED_ID, "T1"));
-    Route route = new Route(new FeedScopedId(FEED_ID, "R1"));
+    Trip trip = new Trip(TransitModelForTest.id("T1"));
+    Route route = new Route(TransitModelForTest.id("R1"));
     trip.setRoute(route);
 
     assertEquals(
@@ -481,7 +485,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    TripPattern pattern = new TripPattern(null, route, stopPattern);
+    TripPattern pattern = new TripPattern(TransitModelForTest.id("P1"), route, stopPattern);
 
     TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
       pattern,
@@ -499,7 +503,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     BikeAccess bikeAccess,
     TransitMode mode,
     String submode,
-    WheelChairBoarding wheelchairBoarding,
+    WheelchairBoarding wheelchairBoarding,
     TripAlteration tripAlteration
   ) {
     Trip trip = new Trip(tripId);

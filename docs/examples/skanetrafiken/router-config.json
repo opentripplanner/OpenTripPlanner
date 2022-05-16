@@ -1,0 +1,57 @@
+{
+  "routingDefaults": {
+    "itineraryFilters": {
+      "filterItinerariesWithSameFirstOrLastTrip": true
+    },
+    "transferSlack": 180,
+    "waitReluctance": 0.175,
+    "walkReluctance": 5,
+    "maxDirectStreetDurationSeconds": 3700
+  },
+  "transit": {
+    "pagingSearchWindowAdjustments": [
+      "24h",
+      "0h"
+    ],
+    "stopTransferCost": {
+      "DISCOURAGED": 3000,
+      "ALLOWED": 150,
+      "RECOMMENDED": 60,
+      "PREFERRED": 0
+    }
+  },
+  "updaters": [
+    {
+      "type": "siri-azure-et-updater",
+      "topic": "<topic_name>",
+      "feedId": "<feed_id>",
+      "servicebus-url": "<service_bus_url>",
+      // Set custom hour for when operating day date breaks
+      // In this case 04:00 every night,
+      // so that 2022-04-21 03:00 will still be operating day date 2022-04-20
+      "customMidnight": 4,
+      "history": {
+        "url": "<history_endpoint_url>",
+        // Get all realtime history for current operating day date
+        "fromDateTime": "-P0D",
+        "timeout": 300000
+      }
+    },
+    {
+      "type": "siri-azure-sx-updater",
+      "topic": "<topic_name>",
+      "feedId": "<feed_id>",
+      "servicebus-url": "<service_bus_url>",
+      "customMidnight": 4,
+      "history": {
+        "url": "<history_endpoint_url>",
+        // Previous operating day date
+        "fromDateTime": "-P1D",
+        // Next operating day date
+        "toDateTime": "P1D",
+        // timeout in miliseconds
+        "timeout": 300000
+      }
+    }
+  ]
+}

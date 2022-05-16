@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestTripPattern implements RaptorTripPattern {
 

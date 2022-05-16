@@ -170,16 +170,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     return new ServiceDate(toZonedDateTime(zoneId, seconds).toLocalDate());
   }
 
-  /**
-   * @return calls {@link #getAsDate(TimeZone)} with the default timezone for this VM
-   * @deprecated This is potentially dangerous to use. The TimeZone on the graph can be diffrent
-   * from the server default.
-   */
-  @Deprecated
-  public Date getAsDate() {
-    return getAsDate(TimeZone.getDefault());
-  }
-
   public LocalDate toLocalDate() {
     return LocalDate.of(year, month, day);
   }

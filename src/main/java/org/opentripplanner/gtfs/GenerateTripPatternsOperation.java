@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
@@ -24,6 +24,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,10 +119,14 @@ public class GenerateTripPatternsOperation {
       return; // Invalid trip, skip it, it will break later
     }
 
-    Collection<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
+    List<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
 
     // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
-    if (stopTimes.size() < 2) {
+    var staticTripWithFewerThan2Stops =
+      !FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2;
+    // flex trips are allowed to have a single stop because that can be an area or a group of stops
+    var flexTripWithZeroStops = FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 1;
+    if (staticTripWithFewerThan2Stops || flexTripWithZeroStops) {
       issueStore.add(new TripDegenerate(trip));
       return;
     }

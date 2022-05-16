@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.TranslatedString;
@@ -178,7 +178,7 @@ public class AlertsUpdateHandler {
   }
 
   /**
-   * Convert a GTFS-RT Protobuf TranslatedString to a OTP TranslatedString or NonLocalizedString.
+   * Convert a GTFS-RT Protobuf TranslatedString to an TranslatedString.
    *
    * @return An OTP TranslatedString containing the same information as the input GTFS-RT Protobuf
    * TranslatedString.
@@ -190,6 +190,6 @@ public class AlertsUpdateHandler {
       String string = translation.getText();
       translations.put(language, string);
     }
-    return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
+    return translations.isEmpty() ? null : TranslatedString.getI18NString(translations, true, true);
   }
 }

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.fares.impl;
 
 import com.google.common.collect.Iterables;
 import java.util.List;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 

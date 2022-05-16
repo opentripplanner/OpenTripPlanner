@@ -1,0 +1,17 @@
+{
+  "areaVisibility": true,
+  "parentStopLinking": true,
+  "platformEntriesLinking": true,
+  "osmWayPropertySet": "norway",
+  "islandWithoutStopsMaxSize": 5,
+  "islandWithStopsMaxSize": 5,
+  "dataImportReport": true,
+  "maxTransferDistance": 5000,
+  "maxStopToShapeSnapDistance": 500,
+  "netex" : {
+    "sharedFilePattern" : "ST_stops.xml",
+    "sharedGroupFilePattern" : "(\\w{2})_shared_data.xml",
+    "groupFilePattern" : "(\\w{2})_line.*\\.xml",
+    "netexFeedId": "ST"
+  }
+}
