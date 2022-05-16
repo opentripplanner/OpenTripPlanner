@@ -22,6 +22,7 @@ import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraversalCosts;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
@@ -969,38 +970,17 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     // Automobiles have variable speeds depending on the edge type
     double speed = calculateSpeed(options, traverseMode, walkingBike);
+    var defaultTimeAndCost = getDistanceMeters() / speed;
 
-    double time;
-    double weight;
-    // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
-    switch (traverseMode) {
-      case BICYCLE:
-        time = getEffectiveBikeDistance() / speed;
-        weight = bicycleTraversalCost(options, speed);
-        break;
-      case WALK:
-        if (options.wheelchairAccessibility.enabled()) {
-          time = getEffectiveWalkDistance() / speed;
-          weight = getEffectiveBikeDistance() / speed;
+    var traversalCosts =
+      switch (traverseMode) {
+        case BICYCLE -> bicycleTraversalCost(options, speed);
+        case WALK -> walkingTraversalCosts(options, speed, walkingBike);
+        default -> new TraversalCosts(defaultTimeAndCost, defaultTimeAndCost);
+      };
 
-          if (getMaxSlope() > options.wheelchairAccessibility.maxSlope()) {
-            double tooSteepCostFactor = options.wheelchairAccessibility.slopeTooSteepPenalty();
-            if (tooSteepCostFactor < 0) {
-              return null;
-            }
-            weight *= tooSteepCostFactor;
-          }
-        } else if (walkingBike) {
-          // take slopes into account when walking bikes
-          time = weight = getEffectiveBikeDistance() / speed;
-        } else {
-          // take slopes into account when walking
-          time = weight = getEffectiveWalkDistance() / speed;
-        }
-        break;
-      default:
-        time = weight = getDistanceMeters() / speed;
-    }
+    var time = traversalCosts.time();
+    var weight = traversalCosts.cost();
 
     if (isStairs()) {
       weight *= options.stairsReluctance;
@@ -1100,7 +1080,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     return s1;
   }
 
-  private double bicycleTraversalCost(RoutingRequest req, double speed) {
+  private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
+    double time = getEffectiveBikeDistance() / speed;
     double weight;
     switch (req.bicycleOptimizeType) {
       case GREENWAYS -> {
@@ -1129,7 +1110,34 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
       }
       default -> weight = getDistanceMeters() / speed;
     }
-    return weight;
+    return new TraversalCosts(time, weight);
+  }
+
+  @Nonnull
+  private TraversalCosts walkingTraversalCosts(
+    RoutingRequest options,
+    double speed,
+    boolean walkingBike
+  ) {
+    double time, weight;
+    if (options.wheelchairAccessibility.enabled()) {
+      time = getEffectiveWalkDistance() / speed;
+      weight = getEffectiveBikeDistance() / speed;
+
+      if (getMaxSlope() > options.wheelchairAccessibility.maxSlope()) {
+        double tooSteepCostFactor = options.wheelchairAccessibility.slopeTooSteepPenalty();
+        if (tooSteepCostFactor > 0) {
+          weight *= tooSteepCostFactor;
+        }
+      }
+    } else if (walkingBike) {
+      // take slopes into account when walking bikes
+      time = weight = getEffectiveBikeDistance() / speed;
+    } else {
+      // take slopes into account when walking
+      time = weight = getEffectiveWalkDistance() / speed;
+    }
+    return new TraversalCosts(time, weight);
   }
 
   /* The no-thru traffic support works by not allowing a transition from a no-thru area out of it.
