@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -29,6 +28,8 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -330,37 +331,21 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     int sizeOfShortestPattern = Math.min(numberOfStops(), other.numberOfStops());
 
     for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
-      final StopLocation oldOriginStop = this.getStop(i);
-      final StopLocation oldDestinationStop = this.getStop(i + 1);
-      final Station oldOriginStation = this.getStop(i).getParentStation();
-      final Station oldDestinationStation = this.getStop(i + 1).getParentStation();
-
-      final StopLocation newOriginStop = other.getStop(i);
-      final StopLocation newDestinationStop = other.getStop(i + 1);
-      final Station newOriginStation = other.getStop(i).getParentStation();
-      final Station newDestinationStation = other.getStop(i + 1).getParentStation();
-
-      boolean stopsAreSame =
-        oldOriginStop.equals(newOriginStop) && oldDestinationStop.equals(newDestinationStop);
-      boolean parentStationsAreSame =
-        Objects.equals(oldOriginStation, newOriginStation) &&
-        Objects.equals(oldDestinationStation, newDestinationStation);
-
       LineString hopGeometry = other.getHopGeometry(i);
 
-      if (hopGeometry != null && stopsAreSame) {
+      if (hopGeometry != null && sameStops(other, i)) {
         // Copy hop geometry from previous pattern
         this.setHopGeometry(i, other.getHopGeometry(i));
-      } else if (hopGeometry != null && parentStationsAreSame) {
+      } else if (hopGeometry != null && sameStations(other, i)) {
         // Use old geometry but patch first and last point with new stops
-        Coordinate newStart = new Coordinate(
-          other.getStop(i).getCoordinate().longitude(),
-          other.getStop(i).getCoordinate().latitude()
+        var newStart = new Coordinate(
+          this.getStop(i).getCoordinate().longitude(),
+          this.getStop(i).getCoordinate().latitude()
         );
 
-        Coordinate newEnd = new Coordinate(
-          other.getStop(i + 1).getCoordinate().longitude(),
-          other.getStop(i + 1).getCoordinate().latitude()
+        var newEnd = new Coordinate(
+          this.getStop(i + 1).getCoordinate().longitude(),
+          this.getStop(i + 1).getCoordinate().latitude()
         );
 
         Coordinate[] coordinates = other.getHopGeometry(i).getCoordinates().clone();
@@ -740,5 +725,48 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     // The Timetable must be indexed from here (rather than in its own readObject method)
     // to ensure that the stops field it uses in TripPattern is already deserialized.
     scheduledTimetable.finish();
+  }
+
+  /**
+   * Check if given stop and next stop on this trip pattern and other are equal.
+   *
+   * @param other Other instance of trip pattern with list of stops. May not be null.
+   * @param index Given index for stop
+   * @return true if stop and next stop are equal on bouth trip patterns, else false
+   */
+  private boolean sameStops(TripPattern other, int index) {
+    var otherOrigin = other.getStop(index);
+    var otherDestination = other.getStop(index + 1);
+    var origin = getStop(index);
+    var destination = getStop(index + 1);
+
+    return origin.equals(otherOrigin) && destination.equals(otherDestination);
+  }
+
+  /**
+   * Check if Station is equal on given stop and next stop for this trip pattern and other.
+   *
+   * @param other Other instance of trip pattern with list of stops. May not be null.
+   * @param index Given index for stop
+   * @return true if the stops have the same stations, else false. If any station is null then
+   * false.
+   */
+  private boolean sameStations(TripPattern other, int index) {
+    var otherOrigin = other.getStop(index).getParentStation();
+    var otherDestination = other.getStop(index + 1).getParentStation();
+    var origin = getStop(index).getParentStation();
+    var destionation = getStop(index + 1).getParentStation();
+
+    var sameOrigin = Optional
+      .ofNullable(origin)
+      .map(o -> o.equals(otherOrigin))
+      .orElse(getStop(index).equals(other.getStop(index)));
+
+    var sameDestination = Optional
+      .ofNullable(destionation)
+      .map(o -> o.equals(otherDestination))
+      .orElse(getStop(index + 1).equals(other.getStop(index + 1)));
+
+    return sameOrigin && sameDestination;
   }
 }

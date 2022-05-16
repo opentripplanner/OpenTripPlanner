@@ -5,8 +5,8 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.asser
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * The responsibility of this class is to encapsulate a Range Raptor travel request search

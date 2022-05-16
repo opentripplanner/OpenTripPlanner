@@ -2,6 +2,8 @@ package org.opentripplanner.model;
 
 import java.util.List;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 
 /**
  * Class for holding data about a certain trip on a certain day. Essentially a DatedServiceJourney.

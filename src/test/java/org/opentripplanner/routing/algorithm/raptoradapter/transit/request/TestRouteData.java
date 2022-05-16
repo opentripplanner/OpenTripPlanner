@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.DATE;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.OFFSET;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.id;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.stopIndex;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -41,7 +41,7 @@ public class TestRouteData {
 
   public TestRouteData(String route, TransitMode mode, List<Stop> stops, String... times) {
     final Deduplicator deduplicator = new Deduplicator();
-    this.route = new Route(id(route));
+    this.route = new Route(TransitModelForTest.id(route));
     this.route.setMode(mode);
     this.trips =
       Arrays
@@ -58,7 +58,11 @@ public class TestRouteData {
 
     raptorTripPattern =
       new TripPatternWithRaptorStopIndexes(
-        new TripPattern(id("TP:" + route), this.route, new StopPattern(stopTimesFistTrip)),
+        new TripPattern(
+          TransitModelForTest.id("TP:" + route),
+          this.route,
+          new StopPattern(stopTimesFistTrip)
+        ),
         stopIndexes(stopTimesFistTrip)
       );
     tripTimes.forEach(t -> raptorTripPattern.getPattern().add(t));
@@ -138,7 +142,7 @@ public class TestRouteData {
     List<Stop> stops,
     Deduplicator deduplicator
   ) {
-    var trip = new Trip(id(route + "-" + stopTimesByTrip.size() + 1));
+    var trip = new Trip(TransitModelForTest.id(route + "-" + stopTimesByTrip.size() + 1));
     trip.setRoute(this.route);
     var stopTimes = stopTimes(trip, stops, tripTimes);
     this.stopTimesByTrip.put(trip, stopTimes);

@@ -5,9 +5,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class PlaceTest {

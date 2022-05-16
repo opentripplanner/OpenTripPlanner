@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class FeedScopedIdMapperTest {
 

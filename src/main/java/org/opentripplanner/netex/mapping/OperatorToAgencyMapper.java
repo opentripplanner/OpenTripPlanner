@@ -1,7 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.organization.OperatorBuilder;
 import org.rutebanken.netex.model.ContactStructure;
 
 /**
@@ -16,15 +17,16 @@ class OperatorToAgencyMapper {
   }
 
   Operator mapOperator(org.rutebanken.netex.model.Operator source) {
-    Operator target = new Operator(idFactory.createId(source.getId()));
-    target.setName(source.getName().getValue());
+    var target = Operator
+      .of(idFactory.createId(source.getId()))
+      .setName(source.getName().getValue());
 
     mapContactDetails(source.getContactDetails(), target);
 
-    return target;
+    return target.build();
   }
 
-  private static void mapContactDetails(ContactStructure contactDetails, Operator target) {
+  private static void mapContactDetails(ContactStructure contactDetails, OperatorBuilder target) {
     if (contactDetails == null) {
       return;
     }

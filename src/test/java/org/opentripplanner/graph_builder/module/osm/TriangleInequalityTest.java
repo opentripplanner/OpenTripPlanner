@@ -149,16 +149,13 @@ public class TriangleInequalityTest {
     checkTriangleInequality(modes);
   }
 
-  private GraphPath getPath(RoutingRequest proto, Edge startBackEdge, Vertex u, Vertex v) {
-    RoutingRequest options = proto.clone();
-
-    ShortestPathTree tree = AStarBuilder
+  private GraphPath getPath(RoutingRequest options, Edge startBackEdge, Vertex u, Vertex v) {
+    return AStarBuilder
       .oneToOne()
       .setOriginBackEdge(startBackEdge)
       .setContext(new RoutingContext(options, graph, u, v))
-      .getShortestPathTree();
-
-    return tree.getPath(v);
+      .getShortestPathTree()
+      .getPath(v);
   }
 
   private void checkTriangleInequality() {
@@ -178,7 +175,6 @@ public class TriangleInequalityTest {
     prototypeOptions.carSpeed = 1.0;
     prototypeOptions.walkSpeed = 1.0;
     prototypeOptions.bikeSpeed = 1.0;
-    prototypeOptions.dominanceFunction = new DominanceFunction.EarliestArrival();
 
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 
@@ -186,11 +182,10 @@ public class TriangleInequalityTest {
       prototypeOptions.setStreetSubRequestModes(traverseModes);
     }
 
-    RoutingRequest options = prototypeOptions.clone();
-
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, start, end))
+      .setDominanceFunction(new DominanceFunction.EarliestArrival())
+      .setContext(new RoutingContext(prototypeOptions, graph, start, end))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(end);

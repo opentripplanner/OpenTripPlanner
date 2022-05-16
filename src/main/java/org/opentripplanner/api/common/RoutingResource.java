@@ -14,12 +14,12 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
@@ -197,10 +197,13 @@ public abstract class RoutingResource {
   protected Double bikeWalkingReluctance;
 
   /**
-   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
-   * Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept of
-   * not wanting to walk too much without asking for totally ridiculous itineraries, but this
-   * observation should in no way be taken as scientific or definitive. Your mileage may vary.
+   * A multiplier for how bad walking is, compared to being in transit for equal
+   * lengths of time. Empirically, values between 2 and 4 seem to correspond
+   * well to the concept of not wanting to walk too much without asking for
+   * totally ridiculous itineraries, but this observation should in no way be
+   * taken as scientific or definitive. Your mileage may vary. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
+   * performance with high values. Default value: 2.0
    */
   @QueryParam("walkReluctance")
   protected Double walkReluctance;

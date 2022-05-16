@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -25,6 +24,8 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -37,15 +38,14 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  */
 public class OtpTransitServiceBuilderLimitPeriodTest {
 
-  private static final String FEED_ID = "F";
   private static final ServiceDate D0 = new ServiceDate(2020, 1, 1);
   private static final ServiceDate D1 = new ServiceDate(2020, 1, 8);
   private static final ServiceDate D2 = new ServiceDate(2020, 1, 15);
   private static final ServiceDate D3 = new ServiceDate(2020, 1, 31);
-  private static final FeedScopedId SERVICE_C_IN = new FeedScopedId(FEED_ID, "CalSrvIn");
-  private static final FeedScopedId SERVICE_D_IN = new FeedScopedId(FEED_ID, "CalSrvDIn");
-  private static final FeedScopedId SERVICE_C_OUT = new FeedScopedId(FEED_ID, "CalSrvOut");
-  private static final FeedScopedId SERVICE_D_OUT = new FeedScopedId(FEED_ID, "CalSrvDOut");
+  private static final FeedScopedId SERVICE_C_IN = TransitModelForTest.id("CalSrvIn");
+  private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
+  private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
+  private static final FeedScopedId SERVICE_D_OUT = TransitModelForTest.id("CalSrvDOut");
   private static final Stop STOP_1 = Stop.stopForTest("Stop-1", 0.0, 0.0);
   private static final Stop STOP_2 = Stop.stopForTest("Stop-2", 0.0, 0.0);
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
@@ -179,12 +179,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private static FeedScopedId newId() {
-    return new FeedScopedId(FEED_ID, Integer.toString(++SEQ_NR));
+    return TransitModelForTest.id(Integer.toString(++SEQ_NR));
   }
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
-    FeedScopedId patternId = new FeedScopedId(
-      FEED_ID,
+    FeedScopedId patternId = TransitModelForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
     TripPattern p = new TripPattern(patternId, route, STOP_PATTERN);
@@ -197,7 +196,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private Trip createTrip(String id, FeedScopedId serviceId) {
-    Trip trip = new Trip(new FeedScopedId(FEED_ID, id));
+    Trip trip = new Trip(TransitModelForTest.id(id));
     trip.setServiceId(serviceId);
     trip.setDirection(Direction.valueOfGtfsCode(1));
     trip.setRoute(route);

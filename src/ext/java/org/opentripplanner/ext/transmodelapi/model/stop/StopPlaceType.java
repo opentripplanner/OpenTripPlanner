@@ -26,7 +26,6 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopCollection;
@@ -37,6 +36,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class StopPlaceType {
 
@@ -373,22 +373,14 @@ public class StopPlaceType {
       departuresPerLineAndDestinationDisplay > 0 &&
       departuresPerLineAndDestinationDisplay < numberOfDepartures;
 
-    int departuresPerTripPattern = limitOnDestinationDisplay
-      ? departuresPerLineAndDestinationDisplay
-      : numberOfDepartures;
-
     List<StopTimesInPattern> stopTimesInPatterns = routingService.stopTimesForStop(
       stop,
       startTimeSeconds,
       timeRage,
-      departuresPerTripPattern,
+      numberOfDepartures,
       arrivalDeparture,
       includeCancelledTrips
     );
-
-    // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used
-    //           - to limit the result, and using filters after that point may result in
-    //           - loosing valid results.
 
     Stream<StopTimesInPattern> stopTimesStream = stopTimesInPatterns.stream();
 

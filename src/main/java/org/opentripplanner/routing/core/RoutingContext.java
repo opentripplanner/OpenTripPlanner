@@ -33,9 +33,6 @@ public class RoutingContext {
 
   public final Set<Vertex> toVertices;
 
-  /** Indicates that the search timed out or was otherwise aborted. */
-  public boolean aborted;
-
   /**
    * DataOverlay Sandbox module context.
    */

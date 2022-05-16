@@ -5,7 +5,12 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
 
 public class GbfsDataSourceParameters extends GbfsVehicleRentalDataSourceParameters {
 
-  public GbfsDataSourceParameters(String url, String language, Map<String, String> httpHeaders) {
-    super(url, language, false, httpHeaders);
+  public GbfsDataSourceParameters(
+    String url,
+    String language,
+    Map<String, String> httpHeaders,
+    String network
+  ) {
+    super(url, language, false, httpHeaders, network);
   }
 }

@@ -78,10 +78,10 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     } else {
       rctx = new RoutingContext(routingRequest, graph, vertex, null);
     }
-    routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
 
     return AStarBuilder
       .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
+      .setDominanceFunction(new DominanceFunction.EarliestArrival())
       .setContext(rctx)
       .getShortestPathTree();
   }

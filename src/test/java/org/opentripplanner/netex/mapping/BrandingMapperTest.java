@@ -19,7 +19,9 @@ public class BrandingMapperTest {
   public void mapBranding() {
     BrandingMapper brandingMapper = new BrandingMapper(MappingSupport.ID_FACTORY);
 
-    org.opentripplanner.model.Branding branding = brandingMapper.mapBranding(createBranding());
+    org.opentripplanner.transit.model.organization.Branding branding = brandingMapper.mapBranding(
+      createBranding()
+    );
 
     assertEquals(ID, branding.getId().getId());
     assertEquals(NAME, branding.getName());

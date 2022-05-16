@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**

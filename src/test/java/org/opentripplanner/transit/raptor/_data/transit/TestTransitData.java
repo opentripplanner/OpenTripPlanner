@@ -211,6 +211,15 @@ public class TestTransitData
     }
   }
 
+  /**
+   * Create constraint for a given transfer. If trip passes through the stop more than once
+   * constraint will be placed on stop position for the first visit.
+   * @param fromTrip initial trip
+   * @param fromStop initial stop index
+   * @param toTrip destination trip
+   * @param toStop destination trip index
+   * @param constraint constraint to set
+   */
   public TestTransitData withConstrainedTransfer(
     TestTripSchedule fromTrip,
     int fromStop,
@@ -227,8 +236,8 @@ public class TestTransitData
     constrainedTransfers.add(
       new ConstrainedTransfer(
         null,
-        new TestTransferPoint(fromStop, fromTrip, false),
-        new TestTransferPoint(toStop, toTrip, false),
+        new TestTransferPoint(fromStop, fromStopPos, fromTrip, false),
+        new TestTransferPoint(toStop, toStopPos, toTrip, false),
         constraint
       )
     );
@@ -242,13 +251,15 @@ public class TestTransitData
   public ConstrainedTransfer findConstrainedTransfer(
     TestTripSchedule fromTrip,
     int fromStop,
+    int fromStopPosition,
     TestTripSchedule toTrip,
-    int toStop
+    int toStop,
+    int toStopPosition
   ) {
     for (ConstrainedTransfer tx : constrainedTransfers) {
       if (
-        ((TestTransferPoint) tx.getFrom()).matches(fromTrip, fromStop) &&
-        ((TestTransferPoint) tx.getTo()).matches(toTrip, toStop)
+        ((TestTransferPoint) tx.getFrom()).matches(fromTrip, fromStop, fromStopPosition) &&
+        ((TestTransferPoint) tx.getTo()).matches(toTrip, toStop, toStopPosition)
       ) {
         return tx;
       }
@@ -262,9 +273,17 @@ public class TestTransitData
       protected ConstrainedTransfer findTransfer(
         TripStopTime<TestTripSchedule> from,
         TestTripSchedule toTrip,
-        int toStop
+        int toStop,
+        int toStopPosition
       ) {
-        return findConstrainedTransfer(from.trip(), from.stop(), toTrip, toStop);
+        return findConstrainedTransfer(
+          from.trip(),
+          from.stop(),
+          from.stopPosition(),
+          toTrip,
+          toStop,
+          toStopPosition
+        );
       }
     };
   }

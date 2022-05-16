@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.filterchain.groupids;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * This creates a group identifier based on all origin and destination stations, or stops if there

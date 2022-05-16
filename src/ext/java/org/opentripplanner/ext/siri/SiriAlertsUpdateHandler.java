@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -21,6 +20,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
@@ -317,11 +317,6 @@ public class SiriAlertsUpdateHandler {
       AffectsScopeStructure.VehicleJourneys vjs = affectsStructure.getVehicleJourneys();
       if (vjs != null && isNotEmpty(vjs.getAffectedVehicleJourneies())) {
         for (AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()) {
-          String lineRef = null;
-          if (affectedVehicleJourney.getLineRef() != null) {
-            lineRef = affectedVehicleJourney.getLineRef().getValue();
-          }
-
           List<AffectedStopPointStructure> affectedStops = new ArrayList<>();
 
           List<AffectedRouteStructure> routes = affectedVehicleJourney.getRoutes();
@@ -432,15 +427,6 @@ public class SiriAlertsUpdateHandler {
                 }
               } else {
                 alert.addEntity(new EntitySelector.Trip(tripId, serviceDate));
-              }
-            }
-          }
-
-          if (lineRef != null) {
-            Set<Route> affectedRoutes = siriFuzzyTripMatcher.getRoutes(lineRef);
-            if (affectedRoutes != null) {
-              for (Route route : affectedRoutes) {
-                alert.addEntity(new EntitySelector.Route(route.getId()));
               }
             }
           }

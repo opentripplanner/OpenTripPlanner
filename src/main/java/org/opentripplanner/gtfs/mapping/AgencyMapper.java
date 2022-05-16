@@ -3,8 +3,8 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Agency into the OTP model. */
@@ -28,18 +28,15 @@ class AgencyMapper {
   }
 
   private Agency doMap(org.onebusaway.gtfs.model.Agency rhs) {
-    Agency lhs = new Agency(
-      new FeedScopedId(feedId, rhs.getId()),
-      rhs.getName(),
-      rhs.getTimezone()
-    );
-
-    lhs.setUrl(rhs.getUrl());
-    lhs.setLang(rhs.getLang());
-    lhs.setPhone(rhs.getPhone());
-    lhs.setFareUrl(rhs.getFareUrl());
-    lhs.setBrandingUrl(rhs.getBrandingUrl());
-
-    return lhs;
+    return Agency
+      .of(new FeedScopedId(feedId, rhs.getId()))
+      .setName(rhs.getName())
+      .setTimezone(rhs.getTimezone())
+      .setUrl(rhs.getUrl())
+      .setLang(rhs.getLang())
+      .setPhone(rhs.getPhone())
+      .setFareUrl(rhs.getFareUrl())
+      .setBrandingUrl(rhs.getBrandingUrl())
+      .build();
   }
 }
