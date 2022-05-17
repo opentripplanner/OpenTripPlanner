@@ -1138,7 +1138,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
       }
 
       if (slopeExceededBy > 0) {
-        double reluctance = wheelchair.slopeTooSteepReluctance();
+        double reluctance = wheelchair.slopeExceededReluctance();
         if (reluctance > 0) {
           // if we exceed the max slope the cost increases quadratically
           var excessMultiplier = (slopeExceededBy * 1000) * reluctance;

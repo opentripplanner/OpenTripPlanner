@@ -1,9 +1,14 @@
 package org.opentripplanner.routing.api.request;
 
 /**
- * @param slopeTooSteepReluctance What penalty factor should be given to street edges, which are over
- *                             the max slope. Set to negative for disable routing on too steep
- *                             edges.
+ * @param slopeExceededReluctance What factor should be given to street edges, which are over the
+ *                                max slope. The penalty is not static but scales with how much you
+ *                                exceed the maximum slope. Set to negative to disable routing on
+ *                                too steep edges.
+ * @param stairsReluctance        Stairs are not completely excluded for wheelchair users but
+ *                                severely punished. This value determines how much they are
+ *                                punished. This should be a very high value as you want to only
+ *                                include stairs as a last result.
  */
 public record WheelchairAccessibilityRequest(
   boolean enabled,
@@ -12,7 +17,7 @@ public record WheelchairAccessibilityRequest(
   WheelchairAccessibilityFeature elevators,
   WheelchairAccessibilityFeature streets,
   float maxSlope,
-  float slopeTooSteepReluctance,
+  float slopeExceededReluctance,
   float stairsReluctance
 ) {
   public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
@@ -21,7 +26,7 @@ public record WheelchairAccessibilityRequest(
     WheelchairAccessibilityFeature.ofOnlyAccessible(),
     // it's very common for elevators in OSM to have unknown wheelchair accessibility since they are assumed to be so
     // for that reason they only have a small default penalty for unknown accessibility
-    WheelchairAccessibilityFeature.ofCost(30, 3600),
+    WheelchairAccessibilityFeature.ofCost(20, 3600),
     // since most streets have no accessibility information, we don't add a cost for that
     WheelchairAccessibilityFeature.ofCost(0, 3600),
     0.0833333333333f, // ADA max wheelchair ramp slope is a good default.
@@ -41,7 +46,7 @@ public record WheelchairAccessibilityRequest(
       elevators,
       streets,
       maxSlope,
-      slopeTooSteepReluctance,
+      slopeExceededReluctance,
       stairsReluctance
     );
   }
