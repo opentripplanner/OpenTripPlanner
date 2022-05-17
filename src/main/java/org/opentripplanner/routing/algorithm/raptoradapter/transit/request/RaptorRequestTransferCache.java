@@ -10,6 +10,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransfe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 
@@ -94,7 +95,7 @@ public class RaptorRequestTransferCache {
     private final double bikeTriangleSafetyFactor;
     private final double bikeTriangleSlopeFactor;
     private final double bikeTriangleTimeFactor;
-    private final boolean wheelchairAccessible;
+    private final WheelchairAccessibilityRequest wheelchairAccessibility;
     private final double walkSpeed;
     private final double bikeSpeed;
     private final double walkReluctance;
@@ -118,7 +119,7 @@ public class RaptorRequestTransferCache {
       this.bikeSwitchCost = routingRequest.bikeSwitchCost;
       this.bikeSwitchTime = routingRequest.bikeSwitchTime;
 
-      this.wheelchairAccessible = routingRequest.wheelchairAccessibility.enabled();
+      this.wheelchairAccessibility = routingRequest.wheelchairAccessibility;
 
       this.walkSpeed = routingRequest.walkSpeed;
       this.bikeSpeed = routingRequest.bikeSpeed;
@@ -142,7 +143,7 @@ public class RaptorRequestTransferCache {
         bikeTriangleSafetyFactor,
         bikeTriangleSlopeFactor,
         bikeTriangleTimeFactor,
-        wheelchairAccessible,
+        wheelchairAccessibility,
         walkSpeed,
         bikeSpeed,
         walkReluctance,
@@ -177,7 +178,7 @@ public class RaptorRequestTransferCache {
         Double.compare(that.stairsReluctance, stairsReluctance) == 0 &&
         Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
         Double.compare(that.turnReluctance, turnReluctance) == 0 &&
-        wheelchairAccessible == that.wheelchairAccessible &&
+        wheelchairAccessibility.equals(that.wheelchairAccessibility) &&
         elevatorBoardCost == that.elevatorBoardCost &&
         elevatorBoardTime == that.elevatorBoardTime &&
         elevatorHopCost == that.elevatorHopCost &&

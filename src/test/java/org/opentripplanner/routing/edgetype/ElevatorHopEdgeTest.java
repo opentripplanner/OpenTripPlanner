@@ -42,7 +42,7 @@ class ElevatorHopEdgeTest {
 
   static Stream<Arguments> all = Stream.of(
     Arguments.of(WheelchairBoarding.POSSIBLE, 20), // no extra cost
-    Arguments.of(WheelchairBoarding.NO_INFORMATION, 50), // low extra cost
+    Arguments.of(WheelchairBoarding.NO_INFORMATION, 40), // low extra cost
     Arguments.of(WheelchairBoarding.NOT_POSSIBLE, 3620) // high extra cost
   );
 
