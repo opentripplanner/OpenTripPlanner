@@ -227,12 +227,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
    * barriers. This is done with intersection of street and barrier permissions in {@link
    * #canTraverseIncludingBarrier(TraverseMode)}
    */
-  public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
-    if (mode.isWalking() && options.wheelchairAccessibility.enabled()) {
-      if (!isWheelchairAccessible()) {
-        return false;
-      }
-    }
+  public boolean canTraverse(TraverseMode mode) {
     return canTraverseIncludingBarrier(mode);
   }
 
@@ -245,7 +240,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
    * <p>
    * If start/end isn't bollard it just checks the street permissions.
    * <p>
-   * It is used in {@link #canTraverse(RoutingRequest, TraverseMode)}
+   * It is used in {@link #canTraverse(TraverseMode)}
    */
   public boolean canTraverseIncludingBarrier(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
@@ -384,14 +379,14 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
     if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
-      if (canTraverse(options, TraverseMode.BICYCLE)) {
+      if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, options, TraverseMode.BICYCLE, false);
-      } else if (canTraverse(options, TraverseMode.WALK)) {
+      } else if (canTraverse(TraverseMode.WALK)) {
         editor = doTraverse(s0, options, TraverseMode.WALK, true);
       } else {
         return null;
       }
-    } else if (canTraverse(options, s0.getNonTransitMode())) {
+    } else if (canTraverse(s0.getNonTransitMode())) {
       editor = doTraverse(s0, options, s0.getNonTransitMode(), false);
     } else {
       editor = null;
@@ -965,7 +960,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
 
     /* Check whether this street allows the current mode. */
-    if (!canTraverse(options, traverseMode)) {
+    if (!canTraverse(traverseMode)) {
       return null;
     }
 
@@ -1140,10 +1135,14 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
       if (slopeExceededBy > 0) {
         double reluctance = wheelchair.slopeExceededReluctance();
         if (reluctance > 0) {
-          // if we exceed the max slope the cost increases quadratically
+          // if we exceed the max slope the cost increases multiplied by how much you go over the maxSlope
           var excessMultiplier = (slopeExceededBy * 1000) * reluctance;
           weight *= excessMultiplier;
         }
+      }
+
+      if (!this.isWheelchairAccessible()) {
+        weight *= wheelchair.inaccessibleStreetReluctance();
       }
     } else if (walkingBike) {
       // take slopes into account when walking bikes

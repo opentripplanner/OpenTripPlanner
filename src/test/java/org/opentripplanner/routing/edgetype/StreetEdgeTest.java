@@ -244,7 +244,7 @@ class StreetEdgeTest extends GraphRoutingTest {
         ofOnlyAccessible(),
         ofOnlyAccessible(),
         ofOnlyAccessible(),
-        ofOnlyAccessible(),
+        25,
         maxSlope,
         1.1f,
         10
@@ -285,7 +285,7 @@ class StreetEdgeTest extends GraphRoutingTest {
   );
 
   @ParameterizedTest(
-    name = "wheelchair stairs reluctance of of {0} should lead to traversal costs of {1}"
+    name = "wheelchair stairs reluctance of {0} should lead to traversal costs of {1}"
   )
   @VariableSource("wheelchairStairsCases")
   public void wheelchairStairsReluctance(float stairsReluctance, long expectedCost) {
@@ -300,7 +300,7 @@ class StreetEdgeTest extends GraphRoutingTest {
         ofOnlyAccessible(),
         ofOnlyAccessible(),
         ofOnlyAccessible(),
-        ofOnlyAccessible(),
+        25,
         0,
         1.1f,
         stairsReluctance
@@ -312,6 +312,43 @@ class StreetEdgeTest extends GraphRoutingTest {
     edge.setStairs(false);
     var notStairsResult = traverse(edge, req);
     assertEquals(15, (long) notStairsResult.weight);
+  }
+
+  static Stream<Arguments> inaccessibleStreetCases = Stream.of(
+    Arguments.of(1f, 15),
+    Arguments.of(10f, 150),
+    Arguments.of(100f, 1503)
+  );
+
+  @ParameterizedTest(
+    name = "an inaccessible street with the reluctance of {0} should lead to traversal costs of {1}"
+  )
+  @VariableSource("inaccessibleStreetCases")
+  public void inaccessibleStreet(float inaccessibleStreetReluctance, long expectedCost) {
+    double length = 10;
+    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    edge.setWheelchairAccessible(false);
+
+    var req = new RoutingRequest();
+    req.wheelchairAccessibility =
+      new WheelchairAccessibilityRequest(
+        true,
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        inaccessibleStreetReluctance,
+        0,
+        1.1f,
+        25
+      );
+
+    var result = traverse(edge, req);
+    assertEquals(expectedCost, (long) result.weight);
+
+    // reluctance should have no effect when the edge is accessible
+    edge.setWheelchairAccessible(true);
+    var accessibleResult = traverse(edge, req);
+    assertEquals(15, (long) accessibleResult.weight);
   }
 
   private State traverse(StreetEdge edge, RoutingRequest req) {

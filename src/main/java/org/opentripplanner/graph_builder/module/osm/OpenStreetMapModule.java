@@ -616,20 +616,20 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         var accessVertex = access.getVertex();
         for (Edge incoming : accessVertex.getIncoming()) {
           if (incoming instanceof StreetEdge streetEdge) {
-            if (streetEdge.canTraverse(walkReq, TraverseMode.WALK)) {
+            if (streetEdge.canTraverse(TraverseMode.WALK)) {
               walkAccessibleIn = true;
             }
-            if (streetEdge.canTraverse(driveReq, TraverseMode.CAR)) {
+            if (streetEdge.canTraverse(TraverseMode.CAR)) {
               carAccessibleIn = true;
             }
           }
         }
         for (Edge outgoing : accessVertex.getOutgoing()) {
           if (outgoing instanceof StreetEdge streetEdge) {
-            if (streetEdge.canTraverse(walkReq, TraverseMode.WALK)) {
+            if (streetEdge.canTraverse(TraverseMode.WALK)) {
               walkAccessibleOut = true;
             }
-            if (streetEdge.canTraverse(driveReq, TraverseMode.CAR)) {
+            if (streetEdge.canTraverse(TraverseMode.CAR)) {
               carAccessibleOut = true;
             }
           }

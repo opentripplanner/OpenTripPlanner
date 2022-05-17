@@ -36,7 +36,7 @@ public class WheelchairCostCalculatorTest {
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
       WheelchairAccessibilityFeature.ofOnlyAccessible(),
-      WheelchairAccessibilityFeature.ofOnlyAccessible(),
+      25,
       8,
       10,
       25

@@ -11,7 +11,10 @@ public class WheelchairAccessibilityRequestMapper {
     var trips = mapAccessibilityFeature(a.path("trips"), DEFAULT.trips());
     var stops = mapAccessibilityFeature(a.path("stops"), DEFAULT.stops());
     var elevators = mapAccessibilityFeature(a.path("elevators"), DEFAULT.elevators());
-    var streets = mapAccessibilityFeature(a.path("streets"), DEFAULT.streets());
+    var inaccessibleStreetReluctance = (float) a.asDouble(
+      "inaccessibleStreetReluctance",
+      DEFAULT.inaccessibleStreetReluctance()
+    );
     var maxSlope = (float) a.asDouble("maxSlope", DEFAULT.maxSlope());
     var slopeTooSteepPenalty = (float) a.asDouble(
       "slopeExceededReluctance",
@@ -24,7 +27,7 @@ public class WheelchairAccessibilityRequestMapper {
       trips,
       stops,
       elevators,
-      streets,
+      inaccessibleStreetReluctance,
       maxSlope,
       slopeTooSteepPenalty,
       stairsReluctance

@@ -15,7 +15,7 @@ public record WheelchairAccessibilityRequest(
   WheelchairAccessibilityFeature trips,
   WheelchairAccessibilityFeature stops,
   WheelchairAccessibilityFeature elevators,
-  WheelchairAccessibilityFeature streets,
+  float inaccessibleStreetReluctance,
   float maxSlope,
   float slopeExceededReluctance,
   float stairsReluctance
@@ -28,7 +28,7 @@ public record WheelchairAccessibilityRequest(
     // for that reason they only have a small default penalty for unknown accessibility
     WheelchairAccessibilityFeature.ofCost(20, 3600),
     // since most streets have no accessibility information, we don't add a cost for that
-    WheelchairAccessibilityFeature.ofCost(0, 3600),
+    25,
     0.0833333333333f, // ADA max wheelchair ramp slope is a good default.
     1.1f,
     100
@@ -44,7 +44,7 @@ public record WheelchairAccessibilityRequest(
       trips,
       stops,
       elevators,
-      streets,
+      inaccessibleStreetReluctance,
       maxSlope,
       slopeExceededReluctance,
       stairsReluctance
