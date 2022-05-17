@@ -26,7 +26,7 @@ public record WheelchairAccessibilityRequest(
     WheelchairAccessibilityFeature.ofCost(0, 3600),
     0.0833333333333f, // ADA max wheelchair ramp slope is a good default.
     1.1f,
-    25
+    100
   );
 
   public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {

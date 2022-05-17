@@ -278,6 +278,42 @@ class StreetEdgeTest extends GraphRoutingTest {
     assertEquals(15, (long) notStairsResult.weight);
   }
 
+  static Stream<Arguments> wheelchairStairsCases = Stream.of(
+    Arguments.of(1f, 22),
+    Arguments.of(10f, 225),
+    Arguments.of(100f, 2255)
+  );
+
+  @ParameterizedTest(
+    name = "wheelchair stairs reluctance of of {0} should lead to traversal costs of {1}"
+  )
+  @VariableSource("wheelchairStairsCases")
+  public void wheelchairStairsReluctance(float stairsReluctance, long expectedCost) {
+    double length = 10;
+    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    edge.setStairs(true);
+
+    var req = new RoutingRequest();
+    req.wheelchairAccessibility =
+      new WheelchairAccessibilityRequest(
+        true,
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        ofOnlyAccessible(),
+        0,
+        1.1f,
+        stairsReluctance
+      );
+
+    var result = traverse(edge, req);
+    assertEquals(expectedCost, (long) result.weight);
+
+    edge.setStairs(false);
+    var notStairsResult = traverse(edge, req);
+    assertEquals(15, (long) notStairsResult.weight);
+  }
+
   private State traverse(StreetEdge edge, RoutingRequest req) {
     var ctx = new RoutingContext(req, graph, V1, V2);
     var state = new State(ctx);

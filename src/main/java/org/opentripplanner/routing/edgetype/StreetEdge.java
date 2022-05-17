@@ -983,11 +983,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     var time = traversalCosts.time();
     var weight = traversalCosts.cost();
 
-    if (isStairs()) {
-      weight *= options.stairsReluctance;
-    } else {
-      weight *= options.getReluctance(traverseMode, walkingBike);
-    }
+    weight *= getReluctance(options, traverseMode, walkingBike);
 
     var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
@@ -1079,6 +1075,16 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     s1.incrementWeight(weight);
 
     return s1;
+  }
+
+  private double getReluctance(RoutingRequest req, TraverseMode traverseMode, boolean walkingBike) {
+    if (isStairs() && req.wheelchairAccessibility.enabled()) {
+      return req.wheelchairAccessibility.stairsReluctance();
+    } else if (isStairs()) {
+      return req.stairsReluctance;
+    } else {
+      return req.getReluctance(traverseMode, walkingBike);
+    }
   }
 
   private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
