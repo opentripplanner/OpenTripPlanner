@@ -52,8 +52,7 @@ The parameters for `stops`, `trips` and `elevators` mean the following:
 | `inaccessibleCost`       | The cost to add if an entity is known to be inaccessible                                       | 3600    |
 
 **Note**: Unless your accessibility data coverage is complete you will receive much better results
-by setting `onlyConsiderAccessible=false`, because
-otherwise you receive barely any results.
+by setting `onlyConsiderAccessible=false`, because otherwise you receive barely any results.
 
 Other parameters are:
 
@@ -63,9 +62,8 @@ Other parameters are:
 - `maxSlope`: the maximum slope that a wheelchair user can use without incurring routing penalties (
   leading to those ways being avoided). default: 0.0833 (8.33 %)
 - `slopeExceededReluctance`: the multiplier applied to how much you exceed the `maxSlope` and then
-  again
-  multiplied with the regular cost of the street. In other words: how steep should the cost increase
-  when you exceed the maximum slope. default: 1.1
+  again multiplied with the regular cost of the street. In other words: how steep should the cost
+  increase when you exceed the maximum slope. default: 1.1
 - `stairsReluctance`: how much should a wheelchair user avoid stairs. This should be quite high so
   that they are used only as a last resort. default: 25
 

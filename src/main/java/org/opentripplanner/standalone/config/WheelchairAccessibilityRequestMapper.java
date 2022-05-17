@@ -16,7 +16,7 @@ public class WheelchairAccessibilityRequestMapper {
       DEFAULT.inaccessibleStreetReluctance()
     );
     var maxSlope = (float) a.asDouble("maxSlope", DEFAULT.maxSlope());
-    var slopeTooSteepPenalty = (float) a.asDouble(
+    var slopeExceededReluctance = (float) a.asDouble(
       "slopeExceededReluctance",
       DEFAULT.slopeExceededReluctance()
     );
@@ -29,7 +29,7 @@ public class WheelchairAccessibilityRequestMapper {
       elevators,
       inaccessibleStreetReluctance,
       maxSlope,
-      slopeTooSteepPenalty,
+      slopeExceededReluctance,
       stairsReluctance
     );
   }
