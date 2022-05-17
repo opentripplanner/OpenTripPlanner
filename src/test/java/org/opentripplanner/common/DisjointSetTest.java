@@ -1,11 +1,13 @@
 package org.opentripplanner.common;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.HashMap;
 import java.util.Random;
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TestDisjointSet extends TestCase {
+public class DisjointSetTest {
 
   @Test
   public void testSimple() {
@@ -32,6 +34,7 @@ public class TestDisjointSet extends TestCase {
     assertEquals(1, set.sets().size());
   }
 
+  @Test
   public void testRandom() {
     DisjointSet<Integer> set = new DisjointSet<>();
     Random random = new Random(1);
