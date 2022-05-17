@@ -221,7 +221,7 @@ class StreetEdgeTest extends GraphRoutingTest {
       V1,
       V2,
       null,
-      "edge-with-elevation",
+      "edge with elevation",
       length,
       StreetTraversalPermission.ALL,
       false
@@ -249,13 +249,41 @@ class StreetEdgeTest extends GraphRoutingTest {
         1.1f,
         10
       );
+    State result = traverse(edge, req);
+    assertNotNull(result);
+    assertEquals(expectedCost, (long) result.weight);
+  }
+
+  static Stream<Arguments> stairsCases = Stream.of(
+    Arguments.of(1f, 22),
+    Arguments.of(1.5f, 33),
+    Arguments.of(3f, 67)
+  );
+
+  @ParameterizedTest(name = "stairs reluctance of of {0} should lead to traversal costs of {1}")
+  @VariableSource("stairsCases")
+  public void stairsReluctance(float stairsReluctance, long expectedCost) {
+    double length = 10;
+    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    edge.setStairs(true);
+
+    var req = new RoutingRequest();
+    req.stairsReluctance = stairsReluctance;
+
+    var result = traverse(edge, req);
+    assertEquals(expectedCost, (long) result.weight);
+
+    edge.setStairs(false);
+    var notStairsResult = traverse(edge, req);
+    assertEquals(15, (long) notStairsResult.weight);
+  }
+
+  private State traverse(StreetEdge edge, RoutingRequest req) {
     var ctx = new RoutingContext(req, graph, V1, V2);
     var state = new State(ctx);
 
     assertEquals(0, state.weight);
-    var result = edge.traverse(state);
-    assertNotNull(result);
-    assertEquals(expectedCost, (long) result.weight);
+    return edge.traverse(state);
   }
 
   private Graph graph() {
