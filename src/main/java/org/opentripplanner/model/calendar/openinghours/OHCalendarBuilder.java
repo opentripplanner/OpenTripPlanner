@@ -1,10 +1,10 @@
 package org.opentripplanner.model.calendar.openinghours;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -70,9 +70,7 @@ public class OHCalendarBuilder {
       if (date.isBefore(startOfPeriod) || date.isAfter(endOfPeriod)) {
         return this;
       }
-      openingDays.set(
-        (int) Duration.between(startOfPeriod.atStartOfDay(), date.atStartOfDay()).toDays()
-      );
+      openingDays.set((int) ChronoUnit.DAYS.between(startOfPeriod, date));
       return this;
     }
 

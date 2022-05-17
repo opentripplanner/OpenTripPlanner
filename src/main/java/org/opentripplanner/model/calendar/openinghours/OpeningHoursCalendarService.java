@@ -1,8 +1,8 @@
 package org.opentripplanner.model.calendar.openinghours;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
 public class OpeningHoursCalendarService {
@@ -18,8 +18,7 @@ public class OpeningHoursCalendarService {
   ) {
     this.deduplicator = deduplicator;
     this.startOfPeriod = startOfPeriod;
-    this.daysInPeriod =
-      (int) Duration.between(startOfPeriod.atStartOfDay(), endOfPeriod.atStartOfDay()).toDays();
+    this.daysInPeriod = (int) ChronoUnit.DAYS.between(startOfPeriod, endOfPeriod);
   }
 
   public OHCalendarBuilder newBuilder(ZoneId zoneId) {
