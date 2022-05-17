@@ -65,11 +65,18 @@ public class TimetableSnapshotTest {
     TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
     tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(
+      TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+    );
+    stopTimeUpdateBuilder.setDeparture(TripUpdate.StopTimeEvent.newBuilder().setDelay(2).build());
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -105,11 +112,20 @@ public class TimetableSnapshotTest {
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
         tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
         TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+        stopTimeUpdateBuilder.setStopSequence(2);
+        stopTimeUpdateBuilder.setScheduleRelationship(
+          TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+        );
+        stopTimeUpdateBuilder.setDeparture(
+          TripUpdate.StopTimeEvent.newBuilder().setDelay(5).build()
+        );
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -152,11 +168,20 @@ public class TimetableSnapshotTest {
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
         tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
         TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+        stopTimeUpdateBuilder.setStopSequence(2);
+        stopTimeUpdateBuilder.setScheduleRelationship(
+          TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+        );
+        stopTimeUpdateBuilder.setDeparture(
+          TripUpdate.StopTimeEvent.newBuilder().setDelay(10).build()
+        );
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -195,11 +220,18 @@ public class TimetableSnapshotTest {
     TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
     tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(
+      TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+    );
+    stopTimeUpdateBuilder.setDeparture(TripUpdate.StopTimeEvent.newBuilder().setDelay(15).build());
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 

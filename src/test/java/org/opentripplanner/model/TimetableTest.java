@@ -72,9 +72,12 @@ public class TimetableTest {
     // non-existing trip
     tripDescriptorBuilder = TripDescriptor.newBuilder();
     tripDescriptorBuilder.setTripId("b");
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
     tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(0);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     tripUpdate = tripUpdateBuilder.build();
     var patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     assertNull(patch);

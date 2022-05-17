@@ -232,122 +232,102 @@ public class Timetable implements Serializable {
     TripTimes newTimes = new TripTimes(getTripTimes(tripIndex));
     List<Integer> skippedStopIndices = new ArrayList<>();
 
-    if (
-      tripDescriptor.hasScheduleRelationship() &&
-      tripDescriptor.getScheduleRelationship() == TripDescriptor.ScheduleRelationship.CANCELED
-    ) {
-      newTimes.cancelTrip();
-    } else {
-      // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
-      Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
-      if (!updates.hasNext()) {
-        LOG.warn("Won't apply zero-length trip update to trip {}.", tripId);
-        return null;
-      }
-      StopTimeUpdate update = updates.next();
+    // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
+    Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
+    if (!updates.hasNext()) {
+      LOG.warn("Won't apply zero-length trip update to trip {}.", tripId);
+      return null;
+    }
+    StopTimeUpdate update = updates.next();
 
-      int numStops = newTimes.getNumStops();
-      Integer delay = null;
+    int numStops = newTimes.getNumStops();
+    Integer delay = null;
 
-      final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
+    final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
 
-      for (int i = 0; i < numStops; i++) {
-        boolean match = false;
-        if (update != null) {
-          if (update.hasStopSequence()) {
-            match = update.getStopSequence() == newTimes.getOriginalGtfsStopSequence(i);
-          } else if (update.hasStopId()) {
-            match = pattern.getStop(i).getId().getId().equals(update.getStopId());
-          }
+    for (int i = 0; i < numStops; i++) {
+      boolean match = false;
+      if (update != null) {
+        if (update.hasStopSequence()) {
+          match = update.getStopSequence() == newTimes.getOriginalGtfsStopSequence(i);
+        } else if (update.hasStopId()) {
+          match = pattern.getStop(i).getId().getId().equals(update.getStopId());
         }
+      }
 
-        if (match) {
-          StopTimeUpdate.ScheduleRelationship scheduleRelationship = update.hasScheduleRelationship()
-            ? update.getScheduleRelationship()
-            : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
-          if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
-            skippedStopIndices.add(i);
-            newTimes.setCancelled(i);
-            int delayOrZero = delay != null ? delay : 0;
-            newTimes.updateArrivalDelay(i, delayOrZero);
-            newTimes.updateDepartureDelay(i, delayOrZero);
-          } else if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.NO_DATA) {
-            newTimes.updateArrivalDelay(i, 0);
-            newTimes.updateDepartureDelay(i, 0);
-            delay = 0;
-            newTimes.setNoData(i);
-          } else {
-            if (update.hasArrival()) {
-              StopTimeEvent arrival = update.getArrival();
-              if (arrival.hasDelay()) {
-                delay = arrival.getDelay();
-                if (arrival.hasTime()) {
-                  newTimes.updateArrivalTime(i, (int) (arrival.getTime() - today));
-                } else {
-                  newTimes.updateArrivalDelay(i, delay);
-                }
-              } else if (arrival.hasTime()) {
+      if (match) {
+        StopTimeUpdate.ScheduleRelationship scheduleRelationship = update.hasScheduleRelationship()
+          ? update.getScheduleRelationship()
+          : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
+        if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
+          skippedStopIndices.add(i);
+          newTimes.setCancelled(i);
+          int delayOrZero = delay != null ? delay : 0;
+          newTimes.updateArrivalDelay(i, delayOrZero);
+          newTimes.updateDepartureDelay(i, delayOrZero);
+        } else if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.NO_DATA) {
+          newTimes.updateArrivalDelay(i, 0);
+          newTimes.updateDepartureDelay(i, 0);
+          delay = 0;
+          newTimes.setNoData(i);
+        } else {
+          if (update.hasArrival()) {
+            StopTimeEvent arrival = update.getArrival();
+            if (arrival.hasDelay()) {
+              delay = arrival.getDelay();
+              if (arrival.hasTime()) {
                 newTimes.updateArrivalTime(i, (int) (arrival.getTime() - today));
-                delay = newTimes.getArrivalDelay(i);
-              } else {
-                LOG.error("Arrival time at index {} is erroneous.", i);
-                return null;
-              }
-            } else {
-              if (delay == null) {
-                // newTimes.cancelDropOffForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
               } else {
                 newTimes.updateArrivalDelay(i, delay);
               }
-            }
-
-            if (update.hasDeparture()) {
-              StopTimeEvent departure = update.getDeparture();
-              if (departure.hasDelay()) {
-                delay = departure.getDelay();
-                if (departure.hasTime()) {
-                  newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
-                } else {
-                  newTimes.updateDepartureDelay(i, delay);
-                }
-              } else if (departure.hasTime()) {
-                newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
-                delay = newTimes.getDepartureDelay(i);
-              } else {
-                LOG.error("Departure time at index {} is erroneous.", i);
-                return null;
-              }
+            } else if (arrival.hasTime()) {
+              newTimes.updateArrivalTime(i, (int) (arrival.getTime() - today));
+              delay = newTimes.getArrivalDelay(i);
             } else {
-              if (delay == null) {
-                //newTimes.cancelPickupForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
+              LOG.error("Arrival time at index {} is erroneous.", i);
+              return null;
+            }
+          } else if (delay != null) {
+            newTimes.updateArrivalDelay(i, delay);
+          }
+
+          if (update.hasDeparture()) {
+            StopTimeEvent departure = update.getDeparture();
+            if (departure.hasDelay()) {
+              delay = departure.getDelay();
+              if (departure.hasTime()) {
+                newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
               } else {
                 newTimes.updateDepartureDelay(i, delay);
               }
+            } else if (departure.hasTime()) {
+              newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
+              delay = newTimes.getDepartureDelay(i);
+            } else {
+              LOG.error("Departure time at index {} is erroneous.", i);
+              return null;
             }
-          }
-
-          if (updates.hasNext()) {
-            update = updates.next();
-          } else {
-            update = null;
-          }
-        } else {
-          if (delay == null) {
-            // newTimes.cancelDropOffForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
-            // newTimes.cancelPickupForStop(i); TODO This needs to cancel on a StopTime object so that a new StopPattern/TripPattern can be constructed
-          } else {
-            newTimes.updateArrivalDelay(i, delay);
+          } else if (delay != null) {
             newTimes.updateDepartureDelay(i, delay);
           }
         }
+
+        if (updates.hasNext()) {
+          update = updates.next();
+        } else {
+          update = null;
+        }
+      } else if (delay != null) {
+        newTimes.updateArrivalDelay(i, delay);
+        newTimes.updateDepartureDelay(i, delay);
       }
-      if (update != null) {
-        LOG.error(
-          "Part of a TripUpdate object could not be applied successfully to trip {}.",
-          tripId
-        );
-        return null;
-      }
+    }
+    if (update != null) {
+      LOG.error(
+        "Part of a TripUpdate object could not be applied successfully to trip {}.",
+        tripId
+      );
+      return null;
     }
     if (!newTimes.timesIncreasing()) {
       LOG.error(
