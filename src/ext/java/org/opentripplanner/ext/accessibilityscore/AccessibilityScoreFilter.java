@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
@@ -18,30 +19,10 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
  * than having to iterate over all the stops and trips.
  * <p>
  * Note: the information to calculate this score are all available to the frontend, however
- * calculating them on the backend makes life a little easier and changes are automatically
- * applied to all frontends.
+ * calculating them on the backend makes life a little easier and changes are automatically applied
+ * to all frontends.
  */
 public class AccessibilityScoreFilter implements ItineraryListFilter {
-
-  @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.stream().map(this::addAccessibilityScore).toList();
-  }
-
-  private Itinerary addAccessibilityScore(Itinerary i) {
-    var scoredLegs = i.legs
-      .stream()
-      .map(leg -> {
-        if (leg instanceof ScheduledTransitLeg transitLeg) {
-          return transitLeg.withAccessibilityScore(compute(transitLeg));
-        } else return leg;
-      })
-      .toList();
-
-    i.legs = scoredLegs;
-    i.accessibilityScore = compute(scoredLegs);
-    return i;
-  }
 
   public static Float compute(List<Leg> legs) {
     return legs
@@ -65,11 +46,39 @@ public class AccessibilityScoreFilter implements ItineraryListFilter {
     return sum / values.size();
   }
 
+  public static float compute(StreetLeg leg) {
+    return 0.5f;
+  }
+
   public static double accessibilityScore(WheelchairAccessibility wheelchair) {
     return switch (wheelchair) {
       case NO_INFORMATION -> 0.5;
       case POSSIBLE -> 1;
       case NOT_POSSIBLE -> 0;
     };
+  }
+
+  @Override
+  public List<Itinerary> filter(List<Itinerary> itineraries) {
+    return itineraries.stream().map(this::addAccessibilityScore).toList();
+  }
+
+  private Itinerary addAccessibilityScore(Itinerary i) {
+    var scoredLegs = i.legs
+      .stream()
+      .map(leg -> {
+        if (leg instanceof ScheduledTransitLeg transitLeg) {
+          return transitLeg.withAccessibilityScore(compute(transitLeg));
+        } else if (leg instanceof StreetLeg streetLeg) {
+          return streetLeg.withAccessibilityScore(compute(streetLeg));
+        } else {
+          return leg;
+        }
+      })
+      .toList();
+
+    i.legs = scoredLegs;
+    i.accessibilityScore = compute(scoredLegs);
+    return i;
   }
 }

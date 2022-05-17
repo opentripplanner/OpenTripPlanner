@@ -35,9 +35,9 @@ public class StreetLeg implements Leg {
   private final Set<StreetNote> streetNotes = new HashSet<>();
   private final int generalizedCost;
   private final List<P2<Double>> legElevation;
+  private final Float accessibilityScore;
   private Double elevationLost = null;
   private Double elevationGained = null;
-
   private FeedScopedId pathwayId;
   private Boolean walkingBike;
   private Boolean rentedVehicle;
@@ -53,7 +53,8 @@ public class StreetLeg implements Leg {
     int generalizedCost,
     LineString geometry,
     List<P2<Double>> elevation,
-    List<WalkStep> walkSteps
+    List<WalkStep> walkSteps,
+    Float accessibilityScore
   ) {
     if (mode.isTransit()) {
       throw new IllegalArgumentException(
@@ -70,6 +71,7 @@ public class StreetLeg implements Leg {
     this.legElevation = elevation;
     this.legGeometry = geometry;
     this.walkSteps = walkSteps;
+    this.accessibilityScore = accessibilityScore;
 
     updateElevationChanges();
   }
@@ -190,10 +192,6 @@ public class StreetLeg implements Leg {
     return generalizedCost;
   }
 
-  public void addStretNote(StreetNote streetNote) {
-    streetNotes.add(streetNote);
-  }
-
   @Override
   public Leg withTimeShift(Duration duration) {
     StreetLeg copy = new StreetLeg(
@@ -206,7 +204,8 @@ public class StreetLeg implements Leg {
       generalizedCost,
       legGeometry,
       legElevation,
-      walkSteps
+      walkSteps,
+      accessibilityScore
     );
 
     copy.setPathwayId(pathwayId);
@@ -215,6 +214,10 @@ public class StreetLeg implements Leg {
     copy.setVehicleRentalNetwork(vehicleRentalNetwork);
 
     return copy;
+  }
+
+  public void addStretNote(StreetNote streetNote) {
+    streetNotes.add(streetNote);
   }
 
   /**
@@ -242,6 +245,27 @@ public class StreetLeg implements Leg {
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
       .toString();
+  }
+
+  public StreetLeg withAccessibilityScore(float accessibilityScore) {
+    var copy = new StreetLeg(
+      mode,
+      startTime,
+      endTime,
+      from,
+      to,
+      distanceMeters,
+      generalizedCost,
+      legGeometry,
+      getLegElevation(),
+      walkSteps,
+      accessibilityScore
+    );
+    copy.setPathwayId(pathwayId);
+    copy.setWalkingBike(walkingBike);
+    copy.setRentedVehicle(rentedVehicle);
+    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
+    return copy;
   }
 
   private void updateElevationChanges() {

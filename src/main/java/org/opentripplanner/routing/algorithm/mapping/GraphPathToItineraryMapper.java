@@ -418,7 +418,8 @@ public class GraphPathToItineraryMapper {
       (int) (lastState.getWeight() - firstState.getWeight()),
       geometry,
       makeElevation(edges, firstState.getOptions().geoidElevation),
-      walkSteps
+      walkSteps,
+      null
     );
 
     leg.setRentedVehicle(firstState.isRentingVehicle());

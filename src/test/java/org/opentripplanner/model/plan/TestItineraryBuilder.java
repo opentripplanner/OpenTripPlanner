@@ -287,7 +287,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
       legCost,
       null,
       null,
-      List.of()
+      List.of(),
+      null
     );
 
     legs.add(leg);
