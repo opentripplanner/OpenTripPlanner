@@ -46,6 +46,14 @@ public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements Itin
     return sum / values.size();
   }
 
+  public static double accessibilityScore(WheelchairBoarding wheelchair) {
+    return switch (wheelchair) {
+      case NO_INFORMATION -> 0.5;
+      case POSSIBLE -> 1;
+      case NOT_POSSIBLE -> 0;
+    };
+  }
+
   public float compute(StreetLeg leg) {
     var streetEdges = leg
       .getWalkSteps()
@@ -55,9 +63,6 @@ public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements Itin
       .map(StreetEdge.class::cast)
       .toList();
 
-    var hasWheelchairInaccessibleEdges = streetEdges
-      .stream()
-      .anyMatch(s -> !s.isWheelchairAccessible());
     var maxSlope = streetEdges
       .stream()
       .filter(StreetEdge::hasElevationExtension)
@@ -65,18 +70,36 @@ public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements Itin
       .max()
       .orElse(0);
 
-    float score = 1.0f;
-    if (hasWheelchairInaccessibleEdges) {
-      score = 0.5f;
+    float score = 0;
+
+    // calculate the worst percentage we go over the max slope
+    // max slope is always above 0
+    double maxSlopeExceeded = streetEdges
+      .stream()
+      .filter(s -> s.getMaxSlope() > maxSlope)
+      .mapToDouble(s -> s.getMaxSlope() - maxSlope)
+      .map(d -> d * 100)
+      .max()
+      .orElse(0);
+
+    // for every percent of being over the max slope we decrease the score quadratically
+    // so 2 percent over the max slope is 4 times as bad as being 1 percent over.
+    // this quickly degrades to 0: being 3 degrees over the max slope can at best give you
+    // a score 0.1, everything worse will give you a score of 0!
+    double slopeMalus = (maxSlopeExceeded * maxSlopeExceeded) / 10;
+
+    score += (0.5 - slopeMalus);
+
+    boolean allEdgesAreAccessible = streetEdges
+      .stream()
+      .allMatch(StreetEdge::isWheelchairAccessible);
+    if (allEdgesAreAccessible) {
+      score += 0.5f;
     }
 
-    if (maxSlope > wheelchairMaxSlope) {
-      score = score - 0.5f;
-    }
 
-    return score;
+    return Math.max(score, 0);
   }
-
   public static double accessibilityScore(WheelchairAccessibility wheelchair) {
     return switch (wheelchair) {
       case NO_INFORMATION -> 0.5;

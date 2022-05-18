@@ -264,7 +264,7 @@ public class StreetLeg implements Leg {
       distanceMeters,
       generalizedCost,
       legGeometry,
-      getLegElevation(),
+      legElevation,
       walkSteps,
       accessibilityScore
     );
