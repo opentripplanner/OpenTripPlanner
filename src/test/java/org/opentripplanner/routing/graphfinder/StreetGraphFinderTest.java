@@ -17,14 +17,14 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 class StreetGraphFinderTest extends GraphRoutingTest {
 
   private TransitStopVertex S1, S2, S3;
   private IntersectionVertex A, B, C, D;
-  private VehicleRentalStationVertex BR1, BR2;
+  private VehicleRentalPlaceVertex BR1, BR2;
   private RoutingService routingService;
   private StreetGraphFinder graphFinder;
   private Route R1, R2;

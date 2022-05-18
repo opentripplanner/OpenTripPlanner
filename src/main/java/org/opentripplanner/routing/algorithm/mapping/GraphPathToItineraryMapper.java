@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
@@ -38,7 +37,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.OTPFeature;
 
@@ -334,8 +333,8 @@ public class GraphPathToItineraryMapper {
 
     if (vertex instanceof TransitStopVertex) {
       return Place.forStop(((TransitStopVertex) vertex).getStop());
-    } else if (vertex instanceof VehicleRentalStationVertex) {
-      return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex);
+    } else if (vertex instanceof VehicleRentalPlaceVertex) {
+      return Place.forVehicleRentalPlace((VehicleRentalPlaceVertex) vertex);
     } else if (vertex instanceof VehicleParkingEntranceVertex) {
       return Place.forVehicleParkingEntrance(
         (VehicleParkingEntranceVertex) vertex,

@@ -16,7 +16,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
@@ -93,8 +93,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
       Stop stop = ((TransitStopVertex) vertex).getStop();
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
-    } else if (vertex instanceof VehicleRentalStationVertex) {
-      handleBikeRentalStation(((VehicleRentalStationVertex) vertex).getStation(), distance);
+    } else if (vertex instanceof VehicleRentalPlaceVertex vrv) {
+      handleBikeRentalStation(((VehicleRentalPlaceVertex) vertex).getStation(), distance);
     } else if (vertex instanceof VehicleParkingEntranceVertex vpv) {
       var parking = vpv.getVehicleParking();
       placesFound.add(new PlaceAtDistance(parking, distance));
