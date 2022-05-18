@@ -231,15 +231,15 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
    * It is used in {@link #canTraverse(TraverseMode)}
    */
   public boolean canTraverse(TraverseMode mode) {
-    StreetTraversalPermission permission1 = getPermission();
+    StreetTraversalPermission permission = getPermission();
     if (fromv instanceof BarrierVertex) {
-      permission1 = permission1.intersection(((BarrierVertex) fromv).getBarrierPermissions());
+      permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
     }
     if (tov instanceof BarrierVertex) {
-      permission1 = permission1.intersection(((BarrierVertex) tov).getBarrierPermissions());
+      permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
     }
 
-    return permission1.allows(mode);
+    return permission.allows(mode);
   }
 
   public void setElevationExtension(StreetElevationExtension streetElevationExtension) {
