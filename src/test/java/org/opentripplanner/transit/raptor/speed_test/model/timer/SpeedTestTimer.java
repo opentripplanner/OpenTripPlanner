@@ -28,8 +28,8 @@ import org.opentripplanner.routing.api.request.RoutingTag;
 public class SpeedTestTimer {
 
   private static final NamingConvention NAMING_CONVENTION = createNamingConvention();
-
   private static final long NANOS_TO_MILLIS = 1000000;
+
   private final Clock clock = Clock.SYSTEM;
   private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
   private final CompositeMeterRegistry registry = new CompositeMeterRegistry(
@@ -37,6 +37,7 @@ public class SpeedTestTimer {
     List.of(loggerRegistry)
   );
   private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
+  private boolean groupResultByTestCaseGroup = false;
 
   public static int nanosToMillisecond(long nanos) {
     return (int) (nanos / NANOS_TO_MILLIS);
@@ -48,7 +49,7 @@ public class SpeedTestTimer {
       if (meter instanceof Timer timer && ((Timer) meter).count() > 0) {
         results.add(
           new Result(
-            getFullName(meter),
+            groupResultByTestCaseGroup ? getNameIncTestCaseGroup(meter) : getName(meter),
             (int) timer.percentile(0.01, TimeUnit.MILLISECONDS),
             (int) timer.max(TimeUnit.MILLISECONDS),
             (int) timer.mean(TimeUnit.MILLISECONDS),
@@ -64,7 +65,8 @@ public class SpeedTestTimer {
     return groupByName.values().stream().map(Result::merge).toList();
   }
 
-  public void setUp() {
+  public void setUp(boolean logResultsByTestCaseGroup) {
+    this.groupResultByTestCaseGroup = logResultsByTestCaseGroup;
     var measurementEnv = Optional
       .ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT"))
       .orElse("local");
@@ -136,17 +138,14 @@ public class SpeedTestTimer {
       .sum();
   }
 
-  private static String getFullName(Meter timer) {
-    var sb = new StringBuilder(timer.getId().getConventionName(NAMING_CONVENTION));
-    String testCaseGroupCategory = RoutingTag.Category.TestCaseGroup.name();
+  private static String getName(Meter timer) {
+    return timer.getId().getConventionName(NAMING_CONVENTION);
+  }
 
-    if (timer.getId().getTag(testCaseGroupCategory) != null) {
-      sb.append(" [");
-      sb.append(timer.getId().getTag(testCaseGroupCategory));
-      sb.append("]");
-    }
-
-    return sb.toString();
+  private static String getNameIncTestCaseGroup(Meter timer) {
+    String name = getName(timer);
+    String group = timer.getId().getTag(RoutingTag.Category.TestCaseGroup.name());
+    return group == null ? name : name + " [" + group + "]";
   }
 
   private static NamingConvention createNamingConvention() {

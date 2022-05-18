@@ -64,7 +64,7 @@ public class SpeedTest {
     this.router = new Router(graph, RouterConfig.DEFAULT, timer.getRegistry());
     this.router.startup();
 
-    timer.setUp();
+    timer.setUp(opts.groupByCategory());
   }
 
   public static void main(String[] args) {
