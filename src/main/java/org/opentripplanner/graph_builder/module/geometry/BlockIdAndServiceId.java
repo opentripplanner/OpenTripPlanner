@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * This compound key object is used when grouping interlining trips together by (serviceId,

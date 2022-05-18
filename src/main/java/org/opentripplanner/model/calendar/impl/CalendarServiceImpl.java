@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * An implementation of {@link CalendarService}. Requires a pre-computed {@link CalendarServiceData}

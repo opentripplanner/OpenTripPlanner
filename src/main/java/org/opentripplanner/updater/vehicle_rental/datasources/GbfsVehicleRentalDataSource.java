@@ -12,13 +12,13 @@ import org.entur.gbfs.v2_2.station_status.GBFSStation;
 import org.entur.gbfs.v2_2.station_status.GBFSStationStatus;
 import org.entur.gbfs.v2_2.system_information.GBFSSystemInformation;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleTypes;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +40,8 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
 
   private final Map<String, String> httpHeaders;
 
+  private final String network;
+
   /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
   private final boolean allowKeepingRentedVehicleAtDestination;
 
@@ -50,6 +52,7 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
     language = parameters.language();
     httpHeaders = parameters.getHttpHeaders();
     allowKeepingRentedVehicleAtDestination = parameters.allowKeepingRentedVehicleAtDestination();
+    network = parameters.network();
   }
 
   @Override
@@ -66,7 +69,8 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
     GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);
     GbfsSystemInformationMapper systemInformationMapper = new GbfsSystemInformationMapper();
     VehicleRentalSystem system = systemInformationMapper.mapSystemInformation(
-      systemInformation.getData()
+      systemInformation.getData(),
+      network
     );
 
     // Get vehicle types
@@ -112,6 +116,7 @@ class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
           .getStations()
           .stream()
           .map(stationInformationMapper::mapStationInformation)
+          .filter(Objects::nonNull)
           .peek(stationStatusMapper::fillStationStatus)
           .collect(Collectors.toList())
       );

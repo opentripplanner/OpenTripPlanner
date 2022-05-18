@@ -1,10 +1,10 @@
 package org.opentripplanner.routing;
 
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class DatedServiceJourneyHelper {
 

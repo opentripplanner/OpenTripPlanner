@@ -2,12 +2,12 @@ package org.opentripplanner.model.vehicle_position;
 
 import java.time.Instant;
 import java.util.Optional;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class RealtimeVehiclePositionBuilder {
 

@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TransitMode;
@@ -19,6 +18,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 class StreetGraphFinderTest extends GraphRoutingTest {
 
@@ -36,7 +36,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
       new Builder() {
         @Override
         public void build() {
-          var a = agency("Agency");
+          var a = TransitModelForTest.agency("Agency");
 
           R1 = route("R1", TransitMode.BUS, a);
           R2 = route("R2", TransitMode.TRAM, a);
@@ -93,7 +93,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           tripPattern(
             TP1 =
               new TripPattern(
-                new FeedScopedId("F", "TP1"),
+                TransitModelForTest.id("TP1"),
                 R1,
                 new StopPattern(List.of(st(S1), st(S2)))
               )
@@ -101,7 +101,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           tripPattern(
             TP2 =
               new TripPattern(
-                new FeedScopedId("F", "TP2"),
+                TransitModelForTest.id("TP2"),
                 R2,
                 new StopPattern(List.of(st(S1), st(S3)))
               )

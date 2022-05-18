@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import java.util.Collection;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
 /**

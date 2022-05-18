@@ -1,10 +1,10 @@
 package org.opentripplanner.model.vehicle_position;
 
 import java.time.Instant;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * Internal model of a realtime vehicle position.

@@ -46,7 +46,8 @@ public class VehicleRentalSourceFactory {
           url(),
           language(),
           allowKeepingRentedVehicleAtDestination(),
-          headers()
+          headers(),
+          network()
         );
       case SMOOVE:
         return new SmooveBikeRentalDataSourceParameters(

@@ -1,7 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiContactInfo;
-import org.opentripplanner.model.ContactInfo;
+import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class ContactInfoMapper {
 

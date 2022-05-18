@@ -21,6 +21,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class TimetableSnapshotTest {
 

@@ -2,9 +2,9 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.List;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Represents a transfer between stops with the street network path attatched to it.

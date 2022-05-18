@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.function.Supplier;
 
 public class DateMapper {
 
@@ -46,6 +47,13 @@ public class DateMapper {
     ZoneId zoneId
   ) {
     ZonedDateTime startOfService = asStartOfService(departureDate.toLocalDate(), zoneId);
+    return (int) Duration.between(startOfService, dateTime).toSeconds();
+  }
+
+  public static int secondsSinceStartOfService(
+    ZonedDateTime startOfService,
+    ZonedDateTime dateTime
+  ) {
     return (int) Duration.between(startOfService, dateTime).toSeconds();
   }
 }

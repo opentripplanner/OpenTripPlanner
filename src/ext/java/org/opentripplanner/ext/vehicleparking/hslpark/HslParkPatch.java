@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * Contains updates to a {@link HslParkUpdater} park.

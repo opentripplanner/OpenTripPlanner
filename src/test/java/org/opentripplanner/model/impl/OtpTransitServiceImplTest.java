@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,11 +16,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
@@ -28,12 +27,13 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class OtpTransitServiceImplTest {
 
-  private static final String FEED_ID = "Z";
-
-  private static final FeedScopedId STATION_ID = new FeedScopedId(FEED_ID, "station");
+  private static final FeedScopedId STATION_ID = TransitModelForTest.id("station");
 
   // The subject is used as read only; hence static is ok
   private static OtpTransitService subject;
@@ -67,7 +67,7 @@ public class OtpTransitServiceImplTest {
     Collection<FareAttribute> fareAttributes = subject.getAllFareAttributes();
 
     assertEquals(1, fareAttributes.size());
-    assertEquals("<FareAttribute Z:FA>", first(fareAttributes).toString());
+    assertEquals("<FareAttribute F:FA>", first(fareAttributes).toString());
   }
 
   @Test
@@ -86,7 +86,7 @@ public class OtpTransitServiceImplTest {
     Collection<FeedInfo> feedInfos = subject.getAllFeedInfos();
 
     assertEquals(1, feedInfos.size());
-    assertEquals("<FeedInfo Z>", first(feedInfos).toString());
+    assertEquals("<FeedInfo F>", first(feedInfos).toString());
   }
 
   @Test
@@ -94,7 +94,7 @@ public class OtpTransitServiceImplTest {
     Collection<Pathway> pathways = subject.getAllPathways();
 
     assertEquals(3, pathways.size());
-    assertEquals("<Pathway Z:pathways_1_1>", first(pathways).toString());
+    assertEquals("<Pathway F:pathways_1_1>", first(pathways).toString());
   }
 
   @Test
@@ -104,13 +104,14 @@ public class OtpTransitServiceImplTest {
     );
 
     assertEquals(
-      "ConstrainedTransfer{from: <Route 2, stop D>, to: <Route 5, stop I>, constraint: {guaranteed}}\n" +
-      "ConstrainedTransfer{from: <Stop F>, to: <Stop E>, constraint: {minTransferTime: 20m}}\n" +
-      "ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}\n" +
-      "ConstrainedTransfer{from: <Stop K>, to: <Stop M>, constraint: {priority: NOT_ALLOWED}}\n" +
-      "ConstrainedTransfer{from: <Stop L>, to: <Stop K>, constraint: {priority: RECOMMENDED}}\n" +
-      "ConstrainedTransfer{from: <Stop M>, to: <Stop K>, constraint: {priority: NOT_ALLOWED}}\n" +
-      "ConstrainedTransfer{from: <Trip 1.1, stopPos 1>, to: <Trip 2.2, stopPos 0>, constraint: {guaranteed}}",
+      """
+        ConstrainedTransfer{from: <Route 2, stop D>, to: <Route 5, stop I>, constraint: {guaranteed}}
+        ConstrainedTransfer{from: <Stop F>, to: <Stop E>, constraint: {minTransferTime: 20m}}
+        ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}
+        ConstrainedTransfer{from: <Stop K>, to: <Stop M>, constraint: {priority: NOT_ALLOWED}}
+        ConstrainedTransfer{from: <Stop L>, to: <Stop K>, constraint: {priority: RECOMMENDED}}
+        ConstrainedTransfer{from: <Stop M>, to: <Stop K>, constraint: {priority: NOT_ALLOWED}}
+        ConstrainedTransfer{from: <Trip 1.1, stopPos 1>, to: <Trip 2.2, stopPos 0>, constraint: {guaranteed}}""",
       result
     );
   }
@@ -120,7 +121,7 @@ public class OtpTransitServiceImplTest {
     Collection<Station> stations = subject.getAllStations();
 
     assertEquals(1, stations.size());
-    assertEquals("<Station Z:station>", first(stations).toString());
+    assertEquals("<Station F:station>", first(stations).toString());
   }
 
   @Test
@@ -128,7 +129,7 @@ public class OtpTransitServiceImplTest {
     Collection<Stop> stops = subject.getAllStops();
 
     assertEquals(22, stops.size());
-    assertEquals("<Stop Z:A>", first(stops).toString());
+    assertEquals("<Stop F:A>", first(stops).toString());
   }
 
   @Test
@@ -140,7 +141,7 @@ public class OtpTransitServiceImplTest {
 
     assertEquals(80, stopTimes.size());
     assertEquals(
-      "StopTime(seq=1 stop=Z:A trip=agency:1.1 times=00:00:00-00:00:00)",
+      "StopTime(seq=1 stop=F:A trip=agency:1.1 times=00:00:00-00:00:00)",
       first(stopTimes).toString()
     );
   }
@@ -155,22 +156,22 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    Stop stop = subject.getStopForId(new FeedScopedId("Z", "P"));
-    assertEquals("<Stop Z:P>", stop.toString());
+    Stop stop = subject.getStopForId(TransitModelForTest.id("P"));
+    assertEquals("<Stop F:P>", stop.toString());
   }
 
   @Test
   public void testGetStopsForStation() {
     List<StopLocation> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
-    assertEquals("[<Stop Z:A>]", stops.toString());
+    assertEquals("[<Stop F:A>]", stops.toString());
   }
 
   @Test
   public void testGetShapePointsForShapeId() {
-    List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(new FeedScopedId("Z", "5"));
+    List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(TransitModelForTest.id("5"));
     assertEquals(
       "[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
-      shapePoints.stream().map(OtpTransitServiceImplTest::toString).collect(toList()).toString()
+      shapePoints.stream().map(OtpTransitServiceImplTest::toString).toList().toString()
     );
   }
 
@@ -178,8 +179,8 @@ public class OtpTransitServiceImplTest {
   public void testGetStopTimesForTrip() {
     List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
     assertEquals(
-      "[<Stop Z:A>, <Stop Z:B>, <Stop Z:C>]",
-      stopTimes.stream().map(StopTime::getStop).collect(toList()).toString()
+      "[<Stop F:A>, <Stop F:B>, <Stop F:C>]",
+      stopTimes.stream().map(StopTime::getStop).toList().toString()
     );
   }
 
@@ -188,7 +189,7 @@ public class OtpTransitServiceImplTest {
     Collection<FeedScopedId> serviceIds = subject.getAllServiceIds();
 
     assertEquals(2, serviceIds.size());
-    assertEquals("Z:alldays", first(serviceIds).toString());
+    assertEquals("F:alldays", first(serviceIds).toString());
   }
 
   @Test
@@ -197,7 +198,7 @@ public class OtpTransitServiceImplTest {
   }
 
   private static FareRule createFareRule() {
-    FareAttribute fa = new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
+    FareAttribute fa = new FareAttribute(TransitModelForTest.id("FA"));
     FareRule rule = new FareRule();
     rule.setOriginId("Zone A");
     rule.setContainsId("Zone B");
@@ -207,7 +208,7 @@ public class OtpTransitServiceImplTest {
   }
 
   private static String removeFeedScope(String text) {
-    return text.replace("agency:", "").replace("Z:", "");
+    return text.replace("agency:", "").replace(FEED_ID + ":", "");
   }
 
   private static <T> List<T> sort(Collection<? extends T> c) {

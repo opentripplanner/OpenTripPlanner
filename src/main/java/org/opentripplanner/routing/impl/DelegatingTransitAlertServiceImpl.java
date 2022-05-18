@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.updater.alerts.TransitAlertProvider;
 
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {

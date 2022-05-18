@@ -2,8 +2,8 @@ package org.opentripplanner.api.common;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * This class is used by the REST API to parse strings representing the from and to places for a

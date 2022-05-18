@@ -3,11 +3,11 @@ package org.opentripplanner.gtfs.mapping;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.StopLevel;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * Wrap GTFS Stop to provide a common base mapping for all {@link StationElement}s.

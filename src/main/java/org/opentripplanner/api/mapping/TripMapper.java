@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class TripMapper {
 

@@ -1,8 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.Branding;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Branding;
+import org.opentripplanner.transit.model.organization.BrandingBuilder;
 
 /**
  * Responsible for mapping NeTEx Branding into the OTP model.
@@ -22,22 +23,23 @@ public class BrandingMapper {
    * @return OTP Branding model
    */
   public Branding mapBranding(org.rutebanken.netex.model.Branding branding) {
-    final FeedScopedId id = idFactory.createId(branding.getId());
+    var builder = Branding.of(idFactory.createId(branding.getId()));
 
-    final String shortName = branding.getShortName() != null
-      ? branding.getShortName().getValue()
-      : null;
+    if (branding.getShortName() != null) {
+      builder.setShortName(branding.getShortName().getValue());
+    }
 
-    final String name = branding.getName() != null ? branding.getName().getValue() : null;
+    if (branding.getName() != null) {
+      builder.setName(branding.getName().getValue());
+    }
 
-    final String description = branding.getDescription() != null
-      ? branding.getDescription().getValue()
-      : null;
+    if (branding.getDescription() != null) {
+      builder.setDescription(branding.getDescription().getValue());
+    }
 
-    final String url = branding.getUrl();
+    builder.setUrl(branding.getUrl());
+    builder.setImage(branding.getImage());
 
-    final String image = branding.getImage();
-
-    return new Branding(id, shortName, name, url, description, image);
+    return builder.build();
   }
 }

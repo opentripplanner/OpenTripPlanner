@@ -2,6 +2,7 @@
 package org.opentripplanner.model;
 
 import java.io.Serializable;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 
 public final class FareRule implements Serializable {
 
