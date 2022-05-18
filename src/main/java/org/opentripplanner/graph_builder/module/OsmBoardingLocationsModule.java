@@ -69,7 +69,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (!ts.hasPathways()) {
         if (!connectVertexToStop(ts, streetIndex, graph.getLinker())) {
           LOG.debug(
-            "Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString()
+            String.format("Could not connect %s at %s", ts.getStop().getCode(), ts.getCoordinate())
           );
         } else {
           successes++;
@@ -126,16 +126,14 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         new BoardingLocationToStopLink(ts, osmVertex);
         new BoardingLocationToStopLink(osmVertex, ts);
         LOG.debug(
-          "Connected " +
-          ts.toString() +
-          " (" +
-          stopCode +
-          ") to " +
-          osmVertex.getLabel() +
-          " at " +
-          osmVertex.getCoordinate().toString()
+          String.format(
+            "Connected %s (%s) to %s at %s",
+            ts,
+            stopCode,
+            osmVertex.getLabel(),
+            osmVertex.getCoordinate()
+          )
         );
-
         return true;
       }
     }
