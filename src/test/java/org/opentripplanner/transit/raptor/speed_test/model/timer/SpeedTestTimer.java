@@ -37,7 +37,7 @@ public class SpeedTestTimer {
     List.of(loggerRegistry)
   );
   private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
-  private boolean groupResultByTestCaseGroup = false;
+  private boolean groupResultByTestCaseCategory = false;
 
   public static int nanosToMillisecond(long nanos) {
     return (int) (nanos / NANOS_TO_MILLIS);
@@ -49,7 +49,7 @@ public class SpeedTestTimer {
       if (meter instanceof Timer timer && ((Timer) meter).count() > 0) {
         results.add(
           new Result(
-            groupResultByTestCaseGroup ? getNameIncTestCaseGroup(meter) : getName(meter),
+            groupResultByTestCaseCategory ? getNameIncTestCaseCategory(meter) : getName(meter),
             (int) timer.percentile(0.01, TimeUnit.MILLISECONDS),
             (int) timer.max(TimeUnit.MILLISECONDS),
             (int) timer.mean(TimeUnit.MILLISECONDS),
@@ -60,13 +60,13 @@ public class SpeedTestTimer {
       }
     }
     // We ignore individual test-case results in the SpeedTest output; hence we need to aggregate
-    // all results for each test-case-group here
+    // all results for each test-case-category here
     Map<String, List<Result>> groupByName = results.stream().collect(groupingBy(Result::name));
     return groupByName.values().stream().map(Result::merge).toList();
   }
 
-  public void setUp(boolean logResultsByTestCaseGroup) {
-    this.groupResultByTestCaseGroup = logResultsByTestCaseGroup;
+  public void setUp(boolean logResultsByTestCaseCategory) {
+    this.groupResultByTestCaseCategory = logResultsByTestCaseCategory;
     var measurementEnv = Optional
       .ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT"))
       .orElse("local");
@@ -142,9 +142,9 @@ public class SpeedTestTimer {
     return timer.getId().getConventionName(NAMING_CONVENTION);
   }
 
-  private static String getNameIncTestCaseGroup(Meter timer) {
+  private static String getNameIncTestCaseCategory(Meter timer) {
     String name = getName(timer);
-    String group = timer.getId().getTag(RoutingTag.Category.TestCaseGroup.name());
+    String group = timer.getId().getTag(RoutingTag.Category.TestCaseCategory.name());
     return group == null ? name : name + " [" + group + "]";
   }
 

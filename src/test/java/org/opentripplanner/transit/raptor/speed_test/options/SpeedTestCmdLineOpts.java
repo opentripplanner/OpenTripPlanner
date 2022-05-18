@@ -19,7 +19,7 @@ public class SpeedTestCmdLineOpts {
   private static final String PROFILES = "p";
   private static final String TEST_CASES = "c";
   private static final String CATEGORIES = "t";
-  private static final String GROUP_BY_CATEGORY = "g";
+  private static final String GROUP_RESULTS_BY_CATEGORY = "T";
   private static final String NUM_OF_ITINERARIES = "i";
   private static final String SAMPLE_TEST_N_TIMES = "n";
   private static final String SKIP_COST = "0";
@@ -102,8 +102,8 @@ public class SpeedTestCmdLineOpts {
     return parseCSVList(CATEGORIES);
   }
 
-  public boolean groupByCategory() {
-    return cmd.hasOption(GROUP_BY_CATEGORY);
+  public boolean groupResultsByCategory() {
+    return cmd.hasOption(GROUP_RESULTS_BY_CATEGORY);
   }
 
   List<String> parseCSVList(String opt) {
@@ -146,11 +146,11 @@ public class SpeedTestCmdLineOpts {
       "A coma separated list of categories to filter the testcases by."
     );
     options.addOption(
-      GROUP_BY_CATEGORY,
-      "groupByCategory",
+      GROUP_RESULTS_BY_CATEGORY,
+      "groupResultsByCategory",
       true,
-      "By default the results are aggregated for each metric. Set this flagg to print" +
-        "metric results for each test-case category."
+      "By default the results are aggregated for each metric. Set this flag to print" +
+      "metric results for each test-case category."
     );
     options.addOption(
       SAMPLE_TEST_N_TIMES,

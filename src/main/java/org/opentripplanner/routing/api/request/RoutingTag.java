@@ -15,7 +15,7 @@ public class RoutingTag implements Serializable {
    * The micrometer standard group tags by category to provide filtering on a pr. group bases.
    */
   public enum Category {
-    TestCaseGroup(true),
+    TestCaseCategory(true),
     TestCaseSample(true);
 
     Category(boolean micrometerTiming) {
@@ -42,8 +42,8 @@ public class RoutingTag implements Serializable {
     this.tag = tag;
   }
 
-  public static RoutingTag testCaseGroup(String tag) {
-    return new RoutingTag(Category.TestCaseGroup, tag);
+  public static RoutingTag testCaseCategory(String tag) {
+    return new RoutingTag(Category.TestCaseCategory, tag);
   }
 
   public static RoutingTag testCaseSample(String tag) {
