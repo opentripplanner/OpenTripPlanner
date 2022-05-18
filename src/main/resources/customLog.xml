@@ -1,6 +1,6 @@
 <included>
   <!-- Activate debug logging in OSM boarding location - transit stop matching module and write its log to a file.
-       The file is user for automatic monitorig of the success rate of the matching process. -->
+       The file is used for automatic monitorig of the success rate of the matching process. -->
   <appender name="OSMBoardingLog" class="ch.qos.logback.core.FileAppender">
     <file>graphs/${ROUTER_NAME}/router/taggedStops.log</file>
     <append>false</append>
