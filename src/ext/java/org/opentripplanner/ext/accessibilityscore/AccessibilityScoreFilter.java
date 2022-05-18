@@ -8,6 +8,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 /**
@@ -22,8 +23,7 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
  * calculating them on the backend makes life a little easier and changes are automatically applied
  * to all frontends.
  */
-public class AccessibilityScoreFilter implements ItineraryListFilter {
-
+public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements ItineraryListFilter {
   public static Float compute(List<Leg> legs) {
     return legs
       .stream()
@@ -46,8 +46,35 @@ public class AccessibilityScoreFilter implements ItineraryListFilter {
     return sum / values.size();
   }
 
-  public static float compute(StreetLeg leg) {
-    return 0.5f;
+  public float compute(StreetLeg leg) {
+    var streetEdges = leg
+      .getWalkSteps()
+      .stream()
+      .map(s -> s.edges)
+      .filter(StreetEdge.class::isInstance)
+      .map(StreetEdge.class::cast)
+      .toList();
+
+    var hasWheelchairInaccessibleEdges = streetEdges
+      .stream()
+      .anyMatch(s -> !s.isWheelchairAccessible());
+    var maxSlope = streetEdges
+      .stream()
+      .filter(StreetEdge::hasElevationExtension)
+      .mapToDouble(StreetEdge::getMaxSlope)
+      .max()
+      .orElse(0);
+
+    float score = 1.0f;
+    if (hasWheelchairInaccessibleEdges) {
+      score = 0.5f;
+    }
+
+    if (maxSlope > wheelchairMaxSlope) {
+      score = score - 0.5f;
+    }
+
+    return score;
   }
 
   public static double accessibilityScore(WheelchairAccessibility wheelchair) {

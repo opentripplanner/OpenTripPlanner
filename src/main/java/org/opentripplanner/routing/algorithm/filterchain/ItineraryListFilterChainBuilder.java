@@ -53,6 +53,7 @@ public class ItineraryListFilterChainBuilder {
   private Instant latestDepartureTimeLimit = null;
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
+  private float wheelchairMaxSlope;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -220,8 +221,12 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withAccessibilityScore(boolean enable) {
+  public ItineraryListFilterChainBuilder withAccessibilityScore(
+    boolean enable,
+    float wheelchairMaxSlope
+  ) {
     this.accessibilityScore = enable;
+    this.wheelchairMaxSlope = wheelchairMaxSlope;
     return this;
   }
 
@@ -237,7 +242,7 @@ public class ItineraryListFilterChainBuilder {
     }
 
     if (accessibilityScore) {
-      filters.add(new AccessibilityScoreFilter());
+      filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
     }
 
     // Filter transit itineraries on generalized-cost
@@ -332,7 +337,7 @@ public class ItineraryListFilterChainBuilder {
     List<GroupBySimilarity> groupBy = groupBySimilarity
       .stream()
       .sorted(Comparator.comparingDouble(o -> o.groupByP))
-      .collect(Collectors.toList());
+      .toList();
 
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 

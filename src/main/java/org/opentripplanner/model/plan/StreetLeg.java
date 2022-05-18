@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
@@ -163,6 +164,12 @@ public class StreetLeg implements Leg {
   @Override
   public Boolean getWalkingBike() {
     return walkingBike;
+  }
+
+  @Nullable
+  @Override
+  public Float accessibilityScore() {
+    return accessibilityScore;
   }
 
   public void setWalkingBike(Boolean walkingBike) {
