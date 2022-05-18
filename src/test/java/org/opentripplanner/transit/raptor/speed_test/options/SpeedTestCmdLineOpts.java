@@ -18,7 +18,7 @@ public class SpeedTestCmdLineOpts {
   private static final String ROOT_DIR = "d";
   private static final String PROFILES = "p";
   private static final String TEST_CASES = "c";
-  private static final String CATEGORIES = "z";
+  private static final String CATEGORIES = "t";
   private static final String NUM_OF_ITINERARIES = "i";
   private static final String SAMPLE_TEST_N_TIMES = "n";
   private static final String SKIP_COST = "0";
