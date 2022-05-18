@@ -452,6 +452,44 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /**
+   * Adjusts arrival time for the stop at the firstUpdatedIndex if no update was given for it
+   * and arrival/departure times for the stops before that stop when required to ensure that the
+   * times are increasing. Returns {@code true} if times have been adjusted.
+   */
+  public boolean adjustTimesBeforeWhenRequired(int firstUpdatedIndex) {
+    boolean hasAdjustedTimes = false;
+    int delay = getDepartureDelay(firstUpdatedIndex);
+    if (getArrivalTime(firstUpdatedIndex) > getDepartureTime(firstUpdatedIndex)) {
+      if (getArrivalDelay(firstUpdatedIndex) != 0) {
+        // The given trip update has arrival time after departure time for the first updated stop.
+        // This method doesn't try to fix issues in the given data, only for the missing part
+        return false;
+      }
+      updateArrivalDelay(firstUpdatedIndex, delay);
+      hasAdjustedTimes = true;
+    }
+    int nextStopArrivalTime = getArrivalTime(firstUpdatedIndex);
+    for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
+      if (getDepartureTime(i) < nextStopArrivalTime) {
+        return hasAdjustedTimes;
+      } else {
+        hasAdjustedTimes = true;
+        updateDepartureDelay(i, delay);
+        if (!isCancelledStop(i)) {
+          setNoData(i);
+        }
+      }
+      if (getArrivalTime(i) < getDepartureTime(i)) {
+        return true;
+      } else {
+        updateArrivalDelay(i, delay);
+        nextStopArrivalTime = getArrivalTime(i);
+      }
+    }
+    return hasAdjustedTimes;
+  }
+
+  /**
    * @return either an array of headsigns (one for each stop on this trip) or null if the headsign
    * is the same at all stops (including null) and can be found in the Trip object.
    */

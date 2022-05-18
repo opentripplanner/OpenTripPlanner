@@ -242,6 +242,7 @@ public class Timetable implements Serializable {
 
     int numStops = newTimes.getNumStops();
     Integer delay = null;
+    Integer firstUpdatedIndex = null;
 
     final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
 
@@ -272,6 +273,9 @@ public class Timetable implements Serializable {
           newTimes.setNoData(i);
         } else {
           if (update.hasArrival()) {
+            if (firstUpdatedIndex == null) {
+              firstUpdatedIndex = i;
+            }
             StopTimeEvent arrival = update.getArrival();
             if (arrival.hasDelay()) {
               delay = arrival.getDelay();
@@ -292,6 +296,9 @@ public class Timetable implements Serializable {
           }
 
           if (update.hasDeparture()) {
+            if (firstUpdatedIndex == null) {
+              firstUpdatedIndex = i;
+            }
             StopTimeEvent departure = update.getDeparture();
             if (departure.hasDelay()) {
               delay = departure.getDelay();
@@ -328,6 +335,12 @@ public class Timetable implements Serializable {
         tripId
       );
       return null;
+    }
+
+    if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
+      if (newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex)) {
+        LOG.debug("Tried to fix TripTimes by propagating delay backwards on trip {}.", tripId);
+      }
     }
     if (!newTimes.timesIncreasing()) {
       LOG.error(
