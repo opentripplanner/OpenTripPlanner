@@ -148,7 +148,7 @@ public class SpeedTestCmdLineOpts {
     options.addOption(
       GROUP_RESULTS_BY_CATEGORY,
       "groupResultsByCategory",
-      true,
+      false,
       "By default the results are aggregated for each metric. Set this flag to print" +
       "metric results for each test-case category."
     );
