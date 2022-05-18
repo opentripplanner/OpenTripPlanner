@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.model.timer;
 
+import static java.util.stream.Collectors.groupingBy;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import io.micrometer.core.instrument.Clock;
@@ -14,12 +15,15 @@ import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.routing.api.request.RoutingTag;
 
 public class SpeedTestTimer {
 
@@ -54,7 +58,10 @@ public class SpeedTestTimer {
         );
       }
     }
-    return results;
+    // We ignore individual test-case results in the SpeedTest output; hence we need to aggregate
+    // all results for each test-case-group here
+    Map<String, List<Result>> groupByName = results.stream().collect(groupingBy(Result::name));
+    return groupByName.values().stream().map(Result::merge).toList();
   }
 
   public void setUp() {
@@ -131,9 +138,11 @@ public class SpeedTestTimer {
 
   private static String getFullName(Meter timer) {
     var sb = new StringBuilder(timer.getId().getConventionName(NAMING_CONVENTION));
-    if (timer.getId().getTag("tags") != null) {
+    String testCaseGroupCategory = RoutingTag.Category.TestCaseGroup.name();
+
+    if (timer.getId().getTag(testCaseGroupCategory) != null) {
       sb.append(" [");
-      sb.append(timer.getId().getTag("tags"));
+      sb.append(timer.getId().getTag(testCaseGroupCategory));
       sb.append("]");
     }
 
@@ -173,5 +182,25 @@ public class SpeedTestTimer {
       .map(Timer.class::cast);
   }
 
-  public record Result(String name, int min, int max, int mean, int totTime, int count) {}
+  public record Result(String name, int min, int max, int mean, int totTime, int count) {
+    public static Result merge(Collection<Result> results) {
+      if (results.isEmpty()) {
+        throw new IllegalArgumentException("At least on result is needed to merge.");
+      }
+      Result any = null;
+      int min = Integer.MAX_VALUE;
+      int max = Integer.MIN_VALUE;
+      int totTime = 0;
+      int count = 0;
+
+      for (Result it : results) {
+        any = it;
+        min = it.min < min ? it.min : min;
+        max = it.max > max ? it.max : max;
+        totTime += it.totTime;
+        count += it.count;
+      }
+      return new Result(any.name, min, max, totTime / count, totTime, count);
+    }
+  }
 }
