@@ -124,11 +124,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         new BoardingLocationToStopLink(ts, osmVertex);
         new BoardingLocationToStopLink(osmVertex, ts);
         LOG.debug(
-            "Connected {} ({}) to {} at {}",
-            ts,
-            stopCode,
-            osmVertex.getLabel(),
-            osmVertex.getCoordinate()
+          "Connected {} ({}) to {} at {}",
+          ts,
+          stopCode,
+          osmVertex.getLabel(),
+          osmVertex.getCoordinate()
         );
         return true;
       }
