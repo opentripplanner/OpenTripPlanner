@@ -126,6 +126,12 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         new BoardingLocationToStopLink(ts, osmVertex);
         new BoardingLocationToStopLink(osmVertex, ts);
         LOG.debug(
+            "Connected {} ({}) to {} at {}",
+            ts,
+            stopCode,
+            osmVertex.getLabel(),
+            osmVertex.getCoordinate()
+        );
           String.format(
             "Connected %s (%s) to %s at %s",
             ts,
