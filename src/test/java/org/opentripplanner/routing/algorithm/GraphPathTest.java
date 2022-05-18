@@ -1,11 +1,16 @@
 package org.opentripplanner.routing.algorithm;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import junit.framework.TestCase;
-import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -24,11 +29,12 @@ import org.opentripplanner.util.TestUtils;
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
-@Ignore
-public class TestGraphPath extends TestCase {
+@Disabled
+public class GraphPathTest {
 
   private Graph graph;
 
+  @BeforeEach
   public void setUp() throws Exception {
     GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
     graph = new Graph();
@@ -37,6 +43,7 @@ public class TestGraphPath extends TestCase {
     graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
   }
 
+  @Test
   public void testGraphPathOptimize() {
     String feedId = graph.getFeedIds().iterator().next();
 

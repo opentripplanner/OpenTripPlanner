@@ -36,6 +36,7 @@ public class TestConstrainedBoardingSearch
   @Override
   public RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> find(
     RaptorTimeTable<TestTripSchedule> targetTimetable,
+    int transferSlack,
     TestTripSchedule sourceTrip,
     int sourceStopIndex,
     int prevTransitArrivalTime,

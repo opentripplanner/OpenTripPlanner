@@ -66,11 +66,7 @@ public final class AccessEgressFunctions {
     int departureTime = arrivalTime;
 
     if (egressPath.stopReachedOnBoard()) {
-      departureTime =
-        timeCalculator.plusDuration(
-          departureTime,
-          slackProvider.accessEgressWithRidesTransferSlack()
-        );
+      departureTime = timeCalculator.plusDuration(departureTime, slackProvider.transferSlack());
     }
     if (timeCalculator.searchForward()) {
       return egressPath.earliestDepartureTime(departureTime);
