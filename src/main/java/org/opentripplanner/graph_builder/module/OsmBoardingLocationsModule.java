@@ -69,7 +69,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (!ts.hasPathways()) {
         if (!connectVertexToStop(ts, streetIndex, graph.getLinker())) {
           LOG.debug(
-            String.format("Could not connect %s at %s", ts.getStop().getCode(), ts.getCoordinate())
+            "Could not connect {} at {}", ts.getStop().getCode(), ts.getCoordinate()
           );
         } else {
           successes++;
