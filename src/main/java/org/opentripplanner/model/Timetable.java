@@ -17,6 +17,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,6 +189,8 @@ public class Timetable implements Serializable {
    * @param tripUpdate        GTFS-RT trip update
    * @param timeZone          time zone of trip update
    * @param updateServiceDate service date of trip update
+   * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
+   *                          if these stops are given the NO_DATA flag
    * @return {@link TripTimesPatch} that contains a new copy of updated TripTimes after TripUpdate
    * has been applied on TripTimes of trip with the id specified in the trip descriptor of the
    * TripUpdate and a list of stop indices that have been skipped with the realtime update; null if
@@ -200,7 +203,8 @@ public class Timetable implements Serializable {
   public TripTimesPatch createUpdatedTripTimes(
     TripUpdate tripUpdate,
     TimeZone timeZone,
-    ServiceDate updateServiceDate
+    ServiceDate updateServiceDate,
+    BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     if (tripUpdate == null) {
       LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
@@ -338,8 +342,25 @@ public class Timetable implements Serializable {
     }
 
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
-      if (newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex)) {
-        LOG.debug("Tried to fix TripTimes by propagating delay backwards on trip {}.", tripId);
+      if (
+        (
+          backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA &&
+          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, true)
+        ) ||
+        (
+          backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED &&
+          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, false)
+        ) ||
+        (
+          backwardsDelayPropagationType == BackwardsDelayPropagationType.ALWAYS &&
+          newTimes.adjustTimesBeforeAlways(firstUpdatedIndex)
+        )
+      ) {
+        LOG.debug(
+          "Propagated delay from stop index {} backwards on trip {}.",
+          firstUpdatedIndex,
+          tripId
+        );
       }
     }
     if (!newTimes.timesIncreasing()) {

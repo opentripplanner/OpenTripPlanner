@@ -453,10 +453,35 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
   /**
    * Adjusts arrival time for the stop at the firstUpdatedIndex if no update was given for it
-   * and arrival/departure times for the stops before that stop when required to ensure that the
-   * times are increasing. Returns {@code true} if times have been adjusted.
+   * and arrival/departure times for the stops before that stop.
+   * Returns {@code true} if times have been adjusted.
    */
-  public boolean adjustTimesBeforeWhenRequired(int firstUpdatedIndex) {
+  public boolean adjustTimesBeforeAlways(int firstUpdatedIndex) {
+    boolean hasAdjustedTimes = false;
+    int delay = getDepartureDelay(firstUpdatedIndex);
+    if (getArrivalDelay(firstUpdatedIndex) == 0) {
+      updateArrivalDelay(firstUpdatedIndex, delay);
+      hasAdjustedTimes = true;
+    }
+    delay = getArrivalDelay(firstUpdatedIndex);
+    if (delay == 0) {
+      return false;
+    }
+    for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
+      hasAdjustedTimes = true;
+      updateDepartureDelay(i, delay);
+      updateArrivalDelay(i, delay);
+    }
+    return hasAdjustedTimes;
+  }
+
+  /**
+   * Adjusts arrival time for the stop at the firstUpdatedIndex if no update was given for it
+   * and arrival/departure times for the stops before that stop when required to ensure that the
+   * times are increasing. Can set NO_DATA flag on the updated previous stops.
+   * Returns {@code true} if times have been adjusted.
+   */
+  public boolean adjustTimesBeforeWhenRequired(int firstUpdatedIndex, boolean setNoData) {
     boolean hasAdjustedTimes = false;
     int delay = getDepartureDelay(firstUpdatedIndex);
     if (getArrivalTime(firstUpdatedIndex) > getDepartureTime(firstUpdatedIndex)) {
@@ -469,13 +494,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       hasAdjustedTimes = true;
     }
     int nextStopArrivalTime = getArrivalTime(firstUpdatedIndex);
+    delay = getArrivalDelay(firstUpdatedIndex);
     for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
       if (getDepartureTime(i) < nextStopArrivalTime) {
         return hasAdjustedTimes;
       } else {
         hasAdjustedTimes = true;
         updateDepartureDelay(i, delay);
-        if (!isCancelledStop(i)) {
+        if (setNoData && !isCancelledStop(i)) {
           setNoData(i);
         }
       }

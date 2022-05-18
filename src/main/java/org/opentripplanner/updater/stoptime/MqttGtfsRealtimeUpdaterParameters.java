@@ -8,6 +8,7 @@ public class MqttGtfsRealtimeUpdaterParameters {
   private final String topic;
   private final int qos;
   private final boolean fuzzyTripMatching;
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
   public MqttGtfsRealtimeUpdaterParameters(
     String configRef,
@@ -15,7 +16,8 @@ public class MqttGtfsRealtimeUpdaterParameters {
     String url,
     String topic,
     int qos,
-    boolean fuzzyTripMatching
+    boolean fuzzyTripMatching,
+    BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -23,6 +25,7 @@ public class MqttGtfsRealtimeUpdaterParameters {
     this.topic = topic;
     this.qos = qos;
     this.fuzzyTripMatching = fuzzyTripMatching;
+    this.backwardsDelayPropagationType = backwardsDelayPropagationType;
   }
 
   String getUrl() {
@@ -43,6 +46,10 @@ public class MqttGtfsRealtimeUpdaterParameters {
 
   boolean getFuzzyTripMatching() {
     return fuzzyTripMatching;
+  }
+
+  BackwardsDelayPropagationType getBackwardsDelayPropagationType() {
+    return backwardsDelayPropagationType;
   }
 
   /** The config name/type for the updater. Used to reference the configuration element. */

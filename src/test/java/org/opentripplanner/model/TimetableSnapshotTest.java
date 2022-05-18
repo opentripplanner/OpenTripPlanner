@@ -22,6 +22,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 
 public class TimetableSnapshotTest {
 
@@ -263,7 +264,12 @@ public class TimetableSnapshotTest {
   ) {
     TripTimesPatch tripTimesPatch = pattern
       .getScheduledTimetable()
-      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+      .createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
     return resolver.update(pattern, updatedTripTimes, serviceDate);
   }

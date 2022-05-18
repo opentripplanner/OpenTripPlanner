@@ -95,6 +95,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /** Epoch time in milliseconds at which the last snapshot was generated. */
   protected long lastSnapshotTime = -1;
   public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  /**
+   * Defines when delays are propagated to previous stops and if these stops are given
+   * the NO_DATA flag.
+   */
+  BackwardsDelayPropagationType backwardsDelayPropagationType =
+    BackwardsDelayPropagationType.REQUIRED_NO_DATA;
   private final Deduplicator deduplicator;
   private final Map<FeedScopedId, Integer> serviceCodes;
 
@@ -360,7 +366,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Get new TripTimes based on scheduled timetable
     final TripTimesPatch tripTimesPatch = pattern
       .getScheduledTimetable()
-      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate, backwardsDelayPropagationType);
 
     if (tripTimesPatch == null) {
       return false;

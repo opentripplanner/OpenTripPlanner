@@ -26,6 +26,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.util.TestUtils;
 
 public class TimetableTest {
@@ -79,7 +80,12 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setStopSequence(0);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     tripUpdate = tripUpdateBuilder.build();
-    var patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
     assertNull(patch);
 
     // update trip with bad data
@@ -92,7 +98,13 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setStopSequence(0);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
     tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     assertNull(patch);
 
     // update trip with non-increasing data
@@ -113,7 +125,13 @@ public class TimetableTest {
       TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 0)
     );
     tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     assertNull(patch);
 
     //---
@@ -139,7 +157,13 @@ public class TimetableTest {
     );
     tripUpdate = tripUpdateBuilder.build();
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     var updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
@@ -157,7 +181,13 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(0);
     tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
@@ -174,7 +204,13 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(1);
     tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
@@ -191,7 +227,13 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
@@ -208,7 +250,13 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
@@ -230,7 +278,13 @@ public class TimetableTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(-1);
     tripUpdate = tripUpdateBuilder.build();
-    patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    patch =
+      timetable.createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     assertNull(patch);
   }
 
@@ -251,7 +305,12 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setStopSequence(3);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
     var updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     assertEquals(RealTimeState.UPDATED, updatedTripTimes.getRealTimeState());
