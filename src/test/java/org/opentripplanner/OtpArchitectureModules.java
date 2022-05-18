@@ -1,6 +1,5 @@
 package org.opentripplanner;
 
-
 import org.opentripplanner._support.arch.Module;
 import org.opentripplanner._support.arch.Package;
 
