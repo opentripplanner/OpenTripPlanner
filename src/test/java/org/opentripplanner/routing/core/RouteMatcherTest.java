@@ -1,11 +1,16 @@
 package org.opentripplanner.routing.core;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 
-public class TestRouteMatcher extends TestCase {
+public class RouteMatcherTest {
 
+  @Test
   public void testRouteMatcher() {
     Route r1 = new Route(new FeedScopedId("A1", "42"));
     r1.setShortName("R1");

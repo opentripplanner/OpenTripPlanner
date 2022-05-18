@@ -4,13 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+import static org.opentripplanner.util.OTPFeature.MinimumTransferTimeIsDefinitive;
 
+import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.time.DurationUtils;
 
 public class TransferConstraintTest {
 
-  public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.durationInSeconds("1h");
+  private final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.durationInSeconds("1h");
+  private final int D3m = DurationUtils.durationInSeconds("3m");
 
   private final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
   private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
@@ -29,9 +34,9 @@ public class TransferConstraintTest {
     .preferred()
     .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
     .build();
-  private final TransferConstraint MIN_TRANSFER_TIME = TransferConstraint
+  private final TransferConstraint MIN_TX_TIME = TransferConstraint
     .create()
-    .minTransferTime(600)
+    .minTransferTime(D3m)
     .build();
 
   @Test
@@ -58,7 +63,7 @@ public class TransferConstraintTest {
     assertTrue(STAY_SEATED.isFacilitated());
     assertFalse(NO_CONSTRAINS.isFacilitated());
     assertFalse(NOT_ALLOWED.isFacilitated());
-    assertFalse(MIN_TRANSFER_TIME.isFacilitated());
+    assertFalse(MIN_TX_TIME.isFacilitated());
   }
 
   @Test
@@ -67,7 +72,7 @@ public class TransferConstraintTest {
     assertTrue(STAY_SEATED.includeInRaptorRouting());
     assertFalse(NO_CONSTRAINS.includeInRaptorRouting());
     assertTrue(NOT_ALLOWED.includeInRaptorRouting());
-    assertTrue(MIN_TRANSFER_TIME.includeInRaptorRouting());
+    assertTrue(MIN_TX_TIME.includeInRaptorRouting());
   }
 
   @Test
@@ -75,7 +80,7 @@ public class TransferConstraintTest {
     assertTrue(NOT_ALLOWED.isNotAllowed());
     assertFalse(GUARANTIED.isNotAllowed());
     assertFalse(NO_CONSTRAINS.isNotAllowed());
-    assertFalse(MIN_TRANSFER_TIME.isNotAllowed());
+    assertFalse(MIN_TX_TIME.isNotAllowed());
   }
 
   @Test
@@ -85,14 +90,14 @@ public class TransferConstraintTest {
 
   @Test
   public void getMinTransferTime() {
-    assertTrue(MIN_TRANSFER_TIME.isMinTransferTimeSet());
-    assertEquals(600, MIN_TRANSFER_TIME.getMinTransferTime());
+    assertTrue(MIN_TX_TIME.isMinTransferTimeSet());
+    assertEquals(D3m, MIN_TX_TIME.getMinTransferTime());
   }
 
   @Test
   public void cost() {
     assertEquals(33_00, NO_CONSTRAINS.cost());
-    assertEquals(33_00, MIN_TRANSFER_TIME.cost());
+    assertEquals(33_00, MIN_TX_TIME.cost());
     assertEquals(32_00, RECOMMENDED.cost());
     assertEquals(23_00, GUARANTIED.cost());
     assertEquals(13_00, STAY_SEATED.cost());
@@ -123,5 +128,67 @@ public class TransferConstraintTest {
     assertEquals(NO_CONSTRAINS.cost(), TransferConstraint.cost(null));
     assertEquals(NO_CONSTRAINS.cost(), TransferConstraint.cost(NO_CONSTRAINS));
     assertEquals(GUARANTIED.cost(), TransferConstraint.cost(GUARANTIED));
+  }
+
+  @Test
+  public void calculateConstrainedTransferTargetTimeForwardSearch() {
+    // source-arrival-time
+    int t0 = 300;
+    // Extra user transfer-time
+    int dt = 240;
+    // Expected arrival-time with minTransferTime constrained transfer
+    int expAt = t0 + dt + MIN_TX_TIME.getMinTransferTime();
+    // Regular transfer with arrival time 1 second before MIN_TRANSFER_TIME constrained transfer
+    int txMinus = expAt - 1;
+    IntSupplier txMinusOp = () -> txMinus;
+    // Regular transfer with arrival time 1 second after MIN_TRANSFER_TIME constrained transfer
+    int txPlus = expAt + 1;
+    IntSupplier txPlusOp = () -> txPlus;
+
+    assertEquals(txMinus, NO_CONSTRAINS.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+    assertEquals(txMinus, RECOMMENDED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+    assertEquals(t0, GUARANTIED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+    assertEquals(t0, STAY_SEATED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+    assertEquals(t0, EVERYTHING.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+
+    MinimumTransferTimeIsDefinitive.testOn(() -> {
+      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, FORWARD));
+    });
+    MinimumTransferTimeIsDefinitive.testOff(() -> {
+      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+      assertEquals(txPlus, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, FORWARD));
+    });
+  }
+
+  @Test
+  public void calculateConstrainedTransferTargetTimeReverseSearch() {
+    // source-arrival-time
+    int t0 = 300;
+    // Extra user transfer-time
+    int dt = 240;
+    // Expected arrival-time with minTransferTime constrained transfer
+    int expAt = t0 - (dt + MIN_TX_TIME.getMinTransferTime());
+    // Regular transfer with arrival time 1 second before MIN_TRANSFER_TIME constrained transfer
+    int txMinus = expAt + 1;
+    IntSupplier txMinusOp = () -> txMinus;
+    // Regular transfer with arrival time 1 second after MIN_TRANSFER_TIME constrained transfer
+    int txPlus = expAt - 1;
+    IntSupplier txPlusOp = () -> txPlus;
+
+    assertEquals(txMinus, NO_CONSTRAINS.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+    assertEquals(txMinus, RECOMMENDED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+    assertEquals(t0, GUARANTIED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+    assertEquals(t0, STAY_SEATED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+    assertEquals(t0, EVERYTHING.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+
+    MinimumTransferTimeIsDefinitive.testOn(() -> {
+      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, REVERSE));
+    });
+    MinimumTransferTimeIsDefinitive.testOff(() -> {
+      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+      assertEquals(txPlus, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, REVERSE));
+    });
   }
 }

@@ -1,10 +1,13 @@
 package org.opentripplanner.routing.core;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -17,19 +20,22 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-public class TestGraph extends TestCase {
+public class GraphTest {
 
+  @Test
   public void testBasic() throws Exception {
     Graph g = new Graph();
     assertNotNull(g);
   }
 
+  @Test
   public void testAddVertex() throws Exception {
     Graph g = new Graph();
     Vertex a = new IntersectionVertex(g, "A", 5, 5);
     assertEquals(a.getLabel(), "A");
   }
 
+  @Test
   public void testGetVertex() throws Exception {
     Graph g = new Graph();
     Vertex a = new IntersectionVertex(g, "A", 5, 5);
@@ -37,6 +43,7 @@ public class TestGraph extends TestCase {
     assertEquals(a, b);
   }
 
+  @Test
   public void testAddEdge() throws Exception {
     Graph g = new Graph();
     Vertex a = new IntersectionVertex(g, "A", 5, 5);
@@ -45,6 +52,7 @@ public class TestGraph extends TestCase {
     assertNotNull(ee);
   }
 
+  @Test
   public void testGetEdgesOneEdge() {
     Graph g = new Graph();
     Vertex a = new IntersectionVertex(g, "A", 5, 5);
@@ -56,6 +64,7 @@ public class TestGraph extends TestCase {
     assertEquals(ee, edges.get(0));
   }
 
+  @Test
   public void testGetEdgesMultiple() {
     Graph g = new Graph();
     Vertex a = new IntersectionVertex(g, "A", 5, 5);
@@ -73,6 +82,7 @@ public class TestGraph extends TestCase {
     assertEquals(expectedEdges, edges);
   }
 
+  @Test
   public void testGetStreetEdgesNone() {
     Graph g = new Graph();
     Vertex a = new IntersectionVertex(g, "A", 5, 5);
@@ -89,6 +99,7 @@ public class TestGraph extends TestCase {
     assertEquals(0, edges.size());
   }
 
+  @Test
   public void testGetStreetEdgesSeveral() {
     Graph g = new Graph();
     StreetVertex a = new IntersectionVertex(g, "A", 5, 5);
@@ -106,6 +117,7 @@ public class TestGraph extends TestCase {
     assertEquals(allStreetEdges, edges);
   }
 
+  @Test
   public void testGetEdgesAndVerticesById() {
     Graph g = new Graph();
     StreetVertex a = new IntersectionVertex(g, "A", 5, 5);

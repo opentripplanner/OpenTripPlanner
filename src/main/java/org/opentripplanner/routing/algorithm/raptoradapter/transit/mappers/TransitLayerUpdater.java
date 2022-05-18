@@ -187,7 +187,11 @@ public class TransitLayerUpdater {
 
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
         if (tripPatternForDate.getLocalDate().equals(date)) {
-          var oldTimeTable = timetables.get(tripPatternForDate.getTripPattern().getPattern());
+          TripPattern pattern = tripPatternForDate.getTripPattern().getPattern();
+          if (!pattern.isCreatedByRealtimeUpdater()) {
+            continue;
+          }
+          var oldTimeTable = timetables.get(pattern);
           if (oldTimeTable != null) {
             var toRemove = oldTimeTable
               .stream()
@@ -199,6 +203,8 @@ public class TransitLayerUpdater {
             if (toRemove) {
               patternsForDate.remove(tripPatternForDate);
             }
+          } else {
+            LOG.warn("Could not fetch timetable for {}", pattern);
           }
         }
       }
