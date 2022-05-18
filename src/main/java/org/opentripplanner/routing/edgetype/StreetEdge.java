@@ -220,18 +220,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   }
 
   /**
-   * Checks if edge is accessible for wheelchair if needed according to tags or if slope is too
-   * big.
-   * <p>
-   * Then it checks if street can be traversed according to street permissions and start/end
-   * barriers. This is done with intersection of street and barrier permissions in {@link
-   * #canTraverseIncludingBarrier(TraverseMode)}
-   */
-  public boolean canTraverse(TraverseMode mode) {
-    return canTraverseIncludingBarrier(mode);
-  }
-
-  /**
    * This checks if start or end vertex is bollard If it is it creates intersection of street edge
    * permissions and from/to barriers. Then it checks if mode is allowed to traverse the edge.
    * <p>
@@ -242,16 +230,16 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
    * <p>
    * It is used in {@link #canTraverse(TraverseMode)}
    */
-  public boolean canTraverseIncludingBarrier(TraverseMode mode) {
-    StreetTraversalPermission permission = getPermission();
+  public boolean canTraverse(TraverseMode mode) {
+    StreetTraversalPermission permission1 = getPermission();
     if (fromv instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
+      permission1 = permission1.intersection(((BarrierVertex) fromv).getBarrierPermissions());
     }
     if (tov instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
+      permission1 = permission1.intersection(((BarrierVertex) tov).getBarrierPermissions());
     }
 
-    return permission.allows(mode);
+    return permission1.allows(mode);
   }
 
   public void setElevationExtension(StreetElevationExtension streetElevationExtension) {
@@ -844,11 +832,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   }
 
   /**
-   * Get the immutable {@link List} of {@link TurnRestriction}s that belongs to this {@link
-   * StreetEdge}.
+   * Get the immutable {@link List} of {@link TurnRestriction}s that belongs to this
+   * {@link StreetEdge}.
    * <p>
-   * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction} or {@link
-   * StreetEdge#removeTurnRestriction} is called concurrently.
+   * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction} or
+   * {@link StreetEdge#removeTurnRestriction} is called concurrently.
    */
   @Nonnull
   public List<TurnRestriction> getTurnRestrictions() {
