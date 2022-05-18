@@ -76,8 +76,8 @@ public class SpeedTestRequest {
     addDebugOptions(request, opts);
     request.tags =
       Set.of(
-        RoutingTag.testCaseSample(testCase.definition().description()),
-        RoutingTag.testCaseGroup(testCase.definition().category())
+        RoutingTag.testCaseSample(input.idAndDescription()),
+        RoutingTag.testCaseGroup(input.category())
       );
 
     return request;

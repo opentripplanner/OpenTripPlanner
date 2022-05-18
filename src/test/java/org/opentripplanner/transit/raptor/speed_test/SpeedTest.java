@@ -184,7 +184,9 @@ public class SpeedTest {
   private boolean runSingleTestCase(TestCase testCase, boolean ignoreResults) {
     try {
       if (!ignoreResults) {
-        System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
+        System.err.println(
+          ResultPrinter.headerLine("#" + testCase.definition().idAndDescription())
+        );
       }
 
       var speedTestRequest = new SpeedTestRequest(
