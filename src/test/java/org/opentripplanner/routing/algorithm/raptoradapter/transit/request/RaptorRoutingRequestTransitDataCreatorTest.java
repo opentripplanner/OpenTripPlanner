@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
@@ -24,7 +23,6 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
@@ -35,14 +33,9 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
   private static final TripPattern TP = new TripPattern(
     id("P1"),
-    new Route(id("L1")),
+    TransitModelForTest.route("1").withMode(TransitMode.BUS).build(),
     new StopPattern(List.of(createStopTime(), createStopTime()))
   );
-
-  @BeforeEach
-  public void setup() {
-    TP.getRoute().setMode(TransitMode.BUS);
-  }
 
   @Test
   public void testMergeTripPatterns() {

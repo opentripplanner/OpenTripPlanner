@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -38,8 +39,8 @@ import org.opentripplanner.util.time.TimeUtils;
 public class TestItineraryBuilder implements PlanTestConstants {
 
   public static final LocalDate SERVICE_DAY = LocalDate.of(2020, Month.FEBRUARY, 2);
-  public static final Route BUS_ROUTE = route(TransitMode.BUS);
-  public static final Route RAIL_ROUTE = route(TransitMode.RAIL);
+  public static final Route BUS_ROUTE = route("1").withMode(TransitMode.BUS).build();
+  public static final Route RAIL_ROUTE = route("2").withMode(TransitMode.RAIL).build();
 
   /**
    * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup the
@@ -133,7 +134,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     LocalDate serviceDate
   ) {
     return transit(
-      BUS_ROUTE,
+      BUS_ROUTE.copy().withShortName(Integer.toString(tripId)).build(),
       tripId,
       startTime,
       endTime,
@@ -202,13 +203,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return trip;
   }
 
-  /** Create a dummy route */
-  private static Route route(TransitMode mode) {
-    Route route = new Route(new FeedScopedId(FEED_ID, mode.name()));
-    route.setMode(mode);
-    return route;
-  }
-
   private static Place stop(Place source) {
     return Place.forStop(source.stop);
   }
@@ -231,7 +225,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     legCost += cost(1.0f, end - start) + BOARD_COST;
 
-    Trip trip = trip(tripId, route);
+    Trip trip = trip(tripId, route.copy().withShortName("" + tripId).build());
 
     final List<StopTime> stopTimes = new ArrayList<>();
     StopTime fromStopTime = new StopTime();

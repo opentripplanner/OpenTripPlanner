@@ -441,10 +441,7 @@ public abstract class GraphRoutingTest {
     }
 
     public Route route(String id, TransitMode mode, Agency agency) {
-      var route = new Route(TransitModelForTest.id(id));
-      route.setAgency(agency);
-      route.setMode(mode);
-      return route;
+      return TransitModelForTest.route(id).withAgency(agency).withMode(mode).build();
     }
 
     // Transit

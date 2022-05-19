@@ -18,12 +18,12 @@ public class TestSpecificTransfer {
   @Test
   public void testSpecificTransfer() {
     // Setup from trip with route
-    Route fromRoute = new Route(TransitModelForTest.id("R1"));
+    Route fromRoute = TransitModelForTest.route("R1").build();
     Trip fromTrip = new Trip(TransitModelForTest.id("T1"));
     fromTrip.setRoute(fromRoute);
 
     // Setup to trip with route
-    Route toRoute = new Route(TransitModelForTest.id("R2"));
+    Route toRoute = TransitModelForTest.route("R2").build();
     Trip toTrip = new Trip(TransitModelForTest.id("T2"));
     toTrip.setRoute(toRoute);
 

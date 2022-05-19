@@ -514,14 +514,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Route route = graph.index.getRouteForId(routeId);
 
     if (route == null) { // Route is unknown - create new
-      route = new Route(routeId);
+      var routeBuilder = Route.of(routeId);
       T2<TransitMode, String> transitMode = getTransitMode(
         estimatedVehicleJourney.getVehicleModes(),
         replacedRoute
       );
-      route.setMode(transitMode.first);
-      route.setNetexSubmode(transitMode.second);
-      route.setOperator(operator);
+      routeBuilder.withMode(transitMode.first);
+      routeBuilder.withNetexSubmode(transitMode.second);
+      routeBuilder.withOperator(operator);
 
       // TODO - SIRI: Is there a better way to find authority/Agency?
       // Finding first Route with same Operator, and using same Authority
@@ -534,14 +534,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         .findFirst()
         .get()
         .getAgency();
-      route.setAgency(agency);
+      routeBuilder.withAgency(agency);
 
       if (
         estimatedVehicleJourney.getPublishedLineNames() != null &&
         !estimatedVehicleJourney.getPublishedLineNames().isEmpty()
       ) {
-        route.setShortName("" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue());
+        routeBuilder.withShortName(
+          "" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue()
+        );
       }
+      route = routeBuilder.build();
       LOG.info("Adding route {} to graph.", routeId);
       graph.index.addRoutes(route);
     }

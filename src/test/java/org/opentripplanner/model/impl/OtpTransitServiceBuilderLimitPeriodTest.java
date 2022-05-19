@@ -55,7 +55,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   );
   private static final StopPattern STOP_PATTERN = new StopPattern(STOP_TIMES);
   private static int SEQ_NR = 0;
-  private final Route route = new Route(newId());
+  private final Route route = TransitModelForTest.route(newId().getId()).build();
   private final Trip tripCSIn = createTrip("TCalIn", SERVICE_C_IN);
   private final Trip tripCSOut = createTrip("TCalOut", SERVICE_C_OUT);
   private final Trip tripCSDIn = createTrip("TDateIn", SERVICE_D_IN);
@@ -85,8 +85,6 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject.getStops().add(STOP_2);
 
     // Add Route
-    route.setGtfsType(3);
-    route.setMode(TransitMode.BUS);
     subject.getRoutes().add(route);
 
     // Add trips; one for each day and calendar

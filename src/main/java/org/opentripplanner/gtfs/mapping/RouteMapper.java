@@ -34,16 +34,17 @@ class RouteMapper {
   }
 
   private Route doMap(org.onebusaway.gtfs.model.Route rhs) {
-    Route lhs = new Route(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
+    var lhs = Route.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
-    lhs.setAgency(agencyMapper.map(rhs.getAgency()));
-    lhs.setShortName(rhs.getShortName());
-    lhs.setLongName(rhs.getLongName());
-    lhs.setGtfsType(rhs.getType());
+    lhs.withAgency(agencyMapper.map(rhs.getAgency()));
+    lhs.withShortName(rhs.getShortName());
+    lhs.withLongName(rhs.getLongName());
+    lhs.withGtfsType(rhs.getType());
 
     if (rhs.isSortOrderSet()) {
-      lhs.setGtfsSortOrder(rhs.getSortOrder());
+      lhs.withGtfsSortOrder(rhs.getSortOrder());
     }
+
     var mode = TransitModeMapper.mapMode(rhs.getType());
 
     if (mode == null) {
@@ -53,17 +54,17 @@ class RouteMapper {
         rhs.getType(),
         lhs.getId()
       );
-      lhs.setMode(TransitMode.BUS);
+      lhs.withMode(TransitMode.BUS);
     } else {
-      lhs.setMode(mode);
+      lhs.withMode(mode);
     }
-    lhs.setDesc(rhs.getDesc());
-    lhs.setUrl(rhs.getUrl());
-    lhs.setColor(rhs.getColor());
-    lhs.setTextColor(rhs.getTextColor());
-    lhs.setBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
-    lhs.setBranding(brandingMapper.map(rhs));
+    lhs.withDescription(rhs.getDesc());
+    lhs.withUrl(rhs.getUrl());
+    lhs.withColor(rhs.getColor());
+    lhs.withTextColor(rhs.getTextColor());
+    lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
+    lhs.withBranding(brandingMapper.map(rhs));
 
-    return lhs;
+    return lhs.build();
   }
 }

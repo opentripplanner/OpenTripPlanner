@@ -21,9 +21,9 @@ public class TransferTestData {
   static final Stop STOP_S = Stop.stopForTest("S", 60.0, 11.0);
   static final Stop ANY_STOP = Stop.stopForTest("any", 60.0, 11.0);
 
-  static final Route ROUTE_1 = createRoute(1, "L1");
-  static final Route ROUTE_2 = createRoute(2, "L2");
-  static final Route ANY_ROUTE = createRoute(999, "any");
+  static final Route ROUTE_1 = TransitModelForTest.route("1").build();
+  static final Route ROUTE_2 = TransitModelForTest.route("2").build();
+  static final Route ANY_ROUTE = TransitModelForTest.route("ANY").build();
 
   static final Trip TRIP_11 = createTrip(11, ROUTE_1);
   static final Trip TRIP_12 = createTrip(12, ROUTE_1);
@@ -56,12 +56,6 @@ public class TransferTestData {
     Trip t = new Trip(createId(id));
     t.setRoute(route);
     return t;
-  }
-
-  private static Route createRoute(int id, String name) {
-    Route r = new Route(createId(id));
-    r.setShortName(name);
-    return r;
   }
 
   private static FeedScopedId createId(int id) {

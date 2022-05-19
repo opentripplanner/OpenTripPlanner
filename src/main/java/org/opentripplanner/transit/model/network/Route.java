@@ -1,118 +1,141 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.network;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.TransitEntity2;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
 
-public final class Route extends TransitEntity {
+public final class Route extends TransitEntity2<Route, RouteBuilder> {
 
-  private static final long serialVersionUID = 1L;
-
-  private Agency agency;
-
-  private Operator operator;
-
-  private Branding branding;
-
-  private List<GroupOfRoutes> groupsOfRoutes = new ArrayList<>();
-
-  private String shortName;
-
-  private String longName;
-
-  private TransitMode mode;
-
+  private final Agency agency;
+  private final Operator operator;
+  private final Branding branding;
+  private final List<GroupOfRoutes> groupsOfRoutes;
+  private final String shortName;
+  private final String longName;
+  private final TransitMode mode;
   // TODO: consolidate these
-  private Integer gtfsType;
+  private final Integer gtfsType;
+  private final Integer gtfsSortOrder;
+  private final String netexSubmode;
+  private final String flexibleLineType;
+  private final String desc;
+  private final String url;
+  private final String color;
+  private final String textColor;
+  private final BikeAccess bikesAllowed;
 
-  private Integer gtfsSortOrder;
+  public Route(RouteBuilder builder) {
+    super(builder.getId());
+    this.agency = builder.getAgency();
+    this.operator = builder.getOperator();
+    this.branding = builder.getBranding();
+    this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
+    this.shortName = builder.getShortName();
+    this.longName = builder.getLongName();
+    this.mode = builder.getMode();
+    this.gtfsType = builder.getGtfsType();
+    this.gtfsSortOrder = builder.getGtfsSortOrder();
 
-  private String netexSubmode;
+    this.netexSubmode = builder.getNetexSubmode();
+    this.flexibleLineType = builder.getFlexibleLineType();
+    this.desc = builder.getDesc();
+    this.url = builder.getUrl();
+    this.color = builder.getColor();
+    this.textColor = builder.getTextColor();
+    this.bikesAllowed = builder.getBikesAllowed();
 
-  private String desc;
-
-  private String url;
-
-  private String color;
-
-  private String textColor;
-
-  private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
-
-  private String flexibleLineType;
-
-  public Route(FeedScopedId id) {
-    super(id);
+    Objects.requireNonNull(this.agency);
+    Objects.requireNonNull(this.mode);
+    Objects.requireNonNull(getName());
   }
 
-  public Branding getBranding() {
-    return branding;
+  public static RouteBuilder of(FeedScopedId id) {
+    return new RouteBuilder(id);
   }
 
-  public void setBranding(Branding branding) {
-    this.branding = branding;
+  @Override
+  public boolean sameValue(@Nonnull Route other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(this.agency, other.agency) &&
+      Objects.equals(this.operator, other.operator) &&
+      Objects.equals(this.groupsOfRoutes, other.groupsOfRoutes) &&
+      Objects.equals(this.shortName, other.shortName) &&
+      Objects.equals(this.longName, other.longName) &&
+      Objects.equals(this.mode, other.mode) &&
+      Objects.equals(this.gtfsType, other.gtfsType) &&
+      Objects.equals(this.flexibleLineType, other.flexibleLineType) &&
+      Objects.equals(this.netexSubmode, other.netexSubmode) &&
+      Objects.equals(this.desc, other.desc) &&
+      Objects.equals(this.url, other.url) &&
+      Objects.equals(this.color, other.color) &&
+      Objects.equals(this.textColor, other.textColor) &&
+      Objects.equals(this.bikesAllowed, other.bikesAllowed)
+    );
+  }
+
+  @Override
+  public RouteBuilder copy() {
+    return new RouteBuilder(this);
   }
 
   /**
    * The 'agency' property represent a GTFS Agency and NeTEx the Authority. Note that Agency does
    * NOT map 1-1 to Authority, it is rather a mix between Authority and Operator.
    */
+  @Nonnull
   public Agency getAgency() {
     return agency;
-  }
-
-  public void setAgency(Agency agency) {
-    this.agency = agency;
   }
 
   /**
    * NeTEx Operator, not in use when importing GTFS files.
    */
+  @Nullable
   public Operator getOperator() {
     return operator;
   }
 
-  public void setOperator(Operator operator) {
-    this.operator = operator;
+  @Nullable
+  public Branding getBranding() {
+    return branding;
   }
 
+  @Nonnull
+  public List<GroupOfRoutes> getGroupsOfRoutes() {
+    return groupsOfRoutes;
+  }
+
+  @Nullable
   public String getShortName() {
     return shortName;
   }
 
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
-  }
-
+  @Nullable
   public String getLongName() {
     return longName;
   }
 
-  public void setLongName(String longName) {
-    this.longName = longName;
+  @Nonnull
+  public TransitMode getMode() {
+    return mode;
   }
 
+  @Nullable
   public String getDesc() {
     return desc;
   }
 
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
-
+  @Nullable
   public Integer getGtfsType() {
     return gtfsType;
-  }
-
-  public void setGtfsType(int gtfsType) {
-    this.gtfsType = gtfsType;
   }
 
   @Nullable
@@ -120,62 +143,41 @@ public final class Route extends TransitEntity {
     return gtfsSortOrder;
   }
 
-  public void setGtfsSortOrder(@Nullable Integer gtfsSortOrder) {
-    this.gtfsSortOrder = gtfsSortOrder;
+  @Nullable
+  public String getNetexSubmode() {
+    return netexSubmode;
   }
 
-  public TransitMode getMode() {
-    return mode;
-  }
-
-  public void setMode(TransitMode mode) {
-    this.mode = mode;
-  }
-
+  @Nullable
   public String getUrl() {
     return url;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
+  @Nullable
   public String getColor() {
     return color;
   }
 
-  public void setColor(String color) {
-    this.color = color;
-  }
-
+  @Nullable
   public String getTextColor() {
     return textColor;
   }
 
-  public void setTextColor(String textColor) {
-    this.textColor = textColor;
-  }
-
+  @Nullable
   public BikeAccess getBikesAllowed() {
     return bikesAllowed;
-  }
-
-  public void setBikesAllowed(BikeAccess bikesAllowed) {
-    this.bikesAllowed = bikesAllowed;
   }
 
   /**
    * Pass-through information from NeTEx FlexibleLineType. This information is not used by OTP.
    */
+  @Nullable
   public String getFlexibleLineType() {
     return flexibleLineType;
   }
 
-  public void setFlexibleLineType(String flexibleLineType) {
-    this.flexibleLineType = flexibleLineType;
-  }
-
   /** @return the route's short name, or the long name if the short name is null. */
+  @Nonnull
   public String getName() {
     return shortName != null ? shortName : longName;
   }
@@ -183,21 +185,5 @@ public final class Route extends TransitEntity {
   @Override
   public String toString() {
     return "<Route " + getId() + " " + getName() + ">";
-  }
-
-  public String getNetexSubmode() {
-    return netexSubmode;
-  }
-
-  public void setNetexSubmode(String netexSubmode) {
-    this.netexSubmode = netexSubmode;
-  }
-
-  public List<GroupOfRoutes> getGroupsOfRoutes() {
-    return groupsOfRoutes;
-  }
-
-  public void setGroupsOfRoutes(Collection<GroupOfRoutes> list) {
-    groupsOfRoutes = List.copyOf(list);
   }
 }

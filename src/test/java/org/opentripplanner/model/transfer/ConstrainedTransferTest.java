@@ -69,8 +69,6 @@ public class ConstrainedTransferTest {
 
   @BeforeEach
   public void setup() {
-    ROUTE_1.setShortName("L1");
-    ROUTE_2.setShortName("L2");
     TRIP_11.setRoute(ROUTE_1);
     TRIP_21.setRoute(ROUTE_2);
     TRIP_11.setRoute(ROUTE_1);

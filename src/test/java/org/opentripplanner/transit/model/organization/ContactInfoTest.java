@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,9 +29,17 @@ class ContactInfoTest {
 
   @Test
   void copy() {
-    var copy = subject.copy().build();
+    // Create a copy, but do not change it
+    var copy = subject.copy().setContactPerson(CONTACT_PERSON).build();
 
-    assertEquals(copy.getContactPerson(), CONTACT_PERSON);
+    // Then the build object should be the same
+    assertSame(subject, copy);
+
+    // Copy and change the contact person
+    copy = subject.copy().setContactPerson("New Person").build();
+
+    assertNotSame(copy, subject);
+    assertEquals(copy.getContactPerson(), "New Person");
     assertEquals(copy.getPhoneNumber(), PHONE);
     assertEquals(copy.geteMail(), EMAIL);
     assertEquals(copy.getFaxNumber(), FAX_NUMBER);

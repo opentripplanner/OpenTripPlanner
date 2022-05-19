@@ -17,7 +17,6 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -50,8 +49,7 @@ public class TripMapperTest {
     var access = new AccessibilityAssessment();
 
     var transitBuilder = new OtpTransitServiceBuilder();
-    var route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -81,8 +79,7 @@ public class TripMapperTest {
   @Test
   public void mapTrip() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
-    Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -107,8 +104,7 @@ public class TripMapperTest {
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
-    Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
     journeyPattern.setRouteRef(new RouteRefStructure().withRef(ROUTE_ID));

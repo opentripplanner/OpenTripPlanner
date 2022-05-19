@@ -281,6 +281,6 @@ public class RouteMapperTest {
   }
 
   private GroupOfRoutes createGroupOfRoutes(String id) {
-    return new GroupOfRoutes(MappingSupport.ID_FACTORY.createId(id), null, null, null, null);
+    return GroupOfRoutes.of(MappingSupport.ID_FACTORY.createId(id)).build();
   }
 }

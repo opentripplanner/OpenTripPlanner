@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -21,11 +23,20 @@ class OperatorTest {
 
   @Test
   void copy() {
-    assertEquals(subject.getId().getId(), ID);
-    var copy = subject.copy().setId(TransitModelForTest.id("v2")).build();
+    // Make a copy, and set the same name (nothing is changed)
+    var copy = subject.copy().setName(NAME).build();
 
-    assertEquals(copy.getId().getId(), "v2");
-    assertEquals(copy.getName(), NAME);
+    assertSame(subject, copy);
+
+    // Copy and change name
+    copy = subject.copy().setName("v2").build();
+
+    // The two objects are not he same instance, but is equal(sae id)
+    assertNotSame(copy, subject);
+    assertEquals(copy, subject);
+
+    assertEquals(copy.getId().getId(), ID);
+    assertEquals("v2", copy.getName());
     assertEquals(copy.getUrl(), URL);
     assertEquals(copy.getPhone(), PHONE);
   }

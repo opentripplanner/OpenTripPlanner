@@ -1,7 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -103,17 +102,22 @@ public class RouteMapperTest {
   @Test
   public void testMapWithNulls() throws Exception {
     Route input = new Route();
+
+    // id, agency, mode and name (short or long) is required.
     input.setId(AGENCY_AND_ID);
+    input.setAgency(AGENCY);
+    input.setType(ROUTE_TYPE);
+    input.setShortName(SHORT_NAME);
 
     org.opentripplanner.transit.model.network.Route result = subject.map(input);
 
     assertNotNull(result.getId());
-    assertNull(result.getAgency());
-    assertNull(result.getShortName());
+    assertNotNull(result.getAgency());
+    assertEquals(result.getShortName(), SHORT_NAME);
     assertNull(result.getLongName());
     assertNull(result.getDesc());
-    assertEquals(0, (int) result.getGtfsType());
-    assertEquals(TransitMode.TRAM, result.getMode());
+    assertEquals(ROUTE_TYPE.intValue(), (int) result.getGtfsType());
+    assertEquals(TRANSIT_MODE, result.getMode());
     assertNull(result.getUrl());
     assertNull(result.getColor());
     assertNull(result.getTextColor());

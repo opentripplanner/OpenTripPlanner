@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -25,11 +27,22 @@ public class BrandingTest {
 
   @Test
   void copy() {
-    var copy = subject.copy().setId(TransitModelForTest.id("v2")).build();
+    // Make a copy, and set the same name (nothing is changed)
+    var copy = subject.copy().setName(NAME).build();
 
-    assertEquals("v2", copy.getId().getId());
+    // Same object should be returned if nothing changed
+    assertSame(subject, copy);
+
+    // Copy and change name
+    copy = subject.copy().setName("v2").build();
+
+    // The two objects are not he same instance, but is equal(sae id)
+    assertNotSame(copy, subject);
+    assertEquals(copy, subject);
+
+    assertEquals(ID, copy.getId().getId());
     assertEquals(SHORT_NAME, copy.getShortName());
-    assertEquals(NAME, copy.getName());
+    assertEquals("v2", copy.getName());
     assertEquals(URL, copy.getUrl());
     assertEquals(DESCRIPTION, copy.getDescription());
     assertEquals(IMAGE, copy.getImage());

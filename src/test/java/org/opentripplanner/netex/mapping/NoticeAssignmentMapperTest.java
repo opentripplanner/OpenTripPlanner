@@ -46,7 +46,7 @@ public class NoticeAssignmentMapperTest {
     noticeAssignment.setNoticedObjectRef(new VersionOfObjectRefStructure().withRef(ROUTE_ID));
     noticeAssignment.setNotice(NOTICE);
 
-    Route route = new Route(MappingSupport.ID_FACTORY.createId(ROUTE_ID));
+    Route route = TransitModelForTest.route(ROUTE_ID).build();
 
     EntityById<Route> routesById = new EntityById<>();
     routesById.add(route);
