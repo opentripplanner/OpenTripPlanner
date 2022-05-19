@@ -1,22 +1,20 @@
 package org.opentripplanner.transit.model.organization;
 
-import java.io.Serializable;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import org.opentripplanner.transit.model.basic.TransitObject;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
-public class ContactInfo implements Serializable {
+public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilder> {
 
   private final String contactPerson;
-
   private final String phoneNumber;
-
   private final String eMail;
-
   private final String faxNumber;
-
   private final String infoUrl;
-
   private final String bookingUrl;
-
   private final String additionalDetails;
 
   public ContactInfo(ContactInfoBuilder builder) {
@@ -29,10 +27,17 @@ public class ContactInfo implements Serializable {
     this.additionalDetails = builder.getAdditionalDetails();
   }
 
+  @NotNull
   public static ContactInfoBuilder of() {
     return new ContactInfoBuilder();
   }
 
+  @NotNull
+  public static ContactInfoBuilder ofNullable(@Nullable ContactInfo ci) {
+    return new ContactInfoBuilder(ci);
+  }
+
+  @NotNull
   public ContactInfoBuilder copy() {
     return new ContactInfoBuilder(this);
   }
@@ -63,6 +68,40 @@ public class ContactInfo implements Serializable {
 
   public String getAdditionalDetails() {
     return additionalDetails;
+  }
+
+  @Override
+  public boolean sameValue(@Nonnull ContactInfo other) {
+    return equals(other);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ContactInfo that = (ContactInfo) o;
+    return (
+      Objects.equals(contactPerson, that.contactPerson) &&
+      Objects.equals(phoneNumber, that.phoneNumber) &&
+      Objects.equals(eMail, that.eMail) &&
+      Objects.equals(faxNumber, that.faxNumber) &&
+      Objects.equals(infoUrl, that.infoUrl) &&
+      Objects.equals(bookingUrl, that.bookingUrl) &&
+      Objects.equals(additionalDetails, that.additionalDetails)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      contactPerson,
+      phoneNumber,
+      eMail,
+      faxNumber,
+      infoUrl,
+      bookingUrl,
+      additionalDetails
+    );
   }
 
   @Override

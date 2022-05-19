@@ -1,37 +1,25 @@
 package org.opentripplanner.transit.model.organization;
 
-import org.checkerframework.checker.units.qual.C;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.AbstractBuilder;
 
-public class ContactInfoBuilder {
+public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfoBuilder> {
 
   private String contactPerson;
-
   private String phoneNumber;
-
   private String eMail;
-
   private String faxNumber;
-
   private String infoUrl;
-
   private String bookingUrl;
-
   private String additionalDetails;
 
-  public ContactInfoBuilder() {}
-
-  ContactInfoBuilder(ContactInfo domain) {
-    this.contactPerson = domain.getContactPerson();
-    this.phoneNumber = domain.getPhoneNumber();
-    this.eMail = domain.geteMail();
-    this.faxNumber = domain.getFaxNumber();
-    this.infoUrl = domain.getInfoUrl();
-    this.bookingUrl = domain.getBookingUrl();
-    this.additionalDetails = domain.getAdditionalDetails();
+  public ContactInfoBuilder() {
+    super(null);
   }
 
-  public ContactInfo build() {
-    return new ContactInfo(this);
+  ContactInfoBuilder(ContactInfo original) {
+    super(original);
   }
 
   public String getContactPerson() {
@@ -95,5 +83,33 @@ public class ContactInfoBuilder {
   public ContactInfoBuilder setAdditionalDetails(String additionalDetails) {
     this.additionalDetails = additionalDetails;
     return this;
+  }
+
+  @Override
+  protected void updateValues(@Nonnull ContactInfo original) {
+    this.contactPerson = original.getContactPerson();
+    this.phoneNumber = original.getPhoneNumber();
+    this.eMail = original.geteMail();
+    this.faxNumber = original.getFaxNumber();
+    this.infoUrl = original.getInfoUrl();
+    this.bookingUrl = original.getBookingUrl();
+    this.additionalDetails = original.getAdditionalDetails();
+  }
+
+  @Override
+  protected void clearValues() {
+    this.contactPerson = null;
+    this.phoneNumber = null;
+    this.eMail = null;
+    this.faxNumber = null;
+    this.infoUrl = null;
+    this.bookingUrl = null;
+    this.additionalDetails = null;
+  }
+
+  @Nullable
+  @Override
+  protected ContactInfo buildFromValues() {
+    return new ContactInfo(this);
   }
 }

@@ -1,51 +1,26 @@
 package org.opentripplanner.transit.model.organization;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 
-public class AgencyBuilder {
-
-  private FeedScopedId id;
+public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
 
   private String name;
-
   private String timezone;
-
   private String url;
-
   private String lang;
-
   private String phone;
-
   private String fareUrl;
-
   private String brandingUrl;
 
   AgencyBuilder(FeedScopedId id) {
-    this.id = id;
+    super(id);
   }
 
-  AgencyBuilder(Agency agency) {
-    this(agency.getId());
-    this.name = agency.getName();
-    this.timezone = agency.getTimezone();
-    this.url = agency.getUrl();
-    this.lang = agency.getLang();
-    this.phone = agency.getPhone();
-    this.fareUrl = agency.getFareUrl();
-    this.brandingUrl = agency.getBrandingUrl();
-  }
-
-  public Agency build() {
-    return new Agency(this);
-  }
-
-  public FeedScopedId getId() {
-    return id;
-  }
-
-  public AgencyBuilder setId(FeedScopedId id) {
-    this.id = id;
-    return this;
+  AgencyBuilder(@Nullable Agency agency) {
+    super(agency);
   }
 
   public String getName() {
@@ -109,5 +84,32 @@ public class AgencyBuilder {
   public AgencyBuilder setBrandingUrl(String brandingUrl) {
     this.brandingUrl = brandingUrl;
     return this;
+  }
+
+  @Override
+  protected Agency buildFromValues() {
+    return new Agency(this);
+  }
+
+  @Override
+  protected void updateValues2(@Nonnull Agency original) {
+    this.name = original.getName();
+    this.timezone = original.getTimezone();
+    this.url = original.getUrl();
+    this.lang = original.getLang();
+    this.phone = original.getPhone();
+    this.fareUrl = original.getFareUrl();
+    this.brandingUrl = original.getBrandingUrl();
+  }
+
+  @Override
+  protected void clearValues2() {
+    this.name = null;
+    this.timezone = null;
+    this.url = null;
+    this.lang = null;
+    this.phone = null;
+    this.fareUrl = null;
+    this.brandingUrl = null;
   }
 }

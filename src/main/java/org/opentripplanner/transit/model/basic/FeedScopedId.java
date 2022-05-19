@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
@@ -28,12 +28,11 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
 
   private final String id;
 
-  public FeedScopedId(@NotNull String feedId, @NotNull String id) {
-    assertHasValue(feedId);
-    assertHasValue(id);
-
+  public FeedScopedId(@Nonnull String feedId, @Nonnull String id) {
     this.feedId = feedId;
     this.id = id;
+    assertHasValue(feedId);
+    assertHasValue(id);
   }
 
   /**
@@ -41,7 +40,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    * only.
    */
   @Nullable
-  public static FeedScopedId ofNullable(@NotNull String feedId, @Nullable String id) {
+  public static FeedScopedId ofNullable(@Nonnull String feedId, @Nullable String id) {
     return id == null || id.isBlank() ? null : new FeedScopedId(feedId, id);
   }
 
