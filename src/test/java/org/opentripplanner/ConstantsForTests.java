@@ -1,6 +1,9 @@
 package org.opentripplanner;
 
 import com.csvreader.CsvReader;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
