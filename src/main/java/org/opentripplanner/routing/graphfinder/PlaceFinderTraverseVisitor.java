@@ -77,7 +77,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
     includeStops = shouldInclude(filterByPlaceTypes, PlaceType.STOP);
     includePatternAtStops = shouldInclude(filterByPlaceTypes, PlaceType.PATTERN_AT_STOP);
-    includeVehicleRentals = shouldInclude(filterByPlaceTypes, PlaceType.BICYCLE_RENT);
+    includeVehicleRentals = shouldInclude(filterByPlaceTypes, PlaceType.VEHICLE_RENT);
     includeCarParking = shouldInclude(filterByPlaceTypes, PlaceType.CAR_PARK);
     includeBikeParking = shouldInclude(filterByPlaceTypes, PlaceType.BIKE_PARK);
     this.maxResults = maxResults;
