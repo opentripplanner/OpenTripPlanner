@@ -495,21 +495,25 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
     int nextStopArrivalTime = getArrivalTime(firstUpdatedIndex);
     delay = getArrivalDelay(firstUpdatedIndex);
+    boolean adjustTimes = true;
     for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
-      if (getDepartureTime(i) < nextStopArrivalTime) {
-        return hasAdjustedTimes;
-      } else {
-        hasAdjustedTimes = true;
-        updateDepartureDelay(i, delay);
-        if (setNoData && !isCancelledStop(i)) {
-          setNoData(i);
-        }
+      if (setNoData && !isCancelledStop(i)) {
+        setNoData(i);
       }
-      if (getArrivalTime(i) < getDepartureTime(i)) {
-        return true;
-      } else {
-        updateArrivalDelay(i, delay);
-        nextStopArrivalTime = getArrivalTime(i);
+      if (adjustTimes) {
+        if (getDepartureTime(i) < nextStopArrivalTime) {
+          adjustTimes = false;
+          continue;
+        } else {
+          hasAdjustedTimes = true;
+          updateDepartureDelay(i, delay);
+        }
+        if (getArrivalTime(i) < getDepartureTime(i)) {
+          adjustTimes = false;
+        } else {
+          updateArrivalDelay(i, delay);
+          nextStopArrivalTime = getArrivalTime(i);
+        }
       }
     }
     return hasAdjustedTimes;
