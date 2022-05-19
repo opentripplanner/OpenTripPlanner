@@ -24,7 +24,7 @@
     <properties>
         <otp.serialization.version.id>24</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>26.2</geotools.version>
+        <geotools.version>26.4</geotools.version>
         <jackson.version>2.13.2</jackson.version>
         <jersey.version>2.34</jersey.version>
         <junit.version>5.8.2</junit.version>
