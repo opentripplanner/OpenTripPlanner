@@ -39,15 +39,19 @@ class RouteMapper {
     lhs.setAgency(agencyMapper.map(rhs.getAgency()));
     lhs.setShortName(rhs.getShortName());
     lhs.setLongName(rhs.getLongName());
-    int routeType = rhs.getType();
-    lhs.setGtfsType(routeType);
-    TransitMode mode = TransitModeMapper.mapMode(routeType);
+    lhs.setGtfsType(rhs.getType());
+
+    if (rhs.isSortOrderSet()) {
+      lhs.setGtfsSortOrder(rhs.getSortOrder());
+    }
+    var mode = TransitModeMapper.mapMode(rhs.getType());
+
     if (mode == null) {
       issueStore.add(
         "RouteMapper",
         "Treating %s route type for route %s as BUS.",
-        routeType,
-        lhs.getId().toString()
+        rhs.getType(),
+        lhs.getId()
       );
       lhs.setMode(TransitMode.BUS);
     } else {
@@ -58,7 +62,6 @@ class RouteMapper {
     lhs.setColor(rhs.getColor());
     lhs.setTextColor(rhs.getTextColor());
     lhs.setBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
-    lhs.setSortOrder(rhs.getSortOrder());
     lhs.setBranding(brandingMapper.map(rhs));
 
     return lhs;

@@ -37,7 +37,7 @@ public class RouteMapper {
     api.color = domain.getColor();
     api.textColor = domain.getTextColor();
     api.bikesAllowed = BikeAccessMapper.mapToApi(domain.getBikesAllowed());
-    api.sortOrder = domain.isSortOrderSet() ? domain.getSortOrder() : null;
+    api.sortOrder = domain.getGtfsSortOrder();
 
     Branding branding = domain.getBranding();
     if (branding != null) {

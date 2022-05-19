@@ -41,7 +41,7 @@ public class RouteMapperTest {
 
   private static final int BIKES_ALLOWED = 1;
 
-  private static final int SORT_ORDER = 1;
+  private static final Integer SORT_ORDER = 1;
 
   private static final String BRANDING_URL = "www.url.me/brand";
 
@@ -93,7 +93,7 @@ public class RouteMapperTest {
     assertEquals(COLOR, result.getColor());
     assertEquals(TEXT_COLOR, result.getTextColor());
     assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
-    assertEquals(SORT_ORDER, result.getSortOrder());
+    assertEquals(SORT_ORDER, result.getGtfsSortOrder());
 
     Branding branding = result.getBranding();
     assertNotNull(branding);
@@ -118,7 +118,7 @@ public class RouteMapperTest {
     assertNull(result.getColor());
     assertNull(result.getTextColor());
     assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
-    assertFalse(result.isSortOrderSet());
+    assertNull(result.getGtfsSortOrder());
 
     Branding branding = result.getBranding();
     assertNull(branding);

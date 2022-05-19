@@ -4,6 +4,7 @@ package org.opentripplanner.transit.model.network;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -13,8 +14,6 @@ import org.opentripplanner.transit.model.organization.Operator;
 public final class Route extends TransitEntity {
 
   private static final long serialVersionUID = 1L;
-
-  private static final int MISSING_VALUE = -999;
 
   private Agency agency;
 
@@ -32,6 +31,9 @@ public final class Route extends TransitEntity {
 
   // TODO: consolidate these
   private Integer gtfsType;
+
+  private Integer gtfsSortOrder;
+
   private String netexSubmode;
 
   private String desc;
@@ -43,8 +45,6 @@ public final class Route extends TransitEntity {
   private String textColor;
 
   private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
-
-  private int sortOrder = MISSING_VALUE;
 
   private String flexibleLineType;
 
@@ -115,6 +115,15 @@ public final class Route extends TransitEntity {
     this.gtfsType = gtfsType;
   }
 
+  @Nullable
+  public Integer getGtfsSortOrder() {
+    return gtfsSortOrder;
+  }
+
+  public void setGtfsSortOrder(@Nullable Integer gtfsSortOrder) {
+    this.gtfsSortOrder = gtfsSortOrder;
+  }
+
   public TransitMode getMode() {
     return mode;
   }
@@ -153,18 +162,6 @@ public final class Route extends TransitEntity {
 
   public void setBikesAllowed(BikeAccess bikesAllowed) {
     this.bikesAllowed = bikesAllowed;
-  }
-
-  public boolean isSortOrderSet() {
-    return sortOrder != MISSING_VALUE;
-  }
-
-  public int getSortOrder() {
-    return sortOrder;
-  }
-
-  public void setSortOrder(int sortOrder) {
-    this.sortOrder = sortOrder;
   }
 
   /**
