@@ -374,11 +374,7 @@
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
-                        <entrypoint>
-                            <arg>/bin/sh</arg>
-                            <arg>-e</arg>
-                            <arg>exec java $JAVA_OPTS -cp $( cat /app/jib-classpath-file ) $( cat /app/jib-main-class-file ) /var/opentripplanner/ $@</arg>
-                        </entrypoint>
+                        <entrypoint>/docker-entrypoint.sh</entrypoint>
                         <volumes>
                             <volume>
                                 /var/opentripplanner/
@@ -398,6 +394,10 @@
                     </to>
                     <extraDirectories>
                         <permissions>
+                            <permission>
+                                <file>/docker-entrypoint.sh</file>
+                                <mode>755</mode>
+                            </permission>
                             <permission>
                                 <file>/var/opentripplanner/</file>
                                 <mode>755</mode>
