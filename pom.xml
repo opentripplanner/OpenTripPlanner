@@ -367,6 +367,41 @@
                 </executions>
 
             </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <container>
+                        <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
+                        <entrypoint>
+                            <arg>/bin/sh</arg>
+                            <arg>-c</arg>
+                            <arg>exec java $JAVA_OPTS -cp $( cat /app/jib-classpath-file ) $( cat /app/jib-main-class-file ) /var/opentripplanner/</arg>
+                        </entrypoint>
+                        <volumes>
+                            <volume>
+                                /var/opentripplanner/
+                            </volume>
+                        </volumes>
+                    </container>
+                    <to>
+                        <image>docker.io/lehrenfried/opentripplanner</image>
+                        <auth>
+                            <username>lehrenfried</username>
+                            <password>${env.DOCKERHUB_TOKEN}</password>
+                        </auth>
+                    </to>
+                    <extraDirectories>
+                        <permissions>
+                            <permission>
+                                <file>/var/opentripplanner/</file>
+                                <mode>755</mode>
+                            </permission>
+                        </permissions>
+                    </extraDirectories>
+                </configuration>
+            </plugin>
 
             <!-- compile the gtfs-realtime.proto file to Java code
                To update the proto file run the following command:

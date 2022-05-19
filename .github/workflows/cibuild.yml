@@ -9,6 +9,7 @@ on:
       - master
       - dev-1.x
       - dev-2.x
+      - container-image
   pull_request:
     branches:
       - master
@@ -51,3 +52,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck
+
+  container-image:
+    runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2.3.2
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Build container image with Jib, push to Dockerhub
+        run: mvn --batch-mode compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,${{ github.sha }}
