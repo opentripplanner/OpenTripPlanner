@@ -22,7 +22,7 @@ public class StreetElevationExtension implements Serializable {
 
   private final double effectiveBikeDistance;
 
-  private final double effectiveBikeWorkCost;
+  private final double effectiveBikeDistanceForWorkCost;
 
   private final double effectiveWalkDistance;
 
@@ -47,7 +47,7 @@ public class StreetElevationExtension implements Serializable {
     this.distanceMeters = distanceMeters;
     this.effectiveBicycleSafetyDistance = effectiveBicycleSafetyFactor * distanceMeters;
     this.effectiveBikeDistance = effectiveBikeDistanceFactor * distanceMeters;
-    this.effectiveBikeWorkCost = effectiveBikeWorkFactor * distanceMeters;
+    this.effectiveBikeDistanceForWorkCost = effectiveBikeWorkFactor * distanceMeters;
     this.effectiveWalkDistance = effectiveWalkDistanceFactor * distanceMeters;
     this.distanceWithElevation = lengthMultiplier * distanceMeters;
     this.maxSlope = maxSlope;
@@ -107,8 +107,8 @@ public class StreetElevationExtension implements Serializable {
    * The distance multiplied by a factor considering how much more/less convenient it is to bike
    * the edge, compared to if it was flat. This is calculated form the energy usage of the cyclist.
    */
-  public double getEffectiveBikeWorkCost() {
-    return effectiveBikeWorkCost;
+  public double getEffectiveBikeDistanceForWorkCost() {
+    return effectiveBikeDistanceForWorkCost;
   }
 
   /**
@@ -141,7 +141,7 @@ public class StreetElevationExtension implements Serializable {
       .addNum("distanceMeters", distanceMeters)
       .addNum("effectiveBicycleSafetyFactor", effectiveBicycleSafetyDistance)
       .addNum("effectiveBikeDistance", effectiveBikeDistance)
-      .addNum("effectiveBikeWorkCost", effectiveBikeWorkCost)
+      .addNum("effectiveBikeDistanceForWorkCost", effectiveBikeDistanceForWorkCost)
       .addNum("effectiveWalkDistance", effectiveWalkDistance)
       .addNum("maxSlope", maxSlope)
       .toString();

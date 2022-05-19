@@ -325,9 +325,9 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
    * This gets the effective work amount for bikes, taking the effort required to traverse the
    * slopes into account.
    */
-  public double getEffectiveBikeWorkCost() {
+  public double getEffectiveBikeDistanceForWorkCost() {
     return hasElevationExtension()
-      ? elevationExtension.getEffectiveBikeWorkCost()
+      ? elevationExtension.getEffectiveBikeDistanceForWorkCost()
       : getDistanceMeters();
   }
 
@@ -989,7 +989,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             break;
           case FLAT:
             /* see notes in StreetVertex on speed overhead */
-            weight = getEffectiveBikeWorkCost() / speed;
+            weight = getEffectiveBikeDistanceForWorkCost() / speed;
             break;
           case QUICK:
             weight = getEffectiveBikeDistance() / speed;
@@ -997,7 +997,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
           case TRIANGLE:
             double quick = getEffectiveBikeDistance();
             double safety = getEffectiveBicycleSafetyDistance();
-            double slope = getEffectiveBikeWorkCost();
+            double slope = getEffectiveBikeDistanceForWorkCost();
             weight =
               quick *
               options.bikeTriangleTimeFactor +
