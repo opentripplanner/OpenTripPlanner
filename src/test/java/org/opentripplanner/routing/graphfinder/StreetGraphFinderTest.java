@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
@@ -15,6 +14,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
@@ -29,6 +29,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
   private StreetGraphFinder graphFinder;
   private Route R1, R2;
   private TripPattern TP1, TP2;
+  private VehicleParking BP1, PR1, PR2;
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -53,32 +54,35 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           C = intersection("C", 47.520, 19.00);
           D = intersection("D", 47.530, 19.00);
 
-          vehicleParking(
-            "BP1",
-            47.520,
-            18.999,
-            true,
-            false,
-            List.of(vehicleParkingEntrance(C, "BP1 Entrance", false, true))
-          );
+          BP1 =
+            vehicleParking(
+              "BP1",
+              47.520,
+              18.999,
+              true,
+              false,
+              List.of(vehicleParkingEntrance(C, "BP1 Entrance", false, true))
+            );
 
-          vehicleParking(
-            "PR1",
-            47.510,
-            18.999,
-            false,
-            true,
-            List.of(vehicleParkingEntrance(B, "PR1 Entrance", true, true))
-          );
+          PR1 =
+            vehicleParking(
+              "PR1",
+              47.510,
+              18.999,
+              false,
+              true,
+              List.of(vehicleParkingEntrance(B, "PR1 Entrance", true, true))
+            );
 
-          vehicleParking(
-            "PR2",
-            47.530,
-            18.999,
-            false,
-            true,
-            List.of(vehicleParkingEntrance(D, "PR2 Entrance", true, true))
-          );
+          PR2 =
+            vehicleParking(
+              "PR2",
+              47.530,
+              18.999,
+              false,
+              true,
+              List.of(vehicleParkingEntrance(D, "PR2 Entrance", true, true))
+            );
 
           biLink(A, S1);
           biLink(A, BR1);
@@ -132,6 +136,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
     var ns2 = new PlaceAtDistance(S2.getStop(), 100);
     var ns3 = new PlaceAtDistance(S3.getStop(), 200);
     var br1 = new PlaceAtDistance(BR1.getStation(), 0);
+    var carParking = new PlaceAtDistance(PR1, 100);
+    var bikeParking = new PlaceAtDistance(BP1, 200);
     var br2 = new PlaceAtDistance(BR2.getStation(), 200);
     var ps11 = new PlaceAtDistance(new PatternAtStop(S1.getStop(), TP1), 0);
     var ps21 = new PlaceAtDistance(new PatternAtStop(S1.getStop(), TP2), 0);
@@ -153,7 +159,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
     );
 
     assertEquals(
-      List.of(ns1, ps21, ps11, br1, ns2, ns3, br2),
+      List.of(ns1, ps21, ps11, br1, carParking, ns2, bikeParking, ns3, br2),
       graphFinder.findClosestPlaces(
         47.500,
         19.000,
@@ -346,7 +352,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
   }
 
   @Test
-  void findClosestPlacesWithABikeRentalFilter() {
+  void findClosestPlacesWithAVehicleRentalFilter() {
     var br1 = new PlaceAtDistance(BR1.getStation(), 0);
     var br2 = new PlaceAtDistance(BR2.getStation(), 200);
 
@@ -384,15 +390,45 @@ class StreetGraphFinderTest extends GraphRoutingTest {
   }
 
   @Test
-  @Disabled
   void findClosestPlacesWithABikeParkFilter() {
-    // This is not implemented in StreetGraphFinder
+    var bikeParking = new PlaceAtDistance(BP1, 200);
+
+    assertEquals(
+      List.of(bikeParking),
+      graphFinder.findClosestPlaces(
+        47.500,
+        19.000,
+        300.0,
+        100,
+        null,
+        List.of(PlaceType.BIKE_PARK),
+        null,
+        null,
+        null,
+        routingService
+      )
+    );
   }
 
   @Test
-  @Disabled
   void findClosestPlacesWithACarParkFilter() {
-    // This is not implemented in StreetGraphFinder
+    var parkAndRides = List.of(new PlaceAtDistance(PR1, 100), new PlaceAtDistance(PR2, 300));
+
+    assertEquals(
+      parkAndRides,
+      graphFinder.findClosestPlaces(
+        47.500,
+        19.000,
+        300.0,
+        100,
+        null,
+        List.of(PlaceType.CAR_PARK),
+        null,
+        null,
+        null,
+        routingService
+      )
+    );
   }
 
   private List<NearbyStop> simplify(List<NearbyStop> closestStops) {
