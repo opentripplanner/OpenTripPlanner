@@ -323,4 +323,227 @@ public class TimetableTest {
     assertEquals(1, skippedStops.size());
     assertEquals(1, skippedStops.get(0));
   }
+
+  @Test
+  public void testUpdateWithAlwaysDelayPropagationFromSecondStop() {
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(10);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    stopTimeEventBuilder.setDelay(10);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(15);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.ALWAYS
+    );
+    var updatedTripTimes = patch.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    assertEquals(10, updatedTripTimes.getArrivalDelay(0));
+    assertEquals(10, updatedTripTimes.getDepartureDelay(0));
+    assertEquals(10, updatedTripTimes.getArrivalDelay(1));
+    assertEquals(10, updatedTripTimes.getDepartureDelay(1));
+    assertEquals(15, updatedTripTimes.getArrivalDelay(2));
+    assertEquals(15, updatedTripTimes.getDepartureDelay(2));
+
+    // ALWAYS propagation type shouldn't set NO_DATA flags
+    assertFalse(updatedTripTimes.isNoDataStop(0));
+    assertFalse(updatedTripTimes.isNoDataStop(1));
+    assertFalse(updatedTripTimes.isNoDataStop(2));
+  }
+
+  @Test
+  public void testUpdateWithAlwaysDelayPropagationFromThirdStop() {
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(15);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.ALWAYS
+    );
+    var updatedTripTimes = patch.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    assertEquals(15, updatedTripTimes.getArrivalDelay(0));
+    assertEquals(15, updatedTripTimes.getDepartureDelay(0));
+    assertEquals(15, updatedTripTimes.getArrivalDelay(1));
+    assertEquals(15, updatedTripTimes.getDepartureDelay(1));
+    assertEquals(15, updatedTripTimes.getArrivalDelay(2));
+    assertEquals(15, updatedTripTimes.getDepartureDelay(2));
+  }
+
+  @Test
+  public void testUpdateWithRequiredNoDataDelayPropagationWhenItsNotRequired() {
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(-100);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var timetable = this.timetable;
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+    var updatedTripTimes = patch.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    assertEquals(0, updatedTripTimes.getArrivalDelay(0));
+    assertEquals(0, updatedTripTimes.getDepartureDelay(0));
+    assertEquals(0, updatedTripTimes.getArrivalDelay(1));
+    assertEquals(0, updatedTripTimes.getDepartureDelay(1));
+    assertEquals(-100, updatedTripTimes.getArrivalDelay(2));
+    assertEquals(-100, updatedTripTimes.getDepartureDelay(2));
+    assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
+
+    // REQUIRED_NO_DATA propagation type should always set NO_DATA flags'
+    // on stops at the beginning with no estimates
+    assertTrue(updatedTripTimes.isNoDataStop(0));
+    assertTrue(updatedTripTimes.isNoDataStop(1));
+    assertFalse(updatedTripTimes.isNoDataStop(2));
+  }
+
+  @Test
+  public void testUpdateWithRequiredNoDataDelayPropagationWhenItsRequired() {
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(-700);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var timetable = this.timetable;
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+    var updatedTripTimes = patch.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(0));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(0));
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(2));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(2));
+    assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
+
+    // REQUIRED_NO_DATA propagation type should always set NO_DATA flags'
+    // on stops at the beginning with no estimates
+    assertTrue(updatedTripTimes.isNoDataStop(0));
+    assertTrue(updatedTripTimes.isNoDataStop(1));
+    assertFalse(updatedTripTimes.isNoDataStop(2));
+  }
+
+  @Test
+  public void testUpdateWithRequiredNoDataDelayPropagationOnArrivalTime() {
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    stopTimeEventBuilder.setDelay(-700);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(15);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var timetable = this.timetable;
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+    var updatedTripTimes = patch.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(0));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(0));
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
+    assertEquals(15, updatedTripTimes.getArrivalDelay(2));
+    assertEquals(15, updatedTripTimes.getDepartureDelay(2));
+    assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
+
+    // REQUIRED_NO_DATA propagation type should always set NO_DATA flags'
+    // on stops at the beginning with no estimates but not on stop that has estimate
+    assertTrue(updatedTripTimes.isNoDataStop(0));
+    assertFalse(updatedTripTimes.isNoDataStop(1));
+    assertFalse(updatedTripTimes.isNoDataStop(2));
+  }
+
+  @Test
+  public void testUpdateWithRequiredDelayPropagationWhenItsRequired() {
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(-700);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var timetable = this.timetable;
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED
+    );
+    var updatedTripTimes = patch.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(0));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(0));
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
+    assertEquals(-700, updatedTripTimes.getArrivalDelay(2));
+    assertEquals(-700, updatedTripTimes.getDepartureDelay(2));
+    assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
+
+    // REQUIRED propagation type should never set NO_DATA flags'
+    // on stops at the beginning with no estimates
+    assertFalse(updatedTripTimes.isNoDataStop(0));
+    assertFalse(updatedTripTimes.isNoDataStop(1));
+    assertFalse(updatedTripTimes.isNoDataStop(2));
+  }
 }
