@@ -377,7 +377,7 @@
                         <entrypoint>
                             <arg>/bin/sh</arg>
                             <arg>-c</arg>
-                            <arg>exec java $JAVA_OPTS -cp $( cat /app/jib-classpath-file ) $( cat /app/jib-main-class-file ) /var/opentripplanner/</arg>
+                            <arg>exec java $JAVA_OPTS -cp $( cat /app/jib-classpath-file ) $( cat /app/jib-main-class-file ) /var/opentripplanner/ $@</arg>
                         </entrypoint>
                         <volumes>
                             <volume>
