@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.core;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -8,8 +10,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
-public class TestTurns extends TestCase {
+public class TurnsTest {
 
+  @Test
   public void testIntersectionVertex() {
     GeometryFactory gf = new GeometryFactory();
 

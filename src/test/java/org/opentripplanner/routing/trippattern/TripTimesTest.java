@@ -131,6 +131,15 @@ public class TripTimesTest {
   }
 
   @Test
+  public void testNoData() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    updatedTripTimesA.setNoData(1);
+    assertFalse(updatedTripTimesA.isNoDataStop(0));
+    assertTrue(updatedTripTimesA.isNoDataStop(1));
+    assertFalse(updatedTripTimesA.isNoDataStop(2));
+  }
+
+  @Test
   public void testApply() {
     Trip trip = new Trip(TRIP_ID);
 

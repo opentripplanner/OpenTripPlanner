@@ -1,13 +1,15 @@
 package org.opentripplanner.util.xml;
 
 import static java.util.Locale.ROOT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Map;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TestXmlDataListDownloader extends TestCase {
+public class XmlDataListDownloaderTest {
 
+  @Test
   public void testKML() {
     XmlDataListDownloader<DataTest> xmlDataListDownloader = new XmlDataListDownloader<>();
     xmlDataListDownloader.setPath("//document/data/element");

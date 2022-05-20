@@ -1,13 +1,13 @@
 package org.opentripplanner.model.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.PickDrop;
@@ -64,7 +64,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   private TripPattern patternInT2;
   private OtpTransitServiceBuilder subject;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     subject = new OtpTransitServiceBuilder();
 
@@ -121,25 +121,25 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();
-    assertEquals(calendars.toString(), 1, calendars.size());
-    assertEquals(calendars.toString(), SERVICE_C_IN, calendars.get(0).getServiceId());
+    assertEquals(1, calendars.size(), calendars.toString());
+    assertEquals(SERVICE_C_IN, calendars.get(0).getServiceId(), calendars.toString());
 
     // Verify calendar dates
     List<ServiceCalendarDate> dates = subject.getCalendarDates();
-    assertEquals(dates.toString(), 1, dates.size());
-    assertEquals(dates.toString(), SERVICE_D_IN, dates.get(0).getServiceId());
+    assertEquals(1, dates.size(), dates.toString());
+    assertEquals(SERVICE_D_IN, dates.get(0).getServiceId(), dates.toString());
 
     // Verify trips
     EntityById<Trip> trips = subject.getTripsById();
-    assertEquals(trips.toString(), 2, trips.size());
-    assertTrue(trips.toString(), trips.containsKey(tripCSIn.getId()));
-    assertTrue(trips.toString(), trips.containsKey(tripCSDIn.getId()));
+    assertEquals(2, trips.size(), trips.toString());
+    assertTrue(trips.containsKey(tripCSIn.getId()), trips.toString());
+    assertTrue(trips.containsKey(tripCSDIn.getId()), trips.toString());
 
     // Verify patterns
     Collection<TripPattern> patterns = subject.getTripPatterns().get(STOP_PATTERN);
     assertEquals(2, patterns.size());
-    assertTrue(patterns.toString(), patterns.contains(patternInT1));
-    assertTrue(patterns.toString(), patterns.contains(patternInT2));
+    assertTrue(patterns.contains(patternInT1), patterns.toString());
+    assertTrue(patterns.contains(patternInT2), patterns.toString());
 
     // Verify trips in pattern (one trip is removed from patternInT1)
     assertEquals(1, patternInT1.scheduledTripsAsStream().count());

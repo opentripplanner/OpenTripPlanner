@@ -704,16 +704,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         tripTimes.updateDepartureDelay(i, expectedDepartureTime - aimedDepartureTime);
       }
 
-      if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-        tripTimes.setCancelled(i);
-      }
-
       boolean isCallPredictionInaccurate =
         estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();
-      tripTimes.setPredictionInaccurate(
-        i,
-        (isJourneyPredictionInaccurate | isCallPredictionInaccurate)
-      );
+
+      if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+        tripTimes.setCancelled(i);
+      } else if (isJourneyPredictionInaccurate | isCallPredictionInaccurate) {
+        tripTimes.setPredictionInaccurate(i);
+      }
 
       if (i == 0) {
         // Fake arrival on first stop

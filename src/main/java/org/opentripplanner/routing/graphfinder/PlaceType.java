@@ -6,7 +6,7 @@ package org.opentripplanner.routing.graphfinder;
 public enum PlaceType {
   STOP,
   PATTERN_AT_STOP,
-  BICYCLE_RENT,
+  VEHICLE_RENT,
   BIKE_PARK,
   CAR_PARK,
 }

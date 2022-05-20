@@ -1,13 +1,17 @@
 package org.opentripplanner.ext.vehicleparking.kml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
-public class TestKmlBikeParkSource extends TestCase {
+public class KmlBikeParkSourceTest {
 
   private static final String TEST_FEED_ID = "testFeed";
 
+  @Test
   public void testKML() {
     var parameters = new KmlUpdaterParameters(
       "",
@@ -32,6 +36,7 @@ public class TestKmlBikeParkSource extends TestCase {
     assertTrue(zwolle.getY() >= 52.504990 && zwolle.getY() <= 52.504991);
   }
 
+  @Test
   public void testKMLWithFolder() {
     var parameters = new KmlUpdaterParameters(
       "",

@@ -52,6 +52,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fallback to recorded/expected arrival/departure time if other one is missing in SIRI-ET [#4055](https://github.com/opentripplanner/OpenTripPlanner/pull/4055)
 - Allow overriding GBFS system_id with configuration [#4147](https://github.com/opentripplanner/OpenTripPlanner/pull/4147)
 - doc: add headers GBFS config doc [#4153](https://github.com/opentripplanner/OpenTripPlanner/pull/4153)
+- Fix error with transfer-slack and GTFS minTransferTime [#4120](https://github.com/opentripplanner/OpenTripPlanner/pull/4120)
+- Use actual distance for walk distance in StreetEdge [#4125](https://github.com/opentripplanner/OpenTripPlanner/pull/4125)
+- Don't indicate stop has been updated when NO_DATA is defined [#3962](https://github.com/opentripplanner/OpenTripPlanner/pull/3962)
+- Implement nearby searches for car and bicycle parking [#4165](https://github.com/opentripplanner/OpenTripPlanner/pull/4165)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

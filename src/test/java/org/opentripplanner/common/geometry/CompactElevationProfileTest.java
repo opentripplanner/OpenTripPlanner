@@ -1,12 +1,17 @@
 package org.opentripplanner.common.geometry;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 
-public class CompactElevationProfileTest extends TestCase {
+public class CompactElevationProfileTest {
 
+  @Test
   public final void testEncodingDecoding() {
     CompactElevationProfile.setDistanceBetweenSamplesM(
       CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
@@ -42,8 +47,8 @@ public class CompactElevationProfileTest extends TestCase {
       Coordinate c2 = elev2.getCoordinate(i);
       double dx = Math.abs(c1.x - c2.x);
       double dy = Math.abs(c1.y - c2.y);
-      assertTrue("Too large arc length delta", dx <= 1e-2);
-      assertTrue("Too large elevation delta", dy <= 1e-2);
+      assertTrue(dx <= 1e-2, "Too large arc length delta");
+      assertTrue(dy <= 1e-2, "Too large elevation delta");
     }
   }
 }
