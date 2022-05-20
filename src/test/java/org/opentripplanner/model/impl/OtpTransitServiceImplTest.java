@@ -151,7 +151,7 @@ public class OtpTransitServiceImplTest {
     Collection<Trip> trips = subject.getAllTrips();
 
     assertEquals(33, trips.size());
-    assertEquals("Trip{id: 'agency:1.1'}", first(trips).toString());
+    assertEquals("<Trip agency:1.1>", first(trips).toString());
   }
 
   @Test

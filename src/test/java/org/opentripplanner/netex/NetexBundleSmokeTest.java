@@ -159,7 +159,7 @@ public class NetexBundleSmokeTest {
     assertEquals("RB", p.getFeedId());
     assertEquals("[<Stop RB:NSR:Quay:7203>, <Stop RB:NSR:Quay:8027>]", p.getStops().toString());
     assertEquals(
-      "[Trip{id: 'RB:RUT:ServiceJourney:12-101375-1000'}]",
+      "[<Trip RB:RUT:ServiceJourney:12-101375-1000>]",
       p.scheduledTripsAsStream().collect(Collectors.toList()).toString()
     );
 
