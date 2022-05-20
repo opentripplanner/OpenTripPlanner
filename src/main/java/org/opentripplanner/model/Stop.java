@@ -83,14 +83,14 @@ public final class Stop extends StationElement implements StopLocation {
    * @see #stopForTest(String, double, double, Station)
    */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
-    return stopForTest(idAndName, null, lat, lon, null, NO_INFORMATION);
+    return stopForTest(idAndName, (String) null, lat, lon, null);
   }
 
   /**
    * @see #stopForTest(String, double, double, Station)
    */
   public static Stop stopForTest(String idAndName, I18NString desc, double lat, double lon) {
-    return stopForTest(idAndName, desc, lat, lon, null, NO_INFORMATION);
+    return stopForTest(idAndName, desc, lat, lon, null);
   }
 
   /**
@@ -98,7 +98,24 @@ public final class Stop extends StationElement implements StopLocation {
    * coordinate. The feedId is static set to "F"
    */
   public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
-    return stopForTest(idAndName, null, lat, lon, parent, NO_INFORMATION);
+    return stopForTest(idAndName, (String) null, lat, lon, parent);
+  }
+
+  public static Stop stopForTest(
+    String idAndName,
+    String desc,
+    double lat,
+    double lon,
+    Station parent
+  ) {
+    return stopForTest(
+      idAndName,
+      NonLocalizedString.ofNullable(desc),
+      lat,
+      lon,
+      parent,
+      NO_INFORMATION
+    );
   }
 
   public static Stop stopForTest(
@@ -123,14 +140,11 @@ public final class Stop extends StationElement implements StopLocation {
     Station parent,
     WheelchairBoarding wheelChairBoarding
   ) {
-    NonLocalizedString nonLocalizedDesc = desc != null
-      ? new NonLocalizedString(desc.toString())
-      : null;
     var stop = new Stop(
       new FeedScopedId("F", idAndName),
       new NonLocalizedString(idAndName),
       idAndName,
-      nonLocalizedDesc,
+      desc,
       new WgsCoordinate(lat, lon),
       wheelChairBoarding,
       null,

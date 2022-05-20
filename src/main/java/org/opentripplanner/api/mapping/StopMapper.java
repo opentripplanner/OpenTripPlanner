@@ -7,6 +7,7 @@ import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class StopMapper {
 
@@ -33,7 +34,9 @@ public class StopMapper {
     api.code = domain.getCode();
     api.name = domain.getName().toString();
     if (extended) {
-      String desc = domain.getDescription() != null ? domain.getDescription().toString() : null;
+      String desc = domain.getDescription() != null
+        ? NonLocalizedString.ofNullable(domain.getDescription().toString()).toString()
+        : null;
       api.desc = desc;
       api.zoneId = domain.getFirstZoneAsString();
       api.url = I18NStringMapper.mapToApi(domain.getUrl(), null);
