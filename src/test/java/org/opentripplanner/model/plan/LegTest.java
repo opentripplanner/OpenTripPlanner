@@ -1,10 +1,10 @@
 package org.opentripplanner.model.plan;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 public class LegTest implements PlanTestConstants {
@@ -60,32 +60,32 @@ public class LegTest implements PlanTestConstants {
     Leg t0 = createLegIgnoreTime(tripId0, fromStopIndex, toStopIndex, day1);
     Leg t1;
 
-    assertTrue("t0 is same trip as it self", t0.isPartiallySameTransitLeg(t0));
+    assertTrue(t0.isPartiallySameTransitLeg(t0), "t0 is same trip as it self");
 
     // Create a new trip with the same trip Id which ride only between the two first stops of trip 0.
     t1 = createLegIgnoreTime(tripId0, fromStopIndex, fromStopIndex + 1, day1);
-    assertTrue("t1 overlap t0", t1.isPartiallySameTransitLeg(t0));
-    assertTrue("t0 overlap t1", t0.isPartiallySameTransitLeg(t1));
+    assertTrue(t1.isPartiallySameTransitLeg(t0), "t1 overlap t0");
+    assertTrue(t0.isPartiallySameTransitLeg(t1), "t0 overlap t1");
 
     // Create a new trip with the same trip Id but on a diffrent service day
     t1 = createLegIgnoreTime(tripId0, fromStopIndex, fromStopIndex + 1, day2);
-    assertFalse("t1 diffrent serviceDate from t0", t1.isPartiallySameTransitLeg(t0));
-    assertFalse("t0 diffrent serviceDate from t1", t0.isPartiallySameTransitLeg(t1));
+    assertFalse(t1.isPartiallySameTransitLeg(t0), "t1 diffrent serviceDate from t0");
+    assertFalse(t0.isPartiallySameTransitLeg(t1), "t0 diffrent serviceDate from t1");
 
     // Create a new trip with the same trip Id which ride only between the two last stops of trip 0.
     t1 = createLegIgnoreTime(tripId0, toStopIndex - 1, toStopIndex, day1);
-    assertTrue("t1 overlap t0", t1.isPartiallySameTransitLeg(t0));
-    assertTrue("t0 overlap t1", t0.isPartiallySameTransitLeg(t1));
+    assertTrue(t1.isPartiallySameTransitLeg(t0), "t1 overlap t0");
+    assertTrue(t0.isPartiallySameTransitLeg(t1), "t0 overlap t1");
 
     // Create a new trip which alight at the board stop of t0 - should not overlap
     t1 = createLegIgnoreTime(tripId0, fromStopIndex - 1, fromStopIndex, day1);
-    assertFalse("t1 do not overlap t0", t1.isPartiallySameTransitLeg(t0));
-    assertFalse("t0 do not overlap t1", t0.isPartiallySameTransitLeg(t1));
+    assertFalse(t1.isPartiallySameTransitLeg(t0), "t1 do not overlap t0");
+    assertFalse(t0.isPartiallySameTransitLeg(t1), "t0 do not overlap t1");
 
     // Two legs do NOT overlap is on diffrent trips
     t1 = createLegIgnoreTime(tripIdOther, fromStopIndex, toStopIndex, day1);
-    assertFalse("t1 do not overlap t0", t1.isPartiallySameTransitLeg(t0));
-    assertFalse("t0 do not overlap t1", t0.isPartiallySameTransitLeg(t1));
+    assertFalse(t1.isPartiallySameTransitLeg(t0), "t1 do not overlap t0");
+    assertFalse(t0.isPartiallySameTransitLeg(t1), "t0 do not overlap t1");
   }
 
   private static Leg createLegIgnoreTime(
