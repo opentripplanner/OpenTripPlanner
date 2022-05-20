@@ -111,7 +111,7 @@ public class TriangleTest {
 
     SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
     double trueLength = costs.lengthMultiplier * length;
-    double slopeWorkLength = testStreet.getEffectiveBikeWorkCost();
+    double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
     double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
     RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);

@@ -7,7 +7,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -102,7 +102,7 @@ public class Place {
     );
   }
 
-  public static Place forVehicleRentalPlace(VehicleRentalStationVertex vertex) {
+  public static Place forVehicleRentalPlace(VehicleRentalPlaceVertex vertex) {
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

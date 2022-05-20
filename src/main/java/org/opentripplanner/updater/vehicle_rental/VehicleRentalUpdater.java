@@ -20,7 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -39,7 +39,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
   private final DataSource<VehicleRentalPlace> source;
   private WriteToGraphCallback saveResultOnGraph;
-  Map<FeedScopedId, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
+  Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private VertexLinker linker;
 
@@ -121,17 +121,17 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       for (VehicleRentalPlace station : stations) {
         service.addVehicleRentalStation(station);
         stationSet.add(station.getId());
-        VehicleRentalStationVertex vehicleRentalVertex = verticesByStation.get(station.getId());
+        VehicleRentalPlaceVertex vehicleRentalVertex = verticesByStation.get(station.getId());
         if (vehicleRentalVertex == null) {
-          vehicleRentalVertex = new VehicleRentalStationVertex(graph, station);
+          vehicleRentalVertex = new VehicleRentalPlaceVertex(graph, station);
           DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
             vehicleRentalVertex,
             new TraverseModeSet(TraverseMode.WALK),
             LinkingDirection.BOTH_WAYS,
             (vertex, streetVertex) ->
               List.of(
-                new StreetVehicleRentalLink((VehicleRentalStationVertex) vertex, streetVertex),
-                new StreetVehicleRentalLink(streetVertex, (VehicleRentalStationVertex) vertex)
+                new StreetVehicleRentalLink((VehicleRentalPlaceVertex) vertex, streetVertex),
+                new StreetVehicleRentalLink(streetVertex, (VehicleRentalPlaceVertex) vertex)
               )
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
@@ -155,7 +155,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       }
       /* remove existing stations that were not present in the update */
       List<FeedScopedId> toRemove = new ArrayList<>();
-      for (Entry<FeedScopedId, VehicleRentalStationVertex> entry : verticesByStation.entrySet()) {
+      for (Entry<FeedScopedId, VehicleRentalPlaceVertex> entry : verticesByStation.entrySet()) {
         FeedScopedId station = entry.getKey();
         if (stationSet.contains(station)) continue;
         toRemove.add(station);

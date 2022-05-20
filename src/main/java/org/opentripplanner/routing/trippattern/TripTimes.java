@@ -89,34 +89,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * real-time updates. Non-final to allow updates.
    */
   private int[] departureTimes;
+
   /**
-   * Flag to indicate that the stop has been passed without removing arrival/departure-times - i.e.
-   * "estimates" are actual times, no longer estimates.
+   * States of the stops in the trip. If the state is DEFAULT for a stop, {@link #realTimeState}
+   * should determine the realtime state of the stop.
    * <p>
-   * This is only for API-purposes. Non-final to allow updates.
+   * This is only for API-purposes (does not affect routing). Non-final to allow updates.
    */
-  private boolean[] recordedStops;
-  /**
-   * Whether each stop has been cancelled by realtime updates (in the most recent derived realtime
-   * StopPattern). The cancellation information here need not match the information in the
-   * StopPattern for this TripTimes. This is somewhat redundant: it duplicates cancellation
-   * information found in the {@link StopPattern} of the new {@link TripPattern} created by the
-   * realtime update. The use case is displaying cancellation information when this original
-   * (non-real-time) pattern is queried, even though this original pattern allows pickup and dropoff
-   * at the canceled stop. This is only for API purposes and does not affect routing.
-   * <p>
-   * // TODO This seems to only be changed after a new TripTimes has been created by the realtime //
-   * TODO updater and the scheduled TripTimes is never changed. We should clean this up // TODO when
-   * refactoring the realtime model. Preferably so that a reference is kept between // TODO the
-   * realtime data and the scheduled data, so that data is not duplicated
-   * <p>
-   * Non-final to allow updates.
-   */
-  private boolean[] cancelledStops;
-  /**
-   * Flag to indicate inaccurate predictions on each stop. Non-final to allow updates.
-   */
-  private boolean[] predictionInaccurateOnStops;
+  private StopRealTimeState[] stopRealTimeStates;
+
   /**
    * The real-time state of this TripTimes.
    */
@@ -167,8 +148,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     // We cannot point to the scheduled times because they are shifted, and updated times are not.
     this.arrivalTimes = null;
     this.departureTimes = null;
-    this.recordedStops = null;
-    this.cancelledStops = null;
+    this.stopRealTimeStates = null;
     this.timepoints = deduplicator.deduplicateBitSet(timepoints);
     LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
   }
@@ -184,8 +164,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.scheduledDepartureTimes = object.scheduledDepartureTimes;
     this.arrivalTimes = null;
     this.departureTimes = null;
-    this.recordedStops = object.recordedStops;
-    this.predictionInaccurateOnStops = object.predictionInaccurateOnStops;
+    this.stopRealTimeStates = object.stopRealTimeStates;
     this.pickupBookingInfos = object.pickupBookingInfos;
     this.dropOffBookingInfos = object.dropOffBookingInfos;
     this.originalGtfsStopSequence = object.originalGtfsStopSequence;
@@ -265,43 +244,54 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
   }
 
-  public void setRecorded(int stop, boolean recorded) {
+  public void setRecorded(int stop) {
     prepareForRealTimeUpdates();
-    recordedStops[stop] = recorded;
+    stopRealTimeStates[stop] = StopRealTimeState.RECORDED;
   }
 
   public void setCancelled(int stop) {
     prepareForRealTimeUpdates();
-    cancelledStops[stop] = true;
+    stopRealTimeStates[stop] = StopRealTimeState.CANCELLED;
+  }
+
+  public void setNoData(int stop) {
+    prepareForRealTimeUpdates();
+    stopRealTimeStates[stop] = StopRealTimeState.NO_DATA;
+  }
+
+  public void setPredictionInaccurate(int stop) {
+    prepareForRealTimeUpdates();
+    stopRealTimeStates[stop] = StopRealTimeState.INACCURATE_PREDICTIONS;
   }
 
   public boolean isCancelledStop(int stop) {
-    if (cancelledStops == null) {
+    if (stopRealTimeStates == null) {
       return false;
     }
-    return cancelledStops[stop];
+    return stopRealTimeStates[stop] == StopRealTimeState.CANCELLED;
   }
 
   // TODO OTP2 - Unused, but will be used by Transmodel API
   public boolean isRecordedStop(int stop) {
-    if (recordedStops == null) {
+    if (stopRealTimeStates == null) {
       return false;
     }
-    return recordedStops[stop];
+    return stopRealTimeStates[stop] == StopRealTimeState.RECORDED;
   }
 
-  //Is prediction for single stop inaccurate
-  public void setPredictionInaccurate(int stop, boolean predictionInaccurate) {
-    prepareForRealTimeUpdates();
-    predictionInaccurateOnStops[stop] = predictionInaccurate;
+  public boolean isNoDataStop(int stop) {
+    if (stopRealTimeStates == null) {
+      return false;
+    }
+    return stopRealTimeStates[stop] == StopRealTimeState.NO_DATA;
   }
 
   // TODO OTP2 - Unused, but will be used by Transmodel API
   public boolean isPredictionInaccurate(int stop) {
-    if (predictionInaccurateOnStops == null) {
+    if (stopRealTimeStates == null) {
       return false;
     }
-    return predictionInaccurateOnStops[stop];
+    return stopRealTimeStates[stop] == StopRealTimeState.INACCURATE_PREDICTIONS;
   }
 
   public BookingInfo getDropOffBookingInfo(int stop) {
@@ -536,15 +526,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     if (arrivalTimes == null) {
       this.arrivalTimes = Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length);
       this.departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
-      this.recordedStops = new boolean[arrivalTimes.length];
-      this.cancelledStops = new boolean[arrivalTimes.length];
-      this.predictionInaccurateOnStops = new boolean[arrivalTimes.length];
+      this.stopRealTimeStates = new StopRealTimeState[arrivalTimes.length];
       for (int i = 0; i < arrivalTimes.length; i++) {
         arrivalTimes[i] += timeShift;
         departureTimes[i] += timeShift;
-        recordedStops[i] = false;
-        cancelledStops[i] = false;
-        predictionInaccurateOnStops[i] = false;
+        stopRealTimeStates[i] = StopRealTimeState.DEFAULT;
       }
 
       // Update the real-time state

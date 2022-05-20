@@ -22,18 +22,11 @@ public class PlaceMapper {
       return null;
     }
 
-    switch (api) {
-      case QUAY:
-      case STOP_PLACE:
-        return PlaceType.STOP;
-      case BICYCLE_RENT:
-        return PlaceType.BICYCLE_RENT;
-      case BIKE_PARK:
-        return PlaceType.BIKE_PARK;
-      case CAR_PARK:
-        return PlaceType.CAR_PARK;
-      default:
-        throw new IllegalArgumentException("Unknown place type: " + api);
-    }
+    return switch (api) {
+      case QUAY, STOP_PLACE -> PlaceType.STOP;
+      case BICYCLE_RENT -> PlaceType.VEHICLE_RENT;
+      case BIKE_PARK -> PlaceType.BIKE_PARK;
+      case CAR_PARK -> PlaceType.CAR_PARK;
+    };
   }
 }

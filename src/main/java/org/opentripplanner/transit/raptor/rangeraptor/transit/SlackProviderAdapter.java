@@ -64,7 +64,7 @@ public final class SlackProviderAdapter {
     }
 
     @Override
-    public int accessEgressWithRidesTransferSlack() {
+    public int transferSlack() {
       return source.transferSlack();
     }
   }
@@ -94,7 +94,7 @@ public final class SlackProviderAdapter {
     }
 
     @Override
-    public int accessEgressWithRidesTransferSlack() {
+    public int transferSlack() {
       return source.transferSlack();
     }
   }

@@ -1,5 +1,9 @@
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import com.google.common.collect.Iterables;
@@ -10,8 +14,9 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
-import junit.framework.TestCase;
-import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssue;
@@ -43,14 +48,15 @@ import org.opentripplanner.util.TestUtils;
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
-@Ignore
-public class TestGeometryAndBlockProcessor extends TestCase {
+@Disabled
+public class GeometryAndBlockProcessorTest {
 
   private Graph graph;
   private GtfsContext context;
   private String feedId;
   private DataImportIssueStore issueStore;
 
+  @BeforeEach
   public void setUp() throws Exception {
     graph = new Graph();
 
@@ -126,6 +132,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     ttsnm.buildGraph(graph, new HashMap<>());
   }
 
+  @Test
   public void testIssue() {
     boolean found = false;
     for (DataImportIssue it : issueStore.getIssues()) {
@@ -138,6 +145,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertTrue(found);
   }
 
+  @Test
   public void testRouting() throws Exception {
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_b = graph.getVertex(feedId + ":B");
@@ -209,6 +217,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertEquals(endTime, path.getEndTime());
   }
 
+  @Test
   public void testRoutingOverMidnight() throws Exception {
     // this route only runs on weekdays
     Vertex stop_g = graph.getVertex(feedId + ":G_depart");
@@ -247,6 +256,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertTrue(endTime < startTime + 60 * 60);
   }
 
+  @Test
   public void testPickupDropoff() throws Exception {
     Vertex stop_o = graph.getVertex(feedId + ":O_depart");
     Vertex stop_p = graph.getVertex(feedId + ":P");
@@ -275,6 +285,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertEquals(endTime, path.getEndTime());
   }
 
+  @Test
   public void testTraverseMode() throws Exception {
     Vertex stop_a = graph.getVertex(feedId + ":A_depart");
     Vertex stop_b = graph.getVertex(feedId + ":B_arrive");
@@ -321,6 +332,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertNotNull(spt.getPath(stop_b));
   }
 
+  @Test
   public void testTimelessStops() throws Exception {
     Vertex stop_d = graph.getVertex(feedId + ":D");
     Vertex stop_c = graph.getVertex(feedId + ":C");
@@ -339,6 +351,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     );
   }
 
+  @Test
   public void testTripBikesAllowed() throws Exception {
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_b = graph.getVertex(feedId + ":B");
@@ -385,6 +398,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertNotNull(path);
   }
 
+  @Test
   public void testWheelchairAccessible() throws Exception {
     Vertex near_a = graph.getVertex("near_1_" + feedId + "_entrance_a");
     Vertex near_b = graph.getVertex("near_1_" + feedId + "_entrance_b");
@@ -455,6 +469,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertEquals(TestUtils.toSeconds(time), path.getEndTime());
   }
 
+  @Test
   public void testRunForTrain() {
     // This is the notorious Byrd bug: we're going from Q to T at 8:30.
     // There's a trip from S to T at 8:50 and a second one at 9:50.
@@ -481,6 +496,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     assertTrue(endTime - TestUtils.toSeconds(startTime) < 7200);
   }
 
+  @Test
   public void testFrequencies() {
     Vertex stop_u = graph.getVertex(feedId + ":U_depart");
     Vertex stop_v = graph.getVertex(feedId + ":V_arrive");
@@ -533,6 +549,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
 
   }
 
+  @Test
   public void testFewestTransfers() {
     Vertex stop_c = graph.getVertex(feedId + ":C");
     Vertex stop_d = graph.getVertex(feedId + ":D");
@@ -569,6 +586,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     );
   }
 
+  @Test
   public void testPathways() throws Exception {
     Vertex entrance = graph.getVertex(feedId + ":entrance_a");
     assertNotNull(entrance);

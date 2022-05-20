@@ -1,9 +1,12 @@
 package org.opentripplanner.model.plan;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestWalkStep extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class WalkStepTest {
+
+  @Test
   public void testRelativeDirection() {
     WalkStep step = new WalkStep();
 
