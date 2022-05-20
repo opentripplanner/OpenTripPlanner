@@ -92,8 +92,7 @@ in `build-config.json`:
 ```
 
 This results in OTP calculating an accessible transfer if the default one is found to be
-inaccessible
-to wheelchair users.
+inaccessible to wheelchair users.
 
 ## Example
 
