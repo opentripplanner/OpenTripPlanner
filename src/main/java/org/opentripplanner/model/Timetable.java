@@ -275,6 +275,7 @@ public class Timetable implements Serializable {
             newTimes.updateArrivalDelay(i, 0);
             newTimes.updateDepartureDelay(i, 0);
             delay = 0;
+            newTimes.setNoData(i);
           } else {
             if (update.hasArrival()) {
               StopTimeEvent arrival = update.getArrival();

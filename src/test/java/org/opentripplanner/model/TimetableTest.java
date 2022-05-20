@@ -1,8 +1,10 @@
 package org.opentripplanner.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -22,6 +24,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.TestUtils;
 
@@ -59,7 +62,6 @@ public class TimetableTest {
     StopTimeEvent.Builder stopTimeEventBuilder;
 
     int trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
-
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_c = graph.getVertex(feedId + ":C");
     RoutingRequest options = new RoutingRequest();
@@ -227,5 +229,36 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
     assertNull(patch);
+  }
+
+  @Test
+  public void testUpdateWithNoData() {
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(1);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(2);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+    var patch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+    var updatedTripTimes = patch.getTripTimes();
+    assertNotNull(updatedTripTimes);
+    assertEquals(RealTimeState.UPDATED, updatedTripTimes.getRealTimeState());
+    assertTrue(updatedTripTimes.isNoDataStop(0));
+    assertFalse(updatedTripTimes.isNoDataStop(1));
+    assertTrue(updatedTripTimes.isCancelledStop(1));
+    assertFalse(updatedTripTimes.isCancelledStop(2));
+    assertTrue(updatedTripTimes.isNoDataStop(2));
+    var skippedStops = patch.getSkippedStopIndices();
+    assertEquals(1, skippedStops.size());
+    assertEquals(1, skippedStops.get(0));
   }
 }

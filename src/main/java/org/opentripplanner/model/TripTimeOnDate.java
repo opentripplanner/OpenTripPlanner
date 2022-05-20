@@ -150,7 +150,7 @@ public class TripTimeOnDate {
   }
 
   public boolean isRealtime() {
-    return !tripTimes.isScheduled();
+    return !tripTimes.isScheduled() && !tripTimes.isNoDataStop(stopIndex);
   }
 
   public boolean isCancelledStop() {
@@ -170,7 +170,9 @@ public class TripTimeOnDate {
   }
 
   public RealTimeState getRealtimeState() {
-    return tripTimes.getRealTimeState();
+    return tripTimes.isNoDataStop(stopIndex)
+      ? RealTimeState.SCHEDULED
+      : tripTimes.getRealTimeState();
   }
 
   public long getServiceDayMidnight() {
