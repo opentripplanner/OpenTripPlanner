@@ -64,6 +64,7 @@
   <logger name="org.glassfish.grizzly" level="info" />
 
   <!-- optional logging configuration to define your own custom logging needs -->
-  <include optional="true" resource="logback-addendum.xml" />
+  <!-- add it to the root of OTP runtime folder -->
+  <include optional="true" file="logback-include-extensions.xml" />
 
 </configuration>
