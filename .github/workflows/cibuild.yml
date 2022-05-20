@@ -59,7 +59,7 @@ jobs:
     needs: build
     env:
       DOCKERHUB_USER: otpbot
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v2.3.2
         with:
