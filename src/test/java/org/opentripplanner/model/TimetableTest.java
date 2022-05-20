@@ -493,21 +493,10 @@ public class TimetableTest {
       serviceDate,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
-    var updatedTripTimes = patch.getTripTimes();
-    assertNotNull(updatedTripTimes);
-    assertEquals(-700, updatedTripTimes.getArrivalDelay(0));
-    assertEquals(-700, updatedTripTimes.getDepartureDelay(0));
-    assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
-    assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
-    assertEquals(15, updatedTripTimes.getArrivalDelay(2));
-    assertEquals(15, updatedTripTimes.getDepartureDelay(2));
-    assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
-
-    // REQUIRED_NO_DATA propagation type should always set NO_DATA flags'
-    // on stops at the beginning with no estimates but not on stop that has estimate
-    assertTrue(updatedTripTimes.isNoDataStop(0));
-    assertFalse(updatedTripTimes.isNoDataStop(1));
-    assertFalse(updatedTripTimes.isNoDataStop(2));
+    // if arrival time is not defined but departure time is not and the arrival time is greater
+    // than to departure time on a stop, we should not try to fix it by default because the spec
+    // only allows you to drop all estimates for a stop when it's passed according to schedule
+    assertNull(patch);
   }
 
   @Test

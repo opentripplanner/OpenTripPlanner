@@ -476,25 +476,19 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /**
-   * Adjusts arrival time for the stop at the firstUpdatedIndex if no update was given for it
-   * and arrival/departure times for the stops before that stop when required to ensure that the
-   * times are increasing. Can set NO_DATA flag on the updated previous stops.
-   * Returns {@code true} if times have been adjusted.
+   * Adjusts arrival and departure times for the stops before the stop at firstUpdatedIndex when
+   * required to ensure that the times are increasing. Can set NO_DATA flag on the updated previous
+   * stops. Returns {@code true} if times have been adjusted.
    */
   public boolean adjustTimesBeforeWhenRequired(int firstUpdatedIndex, boolean setNoData) {
-    boolean hasAdjustedTimes = false;
-    int delay = getDepartureDelay(firstUpdatedIndex);
     if (getArrivalTime(firstUpdatedIndex) > getDepartureTime(firstUpdatedIndex)) {
-      if (getArrivalDelay(firstUpdatedIndex) != 0) {
-        // The given trip update has arrival time after departure time for the first updated stop.
-        // This method doesn't try to fix issues in the given data, only for the missing part
-        return false;
-      }
-      updateArrivalDelay(firstUpdatedIndex, delay);
-      hasAdjustedTimes = true;
+      // The given trip update has arrival time after departure time for the first updated stop.
+      // This method doesn't try to fix issues in the given data, only for the missing part
+      return false;
     }
     int nextStopArrivalTime = getArrivalTime(firstUpdatedIndex);
-    delay = getArrivalDelay(firstUpdatedIndex);
+    int delay = getArrivalDelay(firstUpdatedIndex);
+    boolean hasAdjustedTimes = false;
     boolean adjustTimes = true;
     for (int i = firstUpdatedIndex - 1; i >= 0; i--) {
       if (setNoData && !isCancelledStop(i)) {
