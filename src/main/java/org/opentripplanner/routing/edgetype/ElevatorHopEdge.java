@@ -51,6 +51,28 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     this.wheelchairBoarding = wheelchairBoarding;
   }
 
+  public static void bidirectional(
+    Vertex from,
+    Vertex to,
+    StreetTraversalPermission permission,
+    WheelchairBoarding wheelchairBoarding,
+    int levels,
+    int travelTime
+  ) {
+    new ElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime);
+    new ElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime);
+  }
+
+  public static void bidirectional(
+    Vertex from,
+    Vertex to,
+    StreetTraversalPermission permission,
+    WheelchairBoarding wheelchairBoarding
+  ) {
+    new ElevatorHopEdge(from, to, permission, wheelchairBoarding);
+    new ElevatorHopEdge(to, from, permission, wheelchairBoarding);
+  }
+
   public StreetTraversalPermission getPermission() {
     return permission;
   }
@@ -102,10 +124,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     return s1.makeState();
   }
 
-  public boolean isWheelchairAccessible() {
-    return wheelchairBoarding == WheelchairBoarding.POSSIBLE;
-  }
-
   @Override
   public I18NString getName() {
     return null;
@@ -119,5 +137,9 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
   @Override
   public double getDistanceMeters() {
     return 0;
+  }
+
+  public boolean isWheelchairAccessible() {
+    return wheelchairBoarding == WheelchairBoarding.POSSIBLE;
   }
 }
