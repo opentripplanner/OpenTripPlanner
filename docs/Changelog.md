@@ -54,6 +54,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - doc: add headers GBFS config doc [#4153](https://github.com/opentripplanner/OpenTripPlanner/pull/4153)
 - Fix error with transfer-slack and GTFS minTransferTime [#4120](https://github.com/opentripplanner/OpenTripPlanner/pull/4120)
 - Use actual distance for walk distance in StreetEdge [#4125](https://github.com/opentripplanner/OpenTripPlanner/pull/4125)
+- Don't indicate stop has been updated when NO_DATA is defined [#3962](https://github.com/opentripplanner/OpenTripPlanner/pull/3962)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
