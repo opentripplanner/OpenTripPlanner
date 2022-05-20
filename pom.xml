@@ -388,8 +388,8 @@
                     <to>
                         <image>docker.io/lehrenfried/opentripplanner</image>
                         <auth>
-                            <username>lehrenfried</username>
-                            <password>${env.DOCKERHUB_TOKEN}</password>
+                            <username>${env.DOCKERHUB_USER}</username>
+                            <password>${env.DOCKERHUB_PASSWORD}</password>
                         </auth>
                     </to>
                     <extraDirectories>

@@ -55,7 +55,9 @@ jobs:
 
   container-image:
     runs-on: ubuntu-latest
+    needs: build
     env:
+      DOCKERHUB_USER: otpbot
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2.3.2
