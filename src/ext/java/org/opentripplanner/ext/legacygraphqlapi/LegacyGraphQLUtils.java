@@ -6,7 +6,7 @@ import java.util.Map;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFilterPlaceType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.util.I18NString;
@@ -34,7 +34,7 @@ public class LegacyGraphQLUtils {
     return input.toString(getLocale(environment));
   }
 
-  public static LegacyGraphQLWheelchairBoarding toGraphQL(WheelchairBoarding boarding) {
+  public static LegacyGraphQLWheelchairBoarding toGraphQL(WheelchairAccessibility boarding) {
     if (boarding == null) return null;
     return switch (boarding) {
       case NO_INFORMATION -> LegacyGraphQLWheelchairBoarding.NO_INFORMATION;

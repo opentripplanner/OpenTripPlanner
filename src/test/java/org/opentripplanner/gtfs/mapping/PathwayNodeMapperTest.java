@@ -11,7 +11,7 @@ import java.util.Collections;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.util.TranslationHelper;
 
 public class PathwayNodeMapperTest {
@@ -38,7 +38,8 @@ public class PathwayNodeMapperTest {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final WheelchairBoarding WHEELCHAIR_BOARDING_ENUM = WheelchairBoarding.POSSIBLE;
+  private static final WheelchairAccessibility WHEELCHAIR_BOARDING_ENUM =
+    WheelchairAccessibility.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
@@ -78,7 +79,7 @@ public class PathwayNodeMapperTest {
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
-    assertEquals(WheelchairBoarding.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairBoarding());
   }
 
   @Test
@@ -95,7 +96,7 @@ public class PathwayNodeMapperTest {
     assertEquals(PathwayNodeMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
-    assertEquals(WheelchairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairBoarding());
   }
 
   @Test(expected = IllegalStateException.class)

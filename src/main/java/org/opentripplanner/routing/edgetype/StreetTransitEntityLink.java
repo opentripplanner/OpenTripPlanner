@@ -3,7 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -25,15 +25,23 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final T transitEntityVertex;
 
-  private final WheelchairBoarding wheelchairBoarding;
+  private final WheelchairAccessibility wheelchairBoarding;
 
-  public StreetTransitEntityLink(StreetVertex fromv, T tov, WheelchairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(
+    StreetVertex fromv,
+    T tov,
+    WheelchairAccessibility wheelchairBoarding
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairBoarding = wheelchairBoarding;
   }
 
-  public StreetTransitEntityLink(T fromv, StreetVertex tov, WheelchairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(
+    T fromv,
+    StreetVertex tov,
+    WheelchairAccessibility wheelchairBoarding
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairBoarding = wheelchairBoarding;
@@ -83,12 +91,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     if (accessibility.enabled()) {
       if (
         accessibility.stops().onlyConsiderAccessible() &&
-        wheelchairBoarding != WheelchairBoarding.POSSIBLE
+        wheelchairBoarding != WheelchairAccessibility.POSSIBLE
       ) {
         return null;
-      } else if (wheelchairBoarding == WheelchairBoarding.NO_INFORMATION) {
+      } else if (wheelchairBoarding == WheelchairAccessibility.NO_INFORMATION) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
-      } else if (wheelchairBoarding == WheelchairBoarding.NOT_POSSIBLE) {
+      } else if (wheelchairBoarding == WheelchairAccessibility.NOT_POSSIBLE) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
       }
     }

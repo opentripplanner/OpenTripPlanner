@@ -11,7 +11,7 @@ import java.util.Collections;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.util.TranslationHelper;
 
 public class StopAndStationMapperTest {
@@ -42,7 +42,8 @@ public class StopAndStationMapperTest {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final WheelchairBoarding WHEELCHAIR_BOARDING_ENUM = WheelchairBoarding.POSSIBLE;
+  private static final WheelchairAccessibility WHEELCHAIR_BOARDING_ENUM =
+    WheelchairAccessibility.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
@@ -84,7 +85,7 @@ public class StopAndStationMapperTest {
     assertEquals(LON, result.getLon(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
     assertEquals(URL, result.getUrl().toString());
-    assertEquals(WheelchairBoarding.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairBoarding());
     assertEquals(ZONE_ID, result.getFirstZoneAsString());
   }
 
@@ -104,7 +105,7 @@ public class StopAndStationMapperTest {
     assertNull(result.getCode());
     assertNull(result.getUrl());
     // Skip getting coordinate, it will throw an exception
-    assertEquals(WheelchairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairBoarding());
     assertNull(result.getFirstZoneAsString());
   }
 

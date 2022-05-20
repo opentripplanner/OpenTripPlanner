@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
@@ -77,9 +77,9 @@ public class StopAndStationMapperTest {
 
     assertEquals(3, stops.size(), "Stops.size must be 3 found " + stops.size());
 
-    assertWheelChairBoarding("ST:Quay:1", WheelchairBoarding.POSSIBLE, stops);
-    assertWheelChairBoarding("ST:Quay:2", WheelchairBoarding.NOT_POSSIBLE, stops);
-    assertWheelChairBoarding("ST:Quay:3", WheelchairBoarding.NO_INFORMATION, stops);
+    assertWheelChairBoarding("ST:Quay:1", WheelchairAccessibility.POSSIBLE, stops);
+    assertWheelChairBoarding("ST:Quay:2", WheelchairAccessibility.NOT_POSSIBLE, stops);
+    assertWheelChairBoarding("ST:Quay:3", WheelchairAccessibility.NO_INFORMATION, stops);
 
     // Now test with AccessibilityAssessment set on StopPlace (should be default)
     stopPlace.withAccessibilityAssessment(
@@ -92,7 +92,7 @@ public class StopAndStationMapperTest {
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
 
     assertEquals(4, stops.size(), "stops.size must be 4 found " + stops.size());
-    assertWheelChairBoarding("ST:Quay:4", WheelchairBoarding.POSSIBLE, stops);
+    assertWheelChairBoarding("ST:Quay:4", WheelchairAccessibility.POSSIBLE, stops);
   }
 
   @Test
@@ -240,7 +240,7 @@ public class StopAndStationMapperTest {
    */
   private void assertWheelChairBoarding(
     String quayId,
-    WheelchairBoarding expected,
+    WheelchairAccessibility expected,
     List<Stop> stops
   ) {
     var wheelChairBoarding = stops

@@ -23,7 +23,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 public class QuayType {
@@ -127,7 +127,10 @@ public class QuayType {
             var wheelChairBoarding =
               (((StopLocation) environment.getSource()).getWheelchairBoarding());
 
-            return Objects.requireNonNullElse(wheelChairBoarding, WheelchairBoarding.NO_INFORMATION)
+            return Objects.requireNonNullElse(
+              wheelChairBoarding,
+              WheelchairAccessibility.NO_INFORMATION
+            )
               .gtfsCode;
           })
           .build()

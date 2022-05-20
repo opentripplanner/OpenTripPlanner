@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,9 @@ class TripMapper {
     lhs.setDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
     lhs.setBlockId(rhs.getBlockId());
     lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
-    lhs.setWheelchairBoarding(WheelchairBoarding.valueOfGtfsCode(rhs.getWheelchairAccessible()));
+    lhs.setWheelchairBoarding(
+      WheelchairAccessibility.valueOfGtfsCode(rhs.getWheelchairAccessible())
+    );
     lhs.setBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
     lhs.setFareId(rhs.getFareId());
 
