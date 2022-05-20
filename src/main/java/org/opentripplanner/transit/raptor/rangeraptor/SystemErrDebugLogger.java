@@ -22,6 +22,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -178,7 +179,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private static boolean isNotBlank(String text) {
-    return text != null && !text.isBlank();
+    return StringUtils.hasValue(text);
   }
 
   private void printIterationHeader(int iterationTime) {

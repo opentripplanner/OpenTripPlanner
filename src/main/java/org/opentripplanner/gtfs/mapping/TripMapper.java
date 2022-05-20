@@ -53,9 +53,8 @@ class TripMapper {
 
     lhs.setRoute(routeMapper.map(rhs.getRoute()));
     lhs.setServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
-    lhs.setTripShortName(rhs.getTripShortName());
-    lhs.setTripHeadsign(rhs.getTripHeadsign());
-    lhs.setRouteShortName(rhs.getRouteShortName());
+    lhs.setShortName(rhs.getTripShortName());
+    lhs.setHeadsign(rhs.getTripHeadsign());
     lhs.setDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
     lhs.setBlockId(rhs.getBlockId());
     lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));

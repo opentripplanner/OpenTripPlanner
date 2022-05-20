@@ -109,7 +109,7 @@ public class FlexibleTransitLeg implements Leg {
 
   @Override
   public String getHeadsign() {
-    return getTrip().getTripHeadsign();
+    return getTrip().getHeadsign();
   }
 
   @Override

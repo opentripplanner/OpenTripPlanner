@@ -105,10 +105,10 @@ class TripMapper {
     trip.setWheelchairBoarding(wheelChairBoarding);
 
     if (serviceJourney.getPrivateCode() != null) {
-      trip.setInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
+      trip.setNetexInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
     }
 
-    trip.setTripShortName(serviceJourney.getPublicCode());
+    trip.setShortName(serviceJourney.getPublicCode());
     trip.setTripOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {

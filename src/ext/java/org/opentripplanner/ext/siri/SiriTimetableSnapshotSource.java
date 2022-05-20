@@ -566,22 +566,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     trip.setServiceId(calServiceId);
 
-    // TODO - SIRI: PublishedLineName not defined in SIRI-profile
-    if (
-      estimatedVehicleJourney.getPublishedLineNames() != null &&
-      !estimatedVehicleJourney.getPublishedLineNames().isEmpty()
-    ) {
-      trip.setRouteShortName(
-        "" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue()
-      );
-    }
-
     // Use destinationName as default headsign - if provided
     if (
       estimatedVehicleJourney.getDestinationNames() != null &&
       !estimatedVehicleJourney.getDestinationNames().isEmpty()
     ) {
-      trip.setTripHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
+      trip.setHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
     }
 
     trip.setTripOperator(operator);
@@ -591,7 +581,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     //        trip.setTripPrivateCode(null);
     //        trip.setTripPublicCode(null);
     trip.setBlockId(null);
-    trip.setTripShortName(null);
+    trip.setShortName(null);
     //        trip.setKeyValues(null);
 
     List<StopLocation> addedStops = new ArrayList<>();
@@ -654,7 +644,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           .getDestinationDisplaies()
           .get(0);
         stopTime.setStopHeadsign(destinationDisplay.getValue());
-      } else if (trip.getTripHeadsign() == null) {
+      } else if (trip.getHeadsign() == null) {
         // Fallback to empty string
         stopTime.setStopHeadsign("");
       }

@@ -184,7 +184,7 @@ class TripPatternMapper {
       result.tripStopTimes.put(trip, stopTimes.stopTimes);
       result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
 
-      trip.setTripHeadsign(getHeadsign(stopTimes.stopTimes));
+      trip.setHeadsign(getHeadsign(stopTimes.stopTimes));
       trips.add(trip);
     }
 

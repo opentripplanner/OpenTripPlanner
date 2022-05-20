@@ -19,9 +19,9 @@ public class TripMapper {
     api.id = FeedScopedIdMapper.mapToApi(obj.getId());
     api.routeId = FeedScopedIdMapper.mapIdToApi(obj.getRoute());
     api.serviceId = FeedScopedIdMapper.mapToApi(obj.getServiceId());
-    api.tripShortName = obj.getTripShortName();
-    api.tripHeadsign = obj.getTripHeadsign();
-    api.routeShortName = obj.getRouteShortName();
+    api.tripShortName = obj.getShortName();
+    api.tripHeadsign = obj.getHeadsign();
+    api.routeShortName = obj.getRoute().getShortName();
     api.directionId = obj.getGtfsDirectionIdAsString(null);
     api.blockId = obj.getBlockId();
     api.shapeId = FeedScopedIdMapper.mapToApi(obj.getShapeId());
@@ -39,7 +39,7 @@ public class TripMapper {
 
     ApiTripShort api = new ApiTripShort();
     api.id = FeedScopedIdMapper.mapToApi(domain.getId());
-    api.tripHeadsign = domain.getTripHeadsign();
+    api.tripHeadsign = domain.getHeadsign();
     api.serviceId = FeedScopedIdMapper.mapToApi(domain.getServiceId());
     FeedScopedId shape = domain.getShapeId();
 

@@ -264,8 +264,8 @@ public class SiriFuzzyTripMatcher {
           .getServiceDatesForServiceId(trip.getServiceId());
         if (
           serviceDates.contains(serviceDate) &&
-          trip.getInternalPlanningCode() != null &&
-          trip.getInternalPlanningCode().equals(internalPlanningCode)
+          trip.getNetexInternalPlanningCode() != null &&
+          trip.getNetexInternalPlanningCode().equals(internalPlanningCode)
         ) {
           matches.add(trip.getId());
         }
@@ -314,8 +314,8 @@ public class SiriFuzzyTripMatcher {
           tripPattern != null &&
           tripPattern.matchesModeOrSubMode(TransitMode.RAIL, "railReplacementBus")
         ) {
-          if (trip.getInternalPlanningCode() != null) {
-            String internalPlanningCode = trip.getInternalPlanningCode();
+          if (trip.getNetexInternalPlanningCode() != null) {
+            String internalPlanningCode = trip.getNetexInternalPlanningCode();
             if (mappedVehicleRefCache.containsKey(internalPlanningCode)) {
               mappedVehicleRefCache.get(internalPlanningCode).add(trip);
             } else {

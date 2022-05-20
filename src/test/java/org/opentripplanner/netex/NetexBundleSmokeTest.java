@@ -172,8 +172,8 @@ public class NetexBundleSmokeTest {
     Map<FeedScopedId, Trip> map = trips.stream().collect(Collectors.toMap(Trip::getId, t -> t));
     Trip t = map.get(fId("RUT:ServiceJourney:12-101375-1001"));
 
-    assertEquals("Jernbanetorget", t.getTripHeadsign());
-    assertNull(t.getTripShortName());
+    assertEquals("Jernbanetorget", t.getHeadsign());
+    assertNull(t.getShortName());
     assertNotNull(t.getServiceId());
     assertEquals("Ruter", t.getOperator().getName());
     assertEquals("Ruter", t.getTripOperator().getName());

@@ -155,7 +155,7 @@ public class TransfersReport {
       r.type = "Trip";
       r.entityId = trip.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
-      r.trip = trip.getTripHeadsign();
+      r.trip = trip.getHeadsign();
       var stop = ptn.getStop(tp.getStopPositionInPattern());
       addLocation(r, ptn, stop, trip, boarding);
     } else if (p instanceof RouteStopTransferPoint) {

@@ -113,7 +113,7 @@ public class ServiceJourneyType {
           .description(
             "Publicly announced code for service journey, differentiating it from other service journeys for the same line."
           )
-          .dataFetcher(environment -> ((trip(environment)).getTripShortName()))
+          .dataFetcher(environment -> ((trip(environment)).getShortName()))
           .build()
       )
       .field(
@@ -122,7 +122,7 @@ public class ServiceJourneyType {
           .name("privateCode")
           .type(Scalars.GraphQLString)
           .description("For internal use by operators.")
-          .dataFetcher(environment -> ((trip(environment)).getInternalPlanningCode()))
+          .dataFetcher(environment -> ((trip(environment)).getNetexInternalPlanningCode()))
           .build()
       )
       .field(

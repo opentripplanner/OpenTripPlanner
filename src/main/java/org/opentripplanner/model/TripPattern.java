@@ -645,7 +645,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     if (tripTimes == null) {
       return null;
     }
-    return tripTimes.getTrip().getTripHeadsign();
+    return tripTimes.getTrip().getHeadsign();
   }
 
   public String getStopHeadsign(int stopIndex) {

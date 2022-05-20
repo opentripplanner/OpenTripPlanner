@@ -12,52 +12,29 @@ import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.util.lang.StringUtils;
 
 public final class Trip extends TransitEntity {
 
-  private static final long serialVersionUID = 1L;
-
-  private Route route;
-
   private Operator operator;
-
+  private Route route;
+  private String shortName;
   private TransitMode mode;
-
   private String netexSubmode;
-
   private FeedScopedId serviceId;
-
-  private String tripShortName;
-
-  private String internalPlanningCode;
-
-  private String tripHeadsign;
-
-  private String routeShortName;
+  private String netexInternalPlanningCode;
+  private String headsign;
+  private String blockId;
+  private FeedScopedId shapeId;
 
   @NotNull
   private Direction direction = Direction.UNKNOWN;
 
-  private String blockId;
-
-  private FeedScopedId shapeId;
-
   private WheelchairAccessibility wheelchairBoarding = WheelchairAccessibility.NO_INFORMATION;
-
-  /**
-   * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-   */
   private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
-
-  /** Custom extension for KCM to specify a fare per-trip */
-  private String fareId;
-
-  /**
-   * Default alteration for a trip. // TODO Implement alterations for DSJ
-   * <p>
-   * This is planned, by default (e.g. GTFS and if not set explicit).
-   */
   private TripAlteration alteration = TripAlteration.PLANNED;
+
+  private String fareId;
 
   public Trip(FeedScopedId id) {
     super(id);
@@ -70,9 +47,8 @@ public final class Trip extends TransitEntity {
     this.serviceId = obj.serviceId;
     this.mode = obj.mode;
     this.netexSubmode = obj.netexSubmode;
-    this.tripShortName = obj.tripShortName;
-    this.tripHeadsign = obj.tripHeadsign;
-    this.routeShortName = obj.routeShortName;
+    this.shortName = obj.shortName;
+    this.headsign = obj.headsign;
     this.direction = obj.direction;
     this.blockId = obj.blockId;
     this.shapeId = obj.shapeId;
@@ -143,12 +119,12 @@ public final class Trip extends TransitEntity {
    * Public code or identifier for the journey. Equal to NeTEx PublicCode. GTFS and NeTEx have
    * additional constraints on this fields that are not enforced in OTP.
    */
-  public String getTripShortName() {
-    return tripShortName;
+  public String getShortName() {
+    return shortName;
   }
 
-  public void setTripShortName(String tripShortName) {
-    this.tripShortName = tripShortName;
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
   }
 
   /**
@@ -156,17 +132,14 @@ public final class Trip extends TransitEntity {
    * known. This method is meant for debug/logging, and should not be exposed in any API.
    */
   public String logInfo() {
-    if (hasValue(tripShortName)) {
-      return tripShortName;
+    if (StringUtils.hasValue(shortName)) {
+      return shortName;
     }
-    if (hasValue(routeShortName)) {
-      return routeShortName;
-    }
-    if (route != null && hasValue(route.getName())) {
+    if (route != null && StringUtils.hasValue(route.getName())) {
       return route.getName();
     }
-    if (hasValue(tripHeadsign)) {
-      return tripHeadsign;
+    if (StringUtils.hasValue(headsign)) {
+      return headsign;
     }
     return getId().getId();
   }
@@ -176,28 +149,20 @@ public final class Trip extends TransitEntity {
    * planners' tool). This is kept to ensure compatibility with legacy planning systems. In NeTEx
    * this maps to privateCode, there is no GTFS equivalent.
    */
-  public String getInternalPlanningCode() {
-    return internalPlanningCode;
+  public String getNetexInternalPlanningCode() {
+    return netexInternalPlanningCode;
   }
 
-  public void setInternalPlanningCode(String internalPlanningCode) {
-    this.internalPlanningCode = internalPlanningCode;
+  public void setNetexInternalPlanningCode(String netexInternalPlanningCode) {
+    this.netexInternalPlanningCode = netexInternalPlanningCode;
   }
 
-  public String getTripHeadsign() {
-    return tripHeadsign;
+  public String getHeadsign() {
+    return headsign;
   }
 
-  public void setTripHeadsign(String tripHeadsign) {
-    this.tripHeadsign = tripHeadsign;
-  }
-
-  public String getRouteShortName() {
-    return routeShortName;
-  }
-
-  public void setRouteShortName(String routeShortName) {
-    this.routeShortName = routeShortName;
+  public void setHeadsign(String headsign) {
+    this.headsign = headsign;
   }
 
   // TODO Consider moving this to the TripPattern class once we have refactored the transit model
@@ -258,6 +223,7 @@ public final class Trip extends TransitEntity {
     return "<Trip " + getId() + ">";
   }
 
+  /** Custom extension for KCM to specify a fare per-trip */
   public String getFareId() {
     return fareId;
   }
@@ -266,6 +232,11 @@ public final class Trip extends TransitEntity {
     this.fareId = fareId;
   }
 
+  /**
+   * Default alteration for a trip.
+   * <p>
+   * This is planned, by default (e.g. GTFS and if not set explicit).
+   */
   public TripAlteration getTripAlteration() {
     return alteration;
   }
@@ -274,9 +245,5 @@ public final class Trip extends TransitEntity {
     if (tripAlteration != null) {
       this.alteration = tripAlteration;
     }
-  }
-
-  private boolean hasValue(String text) {
-    return text != null && !text.isBlank();
   }
 }

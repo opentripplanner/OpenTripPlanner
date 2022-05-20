@@ -260,10 +260,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<String> routeShortName() {
     return environment -> {
       Trip trip = getSource(environment);
-
-      return trip.getRouteShortName() != null
-        ? trip.getRouteShortName()
-        : trip.getRoute().getShortName();
+      return trip.getRoute().getShortName();
     };
   }
 
@@ -363,12 +360,12 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> tripHeadsign() {
-    return environment -> getSource(environment).getTripHeadsign();
+    return environment -> getSource(environment).getHeadsign();
   }
 
   @Override
   public DataFetcher<String> tripShortName() {
-    return environment -> getSource(environment).getTripShortName();
+    return environment -> getSource(environment).getShortName();
   }
 
   @Override
