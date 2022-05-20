@@ -112,13 +112,13 @@ public class TripTimeOnDate {
   }
 
   public int getRealtimeArrival() {
-    return isRealtime() && isCancelledStop()
+    return isCancelledStop() || isNoDataStop()
       ? tripTimes.getScheduledArrivalTime(stopIndex)
       : tripTimes.getArrivalTime(stopIndex);
   }
 
   public int getRealtimeDeparture() {
-    return isRealtime() && isCancelledStop()
+    return isCancelledStop() || isNoDataStop()
       ? tripTimes.getScheduledDepartureTime(stopIndex)
       : tripTimes.getDepartureTime(stopIndex);
   }
@@ -138,11 +138,11 @@ public class TripTimeOnDate {
   }
 
   public int getArrivalDelay() {
-    return tripTimes.getArrivalDelay(stopIndex);
+    return isCancelledStop() || isNoDataStop() ? 0 : tripTimes.getArrivalDelay(stopIndex);
   }
 
   public int getDepartureDelay() {
-    return tripTimes.getDepartureDelay(stopIndex);
+    return isCancelledStop() || isNoDataStop() ? 0 : tripTimes.getDepartureDelay(stopIndex);
   }
 
   public boolean isTimepoint() {
@@ -150,7 +150,7 @@ public class TripTimeOnDate {
   }
 
   public boolean isRealtime() {
-    return !tripTimes.isScheduled() && !tripTimes.isNoDataStop(stopIndex);
+    return !tripTimes.isScheduled() && !isNoDataStop();
   }
 
   public boolean isCancelledStop() {
@@ -167,6 +167,10 @@ public class TripTimeOnDate {
       tripTimes.isCanceled() ||
       tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced()
     );
+  }
+
+  public boolean isNoDataStop() {
+    return tripTimes.isNoDataStop(stopIndex);
   }
 
   public RealTimeState getRealtimeState() {
