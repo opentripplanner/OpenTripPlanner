@@ -3,9 +3,9 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLVehiclePosition;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePosition {
 

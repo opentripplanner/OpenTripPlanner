@@ -12,8 +12,8 @@ import java.util.List;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

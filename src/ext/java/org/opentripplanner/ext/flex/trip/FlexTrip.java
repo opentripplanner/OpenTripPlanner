@@ -14,9 +14,9 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class represents the different variations of what is considered flexible transit, and its

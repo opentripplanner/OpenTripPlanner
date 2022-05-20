@@ -23,7 +23,6 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -35,6 +34,7 @@ import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded

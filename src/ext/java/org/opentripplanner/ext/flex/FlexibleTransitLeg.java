@@ -9,7 +9,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -20,6 +19,7 @@ import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

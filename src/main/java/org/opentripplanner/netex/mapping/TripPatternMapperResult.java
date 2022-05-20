@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This mapper returnes two collections, so we need to use a simple wraper to be able to return the

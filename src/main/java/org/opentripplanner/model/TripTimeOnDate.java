@@ -8,6 +8,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Represents a Trip at a specific stop index and on a specific service day. This is a read-only

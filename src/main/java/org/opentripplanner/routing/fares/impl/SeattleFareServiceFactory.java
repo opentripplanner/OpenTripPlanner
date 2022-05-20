@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

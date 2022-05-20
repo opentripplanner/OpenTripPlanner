@@ -18,7 +18,6 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WheelchairAccessibility;
@@ -34,6 +33,7 @@ import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class RoutingRequestTransitDataProviderFilterTest {
 

@@ -19,13 +19,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class VehiclePositionsMatcherTest {
 

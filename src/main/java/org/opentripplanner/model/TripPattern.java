@@ -32,6 +32,7 @@ import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

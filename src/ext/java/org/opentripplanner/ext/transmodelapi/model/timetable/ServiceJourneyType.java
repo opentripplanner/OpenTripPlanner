@@ -23,11 +23,11 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.TripTimesShortHelper;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class ServiceJourneyType {

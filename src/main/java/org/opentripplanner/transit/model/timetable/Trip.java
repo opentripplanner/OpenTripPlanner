@@ -1,8 +1,11 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.timetable;
 
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
+import org.opentripplanner.model.Direction;
+import org.opentripplanner.model.TripAlteration;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;

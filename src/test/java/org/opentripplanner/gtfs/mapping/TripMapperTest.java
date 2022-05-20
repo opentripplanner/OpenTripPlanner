@@ -79,7 +79,7 @@ public class TripMapperTest {
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.Trip result = subject.map(TRIP);
+    org.opentripplanner.transit.model.timetable.Trip result = subject.map(TRIP);
 
     assertEquals("A:1", result.getId().toString());
     assertEquals(BLOCK_ID, result.getBlockId());
@@ -100,7 +100,7 @@ public class TripMapperTest {
     Trip input = new Trip();
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.Trip result = subject.map(input);
+    org.opentripplanner.transit.model.timetable.Trip result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getBlockId());
@@ -119,8 +119,8 @@ public class TripMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() throws Exception {
-    org.opentripplanner.model.Trip result1 = subject.map(TRIP);
-    org.opentripplanner.model.Trip result2 = subject.map(TRIP);
+    org.opentripplanner.transit.model.timetable.Trip result1 = subject.map(TRIP);
+    org.opentripplanner.transit.model.timetable.Trip result2 = subject.map(TRIP);
 
     assertSame(result1, result2);
   }

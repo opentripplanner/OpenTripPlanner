@@ -2,6 +2,7 @@
 package org.opentripplanner.model;
 
 import java.util.List;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**

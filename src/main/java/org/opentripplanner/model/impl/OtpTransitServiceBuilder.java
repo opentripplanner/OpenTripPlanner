@@ -29,7 +29,6 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripStopTimes;
@@ -47,6 +46,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
