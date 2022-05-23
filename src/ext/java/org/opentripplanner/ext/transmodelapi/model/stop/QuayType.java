@@ -92,7 +92,11 @@ public class QuayType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> (((StopLocation) environment.getSource()).getDescription()))
+          .dataFetcher(environment -> {
+            String lang = environment.getArgument("lang");
+            Locale locale = lang != null ? new Locale(lang) : null;
+            return (((StopLocation) environment.getSource()).getDescription().toString(locale));
+          })
           .build()
       )
       .field(
