@@ -422,10 +422,8 @@ public class LegacyGraphQLQueryTypeImpl
       List<PlaceType> filterByPlaceTypes = args.getLegacyGraphQLFilterByPlaceTypes() != null
         ? StreamSupport
           .stream(args.getLegacyGraphQLFilterByPlaceTypes().spliterator(), false)
-          .map(placeType -> placeType.name())
-          .map(placeType -> placeType.equals("DEPARTURE_ROW") ? "PATTERN_AT_STOP" : placeType)
-          .map(PlaceType::valueOf)
-          .collect(Collectors.toList())
+          .map(LegacyGraphQLUtils::toModel)
+          .toList()
         : null;
 
       List<PlaceAtDistance> places;

@@ -7,7 +7,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -20,7 +20,7 @@ public class VehicleRentalEdge extends Edge {
   private static final long serialVersionUID = 1L;
   public FormFactor formFactor;
 
-  public VehicleRentalEdge(VehicleRentalStationVertex vertex, FormFactor formFactor) {
+  public VehicleRentalEdge(VehicleRentalPlaceVertex vertex, FormFactor formFactor) {
     super(vertex, vertex);
     this.formFactor = formFactor;
   }
@@ -39,7 +39,7 @@ public class VehicleRentalEdge extends Edge {
     StateEditor s1 = s0.edit(this);
     RoutingRequest options = s0.getOptions();
 
-    VehicleRentalStationVertex stationVertex = (VehicleRentalStationVertex) tov;
+    VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
     VehicleRentalPlace station = stationVertex.getStation();
     String network = station.getNetwork();
     boolean realtimeAvailability = options.useVehicleRentalAvailabilityInformation;

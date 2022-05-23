@@ -17,7 +17,7 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 
 /**
  * Render traversal permissions for each edge by color and label (walk, bicycle, car, stairs).
@@ -100,7 +100,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     ) {
       attrs.color = TRANSIT_STOP_COLOR_VERTEX;
       attrs.label = v.getDefaultName();
-    } else if (v instanceof VehicleRentalStationVertex) {
+    } else if (v instanceof VehicleRentalPlaceVertex) {
       attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
       attrs.label = v.getDefaultName();
     } else if (v instanceof VehicleParkingEntranceVertex) {

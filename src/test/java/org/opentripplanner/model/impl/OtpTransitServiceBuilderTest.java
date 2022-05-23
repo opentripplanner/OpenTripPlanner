@@ -1,13 +1,14 @@
 package org.opentripplanner.model.impl;
 
 import static java.util.Comparator.comparing;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
@@ -29,7 +30,7 @@ public class OtpTransitServiceBuilderTest {
 
   private static OtpTransitServiceBuilder subject;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws IOException {
     subject = createBuilder();
   }

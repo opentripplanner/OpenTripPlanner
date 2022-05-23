@@ -11,6 +11,7 @@ import static org.opentripplanner.util.OTPFeature.SandboxAPILegacyGraphQLApi;
 import static org.opentripplanner.util.OTPFeature.SandboxAPIMapboxVectorTilesApi;
 import static org.opentripplanner.util.OTPFeature.SandboxAPIParkAndRideApi;
 import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
+import static org.opentripplanner.util.OTPFeature.SandboxAPITravelTime;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLAPI;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
+import org.opentripplanner.ext.traveltime.TravelTimeResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.util.OTPFeature;
@@ -60,6 +62,7 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
+    addIfEnabled(SandboxAPITravelTime, TravelTimeResource.class);
   }
 
   /**

@@ -3,9 +3,11 @@ package org.opentripplanner.ext.legacygraphqlapi;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Locale;
 import java.util.Map;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFilterPlaceType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.util.I18NString;
 
@@ -49,6 +51,17 @@ public class LegacyGraphQLUtils {
       case CAR -> FormFactor.CAR;
       case MOPED -> FormFactor.MOPED;
       case OTHER -> FormFactor.OTHER;
+    };
+  }
+
+  public static PlaceType toModel(LegacyGraphQLFilterPlaceType type) {
+    if (type == null) return null;
+    return switch (type) {
+      case BICYCLE_RENT, VEHICLE_RENT -> PlaceType.VEHICLE_RENT;
+      case BIKE_PARK -> PlaceType.BIKE_PARK;
+      case CAR_PARK -> PlaceType.CAR_PARK;
+      case DEPARTURE_ROW -> PlaceType.PATTERN_AT_STOP;
+      case STOP -> PlaceType.STOP;
     };
   }
 }

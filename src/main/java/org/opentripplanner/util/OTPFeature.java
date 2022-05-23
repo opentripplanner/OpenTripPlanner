@@ -40,6 +40,7 @@ public enum OTPFeature {
   SandboxAPILegacyGraphQLApi(false),
   SandboxAPIMapboxVectorTilesApi(false),
   SandboxAPITransmodelApi(false),
+  SandboxAPITravelTime(false),
   SandboxAPIParkAndRideApi(false),
   TransferAnalyzer(false),
   VehicleToStopHeuristics(false);

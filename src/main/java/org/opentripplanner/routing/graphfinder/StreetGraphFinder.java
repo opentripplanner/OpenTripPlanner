@@ -63,7 +63,7 @@ public class StreetGraphFinder implements GraphFinder {
     SkipEdgeStrategy terminationStrategy = visitor.getSkipEdgeStrategy();
     findClosestUsingStreets(lat, lon, visitor, terminationStrategy);
     List<PlaceAtDistance> results = visitor.placesFound;
-    results.sort(Comparator.comparingDouble(pad -> pad.distance));
+    results.sort(Comparator.comparingDouble(PlaceAtDistance::distance));
     return results.subList(0, min(results.size(), maxResults));
   }
 

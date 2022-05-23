@@ -21,7 +21,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.
@@ -95,13 +95,13 @@ public class StatesToWalkStepsMapper {
 
     // add vehicle rental information if applicable
     if (GraphPathToItineraryMapper.isRentalPickUp(states.get(states.size() - 1))) {
-      VehicleRentalStationVertex vertex = (VehicleRentalStationVertex) (
+      VehicleRentalPlaceVertex vertex = (VehicleRentalPlaceVertex) (
         states.get(states.size() - 1)
       ).getVertex();
       steps.get(steps.size() - 1).vehicleRentalOnStation = new VehicleRentalStationInfo(vertex);
     }
     if (GraphPathToItineraryMapper.isRentalDropOff(states.get(0))) {
-      VehicleRentalStationVertex vertex = (VehicleRentalStationVertex) (states.get(0)).getVertex();
+      VehicleRentalPlaceVertex vertex = (VehicleRentalPlaceVertex) (states.get(0)).getVertex();
       steps.get(0).vehicleRentalOffStation = new VehicleRentalStationInfo(vertex);
     }
 

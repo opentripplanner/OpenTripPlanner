@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 
 /**
  * This is a response model class which holds data that will be serialized and returned to the
@@ -12,7 +12,7 @@ public class VehicleRentalStationInfo {
   public String name;
   public Double lat, lon;
 
-  public VehicleRentalStationInfo(VehicleRentalStationVertex vertex) {
+  public VehicleRentalStationInfo(VehicleRentalPlaceVertex vertex) {
     id = vertex.getStation().getStationId();
     name = vertex.getDefaultName();
     lat = vertex.getLat();

@@ -43,7 +43,7 @@ public class PlaceAtDistanceType {
           .newFieldDefinition()
           .name("place")
           .type(placeInterface)
-          .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).place)
+          .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).place())
           .build()
       )
       .field(
@@ -51,7 +51,7 @@ public class PlaceAtDistanceType {
           .newFieldDefinition()
           .name("distance")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).distance)
+          .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).distance())
           .build()
       )
       .build();
@@ -77,27 +77,27 @@ public class PlaceAtDistanceType {
       List<PlaceAtDistance> stations = places
         .stream()
         // Find all stops
-        .filter(p -> p.place instanceof Stop)
+        .filter(p -> p.place() instanceof Stop)
         // Get their parent stations (possibly including multimodal parents)
         .flatMap(p -> getStopPlaces(p, multiModalMode, routingService))
         // Sort by distance
-        .sorted(Comparator.comparing(p -> p.distance))
+        .sorted(Comparator.comparing(PlaceAtDistance::distance))
         // Make sure each parent appears exactly once
         .filter(new SeenPlacePredicate())
-        .collect(Collectors.toList());
+        .toList();
 
       places.addAll(stations);
 
       if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
         // Remove quays if only stop places are requested
         places =
-          places.stream().filter(p -> !(p.place instanceof Stop)).collect(Collectors.toList());
+          places.stream().filter(p -> !(p.place() instanceof Stop)).collect(Collectors.toList());
       }
     }
-    places.sort(Comparator.comparing(p -> p.distance));
+    places.sort(Comparator.comparing(PlaceAtDistance::distance));
 
     Set<Object> uniquePlaces = new HashSet<>();
-    return places.stream().filter(s -> uniquePlaces.add(s.place)).collect(Collectors.toList());
+    return places.stream().filter(s -> uniquePlaces.add(s.place())).collect(Collectors.toList());
   }
 
   private static Stream<PlaceAtDistance> getStopPlaces(
@@ -105,7 +105,7 @@ public class PlaceAtDistanceType {
     String multiModalMode,
     RoutingService routingService
   ) {
-    Station stopPlace = ((Stop) p.place).getParentStation();
+    Station stopPlace = ((Stop) p.place()).getParentStation();
 
     if (stopPlace == null) {
       return Stream.of();
@@ -121,7 +121,7 @@ public class PlaceAtDistanceType {
       "child".equals(multiModalMode) || "all".equals(multiModalMode) || multiModalStation == null
     ) {
       res.add(
-        new PlaceAtDistance(new MonoOrMultiModalStation(stopPlace, multiModalStation), p.distance)
+        new PlaceAtDistance(new MonoOrMultiModalStation(stopPlace, multiModalStation), p.distance())
       );
     }
 
@@ -130,7 +130,7 @@ public class PlaceAtDistanceType {
     }
 
     if ("parent".equals(multiModalMode) || "all".equals(multiModalMode)) {
-      res.add(new PlaceAtDistance(new MonoOrMultiModalStation(multiModalStation), p.distance));
+      res.add(new PlaceAtDistance(new MonoOrMultiModalStation(multiModalStation), p.distance()));
     }
     return res.stream();
   }
@@ -141,7 +141,7 @@ public class PlaceAtDistanceType {
 
     @Override
     public boolean test(PlaceAtDistance p) {
-      return seen.add(p.place);
+      return seen.add(p.place());
     }
   }
 }
