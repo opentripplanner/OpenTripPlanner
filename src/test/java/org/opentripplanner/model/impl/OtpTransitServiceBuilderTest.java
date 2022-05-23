@@ -1,37 +1,36 @@
 package org.opentripplanner.model.impl;
 
 import static java.util.Comparator.comparing;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 
-/**
- * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)
- */
 public class OtpTransitServiceBuilderTest {
 
-  private static final String FEED_ID = "F";
-  private static final FeedScopedId SERVICE_WEEKDAYS_ID = new FeedScopedId(FEED_ID, "weekdays");
+  private static final String FEED_ID = TransitModelForTest.FEED_ID;
+  private static final FeedScopedId SERVICE_WEEKDAYS_ID = TransitModelForTest.id("weekdays");
 
   private static OtpTransitServiceBuilder subject;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws IOException {
     subject = createBuilder();
   }
@@ -103,7 +102,7 @@ public class OtpTransitServiceBuilderTest {
   }
 
   private static FareAttribute createFareAttribute() {
-    return new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
+    return new FareAttribute(TransitModelForTest.id("FA"));
   }
 
   private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {

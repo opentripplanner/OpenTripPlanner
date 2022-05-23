@@ -25,7 +25,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 
 /**
  * This is adapted from {@link CarPickupTest}. All tests use the same graph structure, but a part of
@@ -40,7 +40,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   private TemporaryStreetLocation T1, T2;
   private TransitEntranceVertex E1;
   private StreetVertex A, B, C, D;
-  private VehicleRentalStationVertex B1, B2;
+  private VehicleRentalPlaceVertex B1, B2;
   private StreetEdge SE1, SE2, SE3;
 
   @BeforeEach

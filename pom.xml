@@ -22,9 +22,9 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>23</otp.serialization.version.id>
+        <otp.serialization.version.id>25</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>26.2</geotools.version>
+        <geotools.version>26.4</geotools.version>
         <jackson.version>2.13.2</jackson.version>
         <jersey.version>2.34</jersey.version>
         <junit.version>5.8.2</junit.version>
@@ -589,6 +589,12 @@
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>0.23.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -5,12 +5,12 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions

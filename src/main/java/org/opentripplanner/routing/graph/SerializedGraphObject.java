@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.util.OtpAppException;
-import org.opentripplanner.util.ProgressTracker;
+import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

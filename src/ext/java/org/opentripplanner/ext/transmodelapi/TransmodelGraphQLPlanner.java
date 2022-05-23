@@ -23,7 +23,6 @@ import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.modes.AllowedTransitMode;
@@ -36,6 +35,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

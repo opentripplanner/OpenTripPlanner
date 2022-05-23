@@ -6,7 +6,6 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -14,6 +13,7 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

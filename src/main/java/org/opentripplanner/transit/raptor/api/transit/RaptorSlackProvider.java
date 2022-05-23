@@ -69,4 +69,20 @@ public interface RaptorSlackProvider {
   default int transitSlack(int slackIndex) {
     return boardSlack(slackIndex) + alightSlack(slackIndex);
   }
+
+  /**
+   * Calculate regular transfer duration including slack.
+   */
+  default int calcRegularTransferDuration(
+    int transferDurationInSeconds,
+    int fromTripAlightSlackIndex,
+    int toTripBoardSlackIndex
+  ) {
+    return (
+      alightSlack(fromTripAlightSlackIndex) +
+      transferDurationInSeconds +
+      transferSlack() +
+      boardSlack(toTripBoardSlackIndex)
+    );
+  }
 }

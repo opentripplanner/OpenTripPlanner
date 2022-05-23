@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class JourneyWhiteListed {
 

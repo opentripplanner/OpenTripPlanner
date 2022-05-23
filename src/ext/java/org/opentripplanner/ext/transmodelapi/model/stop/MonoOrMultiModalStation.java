@@ -5,7 +5,7 @@ import java.util.TimeZone;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 

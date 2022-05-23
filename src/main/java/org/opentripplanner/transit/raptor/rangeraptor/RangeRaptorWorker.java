@@ -314,6 +314,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     var result = txSearch.find(
       targetTimetable,
+      slackProvider.transferSlack(),
       sourceStopArrival.trip(),
       sourceStopArrival.stop(),
       prevTransitArrivalTime,

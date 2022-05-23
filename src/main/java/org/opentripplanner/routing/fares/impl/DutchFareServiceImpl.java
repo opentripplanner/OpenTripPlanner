@@ -4,12 +4,12 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

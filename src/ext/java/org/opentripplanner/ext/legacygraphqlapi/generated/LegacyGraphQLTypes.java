@@ -227,6 +227,7 @@ public class LegacyGraphQLTypes {
     CAR_PARK,
     DEPARTURE_ROW,
     STOP,
+    VEHICLE_RENT,
   }
 
   public enum LegacyGraphQLFormFactor {

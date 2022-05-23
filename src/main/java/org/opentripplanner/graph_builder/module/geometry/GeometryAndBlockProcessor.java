@@ -33,7 +33,6 @@ import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopLocation;
@@ -46,7 +45,8 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.util.ProgressTracker;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

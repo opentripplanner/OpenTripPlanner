@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS

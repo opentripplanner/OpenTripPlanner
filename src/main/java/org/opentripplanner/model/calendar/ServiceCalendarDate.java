@@ -3,7 +3,7 @@ package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * This class explicitly activate or disable a service by date. It can be used in two ways.

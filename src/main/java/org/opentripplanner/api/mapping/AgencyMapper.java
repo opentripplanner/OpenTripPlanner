@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiAgency;
-import org.opentripplanner.model.Agency;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class AgencyMapper {
 

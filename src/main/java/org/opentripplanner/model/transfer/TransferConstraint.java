@@ -7,9 +7,12 @@ import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
+import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class holds transfer constraint information.
@@ -196,6 +199,48 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     return minTransferTime != NOT_SET;
   }
 
+  /**
+   * This method is used to calculate the earliest-board-time in a forward search, and the
+   * latest-alight-time in a reverse search for a constrained transfer. If the given transfer
+   * constraint is a regular transfer, we use the given {@code regularTransferEBT} function
+   * to calculate the targetTime.
+   * <p>
+   * In a forward search we ADD({@code timeAddOp}) the transfer time to the given
+   * {@code sourceTransitArrivalTime} to find the earliest-board-time for the target trip.
+   * <p>
+   * In a reverse search we SUBTRACT({@code timeAddOp}) the transfer time from the given
+   * {@code sourceTransitArrivalTime} to find the latest-alight-time for the target trip.
+   */
+  public int calculateTransferTargetTime(
+    int sourceTransitArrivalTime,
+    int transferSlack,
+    IntSupplier calcRegularTransferTargetTime,
+    SearchDirection direction
+  ) {
+    // Ignore slack and walking-time for guaranteed and stay-seated transfers
+    if (isFacilitated()) {
+      return sourceTransitArrivalTime;
+    }
+
+    // Ignore transfer, board and alight slack for min-transfer-time
+    if (isMinTransferTimeSet()) {
+      int minTransferTime = getMinTransferTime() + transferSlack;
+      if (direction.isForward()) {
+        int minTransferBoardTime = sourceTransitArrivalTime + minTransferTime;
+        return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
+          ? minTransferBoardTime
+          : Math.max(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
+      } else {
+        int minTransferBoardTime = sourceTransitArrivalTime - minTransferTime;
+        return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
+          ? minTransferBoardTime
+          : Math.min(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
+      }
+    }
+    // Transfers with priority only apply to the cost not the transfer time
+    return calcRegularTransferTargetTime.getAsInt();
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(priority, staySeated, guaranteed, maxWaitTime);
@@ -206,10 +251,9 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     if (this == o) {
       return true;
     }
-    if (!(o instanceof TransferConstraint)) {
+    if (!(o instanceof final TransferConstraint that)) {
       return false;
     }
-    final TransferConstraint that = (TransferConstraint) o;
     return (
       staySeated == that.staySeated &&
       guaranteed == that.guaranteed &&

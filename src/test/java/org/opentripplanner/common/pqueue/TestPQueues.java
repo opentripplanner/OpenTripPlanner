@@ -1,15 +1,20 @@
 package org.opentripplanner.common.pqueue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 /*
  * Test correctness and relative speed of various
  * priority queue implementations.
  */
-public class TestPQueues extends TestCase {
+public class TestPQueues {
 
   private static final int N = 50000;
 
@@ -59,6 +64,7 @@ public class TestPQueues extends TestCase {
     assertTrue(sum != 0);
   }
 
+  @Test
   public void testCompareHeaps() throws InterruptedException {
     List<Integer> input, expected;
     input = new ArrayList<>(N);
@@ -81,6 +87,7 @@ public class TestPQueues extends TestCase {
    * You must be careful to produce unique objects for rekeying,
    * otherwise the same object might be rekeyed twice or more.
    */
+  @Test
   public void testRekey() throws InterruptedException {
     final int N = 5000;
     final int ITER = 2;

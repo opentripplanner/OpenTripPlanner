@@ -5,8 +5,8 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.asser
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * The responsibility of this class is to encapsulate a Range Raptor travel request search
@@ -40,6 +40,7 @@ public class SearchParams {
   private final boolean constrainedTransfersEnabled;
   private final Collection<RaptorTransfer> accessPaths;
   private final Collection<RaptorTransfer> egressPaths;
+  private final boolean allowEmptyEgressPaths;
 
   /**
    * Default values is defined in the default constructor.
@@ -56,6 +57,7 @@ public class SearchParams {
     constrainedTransfersEnabled = false;
     accessPaths = List.of();
     egressPaths = List.of();
+    allowEmptyEgressPaths = false;
   }
 
   SearchParams(SearchParamsBuilder<?> builder) {
@@ -70,6 +72,7 @@ public class SearchParams {
     this.constrainedTransfersEnabled = builder.constrainedTransfersEnabled();
     this.accessPaths = List.copyOf(builder.accessPaths());
     this.egressPaths = List.copyOf(builder.egressPaths());
+    this.allowEmptyEgressPaths = builder.allowEmptyEgressPaths();
   }
 
   /**
@@ -235,6 +238,14 @@ public class SearchParams {
   }
 
   /**
+   * If enabled, the check for egress paths is skipped. This is required when wanting to eg. run a
+   * separate heuristic search, with no pre-defined destinations.
+   */
+  public boolean allowEmptyEgressPaths() {
+    return allowEmptyEgressPaths;
+  }
+
+  /**
    * Get the maximum duration of any access or egress path in seconds.
    */
   public int getAccessEgressMaxDurationSeconds() {
@@ -303,7 +314,10 @@ public class SearchParams {
       "'earliestDepartureTime' or 'latestArrivalTime' is required."
     );
     assertProperty(!accessPaths.isEmpty(), "At least one 'accessPath' is required.");
-    assertProperty(!egressPaths.isEmpty(), "At least one 'egressPath' is required.");
+    assertProperty(
+      allowEmptyEgressPaths || !egressPaths.isEmpty(),
+      "At least one 'egressPath' is required."
+    );
     assertProperty(
       !(preferLateArrival && latestArrivalTime == TIME_NOT_SET),
       "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."

@@ -6,7 +6,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -16,16 +16,16 @@ public class StreetVehicleRentalLink extends Edge {
 
   private static final long serialVersionUID = 1L;
 
-  private final VehicleRentalStationVertex vehicleRentalStationVertex;
+  private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
-  public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalStationVertex tov) {
+  public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {
     super(fromv, tov);
-    vehicleRentalStationVertex = tov;
+    vehicleRentalPlaceVertex = tov;
   }
 
-  public StreetVehicleRentalLink(VehicleRentalStationVertex fromv, StreetVertex tov) {
+  public StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
     super(fromv, tov);
-    vehicleRentalStationVertex = fromv;
+    vehicleRentalPlaceVertex = fromv;
   }
 
   public Vertex getFromVertex() {
@@ -52,7 +52,7 @@ public class StreetVehicleRentalLink extends Edge {
       return null;
     }
 
-    if (vehicleRentalStationVertex.getStation().networkIsNotAllowed(s0.getOptions())) {
+    if (vehicleRentalPlaceVertex.getStation().networkIsNotAllowed(s0.getOptions())) {
       return null;
     }
 
@@ -65,7 +65,7 @@ public class StreetVehicleRentalLink extends Edge {
 
   @Override
   public I18NString getName() {
-    return vehicleRentalStationVertex.getName();
+    return vehicleRentalPlaceVertex.getName();
   }
 
   public LineString getGeometry() {

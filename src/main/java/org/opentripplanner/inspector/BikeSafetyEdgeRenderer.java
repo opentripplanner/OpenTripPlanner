@@ -10,7 +10,7 @@ import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 
 /**
  * Render bike safety for each edge using a color palette. Display the bike safety factor as label.
@@ -47,7 +47,7 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
   public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
-    if (v instanceof VehicleRentalStationVertex) {
+    if (v instanceof VehicleRentalPlaceVertex) {
       attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
       attrs.label = v.getDefaultName();
     } else if (v instanceof IntersectionVertex) {

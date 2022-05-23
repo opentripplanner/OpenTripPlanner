@@ -3,10 +3,10 @@ package org.opentripplanner.ext.vehicleparking.hslpark;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.util.xml.JsonDataListDownloader;
 

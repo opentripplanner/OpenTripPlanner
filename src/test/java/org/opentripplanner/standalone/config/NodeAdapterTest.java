@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 

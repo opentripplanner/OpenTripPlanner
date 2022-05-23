@@ -19,9 +19,6 @@ import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
@@ -40,6 +37,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -704,16 +704,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         tripTimes.updateDepartureDelay(i, expectedDepartureTime - aimedDepartureTime);
       }
 
-      if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-        tripTimes.setCancelled(i);
-      }
-
       boolean isCallPredictionInaccurate =
         estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();
-      tripTimes.setPredictionInaccurate(
-        i,
-        (isJourneyPredictionInaccurate | isCallPredictionInaccurate)
-      );
+
+      if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+        tripTimes.setCancelled(i);
+      } else if (isJourneyPredictionInaccurate | isCallPredictionInaccurate) {
+        tripTimes.setPredictionInaccurate(i);
+      }
 
       if (i == 0) {
         // Fake arrival on first stop

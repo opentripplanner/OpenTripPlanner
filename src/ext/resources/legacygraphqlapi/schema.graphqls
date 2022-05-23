@@ -928,13 +928,16 @@ enum FilterPlaceType {
     """Departure rows"""
     DEPARTURE_ROW
 
-    """Bicycle rent stations"""
-    BICYCLE_RENT
+    """Old value for VEHICLE_RENT"""
+    BICYCLE_RENT @deprecated(reason: "Use VEHICLE_RENT instead as it's clearer that it also returns rental scooters, cars...")
 
-    """Bike parks"""
+    """Vehicle (bicycles, scooters, cars ...) rental stations and vehicles"""
+    VEHICLE_RENT
+
+    """Parking lots (not rental stations) that contain spaces for bicycles"""
     BIKE_PARK
 
-    """Car parks"""
+    """Parking lots that contain spaces for cars"""
     CAR_PARK
 }
 

@@ -11,7 +11,6 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -30,6 +28,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class EstimatedCallType {
 

@@ -17,7 +17,6 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeMode
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -47,6 +46,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class LegacyGraphQLDataFetchers {
 
@@ -188,7 +188,7 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLBookingInfo {
-    public DataFetcher<org.opentripplanner.model.ContactInfo> contactInfo();
+    public DataFetcher<org.opentripplanner.transit.model.organization.ContactInfo> contactInfo();
 
     public DataFetcher<String> dropOffMessage();
 

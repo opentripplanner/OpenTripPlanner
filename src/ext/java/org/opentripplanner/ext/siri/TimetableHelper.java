@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.xml.datatype.Duration;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
@@ -26,6 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateM
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
@@ -168,11 +168,6 @@ public class TimetableHelper {
             }
           }
 
-          if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
-            modifiedStopTimes.get(callCounter).cancel();
-            newTimes.setCancelled(callCounter);
-          }
-
           ZonedDateTime startOfService = DateMapper.asStartOfService(
             departureDate.toLocalDate(),
             zoneId
@@ -216,11 +211,17 @@ public class TimetableHelper {
             realtimeDepartureTime = departureTime;
           }
 
-          newTimes.setRecorded(
-            callCounter,
+          if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
+            modifiedStopTimes.get(callCounter).cancel();
+            newTimes.setCancelled(callCounter);
+          } else if (
             recordedCall.getActualArrivalTime() != null ||
             recordedCall.getActualDepartureTime() != null
-          );
+          ) {
+            // Flag as recorded if stop is not cancelled, setting recorded if stop is cancelled would
+            // override the cancellation information.
+            newTimes.setRecorded(callCounter);
+          }
 
           int departureDelay = realtimeDepartureTime - departureTime;
 
@@ -258,20 +259,19 @@ public class TimetableHelper {
               }
             }
 
-            if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-              modifiedStopTimes.get(callCounter).cancel();
-              newTimes.setCancelled(callCounter);
-            }
-
             boolean isCallPredictionInaccurate =
               estimatedCall.isPredictionInaccurate() != null &&
               estimatedCall.isPredictionInaccurate();
 
-            // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag set.
-            newTimes.setPredictionInaccurate(
-              callCounter,
-              (isJourneyPredictionInaccurate | isCallPredictionInaccurate)
-            );
+            if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+              modifiedStopTimes.get(callCounter).cancel();
+              newTimes.setCancelled(callCounter);
+            } else if (isJourneyPredictionInaccurate | isCallPredictionInaccurate) {
+              // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag
+              // set if stop is not cancelled. Setting recorded if stop is cancelled would
+              // override the cancellation information.
+              newTimes.setPredictionInaccurate(callCounter);
+            }
 
             // Update dropoff-/pickuptype only if status is cancelled
             CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();

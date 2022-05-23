@@ -9,6 +9,7 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.WheelchairCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
@@ -90,20 +91,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
 
     var mcCostParams = McCostParamsMapper.map(routingContext.opt);
-    var defaultCostCalculator = new DefaultCostCalculator(
-      mcCostParams,
-      transitLayer.getStopIndex().stopBoardAlightCosts
-    );
 
-    if (accessibility.enabled()) {
-      this.generalizedCostCalculator =
-        new WheelchairCostCalculator(
-          defaultCostCalculator,
-          mcCostParams.accessibilityRequirements()
-        );
-    } else {
-      this.generalizedCostCalculator = defaultCostCalculator;
-    }
+    this.generalizedCostCalculator =
+      CostCalculatorFactory.createCostCalculator(
+        mcCostParams,
+        transitLayer.getStopIndex().stopBoardAlightCosts
+      );
 
     this.validTransitDataStartTime =
       DateMapper.secondsSinceStartOfTime(

@@ -8,9 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Entrance;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
@@ -54,7 +52,10 @@ import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.util.NonLocalizedString;
 
 public abstract class GraphRoutingTest {
@@ -333,13 +334,13 @@ public abstract class GraphRoutingTest {
       return vehicleRentalStation;
     }
 
-    public VehicleRentalStationVertex vehicleRentalStation(
+    public VehicleRentalPlaceVertex vehicleRentalStation(
       String id,
       double latitude,
       double longitude,
       String network
     ) {
-      var vertex = new VehicleRentalStationVertex(
+      var vertex = new VehicleRentalPlaceVertex(
         graph,
         vehicleRentalStationEntity(id, latitude, longitude, network)
       );
@@ -347,7 +348,7 @@ public abstract class GraphRoutingTest {
       return vertex;
     }
 
-    public VehicleRentalStationVertex vehicleRentalStation(
+    public VehicleRentalPlaceVertex vehicleRentalStation(
       String id,
       double latitude,
       double longitude
@@ -355,15 +356,15 @@ public abstract class GraphRoutingTest {
       return vehicleRentalStation(id, latitude, longitude, TEST_VEHICLE_RENTAL_NETWORK);
     }
 
-    public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalStationVertex to) {
+    public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalPlaceVertex to) {
       return new StreetVehicleRentalLink(from, to);
     }
 
-    public StreetVehicleRentalLink link(VehicleRentalStationVertex from, StreetVertex to) {
+    public StreetVehicleRentalLink link(VehicleRentalPlaceVertex from, StreetVertex to) {
       return new StreetVehicleRentalLink(from, to);
     }
 
-    public List<StreetVehicleRentalLink> biLink(StreetVertex from, VehicleRentalStationVertex to) {
+    public List<StreetVehicleRentalLink> biLink(StreetVertex from, VehicleRentalPlaceVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 
@@ -439,12 +440,8 @@ public abstract class GraphRoutingTest {
       return List.of(link(from, to), link(to, from));
     }
 
-    public Agency agency(String name) {
-      return new Agency(new FeedScopedId("Test", name), name, null);
-    }
-
     public Route route(String id, TransitMode mode, Agency agency) {
-      var route = new Route(new FeedScopedId("Test", id));
+      var route = new Route(TransitModelForTest.id(id));
       route.setAgency(agency);
       route.setMode(mode);
       return route;
