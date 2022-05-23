@@ -1,7 +1,7 @@
 # Container image
 
 The CI pipeline deploys container images for runtimes like Docker, Kubernetes or Podman to 
-[Dockerhub](https://hub.docker.com/r/lehrenfried/opentripplanner/tags).
+[Dockerhub](https://hub.docker.com/r/opentripplanner/opentripplanner/tags).
 
 The image assumes you use a volume to mount the input data (GTFS/NeTex, OSM) and config files into 
 `/var/opentripplanner/`. When serving a graph it's also expected to be in this directory.
