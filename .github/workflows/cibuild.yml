@@ -38,6 +38,13 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      # on windows there are frequent failures caused by page files being too small
+      # https://github.com/actions/virtual-environments/issues/785
+      - name: Configure Windows Pagefile
+        if: matrix.os == 'windows-latest'
+        uses: al-cheb/configure-pagefile-action@v1.2
+
       - name: Prepare coverage agent, build and test
         run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
 
