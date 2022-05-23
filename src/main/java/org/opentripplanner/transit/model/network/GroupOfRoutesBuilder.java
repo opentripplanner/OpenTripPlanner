@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 /**
  * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize
  * lines based on their particular purposes such as fare harmonization or public presentation. For
- * exempel divide lines into commercial and non-commercial group.
+ * exampel divide lines into commercial and non-commercial group.
  */
 public class GroupOfRoutesBuilder
   extends TransitEntityBuilder<GroupOfRoutes, GroupOfRoutesBuilder> {
