@@ -9,7 +9,6 @@ on:
       - master
       - dev-1.x
       - dev-2.x
-      - container-image
   pull_request:
     branches:
       - master
@@ -61,7 +60,7 @@ jobs:
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck
 
   container-image:
-    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/container-image'
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
     runs-on: ubuntu-latest
     needs: build
     env:
