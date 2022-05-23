@@ -54,12 +54,13 @@ jobs:
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck
 
   container-image:
-    if: github.repository_owner == 'opentripplanner' #&& github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/container-image'
     runs-on: ubuntu-latest
     needs: build
     env:
-      DOCKERHUB_USER: otpbot
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
+      CONTAINER_REGISTRY_USER: otpbot
+      CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v2.3.2
         with:

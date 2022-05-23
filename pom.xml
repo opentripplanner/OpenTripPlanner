@@ -386,10 +386,10 @@
                         </ports>
                     </container>
                     <to>
-                        <image>docker.io/lehrenfried/opentripplanner</image>
+                        <image>${env.CONTAINER_REPO}</image>
                         <auth>
-                            <username>${env.DOCKERHUB_USER}</username>
-                            <password>${env.DOCKERHUB_PASSWORD}</password>
+                            <username>${env.CONTAINER_REGISTRY_USER}</username>
+                            <password>${env.CONTAINER_REGISTRY_PASSWORD}</password>
                         </auth>
                     </to>
                     <extraDirectories>
