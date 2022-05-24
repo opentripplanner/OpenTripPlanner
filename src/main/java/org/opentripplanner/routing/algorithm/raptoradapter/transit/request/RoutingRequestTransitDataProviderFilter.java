@@ -117,7 +117,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     }
 
     //noinspection RedundantIfStatement
-    if (!includePlannedCancellations && trip.getTripAlteration().isCanceledOrReplaced()) {
+    if (!includePlannedCancellations && trip.getNetexAlteration().isCanceledOrReplaced()) {
       return false;
     }
 

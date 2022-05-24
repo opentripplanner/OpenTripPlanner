@@ -176,7 +176,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> blockId() {
-    return environment -> getSource(environment).getBlockId();
+    return environment -> getSource(environment).getGtfsBlockId();
   }
 
   @Override

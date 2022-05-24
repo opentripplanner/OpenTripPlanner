@@ -186,12 +186,12 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     this.netexSubmode = original.getNetexSubmode();
     this.shortName = original.getShortName();
     this.headsign = original.getHeadsign();
-    this.gtfsBlockId = original.getBlockId();
+    this.gtfsBlockId = original.getGtfsBlockId();
     this.shapeId = original.getShapeId();
     this.direction = original.getDirection();
     this.bikesAllowed = original.getBikesAllowed();
     this.wheelchairBoarding = original.getWheelchairBoarding();
     this.netexInternalPlanningCode = original.getNetexInternalPlanningCode();
-    this.gtfsFareId = original.getFareId();
+    this.gtfsFareId = original.getGtfsFareId();
   }
 }

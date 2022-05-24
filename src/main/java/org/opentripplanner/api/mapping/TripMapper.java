@@ -23,11 +23,11 @@ public class TripMapper {
     api.tripHeadsign = obj.getHeadsign();
     api.routeShortName = obj.getRoute().getShortName();
     api.directionId = obj.getGtfsDirectionIdAsString(null);
-    api.blockId = obj.getBlockId();
+    api.blockId = obj.getGtfsBlockId();
     api.shapeId = FeedScopedIdMapper.mapToApi(obj.getShapeId());
     api.wheelchairAccessible = obj.getWheelchairBoarding().gtfsCode;
     api.bikesAllowed = BikeAccessMapper.mapToApi(obj.getBikesAllowed());
-    api.fareId = obj.getFareId();
+    api.fareId = obj.getGtfsFareId();
 
     return api;
   }

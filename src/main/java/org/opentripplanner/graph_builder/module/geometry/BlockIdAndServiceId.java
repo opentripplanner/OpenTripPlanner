@@ -13,7 +13,7 @@ class BlockIdAndServiceId {
   FeedScopedId serviceId;
 
   BlockIdAndServiceId(Trip trip) {
-    this.blockId = trip.getBlockId();
+    this.blockId = trip.getGtfsBlockId();
     this.serviceId = trip.getServiceId();
   }
 

@@ -276,6 +276,6 @@ class TransferMapper {
     if (a == null || b == null) {
       return false;
     }
-    return a.getBlockId() != null && a.getBlockId().equals(b.getBlockId());
+    return a.getGtfsBlockId() != null && a.getGtfsBlockId().equals(b.getGtfsBlockId());
   }
 }

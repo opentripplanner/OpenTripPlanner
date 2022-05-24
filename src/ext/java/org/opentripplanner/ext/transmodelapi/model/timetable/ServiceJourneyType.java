@@ -151,7 +151,7 @@ public class ServiceJourneyType {
             "DatedServiceJourney. We will create artificial DSJs for the old SJs."
           )
           .type(EnumTypes.SERVICE_ALTERATION)
-          .dataFetcher(environment -> trip(environment).getTripAlteration())
+          .dataFetcher(environment -> trip(environment).getNetexAlteration())
           .build()
       )
       .field(

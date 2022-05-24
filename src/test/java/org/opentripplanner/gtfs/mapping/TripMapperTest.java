@@ -73,9 +73,9 @@ public class TripMapperTest {
     org.opentripplanner.transit.model.timetable.Trip result = subject.map(TRIP);
 
     assertEquals("A:1", result.getId().toString());
-    assertEquals(BLOCK_ID, result.getBlockId());
+    assertEquals(BLOCK_ID, result.getGtfsBlockId());
     assertEquals(DIRECTION_ID, result.getDirection().gtfsCode);
-    assertEquals(FARE_ID, result.getFareId());
+    assertEquals(FARE_ID, result.getGtfsFareId());
     assertNotNull(result.getRoute());
     assertEquals("A:1", result.getServiceId().toString());
     assertEquals("A:1", result.getShapeId().toString());
@@ -96,8 +96,8 @@ public class TripMapperTest {
     assertNotNull(result.getId());
     assertNotNull(result.getRoute());
 
-    assertNull(result.getBlockId());
-    assertNull(result.getFareId());
+    assertNull(result.getGtfsBlockId());
+    assertNull(result.getGtfsFareId());
     assertNull(result.getServiceId());
     assertNull(result.getShapeId());
     assertNull(result.getHeadsign());

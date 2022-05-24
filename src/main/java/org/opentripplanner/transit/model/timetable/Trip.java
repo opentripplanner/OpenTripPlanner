@@ -151,12 +151,12 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
     return wheelchairBoarding;
   }
 
-  public String getBlockId() {
+  public String getGtfsBlockId() {
     return gtfsBlockId;
   }
 
   /** Custom extension for KCM to specify a fare per-trip */
-  public String getFareId() {
+  public String getGtfsFareId() {
     return gtfsFareId;
   }
 
@@ -174,7 +174,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
    * <p>
    * This is planned, by default (e.g. GTFS and if not set explicit).
    */
-  public TripAlteration getTripAlteration() {
+  public TripAlteration getNetexAlteration() {
     return netexAlteration;
   }
 

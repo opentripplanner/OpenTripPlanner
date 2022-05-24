@@ -51,7 +51,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     }
 
     for (Trip trip : transitService.getAllTrips()) {
-      String fareId = trip.getFareId();
+      String fareId = trip.getGtfsFareId();
       FareRuleSet rule = feedFareRulesById.get(fareId);
       if (rule != null) rule.addTrip(trip.getId());
     }

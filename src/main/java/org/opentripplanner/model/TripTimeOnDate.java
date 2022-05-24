@@ -166,7 +166,7 @@ public class TripTimeOnDate {
     return (
       isCancelledStop() ||
       tripTimes.isCanceled() ||
-      tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced()
+      tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()
     );
   }
 
@@ -189,7 +189,7 @@ public class TripTimeOnDate {
   }
 
   public String getBlockId() {
-    return tripTimes.getTrip().getBlockId();
+    return tripTimes.getTrip().getGtfsBlockId();
   }
 
   public String getHeadsign() {

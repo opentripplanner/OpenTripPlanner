@@ -224,7 +224,7 @@ public class GeometryAndBlockProcessor {
       /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
       for (TripTimes tripTimes : timetable.getTripTimes()) {
         Trip trip = tripTimes.getTrip();
-        if (!Strings.isNullOrEmpty(trip.getBlockId())) {
+        if (!Strings.isNullOrEmpty(trip.getGtfsBlockId())) {
           tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
           // For space efficiency, only record times that are part of a block.
           patternForTripTimes.put(tripTimes, pattern);
