@@ -9,12 +9,13 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.Collections;
 import org.junit.Test;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class TripMapperTest {
 
@@ -47,7 +48,13 @@ public class TripMapperTest {
   );
 
   static {
+    Agency agency = new Agency();
+    agency.setId("A1");
+    agency.setName("Agency");
+    agency.setTimezone("Europa/Oslo");
+    ROUTE.setAgency(agency);
     ROUTE.setId(AGENCY_AND_ID);
+    ROUTE.setShortName("R10");
 
     TRIP.setId(AGENCY_AND_ID);
     TRIP.setBikesAllowed(BIKES_ALLOWED);

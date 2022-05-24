@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class BikeAccessMapperTest {
 

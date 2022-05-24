@@ -19,14 +19,12 @@ import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
@@ -38,6 +36,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
@@ -514,14 +514,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Route route = graph.index.getRouteForId(routeId);
 
     if (route == null) { // Route is unknown - create new
-      route = new Route(routeId);
+      var routeBuilder = Route.of(routeId);
       T2<TransitMode, String> transitMode = getTransitMode(
         estimatedVehicleJourney.getVehicleModes(),
         replacedRoute
       );
-      route.setMode(transitMode.first);
-      route.setNetexSubmode(transitMode.second);
-      route.setOperator(operator);
+      routeBuilder.withMode(transitMode.first);
+      routeBuilder.withNetexSubmode(transitMode.second);
+      routeBuilder.withOperator(operator);
 
       // TODO - SIRI: Is there a better way to find authority/Agency?
       // Finding first Route with same Operator, and using same Authority
@@ -534,14 +534,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         .findFirst()
         .get()
         .getAgency();
-      route.setAgency(agency);
+      routeBuilder.withAgency(agency);
 
       if (
         estimatedVehicleJourney.getPublishedLineNames() != null &&
         !estimatedVehicleJourney.getPublishedLineNames().isEmpty()
       ) {
-        route.setShortName("" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue());
+        routeBuilder.withShortName(
+          "" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue()
+        );
       }
+      route = routeBuilder.build();
       LOG.info("Adding route {} to graph.", routeId);
       graph.index.addRoutes(route);
     }

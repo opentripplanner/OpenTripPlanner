@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Route into the OTP model. */
@@ -34,33 +34,37 @@ class RouteMapper {
   }
 
   private Route doMap(org.onebusaway.gtfs.model.Route rhs) {
-    Route lhs = new Route(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
+    var lhs = Route.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
-    lhs.setAgency(agencyMapper.map(rhs.getAgency()));
-    lhs.setShortName(rhs.getShortName());
-    lhs.setLongName(rhs.getLongName());
-    int routeType = rhs.getType();
-    lhs.setGtfsType(routeType);
-    TransitMode mode = TransitModeMapper.mapMode(routeType);
+    lhs.withAgency(agencyMapper.map(rhs.getAgency()));
+    lhs.withShortName(rhs.getShortName());
+    lhs.withLongName(rhs.getLongName());
+    lhs.withGtfsType(rhs.getType());
+
+    if (rhs.isSortOrderSet()) {
+      lhs.withGtfsSortOrder(rhs.getSortOrder());
+    }
+
+    var mode = TransitModeMapper.mapMode(rhs.getType());
+
     if (mode == null) {
       issueStore.add(
         "RouteMapper",
         "Treating %s route type for route %s as BUS.",
-        routeType,
-        lhs.getId().toString()
+        rhs.getType(),
+        lhs.getId()
       );
-      lhs.setMode(TransitMode.BUS);
+      lhs.withMode(TransitMode.BUS);
     } else {
-      lhs.setMode(mode);
+      lhs.withMode(mode);
     }
-    lhs.setDesc(rhs.getDesc());
-    lhs.setUrl(rhs.getUrl());
-    lhs.setColor(rhs.getColor());
-    lhs.setTextColor(rhs.getTextColor());
-    lhs.setBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
-    lhs.setSortOrder(rhs.getSortOrder());
-    lhs.setBranding(brandingMapper.map(rhs));
+    lhs.withDescription(rhs.getDesc());
+    lhs.withUrl(rhs.getUrl());
+    lhs.withColor(rhs.getColor());
+    lhs.withTextColor(rhs.getTextColor());
+    lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
+    lhs.withBranding(brandingMapper.map(rhs));
 
-    return lhs;
+    return lhs.build();
   }
 }

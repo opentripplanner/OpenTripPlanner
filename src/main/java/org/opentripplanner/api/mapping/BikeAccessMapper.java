@@ -1,17 +1,17 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class BikeAccessMapper {
 
   public static int mapToApi(BikeAccess bikeAccess) {
-    switch (bikeAccess) {
-      case ALLOWED:
-        return 1;
-      case NOT_ALLOWED:
-        return 2;
-      default:
-        return 0;
+    if (bikeAccess == null) {
+      return 0;
     }
+    return switch (bikeAccess) {
+      case ALLOWED -> 1;
+      case NOT_ALLOWED -> 2;
+      default -> 0;
+    };
   }
 }

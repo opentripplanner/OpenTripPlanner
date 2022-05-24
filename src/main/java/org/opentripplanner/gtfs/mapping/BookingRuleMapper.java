@@ -41,15 +41,12 @@ class BookingRuleMapper {
   }
 
   private ContactInfo contactInfo(BookingRule rule) {
-    return new ContactInfo(
-      null,
-      rule.getPhoneNumber(),
-      null,
-      null,
-      rule.getInfoUrl(),
-      rule.getUrl(),
-      null
-    );
+    return ContactInfo
+      .of()
+      .setPhoneNumber(rule.getPhoneNumber())
+      .setInfoUrl(rule.getInfoUrl())
+      .setBookingUrl(rule.getUrl())
+      .build();
   }
 
   private EnumSet<BookingMethod> bookingMethods() {

@@ -1,31 +1,25 @@
 package org.opentripplanner.transit.model.organization;
 
-public class ContactInfoBuilder {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.AbstractBuilder;
+
+public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfoBuilder> {
 
   private String contactPerson;
-
   private String phoneNumber;
-
   private String eMail;
-
   private String faxNumber;
-
   private String infoUrl;
-
   private String bookingUrl;
-
   private String additionalDetails;
 
-  public ContactInfoBuilder() {}
+  public ContactInfoBuilder() {
+    super(null);
+  }
 
-  public ContactInfoBuilder(ContactInfo domain) {
-    this.contactPerson = domain.getContactPerson();
-    this.phoneNumber = domain.getPhoneNumber();
-    this.eMail = domain.geteMail();
-    this.faxNumber = domain.getFaxNumber();
-    this.infoUrl = domain.getInfoUrl();
-    this.bookingUrl = domain.getBookingUrl();
-    this.additionalDetails = domain.getAdditionalDetails();
+  ContactInfoBuilder(ContactInfo original) {
+    super(original);
   }
 
   public String getContactPerson() {
@@ -89,5 +83,22 @@ public class ContactInfoBuilder {
   public ContactInfoBuilder setAdditionalDetails(String additionalDetails) {
     this.additionalDetails = additionalDetails;
     return this;
+  }
+
+  @Override
+  protected void update(@Nonnull ContactInfo original) {
+    this.contactPerson = original.getContactPerson();
+    this.phoneNumber = original.getPhoneNumber();
+    this.eMail = original.geteMail();
+    this.faxNumber = original.getFaxNumber();
+    this.infoUrl = original.getInfoUrl();
+    this.bookingUrl = original.getBookingUrl();
+    this.additionalDetails = original.getAdditionalDetails();
+  }
+
+  @Nullable
+  @Override
+  protected ContactInfo buildFromValues() {
+    return new ContactInfo(this);
   }
 }

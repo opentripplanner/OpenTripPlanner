@@ -15,14 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimesPatch;
@@ -34,6 +32,8 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
@@ -593,20 +593,21 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         ? new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
         : tripId;
 
-      route = new Route(id);
+      var builder = Route.of(id);
       // Create dummy agency for added trips
       Agency dummyAgency = Agency
         .of(new FeedScopedId(tripId.getFeedId(), "Dummy"))
         .setName("Dummy")
         .setTimezone("Europe/Paris")
         .build();
-      route.setAgency(dummyAgency);
+      builder.withAgency(dummyAgency);
       // Guess the route type as it doesn't exist yet in the specifications
       // Bus. Used for short- and long-distance bus routes.
-      route.setGtfsType(3);
-      route.setMode(TransitMode.BUS);
+      builder.withGtfsType(3);
+      builder.withMode(TransitMode.BUS);
       // Create route name
-      route.setLongName(tripDescriptor.getTripId());
+      builder.withLongName(tripDescriptor.getTripId());
+      route = builder.build();
     }
 
     // Create new Trip

@@ -5,14 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public class RoutingRequestTest {
@@ -59,14 +60,14 @@ public class RoutingRequestTest {
   @Test
   public void testPreferencesPenaltyForRoute() {
     Agency agency = agency("A").copy().setId(AGENCY_ID).setTimezone(TIMEZONE).build();
-    Route route = new Route(ROUTE_ID);
-    route.setShortName("R");
-    route.setAgency(agency);
+    Route route = route(ROUTE_ID.getId()).withShortName("R").withAgency(agency).build();
 
-    Agency otherAgency = agency.copy().setId(OTHER_ID).setName("OtherA").build();
-    Route otherRoute = new Route(OTHER_ID);
-    otherRoute.setShortName("OtherR");
-    otherRoute.setAgency(otherAgency);
+    Route otherRoute = route
+      .copy()
+      .setId(OTHER_ID)
+      .withShortName("OtherR")
+      .withAgency(agency.copy().setId(OTHER_ID).setName("OtherA").build())
+      .build();
 
     List<String> testCases = List.of(
       // !prefAgency | !prefRoute | unPrefA | unPrefR | expected cost

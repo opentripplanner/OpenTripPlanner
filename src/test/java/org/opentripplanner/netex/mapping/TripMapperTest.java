@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -50,8 +49,7 @@ public class TripMapperTest {
     var access = new AccessibilityAssessment();
 
     var transitBuilder = new OtpTransitServiceBuilder();
-    var route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -81,8 +79,7 @@ public class TripMapperTest {
   @Test
   public void mapTrip() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
-    Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -107,8 +104,7 @@ public class TripMapperTest {
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
-    Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
     journeyPattern.setRouteRef(new RouteRefStructure().withRef(ROUTE_ID));

@@ -11,10 +11,10 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 
 public class FlexIndex {
 
