@@ -25,7 +25,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -178,7 +178,7 @@ public class NetexBundleSmokeTest {
     assertEquals("Ruter", t.getOperator().getName());
     assertEquals("Ruter", t.getTripOperator().getName());
     assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
-    assertEquals(WheelchairBoarding.NO_INFORMATION, t.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, t.getWheelchairBoarding());
     assertEquals(4, trips.size());
   }
 

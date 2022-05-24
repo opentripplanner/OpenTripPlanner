@@ -56,6 +56,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use actual distance for walk distance in StreetEdge [#4125](https://github.com/opentripplanner/OpenTripPlanner/pull/4125)
 - Don't indicate stop has been updated when NO_DATA is defined [#3962](https://github.com/opentripplanner/OpenTripPlanner/pull/3962)
 - Implement nearby searches for car and bicycle parking [#4165](https://github.com/opentripplanner/OpenTripPlanner/pull/4165)
+- Automatic container image build [#4168](https://github.com/opentripplanner/OpenTripPlanner/pull/4168)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

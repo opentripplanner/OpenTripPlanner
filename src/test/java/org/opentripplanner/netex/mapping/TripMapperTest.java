@@ -11,7 +11,7 @@ import javax.xml.bind.JAXBElement;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
@@ -71,7 +71,7 @@ public class TripMapperTest {
     assertNotNull(trip, "trip must not be null");
     assertEquals(
       trip.getWheelchairBoarding(),
-      WheelchairBoarding.POSSIBLE,
+      WheelchairAccessibility.POSSIBLE,
       "Wheelchair accessibility not possible on trip"
     );
   }

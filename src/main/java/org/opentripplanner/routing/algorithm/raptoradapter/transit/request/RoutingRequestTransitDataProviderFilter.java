@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -110,7 +110,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     if (wheelchairAccessibility.enabled()) {
       if (
         wheelchairAccessibility.trips().onlyConsiderAccessible() &&
-        trip.getWheelchairBoarding() != WheelchairBoarding.POSSIBLE
+        trip.getWheelchairBoarding() != WheelchairAccessibility.POSSIBLE
       ) {
         return false;
       }

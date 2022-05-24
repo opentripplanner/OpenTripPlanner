@@ -13,7 +13,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -215,7 +215,7 @@ public abstract class GraphRoutingTest {
         id,
         null,
         WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-        WheelchairBoarding.NO_INFORMATION,
+        WheelchairAccessibility.NO_INFORMATION,
         null
       );
     }
@@ -227,7 +227,7 @@ public abstract class GraphRoutingTest {
         id,
         null,
         WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-        WheelchairBoarding.NO_INFORMATION,
+        WheelchairAccessibility.NO_INFORMATION,
         null,
         null,
         null,

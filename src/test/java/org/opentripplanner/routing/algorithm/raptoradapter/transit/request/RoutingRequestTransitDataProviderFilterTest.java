@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.WheelchairBoarding.NOT_POSSIBLE;
-import static org.opentripplanner.model.WheelchairBoarding.POSSIBLE;
+import static org.opentripplanner.model.WheelchairAccessibility.NOT_POSSIBLE;
+import static org.opentripplanner.model.WheelchairAccessibility.POSSIBLE;
 
 import java.time.LocalDate;
 import java.util.BitSet;
@@ -21,7 +21,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -247,7 +247,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       NOT_POSSIBLE,
       null
     );
-    tripTimes.getTrip().setWheelchairBoarding(WheelchairBoarding.NOT_POSSIBLE);
+    tripTimes.getTrip().setWheelchairBoarding(WheelchairAccessibility.NOT_POSSIBLE);
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
@@ -503,7 +503,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     BikeAccess bikeAccess,
     TransitMode mode,
     String submode,
-    WheelchairBoarding wheelchairBoarding,
+    WheelchairAccessibility wheelchairBoarding,
     TripAlteration tripAlteration
   ) {
     Trip trip = new Trip(tripId);

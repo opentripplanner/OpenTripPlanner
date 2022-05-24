@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
@@ -77,9 +77,9 @@ public class StopAndStationMapperTest {
 
     assertEquals(3, stops.size(), "Stops.size must be 3 found " + stops.size());
 
-    assertWheelChairBoarding("ST:Quay:1", WheelchairBoarding.POSSIBLE, stops);
-    assertWheelChairBoarding("ST:Quay:2", WheelchairBoarding.NOT_POSSIBLE, stops);
-    assertWheelChairBoarding("ST:Quay:3", WheelchairBoarding.NO_INFORMATION, stops);
+    assertWheelchairAccessibility("ST:Quay:1", WheelchairAccessibility.POSSIBLE, stops);
+    assertWheelchairAccessibility("ST:Quay:2", WheelchairAccessibility.NOT_POSSIBLE, stops);
+    assertWheelchairAccessibility("ST:Quay:3", WheelchairAccessibility.NO_INFORMATION, stops);
 
     // Now test with AccessibilityAssessment set on StopPlace (should be default)
     stopPlace.withAccessibilityAssessment(
@@ -92,7 +92,7 @@ public class StopAndStationMapperTest {
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
 
     assertEquals(4, stops.size(), "stops.size must be 4 found " + stops.size());
-    assertWheelChairBoarding("ST:Quay:4", WheelchairBoarding.POSSIBLE, stops);
+    assertWheelchairAccessibility("ST:Quay:4", WheelchairAccessibility.POSSIBLE, stops);
   }
 
   @Test
@@ -238,27 +238,27 @@ public class StopAndStationMapperTest {
    * @param expected Expected WheelChairBoarding value in assertion
    * @param stops    Find correct stop from list
    */
-  private void assertWheelChairBoarding(
+  private void assertWheelchairAccessibility(
     String quayId,
-    WheelchairBoarding expected,
+    WheelchairAccessibility expected,
     List<Stop> stops
   ) {
-    var wheelChairBoarding = stops
+    var wheelchairAccessibility = stops
       .stream()
       .filter(s -> s.getId().getId().equals(quayId))
       .findAny()
-      .map(Stop::getWheelchairBoarding)
+      .map(Stop::getWheelchairAccessibility)
       .orElse(null);
 
-    assertNotNull(wheelChairBoarding, "wheelChairBoarding must not be null");
+    assertNotNull(wheelchairAccessibility, "wheelchairAccessibility must not be null");
     assertEquals(
       expected,
-      wheelChairBoarding,
+      wheelchairAccessibility,
       () ->
-        "wheelChairBoarding should be " +
+        "wheelchairAccessibility should be " +
         expected +
         " found " +
-        wheelChairBoarding +
+        wheelchairAccessibility +
         " for quayId = " +
         quayId
     );

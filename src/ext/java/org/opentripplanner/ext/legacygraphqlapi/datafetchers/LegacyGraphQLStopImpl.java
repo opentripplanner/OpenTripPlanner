@@ -469,7 +469,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
     return environment -> {
-      var boarding = getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
+      var boarding = getValue(
+        environment,
+        StopLocation::getWheelchairAccessibility,
+        station -> null
+      );
       return LegacyGraphQLUtils.toGraphQL(boarding);
     };
   }

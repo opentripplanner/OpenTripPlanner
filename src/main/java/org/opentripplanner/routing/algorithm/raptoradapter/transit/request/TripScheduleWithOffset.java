@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.time.LocalDate;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -72,7 +72,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   }
 
   @Override
-  public WheelchairBoarding wheelchairBoarding() {
+  public WheelchairAccessibility wheelchairBoarding() {
     return pattern.wheelchairBoardingForTrip(tripIndexForDates);
   }
 

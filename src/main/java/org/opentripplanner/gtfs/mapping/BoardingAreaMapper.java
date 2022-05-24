@@ -58,7 +58,7 @@ class BoardingAreaMapper {
       base.getCode(),
       base.getDescription(),
       base.getCoordinate(),
-      base.getWheelchairBoarding(),
+      base.getWheelchairAccessibility(),
       base.getLevel()
     );
   }
