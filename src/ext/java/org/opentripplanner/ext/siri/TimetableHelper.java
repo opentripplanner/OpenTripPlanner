@@ -148,13 +148,7 @@ public class TimetableHelper {
             if (departureDate == null) {
               departureDate = recordedCall.getAimedArrivalTime();
             }
-            if (oldTimes.getDepartureTime(0) > 86400) {
-              // The "departure-date" for this trip is set to "yesterday" (or before) even though it actually departs "today"
-
-              int dayOffsetCount = oldTimes.getDepartureTime(0) / 86400; // calculate number of offset-days
-
-              departureDate = departureDate.minusDays(dayOffsetCount);
-            }
+            departureDate = departureDate.minusDays(calculateDayOffset(oldTimes));
           }
 
           ZonedDateTime startOfService = DateMapper.asStartOfService(
@@ -254,6 +248,7 @@ public class TimetableHelper {
               if (departureDate == null) {
                 departureDate = estimatedCall.getAimedArrivalTime();
               }
+              departureDate = departureDate.minusDays(calculateDayOffset(oldTimes));
             }
 
             boolean isCallPredictionInaccurate =
@@ -395,7 +390,15 @@ public class TimetableHelper {
     return newTimes;
   }
 
-  /**
+  private static int calculateDayOffset(TripTimes oldTimes) {
+    if (oldTimes.getDepartureTime(0) > 86400) {
+      // The "departure-date" for this trip is set to "yesterday" (or before) even though it actually departs "today"
+
+      return oldTimes.getDepartureTime(0) / 86400; // calculate number of offset-days
+    } else {
+      return 0;
+    }
+  }/**
    * Maps the (very limited) SIRI 2.0 OccupancyEnum to internal OccupancyStatus
    * @param occupancy
    * @return
@@ -419,6 +422,7 @@ public class TimetableHelper {
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
+
   public static List<StopLocation> createModifiedStops(
     TripPattern pattern,
     EstimatedVehicleJourney journey,
