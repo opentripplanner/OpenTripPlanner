@@ -34,7 +34,7 @@ import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPo
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -1178,7 +1178,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private void createElevatorHopEdges(
       ArrayList<Vertex> onboardVertices,
-      WheelchairBoarding wheelchairBoarding,
+      WheelchairAccessibility wheelchair,
       boolean bicycleAllowed,
       int levels,
       int travelTime
@@ -1194,16 +1194,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           : StreetTraversalPermission.PEDESTRIAN;
 
         if (travelTime > -1 && levels > 0) {
-          ElevatorHopEdge.bidirectional(
-            from,
-            to,
-            permission,
-            wheelchairBoarding,
-            levels,
-            travelTime
-          );
+          ElevatorHopEdge.bidirectional(from, to, permission, wheelchair, levels, travelTime);
         } else {
-          ElevatorHopEdge.bidirectional(from, to, permission, wheelchairBoarding);
+          ElevatorHopEdge.bidirectional(from, to, permission, wheelchair);
         }
       }
     }

@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
@@ -99,13 +99,13 @@ public class OSMWithTags {
   /**
    * Returns the level of wheelchair access of the element.
    */
-  public WheelchairBoarding getWheelchairBoarding() {
+  public WheelchairAccessibility getWheelchairBoarding() {
     if (isTagTrue("wheelchair")) {
-      return WheelchairBoarding.POSSIBLE;
+      return WheelchairAccessibility.POSSIBLE;
     } else if (isTagFalse("wheelchair")) {
-      return WheelchairBoarding.NOT_POSSIBLE;
+      return WheelchairAccessibility.NOT_POSSIBLE;
     } else {
-      return WheelchairBoarding.NO_INFORMATION;
+      return WheelchairAccessibility.NO_INFORMATION;
     }
   }
 

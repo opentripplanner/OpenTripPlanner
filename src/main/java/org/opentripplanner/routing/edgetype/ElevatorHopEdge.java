@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -22,7 +22,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
   private final StreetTraversalPermission permission;
 
-  private final WheelchairBoarding wheelchairBoarding;
+  private final WheelchairAccessibility wheelchairAccessibility;
 
   private double levels = 1;
   private int travelTime = 0;
@@ -31,11 +31,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairBoarding wheelchairBoarding,
+    WheelchairAccessibility wheelchairAccessibility,
     double levels,
     int travelTime
   ) {
-    this(from, to, permission, wheelchairBoarding);
+    this(from, to, permission, wheelchairAccessibility);
     this.levels = levels;
     this.travelTime = travelTime;
   }
@@ -44,18 +44,18 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairBoarding wheelchairBoarding
+    WheelchairAccessibility wheelchairAccessibility
   ) {
     super(from, to);
     this.permission = permission;
-    this.wheelchairBoarding = wheelchairBoarding;
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   public static void bidirectional(
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairBoarding wheelchairBoarding,
+    WheelchairAccessibility wheelchairBoarding,
     int levels,
     int travelTime
   ) {
@@ -67,7 +67,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairBoarding wheelchairBoarding
+    WheelchairAccessibility wheelchairBoarding
   ) {
     new ElevatorHopEdge(from, to, permission, wheelchairBoarding);
     new ElevatorHopEdge(to, from, permission, wheelchairBoarding);
@@ -90,13 +90,13 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
     if (request.wheelchairAccessibility.enabled()) {
       if (
-        wheelchairBoarding != WheelchairBoarding.POSSIBLE &&
+        wheelchairAccessibility != WheelchairAccessibility.POSSIBLE &&
         request.wheelchairAccessibility.elevators().onlyConsiderAccessible()
       ) {
         return null;
-      } else if (wheelchairBoarding == WheelchairBoarding.NO_INFORMATION) {
+      } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
         s1.incrementWeight(request.wheelchairAccessibility.elevators().unknownCost());
-      } else if (wheelchairBoarding == WheelchairBoarding.NOT_POSSIBLE) {
+      } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
         s1.incrementWeight(request.wheelchairAccessibility.elevators().inaccessibleCost());
       }
     }
@@ -140,6 +140,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
   }
 
   public boolean isWheelchairAccessible() {
-    return wheelchairBoarding == WheelchairBoarding.POSSIBLE;
+    return wheelchairAccessibility == WheelchairAccessibility.POSSIBLE;
   }
 }
