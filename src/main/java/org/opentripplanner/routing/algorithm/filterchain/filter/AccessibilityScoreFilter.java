@@ -53,8 +53,8 @@ public class AccessibilityScoreFilter implements ItineraryListFilter {
   }
 
   public static float compute(ScheduledTransitLeg leg) {
-    var fromStop = leg.getFrom().stop.getWheelchairBoarding();
-    var toStop = leg.getFrom().stop.getWheelchairBoarding();
+    var fromStop = leg.getFrom().stop.getWheelchairAccessibility();
+    var toStop = leg.getFrom().stop.getWheelchairAccessibility();
     var trip = leg.getTrip().getWheelchairBoarding();
 
     var values = List.of(trip, fromStop, toStop);

@@ -53,7 +53,7 @@ public final class Stop extends StationElement implements StopLocation {
     String code,
     String description,
     WgsCoordinate coordinate,
-    WheelchairAccessibility wheelchairBoarding,
+    WheelchairAccessibility wheelchair,
     StopLevel level,
     String platformCode,
     Collection<FareZone> fareZones,
@@ -62,7 +62,7 @@ public final class Stop extends StationElement implements StopLocation {
     TransitMode vehicleType,
     String netexSubmode
   ) {
-    super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    super(id, name, code, description, coordinate, wheelchair, level);
     this.platformCode = platformCode;
     this.fareZones = fareZones;
     this.url = url;
@@ -73,11 +73,11 @@ public final class Stop extends StationElement implements StopLocation {
 
   public static Stop stopForTest(
     String idAndName,
-    WheelchairAccessibility wheelChairBoarding,
+    WheelchairAccessibility wheelchair,
     double lat,
     double lon
   ) {
-    return stopForTest(idAndName, null, lat, lon, null, wheelChairBoarding);
+    return stopForTest(idAndName, null, lat, lon, null, wheelchair);
   }
 
   /**
@@ -122,7 +122,7 @@ public final class Stop extends StationElement implements StopLocation {
     double lat,
     double lon,
     Station parent,
-    WheelchairAccessibility wheelChairBoarding
+    WheelchairAccessibility wheelchair
   ) {
     var stop = new Stop(
       new FeedScopedId("F", idAndName),
@@ -130,7 +130,7 @@ public final class Stop extends StationElement implements StopLocation {
       idAndName,
       desc,
       new WgsCoordinate(lat, lon),
-      wheelChairBoarding,
+      wheelchair,
       null,
       null,
       null,

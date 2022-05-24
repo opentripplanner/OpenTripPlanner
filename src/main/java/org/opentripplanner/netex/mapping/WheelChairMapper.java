@@ -18,7 +18,7 @@ public class WheelChairMapper {
    *                                this value
    * @return Mapped enumerator, {@link WheelchairAccessibility#NO_INFORMATION} if no value is found
    */
-  public static WheelchairAccessibility wheelChairBoarding(
+  public static WheelchairAccessibility wheelchairAccessibility(
     AccessibilityAssessment accessibilityAssessment,
     WheelchairAccessibility defaultValue
   ) {

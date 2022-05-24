@@ -79,7 +79,7 @@ public class EntranceMapperTest {
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
-    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairAccessibility());
   }
 
   @Test
@@ -97,7 +97,7 @@ public class EntranceMapperTest {
     assertEquals(NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
-    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
   }
 
   @Test(expected = IllegalStateException.class)

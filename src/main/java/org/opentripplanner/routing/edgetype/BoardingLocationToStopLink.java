@@ -4,7 +4,6 @@ import java.util.List;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
@@ -14,11 +13,11 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 
   public BoardingLocationToStopLink(OsmBoardingLocationVertex fromv, TransitStopVertex tov) {
-    super(fromv, tov, tov.getWheelchairBoarding());
+    super(fromv, tov, tov.getWheelchairAccessibility());
   }
 
   public BoardingLocationToStopLink(TransitStopVertex fromv, OsmBoardingLocationVertex tov) {
-    super(fromv, tov, fromv.getWheelchairBoarding());
+    super(fromv, tov, fromv.getWheelchairAccessibility());
   }
 
   protected int getStreetToStopTime() {

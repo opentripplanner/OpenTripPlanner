@@ -30,7 +30,8 @@ public class TransitPathwayNodeVertex extends Vertex {
       node.getName()
     );
     this.node = node;
-    this.wheelchairEntrance = node.getWheelchairBoarding() != WheelchairAccessibility.NOT_POSSIBLE;
+    this.wheelchairEntrance =
+      node.getWheelchairAccessibility() != WheelchairAccessibility.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
     graph.expandToInclude(node.getCoordinate().longitude(), node.getCoordinate().latitude());
   }

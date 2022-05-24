@@ -57,15 +57,15 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
   public boolean renderVertex(Vertex v, EdgeVertexTileRenderer.VertexVisualAttributes attrs) {
     if (v instanceof TransitStopVertex) {
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() ==
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
         WheelchairAccessibility.NO_INFORMATION
       ) attrs.color = NO_WHEELCHAIR_INFORMATION_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() ==
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
         WheelchairAccessibility.POSSIBLE
       ) attrs.color = YES_WHEELCHAIR_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() ==
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
         WheelchairAccessibility.NOT_POSSIBLE
       ) attrs.color = NO_WHEELCHAIR_COLOR;
       attrs.label = v.getDefaultName();

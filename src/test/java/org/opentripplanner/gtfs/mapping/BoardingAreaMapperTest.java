@@ -77,7 +77,7 @@ public class BoardingAreaMapperTest {
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
-    assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairBoarding());
+    assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairAccessibility());
   }
 
   @Test
@@ -94,7 +94,7 @@ public class BoardingAreaMapperTest {
     assertEquals(BoardingAreaMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
-    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
   }
 
   @Test(expected = NullPointerException.class)

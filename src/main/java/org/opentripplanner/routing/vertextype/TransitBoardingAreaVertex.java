@@ -27,7 +27,7 @@ public class TransitBoardingAreaVertex extends Vertex {
     );
     this.boardingArea = boardingArea;
     this.wheelchairAccessible =
-      boardingArea.getWheelchairBoarding() != WheelchairAccessibility.NOT_POSSIBLE;
+      boardingArea.getWheelchairAccessibility() != WheelchairAccessibility.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
     graph.expandToInclude(
       boardingArea.getCoordinate().longitude(),

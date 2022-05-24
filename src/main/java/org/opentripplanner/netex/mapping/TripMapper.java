@@ -93,7 +93,7 @@ class TripMapper {
       return mappedTrips.get(id);
     }
 
-    var wheelChairBoarding = WheelChairMapper.wheelChairBoarding(
+    var wheelChairBoarding = WheelChairMapper.wheelchairAccessibility(
       serviceJourney.getAccessibilityAssessment(),
       WheelchairAccessibility.NO_INFORMATION
     );

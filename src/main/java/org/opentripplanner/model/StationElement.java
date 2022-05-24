@@ -21,7 +21,7 @@ public abstract class StationElement extends TransitEntity {
 
   private final WgsCoordinate coordinate;
 
-  private final WheelchairAccessibility wheelchairBoarding;
+  private final WheelchairAccessibility wheelchairAccessibility;
 
   private final StopLevel level;
 
@@ -33,7 +33,7 @@ public abstract class StationElement extends TransitEntity {
     String code,
     String description,
     WgsCoordinate coordinate,
-    WheelchairAccessibility wheelchairBoarding,
+    WheelchairAccessibility wheelchairAccessibility,
     StopLevel level
   ) {
     super(id);
@@ -41,8 +41,8 @@ public abstract class StationElement extends TransitEntity {
     this.code = code;
     this.description = description;
     this.coordinate = coordinate;
-    this.wheelchairBoarding =
-      Objects.requireNonNullElse(wheelchairBoarding, WheelchairAccessibility.NO_INFORMATION);
+    this.wheelchairAccessibility =
+      Objects.requireNonNullElse(wheelchairAccessibility, WheelchairAccessibility.NO_INFORMATION);
     this.level = level;
   }
 
@@ -86,8 +86,8 @@ public abstract class StationElement extends TransitEntity {
    * Returns whether this station element is accessible for wheelchair users.
    */
   @Nonnull
-  public WheelchairAccessibility getWheelchairBoarding() {
-    return wheelchairBoarding;
+  public WheelchairAccessibility getWheelchairAccessibility() {
+    return wheelchairAccessibility;
   }
 
   /** Level name for elevator descriptions */

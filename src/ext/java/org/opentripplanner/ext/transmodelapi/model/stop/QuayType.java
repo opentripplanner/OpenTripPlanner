@@ -125,7 +125,7 @@ public class QuayType {
           .description("Whether this quay is suitable for wheelchair boarding.")
           .dataFetcher(environment -> {
             var wheelChairBoarding =
-              (((StopLocation) environment.getSource()).getWheelchairBoarding());
+              (((StopLocation) environment.getSource()).getWheelchairAccessibility());
 
             return Objects.requireNonNullElse(
               wheelChairBoarding,

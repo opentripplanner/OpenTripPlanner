@@ -15,10 +15,10 @@ public final class Entrance extends StationElement {
     String code,
     String description,
     WgsCoordinate coordinate,
-    WheelchairAccessibility wheelchairBoarding,
+    WheelchairAccessibility wheelchairAccessibility,
     StopLevel level
   ) {
-    super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    super(id, name, code, description, coordinate, wheelchairAccessibility, level);
   }
 
   @Override

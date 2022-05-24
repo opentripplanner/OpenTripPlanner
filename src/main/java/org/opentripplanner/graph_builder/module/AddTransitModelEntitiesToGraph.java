@@ -176,7 +176,7 @@ public class AddTransitModelEntitiesToGraph {
       if (boardingArea.getParentStop() != null) {
         var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
         boolean wheelchair =
-          boardingArea.getWheelchairBoarding() == WheelchairAccessibility.POSSIBLE;
+          boardingArea.getWheelchairAccessibility() == WheelchairAccessibility.POSSIBLE;
 
         PathwayEdge.lowCost(
           boardingAreaVertex,

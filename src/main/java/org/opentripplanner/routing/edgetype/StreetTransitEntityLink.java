@@ -25,26 +25,26 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final T transitEntityVertex;
 
-  private final WheelchairAccessibility wheelchairBoarding;
+  private final WheelchairAccessibility wheelchairAccessibility;
 
   public StreetTransitEntityLink(
     StreetVertex fromv,
     T tov,
-    WheelchairAccessibility wheelchairBoarding
+    WheelchairAccessibility wheelchairAccessibility
   ) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
-    this.wheelchairBoarding = wheelchairBoarding;
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   public StreetTransitEntityLink(
     T fromv,
     StreetVertex tov,
-    WheelchairAccessibility wheelchairBoarding
+    WheelchairAccessibility wheelchairAccessibility
   ) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
-    this.wheelchairBoarding = wheelchairBoarding;
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   public Vertex getFromVertex() {
@@ -91,12 +91,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     if (accessibility.enabled()) {
       if (
         accessibility.stops().onlyConsiderAccessible() &&
-        wheelchairBoarding != WheelchairAccessibility.POSSIBLE
+        wheelchairAccessibility != WheelchairAccessibility.POSSIBLE
       ) {
         return null;
-      } else if (wheelchairBoarding == WheelchairAccessibility.NO_INFORMATION) {
+      } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
-      } else if (wheelchairBoarding == WheelchairAccessibility.NOT_POSSIBLE) {
+      } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
       }
     }

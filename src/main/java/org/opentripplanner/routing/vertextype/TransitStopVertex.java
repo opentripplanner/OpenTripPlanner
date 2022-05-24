@@ -21,7 +21,7 @@ public class TransitStopVertex extends Vertex {
   // Do we actually need a set of modes for each stop?
   // It's nice to have for the index web API but can be generated on demand.
   private final Set<TransitMode> modes;
-  private final WheelchairAccessibility wheelchairBoarding;
+  private final WheelchairAccessibility wheelchairAccessibility;
 
   private final Stop stop;
 
@@ -41,13 +41,13 @@ public class TransitStopVertex extends Vertex {
     super(graph, stop.getId().toString(), stop.getLon(), stop.getLat(), stop.getName());
     this.stop = stop;
     this.modes = modes != null ? modes : new HashSet<>();
-    this.wheelchairBoarding = stop.getWheelchairBoarding();
+    this.wheelchairAccessibility = stop.getWheelchairAccessibility();
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
     graph.expandToInclude(stop.getLon(), stop.getLat());
   }
 
-  public WheelchairAccessibility getWheelchairBoarding() {
-    return wheelchairBoarding;
+  public WheelchairAccessibility getWheelchairAccessibility() {
+    return wheelchairAccessibility;
   }
 
   public boolean hasPathways() {

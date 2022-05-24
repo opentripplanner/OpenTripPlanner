@@ -470,7 +470,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
   /** Returns whether a given stop is wheelchair-accessible. */
   public boolean wheelchairAccessible(int stopIndex) {
     return (
-      stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelchairAccessibility.POSSIBLE
+      stopPattern.getStop(stopIndex).getWheelchairAccessibility() ==
+      WheelchairAccessibility.POSSIBLE
     );
   }
 

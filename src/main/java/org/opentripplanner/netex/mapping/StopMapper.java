@@ -34,7 +34,7 @@ class StopMapper {
     Station parentStation,
     Collection<FareZone> fareZones,
     T2<TransitMode, String> transitMode,
-    WheelchairAccessibility wheelChairBoarding
+    WheelchairAccessibility wheelchair
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
@@ -49,7 +49,7 @@ class StopMapper {
       quay.getPublicCode(),
       quay.getDescription() != null ? quay.getDescription().getValue() : null,
       WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
-      wheelChairBoarding,
+      wheelchair,
       null,
       null,
       fareZones,

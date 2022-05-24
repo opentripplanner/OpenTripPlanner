@@ -40,7 +40,7 @@ class StopMappingWrapper {
     return WgsCoordinateMapper.mapToDomain(stop);
   }
 
-  public WheelchairAccessibility getWheelchairBoarding() {
+  public WheelchairAccessibility getWheelchairAccessibility() {
     return WheelchairAccessibility.valueOfGtfsCode(stop.getWheelchairBoarding());
   }
 
