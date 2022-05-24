@@ -783,7 +783,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     if (replacedRoute != null) {
       TransitMode replacedRouteMode = replacedRoute.getMode();
 
-      if (TransitMode.RAIL.equals(replacedRouteMode)) {
+      if (replacedRouteMode == TransitMode.RAIL) {
         if (transitMode.equals(TransitMode.RAIL)) {
           // Replacement-route is also RAIL
           return RailSubmodeEnumeration.REPLACEMENT_RAIL_SERVICE.value();
