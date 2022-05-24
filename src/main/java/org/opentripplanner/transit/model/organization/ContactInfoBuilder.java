@@ -86,7 +86,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
   }
 
   @Override
-  protected void updateValues(@Nonnull ContactInfo original) {
+  protected void update(@Nonnull ContactInfo original) {
     this.contactPerson = original.getContactPerson();
     this.phoneNumber = original.getPhoneNumber();
     this.eMail = original.geteMail();
@@ -94,17 +94,6 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     this.infoUrl = original.getInfoUrl();
     this.bookingUrl = original.getBookingUrl();
     this.additionalDetails = original.getAdditionalDetails();
-  }
-
-  @Override
-  protected void clearValues() {
-    this.contactPerson = null;
-    this.phoneNumber = null;
-    this.eMail = null;
-    this.faxNumber = null;
-    this.infoUrl = null;
-    this.bookingUrl = null;
-    this.additionalDetails = null;
   }
 
   @Nullable

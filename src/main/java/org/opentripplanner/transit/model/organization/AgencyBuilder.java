@@ -92,7 +92,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
   }
 
   @Override
-  protected void updateValues2(@Nonnull Agency original) {
+  protected void updateLocal(@Nonnull Agency original) {
     this.name = original.getName();
     this.timezone = original.getTimezone();
     this.url = original.getUrl();
@@ -100,16 +100,5 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     this.phone = original.getPhone();
     this.fareUrl = original.getFareUrl();
     this.brandingUrl = original.getBrandingUrl();
-  }
-
-  @Override
-  protected void clearValues2() {
-    this.name = null;
-    this.timezone = null;
-    this.url = null;
-    this.lang = null;
-    this.phone = null;
-    this.fareUrl = null;
-    this.brandingUrl = null;
   }
 }

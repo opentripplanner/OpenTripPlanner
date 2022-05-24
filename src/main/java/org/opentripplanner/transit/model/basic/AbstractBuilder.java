@@ -10,7 +10,10 @@ public abstract class AbstractBuilder<
   private E original;
 
   public AbstractBuilder(@Nullable E original) {
-    setOriginal(original);
+    this.original = original;
+    if (this.original != null) {
+      update(original);
+    }
   }
 
   /**
@@ -21,29 +24,28 @@ public abstract class AbstractBuilder<
     return original;
   }
 
-  public final void setOriginal(@Nullable E original) {
-    this.original = original;
+  /**
+   * Set all fields using the given <em>none null</em> original. This method is call from the
+   * constructor.
+   */
+  protected abstract void update(@Nonnull E original);
 
-    if (original == null) {
-      clearValues();
-    } else {
-      updateValues(original);
-    }
-  }
-
-  protected abstract void updateValues(@Nonnull E original);
-
-  protected abstract void clearValues();
-
-  @Nullable
+  /**
+   * Create a new instance, following the pattern (from the Agency class):
+   * <pre>
+   * protected Agency buildFromValues() {
+   *   return new Agency(this);
+   * }
+   * </pre>
+   */
   protected abstract E buildFromValues();
 
   public final @Nonnull E build() {
-    if (original == null) {
-      return buildFromValues();
-    }
     var b = buildFromValues();
 
+    if (original == null) {
+      return b;
+    }
     // Make sure we only make a new object if it is changed.
     // Another approach is also to use the Deduplicator, but that is a hassle without DI in place.
     return original.sameValue(b) ? original : b;

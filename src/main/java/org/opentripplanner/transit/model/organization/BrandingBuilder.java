@@ -74,20 +74,11 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
   }
 
   @Override
-  protected void updateValues2(@Nonnull Branding original) {
+  protected void updateLocal(@Nonnull Branding original) {
     this.shortName = original.getShortName();
     this.name = original.getName();
     this.url = original.getUrl();
     this.description = original.getDescription();
     this.image = original.getImage();
-  }
-
-  @Override
-  protected void clearValues2() {
-    this.shortName = null;
-    this.name = null;
-    this.url = null;
-    this.description = null;
-    this.image = null;
   }
 }

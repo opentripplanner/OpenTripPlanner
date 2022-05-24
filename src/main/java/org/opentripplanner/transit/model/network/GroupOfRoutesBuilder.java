@@ -67,18 +67,10 @@ public class GroupOfRoutesBuilder
   }
 
   @Override
-  protected void updateValues2(@Nonnull GroupOfRoutes original) {
+  protected void updateLocal(@Nonnull GroupOfRoutes original) {
     this.privateCode = original.getPrivateCode();
     this.shortName = original.getShortName();
     this.name = original.getName();
     this.description = original.getDescription();
-  }
-
-  @Override
-  protected void clearValues2() {
-    this.privateCode = null;
-    this.shortName = null;
-    this.name = null;
-    this.description = null;
   }
 }

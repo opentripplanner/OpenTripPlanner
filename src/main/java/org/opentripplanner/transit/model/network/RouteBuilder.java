@@ -194,7 +194,7 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
   }
 
   @Override
-  protected void updateValues2(@Nonnull Route original) {
+  protected void updateLocal(@Nonnull Route original) {
     this.agency = original.getAgency();
     this.operator = original.getOperator();
     this.branding = original.getBranding();
@@ -210,24 +210,5 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
     this.color = original.getColor();
     this.textColor = original.getTextColor();
     this.bikesAllowed = original.getBikesAllowed();
-  }
-
-  @Override
-  protected void clearValues2() {
-    this.agency = null;
-    this.operator = null;
-    this.branding = null;
-    this.groupsOfRoutes = null;
-    this.shortName = null;
-    this.longName = null;
-    this.mode = null;
-    this.gtfsType = null;
-    this.netexSubmode = null;
-    this.flexibleLineType = null;
-    this.desc = null;
-    this.url = null;
-    this.color = null;
-    this.textColor = null;
-    this.bikesAllowed = null;
   }
 }

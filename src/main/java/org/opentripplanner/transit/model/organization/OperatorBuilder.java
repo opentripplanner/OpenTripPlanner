@@ -51,17 +51,10 @@ public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuil
   }
 
   @Override
-  protected void updateValues2(@Nonnull @NotNull Operator original) {
+  protected void updateLocal(@Nonnull @NotNull Operator original) {
     this.name = original.getName();
     this.url = original.getUrl();
     this.phone = original.getPhone();
-  }
-
-  @Override
-  protected void clearValues2() {
-    this.name = null;
-    this.url = null;
-    this.phone = null;
   }
 
   @Override

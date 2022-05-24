@@ -29,18 +29,17 @@ public abstract class TransitEntityBuilder<
   }
 
   @Override
-  protected final void updateValues(@Nonnull E original) {
+  protected final void update(@Nonnull E original) {
     this.id = original.getId();
-    updateValues2(original);
+    updateLocal(original);
   }
 
-  @Override
-  protected final void clearValues() {
-    this.id = null;
-    clearValues2();
-  }
-
-  protected abstract void updateValues2(@Nonnull E original);
-
-  protected abstract void clearValues2();
+  /**
+   * This method replace the {@link #update(TransitEntity2)} in subclasses. This is done to
+   * enforce the contract - the {@link #update(TransitEntity2)} is made final and call this
+   * method. Any subclass must implement this method and assign all local fields in the method
+   * implementation. The alternative is to override the {@link #update(TransitEntity2)} mathod and
+   * call the super udate, but this is error prune.
+   */
+  protected abstract void updateLocal(@Nonnull E original);
 }
