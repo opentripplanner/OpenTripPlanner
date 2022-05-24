@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
@@ -37,6 +38,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.util.I18NString;
 
 public class StopPlaceType {
 
@@ -104,11 +106,13 @@ public class StopPlaceType {
           .name("description")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> {
-            String lang = environment.getArgument("lang");
-            Locale locale = lang != null ? new Locale(lang) : null;
-            return (
-              ((MonoOrMultiModalStation) environment.getSource()).getDescription().toString(locale)
-            );
+            I18NString description =
+              ((MonoOrMultiModalStation) environment.getSource()).getDescription();
+            if (description != null) {
+              Locale locale = TransmodelGraphQLUtils.getLocale(environment);
+              return (description.toString(locale));
+            }
+            return null;
           })
           .build()
       )
