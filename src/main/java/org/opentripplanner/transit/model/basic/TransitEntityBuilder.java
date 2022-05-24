@@ -35,11 +35,11 @@ public abstract class TransitEntityBuilder<
   }
 
   /**
-   * This method replace the {@link #update(TransitEntity2)} in subclasses. This is done to
+   * This method replaces the {@link #update(TransitEntity2)} in subclasses. This is done to
    * enforce the contract - the {@link #update(TransitEntity2)} is made final and call this
    * method. Any subclass must implement this method and assign all local fields in the method
-   * implementation. The alternative is to override the {@link #update(TransitEntity2)} mathod and
-   * call the super udate, but this is error prune.
+   * implementation. The alternative is to override the {@link #update(TransitEntity2)} method and
+   * call the super update, but this is error prone.
    */
   protected abstract void updateLocal(@Nonnull E original);
 }
