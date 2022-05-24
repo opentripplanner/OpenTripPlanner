@@ -134,9 +134,9 @@ public class LegType {
           .type(EnumTypes.TRANSPORT_SUBMODE)
           .dataFetcher(environment ->
             ((Leg) environment.getSource()).getTrip() != null &&
-              ((Leg) environment.getSource()).getTrip().getNetexSubmode() != null
+              ((Leg) environment.getSource()).getTrip().getSubMode() != null
               ? TransmodelTransportSubmode.fromValue(
-                ((Leg) environment.getSource()).getTrip().getNetexSubmode()
+                ((Leg) environment.getSource()).getTrip().getSubMode().rawValue()
               )
               : null
           )

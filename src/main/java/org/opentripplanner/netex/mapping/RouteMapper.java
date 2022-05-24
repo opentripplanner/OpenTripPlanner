@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -81,7 +82,7 @@ class RouteMapper {
     builder.withLongName(line.getName().getValue());
     builder.withShortName(line.getPublicCode());
 
-    T2<TransitMode, String> mode;
+    T2<TransitMode, TransitSubMode> mode;
     try {
       mode = transportModeMapper.map(line.getTransportMode(), line.getTransportSubmode());
     } catch (TransportModeMapper.UnsupportedModeException e) {
@@ -95,7 +96,7 @@ class RouteMapper {
     }
 
     builder.withMode(mode.first);
-    builder.withNetexSubmode(mode.second);
+    builder.withSubMode(mode.second);
 
     if (line instanceof FlexibleLine_VersionStructure) {
       builder.withFlexibleLineType(

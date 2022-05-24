@@ -18,6 +18,7 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
@@ -162,15 +163,15 @@ public class RoutingRequestTransitDataProviderFilterTest {
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
-      TransmodelTransportSubmode.LOCAL_BUS.getValue(),
+      TransitSubMode.LOCALBUS,
       NOT_POSSIBLE,
       null
     );
 
     final var BUS = TransitMode.BUS;
     final var RAIL = TransitMode.RAIL;
-    final var LOCAL_BUS = TransmodelTransportSubmode.LOCAL_BUS.getValue();
-    final var REGIONAL_BUS = TransmodelTransportSubmode.REGIONAL_BUS.getValue();
+    final var LOCAL_BUS = TransitSubMode.LOCALBUS;
+    final var REGIONAL_BUS = TransitSubMode.REGIONALBUS;
 
     assertFalse(validateModesOnTripTimes(Set.of(), tripTimes));
     assertFalse(
@@ -502,14 +503,14 @@ public class RoutingRequestTransitDataProviderFilterTest {
     Route route,
     BikeAccess bikeAccess,
     TransitMode mode,
-    String submode,
+    TransitSubMode submode,
     WheelchairAccessibility wheelchairBoarding,
     TripAlteration tripAlteration
   ) {
     Trip trip = new Trip(tripId);
     trip.setRoute(route);
     trip.setMode(mode);
-    trip.setNetexSubmode(submode);
+    trip.setSubMode(submode);
     trip.setBikesAllowed(bikeAccess);
     trip.setWheelchairBoarding(wheelchairBoarding);
     trip.setAlteration(tripAlteration);

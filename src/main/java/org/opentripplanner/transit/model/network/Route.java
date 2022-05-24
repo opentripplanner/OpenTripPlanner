@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntity2;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -23,7 +24,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
   // TODO: consolidate these
   private final Integer gtfsType;
   private final Integer gtfsSortOrder;
-  private final String netexSubmode;
+  private TransitSubMode subMode;
   private final String flexibleLineType;
   private final String desc;
   private final String url;
@@ -43,7 +44,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
     this.gtfsType = builder.getGtfsType();
     this.gtfsSortOrder = builder.getGtfsSortOrder();
 
-    this.netexSubmode = builder.getNetexSubmode();
+    this.subMode = builder.getSubMode();
     this.flexibleLineType = builder.getFlexibleLineType();
     this.desc = builder.getDesc();
     this.url = builder.getUrl();
@@ -72,7 +73,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
       Objects.equals(this.mode, other.mode) &&
       Objects.equals(this.gtfsType, other.gtfsType) &&
       Objects.equals(this.flexibleLineType, other.flexibleLineType) &&
-      Objects.equals(this.netexSubmode, other.netexSubmode) &&
+      Objects.equals(this.subMode, other.subMode) &&
       Objects.equals(this.desc, other.desc) &&
       Objects.equals(this.url, other.url) &&
       Objects.equals(this.color, other.color) &&
@@ -143,9 +144,8 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
     return gtfsSortOrder;
   }
 
-  @Nullable
-  public String getNetexSubmode() {
-    return netexSubmode;
+  public TransitSubMode getSubMode() {
+    return subMode;
   }
 
   @Nullable

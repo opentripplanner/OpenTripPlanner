@@ -3,6 +3,7 @@ package org.opentripplanner.model.modes;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
@@ -15,11 +16,11 @@ public class AllowedTransitMode {
 
   private final TransitMode mainMode;
 
-  private final String subMode;
+  private final TransitSubMode subMode;
 
   private static final String UNKNOWN = "unknown";
 
-  public AllowedTransitMode(TransitMode mainMode, String subMode) {
+  public AllowedTransitMode(TransitMode mainMode, TransitSubMode subMode) {
     this.mainMode = mainMode;
     this.subMode = subMode;
   }
@@ -52,13 +53,10 @@ public class AllowedTransitMode {
   /**
    * Check if this filter allows the provided TransitMode
    */
-  public boolean allows(TransitMode transitMode, String netexSubMode) {
-    boolean mainModeMatch = mainMode == transitMode;
-    boolean submodeMatch =
-      subMode == null ||
-      subMode.equals(netexSubMode) ||
-      (UNKNOWN.equals(subMode) && netexSubMode == null);
-    return mainModeMatch && submodeMatch;
+  public boolean allows(TransitMode transitMode, TransitSubMode subMode) {
+    return mainMode == transitMode && (
+      this.subMode == null || this.subMode.equals(subMode)
+    );
   }
 
   public TransitMode getMainMode() {

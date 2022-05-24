@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.modes.AllowedTransitMode;
@@ -62,8 +63,8 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       transitModeIsAllowed =
         (Trip trip) -> {
           TransitMode transitMode = trip.getMode();
-          String netexSubmode = trip.getNetexSubmode();
-          return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
+          TransitSubMode subMode = trip.getSubMode();
+          return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, subMode));
         };
     }
   }

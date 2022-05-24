@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.MapUtils;
@@ -64,6 +65,7 @@ class RouteMapper {
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
     lhs.withBranding(brandingMapper.map(rhs));
+    lhs.withSubMode(TransitSubMode.UNKNOWN);
 
     return lhs.build();
   }

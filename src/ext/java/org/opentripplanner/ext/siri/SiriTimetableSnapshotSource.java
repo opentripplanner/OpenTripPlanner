@@ -25,6 +25,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
@@ -515,12 +516,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (route == null) { // Route is unknown - create new
       var routeBuilder = Route.of(routeId);
-      T2<TransitMode, String> transitMode = getTransitMode(
+      T2<TransitMode, TransitSubMode> transitMode = getTransitMode(
         estimatedVehicleJourney.getVehicleModes(),
         replacedRoute
       );
       routeBuilder.withMode(transitMode.first);
-      routeBuilder.withNetexSubmode(transitMode.second);
+      routeBuilder.withSubMode(transitMode.second);
       routeBuilder.withOperator(operator);
 
       // TODO - SIRI: Is there a better way to find authority/Agency?
@@ -762,13 +763,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Resolves TransitMode from SIRI VehicleMode
    */
-  private T2<TransitMode, String> getTransitMode(
+  private T2<TransitMode, TransitSubMode> getTransitMode(
     List<VehicleModesEnumeration> vehicleModes,
     Route replacedRoute
   ) {
     TransitMode transitMode = mapTransitMainMode(vehicleModes);
 
-    String transitSubMode = resolveTransitSubMode(transitMode, replacedRoute);
+    TransitSubMode transitSubMode = resolveTransitSubMode(transitMode, replacedRoute);
 
     return new T2<>(transitMode, transitSubMode);
   }
@@ -778,19 +779,19 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    *
    * @param transitMode   Mode of the added trip
    * @param replacedRoute Route that is being replaced
-   * @return String-representation of submode
+   * @return enum representation of submode
    */
-  private String resolveTransitSubMode(TransitMode transitMode, Route replacedRoute) {
+  private TransitSubMode resolveTransitSubMode(TransitMode transitMode, Route replacedRoute) {
     if (replacedRoute != null) {
       TransitMode replacedRouteMode = replacedRoute.getMode();
 
       if (replacedRouteMode == TransitMode.RAIL) {
         if (transitMode.equals(TransitMode.RAIL)) {
           // Replacement-route is also RAIL
-          return RailSubmodeEnumeration.REPLACEMENT_RAIL_SERVICE.value();
+          return TransitSubMode.REPLACEMENTRAILSERVICE;
         } else if (transitMode.equals(TransitMode.BUS)) {
           // Replacement-route is BUS
-          return BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value();
+          return TransitSubMode.RAILREPLACEMENTBUS;
         }
       }
     }

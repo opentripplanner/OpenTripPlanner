@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.network;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -21,7 +22,7 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
   private TransitMode mode;
   private Integer gtfsType;
   private Integer gtfsSortOrder;
-  private String netexSubmode;
+  private TransitSubMode subMode;
   private String flexibleLineType;
   private String desc;
   private String url;
@@ -167,12 +168,12 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
     return this;
   }
 
-  public String getNetexSubmode() {
-    return netexSubmode;
+  public TransitSubMode getSubMode() {
+    return subMode;
   }
 
-  public RouteBuilder withNetexSubmode(String netexSubmode) {
-    this.netexSubmode = netexSubmode;
+  public RouteBuilder withSubMode(TransitSubMode subMode) {
+    this.subMode = subMode;
     return this;
   }
 
@@ -203,7 +204,7 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
     this.longName = original.getLongName();
     this.mode = original.getMode();
     this.gtfsType = original.getGtfsType();
-    this.netexSubmode = original.getNetexSubmode();
+    this.subMode = original.getSubMode();
     this.flexibleLineType = original.getFlexibleLineType();
     this.desc = original.getDesc();
     this.url = original.getUrl();

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
@@ -247,7 +248,7 @@ public class SiriFuzzyTripMatcher {
     String internalPlanningCode,
     ServiceDate serviceDate,
     TransitMode mode,
-    String transportSubmode
+    TransitSubMode transportSubmode
   ) {
     Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(internalPlanningCode);
 
@@ -312,7 +313,7 @@ public class SiriFuzzyTripMatcher {
 
         if (
           tripPattern != null &&
-          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, "railReplacementBus")
+          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, TransitSubMode.RAILREPLACEMENTBUS)
         ) {
           if (trip.getInternalPlanningCode() != null) {
             String internalPlanningCode = trip.getInternalPlanningCode();

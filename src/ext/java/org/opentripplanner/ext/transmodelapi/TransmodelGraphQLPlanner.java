@@ -24,6 +24,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputTyp
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -295,7 +296,7 @@ public class TransmodelGraphQLPlanner {
                 "transportSubModes"
               );
               for (TransmodelTransportSubmode transitMode : transportSubModes) {
-                transitModes.add(new AllowedTransitMode(mainMode, transitMode.getValue()));
+                transitModes.add(new AllowedTransitMode(mainMode, TransitSubMode.safeValueOf(transitMode.getValue())));
               }
             } else {
               transitModes.add(AllowedTransitMode.fromMainModeEnum(mainMode));

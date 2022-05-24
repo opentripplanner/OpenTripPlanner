@@ -280,9 +280,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return route.getMode();
   }
 
-  public String getNetexSubmode() {
-    return route.getNetexSubmode();
+  public final TransitSubMode getsubMode() {
+    return route.getSubMode();
   }
+
 
   public LineString getHopGeometry(int stopPosInPattern) {
     if (hopGeometries != null) {
@@ -655,11 +656,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return tripTimes.getHeadsign(stopIndex);
   }
 
-  public boolean matchesModeOrSubMode(TransitMode mode, String transportSubmode) {
-    return (
-      getMode().equals(mode) ||
-      (getNetexSubmode() != null && getNetexSubmode().equals(transportSubmode))
-    );
+  public boolean matchesModeOrSubMode(TransitMode mode, TransitSubMode transportSubmode) {
+    return getMode().equals(mode) || getsubMode() == transportSubmode;
   }
 
   public String toString() {

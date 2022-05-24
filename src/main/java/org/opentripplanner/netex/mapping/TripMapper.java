@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.impl.EntityById;
@@ -112,7 +113,7 @@ class TripMapper {
     trip.setTripOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {
-      T2<TransitMode, String> transitMode = null;
+      T2<TransitMode, TransitSubMode> transitMode = null;
       try {
         transitMode =
           transportModeMapper.map(
@@ -129,7 +130,7 @@ class TripMapper {
         return null;
       }
       trip.setMode(transitMode.first);
-      trip.setNetexSubmode(transitMode.second);
+      trip.setSubMode(transitMode.second);
     }
 
     trip.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));

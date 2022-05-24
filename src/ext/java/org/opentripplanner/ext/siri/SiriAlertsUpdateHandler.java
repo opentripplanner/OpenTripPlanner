@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.model.TransitSubMode;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -365,7 +366,7 @@ public class SiriAlertsUpdateHandler {
                     vehicleJourneyRef.getValue(),
                     serviceDate,
                     TransitMode.RAIL,
-                    "railReplacementBus"
+                    TransitSubMode.RAILREPLACEMENTBUS
                   );
               }
 
