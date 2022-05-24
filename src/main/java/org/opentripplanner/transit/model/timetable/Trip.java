@@ -1,118 +1,98 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.timetable;
 
+import static java.util.Objects.requireNonNullElse;
+import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
+
 import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.TransitEntity2;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.lang.StringUtils;
 
-public final class Trip extends TransitEntity {
+public final class Trip extends TransitEntity2<Trip, TripBuilder> {
 
-  private Operator operator;
-  private Route route;
-  private String shortName;
-  private TransitMode mode;
-  private String netexSubmode;
-  private FeedScopedId serviceId;
-  private String netexInternalPlanningCode;
-  private String headsign;
-  private String blockId;
+  private final Operator operator;
+  private final Route route;
+  private final FeedScopedId serviceId;
+  private final String shortName;
+  private final TransitMode mode;
+  private final String netexSubmode;
+  private final String headsign;
+
+  // TODO RT - Fix this after the Transmodel is refactored
+  // The shapeId is mutable to clear the reference in case the shape do not exist.
+  // This happens late in the graph-build process, but we can not create a new object
+  // because there are other objects witch may reference this particular instance.
   private FeedScopedId shapeId;
 
-  @NotNull
-  private Direction direction = Direction.UNKNOWN;
+  private final Direction direction;
+  private final BikeAccess bikesAllowed;
+  private final WheelchairAccessibility wheelchairBoarding;
 
-  private WheelchairAccessibility wheelchairBoarding = WheelchairAccessibility.NO_INFORMATION;
-  private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
-  private TripAlteration alteration = TripAlteration.PLANNED;
+  private final String gtfsBlockId;
+  private final String gtfsFareId;
 
-  private String fareId;
+  private final String netexInternalPlanningCode;
+  private final TripAlteration netexAlteration;
 
-  public Trip(FeedScopedId id) {
-    super(id);
+  Trip(TripBuilder builder) {
+    super(builder.getId());
+    // Route is done first, it is used as fallback in many cases
+    this.route = builder.getRoute();
+
+    this.operator = ifNotNull(builder.getOperator(), route.getOperator());
+    this.serviceId = builder.getServiceId();
+    this.shortName = builder.getShortName();
+    this.mode = requireNonNullElse(builder.getMode(), route.getMode());
+    this.netexSubmode = ifNotNull(builder.getNetexSubmode(), route.getNetexSubmode());
+    this.headsign = builder.getHeadsign();
+    this.shapeId = builder.getShapeId();
+    this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
+    this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
+    this.wheelchairBoarding =
+      requireNonNullElse(builder.getWheelchairBoarding(), WheelchairAccessibility.NO_INFORMATION);
+    this.gtfsBlockId = builder.getGtfsBlockId();
+    this.gtfsFareId = builder.getGtfsFareId();
+    this.netexInternalPlanningCode = builder.getNetexInternalPlanningCode();
+    this.netexAlteration = requireNonNullElse(builder.getNetexAlteration(), TripAlteration.PLANNED);
   }
 
-  public Trip(Trip obj) {
-    this(obj.getId());
-    this.route = obj.route;
-    this.operator = obj.operator;
-    this.serviceId = obj.serviceId;
-    this.mode = obj.mode;
-    this.netexSubmode = obj.netexSubmode;
-    this.shortName = obj.shortName;
-    this.headsign = obj.headsign;
-    this.direction = obj.direction;
-    this.blockId = obj.blockId;
-    this.shapeId = obj.shapeId;
-    this.wheelchairBoarding = obj.wheelchairBoarding;
-    this.bikesAllowed = obj.bikesAllowed;
-    this.fareId = obj.fareId;
+  public static TripBuilder of(FeedScopedId id) {
+    return new TripBuilder(id);
   }
 
   /**
    * Operator running the trip. Returns operator of this trip, if it exist, or else the route
    * operator.
    */
+  @Nonnull
   public Operator getOperator() {
-    return operator != null ? operator : route.getOperator();
-  }
-
-  /**
-   * This method return the operator associated with the trip. If the Trip have no Operator set
-   * {@code null} is returned. Note! this method do not consider the {@link Route} that the trip is
-   * part of.
-   *
-   * @see #getOperator()
-   */
-  public Operator getTripOperator() {
     return operator;
   }
 
-  public void setTripOperator(Operator operator) {
-    this.operator = operator;
-  }
-
+  @Nonnull
   public Route getRoute() {
     return route;
   }
 
-  public void setRoute(Route route) {
-    this.route = route;
-  }
-
+  /**
+   * At the moment this is probably null-safe, but we want to reduce this to GTFS serviceId for
+   * matching trips in GTFS RT updates, if the datasource is NeTEx, then we do not have this and
+   * would like to remove todays generated ID.
+   */
+  @Nullable
   public FeedScopedId getServiceId() {
     return serviceId;
-  }
-
-  public void setServiceId(FeedScopedId serviceId) {
-    this.serviceId = serviceId;
-  }
-
-  public TransitMode getMode() {
-    return mode == null ? getRoute().getMode() : mode;
-  }
-
-  public void setMode(TransitMode mode) {
-    this.mode = mode.equals(getRoute().getMode()) ? null : mode;
-  }
-
-  public String getNetexSubmode() {
-    return netexSubmode == null ? getRoute().getNetexSubmode() : netexSubmode;
-  }
-
-  public void setNetexSubmode(String netexSubmode) {
-    this.netexSubmode =
-      netexSubmode == null || netexSubmode.equals(getRoute().getNetexSubmode())
-        ? null
-        : netexSubmode;
   }
 
   /**
@@ -123,8 +103,79 @@ public final class Trip extends TransitEntity {
     return shortName;
   }
 
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
+  @Nonnull
+  public TransitMode getMode() {
+    return mode;
+  }
+
+  @Nullable
+  public String getNetexSubmode() {
+    return netexSubmode;
+  }
+
+  public String getHeadsign() {
+    return headsign;
+  }
+
+  public FeedScopedId getShapeId() {
+    return shapeId;
+  }
+
+  /**
+   * Clear the shapeId if the shape is missing from the data. There is no way to set the
+   * shape again, so use this carefully.
+   */
+  public void deleteShapeId() {
+    shapeId = null;
+  }
+
+  /**
+   * The direction for this Trip (and all other Trips in this TripPattern).
+   */
+  @NotNull
+  public Direction getDirection() {
+    return direction;
+  }
+
+  public String getGtfsDirectionIdAsString(String unknownValue) {
+    return direction.equals(Direction.UNKNOWN)
+      ? unknownValue
+      : Integer.toString(direction.gtfsCode);
+  }
+
+  public BikeAccess getBikesAllowed() {
+    return bikesAllowed;
+  }
+
+  public WheelchairAccessibility getWheelchairBoarding() {
+    return wheelchairBoarding;
+  }
+
+  public String getBlockId() {
+    return gtfsBlockId;
+  }
+
+  /** Custom extension for KCM to specify a fare per-trip */
+  public String getFareId() {
+    return gtfsFareId;
+  }
+
+  /**
+   * Internal code (non-public identifier) for the journey (e.g. train- or trip number from the
+   * planners' tool). This is kept to ensure compatibility with legacy planning systems. In NeTEx
+   * this maps to privateCode, there is no GTFS equivalent.
+   */
+  public String getNetexInternalPlanningCode() {
+    return netexInternalPlanningCode;
+  }
+
+  /**
+   * Default alteration for a trip.
+   * <p>
+   * This is planned, by default (e.g. GTFS and if not set explicit).
+   */
+  public TripAlteration getTripAlteration() {
+    return netexAlteration;
   }
 
   /**
@@ -144,106 +195,30 @@ public final class Trip extends TransitEntity {
     return getId().getId();
   }
 
-  /**
-   * Internal code (non-public identifier) for the journey (e.g. train- or trip number from the
-   * planners' tool). This is kept to ensure compatibility with legacy planning systems. In NeTEx
-   * this maps to privateCode, there is no GTFS equivalent.
-   */
-  public String getNetexInternalPlanningCode() {
-    return netexInternalPlanningCode;
+  @Override
+  public boolean sameValue(@Nonnull Trip other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(this.operator, other.operator) &&
+      Objects.equals(this.route, other.route) &&
+      Objects.equals(this.shortName, other.shortName) &&
+      Objects.equals(this.mode, other.mode) &&
+      Objects.equals(this.netexSubmode, other.netexSubmode) &&
+      Objects.equals(this.serviceId, other.serviceId) &&
+      Objects.equals(this.netexInternalPlanningCode, other.netexInternalPlanningCode) &&
+      Objects.equals(this.headsign, other.headsign) &&
+      Objects.equals(this.gtfsBlockId, other.gtfsBlockId) &&
+      Objects.equals(this.shapeId, other.shapeId) &&
+      Objects.equals(this.direction, other.direction) &&
+      Objects.equals(this.bikesAllowed, other.bikesAllowed) &&
+      Objects.equals(this.wheelchairBoarding, other.wheelchairBoarding) &&
+      Objects.equals(this.netexAlteration, other.netexAlteration) &&
+      Objects.equals(this.gtfsFareId, other.gtfsFareId)
+    );
   }
 
-  public void setNetexInternalPlanningCode(String netexInternalPlanningCode) {
-    this.netexInternalPlanningCode = netexInternalPlanningCode;
-  }
-
-  public String getHeadsign() {
-    return headsign;
-  }
-
-  public void setHeadsign(String headsign) {
-    this.headsign = headsign;
-  }
-
-  // TODO Consider moving this to the TripPattern class once we have refactored the transit model
-
-  /**
-   * The direction for this Trip (and all other Trips in this TripPattern).
-   */
-  @NotNull
-  public Direction getDirection() {
-    return direction;
-  }
-
-  public void setDirection(Direction direction) {
-    // Enforce non-null
-    this.direction = direction != null ? direction : Direction.UNKNOWN;
-  }
-
-  public String getGtfsDirectionIdAsString(String unknownValue) {
-    return direction.equals(Direction.UNKNOWN)
-      ? unknownValue
-      : Integer.toString(direction.gtfsCode);
-  }
-
-  public String getBlockId() {
-    return blockId;
-  }
-
-  public void setBlockId(String blockId) {
-    this.blockId = blockId;
-  }
-
-  public FeedScopedId getShapeId() {
-    return shapeId;
-  }
-
-  public void setShapeId(FeedScopedId shapeId) {
-    this.shapeId = shapeId;
-  }
-
-  public WheelchairAccessibility getWheelchairBoarding() {
-    return wheelchairBoarding;
-  }
-
-  public void setWheelchairBoarding(WheelchairAccessibility boarding) {
-    this.wheelchairBoarding =
-      Objects.requireNonNullElse(boarding, WheelchairAccessibility.NO_INFORMATION);
-  }
-
-  public BikeAccess getBikesAllowed() {
-    return bikesAllowed;
-  }
-
-  public void setBikesAllowed(BikeAccess bikesAllowed) {
-    this.bikesAllowed = bikesAllowed;
-  }
-
-  public String toString() {
-    return "<Trip " + getId() + ">";
-  }
-
-  /** Custom extension for KCM to specify a fare per-trip */
-  public String getFareId() {
-    return fareId;
-  }
-
-  public void setFareId(String fareId) {
-    this.fareId = fareId;
-  }
-
-  /**
-   * Default alteration for a trip.
-   * <p>
-   * This is planned, by default (e.g. GTFS and if not set explicit).
-   */
-  public TripAlteration getTripAlteration() {
-    return alteration;
-  }
-
-  public void setAlteration(TripAlteration tripAlteration) {
-    if (tripAlteration != null) {
-      this.alteration = tripAlteration;
-    }
+  @Override
+  public TripBuilder copy() {
+    return new TripBuilder(this);
   }
 }

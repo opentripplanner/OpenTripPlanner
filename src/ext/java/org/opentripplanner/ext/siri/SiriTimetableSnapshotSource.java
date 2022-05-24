@@ -549,8 +549,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       graph.index.addRoutes(route);
     }
 
-    Trip trip = new Trip(tripId);
-    trip.setRoute(route);
+    var tripBuilder = Trip.of(tripId);
+    tripBuilder.setRoute(route);
 
     ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
@@ -564,25 +564,27 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    trip.setServiceId(calServiceId);
+    tripBuilder.setServiceId(calServiceId);
 
     // Use destinationName as default headsign - if provided
     if (
       estimatedVehicleJourney.getDestinationNames() != null &&
       !estimatedVehicleJourney.getDestinationNames().isEmpty()
     ) {
-      trip.setHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
+      tripBuilder.setHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
     }
 
-    trip.setTripOperator(operator);
+    tripBuilder.setOperator(operator);
 
     // TODO - SIRI: Populate these?
-    trip.setShapeId(null); // Replacement-trip has different shape
+    tripBuilder.setShapeId(null); // Replacement-trip has different shape
     //        trip.setTripPrivateCode(null);
     //        trip.setTripPublicCode(null);
-    trip.setBlockId(null);
-    trip.setShortName(null);
+    tripBuilder.setGtfsBlockId(null);
+    tripBuilder.setShortName(null);
     //        trip.setKeyValues(null);
+
+    var trip = tripBuilder.build();
 
     List<StopLocation> addedStops = new ArrayList<>();
     List<StopTime> aimedStopTimes = new ArrayList<>();
@@ -644,7 +646,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           .getDestinationDisplaies()
           .get(0);
         stopTime.setStopHeadsign(destinationDisplay.getValue());
-      } else if (trip.getHeadsign() == null) {
+      } else if (tripBuilder.getHeadsign() == null) {
         // Fallback to empty string
         stopTime.setStopHeadsign("");
       }
@@ -669,7 +671,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
 
-    TripPattern pattern = new TripPattern(id, trip.getRoute(), stopPattern);
+    TripPattern pattern = new TripPattern(id, tripBuilder.getRoute(), stopPattern);
 
     TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, graph.deduplicator);
 

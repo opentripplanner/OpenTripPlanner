@@ -166,6 +166,35 @@ class StopTimesMapper {
     return result;
   }
 
+  /**
+   * @return a map of stop-times indexed by the TimetabledPassingTime id.
+   */
+  @Nullable
+  String findTripHeadsign(JourneyPattern journeyPattern, TimetabledPassingTime firstPassingTime) {
+    String pointInJourneyPattern = firstPassingTime
+      .getPointInJourneyPatternRef()
+      .getValue()
+      .getRef();
+
+    var stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
+
+    if (stopPoint == null) {
+      return null;
+    }
+
+    if (stopPoint.getDestinationDisplayRef() == null) {
+      return null;
+    }
+
+    var destinationDisplay = destinationDisplayById.lookup(
+      stopPoint.getDestinationDisplayRef().getRef()
+    );
+
+    return destinationDisplay == null
+      ? null
+      : MultilingualStringMapper.nullableValueOf(destinationDisplay.getFrontText());
+  }
+
   @Nullable
   private static StopPointInJourneyPattern findStopPoint(
     String pointInJourneyPatterRef,

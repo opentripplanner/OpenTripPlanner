@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.common.model.T2;
@@ -69,7 +70,7 @@ class TripMapper {
    * @return valid trip or {@code null} if unable to map to a valid trip.
    */
   @Nullable
-  Trip mapServiceJourney(ServiceJourney serviceJourney) {
+  Trip mapServiceJourney(ServiceJourney serviceJourney, Supplier<String> headsign) {
     FeedScopedId serviceId = serviceIds.get(serviceJourney.getId());
 
     if (serviceId == null) {
@@ -98,18 +99,18 @@ class TripMapper {
       WheelchairAccessibility.NO_INFORMATION
     );
 
-    Trip trip = new Trip(id);
-    trip.setRoute(route);
-    trip.setServiceId(serviceId);
-    trip.setShapeId(getShapeId(serviceJourney));
-    trip.setWheelchairBoarding(wheelChairBoarding);
+    var builder = Trip.of(id);
+    builder.setRoute(route);
+    builder.setServiceId(serviceId);
+    builder.setShapeId(getShapeId(serviceJourney));
+    builder.setWheelchairBoarding(wheelChairBoarding);
 
     if (serviceJourney.getPrivateCode() != null) {
-      trip.setNetexInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
+      builder.setNetexInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
     }
 
-    trip.setShortName(serviceJourney.getPublicCode());
-    trip.setTripOperator(findOperator(serviceJourney));
+    builder.setShortName(serviceJourney.getPublicCode());
+    builder.setOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {
       T2<TransitMode, String> transitMode = null;
@@ -128,18 +129,22 @@ class TripMapper {
         );
         return null;
       }
-      trip.setMode(transitMode.first);
-      trip.setNetexSubmode(transitMode.second);
+      builder.setMode(transitMode.first);
+      builder.setNetexSubmode(transitMode.second);
     }
 
-    trip.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
+    builder.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
 
-    trip.setAlteration(
+    builder.setNetexAlteration(
       TripServiceAlterationMapper.mapAlteration(serviceJourney.getServiceAlteration())
     );
 
-    mappedTrips.add(trip);
-    return trip;
+    // TODO RTM - Instead of getting the first headsign from the StopTime this could be the
+    //          - default behaviour of the TransitModel - So, in the NeTEx mapper we would just
+    //          - ignore setting the headsign on the Trip.
+    builder.setHeadsign(headsign.get());
+
+    return builder.build();
   }
 
   private DirectionTypeEnumeration resolveDirectionType(ServiceJourney serviceJourney) {

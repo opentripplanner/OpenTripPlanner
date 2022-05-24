@@ -18,7 +18,7 @@ public class FrequencyEntryTest {
   private static final TripTimes tripTimes;
 
   static {
-    Trip trip = new Trip(TransitModelForTest.id("testtrip"));
+    Trip trip = TransitModelForTest.trip("testtrip").build();
 
     List<StopTime> stopTimes = new ArrayList<>();
 

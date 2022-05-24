@@ -85,7 +85,7 @@ public class NoticeAssignmentMapperTest {
         )
     );
 
-    Trip trip = new Trip(TransitModelForTest.id("1"));
+    var trip = TransitModelForTest.trip("1").build();
     StopTime stopTime1 = createStopTime(1, trip);
     StopTime stopTime2 = createStopTime(2, trip);
 

@@ -1,9 +1,10 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 public class FeedScopedIdMapperTest {
@@ -21,8 +22,11 @@ public class FeedScopedIdMapperTest {
     assertEquals("1", mappedId.getId());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testMapAgencyAndIdWithNulls() throws Exception {
-    mapAgencyAndId(new org.onebusaway.gtfs.model.AgencyAndId());
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapAgencyAndId(new org.onebusaway.gtfs.model.AgencyAndId())
+    );
   }
 }

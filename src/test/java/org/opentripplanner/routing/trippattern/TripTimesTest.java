@@ -15,8 +15,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TripTimesTest {
 
-  private static final FeedScopedId TRIP_ID = TransitModelForTest.id("testTripId");
-  private static final FeedScopedId ROUTE_ID = TransitModelForTest.id("testRrouteId");
+  private static final String TRIP_ID = "testTripId";
 
   private static final FeedScopedId STOP_A = TransitModelForTest.id("A"); // 0
   private static final FeedScopedId STOP_B = TransitModelForTest.id("B"); // 1
@@ -41,7 +40,7 @@ public class TripTimesTest {
   private static final TripTimes originalTripTimes;
 
   static {
-    Trip trip = new Trip(TRIP_ID);
+    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 
@@ -139,7 +138,7 @@ public class TripTimesTest {
 
   @Test
   public void testApply() {
-    Trip trip = new Trip(TRIP_ID);
+    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 

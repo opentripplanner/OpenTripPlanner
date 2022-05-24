@@ -30,7 +30,7 @@ public class StopTimesMapperTest {
   private static final BigInteger TWO = BigInteger.valueOf(2);
 
   private static final LocalTime QUARTER_PAST_FIVE = LocalTime.of(5, 15);
-  public static final Trip TRIP = new Trip(TransitModelForTest.id("T1"));
+  public static final Trip TRIP = TransitModelForTest.trip("T1").build();
 
   @Test
   public void testCalculateOtpTime() {

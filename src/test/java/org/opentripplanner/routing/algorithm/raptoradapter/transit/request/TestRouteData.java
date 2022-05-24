@@ -152,8 +152,10 @@ public class TestRouteData {
     List<Stop> stops,
     Deduplicator deduplicator
   ) {
-    var trip = new Trip(TransitModelForTest.id(route + "-" + stopTimesByTrip.size() + 1));
-    trip.setRoute(this.route);
+    var trip = Trip
+      .of(TransitModelForTest.id(route + "-" + stopTimesByTrip.size() + 1))
+      .setRoute(this.route)
+      .build();
     var stopTimes = stopTimes(trip, stops, tripTimes);
     this.stopTimesByTrip.put(trip, stopTimes);
     this.tripTimesByTrip.put(trip, new TripTimes(trip, stopTimes, deduplicator));

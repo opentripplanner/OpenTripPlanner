@@ -48,6 +48,7 @@ import org.rutebanken.netex.model.ServiceJourney;
  */
 class TripPatternMapper {
 
+  public static final String HEADSIGH_EMPTY = "";
   private final DataImportIssueStore issueStore;
 
   private final FeedScopedIdFactory idFactory;
@@ -155,7 +156,7 @@ class TripPatternMapper {
     List<Trip> trips = new ArrayList<>();
 
     for (ServiceJourney serviceJourney : serviceJourneys) {
-      Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+      Trip trip = mapTrip(journeyPattern, serviceJourney);
 
       // Unable to map ServiceJourney, problem logged by the mapper above
       if (trip == null) {
@@ -163,7 +164,7 @@ class TripPatternMapper {
       }
 
       // Add the dated service journey to the model for this trip [if it exists]
-      mapDatedServiceJourney(serviceJourney, trip);
+      mapDatedServiceJourney(journeyPattern, serviceJourney, trip);
 
       StopTimesMapperResult stopTimes = stopTimesMapper.mapToStopTimes(
         journeyPattern,
@@ -184,7 +185,6 @@ class TripPatternMapper {
       result.tripStopTimes.put(trip, stopTimes.stopTimes);
       result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
 
-      trip.setHeadsign(getHeadsign(stopTimes.stopTimes));
       trips.add(trip);
     }
 
@@ -237,17 +237,24 @@ class TripPatternMapper {
     }
   }
 
-  private void mapDatedServiceJourney(ServiceJourney serviceJourney, Trip trip) {
+  private void mapDatedServiceJourney(
+    JourneyPattern journeyPattern,
+    ServiceJourney serviceJourney,
+    Trip trip
+  ) {
     if (datedServiceJourneysBySJId.containsKey(serviceJourney.getId())) {
       for (DatedServiceJourney datedServiceJourney : datedServiceJourneysBySJId.get(
         serviceJourney.getId()
       )) {
-        result.tripOnServiceDates.add(mapDatedServiceJourney(trip, datedServiceJourney));
+        result.tripOnServiceDates.add(
+          mapDatedServiceJourney(journeyPattern, trip, datedServiceJourney)
+        );
       }
     }
   }
 
   private TripOnServiceDate mapDatedServiceJourney(
+    JourneyPattern journeyPattern,
     Trip trip,
     DatedServiceJourney datedServiceJourney
   ) {
@@ -292,7 +299,11 @@ class TripPatternMapper {
           );
           return null;
         }
-        return mapDatedServiceJourney(tripMapper.mapServiceJourney(serviceJourney), replacement);
+        return mapDatedServiceJourney(
+          journeyPattern,
+          mapTrip(journeyPattern, serviceJourney),
+          replacement
+        );
       })
       .filter(Objects::nonNull)
       .toList();
@@ -320,5 +331,21 @@ class TripPatternMapper {
         tripPattern.add(tripTimes);
       }
     }
+  }
+
+  private Trip mapTrip(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+    return tripMapper.mapServiceJourney(
+      serviceJourney,
+      () -> findTripHeadsign(journeyPattern, serviceJourney)
+    );
+  }
+
+  private String findTripHeadsign(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+    var times = serviceJourney.getPassingTimes().getTimetabledPassingTime();
+    if (times == null || times.isEmpty()) {
+      return HEADSIGH_EMPTY;
+    }
+    String headsign = stopTimesMapper.findTripHeadsign(journeyPattern, times.get(0));
+    return headsign == null ? HEADSIGH_EMPTY : headsign;
   }
 }

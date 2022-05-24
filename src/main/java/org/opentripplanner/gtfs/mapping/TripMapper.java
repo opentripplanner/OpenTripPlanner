@@ -49,21 +49,21 @@ class TripMapper {
   }
 
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
-    Trip lhs = new Trip(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
+    var lhs = Trip.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
     lhs.setRoute(routeMapper.map(rhs.getRoute()));
     lhs.setServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
     lhs.setShortName(rhs.getTripShortName());
     lhs.setHeadsign(rhs.getTripHeadsign());
     lhs.setDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
-    lhs.setBlockId(rhs.getBlockId());
+    lhs.setGtfsBlockId(rhs.getBlockId());
     lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
     lhs.setWheelchairBoarding(
       WheelchairAccessibility.valueOfGtfsCode(rhs.getWheelchairAccessible())
     );
     lhs.setBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
-    lhs.setFareId(rhs.getFareId());
+    lhs.setGtfsFareId(rhs.getFareId());
 
-    return lhs;
+    return lhs.build();
   }
 }

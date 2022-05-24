@@ -23,7 +23,6 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
@@ -112,7 +111,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     stopTime2.setArrivalTime(7200);
 
     return new TripTimes(
-      new Trip(TransitModelForTest.id("Test")),
+      TransitModelForTest.trip("Test").build(),
       Arrays.asList(stopTime1, stopTime2),
       new Deduplicator()
     );

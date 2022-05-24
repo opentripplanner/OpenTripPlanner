@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.network;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
@@ -65,7 +66,7 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
   }
 
   public String getName() {
-    return shortName != null ? shortName : longName;
+    return Objects.requireNonNullElse(shortName, longName);
   }
 
   public String getShortName() {

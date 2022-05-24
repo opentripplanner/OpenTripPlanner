@@ -5,6 +5,8 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripBuilder;
 
 /**
  * Test utility class to help construct valid transit model objects.
@@ -30,5 +32,10 @@ public class TransitModelForTest {
   /** Create a valid Bus Route to use in unit tests */
   public static RouteBuilder route(String id) {
     return Route.of(id(id)).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
+  }
+
+  /** Create a valid Bus Route to use in unit tests */
+  public static TripBuilder trip(String id) {
+    return Trip.of(id(id)).setRoute(route("R" + id).build());
   }
 }

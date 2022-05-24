@@ -613,8 +613,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Create new Trip
 
     // TODO: which Agency ID to use? Currently use feed id.
-    final Trip trip = new Trip(tripId);
-    trip.setRoute(route);
+    var tripBuilder = Trip.of(tripId);
+    tripBuilder.setRoute(route);
 
     // Find service ID running on this service date
     final Set<FeedScopedId> serviceIds = routingService
@@ -630,10 +630,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     } else {
       // Just use first service id of set
-      trip.setServiceId(serviceIds.iterator().next());
+      tripBuilder.setServiceId(serviceIds.iterator().next());
     }
 
-    return addTripToGraphAndBuffer(trip, tripUpdate, stops, serviceDate, RealTimeState.ADDED);
+    return addTripToGraphAndBuffer(
+      tripBuilder.build(),
+      tripUpdate,
+      stops,
+      serviceDate,
+      RealTimeState.ADDED
+    );
   }
 
   /**

@@ -140,7 +140,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
     // Verify trips in pattern (one trip is removed from patternInT1)
     assertEquals(1, patternInT1.scheduledTripsAsStream().count());
-    assertEquals(tripCSIn, patternInT1.scheduledTripsAsStream().findFirst().get());
+    assertEquals(tripCSIn, patternInT1.scheduledTripsAsStream().findFirst().orElseThrow());
 
     // Verify trips in pattern is unchanged (one trip)
     assertEquals(1, patternInT2.scheduledTripsAsStream().count());
@@ -193,10 +193,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private Trip createTrip(String id, FeedScopedId serviceId) {
-    Trip trip = new Trip(TransitModelForTest.id(id));
-    trip.setServiceId(serviceId);
-    trip.setDirection(Direction.valueOfGtfsCode(1));
-    trip.setRoute(route);
-    return trip;
+    return TransitModelForTest
+      .trip(id)
+      .setServiceId(serviceId)
+      .setDirection(Direction.valueOfGtfsCode(1))
+      .setRoute(route)
+      .build();
   }
 }

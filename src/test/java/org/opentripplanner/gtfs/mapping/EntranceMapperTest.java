@@ -1,14 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.WheelchairAccessibility;
@@ -64,7 +65,7 @@ public class EntranceMapperTest {
 
   @Test
   public void testMapCollection() throws Exception {
-    assertNull(null, subject.map((Collection<Stop>) null));
+    assertNull(subject.map((Collection<Stop>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP)).size());
   }
@@ -100,7 +101,7 @@ public class EntranceMapperTest {
     assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void verifyMissingCoordinateThrowsException() {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
@@ -110,7 +111,7 @@ public class EntranceMapperTest {
     org.opentripplanner.model.Entrance result = subject.map(input);
 
     // Exception expected because the entrence and the parent do not have a coordinate
-    result.getCoordinate().latitude();
+    assertThrows(IllegalStateException.class, () -> result.getCoordinate().latitude());
   }
 
   /** Mapping the same object twice, should return the the same instance. */

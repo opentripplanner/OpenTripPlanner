@@ -347,7 +347,7 @@ public class OtpTransitServiceBuilder {
             t.getId(),
             shapeId
           );
-          t.setShapeId(null);
+          t.deleteShapeId();
         }
       });
   }

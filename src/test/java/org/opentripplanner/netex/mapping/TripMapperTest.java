@@ -67,7 +67,7 @@ public class TripMapperTest {
     access.withLimitations(limitations);
     serviceJourney.withAccessibilityAssessment(access);
     serviceJourney.setLineRef(LINE_REF);
-    var trip = tripMapper.mapServiceJourney(serviceJourney);
+    var trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
     assertNotNull(trip, "trip must not be null");
     assertEquals(
       trip.getWheelchairBoarding(),
@@ -96,7 +96,7 @@ public class TripMapperTest {
 
     serviceJourney.setLineRef(LINE_REF);
 
-    Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+    Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId(SERVICE_JOURNEY_ID));
   }
@@ -134,7 +134,7 @@ public class TripMapperTest {
       Collections.emptySet()
     );
 
-    Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+    Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId("RUT:ServiceJourney:1"));
   }
@@ -147,5 +147,9 @@ public class TripMapperTest {
       createWrappedRef("RUT:JourneyPattern:1", JourneyPatternRefStructure.class)
     );
     return serviceJourney;
+  }
+
+  private String headsign() {
+    return "To Destination";
   }
 }

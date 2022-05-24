@@ -1,14 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -89,13 +89,15 @@ public class TripMapperTest {
   public void testMapWithNulls() throws Exception {
     Trip input = new Trip();
     input.setId(AGENCY_AND_ID);
+    input.setRoute(ROUTE);
 
     org.opentripplanner.transit.model.timetable.Trip result = subject.map(input);
 
     assertNotNull(result.getId());
+    assertNotNull(result.getRoute());
+
     assertNull(result.getBlockId());
     assertNull(result.getFareId());
-    assertNull(result.getRoute());
     assertNull(result.getServiceId());
     assertNull(result.getShapeId());
     assertNull(result.getHeadsign());
