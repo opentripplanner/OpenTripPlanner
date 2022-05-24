@@ -18,23 +18,23 @@ public class BrandingTest {
 
   Branding subject = Branding
     .of(TransitModelForTest.id(ID))
-    .setShortName(SHORT_NAME)
-    .setName(NAME)
-    .setUrl(URL)
-    .setDescription(DESCRIPTION)
-    .setImage(IMAGE)
+    .withShortName(SHORT_NAME)
+    .withName(NAME)
+    .withUrl(URL)
+    .withDescription(DESCRIPTION)
+    .withImage(IMAGE)
     .build();
 
   @Test
   void copy() {
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().setName(NAME).build();
+    var copy = subject.copy().withName(NAME).build();
 
     // Same object should be returned if nothing changed
     assertSame(subject, copy);
 
     // Copy and change name
-    copy = subject.copy().setName("v2").build();
+    copy = subject.copy().withName("v2").build();
 
     // The two objects are not he same instance, but is equal(sae id)
     assertNotSame(copy, subject);

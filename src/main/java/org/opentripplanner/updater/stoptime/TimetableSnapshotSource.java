@@ -597,8 +597,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Create dummy agency for added trips
       Agency dummyAgency = Agency
         .of(new FeedScopedId(tripId.getFeedId(), "Dummy"))
-        .setName("Dummy")
-        .setTimezone("Europe/Paris")
+        .withName("Dummy")
+        .withTimezone("Europe/Paris")
         .build();
       builder.withAgency(dummyAgency);
       // Guess the route type as it doesn't exist yet in the specifications
@@ -614,7 +614,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // TODO: which Agency ID to use? Currently use feed id.
     var tripBuilder = Trip.of(tripId);
-    tripBuilder.setRoute(route);
+    tripBuilder.withRoute(route);
 
     // Find service ID running on this service date
     final Set<FeedScopedId> serviceIds = routingService
@@ -630,7 +630,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     } else {
       // Just use first service id of set
-      tripBuilder.setServiceId(serviceIds.iterator().next());
+      tripBuilder.withServiceId(serviceIds.iterator().next());
     }
 
     return addTripToGraphAndBuffer(

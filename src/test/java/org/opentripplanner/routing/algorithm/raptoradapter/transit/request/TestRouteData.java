@@ -33,7 +33,7 @@ public class TestRouteData {
 
   private final Agency agency = Agency
     .of(TransitModelForTest.id("agency"))
-    .setName("Test Agency")
+    .withName("Test Agency")
     .build();
   private final Route route;
   private final List<Trip> trips;
@@ -154,7 +154,7 @@ public class TestRouteData {
   ) {
     var trip = Trip
       .of(TransitModelForTest.id(route + "-" + stopTimesByTrip.size() + 1))
-      .setRoute(this.route)
+      .withRoute(this.route)
       .build();
     var stopTimes = stopTimes(trip, stops, tripTimes);
     this.stopTimesByTrip.put(trip, stopTimes);

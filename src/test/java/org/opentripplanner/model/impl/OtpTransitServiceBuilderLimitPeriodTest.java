@@ -195,9 +195,9 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   private Trip createTrip(String id, FeedScopedId serviceId) {
     return TransitModelForTest
       .trip(id)
-      .setServiceId(serviceId)
-      .setDirection(Direction.valueOfGtfsCode(1))
-      .setRoute(route)
+      .withServiceId(serviceId)
+      .withDirection(Direction.valueOfGtfsCode(1))
+      .withRoute(route)
       .build();
   }
 }

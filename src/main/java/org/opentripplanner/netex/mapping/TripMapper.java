@@ -100,17 +100,17 @@ class TripMapper {
     );
 
     var builder = Trip.of(id);
-    builder.setRoute(route);
-    builder.setServiceId(serviceId);
-    builder.setShapeId(getShapeId(serviceJourney));
-    builder.setWheelchairBoarding(wheelChairBoarding);
+    builder.withRoute(route);
+    builder.withServiceId(serviceId);
+    builder.withShapeId(getShapeId(serviceJourney));
+    builder.withWheelchairBoarding(wheelChairBoarding);
 
     if (serviceJourney.getPrivateCode() != null) {
-      builder.setNetexInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
+      builder.withNetexInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
     }
 
-    builder.setShortName(serviceJourney.getPublicCode());
-    builder.setOperator(findOperator(serviceJourney));
+    builder.withShortName(serviceJourney.getPublicCode());
+    builder.withOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {
       T2<TransitMode, String> transitMode = null;
@@ -129,20 +129,20 @@ class TripMapper {
         );
         return null;
       }
-      builder.setMode(transitMode.first);
-      builder.setNetexSubmode(transitMode.second);
+      builder.withMode(transitMode.first);
+      builder.withNetexSubmode(transitMode.second);
     }
 
-    builder.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
+    builder.withDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
 
-    builder.setNetexAlteration(
+    builder.withNetexAlteration(
       TripServiceAlterationMapper.mapAlteration(serviceJourney.getServiceAlteration())
     );
 
     // TODO RTM - Instead of getting the first headsign from the StopTime this could be the
     //          - default behaviour of the TransitModel - So, in the NeTEx mapper we would just
     //          - ignore setting the headsign on the Trip.
-    builder.setHeadsign(headsign.get());
+    builder.withHeadsign(headsign.get());
 
     return builder.build();
   }

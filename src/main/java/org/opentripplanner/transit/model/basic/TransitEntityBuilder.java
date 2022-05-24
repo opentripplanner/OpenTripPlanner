@@ -11,7 +11,7 @@ public abstract class TransitEntityBuilder<
 
   public TransitEntityBuilder(FeedScopedId id) {
     super(null);
-    setId(id);
+    withId(id);
   }
 
   public TransitEntityBuilder(E original) {
@@ -22,7 +22,7 @@ public abstract class TransitEntityBuilder<
     return id;
   }
 
-  public final B setId(FeedScopedId id) {
+  public final B withId(FeedScopedId id) {
     this.id = id;
     //noinspection unchecked
     return (B) this;

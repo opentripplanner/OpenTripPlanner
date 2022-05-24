@@ -197,7 +197,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /** Create a dummy trip */
   private static Trip trip(int id, Route route) {
-    return TransitModelForTest.trip(Integer.toString(id)).setRoute(route).build();
+    return TransitModelForTest.trip(Integer.toString(id)).withRoute(route).build();
   }
 
   private static Place stop(Place source) {

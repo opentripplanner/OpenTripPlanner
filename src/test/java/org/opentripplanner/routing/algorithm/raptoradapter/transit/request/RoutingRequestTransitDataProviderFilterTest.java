@@ -354,33 +354,33 @@ public class RoutingRequestTransitDataProviderFilterTest {
   @Test
   public void testBikesAllowed() {
     RouteBuilder routeBuilder = TransitModelForTest.route("1");
-    TripBuilder trip = Trip.of(TransitModelForTest.id("T1")).setRoute(routeBuilder.build());
+    TripBuilder trip = Trip.of(TransitModelForTest.id("T1")).withRoute(routeBuilder.build());
 
     assertEquals(
       BikeAccess.UNKNOWN,
       RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
-    trip.setBikesAllowed(BikeAccess.ALLOWED);
+    trip.withBikesAllowed(BikeAccess.ALLOWED);
     assertEquals(
       BikeAccess.ALLOWED,
       RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
-    trip.setBikesAllowed(BikeAccess.NOT_ALLOWED);
+    trip.withBikesAllowed(BikeAccess.NOT_ALLOWED);
     assertEquals(
       BikeAccess.NOT_ALLOWED,
       RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
-    trip.setRoute(routeBuilder.withBikesAllowed(BikeAccess.ALLOWED).build());
+    trip.withRoute(routeBuilder.withBikesAllowed(BikeAccess.ALLOWED).build());
     assertEquals(
       BikeAccess.NOT_ALLOWED,
       RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
-    trip.setBikesAllowed(BikeAccess.UNKNOWN);
+    trip.withBikesAllowed(BikeAccess.UNKNOWN);
     assertEquals(
       BikeAccess.ALLOWED,
       RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
-    trip.setRoute(routeBuilder.withBikesAllowed(BikeAccess.NOT_ALLOWED).build());
+    trip.withRoute(routeBuilder.withBikesAllowed(BikeAccess.NOT_ALLOWED).build());
     assertEquals(
       BikeAccess.NOT_ALLOWED,
       RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
@@ -507,12 +507,12 @@ public class RoutingRequestTransitDataProviderFilterTest {
   ) {
     Trip trip = Trip
       .of(tripId)
-      .setRoute(route)
-      .setMode(mode)
-      .setNetexSubmode(submode)
-      .setBikesAllowed(bikeAccess)
-      .setWheelchairBoarding(wheelchairBoarding)
-      .setNetexAlteration(tripAlteration)
+      .withRoute(route)
+      .withMode(mode)
+      .withNetexSubmode(submode)
+      .withBikesAllowed(bikeAccess)
+      .withWheelchairBoarding(wheelchairBoarding)
+      .withNetexAlteration(tripAlteration)
       .build();
 
     StopTime stopTime = new StopTime();

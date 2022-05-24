@@ -24,10 +24,10 @@ public class TransferTestData {
   static final Route ROUTE_2 = TransitModelForTest.route("2").build();
   static final Route ANY_ROUTE = TransitModelForTest.route("ANY").build();
 
-  static final Trip TRIP_11 = TransitModelForTest.trip("11").setRoute(ROUTE_1).build();
-  static final Trip TRIP_12 = TransitModelForTest.trip("12").setRoute(ROUTE_1).build();
-  static final Trip TRIP_21 = TransitModelForTest.trip("21").setRoute(ROUTE_2).build();
-  static final Trip ANY_TRIP = TransitModelForTest.trip("999").setRoute(ANY_ROUTE).build();
+  static final Trip TRIP_11 = TransitModelForTest.trip("11").withRoute(ROUTE_1).build();
+  static final Trip TRIP_12 = TransitModelForTest.trip("12").withRoute(ROUTE_1).build();
+  static final Trip TRIP_21 = TransitModelForTest.trip("21").withRoute(ROUTE_2).build();
+  static final Trip ANY_TRIP = TransitModelForTest.trip("999").withRoute(ANY_ROUTE).build();
 
   static final TransferPoint STATION_POINT = new StationTransferPoint(STATION);
 

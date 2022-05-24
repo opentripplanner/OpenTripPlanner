@@ -550,7 +550,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     var tripBuilder = Trip.of(tripId);
-    tripBuilder.setRoute(route);
+    tripBuilder.withRoute(route);
 
     ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
@@ -564,24 +564,26 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    tripBuilder.setServiceId(calServiceId);
+    tripBuilder.withServiceId(calServiceId);
 
     // Use destinationName as default headsign - if provided
     if (
       estimatedVehicleJourney.getDestinationNames() != null &&
       !estimatedVehicleJourney.getDestinationNames().isEmpty()
     ) {
-      tripBuilder.setHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
+      tripBuilder.withHeadsign(
+        "" + estimatedVehicleJourney.getDestinationNames().get(0).getValue()
+      );
     }
 
-    tripBuilder.setOperator(operator);
+    tripBuilder.withOperator(operator);
 
     // TODO - SIRI: Populate these?
-    tripBuilder.setShapeId(null); // Replacement-trip has different shape
+    tripBuilder.withShapeId(null); // Replacement-trip has different shape
     //        trip.setTripPrivateCode(null);
     //        trip.setTripPublicCode(null);
-    tripBuilder.setGtfsBlockId(null);
-    tripBuilder.setShortName(null);
+    tripBuilder.withGtfsBlockId(null);
+    tripBuilder.withShortName(null);
     //        trip.setKeyValues(null);
 
     var trip = tripBuilder.build();

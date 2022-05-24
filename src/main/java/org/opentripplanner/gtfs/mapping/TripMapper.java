@@ -51,18 +51,18 @@ class TripMapper {
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
     var lhs = Trip.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
-    lhs.setRoute(routeMapper.map(rhs.getRoute()));
-    lhs.setServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
-    lhs.setShortName(rhs.getTripShortName());
-    lhs.setHeadsign(rhs.getTripHeadsign());
-    lhs.setDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
-    lhs.setGtfsBlockId(rhs.getBlockId());
-    lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
-    lhs.setWheelchairBoarding(
+    lhs.withRoute(routeMapper.map(rhs.getRoute()));
+    lhs.withServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
+    lhs.withShortName(rhs.getTripShortName());
+    lhs.withHeadsign(rhs.getTripHeadsign());
+    lhs.withDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
+    lhs.withGtfsBlockId(rhs.getBlockId());
+    lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
+    lhs.withWheelchairBoarding(
       WheelchairAccessibility.valueOfGtfsCode(rhs.getWheelchairAccessible())
     );
-    lhs.setBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
-    lhs.setGtfsFareId(rhs.getFareId());
+    lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
+    lhs.withGtfsFareId(rhs.getFareId());
 
     return lhs.build();
   }

@@ -35,14 +35,14 @@ class AuthorityToAgencyMapper {
   Agency mapAuthorityToAgency(Authority source) {
     AgencyBuilder target = Agency
       .of(idFactory.createId(source.getId()))
-      .setName(source.getName().getValue())
-      .setTimezone(timeZone);
+      .withName(source.getName().getValue())
+      .withTimezone(timeZone);
 
     withOptional(
       source.getContactDetails(),
       c -> {
-        target.setUrl(c.getUrl());
-        target.setPhone(c.getPhone());
+        target.withUrl(c.getUrl());
+        target.withPhone(c.getPhone());
       }
     );
     return target.build();
@@ -55,10 +55,10 @@ class AuthorityToAgencyMapper {
   Agency createDummyAgency() {
     return Agency
       .of(idFactory.createId(dummyAgencyId))
-      .setName("N/A")
-      .setTimezone(timeZone)
-      .setUrl("N/A")
-      .setPhone("N/A")
+      .withName("N/A")
+      .withTimezone(timeZone)
+      .withUrl("N/A")
+      .withPhone("N/A")
       .build();
   }
 

@@ -19,11 +19,11 @@ public class TestSpecificTransfer {
   public void testSpecificTransfer() {
     // Setup from trip with route
     Route fromRoute = TransitModelForTest.route("R1").build();
-    Trip fromTrip = Trip.of(TransitModelForTest.id("T1")).setRoute(fromRoute).build();
+    Trip fromTrip = Trip.of(TransitModelForTest.id("T1")).withRoute(fromRoute).build();
 
     // Setup to trip with route
     Route toRoute = TransitModelForTest.route("R2").build();
-    Trip toTrip = Trip.of(TransitModelForTest.id("T2")).setRoute(toRoute).build();
+    Trip toTrip = Trip.of(TransitModelForTest.id("T2")).withRoute(toRoute).build();
 
     // Create full SpecificTransfer
     SpecificTransfer s1 = new SpecificTransfer(

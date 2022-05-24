@@ -41,7 +41,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return operator;
   }
 
-  public TripBuilder setOperator(Operator operator) {
+  public TripBuilder withOperator(Operator operator) {
     this.operator = operator;
     return this;
   }
@@ -50,7 +50,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return route;
   }
 
-  public TripBuilder setRoute(Route route) {
+  public TripBuilder withRoute(Route route) {
     this.route = route;
     return this;
   }
@@ -59,7 +59,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return serviceId;
   }
 
-  public TripBuilder setServiceId(FeedScopedId serviceId) {
+  public TripBuilder withServiceId(FeedScopedId serviceId) {
     this.serviceId = serviceId;
     return this;
   }
@@ -68,7 +68,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return shortName;
   }
 
-  public TripBuilder setShortName(String shortName) {
+  public TripBuilder withShortName(String shortName) {
     this.shortName = shortName;
     return this;
   }
@@ -77,7 +77,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return mode;
   }
 
-  public TripBuilder setMode(TransitMode mode) {
+  public TripBuilder withMode(TransitMode mode) {
     this.mode = mode;
     return this;
   }
@@ -86,7 +86,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return netexSubmode;
   }
 
-  public TripBuilder setNetexSubmode(String netexSubmode) {
+  public TripBuilder withNetexSubmode(String netexSubmode) {
     this.netexSubmode = netexSubmode;
     return this;
   }
@@ -95,7 +95,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return netexInternalPlanningCode;
   }
 
-  public TripBuilder setNetexInternalPlanningCode(String netexInternalPlanningCode) {
+  public TripBuilder withNetexInternalPlanningCode(String netexInternalPlanningCode) {
     this.netexInternalPlanningCode = netexInternalPlanningCode;
     return this;
   }
@@ -104,7 +104,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return headsign;
   }
 
-  public TripBuilder setHeadsign(String headsign) {
+  public TripBuilder withHeadsign(String headsign) {
     this.headsign = headsign;
     return this;
   }
@@ -113,7 +113,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return gtfsBlockId;
   }
 
-  public TripBuilder setGtfsBlockId(String gtfsBlockId) {
+  public TripBuilder withGtfsBlockId(String gtfsBlockId) {
     this.gtfsBlockId = gtfsBlockId;
     return this;
   }
@@ -122,7 +122,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return shapeId;
   }
 
-  public TripBuilder setShapeId(FeedScopedId shapeId) {
+  public TripBuilder withShapeId(FeedScopedId shapeId) {
     this.shapeId = shapeId;
     return this;
   }
@@ -131,7 +131,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return direction;
   }
 
-  public TripBuilder setDirection(Direction direction) {
+  public TripBuilder withDirection(Direction direction) {
     this.direction = direction;
     return this;
   }
@@ -140,7 +140,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return bikesAllowed;
   }
 
-  public TripBuilder setBikesAllowed(BikeAccess bikesAllowed) {
+  public TripBuilder withBikesAllowed(BikeAccess bikesAllowed) {
     this.bikesAllowed = bikesAllowed;
     return this;
   }
@@ -149,7 +149,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return wheelchairBoarding;
   }
 
-  public TripBuilder setWheelchairBoarding(WheelchairAccessibility wheelchairBoarding) {
+  public TripBuilder withWheelchairBoarding(WheelchairAccessibility wheelchairBoarding) {
     this.wheelchairBoarding = wheelchairBoarding;
     return this;
   }
@@ -158,7 +158,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return netexAlteration;
   }
 
-  public TripBuilder setNetexAlteration(TripAlteration netexAlteration) {
+  public TripBuilder withNetexAlteration(TripAlteration netexAlteration) {
     this.netexAlteration = netexAlteration;
     return this;
   }
@@ -167,7 +167,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return gtfsFareId;
   }
 
-  public TripBuilder setGtfsFareId(String gtfsFareId) {
+  public TripBuilder withGtfsFareId(String gtfsFareId) {
     this.gtfsFareId = gtfsFareId;
     return this;
   }

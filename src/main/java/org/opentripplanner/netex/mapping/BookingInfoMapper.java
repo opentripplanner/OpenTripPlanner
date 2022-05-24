@@ -144,16 +144,16 @@ public class BookingInfoMapper {
 
     ContactInfo contactInfo = ContactInfo
       .of()
-      .setContactPerson(
+      .withContactPerson(
         contactStructure.getContactPerson() != null
           ? contactStructure.getContactPerson().getValue()
           : null
       )
-      .setPhoneNumber(contactStructure.getPhone())
-      .seteMail(contactStructure.getEmail())
-      .setFaxNumber(contactStructure.getFax())
-      .setBookingUrl(contactStructure.getUrl())
-      .setAdditionalDetails(
+      .withPhoneNumber(contactStructure.getPhone())
+      .withEMail(contactStructure.getEmail())
+      .withFaxNumber(contactStructure.getFax())
+      .withBookingUrl(contactStructure.getUrl())
+      .withAdditionalDetails(
         contactStructure.getFurtherDetails() != null
           ? contactStructure.getFurtherDetails().getValue()
           : null

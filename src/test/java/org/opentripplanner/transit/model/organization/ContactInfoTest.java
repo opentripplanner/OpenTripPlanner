@@ -18,25 +18,25 @@ class ContactInfoTest {
 
   private static final ContactInfo subject = ContactInfo
     .of()
-    .setContactPerson(CONTACT_PERSON)
-    .setPhoneNumber(PHONE)
-    .seteMail(EMAIL)
-    .setFaxNumber(FAX_NUMBER)
-    .setInfoUrl(INFO_URL)
-    .setBookingUrl(BOOKING_URL)
-    .setAdditionalDetails(ADD_DETAILS)
+    .withContactPerson(CONTACT_PERSON)
+    .withPhoneNumber(PHONE)
+    .withEMail(EMAIL)
+    .withFaxNumber(FAX_NUMBER)
+    .withInfoUrl(INFO_URL)
+    .withBookingUrl(BOOKING_URL)
+    .withAdditionalDetails(ADD_DETAILS)
     .build();
 
   @Test
   void copy() {
     // Create a copy, but do not change it
-    var copy = subject.copy().setContactPerson(CONTACT_PERSON).build();
+    var copy = subject.copy().withContactPerson(CONTACT_PERSON).build();
 
     // Then the build object should be the same
     assertSame(subject, copy);
 
     // Copy and change the contact person
-    copy = subject.copy().setContactPerson("New Person").build();
+    copy = subject.copy().withContactPerson("New Person").build();
 
     assertNotSame(copy, subject);
     assertEquals(copy.getContactPerson(), "New Person");
