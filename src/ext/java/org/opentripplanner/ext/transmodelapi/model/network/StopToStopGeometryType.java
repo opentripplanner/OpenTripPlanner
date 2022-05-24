@@ -23,9 +23,7 @@ public class StopToStopGeometryType {
             "A list of coordinates encoded as a polyline string between two stops (see http://code.google.com/apis/maps/documentation/polylinealgorithm.html)"
           )
           .type(linkGeometryType)
-          .dataFetcher(env ->
-            ((EncodedPolylineBeanWithStops) env.getSource()).getEncodedPolylineBean()
-          )
+          .dataFetcher(env -> ((EncodedPolylineBeanWithStops) env.getSource()).pointsOnLink())
           .build()
       )
       .field(
@@ -34,7 +32,7 @@ public class StopToStopGeometryType {
           .name("fromQuay")
           .description("Origin Quay")
           .type(quayType)
-          .dataFetcher(env -> ((EncodedPolylineBeanWithStops) env.getSource()).getFromQuay())
+          .dataFetcher(env -> ((EncodedPolylineBeanWithStops) env.getSource()).fromQuay())
           .build()
       )
       .field(
@@ -43,7 +41,7 @@ public class StopToStopGeometryType {
           .name("toQuay")
           .description("Destination Quay")
           .type(quayType)
-          .dataFetcher(env -> ((EncodedPolylineBeanWithStops) env.getSource()).getToQuay())
+          .dataFetcher(env -> ((EncodedPolylineBeanWithStops) env.getSource()).toQuay())
           .build()
       )
       .build();

@@ -21,10 +21,11 @@ public class GeometryMapper {
       var endLocation = tripPattern.getStop(i + 1);
       var geometry = PolylineEncoder.encodeGeometry(tripPattern.getHopGeometry(i));
 
-      var stopToStopGeometry = new EncodedPolylineBeanWithStops();
-      stopToStopGeometry.setFromQuay(startLocation);
-      stopToStopGeometry.setToQuay(endLocation);
-      stopToStopGeometry.setEncodedPolylineBean(geometry);
+      var stopToStopGeometry = new EncodedPolylineBeanWithStops(
+        startLocation,
+        endLocation,
+        geometry
+      );
 
       stopToStopGeometries.add(stopToStopGeometry);
     }
