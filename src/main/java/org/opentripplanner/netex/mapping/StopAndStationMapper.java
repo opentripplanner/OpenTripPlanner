@@ -19,7 +19,7 @@ import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -171,9 +171,9 @@ class StopAndStationMapper {
       return;
     }
 
-    var wheelchairBoarding = wheelChairBoardingFromQuay(quay, stopPlace);
+    var wheelchair = wheelchairAccessibilityFromQuay(quay, stopPlace);
 
-    Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchairBoarding);
+    Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
     if (stop == null) {
       return;
     }
@@ -223,18 +223,18 @@ class StopAndStationMapper {
    * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */
-  private WheelchairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
-    var defaultWheelChairBoarding = WheelchairBoarding.NO_INFORMATION;
+  private WheelchairAccessibility wheelchairAccessibilityFromQuay(Quay quay, StopPlace stopPlace) {
+    var defaultWheelChairBoarding = WheelchairAccessibility.NO_INFORMATION;
 
     if (stopPlace != null) {
       defaultWheelChairBoarding =
-        WheelChairMapper.wheelChairBoarding(
+        WheelChairMapper.wheelchairAccessibility(
           stopPlace.getAccessibilityAssessment(),
-          WheelchairBoarding.NO_INFORMATION
+          WheelchairAccessibility.NO_INFORMATION
         );
     }
 
-    return WheelChairMapper.wheelChairBoarding(
+    return WheelChairMapper.wheelchairAccessibility(
       quay.getAccessibilityAssessment(),
       defaultWheelChairBoarding
     );
