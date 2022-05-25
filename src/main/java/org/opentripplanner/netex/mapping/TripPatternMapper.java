@@ -48,7 +48,8 @@ import org.rutebanken.netex.model.ServiceJourney;
  */
 class TripPatternMapper {
 
-  public static final String HEADSIGH_EMPTY = "";
+  public static final String HEADSIGN_EMPTY = "";
+
   private final DataImportIssueStore issueStore;
 
   private final FeedScopedIdFactory idFactory;
@@ -343,9 +344,9 @@ class TripPatternMapper {
   private String findTripHeadsign(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
     var times = serviceJourney.getPassingTimes().getTimetabledPassingTime();
     if (times == null || times.isEmpty()) {
-      return HEADSIGH_EMPTY;
+      return HEADSIGN_EMPTY;
     }
     String headsign = stopTimesMapper.findTripHeadsign(journeyPattern, times.get(0));
-    return headsign == null ? HEADSIGH_EMPTY : headsign;
+    return headsign == null ? HEADSIGN_EMPTY : headsign;
   }
 }
