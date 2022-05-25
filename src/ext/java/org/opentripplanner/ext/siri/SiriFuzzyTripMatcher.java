@@ -415,6 +415,7 @@ public class SiriFuzzyTripMatcher {
 
     if (trips == null || trips.isEmpty()) {
       //SIRI-data may report other platform, but still on the same Parent-stop
+      // TODO OTP2 - We should pass in correct feed id here
       String feedId = routingService.getFeedIds().iterator().next();
       var stop = routingService.getStopForId(new FeedScopedId(feedId, lastStopPoint));
       if (stop != null && stop.isPartOfStation()) {

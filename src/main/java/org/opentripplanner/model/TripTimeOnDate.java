@@ -56,7 +56,7 @@ public class TripTimeOnDate {
    * StopPatterns.
    */
   public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip) {
-    TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));
+    TripTimes times = table.getTripTimes(trip);
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), (ServiceDay) null));
@@ -75,7 +75,7 @@ public class TripTimeOnDate {
     Trip trip,
     ServiceDay serviceDay
   ) {
-    TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));
+    TripTimes times = table.getTripTimes(trip);
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDay));

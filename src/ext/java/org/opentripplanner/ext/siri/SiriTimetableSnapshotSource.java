@@ -327,7 +327,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     final long now = System.currentTimeMillis();
     if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
       if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer.toString());
+        LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
       } else {
         LOG.debug("Buffer was unchanged, keeping old snapshot.");
@@ -437,9 +437,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     final TripTimes updatedTripTimes = createUpdatedTripTimes(
       currentTimetable,
-      graph,
       activity,
-      trip.getId()
+      trip.getId(),
+      graph::getStopLocationById
     );
     if (updatedTripTimes == null) {
       return false;
@@ -784,7 +784,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     if (replacedRoute != null) {
       TransitMode replacedRouteMode = replacedRoute.getMode();
 
-      if (replacedRouteMode != null && replacedRouteMode.equals(TransitMode.RAIL)) { // Replaced-route is RAIL
+      if (replacedRouteMode == TransitMode.RAIL) {
         if (transitMode.equals(TransitMode.RAIL)) {
           // Replacement-route is also RAIL
           return RailSubmodeEnumeration.REPLACEMENT_RAIL_SERVICE.value();
@@ -854,10 +854,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (exactPattern != null) {
         Timetable currentTimetable = getCurrentTimetable(exactPattern, serviceDate);
         TripTimes exactUpdatedTripTimes = createUpdatedTripTimes(
-          graph,
           currentTimetable,
           estimatedVehicleJourney,
-          tripMatchedByServiceJourneyId.getId()
+          tripMatchedByServiceJourneyId.getId(),
+          graph::getStopLocationById,
+          timeZone.toZoneId(),
+          graph.deduplicator
         );
         if (exactUpdatedTripTimes != null) {
           times.add(exactUpdatedTripTimes);
@@ -906,10 +908,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         if (pattern != null) {
           Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
           TripTimes updatedTripTimes = createUpdatedTripTimes(
-            graph,
             currentTimetable,
             estimatedVehicleJourney,
-            matchingTrip.getId()
+            matchingTrip.getId(),
+            graph::getStopLocationById,
+            timeZone.toZoneId(),
+            graph.deduplicator
           );
           if (updatedTripTimes != null) {
             patterns.add(pattern);
@@ -945,25 +949,23 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                           to replace previous update regardless of realtimestate
                          */
 
-            cancelScheduledTrip(feedId, trip.getId().getId(), serviceDate);
+            cancelScheduledTrip(trip, serviceDate);
 
             // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
             // previously created trip
-            removePreviousRealtimeUpdate(feedId, trip.getId().getId(), serviceDate);
+            removePreviousRealtimeUpdate(trip, serviceDate);
 
             // Calculate modified stop-pattern
-            Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
             var modifiedStops = createModifiedStops(
-              currentTimetable,
+              pattern,
               estimatedVehicleJourney,
-              routingService
+              graph::getStopLocationById
             );
             List<StopTime> modifiedStopTimes = createModifiedStopTimes(
-              currentTimetable,
+              pattern,
               tripTimes,
               estimatedVehicleJourney,
-              trip,
-              routingService
+              graph::getStopLocationById
             );
 
             if (modifiedStops != null && modifiedStops.isEmpty()) {
@@ -1129,26 +1131,25 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Cancel scheduled trip in buffer given trip id (without agency id) on service date
+   * Cancel scheduled trip in buffer given trip on service date
    *
-   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
-  private boolean cancelScheduledTrip(String feedId, String tripId, final ServiceDate serviceDate) {
+  private boolean cancelScheduledTrip(Trip trip, final ServiceDate serviceDate) {
     boolean success = false;
 
-    final TripPattern pattern = getPatternForTripId(feedId, tripId);
+    final TripPattern pattern = routingService.getPatternForTrip().get(trip);
 
     if (pattern != null) {
       // Cancel scheduled trip times for this trip in this pattern
       final Timetable timetable = pattern.getScheduledTimetable();
-      final int tripIndex = timetable.getTripIndex(tripId);
+      final TripTimes tripTimes = timetable.getTripTimes(trip);
 
-      if (tripIndex == -1) {
-        LOG.warn("Could not cancel scheduled trip {}", tripId);
+      if (tripTimes == null) {
+        LOG.warn("Could not cancel scheduled trip {}", trip.getId());
       } else {
-        final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
+        final TripTimes newTripTimes = new TripTimes(tripTimes);
         newTripTimes.cancelTrip();
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;
@@ -1159,30 +1160,22 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Removes previous trip-update from buffer if there is an update with given trip id (without
-   * agency id) on service date
+   * Removes previous trip-update from buffer if there is an update with given trip on service date
    *
-   * @param feedId      feed id the trip id belongs to
-   * @param tripId      trip id without agency id
    * @param serviceDate service date
    * @return true if a previously added trip was removed
    */
-  private boolean removePreviousRealtimeUpdate(
-    final String feedId,
-    final String tripId,
-    final ServiceDate serviceDate
-  ) {
+  private boolean removePreviousRealtimeUpdate(final Trip trip, final ServiceDate serviceDate) {
     boolean success = false;
 
-    FeedScopedId feedScopedTripId = new FeedScopedId(feedId, tripId);
-    final TripPattern pattern = buffer.getLastAddedTripPattern(feedScopedTripId, serviceDate);
+    final TripPattern pattern = buffer.getLastAddedTripPattern(trip.getId(), serviceDate);
     if (pattern != null) {
       /*
               Remove the previous realtime-added TripPattern from buffer.
               Only one version of the realtime-update should exist
              */
-      buffer.removeLastAddedTripPattern(feedScopedTripId, serviceDate);
-      buffer.removeRealtimeUpdatedTripTimes(pattern, feedScopedTripId, serviceDate);
+      buffer.removeLastAddedTripPattern(trip.getId(), serviceDate);
+      buffer.removeRealtimeUpdatedTripTimes(pattern, trip.getId(), serviceDate);
       success = true;
     }
 
@@ -1202,18 +1195,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     lastPurgeDate = previously;
 
     return buffer.purgeExpiredData(previously);
-  }
-
-  /**
-   * Retrieve a trip pattern given a feed id and trid id.
-   *
-   * @param feedId feed id for the trip id
-   * @param tripId trip id without agency
-   * @return trip pattern or null if no trip pattern was found
-   */
-  private TripPattern getPatternForTripId(String feedId, String tripId) {
-    Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
-    return routingService.getPatternForTrip().get(trip);
   }
 
   private Set<TripPattern> getPatternsForTrip(
@@ -1290,17 +1271,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           tripPattern.getScheduledTimetable().getTripTimes().get(0).getDepartureTime(0); // TODO does this line do anything?
           patterns.add(tripPattern);
         }
-      }
-    }
-    return patterns;
-  }
-
-  private Set<TripPattern> getPatternForTrip(Set<Trip> trips, EstimatedVehicleJourney journey) {
-    Set<TripPattern> patterns = new HashSet<>();
-    for (Trip trip : trips) {
-      TripPattern pattern = getPatternForTrip(trip, journey);
-      if (pattern != null) {
-        patterns.add(pattern);
       }
     }
     return patterns;
@@ -1511,10 +1481,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           if (firstStopId.equals(stop.getId().getId())) {
             firstReportedStopIsFound = true;
           } else {
-            String agencyId = stop.getId().getFeedId();
             if (stop.isPartOfStation()) {
               var alternativeStop = routingService.getStopForId(
-                new FeedScopedId(agencyId, firstStopId)
+                new FeedScopedId(stop.getId().getFeedId(), firstStopId)
               );
               if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
                 firstReportedStopIsFound = true;
@@ -1546,28 +1515,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     } else {
       return null;
     }
-  }
-
-  /**
-   * Retrieve route given a route id without an agency
-   *
-   * @param feedId  feed id for the route id
-   * @param routeId route id without the agency
-   * @return route or null if route can't be found in graph index
-   */
-  private Route getRouteForRouteId(String feedId, String routeId) {
-    return routingService.getRouteForId(new FeedScopedId(feedId, routeId));
-  }
-
-  /**
-   * Retrieve trip given a trip id without an agency
-   *
-   * @param feedId feed id for the trip id
-   * @param tripId trip id without the agency
-   * @return trip or null if trip can't be found in graph index
-   */
-  private Trip getTripForTripId(String feedId, String tripId) {
-    return routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
   }
 
   /**
