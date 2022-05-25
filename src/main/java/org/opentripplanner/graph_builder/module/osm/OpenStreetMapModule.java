@@ -93,7 +93,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    */
   private final List<OpenStreetMapProvider> providers;
   private final Set<String> boardingAreaRefTags;
-  private DataImportIssueStore issueStore;
   public boolean skipVisibility = false;
   // Members that can be set by clients.
   public boolean platformEntriesLinking = false;
@@ -119,13 +118,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Whether we should create bike P+R stations from OSM data. (default false)
    */
   public boolean staticBikeParkAndRide;
-  private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
   public int maxAreaNodes = 500;
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
+  private DataImportIssueStore issueStore;
+  private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
   /**
    * Construct and set providers all at once.
@@ -1070,11 +1070,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
         int travelTime = parseDuration(node).orElse(-1);
 
-        var wheelchairBoarding = node.getWheelchairBoarding();
+        var wheelchair = node.getWheelchairAccessibility();
 
         createElevatorHopEdges(
           onboardVertices,
-          wheelchairBoarding,
+          wheelchair,
           node.isTagTrue("bicycle"),
           levels.length,
           travelTime
@@ -1112,11 +1112,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         int travelTime = parseDuration(elevatorWay).orElse(-1);
         int levels = nodes.size();
-        var wheelchairBoarding = elevatorWay.getWheelchairBoarding();
+        var wheelchair = elevatorWay.getWheelchairAccessibility();
 
         createElevatorHopEdges(
           onboardVertices,
-          wheelchairBoarding,
+          wheelchair,
           elevatorWay.isTagTrue("bicycle"),
           levels,
           travelTime

@@ -99,7 +99,7 @@ public class OSMWithTags {
   /**
    * Returns the level of wheelchair access of the element.
    */
-  public WheelchairAccessibility getWheelchairBoarding() {
+  public WheelchairAccessibility getWheelchairAccessibility() {
     if (isTagTrue("wheelchair")) {
       return WheelchairAccessibility.POSSIBLE;
     } else if (isTagFalse("wheelchair")) {
