@@ -109,6 +109,8 @@ public class TimetableHelper {
     //Populate missing data from existing TripTimes
     newTimes.setServiceCode(oldTimes.getServiceCode());
 
+    OccupancyEnumeration journeyOccupancy = journey.getOccupancy();
+
     int callCounter = 0;
     ZonedDateTime departureDate = null;
     Set<Object> alreadyVisited = new HashSet<>();
@@ -215,8 +217,11 @@ public class TimetableHelper {
           lastDepartureDelay = departureDelay;
           departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
 
-          if (recordedCall.getOccupancy() != null) {
-            newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(recordedCall.getOccupancy()));
+          OccupancyEnumeration callOccupancy = recordedCall.getOccupancy() != null ?
+            recordedCall.getOccupancy(): journeyOccupancy;
+
+          if (callOccupancy != null) {
+            newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(callOccupancy));
           }
 
           alreadyVisited.add(recordedCall);
@@ -318,9 +323,12 @@ public class TimetableHelper {
             lastDepartureDelay = departureDelay;
 
             departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
-            
-            if (estimatedCall.getOccupancy() != null) {
-              newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(estimatedCall.getOccupancy()));
+
+            OccupancyEnumeration callOccupancy = estimatedCall.getOccupancy() != null ?
+              estimatedCall.getOccupancy(): journeyOccupancy;
+
+            if (callOccupancy != null) {
+              newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(callOccupancy));
             }
             
             alreadyVisited.add(estimatedCall);
