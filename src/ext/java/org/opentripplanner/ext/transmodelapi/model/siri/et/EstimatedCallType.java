@@ -202,6 +202,14 @@ public class EstimatedCallType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("occupancyStatus")
+          .type(new GraphQLNonNull(EnumTypes.OCCUPANCY_STATUS))
+          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getOccupancyStatus())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("stopPositionInPattern")
           .type(new GraphQLNonNull(Scalars.GraphQLInt))
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStopIndex())
