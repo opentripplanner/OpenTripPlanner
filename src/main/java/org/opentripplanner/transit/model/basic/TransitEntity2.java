@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
  * This class also enforce a strong type-safe relationship between entity and builder.
  */
 public abstract class TransitEntity2<
-  E extends TransitEntity2<E, B>, B extends TransitEntityBuilder<E, B>
+  E extends TransitEntity2<E, B>, B extends AbstractEntityBuilder<E, B>
 >
   extends TransitEntity
   implements TransitObject<E, B> {

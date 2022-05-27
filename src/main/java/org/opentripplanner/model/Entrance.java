@@ -1,4 +1,3 @@
-/* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
 import org.opentripplanner.transit.model.basic.FeedScopedId;
@@ -19,10 +18,5 @@ public final class Entrance extends StationElement {
     StopLevel level
   ) {
     super(id, name, code, description, coordinate, wheelchairAccessibility, level);
-  }
-
-  @Override
-  public String toString() {
-    return "<Entrance " + getId() + ">";
   }
 }

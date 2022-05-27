@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -56,7 +58,15 @@ class AgencyTest {
   }
 
   @Test
-  void testToString() {
-    assertEquals(subject.toString(), "<Agency F:1>");
+  void sameAs() {
+    assertTrue(subject.sameValue(subject.copy().build()));
+    assertFalse(subject.sameValue(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameValue(subject.copy().withName("X").build()));
+    assertFalse(subject.sameValue(subject.copy().withUrl("X").build()));
+    assertFalse(subject.sameValue(subject.copy().withTimezone("X").build()));
+    assertFalse(subject.sameValue(subject.copy().withPhone("X").build()));
+    assertFalse(subject.sameValue(subject.copy().withBrandingUrl("X").build()));
+    assertFalse(subject.sameValue(subject.copy().withFareUrl("X").build()));
+    assertFalse(subject.sameValue(subject.copy().withLang("X").build()));
   }
 }

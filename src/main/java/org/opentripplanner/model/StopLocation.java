@@ -7,15 +7,17 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.LogInfo;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.lang.ObjectUtils;
 
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
  * necessarily a marked stop, but can be of other shapes, such as a service area for flexible
  * transit. StopLocations are referred to in stop times.
  */
-public interface StopLocation {
+public interface StopLocation extends LogInfo {
   /** The ID for the StopLocation */
   FeedScopedId getId();
 
@@ -104,4 +106,9 @@ public interface StopLocation {
   }
 
   boolean isPartOfSameStationAs(StopLocation alternativeStop);
+
+  @Override
+  default String logName() {
+    return ObjectUtils.ifNotNull(getName(), Object::toString, null);
+  }
 }

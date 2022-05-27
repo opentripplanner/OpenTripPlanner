@@ -97,9 +97,4 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
   public Collection<Station> getChildStations() {
     return this.childStations;
   }
-
-  @Override
-  public String toString() {
-    return "<MultiModal station " + getId() + ">";
-  }
 }

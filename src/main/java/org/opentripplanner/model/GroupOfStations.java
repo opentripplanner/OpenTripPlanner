@@ -68,11 +68,6 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
     this.purposeOfGrouping = purposeOfGrouping;
   }
 
-  @Override
-  public String toString() {
-    return "<GroupOfStations " + getId() + ">";
-  }
-
   /**
    * Categorization for the grouping
    */

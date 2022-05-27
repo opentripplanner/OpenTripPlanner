@@ -663,10 +663,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     );
   }
 
-  public String toString() {
-    return String.format("<TripPattern %s>", this.getId());
-  }
-
   /**
    * In most cases we want to use identity equality for Trips. However, in some cases we want a way
    * to consistently identify trips across versions of a GTFS feed, when the feed publisher cannot

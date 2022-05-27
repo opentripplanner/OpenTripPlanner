@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.timetable.TripBuilder;
  */
 public class TransitModelForTest {
 
-  public static final String TIME_ZONE_ID = "Europe/Paris";
   public static final String FEED_ID = "F";
+  public static final String TIME_ZONE_ID = "Europe/Paris";
   public static final Agency AGENCY = Agency
     .of(id("A1"))
     .withName("Agency Test")
@@ -26,7 +26,7 @@ public class TransitModelForTest {
   }
 
   public static Agency agency(String name) {
-    return Agency.of(id(name)).withName(name).withTimezone(TIME_ZONE_ID).build();
+    return AGENCY.copy().withId(id(name)).withName(name).build();
   }
 
   /** Create a valid Bus Route to use in unit tests */

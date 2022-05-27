@@ -112,11 +112,6 @@ public final class Pathway extends TransitEntity {
     this.slope = slope;
   }
 
-  @Override
-  public String toString() {
-    return "<Pathway " + getId() + ">";
-  }
-
   public boolean isPathwayModeWheelchairAccessible() {
     return getPathwayMode() != 2 && getPathwayMode() != 4;
   }

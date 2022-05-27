@@ -3,15 +3,14 @@ package org.opentripplanner.transit.model.network;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.basic.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
 
 @SuppressWarnings("UnusedReturnValue")
-public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder> {
+public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilder> {
 
   private Agency agency;
   private Operator operator;
@@ -34,8 +33,23 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
     super(id);
   }
 
-  public RouteBuilder(Route route) {
-    super(route);
+  public RouteBuilder(Route original) {
+    super(original);
+    this.agency = original.getAgency();
+    this.operator = original.getOperator();
+    this.branding = original.getBranding();
+    this.groupsOfRoutes = new ArrayList<>(original.getGroupsOfRoutes());
+    this.shortName = original.getShortName();
+    this.longName = original.getLongName();
+    this.mode = original.getMode();
+    this.gtfsType = original.getGtfsType();
+    this.netexSubmode = original.getNetexSubmode();
+    this.flexibleLineType = original.getFlexibleLineType();
+    this.desc = original.getDesc();
+    this.url = original.getUrl();
+    this.color = original.getColor();
+    this.textColor = original.getTextColor();
+    this.bikesAllowed = original.getBikesAllowed();
   }
 
   public Agency getAgency() {
@@ -192,24 +206,5 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
   @Override
   protected Route buildFromValues() {
     return new Route(this);
-  }
-
-  @Override
-  protected void updateLocal(@Nonnull Route original) {
-    this.agency = original.getAgency();
-    this.operator = original.getOperator();
-    this.branding = original.getBranding();
-    this.groupsOfRoutes = new ArrayList<>(original.getGroupsOfRoutes());
-    this.shortName = original.getShortName();
-    this.longName = original.getLongName();
-    this.mode = original.getMode();
-    this.gtfsType = original.getGtfsType();
-    this.netexSubmode = original.getNetexSubmode();
-    this.flexibleLineType = original.getFlexibleLineType();
-    this.desc = original.getDesc();
-    this.url = original.getUrl();
-    this.color = original.getColor();
-    this.textColor = original.getTextColor();
-    this.bikesAllowed = original.getBikesAllowed();
   }
 }

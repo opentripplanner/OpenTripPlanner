@@ -49,6 +49,7 @@ public class TransferMapperTest {
   private static final Transfer TRANSFER = new Transfer();
 
   private static final DataImportIssueStore issueStore = new DataImportIssueStore(true);
+
   private final TransferMapper subject = new TransferMapper(
     ROUTE_MAPPER,
     STATION_MAPPER,

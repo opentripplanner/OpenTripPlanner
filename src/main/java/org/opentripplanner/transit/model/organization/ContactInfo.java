@@ -17,6 +17,8 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
   private final String additionalDetails;
 
   public ContactInfo(ContactInfoBuilder builder) {
+    // Required fields - none
+    // Optional fields
     this.contactPerson = builder.getContactPerson();
     this.phoneNumber = builder.getPhoneNumber();
     this.eMail = builder.geteMail();
@@ -32,39 +34,41 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
   }
 
   @Nonnull
-  public static ContactInfoBuilder ofNullable(@Nullable ContactInfo ci) {
-    return new ContactInfoBuilder(ci);
-  }
-
-  @Nonnull
   public ContactInfoBuilder copy() {
     return new ContactInfoBuilder(this);
   }
 
+  @Nullable
   public String getContactPerson() {
     return contactPerson;
   }
 
+  @Nullable
   public String getPhoneNumber() {
     return phoneNumber;
   }
 
+  @Nullable
   public String geteMail() {
     return eMail;
   }
 
+  @Nullable
   public String getFaxNumber() {
     return faxNumber;
   }
 
+  @Nullable
   public String getInfoUrl() {
     return infoUrl;
   }
 
+  @Nullable
   public String getBookingUrl() {
     return bookingUrl;
   }
 
+  @Nullable
   public String getAdditionalDetails() {
     return additionalDetails;
   }

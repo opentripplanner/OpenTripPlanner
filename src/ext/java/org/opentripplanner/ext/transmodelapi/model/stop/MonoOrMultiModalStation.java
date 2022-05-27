@@ -99,9 +99,4 @@ public class MonoOrMultiModalStation extends TransitEntity {
   public MonoOrMultiModalStation getParentStation() {
     return parentStation;
   }
-
-  @Override
-  public String toString() {
-    return "<MonoOrMultiModalStation " + getId() + ">";
-  }
 }

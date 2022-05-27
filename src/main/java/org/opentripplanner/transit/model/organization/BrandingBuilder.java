@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 
-public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuilder> {
+public class BrandingBuilder extends AbstractEntityBuilder<Branding, BrandingBuilder> {
 
   private String shortName;
   private String name;
@@ -13,12 +12,17 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
   private String description;
   private String image;
 
-  public BrandingBuilder(FeedScopedId id) {
+  BrandingBuilder(FeedScopedId id) {
     super(id);
   }
 
-  BrandingBuilder(@Nullable Branding original) {
+  BrandingBuilder(@Nonnull Branding original) {
     super(original);
+    this.shortName = original.getShortName();
+    this.name = original.getName();
+    this.url = original.getUrl();
+    this.description = original.getDescription();
+    this.image = original.getImage();
   }
 
   public String getShortName() {
@@ -70,14 +74,5 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
   @Override
   protected Branding buildFromValues() {
     return new Branding(this);
-  }
-
-  @Override
-  protected void updateLocal(@Nonnull Branding original) {
-    this.shortName = original.getShortName();
-    this.name = original.getName();
-    this.url = original.getUrl();
-    this.description = original.getDescription();
-    this.image = original.getImage();
   }
 }

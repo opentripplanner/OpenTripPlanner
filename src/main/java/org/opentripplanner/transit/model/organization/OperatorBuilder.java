@@ -1,10 +1,9 @@
 package org.opentripplanner.transit.model.organization;
 
-import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.basic.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 
-public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuilder> {
+public class OperatorBuilder extends AbstractEntityBuilder<Operator, OperatorBuilder> {
 
   private String name;
   private String url;
@@ -20,6 +19,9 @@ public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuil
    */
   OperatorBuilder(Operator original) {
     super(original);
+    this.name = original.getName();
+    this.url = original.getUrl();
+    this.phone = original.getPhone();
   }
 
   public String getName() {
@@ -47,13 +49,6 @@ public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuil
   public OperatorBuilder withPhone(String phone) {
     this.phone = phone;
     return this;
-  }
-
-  @Override
-  protected void updateLocal(@Nonnull Operator original) {
-    this.name = original.getName();
-    this.url = original.getUrl();
-    this.phone = original.getPhone();
   }
 
   @Override

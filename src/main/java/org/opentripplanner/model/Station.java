@@ -97,11 +97,6 @@ public class Station extends TransitEntity implements StopCollection {
     return childStops.contains(stop);
   }
 
-  @Override
-  public String toString() {
-    return "<Station " + getId() + ">";
-  }
-
   public I18NString getName() {
     return name;
   }

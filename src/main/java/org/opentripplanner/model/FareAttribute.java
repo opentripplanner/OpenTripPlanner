@@ -115,10 +115,6 @@ public final class FareAttribute extends TransitEntity {
     this.journeyDuration = MISSING_VALUE;
   }
 
-  public String toString() {
-    return "<FareAttribute " + getId() + ">";
-  }
-
   public float getYouthPrice() {
     return youthPrice;
   }

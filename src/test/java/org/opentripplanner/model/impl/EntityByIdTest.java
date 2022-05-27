@@ -65,10 +65,5 @@ public class EntityByIdTest {
     E(FeedScopedId id) {
       super(id);
     }
-
-    @Override
-    public String toString() {
-      return "E-" + getId();
-    }
   }
 }

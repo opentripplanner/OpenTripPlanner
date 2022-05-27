@@ -43,9 +43,4 @@ public final class BoardingArea extends StationElement {
   public void setParentStop(Stop parentStop) {
     this.parentStop = parentStop;
   }
-
-  @Override
-  public String toString() {
-    return "<BoardingArea " + getId() + ">";
-  }
 }

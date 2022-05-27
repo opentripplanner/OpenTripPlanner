@@ -168,11 +168,6 @@ public final class Stop extends StationElement implements StopLocation {
     boardingAreas.add(boardingArea);
   }
 
-  @Override
-  public String toString() {
-    return "<Stop " + getId() + ">";
-  }
-
   public I18NString getUrl() {
     return url;
   }

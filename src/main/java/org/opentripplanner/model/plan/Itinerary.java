@@ -334,7 +334,7 @@ public class Itinerary {
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.getDuration());
       } else if (leg.isTransitLeg()) {
-        buf.transit(leg.getMode(), leg.getTrip().logInfo(), leg.getStartTime(), leg.getEndTime());
+        buf.transit(leg.getMode(), leg.getTrip().logName(), leg.getStartTime(), leg.getEndTime());
       } else {
         buf.other(leg.getMode(), leg.getStartTime(), leg.getEndTime());
       }

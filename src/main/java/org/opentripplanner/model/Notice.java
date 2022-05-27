@@ -35,9 +35,4 @@ public class Notice extends TransitEntity {
   public void setPublicCode(String publicCode) {
     this.publicCode = publicCode;
   }
-
-  @Override
-  public String toString() {
-    return "<Notice " + getId() + ">";
-  }
 }

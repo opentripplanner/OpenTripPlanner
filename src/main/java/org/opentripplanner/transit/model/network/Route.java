@@ -1,17 +1,21 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.network;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
+
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.LogInfo;
 import org.opentripplanner.transit.model.basic.TransitEntity2;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
 
-public final class Route extends TransitEntity2<Route, RouteBuilder> {
+public final class Route extends TransitEntity2<Route, RouteBuilder> implements LogInfo {
 
   private final Agency agency;
   private final Operator operator;
@@ -33,27 +37,27 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
 
   public Route(RouteBuilder builder) {
     super(builder.getId());
-    this.agency = builder.getAgency();
+    // Required fields
+    this.agency = requireNonNull(builder.getAgency());
+    this.mode = requireNonNull(builder.getMode());
+    this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), BikeAccess.UNKNOWN);
+    // One of short- or long- name is required
+    this.shortName = builder.getShortName();
+    this.longName = builder.getLongName();
+    requireNonNull(getName());
+
+    // Optional fields
     this.operator = builder.getOperator();
     this.branding = builder.getBranding();
     this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
-    this.shortName = builder.getShortName();
-    this.longName = builder.getLongName();
-    this.mode = builder.getMode();
     this.gtfsType = builder.getGtfsType();
     this.gtfsSortOrder = builder.getGtfsSortOrder();
-
     this.netexSubmode = builder.getNetexSubmode();
     this.flexibleLineType = builder.getFlexibleLineType();
     this.desc = builder.getDesc();
     this.url = builder.getUrl();
     this.color = builder.getColor();
     this.textColor = builder.getTextColor();
-    this.bikesAllowed = builder.getBikesAllowed();
-
-    Objects.requireNonNull(this.agency);
-    Objects.requireNonNull(this.mode);
-    Objects.requireNonNull(getName());
   }
 
   public static RouteBuilder of(@Nonnull FeedScopedId id) {
@@ -163,7 +167,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
     return textColor;
   }
 
-  @Nullable
+  @Nonnull
   public BikeAccess getBikesAllowed() {
     return bikesAllowed;
   }
@@ -179,11 +183,11 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
   public String getName() {
-    return Objects.requireNonNullElse(shortName, longName);
+    return shortName == null ? longName : shortName;
   }
 
   @Override
-  public String toString() {
-    return "<Route " + getId() + " " + getName() + ">";
+  public String logName() {
+    return getName();
   }
 }
