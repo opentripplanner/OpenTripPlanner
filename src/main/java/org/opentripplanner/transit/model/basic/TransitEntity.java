@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.basic;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
@@ -23,7 +23,7 @@ public abstract class TransitEntity implements Serializable {
 
   private final FeedScopedId id;
 
-  public TransitEntity(@NotNull FeedScopedId id) {
+  public TransitEntity(@Nonnull FeedScopedId id) {
     this.id = id;
     Objects.requireNonNull(this.id);
   }

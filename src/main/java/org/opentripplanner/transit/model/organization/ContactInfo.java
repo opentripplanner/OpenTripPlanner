@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.organization;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.model.basic.TransitObject;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -27,17 +26,17 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
     this.additionalDetails = builder.getAdditionalDetails();
   }
 
-  @NotNull
+  @Nonnull
   public static ContactInfoBuilder of() {
     return new ContactInfoBuilder();
   }
 
-  @NotNull
+  @Nonnull
   public static ContactInfoBuilder ofNullable(@Nullable ContactInfo ci) {
     return new ContactInfoBuilder(ci);
   }
 
-  @NotNull
+  @Nonnull
   public ContactInfoBuilder copy() {
     return new ContactInfoBuilder(this);
   }

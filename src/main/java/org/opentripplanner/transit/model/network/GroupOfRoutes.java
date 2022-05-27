@@ -2,11 +2,8 @@ package org.opentripplanner.transit.model.network;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.transit.model.basic.TransitEntity2;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -38,19 +35,19 @@ public class GroupOfRoutes extends TransitEntity2<GroupOfRoutes, GroupOfRoutesBu
     return new GroupOfRoutesBuilder(id);
   }
 
-  //@NotNull
+  //@Nonnull
   @Nullable
   public String getPrivateCode() {
     return privateCode;
   }
 
-  //@NotNull
+  //@Nonnull
   @Nullable
   public String getShortName() {
     return shortName;
   }
 
-  //@NotNull
+  //@Nonnull
   @Nullable
   public String getName() {
     return name;

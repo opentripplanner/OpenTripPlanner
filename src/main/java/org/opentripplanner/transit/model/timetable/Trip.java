@@ -7,7 +7,6 @@ import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.WheelchairAccessibility;
@@ -132,7 +131,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
   /**
    * The direction for this Trip (and all other Trips in this TripPattern).
    */
-  @NotNull
+  @Nonnull
   public Direction getDirection() {
     return direction;
   }

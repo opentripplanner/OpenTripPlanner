@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.organization;
 
 import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 
@@ -51,7 +50,7 @@ public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuil
   }
 
   @Override
-  protected void updateLocal(@Nonnull @NotNull Operator original) {
+  protected void updateLocal(@Nonnull Operator original) {
     this.name = original.getName();
     this.url = original.getUrl();
     this.phone = original.getPhone();

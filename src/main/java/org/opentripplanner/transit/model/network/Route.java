@@ -56,7 +56,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
     Objects.requireNonNull(getName());
   }
 
-  public static RouteBuilder of(FeedScopedId id) {
+  public static RouteBuilder of(@Nonnull FeedScopedId id) {
     return new RouteBuilder(id);
   }
 

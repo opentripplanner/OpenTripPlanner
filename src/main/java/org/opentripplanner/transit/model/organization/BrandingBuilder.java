@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.organization;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 
@@ -67,7 +66,7 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
     return this;
   }
 
-  @NotNull
+  @Nonnull
   @Override
   protected Branding buildFromValues() {
     return new Branding(this);
