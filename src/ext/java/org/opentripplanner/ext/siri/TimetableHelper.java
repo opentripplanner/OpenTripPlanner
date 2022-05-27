@@ -217,8 +217,9 @@ public class TimetableHelper {
           lastDepartureDelay = departureDelay;
           departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
 
-          OccupancyEnumeration callOccupancy = recordedCall.getOccupancy() != null ?
-            recordedCall.getOccupancy(): journeyOccupancy;
+          OccupancyEnumeration callOccupancy = recordedCall.getOccupancy() != null
+            ? recordedCall.getOccupancy()
+            : journeyOccupancy;
 
           if (callOccupancy != null) {
             newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(callOccupancy));
@@ -324,13 +325,14 @@ public class TimetableHelper {
 
             departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
 
-            OccupancyEnumeration callOccupancy = estimatedCall.getOccupancy() != null ?
-              estimatedCall.getOccupancy(): journeyOccupancy;
+            OccupancyEnumeration callOccupancy = estimatedCall.getOccupancy() != null
+              ? estimatedCall.getOccupancy()
+              : journeyOccupancy;
 
             if (callOccupancy != null) {
               newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(callOccupancy));
             }
-            
+
             alreadyVisited.add(estimatedCall);
             break;
           }
@@ -407,7 +409,6 @@ public class TimetableHelper {
     }
     return OccupancyStatus.NO_DATA;
   }
-
 
   /**
    * Apply the SIRI ET to the appropriate TripTimes from this Timetable. Calculate new stoppattern

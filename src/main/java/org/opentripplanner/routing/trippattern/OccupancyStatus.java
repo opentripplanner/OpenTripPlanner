@@ -31,5 +31,5 @@ public enum OccupancyStatus {
   /**
    * If vehicle/carriage is not in use / unavailable, or passengers are only allowed to alight due to e.g. crowding
    */
-  NOT_ACCEPTING_PASSENGERS
+  NOT_ACCEPTING_PASSENGERS,
 }

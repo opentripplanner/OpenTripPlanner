@@ -204,7 +204,9 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("occupancyStatus")
           .type(new GraphQLNonNull(EnumTypes.OCCUPANCY_STATUS))
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getOccupancyStatus())
+          .dataFetcher(environment ->
+            ((TripTimeOnDate) environment.getSource()).getOccupancyStatus()
+          )
           .build()
       )
       .field(
