@@ -284,7 +284,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return route.getSubMode();
   }
 
-
   public LineString getHopGeometry(int stopPosInPattern) {
     if (hopGeometries != null) {
       return CompactLineString.uncompactLineString(hopGeometries[stopPosInPattern], false);

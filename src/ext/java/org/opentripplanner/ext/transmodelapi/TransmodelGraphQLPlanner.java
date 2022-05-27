@@ -296,7 +296,12 @@ public class TransmodelGraphQLPlanner {
                 "transportSubModes"
               );
               for (TransmodelTransportSubmode transitMode : transportSubModes) {
-                transitModes.add(new AllowedTransitMode(mainMode, TransitSubMode.safeValueOf(transitMode.getValue())));
+                transitModes.add(
+                  new AllowedTransitMode(
+                    mainMode,
+                    TransitSubMode.safeValueOf(transitMode.getValue())
+                  )
+                );
               }
             } else {
               transitModes.add(AllowedTransitMode.fromMainModeEnum(mainMode));

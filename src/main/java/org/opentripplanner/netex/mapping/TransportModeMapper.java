@@ -43,29 +43,57 @@ class TransportModeMapper {
     };
   }
 
-  private T2<TransitMode, TransitSubMode> mapModeAndSubMode(TransportSubmodeStructure submodeStructure) {
+  private T2<TransitMode, TransitSubMode> mapModeAndSubMode(
+    TransportSubmodeStructure submodeStructure
+  ) {
     if (submodeStructure.getAirSubmode() != null) {
-      return new T2<>(TransitMode.AIRPLANE, TransitSubMode.safeValueOf(submodeStructure.getAirSubmode().value()));
+      return new T2<>(
+        TransitMode.AIRPLANE,
+        TransitSubMode.safeValueOf(submodeStructure.getAirSubmode().value())
+      );
     } else if (submodeStructure.getBusSubmode() != null) {
-      return new T2<>(TransitMode.BUS, TransitSubMode.safeValueOf(submodeStructure.getBusSubmode().value()));
+      return new T2<>(
+        TransitMode.BUS,
+        TransitSubMode.safeValueOf(submodeStructure.getBusSubmode().value())
+      );
     } else if (submodeStructure.getTelecabinSubmode() != null) {
-      return new T2<>(TransitMode.GONDOLA, TransitSubMode.safeValueOf(submodeStructure.getTelecabinSubmode().value()));
+      return new T2<>(
+        TransitMode.GONDOLA,
+        TransitSubMode.safeValueOf(submodeStructure.getTelecabinSubmode().value())
+      );
     } else if (submodeStructure.getCoachSubmode() != null) {
-      return new T2<>(TransitMode.COACH, TransitSubMode.safeValueOf(submodeStructure.getCoachSubmode().value()));
+      return new T2<>(
+        TransitMode.COACH,
+        TransitSubMode.safeValueOf(submodeStructure.getCoachSubmode().value())
+      );
     } else if (submodeStructure.getFunicularSubmode() != null) {
-      return new T2<>(TransitMode.FUNICULAR, TransitSubMode.safeValueOf(submodeStructure.getFunicularSubmode().value()));
+      return new T2<>(
+        TransitMode.FUNICULAR,
+        TransitSubMode.safeValueOf(submodeStructure.getFunicularSubmode().value())
+      );
     } else if (submodeStructure.getMetroSubmode() != null) {
-      return new T2<>(TransitMode.SUBWAY, TransitSubMode.safeValueOf(submodeStructure.getMetroSubmode().value()));
+      return new T2<>(
+        TransitMode.SUBWAY,
+        TransitSubMode.safeValueOf(submodeStructure.getMetroSubmode().value())
+      );
     } else if (submodeStructure.getRailSubmode() != null) {
-      return new T2<>(TransitMode.RAIL, TransitSubMode.safeValueOf(submodeStructure.getRailSubmode().value()));
+      return new T2<>(
+        TransitMode.RAIL,
+        TransitSubMode.safeValueOf(submodeStructure.getRailSubmode().value())
+      );
     } else if (submodeStructure.getTramSubmode() != null) {
-      return new T2<>(TransitMode.TRAM, TransitSubMode.safeValueOf(submodeStructure.getTramSubmode().value()));
+      return new T2<>(
+        TransitMode.TRAM,
+        TransitSubMode.safeValueOf(submodeStructure.getTramSubmode().value())
+      );
     } else if (submodeStructure.getWaterSubmode() != null) {
-      return new T2<>(TransitMode.FERRY, TransitSubMode.safeValueOf(submodeStructure.getWaterSubmode().value()));
+      return new T2<>(
+        TransitMode.FERRY,
+        TransitSubMode.safeValueOf(submodeStructure.getWaterSubmode().value())
+      );
     }
     throw new IllegalArgumentException();
   }
-
 
   static class UnsupportedModeException extends Exception {
 

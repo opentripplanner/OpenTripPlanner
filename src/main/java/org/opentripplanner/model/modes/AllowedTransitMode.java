@@ -54,9 +54,7 @@ public class AllowedTransitMode {
    * Check if this filter allows the provided TransitMode
    */
   public boolean allows(TransitMode transitMode, TransitSubMode subMode) {
-    return mainMode == transitMode && (
-      this.subMode == null || this.subMode.equals(subMode)
-    );
+    return mainMode == transitMode && (this.subMode == null || this.subMode.equals(subMode));
   }
 
   public TransitMode getMainMode() {

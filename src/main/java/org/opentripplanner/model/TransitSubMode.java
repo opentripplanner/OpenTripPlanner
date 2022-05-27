@@ -112,13 +112,17 @@ public enum TransitSubMode {
   HIREMOTORBIKE("hireMotorbike"),
   HIRECYCLE("hireCycle"),
   ALLHIREVEHICLES("allHireVehicles");
+
   private final String rawValue;
+
   TransitSubMode(String rawValue) {
     this.rawValue = rawValue;
   }
+
   public String rawValue() {
     return rawValue;
   }
+
   public static TransitSubMode safeValueOf(String rawValue) {
     for (TransitSubMode enumValue : values()) {
       if (enumValue.rawValue.equalsIgnoreCase(rawValue)) {
