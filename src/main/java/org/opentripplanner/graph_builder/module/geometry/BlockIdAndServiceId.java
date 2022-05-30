@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This compound key object is used when grouping interlining trips together by (serviceId,
@@ -13,7 +13,7 @@ class BlockIdAndServiceId {
   FeedScopedId serviceId;
 
   BlockIdAndServiceId(Trip trip) {
-    this.blockId = trip.getBlockId();
+    this.blockId = trip.getGtfsBlockId();
     this.serviceId = trip.getServiceId();
   }
 

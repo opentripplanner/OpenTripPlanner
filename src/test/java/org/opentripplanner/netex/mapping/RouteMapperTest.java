@@ -276,7 +276,7 @@ public class RouteMapperTest {
     return TransitModelForTest
       .agency("Ruter AS")
       .copy()
-      .setId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))
+      .withId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))
       .build();
   }
 

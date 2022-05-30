@@ -20,13 +20,13 @@ class AgencyTest {
 
   private static final Agency subject = Agency
     .of(TransitModelForTest.id(ID))
-    .setName(NAME)
-    .setUrl(URL)
-    .setTimezone(TIMEZONE)
-    .setPhone(PHONE)
-    .setBrandingUrl(BRANDING_URL)
-    .setFareUrl(FARE_URL)
-    .setLang(LANG)
+    .withName(NAME)
+    .withUrl(URL)
+    .withTimezone(TIMEZONE)
+    .withPhone(PHONE)
+    .withBrandingUrl(BRANDING_URL)
+    .withFareUrl(FARE_URL)
+    .withLang(LANG)
     .build();
 
   @Test
@@ -34,12 +34,12 @@ class AgencyTest {
     assertEquals(subject.getId().getId(), ID);
 
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().setName(NAME).build();
+    var copy = subject.copy().withName(NAME).build();
 
     assertSame(subject, copy);
 
     // Copy and change name
-    copy = subject.copy().setName("v2").build();
+    copy = subject.copy().withName("v2").build();
 
     // The two objects are not he same instance, but is equal(sae id)
     assertNotSame(copy, subject);

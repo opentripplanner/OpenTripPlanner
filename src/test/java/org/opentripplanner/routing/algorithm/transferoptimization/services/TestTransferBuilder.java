@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -95,8 +95,8 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
   private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
     // Set a uniq id: pattern + the first stop departure time
-    return new Trip(
-      new FeedScopedId(trip.pattern().debugInfo(), TimeUtils.timeToStrCompact(trip.departure(0)))
-    );
+    return TransitModelForTest
+      .trip(trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0)))
+      .build();
   }
 }

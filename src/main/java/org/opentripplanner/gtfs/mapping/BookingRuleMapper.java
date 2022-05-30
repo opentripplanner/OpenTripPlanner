@@ -43,9 +43,9 @@ class BookingRuleMapper {
   private ContactInfo contactInfo(BookingRule rule) {
     return ContactInfo
       .of()
-      .setPhoneNumber(rule.getPhoneNumber())
-      .setInfoUrl(rule.getInfoUrl())
-      .setBookingUrl(rule.getUrl())
+      .withPhoneNumber(rule.getPhoneNumber())
+      .withInfoUrl(rule.getInfoUrl())
+      .withBookingUrl(rule.getUrl())
       .build();
   }
 

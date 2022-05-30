@@ -1,14 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Trip;
@@ -32,12 +32,20 @@ public class FrequencyMapperTest {
 
   private static final int LABEL_ONLY = 1;
 
-  private static final Trip TRIP = new Trip();
+  private static final Trip TRIP = new GtfsTestData().trip;
+
+  private static final TripMapper TRIP_MAPPER = new TripMapper(
+    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))
+  );
 
   private static final Frequency FREQUENCY = new Frequency();
-  private final FrequencyMapper subject = new FrequencyMapper(
-    new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)))
-  );
+
+  private final FrequencyMapper subject;
+
+  {
+    TRIP_MAPPER.map(TRIP);
+    subject = new FrequencyMapper(TRIP_MAPPER);
+  }
 
   static {
     TRIP.setId(AGENCY_AND_ID);
@@ -53,7 +61,7 @@ public class FrequencyMapperTest {
 
   @Test
   public void testMapCollection() throws Exception {
-    assertNull(null, subject.map((Collection<Frequency>) null));
+    assertNull(subject.map((Collection<Frequency>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(FREQUENCY)).size());
   }

@@ -26,7 +26,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     return contactPerson;
   }
 
-  public ContactInfoBuilder setContactPerson(String contactPerson) {
+  public ContactInfoBuilder withContactPerson(String contactPerson) {
     this.contactPerson = contactPerson;
     return this;
   }
@@ -35,7 +35,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     return phoneNumber;
   }
 
-  public ContactInfoBuilder setPhoneNumber(String phoneNumber) {
+  public ContactInfoBuilder withPhoneNumber(String phoneNumber) {
     this.phoneNumber = phoneNumber;
     return this;
   }
@@ -44,7 +44,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     return eMail;
   }
 
-  public ContactInfoBuilder seteMail(String eMail) {
+  public ContactInfoBuilder withEMail(String eMail) {
     this.eMail = eMail;
     return this;
   }
@@ -53,7 +53,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     return faxNumber;
   }
 
-  public ContactInfoBuilder setFaxNumber(String faxNumber) {
+  public ContactInfoBuilder withFaxNumber(String faxNumber) {
     this.faxNumber = faxNumber;
     return this;
   }
@@ -62,7 +62,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     return infoUrl;
   }
 
-  public ContactInfoBuilder setInfoUrl(String infoUrl) {
+  public ContactInfoBuilder withInfoUrl(String infoUrl) {
     this.infoUrl = infoUrl;
     return this;
   }
@@ -71,7 +71,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     return bookingUrl;
   }
 
-  public ContactInfoBuilder setBookingUrl(String bookingUrl) {
+  public ContactInfoBuilder withBookingUrl(String bookingUrl) {
     this.bookingUrl = bookingUrl;
     return this;
   }
@@ -80,7 +80,7 @@ public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfo
     return additionalDetails;
   }
 
-  public ContactInfoBuilder setAdditionalDetails(String additionalDetails) {
+  public ContactInfoBuilder withAdditionalDetails(String additionalDetails) {
     this.additionalDetails = additionalDetails;
     return this;
   }

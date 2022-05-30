@@ -1244,7 +1244,7 @@ public class TransmodelGraphQLSchema {
               )
               .filter(t ->
                 CollectionUtils.isEmpty(privateCodes) ||
-                privateCodes.contains(t.getInternalPlanningCode())
+                privateCodes.contains(t.getNetexInternalPlanningCode())
               )
               .filter(t ->
                 authorities == null ||

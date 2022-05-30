@@ -20,7 +20,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
   private final String shortName;
   private final String longName;
   private final TransitMode mode;
-  // TODO: consolidate these
+  // TODO: consolidate gtfsType and netexSubmode
   private final Integer gtfsType;
   private final Integer gtfsSortOrder;
   private final String netexSubmode;
@@ -179,7 +179,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
   public String getName() {
-    return shortName != null ? shortName : longName;
+    return Objects.requireNonNullElse(shortName, longName);
   }
 
   @Override

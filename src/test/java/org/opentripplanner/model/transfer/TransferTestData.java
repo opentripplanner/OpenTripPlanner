@@ -2,10 +2,9 @@ package org.opentripplanner.model.transfer;
 
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
 
@@ -25,11 +24,10 @@ public class TransferTestData {
   static final Route ROUTE_2 = TransitModelForTest.route("2").build();
   static final Route ANY_ROUTE = TransitModelForTest.route("ANY").build();
 
-  static final Trip TRIP_11 = createTrip(11, ROUTE_1);
-  static final Trip TRIP_12 = createTrip(12, ROUTE_1);
-  static final Trip TRIP_21 = createTrip(21, ROUTE_2);
-  static final Trip TRIP_22 = createTrip(22, ROUTE_2);
-  static final Trip ANY_TRIP = createTrip(999, ANY_ROUTE);
+  static final Trip TRIP_11 = TransitModelForTest.trip("11").withRoute(ROUTE_1).build();
+  static final Trip TRIP_12 = TransitModelForTest.trip("12").withRoute(ROUTE_1).build();
+  static final Trip TRIP_21 = TransitModelForTest.trip("21").withRoute(ROUTE_2).build();
+  static final Trip ANY_TRIP = TransitModelForTest.trip("999").withRoute(ANY_ROUTE).build();
 
   static final TransferPoint STATION_POINT = new StationTransferPoint(STATION);
 
@@ -50,15 +48,5 @@ public class TransferTestData {
     STOP_A.setParentStation(STATION);
     STATION.addChildStop(STOP_S);
     STOP_S.setParentStation(STATION);
-  }
-
-  private static Trip createTrip(int id, Route route) {
-    Trip t = new Trip(createId(id));
-    t.setRoute(route);
-    return t;
-  }
-
-  private static FeedScopedId createId(int id) {
-    return TransitModelForTest.id(String.valueOf(id));
   }
 }

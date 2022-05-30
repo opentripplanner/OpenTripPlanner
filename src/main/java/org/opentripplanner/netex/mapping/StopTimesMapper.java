@@ -19,11 +19,11 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
@@ -164,6 +164,35 @@ class StopTimesMapper {
     }
 
     return result;
+  }
+
+  /**
+   * @return a map of stop-times indexed by the TimetabledPassingTime id.
+   */
+  @Nullable
+  String findTripHeadsign(JourneyPattern journeyPattern, TimetabledPassingTime firstPassingTime) {
+    String pointInJourneyPattern = firstPassingTime
+      .getPointInJourneyPatternRef()
+      .getValue()
+      .getRef();
+
+    var stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
+
+    if (stopPoint == null) {
+      return null;
+    }
+
+    if (stopPoint.getDestinationDisplayRef() == null) {
+      return null;
+    }
+
+    var destinationDisplay = destinationDisplayById.lookup(
+      stopPoint.getDestinationDisplayRef().getRef()
+    );
+
+    return destinationDisplay == null
+      ? null
+      : MultilingualStringMapper.nullableValueOf(destinationDisplay.getFrontText());
   }
 
   @Nullable

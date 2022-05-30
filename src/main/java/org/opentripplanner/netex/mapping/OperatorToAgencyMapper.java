@@ -19,7 +19,7 @@ class OperatorToAgencyMapper {
   Operator mapOperator(org.rutebanken.netex.model.Operator source) {
     var target = Operator
       .of(idFactory.createId(source.getId()))
-      .setName(source.getName().getValue());
+      .withName(source.getName().getValue());
 
     mapContactDetails(source.getContactDetails(), target);
 
@@ -30,7 +30,7 @@ class OperatorToAgencyMapper {
     if (contactDetails == null) {
       return;
     }
-    target.setUrl(contactDetails.getUrl());
-    target.setPhone(contactDetails.getPhone());
+    target.withUrl(contactDetails.getUrl());
+    target.withPhone(contactDetails.getPhone());
   }
 }

@@ -25,7 +25,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -40,6 +39,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -549,8 +549,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       graph.index.addRoutes(route);
     }
 
-    Trip trip = new Trip(tripId);
-    trip.setRoute(route);
+    var tripBuilder = Trip.of(tripId);
+    tripBuilder.withRoute(route);
 
     ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
@@ -564,35 +564,29 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    trip.setServiceId(calServiceId);
-
-    // TODO - SIRI: PublishedLineName not defined in SIRI-profile
-    if (
-      estimatedVehicleJourney.getPublishedLineNames() != null &&
-      !estimatedVehicleJourney.getPublishedLineNames().isEmpty()
-    ) {
-      trip.setRouteShortName(
-        "" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue()
-      );
-    }
+    tripBuilder.withServiceId(calServiceId);
 
     // Use destinationName as default headsign - if provided
     if (
       estimatedVehicleJourney.getDestinationNames() != null &&
       !estimatedVehicleJourney.getDestinationNames().isEmpty()
     ) {
-      trip.setTripHeadsign("" + estimatedVehicleJourney.getDestinationNames().get(0).getValue());
+      tripBuilder.withHeadsign(
+        "" + estimatedVehicleJourney.getDestinationNames().get(0).getValue()
+      );
     }
 
-    trip.setTripOperator(operator);
+    tripBuilder.withOperator(operator);
 
     // TODO - SIRI: Populate these?
-    trip.setShapeId(null); // Replacement-trip has different shape
+    tripBuilder.withShapeId(null); // Replacement-trip has different shape
     //        trip.setTripPrivateCode(null);
     //        trip.setTripPublicCode(null);
-    trip.setBlockId(null);
-    trip.setTripShortName(null);
+    tripBuilder.withGtfsBlockId(null);
+    tripBuilder.withShortName(null);
     //        trip.setKeyValues(null);
+
+    var trip = tripBuilder.build();
 
     List<StopLocation> addedStops = new ArrayList<>();
     List<StopTime> aimedStopTimes = new ArrayList<>();
@@ -654,7 +648,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           .getDestinationDisplaies()
           .get(0);
         stopTime.setStopHeadsign(destinationDisplay.getValue());
-      } else if (trip.getTripHeadsign() == null) {
+      } else if (tripBuilder.getHeadsign() == null) {
         // Fallback to empty string
         stopTime.setStopHeadsign("");
       }
@@ -679,7 +673,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
 
-    TripPattern pattern = new TripPattern(id, trip.getRoute(), stopPattern);
+    TripPattern pattern = new TripPattern(id, tripBuilder.getRoute(), stopPattern);
 
     TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, graph.deduplicator);
 

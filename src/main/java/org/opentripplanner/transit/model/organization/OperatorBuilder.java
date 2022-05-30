@@ -27,7 +27,7 @@ public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuil
     return name;
   }
 
-  public OperatorBuilder setName(String name) {
+  public OperatorBuilder withName(String name) {
     this.name = name;
     return this;
   }
@@ -36,7 +36,7 @@ public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuil
     return url;
   }
 
-  public OperatorBuilder setUrl(String url) {
+  public OperatorBuilder withUrl(String url) {
     this.url = url;
     return this;
   }
@@ -45,7 +45,7 @@ public class OperatorBuilder extends TransitEntityBuilder<Operator, OperatorBuil
     return phone;
   }
 
-  public OperatorBuilder setPhone(String phone) {
+  public OperatorBuilder withPhone(String phone) {
     this.phone = phone;
     return this;
   }

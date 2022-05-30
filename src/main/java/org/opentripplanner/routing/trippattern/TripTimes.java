@@ -10,10 +10,8 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +178,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   public String getHeadsign(final int stop) {
     if (headsigns == null) {
-      return getTrip().getTripHeadsign();
+      return getTrip().getHeadsign();
     } else {
       return headsigns[stop];
     }
@@ -456,7 +454,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * is the same at all stops (including null) and can be found in the Trip object.
    */
   private String[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
-    final String tripHeadsign = trip.getTripHeadsign();
+    final String tripHeadsign = trip.getHeadsign();
     boolean useStopHeadsigns = false;
     if (tripHeadsign == null) {
       useStopHeadsigns = true;

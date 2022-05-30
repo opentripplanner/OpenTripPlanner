@@ -5,10 +5,10 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.

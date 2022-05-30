@@ -15,7 +15,6 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -27,6 +26,7 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -47,6 +47,8 @@ import org.rutebanken.netex.model.ServiceJourney;
  * THIS CLASS IS NOT THREADSAFE! This mapper store its intermediate results as part of its state.
  */
 class TripPatternMapper {
+
+  public static final String HEADSIGN_EMPTY = "";
 
   private final DataImportIssueStore issueStore;
 
@@ -155,7 +157,7 @@ class TripPatternMapper {
     List<Trip> trips = new ArrayList<>();
 
     for (ServiceJourney serviceJourney : serviceJourneys) {
-      Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+      Trip trip = mapTrip(journeyPattern, serviceJourney);
 
       // Unable to map ServiceJourney, problem logged by the mapper above
       if (trip == null) {
@@ -163,7 +165,7 @@ class TripPatternMapper {
       }
 
       // Add the dated service journey to the model for this trip [if it exists]
-      mapDatedServiceJourney(serviceJourney, trip);
+      mapDatedServiceJourney(journeyPattern, serviceJourney, trip);
 
       StopTimesMapperResult stopTimes = stopTimesMapper.mapToStopTimes(
         journeyPattern,
@@ -184,7 +186,6 @@ class TripPatternMapper {
       result.tripStopTimes.put(trip, stopTimes.stopTimes);
       result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
 
-      trip.setTripHeadsign(getHeadsign(stopTimes.stopTimes));
       trips.add(trip);
     }
 
@@ -237,17 +238,24 @@ class TripPatternMapper {
     }
   }
 
-  private void mapDatedServiceJourney(ServiceJourney serviceJourney, Trip trip) {
+  private void mapDatedServiceJourney(
+    JourneyPattern journeyPattern,
+    ServiceJourney serviceJourney,
+    Trip trip
+  ) {
     if (datedServiceJourneysBySJId.containsKey(serviceJourney.getId())) {
       for (DatedServiceJourney datedServiceJourney : datedServiceJourneysBySJId.get(
         serviceJourney.getId()
       )) {
-        result.tripOnServiceDates.add(mapDatedServiceJourney(trip, datedServiceJourney));
+        result.tripOnServiceDates.add(
+          mapDatedServiceJourney(journeyPattern, trip, datedServiceJourney)
+        );
       }
     }
   }
 
   private TripOnServiceDate mapDatedServiceJourney(
+    JourneyPattern journeyPattern,
     Trip trip,
     DatedServiceJourney datedServiceJourney
   ) {
@@ -292,7 +300,11 @@ class TripPatternMapper {
           );
           return null;
         }
-        return mapDatedServiceJourney(tripMapper.mapServiceJourney(serviceJourney), replacement);
+        return mapDatedServiceJourney(
+          journeyPattern,
+          mapTrip(journeyPattern, serviceJourney),
+          replacement
+        );
       })
       .filter(Objects::nonNull)
       .toList();
@@ -320,5 +332,21 @@ class TripPatternMapper {
         tripPattern.add(tripTimes);
       }
     }
+  }
+
+  private Trip mapTrip(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+    return tripMapper.mapServiceJourney(
+      serviceJourney,
+      () -> findTripHeadsign(journeyPattern, serviceJourney)
+    );
+  }
+
+  private String findTripHeadsign(JourneyPattern journeyPattern, ServiceJourney serviceJourney) {
+    var times = serviceJourney.getPassingTimes().getTimetabledPassingTime();
+    if (times == null || times.isEmpty()) {
+      return HEADSIGN_EMPTY;
+    }
+    String headsign = stopTimesMapper.findTripHeadsign(journeyPattern, times.get(0));
+    return headsign == null ? HEADSIGN_EMPTY : headsign;
   }
 }
