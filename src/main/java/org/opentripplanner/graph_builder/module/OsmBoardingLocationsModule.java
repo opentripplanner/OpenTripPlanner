@@ -19,6 +19,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
+import org.opentripplanner.routing.vertextype.OsmPlatformEntranceVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.LocalizedString;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * When OSM data is being loaded, certain entities that represent transit stops are made into
  * {@link OsmBoardingLocationVertex} instances. In some cities, these nodes have a ref=* tag which
- * gives the corresponding GFTS stop ID for the stop but the exact tag name is configurable. See
+ * gives the corresponding GTFS stop ID for the stop but the exact tag name is configurable. See
  * <a href="https://wiki.openstreetmap.org/wiki/Key:public_transport">the OSM wiki page</a>.
  * <p>
  * This module will attempt to link all transit stops and platforms to such nodes or way centroids
@@ -92,42 +93,48 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
-    var vertices = index
-      .getVerticesForEnvelope(envelope)
+
+    var nearbyVertices = index.getVerticesForEnvelope(envelope).stream().toList();
+
+    var boardingLocations = nearbyVertices
       .stream()
       .filter(OsmBoardingLocationVertex.class::isInstance)
       .map(OsmBoardingLocationVertex.class::cast)
       .toList();
-    // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or di
+
+    var platformEntrances = nearbyVertices
+      .stream()
+      .filter(OsmPlatformEntranceVertex.class::isInstance)
+      .map(OsmPlatformEntranceVertex.class::cast)
+      .toList();
+
+    // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or id
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
-    for (var osmVertex : vertices) {
+    for (var boardingLocation : boardingLocations) {
       if (
-        (stopCode != null && osmVertex.references.contains(stopCode)) ||
-        osmVertex.references.contains(stopId)
+        (stopCode != null && boardingLocation.references.contains(stopCode)) ||
+        boardingLocation.references.contains(stopId)
       ) {
-        if (!osmVertex.isConnectedToStreetNetwork()) {
-          linker.linkVertexPermanently(
-            osmVertex,
-            new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BOTH_WAYS,
-            (osmBoardingLocationVertex, splitVertex) -> {
-              // the OSM boarding location vertex is not connected to the street network, so we
-              // need to link it to the platform
-              return List.of(
-                linkBoardingLocationToStreetNetwork(osmVertex, splitVertex),
-                linkBoardingLocationToStreetNetwork(splitVertex, osmVertex)
-              );
-            }
-          );
+        if (!boardingLocation.isConnectedToStreetNetwork()) {
+          var entrances = platformEntrances
+            .stream()
+            .filter(e -> e.references.equals(boardingLocation.references))
+            .toList();
+
+          LOG.error("Found {} matching entrances", entrances.size());
+          entrances.forEach(e -> {
+            linkBoardingLocationToStreetNetwork(boardingLocation, e);
+            linkBoardingLocationToStreetNetwork(e, boardingLocation);
+          });
         }
-        new BoardingLocationToStopLink(ts, osmVertex);
-        new BoardingLocationToStopLink(osmVertex, ts);
+        new BoardingLocationToStopLink(ts, boardingLocation);
+        new BoardingLocationToStopLink(boardingLocation, ts);
         LOG.debug(
           "Connected {} ({}) to {} at {}",
           ts,
           stopCode,
-          osmVertex.getLabel(),
-          osmVertex.getCoordinate()
+          boardingLocation.getLabel(),
+          boardingLocation.getCoordinate()
         );
         return true;
       }
