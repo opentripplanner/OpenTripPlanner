@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -116,9 +117,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           var entrances = platformEntrances
             .stream()
             .filter(e -> e.references.equals(boardingLocation.references))
+            .filter(e ->
+              Stream
+                .concat(e.getOutgoingStreetEdges().stream(), e.getIncomingStreetEdges().stream())
+                .anyMatch(edge -> !(edge.getToVertex() instanceof OsmPlatformVertex))
+            )
             .toList();
 
-          LOG.error("Found {} matching entrances", entrances.size());
           entrances.forEach(e -> {
             linkBoardingLocationToStreetNetwork(boardingLocation, e);
             linkBoardingLocationToStreetNetwork(e, boardingLocation);

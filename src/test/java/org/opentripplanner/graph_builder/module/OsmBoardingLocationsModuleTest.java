@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
@@ -18,6 +19,7 @@ import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.network.TransitMode;
@@ -32,6 +34,9 @@ class OsmBoardingLocationsModuleTest {
   Stop stop = Stop.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
 
   @Test
+  @DisplayName(
+    "Should extract boarding locations and link them to those platform edges that are connected to outside world"
+  )
   void extractBoardingLocations() {
     var graph = new Graph();
     var extra = new HashMap<Class<?>, Object>();
@@ -73,6 +78,26 @@ class OsmBoardingLocationsModuleTest {
           edges.stream().map(Edge::getClass).collect(Collectors.toSet())
         )
       );
+
+    assertEquals(
+      List.of("osm:node:768590748"),
+      platform
+        .getOutgoingStreetEdges()
+        .stream()
+        .map(Edge::getToVertex)
+        .map(Vertex::getLabel)
+        .toList()
+    );
+
+    assertEquals(
+      List.of("osm:node:768590748"),
+      platform
+        .getIncomingStreetEdges()
+        .stream()
+        .map(Edge::getFromVertex)
+        .map(Vertex::getLabel)
+        .toList()
+    );
 
     platformCentroids
       .stream()

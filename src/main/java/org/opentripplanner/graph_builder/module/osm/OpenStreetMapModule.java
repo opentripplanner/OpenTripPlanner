@@ -374,6 +374,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         var nodeStopRefs = node.getMultiTagValues(boardingAreaRefTags);
         var name = node.getTag("name");
 
+        // we check if the node is part of a boarding area (platform) that holds references to GTFS stops
         var wayStopRefs = osmdb
           .getAreasForNode(node.getId())
           .stream()
@@ -382,7 +383,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           .collect(Collectors.toSet());
 
         if (!wayStopRefs.isEmpty()) {
-          LOG.error("Found platform entrance at {}, {}", way, node.getOpenStreetMapLink());
           iv =
             new OsmPlatformVertex(
               graph,
