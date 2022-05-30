@@ -58,6 +58,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Implement nearby searches for car and bicycle parking [#4165](https://github.com/opentripplanner/OpenTripPlanner/pull/4165)
 - Automatic container image build [#4168](https://github.com/opentripplanner/OpenTripPlanner/pull/4168)
 - Do not link cars to stop vertices in routing [#4166](https://github.com/opentripplanner/OpenTripPlanner/pull/4166)
+- Transit model - Part 3 [#4176](https://github.com/opentripplanner/OpenTripPlanner/pull/4176)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
