@@ -18,6 +18,7 @@ import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmPlatformVertex;
@@ -124,6 +125,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     );
   }
 
+  private static <T extends Vertex> List<T> getVerticesOfType(
+    List<Vertex> nearbyVertices,
+    Class<T> type
+  ) {
+    return nearbyVertices.stream().filter(type::isInstance).map(type::cast).toList();
+  }
+
   private boolean connectVertexToStop(
     TransitStopVertex ts,
     StreetVertexIndex index,
@@ -138,17 +146,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     var nearbyVertices = index.getVerticesForEnvelope(envelope).stream().toList();
 
-    var boardingLocations = nearbyVertices
-      .stream()
-      .filter(OsmBoardingLocationVertex.class::isInstance)
-      .map(OsmBoardingLocationVertex.class::cast)
-      .toList();
+    var boardingLocations = getVerticesOfType(nearbyVertices, OsmBoardingLocationVertex.class);
 
-    var platformVertices = nearbyVertices
-      .stream()
-      .filter(OsmPlatformVertex.class::isInstance)
-      .map(OsmPlatformVertex.class::cast)
-      .toList();
+    var platformVertices = getVerticesOfType(nearbyVertices, OsmPlatformVertex.class);
 
     // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or id
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
@@ -175,6 +175,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           if (entrances.size() > 0) {
             toMatch = entrances;
           } else {
+            // if there are none then we link to all vertices of the platform
             toMatch = matchingVertices;
           }
 
