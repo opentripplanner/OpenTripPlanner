@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.organization;
 
-import org.opentripplanner.transit.model.basic.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class OperatorBuilder extends AbstractEntityBuilder<Operator, OperatorBuilder> {
 

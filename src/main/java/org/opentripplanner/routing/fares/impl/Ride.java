@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * A set of edges on a single route, with associated information. Used only in calculating fares.

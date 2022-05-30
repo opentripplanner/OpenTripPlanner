@@ -3,7 +3,7 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
 

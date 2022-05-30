@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.organization;
 
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.basic.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class BrandingBuilder extends AbstractEntityBuilder<Branding, BrandingBuilder> {
 

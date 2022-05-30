@@ -7,7 +7,7 @@ import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This creates a group identifier based on all origin and destination stations, or stops if there

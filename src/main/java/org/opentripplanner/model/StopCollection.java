@@ -1,8 +1,8 @@
 package org.opentripplanner.model;
 
 import java.util.Collection;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.LogInfo;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.lang.ObjectUtils;
 

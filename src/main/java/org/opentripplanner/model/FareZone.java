@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 public class FareZone extends TransitEntity {
 

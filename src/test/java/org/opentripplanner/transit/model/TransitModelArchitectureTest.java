@@ -10,7 +10,7 @@ import org.opentripplanner._support.arch.Package;
 
 public class TransitModelArchitectureTest {
 
-  private static final Package BASIC = TRANSIT_MODEL.subPackage("basic");
+  private static final Package BASIC = TRANSIT_MODEL.subPackage("framework");
   private static final Package ORGANIZATION = TRANSIT_MODEL.subPackage("organization");
 
   @Test

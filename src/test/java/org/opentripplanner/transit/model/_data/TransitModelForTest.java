@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model._data;
 
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.TransitMode;
@@ -19,6 +19,7 @@ public class TransitModelForTest {
     .of(id("A1"))
     .withName("Agency Test")
     .withTimezone(TIME_ZONE_ID)
+    .withUrl("https://www.agency.com")
     .build();
 
   public static FeedScopedId id(String id) {

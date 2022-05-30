@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.organization;
 
-import org.opentripplanner.transit.model.basic.AbstractBuilder;
+import org.opentripplanner.transit.model.framework.AbstractBuilder;
 
 public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfoBuilder> {
 

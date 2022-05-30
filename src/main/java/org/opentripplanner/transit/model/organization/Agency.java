@@ -6,9 +6,9 @@ import static org.opentripplanner.util.lang.AssertUtils.assertHasValue;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.LogInfo;
-import org.opentripplanner.transit.model.basic.TransitEntity2;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.

@@ -7,7 +7,7 @@ import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.StopLevel;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Wrap GTFS Stop to provide a common base mapping for all {@link StationElement}s.

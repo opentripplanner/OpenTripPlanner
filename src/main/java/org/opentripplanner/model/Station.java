@@ -13,8 +13,9 @@ import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -23,7 +24,7 @@ import org.opentripplanner.util.NonLocalizedString;
  * bus terminal, or a bus station (with a bus stop at each side of the road). Equivalent to GTFS
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
-public class Station extends TransitEntity implements StopCollection {
+public class Station extends TransitEntity implements StopCollection, LogInfo {
 
   private static final long serialVersionUID = 1L;
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
@@ -178,5 +179,10 @@ public class Station extends TransitEntity implements StopCollection {
       ? new Geometry[] { stationPoint, convexHull }
       : new Geometry[] { convexHull };
     return getGeometryFactory().createGeometryCollection(geometries);
+  }
+
+  @Override
+  public String logName() {
+    return name == null ? null : name.toString();
   }
 }

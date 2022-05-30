@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.transit.model.framework;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
