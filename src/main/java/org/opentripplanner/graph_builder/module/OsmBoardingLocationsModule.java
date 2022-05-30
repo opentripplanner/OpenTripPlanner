@@ -7,8 +7,11 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -80,6 +83,47 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     //no inputs
   }
 
+  private static boolean connectedToOutsideOfPlatform(OsmPlatformVertex e) {
+    return Stream
+      .concat(e.getOutgoingStreetEdges().stream(), e.getIncomingStreetEdges().stream())
+      .anyMatch(edge -> !(edge.getToVertex() instanceof OsmPlatformVertex));
+  }
+
+  private static void linkBoardingLocationToStreetNetwork(
+    VertexLinker linker,
+    OsmBoardingLocationVertex boardingLocation
+  ) {
+    linker.linkVertexPermanently(
+      boardingLocation,
+      new TraverseModeSet(TraverseMode.WALK),
+      LinkingDirection.BOTH_WAYS,
+      (osmBoardingLocationVertex, splitVertex) -> {
+        // the OSM boarding location vertex is not connected to the street network, so we
+        // need to link it to the platform
+        return List.of(
+          linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
+          linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)
+        );
+      }
+    );
+  }
+
+  private static StreetEdge linkBoardingLocationToStreetNetwork(
+    StreetVertex from,
+    StreetVertex to
+  ) {
+    var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
+    return new StreetEdge(
+      from,
+      to,
+      line,
+      new LocalizedString("name.platform"),
+      SphericalDistanceLibrary.length(line),
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      false
+    );
+  }
+
   private boolean connectVertexToStop(
     TransitStopVertex ts,
     StreetVertexIndex index,
@@ -100,7 +144,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .map(OsmBoardingLocationVertex.class::cast)
       .toList();
 
-    var platformEntrances = nearbyVertices
+    var platformVertices = nearbyVertices
       .stream()
       .filter(OsmPlatformVertex.class::isInstance)
       .map(OsmPlatformVertex.class::cast)
@@ -114,20 +158,36 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         boardingLocation.references.contains(stopId)
       ) {
         if (!boardingLocation.isConnectedToStreetNetwork()) {
-          var entrances = platformEntrances
+          var matchingVertices = platformVertices
             .stream()
             .filter(e -> e.references.equals(boardingLocation.references))
-            .filter(e ->
-              Stream
-                .concat(e.getOutgoingStreetEdges().stream(), e.getIncomingStreetEdges().stream())
-                .anyMatch(edge -> !(edge.getToVertex() instanceof OsmPlatformVertex))
-            )
             .toList();
 
-          entrances.forEach(e -> {
+          var entrances = matchingVertices
+            .stream()
+            .filter(OsmBoardingLocationsModule::connectedToOutsideOfPlatform)
+            .toList();
+
+          List<OsmPlatformVertex> toMatch;
+
+          // we try to find platform vertices that are actually connected to the outside world (entrances) rather than just to
+          // other nodes on the platform
+          if (entrances.size() > 0) {
+            toMatch = entrances;
+          } else {
+            toMatch = matchingVertices;
+          }
+
+          toMatch.forEach(e -> {
             linkBoardingLocationToStreetNetwork(boardingLocation, e);
             linkBoardingLocationToStreetNetwork(e, boardingLocation);
           });
+
+          // if we cannot find any platform vertices for some reason we use the regular linker to
+          // find the edge to link to
+          if (toMatch.size() < 1) {
+            linkBoardingLocationToStreetNetwork(linker, boardingLocation);
+          }
         }
         new BoardingLocationToStopLink(ts, boardingLocation);
         new BoardingLocationToStopLink(boardingLocation, ts);
@@ -142,18 +202,5 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       }
     }
     return false;
-  }
-
-  private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
-    var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    return new StreetEdge(
-      from,
-      to,
-      line,
-      new LocalizedString("name.platform"),
-      SphericalDistanceLibrary.length(line),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      false
-    );
   }
 }
