@@ -6,11 +6,8 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -19,7 +16,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.OsmPlatformEntranceVertex;
+import org.opentripplanner.routing.vertextype.OsmPlatformVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.LocalizedString;
@@ -104,8 +101,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     var platformEntrances = nearbyVertices
       .stream()
-      .filter(OsmPlatformEntranceVertex.class::isInstance)
-      .map(OsmPlatformEntranceVertex.class::cast)
+      .filter(OsmPlatformVertex.class::isInstance)
+      .map(OsmPlatformVertex.class::cast)
       .toList();
 
     // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or id

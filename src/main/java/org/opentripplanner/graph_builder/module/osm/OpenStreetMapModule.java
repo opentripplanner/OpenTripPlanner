@@ -66,11 +66,12 @@ import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.OsmPlatformEntranceVertex;
+import org.opentripplanner.routing.vertextype.OsmPlatformVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.LocalizedStringFormat;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -343,7 +344,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * @param node The node to fetch a label for.
      * @param way  The way it is connected to (for fetching level information).
      * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
-     * {@link OsmBoardingLocationVertex} or {@link OsmPlatformEntranceVertex}
+     * {@link OsmBoardingLocationVertex} or {@link OsmPlatformVertex}
      */
     protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
       // If the node should be decomposed to multiple levels,
@@ -371,10 +372,30 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         var nodeStopRefs = node.getMultiTagValues(boardingAreaRefTags);
-        var wayStopRefs = way.getMultiTagValues(boardingAreaRefTags);
         var name = node.getTag("name");
-        /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
-        if (node.isBoardingLocation() && !nodeStopRefs.isEmpty()) {
+
+        var wayStopRefs = osmdb
+          .getAreasForNode(node.getId())
+          .stream()
+          .filter(OSMWithTags::isBoardingLocation)
+          .flatMap(w -> w.getMultiTagValues(boardingAreaRefTags).stream())
+          .collect(Collectors.toSet());
+
+        if (!wayStopRefs.isEmpty()) {
+          LOG.error("Found platform entrance at {}, {}", way, node.getOpenStreetMapLink());
+          iv =
+            new OsmPlatformVertex(
+              graph,
+              label,
+              coordinate.x,
+              coordinate.y,
+              nid,
+              new LocalizedString("name.platform"),
+              wayStopRefs
+            );
+        }
+        // If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. *
+        else if (node.isBoardingLocation() && !nodeStopRefs.isEmpty()) {
           iv =
             new OsmBoardingLocationVertex(
               graph,
@@ -384,18 +405,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               nid,
               name,
               nodeStopRefs
-            );
-        } else if (way.isBoardingLocation() && !wayStopRefs.isEmpty()) {
-          LOG.error("Found platform entrance at {}, {}", way, node.getOpenStreetMapLink());
-          iv =
-            new OsmPlatformEntranceVertex(
-              graph,
-              label,
-              coordinate.x,
-              coordinate.y,
-              nid,
-              "platform entrance",
-              wayStopRefs
             );
         } else if (node.isBarrier()) {
           BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
