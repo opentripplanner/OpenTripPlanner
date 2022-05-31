@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -94,8 +95,32 @@ class PathwayEdgeTest {
     assertEquals(266, state.getWeight());
   }
 
+  @Test
+  void wheelchair() {
+    var edge = new PathwayEdge(
+      from,
+      to,
+      null,
+      new NonLocalizedString("pathway"),
+      0,
+      100,
+      0,
+      0,
+      false
+    );
+
+    var state = assertThatEdgeIsTraversable(edge, true);
+    assertEquals(133, state.getElapsedTimeSeconds());
+    assertEquals(6650.0, state.getWeight());
+  }
+
   private State assertThatEdgeIsTraversable(PathwayEdge edge) {
+    return assertThatEdgeIsTraversable(edge, false);
+  }
+
+  private State assertThatEdgeIsTraversable(PathwayEdge edge, boolean wheelchair) {
     var req = new RoutingRequest();
+    req.wheelchairAccessibility = WheelchairAccessibilityRequest.DEFAULT.withEnabled(wheelchair);
     var state = new State(new RoutingContext(req, graph, from, to));
 
     var afterTraversal = edge.traverse(state);
