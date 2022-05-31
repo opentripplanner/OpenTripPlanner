@@ -15,10 +15,10 @@ public record WheelchairAccessibilityRequest(
   WheelchairAccessibilityFeature trips,
   WheelchairAccessibilityFeature stops,
   WheelchairAccessibilityFeature elevators,
-  float inaccessibleStreetReluctance,
-  float maxSlope,
-  float slopeExceededReluctance,
-  float stairsReluctance
+  double inaccessibleStreetReluctance,
+  double maxSlope,
+  double slopeExceededReluctance,
+  double stairsReluctance
 ) {
   public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
     false,

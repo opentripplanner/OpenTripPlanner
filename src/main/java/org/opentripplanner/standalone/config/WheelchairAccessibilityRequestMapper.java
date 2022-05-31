@@ -15,12 +15,12 @@ public class WheelchairAccessibilityRequestMapper {
       "inaccessibleStreetReluctance",
       DEFAULT.inaccessibleStreetReluctance()
     );
-    var maxSlope = (float) a.asDouble("maxSlope", DEFAULT.maxSlope());
-    var slopeExceededReluctance = (float) a.asDouble(
+    var maxSlope = a.asDouble("maxSlope", DEFAULT.maxSlope());
+    var slopeExceededReluctance = a.asDouble(
       "slopeExceededReluctance",
       DEFAULT.slopeExceededReluctance()
     );
-    var stairsReluctance = (float) a.asDouble("stairsReluctance", DEFAULT.stairsReluctance());
+    var stairsReluctance = a.asDouble("stairsReluctance", DEFAULT.stairsReluctance());
 
     return new WheelchairAccessibilityRequest(
       a.asBoolean("enabled", DEFAULT.enabled()),

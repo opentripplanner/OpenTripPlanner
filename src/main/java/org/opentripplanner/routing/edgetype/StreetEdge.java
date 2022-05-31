@@ -1116,7 +1116,7 @@ public class StreetEdge
       time = getEffectiveWalkDistance() / speed;
       weight = getEffectiveBikeDistance() / speed;
 
-      float slopeExceededBy = 0;
+      double slopeExceededBy = 0;
 
       if (hasElevationExtension()) {
         slopeExceededBy = wheelchair.maxSlope() - Math.abs(getMaxSlope());
