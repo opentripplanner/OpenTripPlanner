@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.network.TransitMode;
 
-public class AllowedTransitModeTest {
+public class AllowedTransitModeFilterTest {
 
   @Test
   public void testMainModeMatch() {
-    final var ALLOWED_TRANSIT_MODE = AllowedTransitMode.of(TransitMode.BUS);
+    final var ALLOWED_TRANSIT_MODE = AllowedTransitModeFilter.of(TransitMode.BUS);
     assertTrue(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, null));
     assertTrue(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, "something"));
     assertFalse(ALLOWED_TRANSIT_MODE.allows(TransitMode.RAIL, null));
@@ -20,7 +20,7 @@ public class AllowedTransitModeTest {
   @Test
   public void testSubmodeMatch() {
     final var SUBMODE = "shuttleBus";
-    final var subject = AllowedTransitMode.of(TransitMode.BUS, SUBMODE);
+    final var subject = AllowedTransitModeFilter.of(TransitMode.BUS, SUBMODE);
 
     assertTrue(subject.allows(TransitMode.BUS, SUBMODE));
     assertFalse(subject.allows(TransitMode.BUS, "other"));
@@ -29,7 +29,7 @@ public class AllowedTransitModeTest {
 
   @Test
   public void testUnknownSubmodeMatch() {
-    final var ALLOWED_TRANSIT_MODE = AllowedTransitMode.ofUnknownSubModes(TransitMode.BUS);
+    final var ALLOWED_TRANSIT_MODE = AllowedTransitModeFilter.ofUnknownSubModes(TransitMode.BUS);
 
     assertTrue(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, null));
     assertFalse(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, "shuttleBus"));

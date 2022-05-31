@@ -1,11 +1,11 @@
 package org.opentripplanner.api.parameter;
 
-import static org.opentripplanner.model.modes.AllowedTransitMode.fromMainModeEnum;
+import static org.opentripplanner.model.modes.AllowedTransitModeFilter.fromMainModeEnum;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 public enum ApiRequestMode {
@@ -21,19 +21,19 @@ public enum ApiRequestMode {
   CABLE_CAR(fromMainModeEnum(TransitMode.CABLE_CAR)),
   GONDOLA(fromMainModeEnum(TransitMode.GONDOLA)),
   FUNICULAR(fromMainModeEnum(TransitMode.FUNICULAR)),
-  TRANSIT(AllowedTransitMode.ofAllTransitModes()),
+  TRANSIT(AllowedTransitModeFilter.ofAllTransitModes()),
   AIRPLANE(fromMainModeEnum(TransitMode.AIRPLANE)),
   TROLLEYBUS(fromMainModeEnum(TransitMode.TROLLEYBUS)),
   MONORAIL(fromMainModeEnum(TransitMode.MONORAIL)),
   FLEX();
 
-  private final Set<AllowedTransitMode> transitModes;
+  private final Set<AllowedTransitModeFilter> transitModes;
 
-  ApiRequestMode(Set<AllowedTransitMode> transitModes) {
+  ApiRequestMode(Set<AllowedTransitModeFilter> transitModes) {
     this.transitModes = transitModes;
   }
 
-  ApiRequestMode(AllowedTransitMode transitMode) {
+  ApiRequestMode(AllowedTransitModeFilter transitMode) {
     this.transitModes = Set.of(transitMode);
   }
 
@@ -41,7 +41,7 @@ public enum ApiRequestMode {
     this.transitModes = Collections.emptySet();
   }
 
-  public Collection<AllowedTransitMode> getTransitModes() {
+  public Collection<AllowedTransitModeFilter> getTransitModes() {
     return transitModes;
   }
 }

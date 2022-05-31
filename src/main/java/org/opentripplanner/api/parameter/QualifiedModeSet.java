@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 
@@ -46,7 +46,7 @@ public class QualifiedModeSet implements Serializable {
     StreetMode transferMode = null;
 
     // Set transit modes
-    Set<AllowedTransitMode> transitModes = qModes
+    Set<AllowedTransitModeFilter> transitModes = qModes
       .stream()
       .flatMap(q -> q.mode.getTransitModes().stream())
       .collect(Collectors.toSet());

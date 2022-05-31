@@ -25,7 +25,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
@@ -152,7 +152,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     StreetMode.WALK,
     StreetMode.WALK,
     StreetMode.WALK,
-    AllowedTransitMode.ofAllTransitModes()
+    AllowedTransitModeFilter.ofAllTransitModes()
   );
   /**
    * The set of TraverseModes allowed when doing creating sub requests and doing street routing. //

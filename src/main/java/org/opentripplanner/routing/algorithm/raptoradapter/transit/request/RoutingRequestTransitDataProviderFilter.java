@@ -4,7 +4,7 @@ import java.util.BitSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -35,7 +35,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     boolean requireBikesAllowed,
     WheelchairAccessibilityRequest accessibility,
     boolean includePlannedCancellations,
-    Set<AllowedTransitMode> allowedTransitModes,
+    Set<AllowedTransitModeFilter> allowedTransitModes,
     Set<FeedScopedId> bannedRoutes,
     Set<FeedScopedId> bannedTrips
   ) {

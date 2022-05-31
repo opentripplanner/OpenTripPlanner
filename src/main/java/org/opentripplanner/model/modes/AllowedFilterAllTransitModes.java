@@ -2,11 +2,8 @@ package org.opentripplanner.model.modes;
 
 import org.opentripplanner.transit.model.network.TransitMode;
 
-public class AllowedAllTransitModes implements AllowedTransitMode {
+class AllowedFilterAllTransitModes implements AllowedTransitModeFilter {
 
-  /**
-   * Check if this filter allows the provided TransitMode
-   */
   public boolean allows(TransitMode transitMode, String netexSubMode) {
     return true;
   }
@@ -18,11 +15,11 @@ public class AllowedAllTransitModes implements AllowedTransitMode {
 
   @Override
   public boolean equals(Object obj) {
-    return obj != null && obj.getClass() == AllowedAllTransitModes.class;
+    return obj != null && obj.getClass() == AllowedFilterAllTransitModes.class;
   }
 
   @Override
   public String toString() {
-    return "AllowedAllTransitModes{}";
+    return "AllowedFilterAllTransitModes{}";
   }
 }

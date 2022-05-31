@@ -4,20 +4,20 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.network.TransitMode;
 
-public class AllowedMainAndSubTransitMode implements AllowedTransitMode {
+class AllowedMainAndSubTransitModeFilter implements AllowedTransitModeFilter {
 
   private final TransitMode mainMode;
 
   private final String subMode;
 
-  public AllowedMainAndSubTransitMode(@Nonnull TransitMode mainMode, @Nonnull String subMode) {
+  public AllowedMainAndSubTransitModeFilter(
+    @Nonnull TransitMode mainMode,
+    @Nonnull String subMode
+  ) {
     this.mainMode = mainMode;
     this.subMode = subMode;
   }
 
-  /**
-   * Check if this filter allows the provided TransitMode
-   */
   public boolean allows(TransitMode transitMode, String netexSubMode) {
     return mainMode == transitMode && subMode.equals(netexSubMode);
   }
@@ -35,12 +35,14 @@ public class AllowedMainAndSubTransitMode implements AllowedTransitMode {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AllowedMainAndSubTransitMode that = (AllowedMainAndSubTransitMode) o;
+    AllowedMainAndSubTransitModeFilter that = (AllowedMainAndSubTransitModeFilter) o;
     return mainMode == that.mainMode && subMode.equals(that.subMode);
   }
 
   @Override
   public String toString() {
-    return "AllowedMainAndSubTransitMode{ mainMode: " + mainMode + ", subMode: " + subMode + "}";
+    return (
+      "AllowedMainAndSubTransitModeFilter{ mainMode: " + mainMode + ", subMode: " + subMode + "}"
+    );
   }
 }

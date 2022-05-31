@@ -2,24 +2,21 @@ package org.opentripplanner.model.modes;
 
 import org.opentripplanner.transit.model.network.TransitMode;
 
-public class AllowedMainTransitMode implements AllowedTransitMode {
+class AllowedUnknownSubTransitModeFilter implements AllowedTransitModeFilter {
 
   private final TransitMode mainMode;
 
-  public AllowedMainTransitMode(TransitMode mainMode) {
+  public AllowedUnknownSubTransitModeFilter(TransitMode mainMode) {
     this.mainMode = mainMode;
   }
 
-  /**
-   * Check if this filter allows the provided TransitMode
-   */
   public boolean allows(TransitMode transitMode, String netexSubMode) {
-    return mainMode == transitMode;
+    return mainMode == transitMode && netexSubMode == null;
   }
 
   @Override
   public int hashCode() {
-    return mainMode.hashCode() + 176393;
+    return mainMode.hashCode() + 275347561;
   }
 
   @Override
@@ -30,12 +27,12 @@ public class AllowedMainTransitMode implements AllowedTransitMode {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AllowedMainTransitMode that = (AllowedMainTransitMode) o;
+    AllowedUnknownSubTransitModeFilter that = (AllowedUnknownSubTransitModeFilter) o;
     return mainMode == that.mainMode;
   }
 
   @Override
   public String toString() {
-    return "AllowedMainTransitMode{ mainMode: " + mainMode + "}";
+    return "AllowedUnknownSubTransitModeFilter{ mainMode: " + mainMode + "}";
   }
 }

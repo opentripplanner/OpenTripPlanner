@@ -23,7 +23,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputTyp
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -282,9 +282,9 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("modes.directMode", directMode::set);
       callWith.argument("modes.transportModes", transportModes::set);
 
-      List<AllowedTransitMode> transitModes = new ArrayList<>();
+      List<AllowedTransitModeFilter> transitModes = new ArrayList<>();
       if (transportModes.get() == null) {
-        transitModes.add(AllowedTransitMode.ALLOWED_ALL_TRANSIT_MODES);
+        transitModes.add(AllowedTransitModeFilter.ALLOWED_ALL_TRANSIT_MODES);
       } else {
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
@@ -295,13 +295,13 @@ public class TransmodelGraphQLPlanner {
               );
               for (TransmodelTransportSubmode submode : transportSubModes) {
                 if (submode == TransmodelTransportSubmode.UNKNOWN) {
-                  transitModes.add(AllowedTransitMode.ofUnknownSubModes(mainMode));
+                  transitModes.add(AllowedTransitModeFilter.ofUnknownSubModes(mainMode));
                 } else {
-                  transitModes.add(AllowedTransitMode.of(mainMode, submode.getValue()));
+                  transitModes.add(AllowedTransitModeFilter.of(mainMode, submode.getValue()));
                 }
               }
             } else {
-              transitModes.add(AllowedTransitMode.fromMainModeEnum(mainMode));
+              transitModes.add(AllowedTransitModeFilter.fromMainModeEnum(mainMode));
             }
           }
         }

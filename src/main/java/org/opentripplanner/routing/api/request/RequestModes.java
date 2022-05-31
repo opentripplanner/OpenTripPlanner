@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 
 public class RequestModes {
 
@@ -13,7 +13,7 @@ public class RequestModes {
     StreetMode.WALK,
     StreetMode.WALK,
     StreetMode.WALK,
-    AllowedTransitMode.ofAllTransitModes()
+    AllowedTransitModeFilter.ofAllTransitModes()
   );
 
   @Nonnull
@@ -29,14 +29,14 @@ public class RequestModes {
   public StreetMode directMode;
 
   @Nonnull
-  public Set<AllowedTransitMode> transitModes;
+  public Set<AllowedTransitModeFilter> transitModes;
 
   public RequestModes(
     StreetMode accessMode,
     StreetMode transferMode,
     StreetMode egressMode,
     StreetMode directMode,
-    Collection<AllowedTransitMode> transitModes
+    Collection<AllowedTransitModeFilter> transitModes
   ) {
     this.accessMode = (accessMode != null && accessMode.access) ? accessMode : StreetMode.NOT_SET;
     this.transferMode =

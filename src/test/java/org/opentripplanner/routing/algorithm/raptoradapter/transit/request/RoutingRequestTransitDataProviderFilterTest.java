@@ -19,7 +19,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
@@ -102,7 +102,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+      Set.of(AllowedTransitModeFilter.fromMainModeEnum(TransitMode.BUS)),
       Set.of(),
       Set.of()
     );
@@ -120,7 +120,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+      Set.of(AllowedTransitModeFilter.fromMainModeEnum(TransitMode.BUS)),
       Set.of(ROUTE.getId()),
       Set.of()
     );
@@ -146,7 +146,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+      Set.of(AllowedTransitModeFilter.fromMainModeEnum(TransitMode.BUS)),
       Set.of(),
       Set.of(TRIP_ID)
     );
@@ -175,14 +175,16 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     assertFalse(validateModesOnTripTimes(Set.of(), tripTimes));
     assertFalse(
-      validateModesOnTripTimes(Set.of(AllowedTransitMode.of(BUS, REGIONAL_BUS)), tripTimes)
+      validateModesOnTripTimes(Set.of(AllowedTransitModeFilter.of(BUS, REGIONAL_BUS)), tripTimes)
     );
     assertFalse(
-      validateModesOnTripTimes(Set.of(AllowedTransitMode.of(RAIL, LOCAL_BUS)), tripTimes)
+      validateModesOnTripTimes(Set.of(AllowedTransitModeFilter.of(RAIL, LOCAL_BUS)), tripTimes)
     );
 
-    assertTrue(validateModesOnTripTimes(Set.of(AllowedTransitMode.of(BUS)), tripTimes));
-    assertTrue(validateModesOnTripTimes(Set.of(AllowedTransitMode.of(BUS, LOCAL_BUS)), tripTimes));
+    assertTrue(validateModesOnTripTimes(Set.of(AllowedTransitModeFilter.of(BUS)), tripTimes));
+    assertTrue(
+      validateModesOnTripTimes(Set.of(AllowedTransitModeFilter.of(BUS, LOCAL_BUS)), tripTimes)
+    );
   }
 
   @Test
@@ -201,7 +203,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+      Set.of(AllowedTransitModeFilter.fromMainModeEnum(TransitMode.BUS)),
       Set.of(),
       Set.of()
     );
@@ -227,7 +229,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       true,
       DEFAULT_ACCESSIBILITY,
       false,
-      AllowedTransitMode.ofAllTransitModes(),
+      AllowedTransitModeFilter.ofAllTransitModes(),
       Set.of(),
       Set.of()
     );
@@ -253,7 +255,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       false,
       WheelchairAccessibilityRequest.makeDefault(true),
       false,
-      AllowedTransitMode.ofAllTransitModes(),
+      AllowedTransitModeFilter.ofAllTransitModes(),
       Set.of(),
       Set.of()
     );
@@ -279,7 +281,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       false,
-      Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+      Set.of(AllowedTransitModeFilter.fromMainModeEnum(TransitMode.BUS)),
       Set.of(),
       Set.of()
     );
@@ -315,7 +317,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       false,
       DEFAULT_ACCESSIBILITY,
       true,
-      Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+      Set.of(AllowedTransitModeFilter.fromMainModeEnum(TransitMode.BUS)),
       Set.of(),
       Set.of()
     );
@@ -448,7 +450,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       true,
       WheelchairAccessibilityRequest.makeDefault(true),
       false,
-      Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+      Set.of(AllowedTransitModeFilter.fromMainModeEnum(TransitMode.BUS)),
       Set.of(),
       Set.of()
     );
@@ -463,7 +465,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
   }
 
   private boolean validateModesOnTripTimes(
-    Set<AllowedTransitMode> allowedModes,
+    Set<AllowedTransitModeFilter> allowedModes,
     TripTimes tripTimes
   ) {
     var filter = new RoutingRequestTransitDataProviderFilter(

@@ -38,7 +38,7 @@ import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
@@ -234,15 +234,15 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  private static List<ApiRequestMode> mapModes(Collection<AllowedTransitMode> reqModes) {
+  private static List<ApiRequestMode> mapModes(Collection<AllowedTransitModeFilter> reqModes) {
     List<ApiRequestMode> result = new ArrayList<>();
 
     if (ApiRequestMode.TRANSIT.getTransitModes().equals(reqModes)) {
       return List.of(ApiRequestMode.TRANSIT);
     }
 
-    for (AllowedTransitMode allowedTransitMode : reqModes) {
-      Collection<AllowedTransitMode> allowedTransitModes = Set.of(allowedTransitMode);
+    for (AllowedTransitModeFilter allowedTransitMode : reqModes) {
+      Collection<AllowedTransitModeFilter> allowedTransitModes = Set.of(allowedTransitMode);
       for (ApiRequestMode apiCandidate : ApiRequestMode.values()) {
         if (allowedTransitModes.equals(apiCandidate.getTransitModes())) {
           result.add(apiCandidate);

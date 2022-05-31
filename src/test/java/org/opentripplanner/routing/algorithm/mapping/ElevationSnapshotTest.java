@@ -13,7 +13,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowedTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -113,7 +113,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         null,
-        AllowedTransitMode.ofAllTransitModes()
+        AllowedTransitModeFilter.ofAllTransitModes()
       );
     request.from = p1;
     request.to = p3;
@@ -136,7 +136,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         null,
-        AllowedTransitMode.ofAllTransitModes()
+        AllowedTransitModeFilter.ofAllTransitModes()
       );
     request.from = p3;
     request.to = p1;
