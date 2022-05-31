@@ -11,7 +11,7 @@ import java.util.Set;
 public enum TraverseMode {
     WALK, BICYCLE, CAR,
     TRAM, SUBWAY, RAIL, BUS, FERRY,
-    CABLE_CAR, GONDOLA, FUNICULAR,
+    CABLE_CAR, GONDOLA, FUNICULAR, TROLLEY, MONORAIL,
     TRANSIT, LEG_SWITCH,
     AIRPLANE;
 

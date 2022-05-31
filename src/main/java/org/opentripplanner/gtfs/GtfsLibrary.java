@@ -27,7 +27,7 @@ public class GtfsLibrary {
     }
 
     public static GtfsContext createContext(GtfsFeedId feedId, OtpTransitService transitService,
-            CalendarService calendarService) {
+                                            CalendarService calendarService) {
         return new GtfsContextImpl(feedId, transitService, calendarService);
     }
 
@@ -55,7 +55,9 @@ public class GtfsLibrary {
         return aid.getAgencyId() + ID_SEPARATOR + aid.getId();
     }
 
-    /** @return the route's short name, or the long name if the short name is null. */
+    /**
+     * @return the route's short name, or the long name if the short name is null.
+     */
     public static String getRouteName(Route route) {
         if (route.getShortName() != null)
             return route.getShortName();
@@ -93,31 +95,35 @@ public class GtfsLibrary {
             return TraverseMode.FUNICULAR;
         } else if (routeType >= 1500 && routeType < 1600) { //Taxi Service
             LOG.warn("Treating taxi route {} (extended route type {}) as a bus.",
-                route.getId(), routeType);
+                    route.getId(), routeType);
             return TraverseMode.BUS;
         } else if (routeType >= 1600 && routeType < 1700) { //Self drive
             return TraverseMode.CAR;
         }
         /* Original GTFS route types. Should these be checked before TPEG types? */
         switch (routeType) {
-        case 0:
-            return TraverseMode.TRAM;
-        case 1:
-            return TraverseMode.SUBWAY;
-        case 2:
-            return TraverseMode.RAIL;
-        case 3:
-            return TraverseMode.BUS;
-        case 4:
-            return TraverseMode.FERRY;
-        case 5:
-            return TraverseMode.CABLE_CAR;
-        case 6:
-            return TraverseMode.GONDOLA;
-        case 7:
-            return TraverseMode.FUNICULAR;
-        default:
-            throw new IllegalArgumentException("unknown gtfs route type " + routeType);
+            case 0:
+                return TraverseMode.TRAM;
+            case 1:
+                return TraverseMode.SUBWAY;
+            case 2:
+                return TraverseMode.RAIL;
+            case 3:
+                return TraverseMode.BUS;
+            case 4:
+                return TraverseMode.FERRY;
+            case 5:
+                return TraverseMode.CABLE_CAR;
+            case 6:
+                return TraverseMode.GONDOLA;
+            case 7:
+                return TraverseMode.FUNICULAR;
+            case 11:
+                return TraverseMode.TROLLEY;
+            case 12:
+                return TraverseMode.MONORAIL;
+            default:
+                throw new IllegalArgumentException("unknown gtfs route type " + routeType);
         }
     }
 
@@ -130,7 +136,7 @@ public class GtfsLibrary {
         private CalendarService calendar;
 
         public GtfsContextImpl(GtfsFeedId feedId, OtpTransitService transitService,
-                CalendarService calendar) {
+                               CalendarService calendar) {
             this.feedId = feedId;
             this.transitService = transitService;
             this.calendar = calendar;
