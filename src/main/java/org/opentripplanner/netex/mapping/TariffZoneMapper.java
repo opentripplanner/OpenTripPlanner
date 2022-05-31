@@ -35,7 +35,8 @@ class TariffZoneMapper {
     return tariffZonesById
       .localListCurrentVersionEntities(startOfPeriod)
       .stream()
-      .map(this::mapTariffZone).toList();
+      .map(this::mapTariffZone)
+      .toList();
   }
 
   /**

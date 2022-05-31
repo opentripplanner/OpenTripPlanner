@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.util.TranslationHelper;
 
 public class PathwayNodeMapperTest {
@@ -72,7 +73,7 @@ public class PathwayNodeMapperTest {
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.PathwayNode result = subject.map(STOP);
+    PathwayNode result = subject.map(STOP);
 
     assertEquals("A:N1", result.getId().toString());
     assertEquals(CODE, result.getCode());
@@ -89,7 +90,7 @@ public class PathwayNodeMapperTest {
     input.setLocationType(Stop.LOCATION_TYPE_NODE);
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.PathwayNode result = subject.map(input);
+    PathwayNode result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getCode());
@@ -106,7 +107,7 @@ public class PathwayNodeMapperTest {
     input.setLocationType(Stop.LOCATION_TYPE_NODE);
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.PathwayNode result = subject.map(input);
+    PathwayNode result = subject.map(input);
 
     assertThrows(IllegalStateException.class, () -> result.getCoordinate().latitude());
   }
@@ -114,8 +115,8 @@ public class PathwayNodeMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() {
-    org.opentripplanner.model.PathwayNode result1 = subject.map(STOP);
-    org.opentripplanner.model.PathwayNode result2 = subject.map(STOP);
+    PathwayNode result1 = subject.map(STOP);
+    PathwayNode result2 = subject.map(STOP);
 
     assertSame(result1, result2);
   }

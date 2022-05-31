@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.model.PathwayNode;
+import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.TranslationHelper;

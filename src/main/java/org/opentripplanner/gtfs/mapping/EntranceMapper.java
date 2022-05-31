@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.Entrance;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.TranslationHelper;

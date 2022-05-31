@@ -2,11 +2,11 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Entrance;
-import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.site.BoardingArea;
+import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.TranslationHelper;
