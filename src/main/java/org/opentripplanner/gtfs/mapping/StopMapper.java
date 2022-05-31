@@ -1,8 +1,8 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -95,7 +95,7 @@ class StopMapper {
 
   private Collection<FareZone> getTariffZones(String zoneId, String agencyId) {
     return zoneId != null
-      ? Collections.singletonList(new FareZone(new FeedScopedId(agencyId, zoneId), null))
-      : Collections.emptyList();
+      ? List.of(FareZone.of(new FeedScopedId(agencyId, zoneId)).build())
+      : List.of();
   }
 }

@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.stream.Collectors;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -36,8 +35,7 @@ class TariffZoneMapper {
     return tariffZonesById
       .localListCurrentVersionEntities(startOfPeriod)
       .stream()
-      .map(this::mapTariffZone)
-      .collect(Collectors.toUnmodifiableList());
+      .map(this::mapTariffZone).toList();
   }
 
   /**
@@ -58,14 +56,14 @@ class TariffZoneMapper {
 
     FeedScopedId id = idFactory.createId(tariffZone.getId());
     String name = tariffZone.getName().getValue();
-    return deduplicate(new FareZone(id, name));
+    return deduplicate(FareZone.of(id).withName(name).build());
   }
 
   private FareZone deduplicate(FareZone candidate) {
     var existing = deduplicateCache
       .get(candidate.getId())
       .stream()
-      .filter(candidate::sameValueAs)
+      .filter(candidate::sameValue)
       .findFirst();
 
     if (existing.isPresent()) {
