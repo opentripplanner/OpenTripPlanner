@@ -84,6 +84,7 @@ import org.opentripplanner.ext.transmodelapi.model.timetable.ServiceJourneyType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.TripMetadataType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
@@ -877,15 +878,15 @@ public class TransmodelGraphQLSchema {
               filterByBikeRentalStations =
                 filterByIds.get("bikeRentalStations") != null
                   ? (List<String>) filterByIds.get("bikeRentalStations")
-                  : Collections.emptyList();
+                  : List.of();
               filterByBikeParks =
                 filterByIds.get("bikeParks") != null
                   ? (List<String>) filterByIds.get("bikeParks")
-                  : Collections.emptyList();
+                  : List.of();
               filterByCarParks =
                 filterByIds.get("carParks") != null
                   ? (List<String>) filterByIds.get("carParks")
-                  : Collections.emptyList();
+                  : List.of();
             }
 
             List<TransitMode> filterByTransportModes = environment.getArgument("filterByModes");
@@ -921,6 +922,23 @@ public class TransmodelGraphQLSchema {
                   GqlUtil.getRoutingService(environment)
                 );
 
+            if (TRUE.equals(environment.getArgument("filterByInUse"))) {
+              places =
+                places
+                  .stream()
+                  .filter(placeAtDistance -> {
+                    if (placeAtDistance.place() instanceof StopLocation stop) {
+                      return !GqlUtil
+                        .getRoutingService(environment)
+                        .getPatternsForStop(stop, true)
+                        .isEmpty();
+                    } else {
+                      return true;
+                    }
+                  })
+                  .toList();
+            }
+
             places =
               PlaceAtDistanceType
                 .convertQuaysToStopPlaces(
@@ -934,7 +952,7 @@ public class TransmodelGraphQLSchema {
                 .collect(Collectors.toList());
             if (places.isEmpty()) {
               return new DefaultConnection<>(
-                Collections.emptyList(),
+                List.of(),
                 new DefaultPageInfo(null, null, false, false)
               );
             }
