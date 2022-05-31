@@ -23,12 +23,12 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
 {
   "routingDefaults": {
     "wheelchairAccessibility": {
-      "trips": {
+      "trip": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600
       },
-      "stops": {
+      "stop": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600
@@ -43,7 +43,7 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
 }
 ```
 
-The parameters for `stops`, `trips` and `elevators` mean the following:
+The parameters for `stop`, `trip` and `elevator` mean the following:
 
 | name                     |                                                                                                | default |
 |--------------------------|------------------------------------------------------------------------------------------------|---------|

@@ -8,9 +8,9 @@ import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 public class WheelchairAccessibilityRequestMapper {
 
   static WheelchairAccessibilityRequest mapAccessibilityRequest(NodeAdapter a) {
-    var trips = mapAccessibilityFeature(a.path("trips"), DEFAULT.trips());
-    var stops = mapAccessibilityFeature(a.path("stops"), DEFAULT.stops());
-    var elevators = mapAccessibilityFeature(a.path("elevators"), DEFAULT.elevators());
+    var trips = mapAccessibilityFeature(a.path("trip"), DEFAULT.trip());
+    var stops = mapAccessibilityFeature(a.path("stop"), DEFAULT.stop());
+    var elevators = mapAccessibilityFeature(a.path("elevator"), DEFAULT.elevator());
     var inaccessibleStreetReluctance = (float) a.asDouble(
       "inaccessibleStreetReluctance",
       DEFAULT.inaccessibleStreetReluctance()

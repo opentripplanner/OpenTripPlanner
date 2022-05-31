@@ -12,9 +12,9 @@ package org.opentripplanner.routing.api.request;
  */
 public record WheelchairAccessibilityRequest(
   boolean enabled,
-  WheelchairAccessibilityFeature trips,
-  WheelchairAccessibilityFeature stops,
-  WheelchairAccessibilityFeature elevators,
+  WheelchairAccessibilityFeature trip,
+  WheelchairAccessibilityFeature stop,
+  WheelchairAccessibilityFeature elevator,
   double inaccessibleStreetReluctance,
   double maxSlope,
   double slopeExceededReluctance,
@@ -41,9 +41,9 @@ public record WheelchairAccessibilityRequest(
   public WheelchairAccessibilityRequest withEnabled(boolean enabled) {
     return new WheelchairAccessibilityRequest(
       enabled,
-      trips,
-      stops,
-      elevators,
+      trip,
+      stop,
+      elevator,
       inaccessibleStreetReluctance,
       maxSlope,
       slopeExceededReluctance,

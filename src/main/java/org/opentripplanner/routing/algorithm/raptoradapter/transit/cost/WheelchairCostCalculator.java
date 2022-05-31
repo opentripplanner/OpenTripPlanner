@@ -24,9 +24,9 @@ public class WheelchairCostCalculator implements CostCalculator {
     wheelchairBoardingCost = new int[3];
     wheelchairBoardingCost[POSSIBLE.ordinal()] = 0;
     wheelchairBoardingCost[NO_INFORMATION.ordinal()] =
-      RaptorCostConverter.toRaptorCost(requirements.trips().unknownCost());
+      RaptorCostConverter.toRaptorCost(requirements.trip().unknownCost());
     wheelchairBoardingCost[NOT_POSSIBLE.ordinal()] =
-      RaptorCostConverter.toRaptorCost(requirements.trips().inaccessibleCost());
+      RaptorCostConverter.toRaptorCost(requirements.trip().inaccessibleCost());
 
     this.delegate = delegate;
   }
