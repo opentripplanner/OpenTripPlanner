@@ -96,7 +96,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, ReluctanceEdg
     if (time == 0) {
       if (distance > 0) {
         time = (int) (distance * options.walkSpeed);
-      } else if (steps > 0) {
+      } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
         time = (int) (0.4 * Math.abs(steps) * options.walkSpeed);
       }
@@ -166,5 +166,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, ReluctanceEdg
 
   public FeedScopedId getId() {
     return id;
+  }
+
+  @Override
+  public boolean isStairs() {
+    return steps > 0;
   }
 }

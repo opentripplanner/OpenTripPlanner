@@ -968,7 +968,7 @@ public class StreetEdge
     var time = traversalCosts.time();
     var weight = traversalCosts.cost();
 
-    weight *= getReluctance(options, traverseMode, walkingBike);
+    weight *= computeReluctance(options, traverseMode, walkingBike);
 
     var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
@@ -1060,16 +1060,6 @@ public class StreetEdge
     s1.incrementWeight(weight);
 
     return s1;
-  }
-
-  private double getReluctance(RoutingRequest req, TraverseMode traverseMode, boolean walkingBike) {
-    if (isStairs() && req.wheelchairAccessibility.enabled()) {
-      return req.wheelchairAccessibility.stairsReluctance();
-    } else if (isStairs()) {
-      return req.stairsReluctance;
-    } else {
-      return computeReluctance(req, traverseMode, walkingBike);
-    }
   }
 
   private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
