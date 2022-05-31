@@ -4,17 +4,15 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.base.WgsCoordinate;
+import org.opentripplanner.transit.model.base.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.TransitMode;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.TranslatedString;
 import org.rutebanken.netex.model.Quay;
 
 class StopMapper {

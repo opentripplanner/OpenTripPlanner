@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.base;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Coordinate;

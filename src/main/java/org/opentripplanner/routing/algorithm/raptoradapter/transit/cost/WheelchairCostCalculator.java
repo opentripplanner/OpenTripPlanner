@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import static org.opentripplanner.model.WheelchairAccessibility.NOT_POSSIBLE;
-import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
-import static org.opentripplanner.model.WheelchairAccessibility.POSSIBLE;
+import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NOT_POSSIBLE;
+import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.base.WheelchairAccessibility.POSSIBLE;
 
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;

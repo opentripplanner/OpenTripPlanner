@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.timetable;
 
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TripAlteration;
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.base.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;

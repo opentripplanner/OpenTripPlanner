@@ -1,6 +1,7 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
+import org.opentripplanner.transit.model.base.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.util.I18NString;

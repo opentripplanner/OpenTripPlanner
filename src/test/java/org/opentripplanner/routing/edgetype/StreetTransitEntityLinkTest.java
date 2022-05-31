@@ -2,13 +2,12 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.model.WheelchairAccessibility.NOT_POSSIBLE;
-import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
-import static org.opentripplanner.model.WheelchairAccessibility.POSSIBLE;
+import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NOT_POSSIBLE;
+import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.base.WheelchairAccessibility.POSSIBLE;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
@@ -19,6 +18,7 @@ import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.Stop;
 
 class StreetTransitEntityLinkTest {
 

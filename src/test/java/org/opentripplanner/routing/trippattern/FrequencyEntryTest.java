@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class FrequencyEntryTest {

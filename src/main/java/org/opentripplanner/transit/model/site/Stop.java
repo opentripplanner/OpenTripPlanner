@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
-import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NO_INFORMATION;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +11,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.transit.model.base.WgsCoordinate;
+import org.opentripplanner.transit.model.base.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;

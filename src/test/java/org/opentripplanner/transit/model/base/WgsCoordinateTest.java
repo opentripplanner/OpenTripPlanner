@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.base;
 
 import static org.junit.Assert.assertEquals;
 

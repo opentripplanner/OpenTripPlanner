@@ -12,7 +12,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.base.WheelchairAccessibility;
 import org.opentripplanner.util.TranslationHelper;
 
 public class StopAndStationMapperTest {
@@ -77,7 +77,7 @@ public class StopAndStationMapperTest {
 
   @Test
   public void testMap() {
-    org.opentripplanner.model.Stop result = subject.map(STOP);
+    org.opentripplanner.transit.model.site.Stop result = subject.map(STOP);
 
     assertEquals("A:1", result.getId().toString());
     assertEquals(CODE, result.getCode());
@@ -96,7 +96,7 @@ public class StopAndStationMapperTest {
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
 
-    org.opentripplanner.model.Stop result = subject.map(input);
+    org.opentripplanner.transit.model.site.Stop result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getCode());
@@ -116,7 +116,7 @@ public class StopAndStationMapperTest {
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
 
-    org.opentripplanner.model.Stop result = subject.map(input);
+    org.opentripplanner.transit.model.site.Stop result = subject.map(input);
 
     // Getting the coordinate will throw an IllegalArgumentException if not set,
     // this is considered to be a implementation error
@@ -126,8 +126,8 @@ public class StopAndStationMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() {
-    org.opentripplanner.model.Stop result1 = subject.map(STOP);
-    org.opentripplanner.model.Stop result2 = subject.map(STOP);
+    org.opentripplanner.transit.model.site.Stop result1 = subject.map(STOP);
+    org.opentripplanner.transit.model.site.Stop result2 = subject.map(STOP);
 
     assertSame(result1, result2);
   }

@@ -5,7 +5,7 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.opentripplanner.model.Station;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.TranslationHelper;
 

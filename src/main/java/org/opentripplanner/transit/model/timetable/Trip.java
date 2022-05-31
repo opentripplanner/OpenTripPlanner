@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TripAlteration;
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.base.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity2;

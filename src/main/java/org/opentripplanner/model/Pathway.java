@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.site.StationElement;
 
 public final class Pathway extends TransitEntity {
 

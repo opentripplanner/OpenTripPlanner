@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.Stop;
 
 /**
  * We test that the platform area at Herrenberg station (https://www.openstreetmap.org/way/27558650)

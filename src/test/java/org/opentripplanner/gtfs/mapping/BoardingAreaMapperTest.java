@@ -12,7 +12,8 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.util.TranslationHelper;
 
 public class BoardingAreaMapperTest {
@@ -70,7 +71,7 @@ public class BoardingAreaMapperTest {
 
   @Test
   public void testMap() {
-    org.opentripplanner.model.BoardingArea result = subject.map(STOP);
+    BoardingArea result = subject.map(STOP);
 
     assertEquals("A:B1", result.getId().toString());
     assertEquals(CODE, result.getCode());
@@ -87,7 +88,7 @@ public class BoardingAreaMapperTest {
     input.setLocationType(Stop.LOCATION_TYPE_BOARDING_AREA);
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.BoardingArea result = subject.map(input);
+    BoardingArea result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getCode());
@@ -104,7 +105,7 @@ public class BoardingAreaMapperTest {
     input.setLocationType(Stop.LOCATION_TYPE_BOARDING_AREA);
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.BoardingArea result = subject.map(input);
+    BoardingArea result = subject.map(input);
 
     assertThrows(NullPointerException.class, () -> result.getCoordinate().latitude());
   }
@@ -112,8 +113,8 @@ public class BoardingAreaMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() {
-    org.opentripplanner.model.BoardingArea result1 = subject.map(STOP);
-    org.opentripplanner.model.BoardingArea result2 = subject.map(STOP);
+    BoardingArea result1 = subject.map(STOP);
+    BoardingArea result2 = subject.map(STOP);
 
     assertSame(result1, result2);
   }
