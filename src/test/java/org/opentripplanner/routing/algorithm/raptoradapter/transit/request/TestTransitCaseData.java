@@ -8,8 +8,8 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public final class TestTransitCaseData {
 
-  public static final Station STATION_A = Station.stationForTest("A", 60.0, 11.1);
-  public static final Station STATION_B = Station.stationForTest("B", 61.0, 11.5);
+  public static final Station STATION_A = TransitModelForTest.stationForTest("A", 60.0, 11.1);
+  public static final Station STATION_B = TransitModelForTest.stationForTest("B", 61.0, 11.5);
 
   public static final Stop STOP_A = TransitModelForTest.stopForTest("A", 60.0, 11.0, STATION_A);
   public static final Stop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.2, STATION_B);

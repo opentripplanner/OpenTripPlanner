@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
@@ -29,6 +30,8 @@ public final class BoardingArea extends StationElement {
    * Center point/location for the boarding area. Returns the coordinate of the parent stop,
    * if the coordinate is not defined for this boarding area.
    */
+  @Override
+  @Nonnull
   public WgsCoordinate getCoordinate() {
     return isCoordinateSet() ? super.getCoordinate() : parentStop.getCoordinate();
   }

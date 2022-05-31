@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.util.I18NString;
@@ -57,6 +58,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Public facing stop code (short text or number).
    */
+  @Nullable
   public String getCode() {
     return code;
   }
@@ -64,6 +66,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Additional information about the station element (if needed).
    */
+  @Nullable
   public I18NString getDescription() {
     return description;
   }
@@ -72,6 +75,7 @@ public abstract class StationElement extends TransitEntity {
    * Center point/location for the station element. Returns the coordinate of the parent station, if
    * the coordinate is not defined for this station element.
    */
+  @Nonnull
   public WgsCoordinate getCoordinate() {
     if (coordinate != null) {
       return coordinate;
@@ -91,16 +95,19 @@ public abstract class StationElement extends TransitEntity {
   }
 
   /** Level name for elevator descriptions */
+  @Nullable
   public String getLevelName() {
     return level == null ? null : level.getName();
   }
 
   /** Level index for hop counts in elevators. Is {@code null} if not set. */
+  @Nullable
   public Double getLevelIndex() {
     return level == null ? null : level.getIndex();
   }
 
   /** Parent station for the station element */
+  @Nullable
   public Station getParentStation() {
     return parentStation;
   }

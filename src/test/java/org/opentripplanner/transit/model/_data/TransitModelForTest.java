@@ -4,6 +4,7 @@ import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
 
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -117,5 +118,22 @@ public class TransitModelForTest {
     );
     stop.setParentStation(parent);
     return stop;
+  }
+
+  /**
+   * Create a minimal Station object for unit-test use, where the test only care about id, name and
+   * coordinate. The feedId is static set to "F"
+   */
+  public static Station stationForTest(String idAndName, double lat, double lon) {
+    return new Station(
+      new FeedScopedId("F", idAndName),
+      new NonLocalizedString(idAndName),
+      new WgsCoordinate(lat, lon),
+      idAndName,
+      new NonLocalizedString("Station " + idAndName),
+      null,
+      null,
+      StopTransferPriority.ALLOWED
+    );
   }
 }

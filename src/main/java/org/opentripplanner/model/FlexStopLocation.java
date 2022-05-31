@@ -1,7 +1,8 @@
 package org.opentripplanner.model;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.util.I18NString;
@@ -13,8 +14,6 @@ import org.opentripplanner.util.I18NString;
 
 public class FlexStopLocation extends TransitEntity implements StopLocation {
 
-  private static final long serialVersionUID = 1L;
-
   private I18NString name;
 
   private I18NString description;
@@ -25,7 +24,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private I18NString url;
 
-  private Point centroid;
+  private WgsCoordinate centroid;
 
   public FlexStopLocation(FeedScopedId id) {
     super(id);
@@ -36,6 +35,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    * communication, eg. the name of the village where the service stops.
    */
   @Override
+  @Nonnull
   public I18NString getName() {
     return name;
   }
@@ -46,6 +46,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   }
 
   @Override
+  @Nullable
   public I18NString getUrl() {
     return url;
   }
@@ -63,8 +64,9 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    * Returns the centroid of this location.
    */
   @Override
+  @Nonnull
   public WgsCoordinate getCoordinate() {
-    return new WgsCoordinate(centroid.getY(), centroid.getX());
+    return centroid;
   }
 
   /**
@@ -77,7 +79,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   public void setGeometry(Geometry geometry) {
     this.geometry = geometry;
-    this.centroid = geometry.getCentroid();
+    this.centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
   }
 
   @Override

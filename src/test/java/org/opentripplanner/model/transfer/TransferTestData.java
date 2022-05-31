@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
 
-  static final Station STATION = Station.stationForTest("Central Station", 60.0, 11.0);
+  static final Station STATION = TransitModelForTest.stationForTest("Central Station", 60.0, 11.0);
 
   static final int POS_1 = 1;
   static final int POS_2 = 2;

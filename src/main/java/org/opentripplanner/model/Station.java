@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -17,7 +19,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -26,7 +27,6 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 public class Station extends TransitEntity implements StopCollection, LogInfo {
 
-  private static final long serialVersionUID = 1L;
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
   private final I18NString name;
@@ -72,23 +72,6 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
     this.geometry = computeGeometry(coordinate, Set.of());
   }
 
-  /**
-   * Create a minimal Station object for unit-test use, where the test only care about id, name and
-   * coordinate. The feedId is static set to "F"
-   */
-  public static Station stationForTest(String idAndName, double lat, double lon) {
-    return new Station(
-      new FeedScopedId("F", idAndName),
-      new NonLocalizedString(idAndName),
-      new WgsCoordinate(lat, lon),
-      idAndName,
-      new NonLocalizedString("Station " + idAndName),
-      null,
-      null,
-      StopTransferPriority.ALLOWED
-    );
-  }
-
   public void addChildStop(Stop stop) {
     this.childStops.add(stop);
     this.geometry = computeGeometry(coordinate, childStops);
@@ -98,10 +81,12 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
     return childStops.contains(stop);
   }
 
+  @Nonnull
   public I18NString getName() {
     return name;
   }
 
+  @Nonnull
   public Collection<StopLocation> getChildStops() {
     return childStops;
   }
@@ -114,20 +99,24 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
     return coordinate.longitude();
   }
 
+  @Nonnull
   public WgsCoordinate getCoordinate() {
     return coordinate;
   }
 
   /** Public facing station code (short text or number) */
+  @Nullable
   public String getCode() {
     return code;
   }
 
   /** Additional information about the station (if needed) */
+  @Nullable
   public I18NString getDescription() {
     return description;
   }
 
+  @Nullable
   public I18NString getUrl() {
     return url;
   }
@@ -141,10 +130,12 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
    * that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of adding
    * 0 - zero cost.
    */
+  @Nonnull
   public StopTransferPriority getPriority() {
     return priority;
   }
 
+  @Nullable
   public TimeZone getTimezone() {
     return timezone;
   }
@@ -153,6 +144,7 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
    * A geometry collection that contains the center point and the convex hull of all the child
    * stops.
    */
+  @Nonnull
   public GeometryCollection getGeometry() {
     return geometry;
   }
@@ -182,6 +174,7 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
   }
 
   @Override
+  @Nullable
   public String logName() {
     return name == null ? null : name.toString();
   }

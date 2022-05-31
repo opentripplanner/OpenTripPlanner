@@ -22,8 +22,10 @@ public interface StopLocation extends LogInfo {
   FeedScopedId getId();
 
   /** Name of the StopLocation, if provided */
+  @Nullable
   I18NString getName();
 
+  @Nullable
   I18NString getDescription();
 
   @Nullable
@@ -35,18 +37,22 @@ public interface StopLocation extends LogInfo {
    * The stop_code can be the same as id if it is public facing. This field should be left empty for
    * locations without a code presented to riders.
    */
+  @Nullable
   default String getCode() {
     return null;
   }
 
+  @Nullable
   default String getPlatformCode() {
     return null;
   }
 
+  @Nullable
   default TransitMode getVehicleType() {
     return null;
   }
 
+  @Nullable
   default String getVehicleSubmode() {
     return null;
   }
@@ -59,10 +65,12 @@ public interface StopLocation extends LogInfo {
     return getCoordinate().longitude();
   }
 
+  @Nullable
   default Station getParentStation() {
     return null;
   }
 
+  @Nonnull
   default Collection<FareZone> getFareZones() {
     return List.of();
   }
@@ -76,6 +84,7 @@ public interface StopLocation extends LogInfo {
    * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
    * which only permits one zone per stop.
    */
+  @Nullable
   default String getFirstZoneAsString() {
     return getFareZones().stream().map(t -> t.getId().getId()).findFirst().orElse(null);
   }
@@ -84,6 +93,7 @@ public interface StopLocation extends LogInfo {
    * Representative location for the StopLocation. Can either be the actual location of the stop, or
    * the centroid of an area or line.
    */
+  @Nonnull
   WgsCoordinate getCoordinate();
 
   /**
@@ -93,14 +103,17 @@ public interface StopLocation extends LogInfo {
    * <p>
    * For flex stops this will return the geometries of the stop or group of stops.
    */
+  @Nullable
   Geometry getGeometry();
 
+  @Nullable
   default TimeZone getTimeZone() {
     return null;
   }
 
   boolean isPartOfStation();
 
+  @Nonnull
   default StopTransferPriority getPriority() {
     return StopTransferPriority.ALLOWED;
   }

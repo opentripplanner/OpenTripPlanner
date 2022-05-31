@@ -7,7 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -20,8 +21,6 @@ import org.opentripplanner.util.NonLocalizedString;
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
 public final class Stop extends StationElement implements StopLocation {
-
-  private static final long serialVersionUID = 2L;
 
   private final Collection<FareZone> fareZones;
 
@@ -168,32 +167,44 @@ public final class Stop extends StationElement implements StopLocation {
     boardingAreas.add(boardingArea);
   }
 
+  @Override
+  @Nullable
   public I18NString getUrl() {
     return url;
   }
 
+  @Override
+  @Nullable
   public String getPlatformCode() {
     return platformCode;
   }
 
+  @Override
+  @Nullable
   public TransitMode getVehicleType() {
     return vehicleType;
   }
 
   @Override
+  @Nullable
   public String getVehicleSubmode() {
     return netexSubmode;
   }
 
+  @Override
+  @Nonnull
   public Collection<FareZone> getFareZones() {
     return Collections.unmodifiableCollection(fareZones);
   }
 
   @Override
+  @Nullable
   public Geometry getGeometry() {
     return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
   }
 
+  @Override
+  @Nullable
   public TimeZone getTimeZone() {
     return timeZone;
   }
@@ -202,7 +213,8 @@ public final class Stop extends StationElement implements StopLocation {
    * Get the transfer cost priority for Stop. This will fetch the value from the parent [if parent
    * exist] or return the default value.
    */
-  @NotNull
+  @Override
+  @Nonnull
   public StopTransferPriority getPriority() {
     return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
   }

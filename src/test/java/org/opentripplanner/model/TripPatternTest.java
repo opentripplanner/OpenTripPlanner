@@ -25,8 +25,8 @@ public class TripPatternTest {
    */
   @Test
   public void testSetHopGeometriesFromPattern() {
-    var stationOrigin = Station.stationForTest("S1", 0.0, 0.0);
-    var stationDestination = Station.stationForTest("S2", 1.0, 1.0);
+    var stationOrigin = TransitModelForTest.stationForTest("S1", 0.0, 0.0);
+    var stationDestination = TransitModelForTest.stationForTest("S2", 1.0, 1.0);
     var stopOrigin = TransitModelForTest.stopForTest("A1", 0.1, 0.1);
     var stopNewOrigin = TransitModelForTest.stopForTest("A2", 0.2, 0.2);
     var stopDestination = TransitModelForTest.stopForTest("C", 0.9, 0.9);
