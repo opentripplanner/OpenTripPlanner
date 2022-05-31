@@ -17,7 +17,7 @@ import org.opentripplanner.util.NonLocalizedString;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends Edge implements BikeWalkableEdge, ReluctanceEdge {
+public class PathwayEdge extends Edge implements BikeWalkableEdge, StreetCostCalculator {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
   private static final long serialVersionUID = -3311099256178798982L;
@@ -107,16 +107,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, ReluctanceEdg
         );
 
       if (options.wheelchairAccessibility.enabled()) {
-        if (this.slope > options.wheelchairAccessibility.maxSlope()) {
-          double tooSteepCostFactor = options.wheelchairAccessibility.slopeExceededReluctance();
-          if (tooSteepCostFactor < 0) {
-            return null;
-          }
-          weight *= tooSteepCostFactor;
-        }
-        if (!this.wheelchairAccessible) {
-          weight *= options.wheelchairAccessibility.inaccessibleStreetReluctance();
-        }
+        weight = addWheelchairCost(weight, options.wheelchairAccessibility);
       }
 
       s1.incrementTimeInSeconds(time);
@@ -169,5 +160,20 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, ReluctanceEdg
   @Override
   public boolean isStairs() {
     return steps > 0;
+  }
+
+  @Override
+  public boolean hasElevation() {
+    return slope != 0;
+  }
+
+  @Override
+  public float getMaxSlope() {
+    return (float) slope;
+  }
+
+  @Override
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
   }
 }

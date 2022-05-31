@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetEdge
   extends Edge
-  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, ReluctanceEdge {
+  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, StreetCostCalculator {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
   private static final long serialVersionUID = 1L;
@@ -587,6 +587,11 @@ public class StreetEdge
     return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
   }
 
+  @Override
+  public boolean hasElevation() {
+    return hasElevationExtension();
+  }
+
   public void setStairs(boolean stairs) {
     flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
   }
@@ -1105,25 +1110,7 @@ public class StreetEdge
     if (wheelchair.enabled()) {
       time = getEffectiveWalkDistance() / speed;
       weight = getEffectiveBikeDistance() / speed;
-
-      double slopeExceededBy = 0;
-
-      if (hasElevationExtension()) {
-        slopeExceededBy = wheelchair.maxSlope() - Math.abs(getMaxSlope());
-      }
-
-      if (slopeExceededBy > 0) {
-        double reluctance = wheelchair.slopeExceededReluctance();
-        if (reluctance > 0) {
-          // if we exceed the max slope the cost increases multiplied by how much you go over the maxSlope
-          var excessMultiplier = (slopeExceededBy * 1000) * reluctance;
-          weight *= excessMultiplier;
-        }
-      }
-
-      if (!this.isWheelchairAccessible()) {
-        weight *= wheelchair.inaccessibleStreetReluctance();
-      }
+      weight = addWheelchairCost(weight, wheelchair);
     } else if (walkingBike) {
       // take slopes into account when walking bikes
       time = weight = getEffectiveBikeDistance() / speed;
