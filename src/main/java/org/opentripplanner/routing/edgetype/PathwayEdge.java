@@ -17,11 +17,10 @@ import org.opentripplanner.util.NonLocalizedString;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends Edge implements BikeWalkableEdge {
+public class PathwayEdge extends Edge implements BikeWalkableEdge, ReluctanceEdge {
 
-  private static final long serialVersionUID = -3311099256178798982L;
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
-
+  private static final long serialVersionUID = -3311099256178798982L;
   private final I18NString name;
   private final int traversalTime;
   private final double distance;
@@ -106,7 +105,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     if (time > 0) {
       double weight =
         time *
-        options.getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
+        computeReluctance(
+          options,
+          TraverseMode.WALK,
+          s0.getNonTransitMode() == TraverseMode.BICYCLE
+        );
 
       if (options.wheelchairAccessibility.enabled()) {
         if (this.slope > options.wheelchairAccessibility.maxSlope()) {

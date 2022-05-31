@@ -43,7 +43,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author novalis
  */
-public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, CarPickupableEdge {
+public class StreetEdge
+  extends Edge
+  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, ReluctanceEdge {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
   private static final long serialVersionUID = 1L;
@@ -1066,7 +1068,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     } else if (isStairs()) {
       return req.stairsReluctance;
     } else {
-      return req.getReluctance(traverseMode, walkingBike);
+      return computeReluctance(req, traverseMode, walkingBike);
     }
   }
 

@@ -1162,22 +1162,6 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * The road speed for a specific traverse mode.
    */
-  public double getReluctance(TraverseMode mode, boolean walkingBike) {
-    switch (mode) {
-      case WALK:
-        return walkingBike ? bikeWalkingReluctance : walkReluctance;
-      case BICYCLE:
-        return bikeReluctance;
-      case CAR:
-        return carReluctance;
-      default:
-        throw new IllegalArgumentException("getReluctance(): Invalid mode " + mode);
-    }
-  }
-
-  /**
-   * The road speed for a specific traverse mode.
-   */
   public double getSpeed(TraverseMode mode, boolean walkingBike) {
     return switch (mode) {
       case WALK -> walkingBike ? bikeWalkingSpeed : walkSpeed;
