@@ -27,7 +27,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     return name;
   }
 
-  public AgencyBuilder setName(String name) {
+  public AgencyBuilder withName(String name) {
     this.name = name;
     return this;
   }
@@ -36,7 +36,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     return timezone;
   }
 
-  public AgencyBuilder setTimezone(String timezone) {
+  public AgencyBuilder withTimezone(String timezone) {
     this.timezone = timezone;
     return this;
   }
@@ -45,7 +45,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     return url;
   }
 
-  public AgencyBuilder setUrl(String url) {
+  public AgencyBuilder withUrl(String url) {
     this.url = url;
     return this;
   }
@@ -54,7 +54,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     return lang;
   }
 
-  public AgencyBuilder setLang(String lang) {
+  public AgencyBuilder withLang(String lang) {
     this.lang = lang;
     return this;
   }
@@ -63,7 +63,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     return phone;
   }
 
-  public AgencyBuilder setPhone(String phone) {
+  public AgencyBuilder withPhone(String phone) {
     this.phone = phone;
     return this;
   }
@@ -72,7 +72,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     return fareUrl;
   }
 
-  public AgencyBuilder setFareUrl(String fareUrl) {
+  public AgencyBuilder withFareUrl(String fareUrl) {
     this.fareUrl = fareUrl;
     return this;
   }
@@ -81,7 +81,7 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     return brandingUrl;
   }
 
-  public AgencyBuilder setBrandingUrl(String brandingUrl) {
+  public AgencyBuilder withBrandingUrl(String brandingUrl) {
     this.brandingUrl = brandingUrl;
     return this;
   }

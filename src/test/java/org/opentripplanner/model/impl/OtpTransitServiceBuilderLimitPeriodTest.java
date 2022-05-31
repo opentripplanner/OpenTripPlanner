@@ -14,7 +14,6 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
@@ -25,7 +24,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -141,7 +140,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
     // Verify trips in pattern (one trip is removed from patternInT1)
     assertEquals(1, patternInT1.scheduledTripsAsStream().count());
-    assertEquals(tripCSIn, patternInT1.scheduledTripsAsStream().findFirst().get());
+    assertEquals(tripCSIn, patternInT1.scheduledTripsAsStream().findFirst().orElseThrow());
 
     // Verify trips in pattern is unchanged (one trip)
     assertEquals(1, patternInT2.scheduledTripsAsStream().count());
@@ -194,10 +193,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private Trip createTrip(String id, FeedScopedId serviceId) {
-    Trip trip = new Trip(TransitModelForTest.id(id));
-    trip.setServiceId(serviceId);
-    trip.setDirection(Direction.valueOfGtfsCode(1));
-    trip.setRoute(route);
-    return trip;
+    return TransitModelForTest
+      .trip(id)
+      .withServiceId(serviceId)
+      .withDirection(Direction.valueOfGtfsCode(1))
+      .withRoute(route)
+      .build();
   }
 }

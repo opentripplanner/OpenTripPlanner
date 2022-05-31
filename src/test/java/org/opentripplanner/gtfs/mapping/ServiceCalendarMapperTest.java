@@ -1,15 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.calendar.ServiceDate.MAX_DATE;
 import static org.opentripplanner.model.calendar.ServiceDate.MIN_DATE;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -57,7 +57,7 @@ public class ServiceCalendarMapperTest {
 
   @Test
   public void testMapCollection() {
-    assertNull(null, subject.map((Collection<ServiceCalendar>) null));
+    assertNull(subject.map((Collection<ServiceCalendar>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(CALENDAR)).size());
   }

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router;
 import java.time.Duration;
 import java.time.Period;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
@@ -60,7 +61,7 @@ public class AdditionalSearchDays {
    */
   public int additionalSearchDaysInPast() {
     if (arriveBy) {
-      var sw = getMaximumSearchWindow();
+      var sw = getSearchWindowOrElseMax();
       var earliestStart = searchDateTime.minus(maxJourneyDuration.plus(sw));
       return daysInBetween(searchDateTime, earliestStart);
     } else {
@@ -75,15 +76,15 @@ public class AdditionalSearchDays {
     if (arriveBy) {
       return 0;
     } else {
-      var sw = getMaximumSearchWindow();
+      var sw = getSearchWindowOrElseMax();
       var requestTime = searchDateTime;
       var lastArrival = requestTime.plus(maxJourneyDuration.plus(sw));
       return daysInBetween(requestTime, lastArrival);
     }
   }
 
-  private Duration getMaximumSearchWindow() {
-    return searchWindow != null ? searchWindow : maxSearchWindow;
+  private Duration getSearchWindowOrElseMax() {
+    return Objects.requireNonNullElse(searchWindow, maxSearchWindow);
   }
 
   private int daysInBetween(ZonedDateTime requestTime, ZonedDateTime earliestStart) {

@@ -1,9 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Branding;
-import org.opentripplanner.transit.model.organization.BrandingBuilder;
 
 /**
  * Responsible for mapping NeTEx Branding into the OTP model.
@@ -26,19 +24,19 @@ public class BrandingMapper {
     var builder = Branding.of(idFactory.createId(branding.getId()));
 
     if (branding.getShortName() != null) {
-      builder.setShortName(branding.getShortName().getValue());
+      builder.withShortName(branding.getShortName().getValue());
     }
 
     if (branding.getName() != null) {
-      builder.setName(branding.getName().getValue());
+      builder.withName(branding.getName().getValue());
     }
 
     if (branding.getDescription() != null) {
-      builder.setDescription(branding.getDescription().getValue());
+      builder.withDescription(branding.getDescription().getValue());
     }
 
-    builder.setUrl(branding.getUrl());
-    builder.setImage(branding.getImage());
+    builder.withUrl(branding.getUrl());
+    builder.withImage(branding.getImage());
 
     return builder.build();
   }

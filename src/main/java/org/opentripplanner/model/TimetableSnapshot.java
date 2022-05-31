@@ -17,6 +17,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,13 +119,13 @@ public class TimetableSnapshot {
       TripTimes tripTimesToRemove = null;
       for (Timetable timetable : sortedTimetables) {
         if (timetable.isValidFor(serviceDate)) {
-          final int tripIndex = timetable.getTripIndex(tripId);
-          if (tripIndex == -1) {
+          final TripTimes tripTimes = timetable.getTripTimes(tripId);
+          if (tripTimes == null) {
             LOG.debug("No triptimes to remove for trip {}", tripId);
           } else if (tripTimesToRemove != null) {
             LOG.debug("Found two triptimes to remove for trip {}", tripId);
           } else {
-            tripTimesToRemove = timetable.getTripTimes(tripIndex);
+            tripTimesToRemove = tripTimes;
           }
         }
       }

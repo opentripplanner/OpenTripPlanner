@@ -50,8 +50,8 @@ public class TestBanning {
   }
 
   private List<Route> getTestRoutes() {
-    Agency agency1 = TransitModelForTest.agency("A").copy().setId(id("RUT:Agency:1")).build();
-    Agency agency2 = TransitModelForTest.agency("B").copy().setId(id("RUT:Agency:2")).build();
+    Agency agency1 = TransitModelForTest.agency("A").copy().withId(id("RUT:Agency:1")).build();
+    Agency agency2 = TransitModelForTest.agency("B").copy().withId(id("RUT:Agency:2")).build();
 
     return List.of(
       TransitModelForTest.route("RUT:Route:1").withAgency(agency1).build(),

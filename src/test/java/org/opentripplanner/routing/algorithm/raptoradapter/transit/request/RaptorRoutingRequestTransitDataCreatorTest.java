@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -112,7 +111,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     stopTime2.setArrivalTime(7200);
 
     return new TripTimes(
-      new Trip(TransitModelForTest.id("Test")),
+      TransitModelForTest.trip("Test").build(),
       Arrays.asList(stopTime1, stopTime2),
       new Deduplicator()
     );

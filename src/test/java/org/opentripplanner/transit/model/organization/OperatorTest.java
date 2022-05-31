@@ -16,20 +16,20 @@ class OperatorTest {
 
   private static final Operator subject = Operator
     .of(TransitModelForTest.id(ID))
-    .setName(NAME)
-    .setUrl(URL)
-    .setPhone(PHONE)
+    .withName(NAME)
+    .withUrl(URL)
+    .withPhone(PHONE)
     .build();
 
   @Test
   void copy() {
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().setName(NAME).build();
+    var copy = subject.copy().withName(NAME).build();
 
     assertSame(subject, copy);
 
     // Copy and change name
-    copy = subject.copy().setName("v2").build();
+    copy = subject.copy().withName("v2").build();
 
     // The two objects are not he same instance, but is equal(sae id)
     assertNotSame(copy, subject);

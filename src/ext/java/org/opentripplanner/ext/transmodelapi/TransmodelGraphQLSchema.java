@@ -56,11 +56,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeTy
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
 import org.opentripplanner.ext.transmodelapi.model.framework.SystemNoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ValidityPeriodType;
-import org.opentripplanner.ext.transmodelapi.model.network.DestinationDisplayType;
-import org.opentripplanner.ext.transmodelapi.model.network.GroupOfLinesType;
-import org.opentripplanner.ext.transmodelapi.model.network.JourneyPatternType;
-import org.opentripplanner.ext.transmodelapi.model.network.LineType;
-import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
+import org.opentripplanner.ext.transmodelapi.model.network.*;
 import org.opentripplanner.ext.transmodelapi.model.plan.LegType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PathGuidanceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PlanPlaceType;
@@ -88,6 +84,7 @@ import org.opentripplanner.ext.transmodelapi.model.timetable.ServiceJourneyType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.TripMetadataType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
@@ -245,6 +242,12 @@ public class TransmodelGraphQLSchema {
       tariffZoneType,
       gqlUtil
     );
+
+    GraphQLOutputType stopToStopGeometryType = StopToStopGeometryType.create(
+      linkGeometryType,
+      quayType
+    );
+
     GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(quayType, relay);
     GraphQLNamedOutputType placeAtDistanceType = PlaceAtDistanceType.create(relay, placeInterface);
 
@@ -284,6 +287,7 @@ public class TransmodelGraphQLSchema {
       quayType,
       lineType,
       ServiceJourneyType.REF,
+      stopToStopGeometryType,
       ptSituationElementType,
       gqlUtil
     );
@@ -874,15 +878,15 @@ public class TransmodelGraphQLSchema {
               filterByBikeRentalStations =
                 filterByIds.get("bikeRentalStations") != null
                   ? (List<String>) filterByIds.get("bikeRentalStations")
-                  : Collections.emptyList();
+                  : List.of();
               filterByBikeParks =
                 filterByIds.get("bikeParks") != null
                   ? (List<String>) filterByIds.get("bikeParks")
-                  : Collections.emptyList();
+                  : List.of();
               filterByCarParks =
                 filterByIds.get("carParks") != null
                   ? (List<String>) filterByIds.get("carParks")
-                  : Collections.emptyList();
+                  : List.of();
             }
 
             List<TransitMode> filterByTransportModes = environment.getArgument("filterByModes");
@@ -918,6 +922,23 @@ public class TransmodelGraphQLSchema {
                   GqlUtil.getRoutingService(environment)
                 );
 
+            if (TRUE.equals(environment.getArgument("filterByInUse"))) {
+              places =
+                places
+                  .stream()
+                  .filter(placeAtDistance -> {
+                    if (placeAtDistance.place() instanceof StopLocation stop) {
+                      return !GqlUtil
+                        .getRoutingService(environment)
+                        .getPatternsForStop(stop, true)
+                        .isEmpty();
+                    } else {
+                      return true;
+                    }
+                  })
+                  .toList();
+            }
+
             places =
               PlaceAtDistanceType
                 .convertQuaysToStopPlaces(
@@ -931,7 +952,7 @@ public class TransmodelGraphQLSchema {
                 .collect(Collectors.toList());
             if (places.isEmpty()) {
               return new DefaultConnection<>(
-                Collections.emptyList(),
+                List.of(),
                 new DefaultPageInfo(null, null, false, false)
               );
             }
@@ -1241,7 +1262,7 @@ public class TransmodelGraphQLSchema {
               )
               .filter(t ->
                 CollectionUtils.isEmpty(privateCodes) ||
-                privateCodes.contains(t.getInternalPlanningCode())
+                privateCodes.contains(t.getNetexInternalPlanningCode())
               )
               .filter(t ->
                 authorities == null ||

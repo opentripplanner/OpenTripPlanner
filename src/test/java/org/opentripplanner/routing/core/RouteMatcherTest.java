@@ -14,10 +14,10 @@ public class RouteMatcherTest {
 
   @Test
   public void testRouteMatcher() {
-    Route r1 = route("X").setId(new FeedScopedId("A1", "42")).withShortName("R1").build();
-    Route r2 = route("X").setId(new FeedScopedId("A1", "43")).withShortName("R2").build();
-    Route r1b = route("X").setId(new FeedScopedId("A2", "42")).withShortName("R1").build();
-    Route r3 = route("X").setId(new FeedScopedId("A1", "44")).withShortName("R3_b").build();
+    Route r1 = route("X").withId(new FeedScopedId("A1", "42")).withShortName("R1").build();
+    Route r2 = route("X").withId(new FeedScopedId("A1", "43")).withShortName("R2").build();
+    Route r1b = route("X").withId(new FeedScopedId("A2", "42")).withShortName("R1").build();
+    Route r3 = route("X").withId(new FeedScopedId("A1", "44")).withShortName("R3_b").build();
 
     RouteMatcher emptyMatcher = RouteMatcher.emptyMatcher();
     assertFalse(emptyMatcher.matches(r1));
@@ -74,7 +74,7 @@ public class RouteMatcherTest {
 
     Route r1c = TransitModelForTest
       .route("X")
-      .setId(new FeedScopedId("A_1", "R_42"))
+      .withId(new FeedScopedId("A_1", "R_42"))
       .withShortName("R_42")
       .build();
 

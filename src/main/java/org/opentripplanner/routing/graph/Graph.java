@@ -859,6 +859,38 @@ public class Graph implements Serializable {
     return stops.stream().map(index.getStopVertexForStop()::get).collect(Collectors.toSet());
   }
 
+  /**
+   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+   * @return The coordinate for the transit entity
+   */
+  public WgsCoordinate getCoordinateById(FeedScopedId id) {
+    // GroupOfStations
+    GroupOfStations groupOfStations = groupOfStationsById.get(id);
+    if (groupOfStations != null) {
+      return groupOfStations.getCoordinate();
+    }
+
+    // Multimodal station
+    MultiModalStation multiModalStation = multiModalStationById.get(id);
+    if (multiModalStation != null) {
+      return multiModalStation.getCoordinate();
+    }
+
+    // Station
+    Station station = stationById.get(id);
+    if (station != null) {
+      return station.getCoordinate();
+    }
+
+    // Single stop
+    var stop = index.getStopForId(id);
+    if (stop != null) {
+      return stop.getCoordinate();
+    }
+
+    return null;
+  }
+
   /** An OBA Service Date is a local date without timezone, only year month and day. */
   public BitSet getServicesRunningForDate(ServiceDate date) {
     BitSet services = new BitSet(calendarService.getServiceIds().size());

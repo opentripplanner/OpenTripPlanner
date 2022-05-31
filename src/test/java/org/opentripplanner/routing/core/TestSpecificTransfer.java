@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TestSpecificTransfer {
 
@@ -19,13 +19,11 @@ public class TestSpecificTransfer {
   public void testSpecificTransfer() {
     // Setup from trip with route
     Route fromRoute = TransitModelForTest.route("R1").build();
-    Trip fromTrip = new Trip(TransitModelForTest.id("T1"));
-    fromTrip.setRoute(fromRoute);
+    Trip fromTrip = Trip.of(TransitModelForTest.id("T1")).withRoute(fromRoute).build();
 
     // Setup to trip with route
     Route toRoute = TransitModelForTest.route("R2").build();
-    Trip toTrip = new Trip(TransitModelForTest.id("T2"));
-    toTrip.setRoute(toRoute);
+    Trip toTrip = Trip.of(TransitModelForTest.id("T2")).withRoute(toRoute).build();
 
     // Create full SpecificTransfer
     SpecificTransfer s1 = new SpecificTransfer(

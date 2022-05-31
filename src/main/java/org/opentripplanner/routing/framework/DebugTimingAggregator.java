@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.api.resource.TransitTimingOutput;
+import org.opentripplanner.routing.api.request.RoutingTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +79,8 @@ public class DebugTimingAggregator {
    * Record the time when we first began calculating a path for this request. Note that timings will
    * not include network and server request queue overhead, which is what we want.
    */
-  public DebugTimingAggregator(MeterRegistry registry, Collection<String> timingTags) {
-    var tags = MicrometerUtils.mapTimingTags(timingTags);
+  public DebugTimingAggregator(MeterRegistry registry, Collection<RoutingTag> routingRequestTags) {
+    var tags = MicrometerUtils.mapTimingTags(routingRequestTags);
     clock = registry.config().clock();
     startedCalculating = Timer.start(this.clock);
 

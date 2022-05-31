@@ -26,7 +26,7 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
     return shortName;
   }
 
-  public BrandingBuilder setShortName(String shortName) {
+  public BrandingBuilder withShortName(String shortName) {
     this.shortName = shortName;
     return this;
   }
@@ -35,7 +35,7 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
     return name;
   }
 
-  public BrandingBuilder setName(String name) {
+  public BrandingBuilder withName(String name) {
     this.name = name;
     return this;
   }
@@ -44,7 +44,7 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
     return url;
   }
 
-  public BrandingBuilder setUrl(String url) {
+  public BrandingBuilder withUrl(String url) {
     this.url = url;
     return this;
   }
@@ -53,7 +53,7 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
     return description;
   }
 
-  public BrandingBuilder setDescription(String description) {
+  public BrandingBuilder withDescription(String description) {
     this.description = description;
     return this;
   }
@@ -62,7 +62,7 @@ public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuil
     return image;
   }
 
-  public BrandingBuilder setImage(String image) {
+  public BrandingBuilder withImage(String image) {
     this.image = image;
     return this;
   }

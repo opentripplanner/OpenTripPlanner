@@ -678,19 +678,23 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Raptor can print all events when arriving at stops to system error. For developers only.
    */
   public DebugRaptor raptorDebugging = new DebugRaptor();
+
   /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
   public RaptorOptions raptorOptions = new RaptorOptions();
 
-  /* CONSTRUCTORS */
   /**
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
    * tags. Currently, all tags are added to all the timer instances for this request.
    */
-  public Tags tags = Tags.of();
+  public Set<RoutingTag> tags = Set.of();
+
   private Envelope fromEnvelope;
+
   private Envelope toEnvelope;
+
+  /* CONSTRUCTORS */
 
   /** Constructor for options; modes defaults to walk and transit */
   public RoutingRequest() {
@@ -1135,6 +1139,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
       clone.raptorOptions = new RaptorOptions(this.raptorOptions);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
+      clone.itineraryFilters = new ItineraryFilterParameters(this.itineraryFilters);
 
       return clone;
     } catch (CloneNotSupportedException e) {

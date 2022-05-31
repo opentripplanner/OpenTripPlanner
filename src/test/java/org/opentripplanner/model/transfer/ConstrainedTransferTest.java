@@ -3,8 +3,6 @@ package org.opentripplanner.model.transfer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_1;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_2;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1A;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1S;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2B;
@@ -12,12 +10,9 @@ import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2S
 import static org.opentripplanner.model.transfer.TransferTestData.STATION_POINT;
 import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_A;
 import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_B;
-import static org.opentripplanner.model.transfer.TransferTestData.TRIP_11;
-import static org.opentripplanner.model.transfer.TransferTestData.TRIP_21;
 import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_11_1;
 import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_21_3;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ConstrainedTransferTest {
@@ -66,14 +61,6 @@ public class ConstrainedTransferTest {
     TRIP_POINT_21_3,
     GUARANTIED
   );
-
-  @BeforeEach
-  public void setup() {
-    TRIP_11.setRoute(ROUTE_1);
-    TRIP_21.setRoute(ROUTE_2);
-    TRIP_11.setRoute(ROUTE_1);
-    TRIP_21.setRoute(ROUTE_2);
-  }
 
   @Test
   public void getSpecificityRanking() {

@@ -9,10 +9,10 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteMo
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LegacyGraphQLAlertEntityTypeResolver implements TypeResolver {
 

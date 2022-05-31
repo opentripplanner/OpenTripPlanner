@@ -10,7 +10,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.util.time.TimeUtils;
@@ -85,7 +84,7 @@ public class ToStringBuilderTest {
 
   @Test
   public void addObjOp() {
-    Trip trip = new Trip(TransitModelForTest.id("1"));
+    var trip = TransitModelForTest.trip("1").build();
     assertEquals(
       "ToStringBuilderTest{tripId: F:1}",
       subject().addObjOp("tripId", trip, TransitEntity::getId).toString()

@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.issues;
 
 import gnu.trove.list.TIntList;
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class RepeatedStops implements DataImportIssue {
 

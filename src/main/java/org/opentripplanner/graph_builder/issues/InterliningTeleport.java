@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class InterliningTeleport implements DataImportIssue {
 

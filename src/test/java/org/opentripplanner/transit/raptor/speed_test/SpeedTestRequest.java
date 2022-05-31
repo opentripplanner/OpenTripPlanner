@@ -6,8 +6,9 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Set;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.Tags;
+import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
@@ -73,7 +74,11 @@ public class SpeedTestRequest {
     }
 
     addDebugOptions(request, opts);
-    request.tags = Tags.of(testCase.definition().tags());
+    request.tags =
+      Set.of(
+        RoutingTag.testCaseSample(input.idAndDescription()),
+        RoutingTag.testCaseCategory(input.category())
+      );
 
     return request;
   }
