@@ -22,6 +22,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
@@ -36,6 +37,7 @@ import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.MonitoredCallStructure;
 import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri20.OccupancyEnumeration;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 
@@ -107,6 +109,8 @@ public class TimetableHelper {
 
     //Populate missing data from existing TripTimes
     newTimes.setServiceCode(oldTimes.getServiceCode());
+
+    OccupancyEnumeration journeyOccupancy = journey.getOccupancy();
 
     int callCounter = 0;
     ZonedDateTime departureDate = null;
@@ -214,6 +218,14 @@ public class TimetableHelper {
           lastDepartureDelay = departureDelay;
           departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
 
+          OccupancyEnumeration callOccupancy = recordedCall.getOccupancy() != null
+            ? recordedCall.getOccupancy()
+            : journeyOccupancy;
+
+          if (callOccupancy != null) {
+            newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(callOccupancy));
+          }
+
           alreadyVisited.add(recordedCall);
           break;
         }
@@ -314,6 +326,14 @@ public class TimetableHelper {
 
             departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
 
+            OccupancyEnumeration callOccupancy = estimatedCall.getOccupancy() != null
+              ? estimatedCall.getOccupancy()
+              : journeyOccupancy;
+
+            if (callOccupancy != null) {
+              newTimes.setOccupancyStatus(callCounter, resolveOccupancyStatus(callOccupancy));
+            }
+
             alreadyVisited.add(estimatedCall);
             break;
           }
@@ -373,6 +393,22 @@ public class TimetableHelper {
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
     return newTimes;
+  }
+
+  /**
+   * Maps the (very limited) SIRI 2.0 OccupancyEnum to internal OccupancyStatus
+   * @param occupancy
+   * @return
+   */
+  private static OccupancyStatus resolveOccupancyStatus(OccupancyEnumeration occupancy) {
+    if (occupancy != null) {
+      return switch (occupancy) {
+        case SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;
+        case STANDING_AVAILABLE -> OccupancyStatus.STANDING_ROOM_ONLY;
+        case FULL -> OccupancyStatus.FULL;
+      };
+    }
+    return OccupancyStatus.NO_DATA;
   }
 
   /**

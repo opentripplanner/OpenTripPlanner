@@ -97,6 +97,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   private StopRealTimeState[] stopRealTimeStates;
 
   /**
+   * This is only for API-purposes (does not affect routing). Non-final to allow updates.
+   */
+  private OccupancyStatus[] occupancyStatus;
+
+  /**
    * The real-time state of this TripTimes.
    */
   private RealTimeState realTimeState = RealTimeState.SCHEDULED;
@@ -290,6 +295,18 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       return false;
     }
     return stopRealTimeStates[stop] == StopRealTimeState.INACCURATE_PREDICTIONS;
+  }
+
+  public void setOccupancyStatus(int stop, OccupancyStatus occupancyStatus) {
+    prepareForRealTimeUpdates();
+    this.occupancyStatus[stop] = occupancyStatus;
+  }
+
+  public OccupancyStatus getOccupancyStatus(int stop) {
+    if (this.occupancyStatus == null) {
+      return OccupancyStatus.NO_DATA;
+    }
+    return this.occupancyStatus[stop];
   }
 
   public BookingInfo getDropOffBookingInfo(int stop) {
@@ -525,10 +542,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       this.arrivalTimes = Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length);
       this.departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
       this.stopRealTimeStates = new StopRealTimeState[arrivalTimes.length];
+      this.occupancyStatus = new OccupancyStatus[arrivalTimes.length];
       for (int i = 0; i < arrivalTimes.length; i++) {
         arrivalTimes[i] += timeShift;
         departureTimes[i] += timeShift;
         stopRealTimeStates[i] = StopRealTimeState.DEFAULT;
+        occupancyStatus[i] = OccupancyStatus.NO_DATA;
       }
 
       // Update the real-time state
