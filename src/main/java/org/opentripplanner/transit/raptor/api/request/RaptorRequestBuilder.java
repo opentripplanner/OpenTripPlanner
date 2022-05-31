@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
+import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -24,8 +25,8 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   // Search
   private final SearchParamsBuilder<T> searchParams;
   private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
-  // Timer
-  private final Set<String> timingTags;
+  // Tags, currently used for Micrometer tagging
+  private final Set<RoutingTag> tags;
   // Debug
   private final DebugRequestBuilder debug;
   private SearchDirection searchDirection;
@@ -47,7 +48,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     this.optimizations.addAll(defaults.optimizations());
 
     // Timer
-    timingTags = new HashSet<>(defaults.timingTags());
+    tags = new HashSet<>(defaults.tags());
 
     // Debug
     this.debug = new DebugRequestBuilder(defaults.debug());
@@ -102,13 +103,13 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     return this;
   }
 
-  public RaptorRequestBuilder<T> addTimingTags(Collection<String> tags) {
-    this.timingTags.addAll(tags);
+  public RaptorRequestBuilder<T> addTags(Collection<RoutingTag> tags) {
+    this.tags.addAll(tags);
     return this;
   }
 
-  public Set<String> timingTags() {
-    return timingTags;
+  public Set<RoutingTag> tags() {
+    return tags;
   }
 
   public DebugRequestBuilder debug() {
