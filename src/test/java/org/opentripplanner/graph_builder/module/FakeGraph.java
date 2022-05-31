@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 /**
  * Get graphs of Columbus Ohio with real OSM streets and a synthetic transit system for use in
@@ -73,7 +74,7 @@ public class FakeGraph {
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
         String id = Integer.toString(count++);
-        Stop stop = Stop.stopForTest(id, lat, lon);
+        Stop stop = TransitModelForTest.stopForTest(id, lat, lon);
         new TransitStopVertex(g, stop, null);
       }
     }
@@ -85,7 +86,7 @@ public class FakeGraph {
     double lon = -83;
     for (double lat = 40; lat < 40.01; lat += 0.005) {
       String id = "EXTRA_" + count++;
-      Stop stop = Stop.stopForTest(id, lat, lon);
+      Stop stop = TransitModelForTest.stopForTest(id, lat, lon);
       new TransitStopVertex(g, stop, null);
     }
 
@@ -93,7 +94,7 @@ public class FakeGraph {
     lon = -83.1341 + 0.1;
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       String id = "DUPE_" + count++;
-      Stop stop = Stop.stopForTest(id, lat, lon);
+      Stop stop = TransitModelForTest.stopForTest(id, lat, lon);
       new TransitStopVertex(g, stop, null);
     }
 
@@ -101,7 +102,7 @@ public class FakeGraph {
     lon = -83.1341 + 0.15;
     for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
       String id = "ALMOST_" + count++;
-      Stop stop = Stop.stopForTest(id, lat, lon);
+      Stop stop = TransitModelForTest.stopForTest(id, lat, lon);
       new TransitStopVertex(g, stop, null);
     }
   }

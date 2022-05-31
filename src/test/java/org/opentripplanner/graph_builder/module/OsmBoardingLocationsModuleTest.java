@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
@@ -29,7 +30,7 @@ import org.opentripplanner.transit.model.network.TransitMode;
 class OsmBoardingLocationsModuleTest {
 
   File file = new File(ConstantsForTests.HERRENBERG_OSM);
-  Stop stop = Stop.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
+  Stop stop = TransitModelForTest.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
 
   @Test
   void extractBoardingLocations() {

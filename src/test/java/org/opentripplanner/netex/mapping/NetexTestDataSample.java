@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
@@ -184,7 +183,7 @@ class NetexTestDataSample {
     // Setup stops
     for (int i = 0; i < NUM_OF_STOPS; i++) {
       String stopId = "NSR:Quay:" + (i + 1);
-      stopsById.add(Stop.stopForTest(stopId, 60.0, 10.0));
+      stopsById.add(TransitModelForTest.stopForTest(stopId, 60.0, 10.0));
       quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
     }
   }

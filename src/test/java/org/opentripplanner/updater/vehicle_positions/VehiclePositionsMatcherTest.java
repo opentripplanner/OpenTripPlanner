@@ -16,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
@@ -216,7 +215,7 @@ public class VehiclePositionsMatcherTest {
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);
 
-    var stop = Stop.stopForTest("stop-" + seq, 0, 0);
+    var stop = TransitModelForTest.stopForTest("stop-" + seq, 0, 0);
     stopTime.setStop(stop);
 
     return stopTime;

@@ -24,11 +24,11 @@ public class StopIndexForRaptorTest {
 
   private final FeedScopedId ANY_ID = TransitModelForTest.id("1");
 
-  private final Stop STOP_0 = Stop.stopForTest("ID-" + 1, 0.0, 0.0);
-  private final Stop STOP_1 = Stop.stopForTest("ID-" + 2, 0.0, 0.0);
-  private final Stop STOP_2 = Stop.stopForTest("ID-" + 3, 0.0, 0.0);
-  private final Stop STOP_3 = Stop.stopForTest("ID-" + 4, 0.0, 0.0);
-  private final Stop STOP_4 = Stop.stopForTest("ID-" + 5, 0.0, 0.0);
+  private final Stop STOP_0 = TransitModelForTest.stopForTest("ID-" + 1, 0.0, 0.0);
+  private final Stop STOP_1 = TransitModelForTest.stopForTest("ID-" + 2, 0.0, 0.0);
+  private final Stop STOP_2 = TransitModelForTest.stopForTest("ID-" + 3, 0.0, 0.0);
+  private final Stop STOP_3 = TransitModelForTest.stopForTest("ID-" + 4, 0.0, 0.0);
+  private final Stop STOP_4 = TransitModelForTest.stopForTest("ID-" + 5, 0.0, 0.0);
 
   private final List<StopLocation> STOPS = Arrays.asList(STOP_0, STOP_1, STOP_2, STOP_3, STOP_4);
 

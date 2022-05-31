@@ -23,6 +23,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 
@@ -64,7 +65,7 @@ public class LinkStopToPlatformTest {
     edges.add(createAreaEdge(vertices.get(4), vertices.get(3), areaEdgeList, "edge 9"));
     edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
-    Stop stop = Stop.stopForTest("TestStop", 59.13545, 10.22213);
+    Stop stop = TransitModelForTest.stopForTest("TestStop", 59.13545, 10.22213);
 
     TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, null);
   }

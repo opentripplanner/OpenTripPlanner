@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
@@ -124,7 +123,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
    */
   private static StopTime createStopTime() {
     var st = new StopTime();
-    st.setStop(Stop.stopForTest("Stop:1", 0.0, 0.0));
+    st.setStop(TransitModelForTest.stopForTest("Stop:1", 0.0, 0.0));
     return st;
   }
 

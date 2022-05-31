@@ -40,7 +40,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
 
-  private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
+  private static final Stop STOP_FOR_TEST = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
 
   private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
     WheelchairAccessibilityRequest.DEFAULT;
@@ -57,8 +57,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
       ? WheelchairAccessibility.POSSIBLE
       : WheelchairAccessibility.NOT_POSSIBLE;
 
-    var firstStop = Stop.stopForTest("TEST:START", wheelchairBoarding, 0.0, 0.0);
-    var lastStop = Stop.stopForTest("TEST:END", wheelchairBoarding, 0.0, 0.0);
+    var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchairBoarding, 0.0, 0.0);
+    var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchairBoarding, 0.0, 0.0);
 
     var stopTimeStart = new StopTime();
     var stopTimeEnd = new StopTime();

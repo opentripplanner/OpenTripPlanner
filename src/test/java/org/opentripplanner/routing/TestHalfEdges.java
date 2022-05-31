@@ -45,6 +45,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TestUtils;
@@ -159,9 +160,9 @@ public class TestHalfEdges {
         true
       );
 
-    Stop s1 = Stop.stopForTest("fleem station", 40.0099999, -74.005);
+    Stop s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
 
-    Stop s2 = Stop.stopForTest("morx station", 40.0099999, -74.002);
+    Stop s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
 
     station1 = new TransitStopVertex(graph, s1, null);
     station2 = new TransitStopVertex(graph, s2, null);

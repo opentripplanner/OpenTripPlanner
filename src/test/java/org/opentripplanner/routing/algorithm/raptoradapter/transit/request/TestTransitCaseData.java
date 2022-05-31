@@ -4,16 +4,17 @@ import java.time.LocalDate;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public final class TestTransitCaseData {
 
   public static final Station STATION_A = Station.stationForTest("A", 60.0, 11.1);
   public static final Station STATION_B = Station.stationForTest("B", 61.0, 11.5);
 
-  public static final Stop STOP_A = Stop.stopForTest("A", 60.0, 11.0, STATION_A);
-  public static final Stop STOP_B = Stop.stopForTest("B", 60.0, 11.2, STATION_B);
-  public static final Stop STOP_C = Stop.stopForTest("C", 61.0, 11.4);
-  public static final Stop STOP_D = Stop.stopForTest("D", 61.0, 11.6);
+  public static final Stop STOP_A = TransitModelForTest.stopForTest("A", 60.0, 11.0, STATION_A);
+  public static final Stop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.2, STATION_B);
+  public static final Stop STOP_C = TransitModelForTest.stopForTest("C", 61.0, 11.4);
+  public static final Stop STOP_D = TransitModelForTest.stopForTest("D", 61.0, 11.6);
 
   // Random order stop indexes - should be different from stopPos in pattern to
   // make sure code-under-test do not mix stopIndex and stopPosition

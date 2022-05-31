@@ -15,10 +15,10 @@ public class TransferTestData {
   static final int POS_3 = 3;
   static final int ANY_POS = 999;
 
-  static final Stop STOP_A = Stop.stopForTest("A", 60.0, 11.0);
-  static final Stop STOP_B = Stop.stopForTest("B", 60.0, 11.0);
-  static final Stop STOP_S = Stop.stopForTest("S", 60.0, 11.0);
-  static final Stop ANY_STOP = Stop.stopForTest("any", 60.0, 11.0);
+  static final Stop STOP_A = TransitModelForTest.stopForTest("A", 60.0, 11.0);
+  static final Stop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.0);
+  static final Stop STOP_S = TransitModelForTest.stopForTest("S", 60.0, 11.0);
+  static final Stop ANY_STOP = TransitModelForTest.stopForTest("any", 60.0, 11.0);
 
   static final Route ROUTE_1 = TransitModelForTest.route("1").build();
   static final Route ROUTE_2 = TransitModelForTest.route("2").build();

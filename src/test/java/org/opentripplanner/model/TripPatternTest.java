@@ -27,9 +27,9 @@ public class TripPatternTest {
   public void testSetHopGeometriesFromPattern() {
     var stationOrigin = Station.stationForTest("S1", 0.0, 0.0);
     var stationDestination = Station.stationForTest("S2", 1.0, 1.0);
-    var stopOrigin = Stop.stopForTest("A1", 0.1, 0.1);
-    var stopNewOrigin = Stop.stopForTest("A2", 0.2, 0.2);
-    var stopDestination = Stop.stopForTest("C", 0.9, 0.9);
+    var stopOrigin = TransitModelForTest.stopForTest("A1", 0.1, 0.1);
+    var stopNewOrigin = TransitModelForTest.stopForTest("A2", 0.2, 0.2);
+    var stopDestination = TransitModelForTest.stopForTest("C", 0.9, 0.9);
     var coordinate = new Coordinate(0.5, 0.5);
 
     stopNewOrigin.setParentStation(stationOrigin);
