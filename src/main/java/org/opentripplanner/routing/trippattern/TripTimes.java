@@ -521,6 +521,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     for (final StopTime st : stopTimes) {
       if (st.getHeadsignVias() == null) {
         vias[i] = EMPTY_STRING_ARRAY;
+        i++;
         continue;
       }
 
