@@ -9,7 +9,7 @@ public interface StreetCostCalculator {
 
   boolean hasElevation();
 
-  float getMaxSlope();
+  double getMaxSlope();
 
   boolean isWheelchairAccessible();
 
@@ -17,10 +17,10 @@ public interface StreetCostCalculator {
     double slopeExceededBy = 0;
 
     if (hasElevation()) {
-      slopeExceededBy = wheelchair.maxSlope() - Math.abs(getMaxSlope());
+      slopeExceededBy = Math.abs(getMaxSlope()) - wheelchair.maxSlope();
     }
 
-    if (slopeExceededBy > 0) {
+    if (slopeExceededBy > 0.00001) {
       double reluctance = wheelchair.slopeExceededReluctance();
       if (reluctance > 0) {
         // if we exceed the max slope the cost increases multiplied by how much you go over the maxSlope

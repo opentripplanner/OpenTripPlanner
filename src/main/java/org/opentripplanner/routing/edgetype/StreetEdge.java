@@ -260,8 +260,8 @@ public class StreetEdge
     return hasElevationExtension() && elevationExtension.isFlattened();
   }
 
-  public float getMaxSlope() {
-    return hasElevationExtension() ? elevationExtension.getMaxSlope() : 0.0f;
+  public double getMaxSlope() {
+    return hasElevationExtension() ? elevationExtension.getMaxSlope() : 0.0d;
   }
 
   public boolean isNoThruTraffic(TraverseMode traverseMode) {

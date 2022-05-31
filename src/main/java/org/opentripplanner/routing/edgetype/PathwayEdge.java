@@ -168,8 +168,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, StreetCostCal
   }
 
   @Override
-  public float getMaxSlope() {
-    return (float) slope;
+  public double getMaxSlope() {
+    return slope;
   }
 
   @Override

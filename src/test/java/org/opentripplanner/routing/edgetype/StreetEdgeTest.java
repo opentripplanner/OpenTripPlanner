@@ -197,12 +197,12 @@ class StreetEdgeTest extends GraphRoutingTest {
   }
 
   static Stream<Arguments> slopeCases = Stream.of(
-    Arguments.of(0.07f, 6908), // no extra cost
-    Arguments.of(0.08f, 6908), // no extra cost
+    Arguments.of(0.07f, 5081), // no extra cost
+    Arguments.of(0.08f, 5945), // no extra cost
     Arguments.of(0.09f, 6908), // no extra cost
-    Arguments.of(0.091f, 7599), // 0.1 % above the max slope, tiny extra cost
-    Arguments.of(0.0915f, 11398), // 0.15 % above the max slope, will incur larger cost
-    Arguments.of(0.11f, 151982) // 2 % above max slope, will incur very large cost
+    Arguments.of(0.091f, 7708), // 0.1 % above the max slope, tiny extra cost
+    Arguments.of(0.0915f, 11645), // 0.15 % above the max slope, will incur larger cost
+    Arguments.of(0.11f, 194144) // 2 % above max slope, will incur very large cost
   );
 
   /**
@@ -214,9 +214,8 @@ class StreetEdgeTest extends GraphRoutingTest {
    */
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
   @VariableSource("slopeCases")
-  public void shouldScaleCostWithMaxSlope(float maxSlope, long expectedCost) {
+  public void shouldScaleCostWithMaxSlope(float slope, long expectedCost) {
     double length = 1000;
-    double slope = 0.09; // edge has a slope of 9 percent
     var edge = new StreetEdge(
       V1,
       V2,
@@ -245,7 +244,7 @@ class StreetEdgeTest extends GraphRoutingTest {
         ofOnlyAccessible(),
         ofOnlyAccessible(),
         25,
-        maxSlope,
+        0.09,
         1.1f,
         10
       );
