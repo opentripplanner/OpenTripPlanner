@@ -152,7 +152,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     StreetMode.WALK,
     StreetMode.WALK,
     StreetMode.WALK,
-    AllowedTransitMode.getAllTransitModes()
+    AllowedTransitMode.ofAllTransitModes()
   );
   /**
    * The set of TraverseModes allowed when doing creating sub requests and doing street routing. //

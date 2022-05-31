@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -285,7 +284,7 @@ public class TransmodelGraphQLPlanner {
 
       List<AllowedTransitMode> transitModes = new ArrayList<>();
       if (transportModes.get() == null) {
-        transitModes.addAll(AllowedTransitMode.getAllTransitModes());
+        transitModes.add(AllowedTransitMode.ALLOWED_ALL_TRANSIT_MODES);
       } else {
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
@@ -294,8 +293,12 @@ public class TransmodelGraphQLPlanner {
               List<TransmodelTransportSubmode> transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
                 "transportSubModes"
               );
-              for (TransmodelTransportSubmode transitMode : transportSubModes) {
-                transitModes.add(new AllowedTransitMode(mainMode, transitMode.getValue()));
+              for (TransmodelTransportSubmode submode : transportSubModes) {
+                if (submode == TransmodelTransportSubmode.UNKNOWN) {
+                  transitModes.add(AllowedTransitMode.ofUnknownSubModes(mainMode));
+                } else {
+                  transitModes.add(AllowedTransitMode.of(mainMode, submode.getValue()));
+                }
               }
             } else {
               transitModes.add(AllowedTransitMode.fromMainModeEnum(mainMode));

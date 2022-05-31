@@ -10,7 +10,7 @@ public class AllowedTransitModeTest {
 
   @Test
   public void testMainModeMatch() {
-    final var ALLOWED_TRANSIT_MODE = AllowedTransitMode.fromMainModeEnum(TransitMode.BUS);
+    final var ALLOWED_TRANSIT_MODE = AllowedTransitMode.of(TransitMode.BUS);
     assertTrue(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, null));
     assertTrue(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, "something"));
     assertFalse(ALLOWED_TRANSIT_MODE.allows(TransitMode.RAIL, null));
@@ -20,18 +20,18 @@ public class AllowedTransitModeTest {
   @Test
   public void testSubmodeMatch() {
     final var SUBMODE = "shuttleBus";
-    final var ALLOWED_TRANSIT_MODE = new AllowedTransitMode(TransitMode.BUS, SUBMODE);
+    final var subject = AllowedTransitMode.of(TransitMode.BUS, SUBMODE);
 
-    assertTrue(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, SUBMODE));
-    assertFalse(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, "other"));
-    assertFalse(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, null));
+    assertTrue(subject.allows(TransitMode.BUS, SUBMODE));
+    assertFalse(subject.allows(TransitMode.BUS, "other"));
+    assertFalse(subject.allows(TransitMode.BUS, null));
   }
 
   @Test
   public void testUnknownSubmodeMatch() {
-    final var SUBMODE = "unknown";
-    final var ALLOWED_TRANSIT_MODE = new AllowedTransitMode(TransitMode.BUS, SUBMODE);
+    final var ALLOWED_TRANSIT_MODE = AllowedTransitMode.ofUnknownSubModes(TransitMode.BUS);
 
     assertTrue(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, null));
+    assertFalse(ALLOWED_TRANSIT_MODE.allows(TransitMode.BUS, "shuttleBus"));
   }
 }

@@ -1,8 +1,7 @@
 package org.opentripplanner.model.modes;
 
-import java.util.Arrays;
+import java.io.Serializable;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
@@ -11,64 +10,47 @@ import org.opentripplanner.transit.model.network.TransitMode;
  * accepted. This class is separated from the TransitMode class because the meanings of the fields
  * are slightly different.
  */
-public class AllowedTransitMode {
+public interface AllowedTransitMode extends Serializable {
+  AllowedAllTransitModes ALLOWED_ALL_TRANSIT_MODES = new AllowedAllTransitModes();
 
-  private final TransitMode mainMode;
-
-  private final String subMode;
-
-  private static final String UNKNOWN = "unknown";
-
-  public AllowedTransitMode(TransitMode mainMode, String subMode) {
-    this.mainMode = mainMode;
-    this.subMode = subMode;
+  static AllowedTransitMode fromMainModeEnum(TransitMode mainMode) {
+    return new AllowedMainTransitMode(mainMode);
   }
 
-  public static AllowedTransitMode fromMainModeEnum(TransitMode mainMode) {
-    return new AllowedTransitMode(mainMode, null);
+  static AllowedTransitMode of(TransitMode mainMode, String subMode) {
+    if (subMode == null) {
+      return of(mainMode);
+    }
+    if (mainMode == null) {
+      throw new IllegalArgumentException("Main mode is requiered with submode: " + subMode);
+    }
+    return new AllowedMainAndSubTransitMode(mainMode, subMode);
+  }
+
+  static AllowedTransitMode of(TransitMode mainMode) {
+    if (mainMode == null) {
+      return ALLOWED_ALL_TRANSIT_MODES;
+    }
+    return new AllowedMainTransitMode(mainMode);
+  }
+
+  /**
+   * Returns a matcher for trips matching the given main mode with no submode set. If main mode is
+   * BUS, all busses without any sub-mode is included.
+   */
+  static AllowedTransitMode ofUnknownSubModes(TransitMode mainMode) {
+    return new AllowedUnknownSubTransitMode(mainMode);
   }
 
   /**
    * Returns a set of AllowedModes that will cover all available TransitModes.
    */
-  public static Set<AllowedTransitMode> getAllTransitModes() {
-    return Arrays
-      .stream(TransitMode.values())
-      .map(m -> new AllowedTransitMode(m, null))
-      .collect(Collectors.toSet());
-  }
-
-  /**
-   * Returns a set of AllowedModes that will cover all available TransitModes except airplane.
-   */
-  public static Set<AllowedTransitMode> getAllTransitModesExceptAirplane() {
-    return TransitMode
-      .transitModesExceptAirplane()
-      .stream()
-      .map(m -> new AllowedTransitMode(m, null))
-      .collect(Collectors.toSet());
+  static Set<AllowedTransitMode> ofAllTransitModes() {
+    return Set.of(ALLOWED_ALL_TRANSIT_MODES);
   }
 
   /**
    * Check if this filter allows the provided TransitMode
    */
-  public boolean allows(TransitMode transitMode, String netexSubMode) {
-    boolean mainModeMatch = mainMode == transitMode;
-    boolean submodeMatch =
-      subMode == null ||
-      subMode.equals(netexSubMode) ||
-      (UNKNOWN.equals(subMode) && netexSubMode == null);
-    return mainModeMatch && submodeMatch;
-  }
-
-  public TransitMode getMainMode() {
-    return mainMode;
-  }
-
-  /**
-   * Is the sub-mode set for this main mode
-   */
-  public boolean hasSubMode() {
-    return subMode != null;
-  }
+  boolean allows(TransitMode transitMode, String netexSubMode);
 }

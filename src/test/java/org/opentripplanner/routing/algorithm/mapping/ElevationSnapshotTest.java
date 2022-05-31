@@ -113,7 +113,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         null,
-        AllowedTransitMode.getAllTransitModes()
+        AllowedTransitMode.ofAllTransitModes()
       );
     request.from = p1;
     request.to = p3;
@@ -136,7 +136,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         null,
-        AllowedTransitMode.getAllTransitModes()
+        AllowedTransitMode.ofAllTransitModes()
       );
     request.from = p3;
     request.to = p1;

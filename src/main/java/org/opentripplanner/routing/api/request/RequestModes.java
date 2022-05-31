@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -14,7 +13,7 @@ public class RequestModes {
     StreetMode.WALK,
     StreetMode.WALK,
     StreetMode.WALK,
-    new HashSet<>(AllowedTransitMode.getAllTransitModes())
+    AllowedTransitMode.ofAllTransitModes()
   );
 
   @Nonnull
@@ -44,7 +43,7 @@ public class RequestModes {
       (transferMode != null && transferMode.transfer) ? transferMode : StreetMode.NOT_SET;
     this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : StreetMode.NOT_SET;
     this.directMode = directMode != null ? directMode : StreetMode.NOT_SET;
-    this.transitModes = transitModes != null ? new HashSet<>(transitModes) : Set.of();
+    this.transitModes = transitModes != null ? Set.copyOf(transitModes) : Set.of();
   }
 
   public boolean contains(StreetMode streetMode) {

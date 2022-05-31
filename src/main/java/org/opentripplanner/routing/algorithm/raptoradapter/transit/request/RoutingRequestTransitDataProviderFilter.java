@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
-import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
@@ -46,26 +44,15 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
-    boolean hasOnlyMainModeFilters = allowedTransitModes
-      .stream()
-      .noneMatch(AllowedTransitMode::hasSubMode);
 
     // It is much faster to do a lookup in an EnumSet, so we use it if we don't want to filter
     // using submodes
-    if (hasOnlyMainModeFilters) {
-      EnumSet<TransitMode> allowedMainModes = allowedTransitModes
-        .stream()
-        .map(AllowedTransitMode::getMainMode)
-        .collect(Collectors.toCollection(() -> EnumSet.noneOf(TransitMode.class)));
-      transitModeIsAllowed = (Trip trip) -> allowedMainModes.contains(trip.getMode());
-    } else {
-      transitModeIsAllowed =
-        (Trip trip) -> {
-          TransitMode transitMode = trip.getMode();
-          String netexSubmode = trip.getNetexSubmode();
-          return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
-        };
-    }
+    transitModeIsAllowed =
+      (Trip trip) -> {
+        TransitMode transitMode = trip.getMode();
+        String netexSubmode = trip.getNetexSubmode();
+        return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
+      };
   }
 
   public RoutingRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {

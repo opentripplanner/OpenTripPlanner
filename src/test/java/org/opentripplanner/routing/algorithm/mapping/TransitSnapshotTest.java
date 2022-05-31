@@ -130,7 +130,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowedTransitMode.getAllTransitModes()
+        AllowedTransitMode.ofAllTransitModes()
       );
     request.from = p1;
     request.to = p2;
@@ -148,7 +148,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowedTransitMode.getAllTransitModes()
+        AllowedTransitMode.ofAllTransitModes()
       );
     request.from = ps;
     request.to = p3;
@@ -167,7 +167,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowedTransitMode.getAllTransitModes()
+        AllowedTransitMode.ofAllTransitModes()
       );
     request.from = ptc;
     request.to = p3;

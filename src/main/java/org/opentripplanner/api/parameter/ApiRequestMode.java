@@ -21,7 +21,7 @@ public enum ApiRequestMode {
   CABLE_CAR(fromMainModeEnum(TransitMode.CABLE_CAR)),
   GONDOLA(fromMainModeEnum(TransitMode.GONDOLA)),
   FUNICULAR(fromMainModeEnum(TransitMode.FUNICULAR)),
-  TRANSIT(AllowedTransitMode.getAllTransitModes()),
+  TRANSIT(AllowedTransitMode.ofAllTransitModes()),
   AIRPLANE(fromMainModeEnum(TransitMode.AIRPLANE)),
   TROLLEYBUS(fromMainModeEnum(TransitMode.TROLLEYBUS)),
   MONORAIL(fromMainModeEnum(TransitMode.MONORAIL)),
