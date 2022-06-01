@@ -3,6 +3,7 @@ package org.opentripplanner.routing.impl;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -56,7 +57,12 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getStopAlerts(FeedScopedId stopId) {
-    Set<TransitAlert> result = new HashSet<>(alerts.get(new EntitySelector.Stop(stopId)));
+    // TODO StopConditions: Need to take the required StopConditions into account.
+    //  These are matched using equals/hashCode, but required StopConditions do not necessarily
+    //  match, but may be a subset/superset.
+    Set<TransitAlert> result = new HashSet<>(
+      alerts.get(new EntitySelector.Stop(stopId, Collections.EMPTY_SET))
+    );
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
       if (graph != null && graph.index != null) {
@@ -96,6 +102,10 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getStopAndRouteAlerts(FeedScopedId stop, FeedScopedId route) {
+    // TODO StopConditions: Need to take the required StopConditions into account.
+    //  These are matched using equals/hashCode, but required StopConditions do not necessarily
+    //  match, but may be a subset/superset.
+
     return alerts.get(new EntitySelector.StopAndRoute(stop, route));
   }
 
@@ -105,6 +115,10 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     FeedScopedId trip,
     ServiceDate serviceDate
   ) {
+    // TODO StopConditions: Need to take the required StopConditions into account.
+    //  These are matched using equals/hashCode, but required StopConditions do not necessarily
+    //  match, but may be a subset/superset.
+
     return alerts.get(new EntitySelector.StopAndTrip(stop, trip, serviceDate));
   }
 

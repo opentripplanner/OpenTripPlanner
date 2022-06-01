@@ -1,8 +1,12 @@
 package org.opentripplanner.routing.alertpatch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collections;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
@@ -117,5 +121,32 @@ public class EntitySelectorTest {
 
     // Assert NO match on another date
     assertNotEquals(key, new EntitySelector.Trip(tripId, serviceDate.next()));
+  }
+
+  @Test
+  public void testStopConditionMatcher() {
+    // Assert default behaviour - no StopConditions should always return "true"
+    assertTrue(
+      EntitySelectorHelper.matchesStopCondition(Collections.EMPTY_SET, Set.of(StopCondition.STOP))
+    );
+
+    assertTrue(
+      EntitySelectorHelper.matchesStopCondition(Set.of(StopCondition.STOP), Collections.EMPTY_SET)
+    );
+
+    // Assert match - since StopCondition not edmpty, it must match
+    assertTrue(
+      EntitySelectorHelper.matchesStopCondition(
+        Set.of(StopCondition.START_POINT),
+        Set.of(StopCondition.START_POINT)
+      )
+    );
+
+    assertFalse(
+      EntitySelectorHelper.matchesStopCondition(
+        Set.of(StopCondition.START_POINT),
+        Set.of(StopCondition.STOP)
+      )
+    );
   }
 }

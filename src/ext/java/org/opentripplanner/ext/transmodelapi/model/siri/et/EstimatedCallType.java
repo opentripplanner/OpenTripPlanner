@@ -24,6 +24,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -388,6 +389,9 @@ public class EstimatedCallType {
 
     final ServiceDate serviceDate = tripTimeOnDate.getServiceDay();
 
+    // TODO StopConditions: To ensure correct handling of StopConditions, these need to be taken
+    //  into account when fetching relevant alerts -e.g.
+    //  alertPatchService.getStopAlerts(stopId, stopConditions)
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
     allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate));
@@ -439,13 +443,15 @@ public class EstimatedCallType {
       alertPatches.removeIf(alertPatch ->
         !alertPatch.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)
       );
-
-      alertPatches.removeIf(alert ->
-        !alert.getStopConditions().isEmpty() &&
-        stopConditions
-          .stream()
-          .noneMatch(stopCondition -> alert.getStopConditions().contains(stopCondition))
-      );
+      //TODO StopConditions: We need to check that the Alert's EntitySelector that matches the
+      // criteria actually has the correct/required StopConditions set. I.e. this filtering has
+      // to be done before entering this method
+      //      alertPatches.removeIf(alert ->
+      //        !alert.getStopConditions().isEmpty() &&
+      //        stopConditions
+      //          .stream()
+      //          .noneMatch(stopCondition -> alert.getStopConditions().contains(stopCondition))
+      //      );
     }
   }
 }

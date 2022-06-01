@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.routing.alertpatch.EntitySelectorHelper.matchesStopCondition;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +12,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -113,20 +116,9 @@ public class AlertToLegMapper {
     if (alertPatches != null) {
       for (TransitAlert alert : alertPatches) {
         if (alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond())) {
-          if (
-            !alert.getStopConditions().isEmpty() && // Skip if stopConditions are not set for alert
-            stopConditions != null &&
-            !stopConditions.isEmpty()
-          ) { // ...or specific stopConditions are not requested
-            for (StopCondition stopCondition : stopConditions) {
-              if (alert.getStopConditions().contains(stopCondition)) {
-                leg.addAlert(alert);
-                break; //Only add alert once
-              }
-            }
-          } else {
-            leg.addAlert(alert);
-          }
+          // TODO StopConditions: Is it safe to assume that criteria has already been met at this point?
+
+          leg.addAlert(alert);
         }
       }
     }
@@ -197,6 +189,23 @@ public class AlertToLegMapper {
       //            }
     }
     return alertsForStopAndRoute;
+  }
+
+  private static void filterByStopConditions(
+    Collection<TransitAlert> alerts,
+    Collection<StopCondition> stopConditions
+  ) {
+    if (alerts != null && stopConditions != null && !stopConditions.isEmpty()) {
+      alerts.removeIf(alert -> {
+        for (EntitySelector entity : alert.getEntities()) {
+          if (!matchesStopCondition(entity, stopConditions)) {
+            // No match - return true to trigger removal from Collection
+            return true;
+          }
+        }
+        return false;
+      });
+    }
   }
 
   private Collection<TransitAlert> getAlertsForStopAndTrip(

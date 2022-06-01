@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.alertpatch;
 
+import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 
@@ -34,9 +36,15 @@ public interface EntitySelector {
   class Stop implements EntitySelector {
 
     public final FeedScopedId stopId;
+    public final Set<StopCondition> stopConditions;
 
     public Stop(FeedScopedId stopId) {
+      this(stopId, Collections.EMPTY_SET);
+    }
+
+    public Stop(FeedScopedId stopId, Set<StopCondition> stopConditions) {
       this.stopId = stopId;
+      this.stopConditions = stopConditions;
     }
 
     @Override
@@ -134,7 +142,15 @@ public interface EntitySelector {
     public final StopAndRouteOrTripKey stopAndRoute;
 
     public StopAndRoute(FeedScopedId stopId, FeedScopedId routeId) {
-      this.stopAndRoute = new StopAndRouteOrTripKey(stopId, routeId);
+      this.stopAndRoute = new StopAndRouteOrTripKey(stopId, Collections.EMPTY_SET, routeId);
+    }
+
+    public StopAndRoute(
+      FeedScopedId stopId,
+      Set<StopCondition> stopConditions,
+      FeedScopedId routeId
+    ) {
+      this.stopAndRoute = new StopAndRouteOrTripKey(stopId, stopConditions, routeId);
     }
 
     @Override
@@ -160,11 +176,21 @@ public interface EntitySelector {
     public final StopAndRouteOrTripKey stopAndTrip;
 
     public StopAndTrip(FeedScopedId stopId, FeedScopedId tripId) {
-      this(stopId, tripId, null);
+      this(stopId, Collections.EMPTY_SET, tripId, null);
     }
 
     public StopAndTrip(FeedScopedId stopId, FeedScopedId tripId, ServiceDate serviceDate) {
-      this.stopAndTrip = new StopAndRouteOrTripKey(stopId, tripId, serviceDate);
+      this.stopAndTrip =
+        new StopAndRouteOrTripKey(stopId, Collections.EMPTY_SET, tripId, serviceDate);
+    }
+
+    public StopAndTrip(
+      FeedScopedId stopId,
+      Set<StopCondition> stopConditions,
+      FeedScopedId tripId,
+      ServiceDate serviceDate
+    ) {
+      this.stopAndTrip = new StopAndRouteOrTripKey(stopId, stopConditions, tripId, serviceDate);
     }
 
     @Override
@@ -305,20 +331,27 @@ public interface EntitySelector {
     public final FeedScopedId stop;
     public final FeedScopedId routeOrTrip;
     public final ServiceDate serviceDate;
+    public final Set<StopCondition> stopConditions;
     private final transient int hash;
 
-    public StopAndRouteOrTripKey(FeedScopedId stop, FeedScopedId routeOrTrip) {
-      this(stop, routeOrTrip, null);
+    public StopAndRouteOrTripKey(
+      FeedScopedId stop,
+      Set<StopCondition> stopConditions,
+      FeedScopedId routeOrTrip
+    ) {
+      this(stop, stopConditions, routeOrTrip, null);
     }
 
     public StopAndRouteOrTripKey(
       FeedScopedId stop,
+      Set<StopCondition> stopConditions,
       FeedScopedId routeOrTrip,
       ServiceDate serviceDate
     ) {
       this.stop = stop;
       this.routeOrTrip = routeOrTrip;
       this.serviceDate = serviceDate;
+      this.stopConditions = stopConditions;
       this.hash = Objects.hash(stop, serviceDate, routeOrTrip);
     }
 
