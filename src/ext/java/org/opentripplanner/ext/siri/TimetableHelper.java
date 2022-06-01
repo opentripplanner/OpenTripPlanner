@@ -403,6 +403,7 @@ public class TimetableHelper {
    * @param occupancy
    * @return
    */
+
   private static OccupancyStatus resolveOccupancyStatus(OccupancyEnumeration occupancy) {
     if (occupancy != null) {
       return switch (occupancy) {
