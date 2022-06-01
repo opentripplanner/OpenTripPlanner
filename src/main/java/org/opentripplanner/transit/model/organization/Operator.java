@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
+import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.TransitEntity2;
 import org.opentripplanner.util.lang.AssertUtils;
 
 /**
@@ -14,12 +15,10 @@ import org.opentripplanner.util.lang.AssertUtils;
  *
  * @see Agency
  */
-public class Operator extends TransitEntity {
+public class Operator extends TransitEntity2<Operator, OperatorBuilder> {
 
   private final String name;
-
   private final String url;
-
   private final String phone;
 
   Operator(OperatorBuilder builder) {
@@ -36,11 +35,13 @@ public class Operator extends TransitEntity {
     return new OperatorBuilder(id);
   }
 
-  public OperatorBuilder copy() {
-    return new OperatorBuilder(this);
+  /** if given operator is null, the returned builder is marked for removal in the parent */
+  @Nonnull
+  public static OperatorBuilder of(@Nullable Operator operator) {
+    return new OperatorBuilder(operator);
   }
 
-  @NotNull
+  @Nonnull
   public String getName() {
     return name;
   }
@@ -57,5 +58,21 @@ public class Operator extends TransitEntity {
 
   public String toString() {
     return "<Operator " + getId() + ">";
+  }
+
+  @Override
+  public OperatorBuilder copy() {
+    return new OperatorBuilder(this);
+  }
+
+  @Override
+  public boolean sameValue(Operator other) {
+    return (
+      other != null &&
+      getId().equals(other.getId()) &&
+      Objects.equals(name, other.name) &&
+      Objects.equals(url, other.url) &&
+      Objects.equals(phone, other.phone)
+    );
   }
 }

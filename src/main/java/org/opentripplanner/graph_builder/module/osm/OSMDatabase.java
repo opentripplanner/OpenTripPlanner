@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -203,8 +204,7 @@ public class OSMDatabase {
   }
 
   public OSMLevel getLevelForWay(OSMWithTags way) {
-    OSMLevel level = wayLevels.get(way);
-    return level != null ? level : OSMLevel.DEFAULT;
+    return Objects.requireNonNullElse(wayLevels.get(way), OSMLevel.DEFAULT);
   }
 
   public Set<OSMWay> getAreasForNode(Long nodeId) {

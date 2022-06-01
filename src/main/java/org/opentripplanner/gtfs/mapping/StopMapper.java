@@ -82,7 +82,7 @@ class StopMapper {
       base.getCode(),
       desc,
       base.getCoordinate(),
-      base.getWheelchairBoarding(),
+      base.getWheelchairAccessibility(),
       base.getLevel(),
       gtfsStop.getPlatformCode(),
       fareZones,

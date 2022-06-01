@@ -63,7 +63,7 @@ class PathwayNodeMapper {
       base.getCode(),
       description,
       base.getCoordinate(),
-      base.getWheelchairBoarding(),
+      base.getWheelchairAccessibility(),
       base.getLevel()
     );
   }

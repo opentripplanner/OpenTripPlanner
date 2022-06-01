@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.util.I18NString;
 

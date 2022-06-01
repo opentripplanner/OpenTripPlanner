@@ -9,13 +9,11 @@ import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Entrance;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -55,6 +53,8 @@ import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -215,7 +215,7 @@ public abstract class GraphRoutingTest {
         id,
         null,
         WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-        WheelchairBoarding.NO_INFORMATION,
+        WheelchairAccessibility.NO_INFORMATION,
         null
       );
     }
@@ -227,7 +227,7 @@ public abstract class GraphRoutingTest {
         id,
         null,
         WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-        WheelchairBoarding.NO_INFORMATION,
+        WheelchairAccessibility.NO_INFORMATION,
         null,
         null,
         null,
@@ -441,10 +441,7 @@ public abstract class GraphRoutingTest {
     }
 
     public Route route(String id, TransitMode mode, Agency agency) {
-      var route = new Route(TransitModelForTest.id(id));
-      route.setAgency(agency);
-      route.setMode(mode);
-      return route;
+      return TransitModelForTest.route(id).withAgency(agency).withMode(mode).build();
     }
 
     // Transit

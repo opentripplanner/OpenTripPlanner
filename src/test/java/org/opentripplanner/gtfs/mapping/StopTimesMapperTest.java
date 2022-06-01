@@ -1,15 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
@@ -49,7 +49,7 @@ public class StopTimesMapperTest {
 
   private static final int TIMEPOINT = 50;
 
-  private static final Trip TRIP = new Trip();
+  private static final Trip TRIP = new GtfsTestData().trip;
 
   private static final StopTime STOP_TIME = new StopTime();
   private final StopMapper stopMapper = new StopMapper(new TranslationHelper());
@@ -89,7 +89,7 @@ public class StopTimesMapperTest {
 
   @Test
   public void testMapCollection() {
-    assertNull(null, subject.map((Collection<StopTime>) null));
+    assertNull(subject.map((Collection<StopTime>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP_TIME)).size());
   }

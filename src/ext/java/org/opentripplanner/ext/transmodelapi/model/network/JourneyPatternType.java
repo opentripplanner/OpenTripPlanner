@@ -14,6 +14,7 @@ import java.util.BitSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.ext.transmodelapi.mapping.GeometryMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripPattern;
@@ -32,6 +33,7 @@ public class JourneyPatternType {
     GraphQLOutputType quayType,
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType,
+    GraphQLOutputType stopToStopGeometryType,
     GraphQLNamedOutputType ptSituationElementType,
     GqlUtil gqlUtil
   ) {
@@ -123,6 +125,19 @@ public class JourneyPatternType {
               return PolylineEncoder.encodeGeometry(geometry);
             }
           })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("stopToStopGeometries")
+          .description(
+            "Detailed path travelled by journey pattern divided into stop-to-stop sections."
+          )
+          .type(new GraphQLList(stopToStopGeometryType))
+          .dataFetcher(environment ->
+            GeometryMapper.mapStopToStopGeometries(environment.getSource())
+          )
           .build()
       )
       .field(

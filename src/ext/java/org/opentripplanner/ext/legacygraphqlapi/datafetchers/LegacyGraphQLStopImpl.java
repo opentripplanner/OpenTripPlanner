@@ -19,7 +19,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -36,6 +35,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
 
@@ -142,12 +142,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<String> zoneId() {
-    return environment ->
-      getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
-  }
-
-  @Override
   public DataFetcher<String> url() {
     return environment ->
       getValue(
@@ -165,14 +159,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Object> parentStation() {
     return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
-  }
-
-  @Override
-  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
-    return environment -> {
-      var boarding = getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
-      return LegacyGraphQLUtils.toGraphQL(boarding);
-    };
   }
 
   // TODO
@@ -482,6 +468,24 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Integer> vehicleType() {
     return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
+    return environment -> {
+      var boarding = getValue(
+        environment,
+        StopLocation::getWheelchairAccessibility,
+        station -> null
+      );
+      return LegacyGraphQLUtils.toGraphQL(boarding);
+    };
+  }
+
+  @Override
+  public DataFetcher<String> zoneId() {
+    return environment ->
+      getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
   }
 
   private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {

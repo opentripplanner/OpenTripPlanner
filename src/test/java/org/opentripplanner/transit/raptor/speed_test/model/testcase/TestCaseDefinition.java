@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
-import java.util.List;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.util.time.DurationUtils;
@@ -14,7 +13,11 @@ public record TestCaseDefinition(
   int window,
   GenericLocation fromPlace,
   GenericLocation toPlace,
-  List<String> tags,
+  /**
+   * A test cases can be grouped into a category used to group similar cases, like "Flex" or
+   * "Long Distance".
+   */
+  String category,
   RequestModes modes
 ) {
   @Override
@@ -30,5 +33,13 @@ public record TestCaseDefinition(
       TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),
       DurationUtils.durationToStr(window, TestCase.NOT_SET)
     );
+  }
+
+  /**
+   * Return a short unique descriptive text for this test-case definition. The returned string is
+   * a combination of {@code id} and {@code description}.
+   */
+  public String idAndDescription() {
+    return id + " " + description;
   }
 }

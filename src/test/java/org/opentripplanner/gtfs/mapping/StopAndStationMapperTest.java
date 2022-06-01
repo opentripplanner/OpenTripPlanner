@@ -1,17 +1,18 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.util.TranslationHelper;
 
 public class StopAndStationMapperTest {
@@ -42,7 +43,8 @@ public class StopAndStationMapperTest {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final WheelchairBoarding WHEELCHAIR_BOARDING_ENUM = WheelchairBoarding.POSSIBLE;
+  private static final WheelchairAccessibility WHEELCHAIR_BOARDING_ENUM =
+    WheelchairAccessibility.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
@@ -68,7 +70,7 @@ public class StopAndStationMapperTest {
 
   @Test
   public void testMapCollection() {
-    assertNull(null, subject.map((Collection<Stop>) null));
+    assertNull(subject.map((Collection<Stop>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP)).size());
   }
@@ -84,7 +86,7 @@ public class StopAndStationMapperTest {
     assertEquals(LON, result.getLon(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
     assertEquals(URL, result.getUrl().toString());
-    assertEquals(WheelchairBoarding.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairAccessibility());
     assertEquals(ZONE_ID, result.getFirstZoneAsString());
   }
 
@@ -104,11 +106,11 @@ public class StopAndStationMapperTest {
     assertNull(result.getCode());
     assertNull(result.getUrl());
     // Skip getting coordinate, it will throw an exception
-    assertEquals(WheelchairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
     assertNull(result.getFirstZoneAsString());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void verifyMissingCoordinateThrowsException() {
     Stop input = new Stop();
     input.setId(AGENCY_AND_ID);
@@ -118,7 +120,7 @@ public class StopAndStationMapperTest {
 
     // Getting the coordinate will throw an IllegalArgumentException if not set,
     // this is considered to be a implementation error
-    result.getCoordinate();
+    assertThrows(IllegalStateException.class, result::getCoordinate);
   }
 
   /** Mapping the same object twice, should return the the same instance. */

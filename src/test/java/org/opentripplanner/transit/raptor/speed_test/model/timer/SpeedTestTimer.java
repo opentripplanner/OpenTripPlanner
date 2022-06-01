@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.model.timer;
 
+import static java.util.stream.Collectors.groupingBy;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import io.micrometer.core.instrument.Clock;
@@ -14,18 +15,21 @@ import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.routing.api.request.RoutingTag;
 
 public class SpeedTestTimer {
 
   private static final NamingConvention NAMING_CONVENTION = createNamingConvention();
-
   private static final long NANOS_TO_MILLIS = 1000000;
+
   private final Clock clock = Clock.SYSTEM;
   private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
   private final CompositeMeterRegistry registry = new CompositeMeterRegistry(
@@ -33,6 +37,7 @@ public class SpeedTestTimer {
     List.of(loggerRegistry)
   );
   private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
+  private boolean groupResultByTestCaseCategory = false;
 
   public static int nanosToMillisecond(long nanos) {
     return (int) (nanos / NANOS_TO_MILLIS);
@@ -44,7 +49,7 @@ public class SpeedTestTimer {
       if (meter instanceof Timer timer && ((Timer) meter).count() > 0) {
         results.add(
           new Result(
-            getFullName(meter),
+            groupResultByTestCaseCategory ? getNameIncTestCaseCategory(meter) : getName(meter),
             (int) timer.percentile(0.01, TimeUnit.MILLISECONDS),
             (int) timer.max(TimeUnit.MILLISECONDS),
             (int) timer.mean(TimeUnit.MILLISECONDS),
@@ -54,10 +59,14 @@ public class SpeedTestTimer {
         );
       }
     }
-    return results;
+    // We ignore individual test-case results in the SpeedTest output; hence we need to aggregate
+    // all results for each test-case-category here
+    Map<String, List<Result>> groupByName = results.stream().collect(groupingBy(Result::name));
+    return groupByName.values().stream().map(Result::merge).toList();
   }
 
-  public void setUp() {
+  public void setUp(boolean logResultsByTestCaseCategory) {
+    this.groupResultByTestCaseCategory = logResultsByTestCaseCategory;
     var measurementEnv = Optional
       .ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT"))
       .orElse("local");
@@ -129,15 +138,14 @@ public class SpeedTestTimer {
       .sum();
   }
 
-  private static String getFullName(Meter timer) {
-    var sb = new StringBuilder(timer.getId().getConventionName(NAMING_CONVENTION));
-    if (timer.getId().getTag("tags") != null) {
-      sb.append(" [");
-      sb.append(timer.getId().getTag("tags"));
-      sb.append("]");
-    }
+  private static String getName(Meter timer) {
+    return timer.getId().getConventionName(NAMING_CONVENTION);
+  }
 
-    return sb.toString();
+  private static String getNameIncTestCaseCategory(Meter timer) {
+    String name = getName(timer);
+    String group = timer.getId().getTag(RoutingTag.Category.TestCaseCategory.name());
+    return group == null ? name : name + " [" + group + "]";
   }
 
   private static NamingConvention createNamingConvention() {
@@ -173,5 +181,25 @@ public class SpeedTestTimer {
       .map(Timer.class::cast);
   }
 
-  public record Result(String name, int min, int max, int mean, int totTime, int count) {}
+  public record Result(String name, int min, int max, int mean, int totTime, int count) {
+    public static Result merge(Collection<Result> results) {
+      if (results.isEmpty()) {
+        throw new IllegalArgumentException("At least on result is needed to merge.");
+      }
+      Result any = null;
+      int min = Integer.MAX_VALUE;
+      int max = Integer.MIN_VALUE;
+      int totTime = 0;
+      int count = 0;
+
+      for (Result it : results) {
+        any = it;
+        min = it.min < min ? it.min : min;
+        max = it.max > max ? it.max : max;
+        totTime += it.totTime;
+        count += it.count;
+      }
+      return new Result(any.name, min, max, totTime / count, totTime, count);
+    }
+  }
 }

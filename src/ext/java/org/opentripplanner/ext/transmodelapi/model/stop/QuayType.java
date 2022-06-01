@@ -22,10 +22,10 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
 
 public class QuayType {
@@ -134,9 +134,12 @@ public class QuayType {
           .description("Whether this quay is suitable for wheelchair boarding.")
           .dataFetcher(environment -> {
             var wheelChairBoarding =
-              (((StopLocation) environment.getSource()).getWheelchairBoarding());
+              (((StopLocation) environment.getSource()).getWheelchairAccessibility());
 
-            return Objects.requireNonNullElse(wheelChairBoarding, WheelchairBoarding.NO_INFORMATION)
+            return Objects.requireNonNullElse(
+              wheelChairBoarding,
+              WheelchairAccessibility.NO_INFORMATION
+            )
               .gtfsCode;
           })
           .build()

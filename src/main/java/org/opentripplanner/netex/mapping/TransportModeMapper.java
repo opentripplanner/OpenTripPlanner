@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 

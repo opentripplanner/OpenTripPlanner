@@ -1,6 +1,6 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 public class RouteTypeMapper {
 

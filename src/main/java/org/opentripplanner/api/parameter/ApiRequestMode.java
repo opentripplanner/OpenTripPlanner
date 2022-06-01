@@ -5,8 +5,8 @@ import static org.opentripplanner.model.modes.AllowedTransitMode.fromMainModeEnu
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 public enum ApiRequestMode {
   WALK(),

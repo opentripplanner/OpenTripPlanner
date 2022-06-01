@@ -3,7 +3,7 @@ package org.opentripplanner.model.modes;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
  * Used to filter out modes for routing requests. If both mainMode and subMode are specified, they

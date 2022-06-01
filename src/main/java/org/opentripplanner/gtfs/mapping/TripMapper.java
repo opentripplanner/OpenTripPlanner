@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,20 +49,21 @@ class TripMapper {
   }
 
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
-    Trip lhs = new Trip(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
+    var lhs = Trip.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
-    lhs.setRoute(routeMapper.map(rhs.getRoute()));
-    lhs.setServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
-    lhs.setTripShortName(rhs.getTripShortName());
-    lhs.setTripHeadsign(rhs.getTripHeadsign());
-    lhs.setRouteShortName(rhs.getRouteShortName());
-    lhs.setDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
-    lhs.setBlockId(rhs.getBlockId());
-    lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
-    lhs.setWheelchairBoarding(WheelchairBoarding.valueOfGtfsCode(rhs.getWheelchairAccessible()));
-    lhs.setBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
-    lhs.setFareId(rhs.getFareId());
+    lhs.withRoute(routeMapper.map(rhs.getRoute()));
+    lhs.withServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
+    lhs.withShortName(rhs.getTripShortName());
+    lhs.withHeadsign(rhs.getTripHeadsign());
+    lhs.withDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
+    lhs.withGtfsBlockId(rhs.getBlockId());
+    lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
+    lhs.withWheelchairBoarding(
+      WheelchairAccessibility.valueOfGtfsCode(rhs.getWheelchairAccessible())
+    );
+    lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
+    lhs.withGtfsFareId(rhs.getFareId());
 
-    return lhs;
+    return lhs.build();
   }
 }

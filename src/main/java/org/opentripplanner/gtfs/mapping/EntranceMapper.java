@@ -62,7 +62,7 @@ class EntranceMapper {
       base.getCode(),
       desc,
       base.getCoordinate(),
-      base.getWheelchairBoarding(),
+      base.getWheelchairAccessibility(),
       base.getLevel()
     );
   }

@@ -87,15 +87,15 @@ public class ItineraryFilterParameters {
   public DoubleFunction<Double> nonTransitGeneralizedCostLimit;
 
   /**
-   * This is used to filter out journeys that have either same first or last trip.
-   * If two journeys starts or ends with exactly same transit leg (same trip id and same service day),
-   * one of them will be filtered out.
+   * This is used to filter out journeys that have either same first or last trip. If two journeys
+   * starts or ends with exactly same transit leg (same trip id and same service day), one of them
+   * will be filtered out.
    */
   public boolean filterItinerariesWithSameFirstOrLastTrip;
 
   /**
    * Whether to compute the experimental accessibility score currently being tested at IBI.
-   *
+   * <p>
    * {@link AccessibilityScoreFilter}
    */
   public boolean accessibilityScore;
@@ -111,6 +111,21 @@ public class ItineraryFilterParameters {
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
+  }
+
+  public ItineraryFilterParameters(ItineraryFilterParameters i) {
+    this(
+      i.debug,
+      i.groupSimilarityKeepOne,
+      i.groupSimilarityKeepThree,
+      i.groupedOtherThanSameLegsMaxCostMultiplier,
+      i.transitGeneralizedCostLimit,
+      i.nonTransitGeneralizedCostLimit,
+      i.bikeRentalDistanceRatio,
+      i.parkAndRideDurationRatio,
+      i.filterItinerariesWithSameFirstOrLastTrip,
+      i.accessibilityScore
+    );
   }
 
   public ItineraryFilterParameters(

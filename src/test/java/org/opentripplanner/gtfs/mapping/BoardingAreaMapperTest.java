@@ -1,17 +1,18 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.util.TranslationHelper;
 
 public class BoardingAreaMapperTest {
@@ -36,7 +37,8 @@ public class BoardingAreaMapperTest {
 
   private static final int VEHICLE_TYPE = 5;
 
-  private static final WheelchairBoarding WHEELCHAIR_BOARDING = WheelchairBoarding.POSSIBLE;
+  private static final WheelchairAccessibility WHEELCHAIR_BOARDING =
+    WheelchairAccessibility.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
@@ -61,7 +63,7 @@ public class BoardingAreaMapperTest {
 
   @Test
   public void testMapCollection() {
-    assertNull(null, subject.map((Collection<Stop>) null));
+    assertNull(subject.map((Collection<Stop>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP)).size());
   }
@@ -76,7 +78,7 @@ public class BoardingAreaMapperTest {
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
-    assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairBoarding());
+    assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairAccessibility());
   }
 
   @Test
@@ -93,10 +95,10 @@ public class BoardingAreaMapperTest {
     assertEquals(BoardingAreaMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
-    assertEquals(WheelchairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void testThrowsNPEWhenCoordinateUnset() {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_BOARDING_AREA);
@@ -104,7 +106,7 @@ public class BoardingAreaMapperTest {
 
     org.opentripplanner.model.BoardingArea result = subject.map(input);
 
-    result.getCoordinate().latitude();
+    assertThrows(NullPointerException.class, () -> result.getCoordinate().latitude());
   }
 
   /** Mapping the same object twice, should return the the same instance. */

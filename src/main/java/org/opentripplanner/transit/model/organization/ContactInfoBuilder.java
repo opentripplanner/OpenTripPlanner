@@ -1,38 +1,32 @@
 package org.opentripplanner.transit.model.organization;
 
-public class ContactInfoBuilder {
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.AbstractBuilder;
+
+public class ContactInfoBuilder extends AbstractBuilder<ContactInfo, ContactInfoBuilder> {
 
   private String contactPerson;
-
   private String phoneNumber;
-
   private String eMail;
-
   private String faxNumber;
-
   private String infoUrl;
-
   private String bookingUrl;
-
   private String additionalDetails;
 
-  public ContactInfoBuilder() {}
+  public ContactInfoBuilder() {
+    super(null);
+  }
 
-  public ContactInfoBuilder(ContactInfo domain) {
-    this.contactPerson = domain.getContactPerson();
-    this.phoneNumber = domain.getPhoneNumber();
-    this.eMail = domain.geteMail();
-    this.faxNumber = domain.getFaxNumber();
-    this.infoUrl = domain.getInfoUrl();
-    this.bookingUrl = domain.getBookingUrl();
-    this.additionalDetails = domain.getAdditionalDetails();
+  ContactInfoBuilder(ContactInfo original) {
+    super(original);
   }
 
   public String getContactPerson() {
     return contactPerson;
   }
 
-  public ContactInfoBuilder setContactPerson(String contactPerson) {
+  public ContactInfoBuilder withContactPerson(String contactPerson) {
     this.contactPerson = contactPerson;
     return this;
   }
@@ -41,7 +35,7 @@ public class ContactInfoBuilder {
     return phoneNumber;
   }
 
-  public ContactInfoBuilder setPhoneNumber(String phoneNumber) {
+  public ContactInfoBuilder withPhoneNumber(String phoneNumber) {
     this.phoneNumber = phoneNumber;
     return this;
   }
@@ -50,7 +44,7 @@ public class ContactInfoBuilder {
     return eMail;
   }
 
-  public ContactInfoBuilder seteMail(String eMail) {
+  public ContactInfoBuilder withEMail(String eMail) {
     this.eMail = eMail;
     return this;
   }
@@ -59,7 +53,7 @@ public class ContactInfoBuilder {
     return faxNumber;
   }
 
-  public ContactInfoBuilder setFaxNumber(String faxNumber) {
+  public ContactInfoBuilder withFaxNumber(String faxNumber) {
     this.faxNumber = faxNumber;
     return this;
   }
@@ -68,7 +62,7 @@ public class ContactInfoBuilder {
     return infoUrl;
   }
 
-  public ContactInfoBuilder setInfoUrl(String infoUrl) {
+  public ContactInfoBuilder withInfoUrl(String infoUrl) {
     this.infoUrl = infoUrl;
     return this;
   }
@@ -77,7 +71,7 @@ public class ContactInfoBuilder {
     return bookingUrl;
   }
 
-  public ContactInfoBuilder setBookingUrl(String bookingUrl) {
+  public ContactInfoBuilder withBookingUrl(String bookingUrl) {
     this.bookingUrl = bookingUrl;
     return this;
   }
@@ -86,8 +80,25 @@ public class ContactInfoBuilder {
     return additionalDetails;
   }
 
-  public ContactInfoBuilder setAdditionalDetails(String additionalDetails) {
+  public ContactInfoBuilder withAdditionalDetails(String additionalDetails) {
     this.additionalDetails = additionalDetails;
     return this;
+  }
+
+  @Override
+  protected void update(@Nonnull ContactInfo original) {
+    this.contactPerson = original.getContactPerson();
+    this.phoneNumber = original.getPhoneNumber();
+    this.eMail = original.geteMail();
+    this.faxNumber = original.getFaxNumber();
+    this.infoUrl = original.getInfoUrl();
+    this.bookingUrl = original.getBookingUrl();
+    this.additionalDetails = original.getAdditionalDetails();
+  }
+
+  @Nullable
+  @Override
+  protected ContactInfo buildFromValues() {
+    return new ContactInfo(this);
   }
 }

@@ -1,52 +1,52 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class TripMapperTest {
 
   private static final String FEED_ID = "FEED";
-
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
-
   private static final int BIKES_ALLOWED = 1;
-
   private static final String BLOCK_ID = "Block Id";
-
   private static final int DIRECTION_ID = 1;
-
   private static final String FARE_ID = "Fare Id";
-
   private static final Route ROUTE = new Route();
-
-  private static final String ROUTE_SHORT_NAME = "Route Short Name";
-
   private static final String TRIP_HEADSIGN = "Trip Headsign";
-
   private static final String TRIP_SHORT_NAME = "Trip Short Name";
 
-  private static final WheelchairBoarding WHEELCHAIR_ACCESSIBLE = WheelchairBoarding.POSSIBLE;
+  private static final WheelchairAccessibility WHEELCHAIR_ACCESSIBLE =
+    WheelchairAccessibility.POSSIBLE;
 
   private static final Trip TRIP = new Trip();
+
   private final TripMapper subject = new TripMapper(
     new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))
   );
 
   static {
+    Agency agency = new Agency();
+    agency.setId("A1");
+    agency.setName("Agency");
+    agency.setTimezone("Europa/Oslo");
+
+    ROUTE.setAgency(agency);
     ROUTE.setId(AGENCY_AND_ID);
+    ROUTE.setShortName("R10");
 
     TRIP.setId(AGENCY_AND_ID);
     TRIP.setBikesAllowed(BIKES_ALLOWED);
@@ -54,7 +54,6 @@ public class TripMapperTest {
     TRIP.setDirectionId(Integer.toString(DIRECTION_ID));
     TRIP.setFareId(FARE_ID);
     TRIP.setRoute(ROUTE);
-    TRIP.setRouteShortName(ROUTE_SHORT_NAME);
     TRIP.setServiceId(AGENCY_AND_ID);
     TRIP.setShapeId(AGENCY_AND_ID);
     TRIP.setTripHeadsign(TRIP_HEADSIGN);
@@ -71,18 +70,17 @@ public class TripMapperTest {
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.Trip result = subject.map(TRIP);
+    org.opentripplanner.transit.model.timetable.Trip result = subject.map(TRIP);
 
     assertEquals("A:1", result.getId().toString());
-    assertEquals(BLOCK_ID, result.getBlockId());
+    assertEquals(BLOCK_ID, result.getGtfsBlockId());
     assertEquals(DIRECTION_ID, result.getDirection().gtfsCode);
-    assertEquals(FARE_ID, result.getFareId());
+    assertEquals(FARE_ID, result.getGtfsFareId());
     assertNotNull(result.getRoute());
-    assertEquals(ROUTE_SHORT_NAME, result.getRouteShortName());
     assertEquals("A:1", result.getServiceId().toString());
     assertEquals("A:1", result.getShapeId().toString());
-    assertEquals(TRIP_HEADSIGN, result.getTripHeadsign());
-    assertEquals(TRIP_SHORT_NAME, result.getTripShortName());
+    assertEquals(TRIP_HEADSIGN, result.getHeadsign());
+    assertEquals(TRIP_SHORT_NAME, result.getShortName());
     assertEquals(WHEELCHAIR_ACCESSIBLE, result.getWheelchairBoarding());
     assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
   }
@@ -91,28 +89,29 @@ public class TripMapperTest {
   public void testMapWithNulls() throws Exception {
     Trip input = new Trip();
     input.setId(AGENCY_AND_ID);
+    input.setRoute(ROUTE);
 
-    org.opentripplanner.model.Trip result = subject.map(input);
+    org.opentripplanner.transit.model.timetable.Trip result = subject.map(input);
 
     assertNotNull(result.getId());
-    assertNull(result.getBlockId());
-    assertNull(result.getFareId());
-    assertNull(result.getRoute());
-    assertNull(result.getRouteShortName());
+    assertNotNull(result.getRoute());
+
+    assertNull(result.getGtfsBlockId());
+    assertNull(result.getGtfsFareId());
     assertNull(result.getServiceId());
     assertNull(result.getShapeId());
-    assertNull(result.getTripHeadsign());
-    assertNull(result.getTripShortName());
+    assertNull(result.getHeadsign());
+    assertNull(result.getShortName());
     assertEquals(-1, result.getDirection().gtfsCode);
-    assertEquals(WheelchairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairBoarding());
     assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
   }
 
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() throws Exception {
-    org.opentripplanner.model.Trip result1 = subject.map(TRIP);
-    org.opentripplanner.model.Trip result2 = subject.map(TRIP);
+    org.opentripplanner.transit.model.timetable.Trip result1 = subject.map(TRIP);
+    org.opentripplanner.transit.model.timetable.Trip result2 = subject.map(TRIP);
 
     assertSame(result1, result2);
   }

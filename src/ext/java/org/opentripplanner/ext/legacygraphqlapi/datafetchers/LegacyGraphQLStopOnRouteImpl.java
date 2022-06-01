@@ -4,7 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
-import org.opentripplanner.model.Route;
+import org.opentripplanner.transit.model.network.Route;
 
 public class LegacyGraphQLStopOnRouteImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLStopOnRoute {

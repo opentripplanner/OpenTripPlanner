@@ -25,8 +25,6 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -46,6 +44,8 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -683,19 +683,23 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Raptor can print all events when arriving at stops to system error. For developers only.
    */
   public DebugRaptor raptorDebugging = new DebugRaptor();
+
   /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
   public RaptorOptions raptorOptions = new RaptorOptions();
 
-  /* CONSTRUCTORS */
   /**
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
    * tags. Currently, all tags are added to all the timer instances for this request.
    */
-  public Tags tags = Tags.of();
+  public Set<RoutingTag> tags = Set.of();
+
   private Envelope fromEnvelope;
+
   private Envelope toEnvelope;
+
+  /* CONSTRUCTORS */
 
   /** Constructor for options; modes defaults to walk and transit */
   public RoutingRequest() {
@@ -1140,6 +1144,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
       clone.raptorOptions = new RaptorOptions(this.raptorOptions);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
+      clone.itineraryFilters = new ItineraryFilterParameters(this.itineraryFilters);
 
       return clone;
     } catch (CloneNotSupportedException e) {

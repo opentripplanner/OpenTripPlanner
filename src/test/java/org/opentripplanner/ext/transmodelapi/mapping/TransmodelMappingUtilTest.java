@@ -35,7 +35,7 @@ public class TransmodelMappingUtilTest {
     return TransitModelForTest
       .agency("Agency " + id)
       .copy()
-      .setId(new FeedScopedId(feedScope, Integer.toString(id)))
+      .withId(new FeedScopedId(feedScope, Integer.toString(id)))
       .build();
   }
 }

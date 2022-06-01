@@ -179,8 +179,8 @@ public class CalendarServiceDataFactoryImplTest {
     return sort(c).get(0);
   }
 
-  private static <T extends Comparable<T>> String toString(Collection<T> c) {
-    return c.stream().sorted(comparing(T::toString)).toList().toString();
+  private static String toString(Collection<?> c) {
+    return c.stream().sorted(comparing(Object::toString)).toList().toString();
   }
 
   private static List<String> sevenFirstDays(List<ServiceDate> dates) {
