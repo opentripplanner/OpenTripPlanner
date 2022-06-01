@@ -155,8 +155,8 @@ msgstr "Unminimize all"
 
 #. widget title
 #: src/client/js/otp/layers/StopsLayer.js:102
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:555
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:679
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:806
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:930
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:31
 msgid "Stop Viewer"
 msgstr "Stop Viewer"
@@ -421,7 +421,7 @@ msgstr ""
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:716
 #, fuzzy
 msgid "Elevation Lost"
-msgstr "elevator"
+msgstr "Elevation Lost"
 
 #. how many public transit transfers in a trip
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:721

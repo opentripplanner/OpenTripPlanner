@@ -433,7 +433,7 @@ msgstr ""
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:716
 #, fuzzy
 msgid "Elevation Lost"
-msgstr "pojdite z dvigalom"
+msgstr ""
 
 #. how many public transit transfers in a trip
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:721
