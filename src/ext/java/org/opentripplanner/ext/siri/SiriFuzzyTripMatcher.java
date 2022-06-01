@@ -7,10 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -18,6 +15,9 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedCall;
@@ -264,8 +264,8 @@ public class SiriFuzzyTripMatcher {
           .getServiceDatesForServiceId(trip.getServiceId());
         if (
           serviceDates.contains(serviceDate) &&
-          trip.getInternalPlanningCode() != null &&
-          trip.getInternalPlanningCode().equals(internalPlanningCode)
+          trip.getNetexInternalPlanningCode() != null &&
+          trip.getNetexInternalPlanningCode().equals(internalPlanningCode)
         ) {
           matches.add(trip.getId());
         }
@@ -314,8 +314,8 @@ public class SiriFuzzyTripMatcher {
           tripPattern != null &&
           tripPattern.matchesModeOrSubMode(TransitMode.RAIL, "railReplacementBus")
         ) {
-          if (trip.getInternalPlanningCode() != null) {
-            String internalPlanningCode = trip.getInternalPlanningCode();
+          if (trip.getNetexInternalPlanningCode() != null) {
+            String internalPlanningCode = trip.getNetexInternalPlanningCode();
             if (mappedVehicleRefCache.containsKey(internalPlanningCode)) {
               mappedVehicleRefCache.get(internalPlanningCode).add(trip);
             } else {
@@ -415,6 +415,7 @@ public class SiriFuzzyTripMatcher {
 
     if (trips == null || trips.isEmpty()) {
       //SIRI-data may report other platform, but still on the same Parent-stop
+      // TODO OTP2 - We should pass in correct feed id here
       String feedId = routingService.getFeedIds().iterator().next();
       var stop = routingService.getStopForId(new FeedScopedId(feedId, lastStopPoint));
       if (stop != null && stop.isPartOfStation()) {

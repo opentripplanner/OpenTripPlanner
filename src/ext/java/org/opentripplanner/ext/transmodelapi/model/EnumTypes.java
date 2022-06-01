@@ -3,10 +3,8 @@ package org.opentripplanner.ext.transmodelapi.model;
 import graphql.schema.GraphQLEnumType;
 import java.util.Arrays;
 import java.util.function.Function;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
@@ -20,7 +18,10 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 public class EnumTypes {
 
@@ -134,6 +135,41 @@ public class EnumTypes {
       "modified",
       RealTimeState.MODIFIED,
       "The service journey information has been updated and resulted in a different journey pattern compared to the journey pattern of the scheduled service journey."
+    )
+    .build();
+
+  public static GraphQLEnumType OCCUPANCY_STATUS = GraphQLEnumType
+    .newEnum()
+    .name("OccupancyStatus")
+    .value(
+      "noData",
+      OccupancyStatus.NO_DATA,
+      "The vehicle or carriage doesn't have any occupancy data available."
+    )
+    .value(
+      "manySeatsAvailable",
+      OccupancyStatus.MANY_SEATS_AVAILABLE,
+      "The vehicle or carriage has a large number of seats available."
+    )
+    .value(
+      "fewSeatsAvailable",
+      OccupancyStatus.SEATS_AVAILABLE,
+      "The vehicle or carriage has a few seats available."
+    )
+    .value(
+      "standingRoomOnly",
+      OccupancyStatus.STANDING_ROOM_ONLY,
+      "The vehicle or carriage only has standing room available."
+    )
+    .value(
+      "full",
+      OccupancyStatus.FULL,
+      "The vehicle or carriage is considered full by most measures, but may still be allowing passengers to board."
+    )
+    .value(
+      "notAcceptingPassengers",
+      OccupancyStatus.NOT_ACCEPTING_PASSENGERS,
+      "The vehicle or carriage has no seats or standing room available."
     )
     .build();
 

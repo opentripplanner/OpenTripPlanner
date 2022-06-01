@@ -209,7 +209,7 @@ public class CsvFileIO {
             Double.parseDouble(csvReader.get("toLat")),
             Double.parseDouble(csvReader.get("toLon"))
           ),
-          asSortedList(toArray(csvReader.get("tags"))),
+          csvReader.get("category"),
           new QualifiedModeSet(toArray(csvReader.get("modes"))).getRequestModes()
         );
         testCases.add(tc);

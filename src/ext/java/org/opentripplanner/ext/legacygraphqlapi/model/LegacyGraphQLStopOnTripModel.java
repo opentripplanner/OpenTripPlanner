@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi.model;
 
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Class that contains a {@link StopLocation} on a {@link Trip}.

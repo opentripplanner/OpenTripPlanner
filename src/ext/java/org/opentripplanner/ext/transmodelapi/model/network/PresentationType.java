@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.network;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.model.Route;
+import org.opentripplanner.transit.model.network.Route;
 
 public class PresentationType {
 

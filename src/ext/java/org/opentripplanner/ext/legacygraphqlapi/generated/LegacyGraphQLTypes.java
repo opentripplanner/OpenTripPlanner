@@ -2536,6 +2536,25 @@ public class LegacyGraphQLTypes {
     }
   }
 
+  public static class LegacyGraphQLStopDescArgs {
+
+    private String language;
+
+    public LegacyGraphQLStopDescArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   public static class LegacyGraphQLStopNameArgs {
 
     private String language;

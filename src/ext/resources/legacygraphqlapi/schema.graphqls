@@ -2848,7 +2848,11 @@ type Stop implements Node & PlaceInterface {
     code: String
 
     """Description of the stop, usually a street name"""
-    desc: String
+    desc(
+        """If translated description is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses descriptions from stops.txt.
+        """
+        language: String): String
 
     """ID of the zone where this stop is located"""
     zoneId: String

@@ -8,9 +8,9 @@ import org.junit.Test;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class FrequencyEntryTest {
 
@@ -18,7 +18,7 @@ public class FrequencyEntryTest {
   private static final TripTimes tripTimes;
 
   static {
-    Trip trip = new Trip(TransitModelForTest.id("testtrip"));
+    Trip trip = TransitModelForTest.trip("testtrip").build();
 
     List<StopTime> stopTimes = new ArrayList<>();
 

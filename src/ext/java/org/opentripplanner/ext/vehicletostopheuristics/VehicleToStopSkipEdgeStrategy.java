@@ -9,14 +9,14 @@ import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 
 import java.util.Set;
 import java.util.function.Function;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
  * This strategy terminates when enough "important" stops are found.

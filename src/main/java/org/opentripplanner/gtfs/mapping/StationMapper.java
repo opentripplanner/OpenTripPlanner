@@ -51,6 +51,13 @@ class StationMapper {
       rhs.getName()
     );
 
+    final I18NString description = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "desc",
+      rhs.getId().getId(),
+      rhs.getDesc()
+    );
+
     I18NString url = null;
 
     if (rhs.getUrl() != null) {
@@ -68,7 +75,7 @@ class StationMapper {
       name,
       WgsCoordinateMapper.mapToDomain(rhs),
       rhs.getCode(),
-      rhs.getDesc(),
+      description,
       url,
       rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone()),
       // Use default cost priority

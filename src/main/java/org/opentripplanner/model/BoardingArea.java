@@ -17,17 +17,17 @@ public final class BoardingArea extends StationElement {
     FeedScopedId id,
     I18NString name,
     String code,
-    String description,
+    I18NString description,
     WgsCoordinate coordinate,
-    WheelchairBoarding wheelchairBoarding,
+    WheelchairAccessibility wheelchairAccessibility,
     StopLevel level
   ) {
-    super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    super(id, name, code, description, coordinate, wheelchairAccessibility, level);
   }
 
   /**
-   * Center point/location for the boarding area. Returns the coordinate of the parent stop, if the
-   * coordinate is not defined for this boarding area.
+   * Center point/location for the boarding area. Returns the coordinate of the parent stop,
+   * if the coordinate is not defined for this boarding area.
    */
   public WgsCoordinate getCoordinate() {
     return isCoordinateSet() ? super.getCoordinate() : parentStop.getCoordinate();

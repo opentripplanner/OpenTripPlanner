@@ -63,7 +63,7 @@ config:
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
-    Route: org.opentripplanner.model.Route#Route
+    Route: org.opentripplanner.transit.model.network.Route#Route
     serviceTimeRange: Object
     step: org.opentripplanner.model.plan.WalkStep#WalkStep
     Stop: Object # Can be either Stop or Station
@@ -76,7 +76,7 @@ config:
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
-    Trip: org.opentripplanner.model.Trip#Trip
+    Trip: org.opentripplanner.transit.model.timetable.Trip#Trip
     Unknown: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel#LegacyGraphQLUnknownModel
     VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces

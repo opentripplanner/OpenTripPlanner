@@ -10,11 +10,11 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEntranceVertex> {
 
   public StreetTransitEntranceLink(StreetVertex fromv, TransitEntranceVertex tov) {
-    super(fromv, tov, tov.getWheelchairBoarding());
+    super(fromv, tov, tov.getWheelchairAccessibility());
   }
 
   public StreetTransitEntranceLink(TransitEntranceVertex fromv, StreetVertex tov) {
-    super(fromv, tov, fromv.getWheelchairBoarding());
+    super(fromv, tov, fromv.getWheelchairAccessibility());
   }
 
   public String toString() {

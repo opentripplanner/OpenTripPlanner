@@ -1,14 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.FareRule;
@@ -40,8 +41,15 @@ public class FareRuleMapperTest {
   );
 
   static {
+    var agency = new Agency();
+    agency.setId("Agency:1");
+    agency.setName("Agency 1");
+
     FARE_ATTRIBUTE.setId(AGENCY_AND_ID);
     ROUTE.setId(AGENCY_AND_ID);
+    ROUTE.setAgency(agency);
+    ROUTE.setType(3);
+    ROUTE.setShortName("R1");
 
     FARE_RULE.setId(ID);
     FARE_RULE.setContainsId(CONTAINS_ID);

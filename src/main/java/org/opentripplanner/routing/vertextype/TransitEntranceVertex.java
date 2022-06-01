@@ -2,7 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -10,7 +10,7 @@ public class TransitEntranceVertex extends Vertex {
 
   private static final long serialVersionUID = 1L;
 
-  private final WheelchairBoarding wheelchairBoarding;
+  private final WheelchairAccessibility wheelchairAccessibility;
 
   private final Entrance entrance;
 
@@ -26,7 +26,7 @@ public class TransitEntranceVertex extends Vertex {
       entrance.getName()
     );
     this.entrance = entrance;
-    this.wheelchairBoarding = entrance.getWheelchairBoarding();
+    this.wheelchairAccessibility = entrance.getWheelchairAccessibility();
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
     graph.expandToInclude(
       entrance.getCoordinate().longitude(),
@@ -34,8 +34,8 @@ public class TransitEntranceVertex extends Vertex {
     );
   }
 
-  public WheelchairBoarding getWheelchairBoarding() {
-    return wheelchairBoarding;
+  public WheelchairAccessibility getWheelchairAccessibility() {
+    return wheelchairAccessibility;
   }
 
   public Entrance getEntrance() {

@@ -7,6 +7,8 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -15,6 +17,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -33,6 +36,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinkedFromTo(47.501, 19.02, "B1B2 street", StreetMode.CAR);
     assertLinkedFromTo(47.501, 19.03, "E1E2 street", StreetMode.CAR);
     assertLinkedFromTo(47.501, 19.04, "E1E2 street", StreetMode.CAR);
+    assertLinkedFromTo("STOP", "E1E2 street", StreetMode.CAR);
   }
 
   @Test
@@ -53,6 +57,15 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinking(setup.apply(47.501, 19.02), "B1B2 street", "C1C2 street", StreetMode.CAR_TO_PARK);
     assertLinking(setup.apply(47.501, 19.03), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
     assertLinking(setup.apply(47.501, 19.04), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
+    assertLinking(
+      rr -> {
+        rr.from = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, "STOP"), null, null);
+        rr.to = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, "STOP"), null, null);
+      },
+      "E1E2 street",
+      "D1D2 street",
+      StreetMode.CAR_TO_PARK
+    );
   }
 
   // Only CAR linking is handled specially, since walking with a bike is always a possibility,
@@ -75,6 +88,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinkedFromTo(47.501, 19.02, "C1C2 street", streetModes);
     assertLinkedFromTo(47.501, 19.03, "D1D2 street", streetModes);
     assertLinkedFromTo(47.501, 19.04, "D1D2 street", streetModes);
+    assertLinkedFromTo("STOP", "D1D2 street", streetModes);
   }
 
   // Linking to wheelchair accessible streets is currently not implemented.
@@ -135,9 +149,15 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
               100,
               StreetTraversalPermission.BICYCLE_AND_CAR
             );
+
+            stop("STOP", 47.501, 19.04);
           }
         }
       );
+
+    graph.hasStreets = true;
+    graph.index();
+    new StreetLinkerModule().buildGraph(graph, null, new DataImportIssueStore(false));
   }
 
   private void assertLinkedFromTo(
@@ -150,6 +170,18 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       rr -> {
         rr.from = new GenericLocation(latitude, longitude);
         rr.to = new GenericLocation(latitude, longitude);
+      },
+      streetName,
+      streetName,
+      streetModes
+    );
+  }
+
+  private void assertLinkedFromTo(String stopId, String streetName, StreetMode... streetModes) {
+    assertLinking(
+      rr -> {
+        rr.from = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, stopId), null, null);
+        rr.to = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, stopId), null, null);
       },
       streetName,
       streetName,

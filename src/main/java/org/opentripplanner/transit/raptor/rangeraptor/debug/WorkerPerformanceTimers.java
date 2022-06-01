@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.debug;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import java.util.Collection;
+import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.routing.framework.MicrometerUtils;
 
 public class WorkerPerformanceTimers {
@@ -14,10 +15,10 @@ public class WorkerPerformanceTimers {
 
   public WorkerPerformanceTimers(
     String namePrefix,
-    Collection<String> timingTags,
+    Collection<RoutingTag> routingRequestTags,
     MeterRegistry registry
   ) {
-    var tags = MicrometerUtils.mapTimingTags(timingTags);
+    var tags = MicrometerUtils.mapTimingTags(routingRequestTags);
     timerRoute = Timer.builder("raptor." + namePrefix + ".route").tags(tags).register(registry);
     timerByMinuteScheduleSearch =
       Timer.builder("raptor." + namePrefix + ".minute.transit").tags(tags).register(registry);
