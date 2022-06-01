@@ -66,12 +66,10 @@ import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.OsmPlatformVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.LocalizedStringFormat;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -93,9 +91,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Providers of OSM data.
    */
   private final List<OpenStreetMapProvider> providers;
-  private final Set<String> boardingAreaRefTags;
   private DataImportIssueStore issueStore;
   public boolean skipVisibility = false;
+
   // Members that can be set by clients.
   public boolean platformEntriesLinking = false;
   /**
@@ -106,27 +104,34 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Allows for arbitrary custom naming of edges.
    */
   public CustomNamer customNamer;
+
   /**
    * Ignore wheelchair accessibility information.
    */
   public boolean ignoreWheelchairAccessibility = false;
+
   /**
    * Whether we should create car P+R stations from OSM data. The default value is true. In normal
    * operation it is set by the JSON graph build configuration, but it is also initialized to "true"
    * here to provide the default behavior in tests.
    */
   public boolean staticParkAndRide = true;
+
   /**
    * Whether we should create bike P+R stations from OSM data. (default false)
    */
   public boolean staticBikeParkAndRide;
+
   private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
   public int maxAreaNodes = 500;
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
+
+  private final Set<String> boardingAreaRefTags;
 
   /**
    * Construct and set providers all at once.
@@ -344,7 +349,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * @param node The node to fetch a label for.
      * @param way  The way it is connected to (for fetching level information).
      * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
-     * {@link OsmBoardingLocationVertex} or {@link OsmPlatformVertex}
+     * {@link OsmBoardingLocationVertex}
      */
     protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
       // If the node should be decomposed to multiple levels,
@@ -371,42 +376,25 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           }
         }
 
-        var nodeStopRefs = node.getMultiTagValues(boardingAreaRefTags);
-        var name = node.getTag("name");
-
-        // we check if the node is part of a boarding area (platform) that holds references to GTFS stops
-        var wayStopRefs = osmdb
-          .getAreasForNode(node.getId())
-          .stream()
-          .filter(OSMWithTags::isBoardingLocation)
-          .flatMap(w -> w.getMultiTagValues(boardingAreaRefTags).stream())
-          .collect(Collectors.toSet());
-
-        if (!wayStopRefs.isEmpty()) {
-          iv =
-            new OsmPlatformVertex(
-              graph,
-              label,
-              coordinate.x,
-              coordinate.y,
-              nid,
-              new LocalizedString("name.platform"),
-              wayStopRefs
-            );
+        /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
+        if (node.isBoardingLocation()) {
+          var refs = node.getMultiTagValues(boardingAreaRefTags);
+          if (!refs.isEmpty()) {
+            String name = node.getTag("name");
+            iv =
+              new OsmBoardingLocationVertex(
+                graph,
+                label,
+                coordinate.x,
+                coordinate.y,
+                nid,
+                name,
+                refs
+              );
+          }
         }
-        // If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. *
-        else if (node.isBoardingLocation() && !nodeStopRefs.isEmpty()) {
-          iv =
-            new OsmBoardingLocationVertex(
-              graph,
-              label,
-              coordinate.x,
-              coordinate.y,
-              nid,
-              name,
-              nodeStopRefs
-            );
-        } else if (node.isBarrier()) {
+
+        if (node.isBarrier()) {
           BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
           bv.setBarrierPermissions(
             OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
@@ -811,7 +799,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           .getHoles()
           .stream()
           .flatMap(innerRing -> processVehicleParkingArea(innerRing, entity, envelope).stream())
-          .toList()
+          .collect(Collectors.toList())
       );
 
       return accessVertices;

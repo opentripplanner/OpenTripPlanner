@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -125,18 +126,20 @@ public class AreaEdgeList implements Serializable {
         length,
         area.getPermission(),
         false,
-        this
+        this,
+        Set.of()
       );
       forward.setStreetClass(area.getStreetClass());
       AreaEdge backward = new AreaEdge(
         to,
         from,
-        (LineString) line.reverse(),
+        line.reverse(),
         area.getName(),
         length,
         area.getPermission(),
         true,
-        this
+        this,
+        Set.of()
       );
       backward.setStreetClass(area.getStreetClass());
     }

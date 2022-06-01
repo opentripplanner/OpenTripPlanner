@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,6 +47,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
@@ -231,7 +233,7 @@ public class WalkableAreaBuilder {
               .filter(t ->
                 outerRing.jtsPolygon.contains(geometryFactory.createPoint(t.getCoordinate()))
               )
-              .collect(Collectors.toList());
+              .toList();
             platformLinkingVertices.addAll(endpointsWithin);
             for (OsmVertex v : endpointsWithin) {
               OSMNode node = osmdb.getNode(v.nodeId);
@@ -475,6 +477,12 @@ public class WalkableAreaBuilder {
         endEndpoint.getLabel();
       I18NString name = handler.getNameForWay(areaEntity, label);
 
+      var stopReferences = Optional
+        .of(areaEntity)
+        .filter(OSMWithTags::isBoardingLocation)
+        .map(e -> e.getMultiTagValues(Set.of("ref", "ref:IFOPT")))
+        .orElseGet(Set::of);
+
       AreaEdge street = new AreaEdge(
         startEndpoint,
         endEndpoint,
@@ -483,7 +491,8 @@ public class WalkableAreaBuilder {
         length,
         areaPermissions,
         false,
-        edgeList
+        edgeList,
+        stopReferences
       );
       street.setCarSpeed(carSpeed);
 
@@ -514,7 +523,8 @@ public class WalkableAreaBuilder {
         length,
         areaPermissions,
         true,
-        edgeList
+        edgeList,
+        stopReferences
       );
       backStreet.setCarSpeed(carSpeed);
 

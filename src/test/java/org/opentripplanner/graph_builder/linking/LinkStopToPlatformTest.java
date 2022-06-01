@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -113,7 +113,6 @@ public class LinkStopToPlatformTest {
     LineString line = geometryFactory.createLineString(
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
-    double length = SphericalDistanceLibrary.distance(v1.getCoordinate(), v2.getCoordinate());
     I18NString name = new LocalizedString(nameString, new OSMWithTags());
 
     return new AreaEdge(
@@ -124,7 +123,8 @@ public class LinkStopToPlatformTest {
       line.getLength(),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       false,
-      area
+      area,
+      Set.of()
     );
   }
 }

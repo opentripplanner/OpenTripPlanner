@@ -12,6 +12,7 @@ import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -21,7 +22,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.OsmPlatformVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.LocalizedString;
@@ -84,12 +84,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     //no inputs
   }
 
-  private static boolean connectedToOutsideOfPlatform(OsmPlatformVertex e) {
-    return Stream
-      .concat(e.getOutgoingStreetEdges().stream(), e.getIncomingStreetEdges().stream())
-      .anyMatch(edge -> !(edge.getToVertex() instanceof OsmPlatformVertex));
-  }
-
   private static void linkBoardingLocationToStreetNetwork(
     VertexLinker linker,
     OsmBoardingLocationVertex boardingLocation
@@ -145,10 +139,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
     var nearbyVertices = index.getVerticesForEnvelope(envelope).stream().toList();
-
     var boardingLocations = getVerticesOfType(nearbyVertices, OsmBoardingLocationVertex.class);
-
-    var platformVertices = getVerticesOfType(nearbyVertices, OsmPlatformVertex.class);
 
     // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or id
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
@@ -158,38 +149,25 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         boardingLocation.references.contains(stopId)
       ) {
         if (!boardingLocation.isConnectedToStreetNetwork()) {
-          var matchingVertices = platformVertices
+          var platformVertices = index
+            .getEdgesForEnvelope(envelope)
             .stream()
+            .filter(AreaEdge.class::isInstance)
+            .map(AreaEdge.class::cast)
             .filter(e -> e.references.equals(boardingLocation.references))
+            .flatMap(e -> Stream.of(e.getFromVertex(), e.getToVertex()))
+            .filter(StreetVertex.class::isInstance)
+            .map(StreetVertex.class::cast)
+            .distinct()
             .toList();
 
-          var entrances = matchingVertices
-            .stream()
-            .filter(OsmBoardingLocationsModule::connectedToOutsideOfPlatform)
-            .toList();
-
-          List<OsmPlatformVertex> toMatch;
-
-          // we try to find platform vertices that are actually connected to the outside world (entrances) rather than just to
-          // other nodes on the platform
-          if (entrances.size() > 0) {
-            toMatch = entrances;
-          } else {
-            // if there are none then we link to all vertices of the platform
-            toMatch = matchingVertices;
-          }
-
-          toMatch.forEach(e -> {
-            linkBoardingLocationToStreetNetwork(boardingLocation, e);
-            linkBoardingLocationToStreetNetwork(e, boardingLocation);
+          System.out.println(platformVertices);
+          platformVertices.forEach(v -> {
+            linkBoardingLocationToStreetNetwork(v, boardingLocation);
+            linkBoardingLocationToStreetNetwork(boardingLocation, v);
           });
-
-          // if we cannot find any platform vertices for some reason we use the regular linker to
-          // find the edge to link to
-          if (toMatch.size() < 1) {
-            linkBoardingLocationToStreetNetwork(linker, boardingLocation);
-          }
         }
+
         new BoardingLocationToStopLink(ts, boardingLocation);
         new BoardingLocationToStopLink(boardingLocation, ts);
         LOG.debug(
