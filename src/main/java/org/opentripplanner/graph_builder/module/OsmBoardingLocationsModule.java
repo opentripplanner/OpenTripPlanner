@@ -149,23 +149,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         boardingLocation.references.contains(stopId)
       ) {
         if (!boardingLocation.isConnectedToStreetNetwork()) {
-          var platformVertices = index
-            .getEdgesForEnvelope(envelope)
-            .stream()
-            .filter(AreaEdge.class::isInstance)
-            .map(AreaEdge.class::cast)
-            .filter(e -> e.references.equals(boardingLocation.references))
-            .flatMap(e -> Stream.of(e.getFromVertex(), e.getToVertex()))
-            .filter(StreetVertex.class::isInstance)
-            .map(StreetVertex.class::cast)
-            .distinct()
-            .toList();
-
-          System.out.println(platformVertices);
-          platformVertices.forEach(v -> {
-            linkBoardingLocationToStreetNetwork(v, boardingLocation);
-            linkBoardingLocationToStreetNetwork(boardingLocation, v);
-          });
+          boardingLocation.edgeList.addVertex(boardingLocation);
         }
 
         new BoardingLocationToStopLink(ts, boardingLocation);

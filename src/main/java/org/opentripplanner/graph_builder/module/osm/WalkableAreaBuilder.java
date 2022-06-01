@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -192,6 +193,27 @@ public class WalkableAreaBuilder {
     for (Ring ring : group.outermostRings) {
       Polygon polygon = ring.jtsPolygon;
       AreaEdgeList edgeList = new AreaEdgeList(polygon);
+
+      group.areas
+        .stream()
+        .filter(g -> g.parent.isBoardingLocation())
+        .forEach(g -> {
+          var references = g.parent.getMultiTagValues(Set.of("ref", "ref:IFOPT"));
+          var centroid = g.jtsMultiPolygon.getCentroid();
+          if (!references.isEmpty() && !centroid.isEmpty()) {
+            var label = "platform-centroid/osm/%s".formatted(g.parent.getId());
+            new OsmBoardingLocationVertex(
+              graph,
+              label,
+              centroid.getX(),
+              centroid.getY(),
+              g.parent.getId(),
+              g.parent.getTag("name"),
+              references,
+              edgeList
+            );
+          }
+        });
 
       // the points corresponding to concave or hole vertices
       // or those linked to ways

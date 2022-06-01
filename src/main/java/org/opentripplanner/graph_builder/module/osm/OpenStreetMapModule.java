@@ -91,9 +91,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Providers of OSM data.
    */
   private final List<OpenStreetMapProvider> providers;
+  private final Set<String> boardingAreaRefTags;
   private DataImportIssueStore issueStore;
   public boolean skipVisibility = false;
-
   // Members that can be set by clients.
   public boolean platformEntriesLinking = false;
   /**
@@ -104,34 +104,27 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Allows for arbitrary custom naming of edges.
    */
   public CustomNamer customNamer;
-
   /**
    * Ignore wheelchair accessibility information.
    */
   public boolean ignoreWheelchairAccessibility = false;
-
   /**
    * Whether we should create car P+R stations from OSM data. The default value is true. In normal
    * operation it is set by the JSON graph build configuration, but it is also initialized to "true"
    * here to provide the default behavior in tests.
    */
   public boolean staticParkAndRide = true;
-
   /**
    * Whether we should create bike P+R stations from OSM data. (default false)
    */
   public boolean staticBikeParkAndRide;
-
   private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
-
   public int maxAreaNodes = 500;
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
-
-  private final Set<String> boardingAreaRefTags;
 
   /**
    * Construct and set providers all at once.
@@ -389,7 +382,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 coordinate.y,
                 nid,
                 name,
-                refs
+                refs,
+                null
               );
           }
         }
@@ -501,26 +495,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private void extractPlatformCentroids() {
       LOG.info("Extracting centroids from platforms");
-
-      osmdb
-        .getBoardingLocationAreas()
-        .forEach(bl -> {
-          var references = bl.parent.getMultiTagValues(boardingAreaRefTags);
-          var centroid = bl.jtsMultiPolygon.getCentroid();
-          if (!references.isEmpty() && !centroid.isEmpty()) {
-            var label = "platform-centroid/osm/%s".formatted(bl.parent.getId());
-
-            new OsmBoardingLocationVertex(
-              graph,
-              label,
-              centroid.getX(),
-              centroid.getY(),
-              bl.parent.getId(),
-              bl.parent.getTag("name"),
-              references
-            );
-          }
-        });
+      osmdb.getBoardingLocationAreas().forEach(bl -> {});
     }
 
     private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {

@@ -15,6 +15,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -44,6 +45,7 @@ class OsmBoardingLocationsModuleTest {
     var provider = new OpenStreetMapProvider(file, false);
 
     var osmModule = new OpenStreetMapModule(List.of(provider), Set.of("ref", "ref:IFOPT"));
+    osmModule.skipVisibility = false;
 
     osmModule.buildGraph(graph, extra);
 
@@ -74,7 +76,7 @@ class OsmBoardingLocationsModuleTest {
       .of(platform.getIncoming(), platform.getOutgoing())
       .forEach(edges ->
         assertEquals(
-          Set.of(BoardingLocationToStopLink.class, StreetEdge.class),
+          Set.of(BoardingLocationToStopLink.class, AreaEdge.class),
           edges.stream().map(Edge::getClass).collect(Collectors.toSet())
         )
       );
@@ -108,6 +110,6 @@ class OsmBoardingLocationsModuleTest {
       .stream()
       .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
       .filter(StreetEdge.class::isInstance)
-      .forEach(e -> assertEquals("platform", e.getName().toString()));
+      .forEach(e -> assertEquals("101;102", e.getName().toString()));
   }
 }
