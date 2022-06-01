@@ -398,12 +398,13 @@ public class TimetableHelper {
     } else {
       return 0;
     }
-  }/**
+  }
+
+  /**
    * Maps the (very limited) SIRI 2.0 OccupancyEnum to internal OccupancyStatus
    * @param occupancy
    * @return
    */
-
   private static OccupancyStatus resolveOccupancyStatus(OccupancyEnumeration occupancy) {
     if (occupancy != null) {
       return switch (occupancy) {
@@ -423,7 +424,6 @@ public class TimetableHelper {
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
-
   public static List<StopLocation> createModifiedStops(
     TripPattern pattern,
     EstimatedVehicleJourney journey,
