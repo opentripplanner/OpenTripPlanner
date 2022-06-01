@@ -85,48 +85,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     //no inputs
   }
 
-  private static void linkBoardingLocationToStreetNetwork(
-    VertexLinker linker,
-    OsmBoardingLocationVertex boardingLocation
-  ) {
-    linker.linkVertexPermanently(
-      boardingLocation,
-      new TraverseModeSet(TraverseMode.WALK),
-      LinkingDirection.BOTH_WAYS,
-      (osmBoardingLocationVertex, splitVertex) -> {
-        // the OSM boarding location vertex is not connected to the street network, so we
-        // need to link it to the platform
-        return List.of(
-          linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
-          linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)
-        );
-      }
-    );
-  }
-
-  private static StreetEdge linkBoardingLocationToStreetNetwork(
-    StreetVertex from,
-    StreetVertex to
-  ) {
-    var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    return new StreetEdge(
-      from,
-      to,
-      line,
-      new LocalizedString("name.platform"),
-      SphericalDistanceLibrary.length(line),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      false
-    );
-  }
-
-  private static <T extends Vertex> List<T> getVerticesOfType(
-    List<Vertex> nearbyVertices,
-    Class<T> type
-  ) {
-    return nearbyVertices.stream().filter(type::isInstance).map(type::cast).toList();
-  }
-
   private boolean connectVertexToStop(
     TransitStopVertex ts,
     StreetVertexIndex index,
