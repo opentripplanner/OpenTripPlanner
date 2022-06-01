@@ -75,6 +75,8 @@
     "Total Walk": "Długość trasy do pokonania pieszo",
     "Total Bike": "Długośc trasy do pokonania rowerem",
     "Total drive": "",
+    "Elevation Gained": "",
+    "Elevation Lost": "wzniesienie",
     "Transfers": "Przesiadki",
     "Fare": "Koszt",
     "Valid": "Aktualna",
