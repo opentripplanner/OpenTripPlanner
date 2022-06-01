@@ -18,6 +18,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.util.NonLocalizedString;
 
 class StreetTransitEntityLinkTest {
 
@@ -25,7 +26,7 @@ class StreetTransitEntityLinkTest {
 
   Stop inaccessibleStop = Stop.stopForTest(
     "A:inaccessible",
-    "wheelchair inaccessible stop",
+    new NonLocalizedString("wheelchair inaccessible stop"),
     10.001,
     10.001,
     null,
@@ -33,14 +34,21 @@ class StreetTransitEntityLinkTest {
   );
   Stop accessibleStop = Stop.stopForTest(
     "A:accessible",
-    "wheelchair accessible stop",
+    new NonLocalizedString("wheelchair accessible stop"),
     10.001,
     10.001,
     null,
     POSSIBLE
   );
 
-  Stop unknownStop = Stop.stopForTest("A:unknown", "unknown", 10.001, 10.001, null, NO_INFORMATION);
+  Stop unknownStop = Stop.stopForTest(
+    "A:unknown",
+    new NonLocalizedString("unknown"),
+    10.001,
+    10.001,
+    null,
+    NO_INFORMATION
+  );
 
   @Test
   void disallowInaccessibleStop() {

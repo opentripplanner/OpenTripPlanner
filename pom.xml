@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>25</otp.serialization.version.id>
+        <otp.serialization.version.id>26</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>26.4</geotools.version>
         <jackson.version>2.13.2</jackson.version>

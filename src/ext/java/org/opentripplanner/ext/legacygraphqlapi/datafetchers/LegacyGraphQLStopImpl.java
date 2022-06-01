@@ -134,7 +134,31 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<String> desc() {
     return environment ->
-      getValue(environment, StopLocation::getDescription, Station::getDescription);
+      getValue(
+        environment,
+        stop -> LegacyGraphQLUtils.getTranslation(stop.getDescription(), environment),
+        station -> LegacyGraphQLUtils.getTranslation(station.getDescription(), environment)
+      );
+  }
+
+  @Override
+  public DataFetcher<String> url() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
+        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
+      );
+  }
+
+  @Override
+  public DataFetcher<Object> locationType() {
+    return environment -> getValue(environment, stop -> "STOP", station -> "STATION");
+  }
+
+  @Override
+  public DataFetcher<Object> parentStation() {
+    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
   }
 
   // TODO
@@ -170,11 +194,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Object> locationType() {
-    return environment -> getValue(environment, stop -> "STOP", station -> "STATION");
-  }
-
-  @Override
   public DataFetcher<Double> lon() {
     return environment -> getValue(environment, StopLocation::getLon, Station::getLon);
   }
@@ -187,11 +206,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
         station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
       );
-  }
-
-  @Override
-  public DataFetcher<Object> parentStation() {
-    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
   }
 
   @Override
@@ -407,16 +421,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             .collect(Collectors.toList());
         },
         station -> null
-      );
-  }
-
-  @Override
-  public DataFetcher<String> url() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
       );
   }
 
