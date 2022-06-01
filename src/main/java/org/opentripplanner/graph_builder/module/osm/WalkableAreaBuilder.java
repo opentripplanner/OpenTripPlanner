@@ -127,12 +127,11 @@ public class WalkableAreaBuilder {
    * visibility calculations
    */
   public void buildWithoutVisibility(AreaGroup group) {
-    Set<Edge> edges = new HashSet<>();
-
     var references = getStopReferences(group);
 
     // create polygon and accumulate nodes for area
     for (Ring ring : group.outermostRings) {
+      Set<AreaEdge> edges = new HashSet<>();
       AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon, references);
       // the points corresponding to concave or hole vertices
       // or those linked to ways
@@ -161,6 +160,17 @@ public class WalkableAreaBuilder {
           }
         }
       }
+      edges
+        .stream()
+        .flatMap(v ->
+          Stream
+            .of(v.getFromVertex(), v.getToVertex())
+            .filter(IntersectionVertex.class::isInstance)
+            .map(IntersectionVertex.class::cast)
+        )
+        .forEach(edgeList::addVertex);
+
+      createNamedAreas(edgeList, ring, group.areas);
     }
   }
 

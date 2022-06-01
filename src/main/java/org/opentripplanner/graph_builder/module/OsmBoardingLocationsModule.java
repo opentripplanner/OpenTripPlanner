@@ -147,7 +147,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .map(AreaEdge::getArea)
       .collect(Collectors.toSet());
 
-    // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or id
+    // Iterate over all nearby areas representing transit stops in OSM, linking to them if they have a stop code or id
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
     for (var edgeList : nearbyEdgeLists) {
       if (
