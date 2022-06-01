@@ -19,20 +19,20 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class VehiclePositionsMatcherTest {
 
   ZoneId zoneId = ZoneId.of("Europe/Berlin");
-  String feedId = "feed1";
   String tripId = "trip1";
-  FeedScopedId scopedTripId = new FeedScopedId(feedId, tripId);
+  FeedScopedId scopedTripId = TransitModelForTest.id(tripId);
 
   @Test
   public void matchRealtimePositionsToTrip() {
@@ -53,11 +53,11 @@ public class VehiclePositionsMatcherTest {
 
   private void testVehiclePositions(VehiclePosition pos) {
     var service = new RealtimeVehiclePositionService();
-    var trip = new Trip(scopedTripId);
+    var trip = TransitModelForTest.trip(tripId).build();
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
     var stopPattern = new StopPattern(stopTimes);
 
-    var pattern = new TripPattern(new FeedScopedId(feedId, tripId), null, stopPattern);
+    var pattern = new TripPattern(TransitModelForTest.id(tripId), null, stopPattern);
     pattern
       .getScheduledTimetable()
       .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
@@ -70,7 +70,7 @@ public class VehiclePositionsMatcherTest {
 
     // Map positions to trips in feed
     VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
-      feedId,
+      TransitModelForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
@@ -100,11 +100,11 @@ public class VehiclePositionsMatcherTest {
 
     var tripId1 = "trip1";
     var tripId2 = "trip2";
-    var scopedTripId1 = new FeedScopedId(feedId, tripId1);
-    var scopedTripId2 = new FeedScopedId(feedId, tripId2);
+    var scopedTripId1 = TransitModelForTest.id(tripId1);
+    var scopedTripId2 = TransitModelForTest.id(tripId2);
 
-    var trip1 = new Trip(scopedTripId1);
-    var trip2 = new Trip(scopedTripId2);
+    var trip1 = TransitModelForTest.trip(tripId1).build();
+    var trip2 = TransitModelForTest.trip(tripId2).build();
 
     var stopPattern1 = new StopPattern(
       List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2))
@@ -114,8 +114,8 @@ public class VehiclePositionsMatcherTest {
       List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2))
     );
 
-    var pattern1 = new TripPattern(new FeedScopedId(feedId, tripId1), null, stopPattern1);
-    var pattern2 = new TripPattern(new FeedScopedId(feedId, tripId2), null, stopPattern2);
+    var pattern1 = new TripPattern(TransitModelForTest.id(tripId1), null, stopPattern1);
+    var pattern2 = new TripPattern(TransitModelForTest.id(tripId2), null, stopPattern2);
 
     var tripForId = Map.of(scopedTripId1, trip1, scopedTripId2, trip2);
 
@@ -126,7 +126,7 @@ public class VehiclePositionsMatcherTest {
 
     // Map positions to trips in feed
     VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
-      feedId,
+      TransitModelForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
@@ -162,7 +162,7 @@ public class VehiclePositionsMatcherTest {
   @ParameterizedTest(name = "{0} should resolve to {1}")
   @VariableSource("inferenceTestCases")
   void inferServiceDayOfTripAt6(String time, String expectedDate) {
-    var trip = new Trip(scopedTripId);
+    var trip = TransitModelForTest.trip(tripId).build();
 
     var sixOclock = (int) Duration.ofHours(18).toSeconds();
     var fivePast6 = sixOclock + 300;
@@ -179,7 +179,7 @@ public class VehiclePositionsMatcherTest {
 
   @Test
   void inferServiceDateCloseToMidnight() {
-    var trip = new Trip(scopedTripId);
+    var trip = TransitModelForTest.trip(tripId).build();
 
     var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
     var fivePastMidnight = fiveToMidnight + (10 * 60);

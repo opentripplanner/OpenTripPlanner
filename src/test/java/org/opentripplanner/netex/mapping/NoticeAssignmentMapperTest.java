@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
@@ -46,7 +46,7 @@ public class NoticeAssignmentMapperTest {
     noticeAssignment.setNoticedObjectRef(new VersionOfObjectRefStructure().withRef(ROUTE_ID));
     noticeAssignment.setNotice(NOTICE);
 
-    Route route = new Route(MappingSupport.ID_FACTORY.createId(ROUTE_ID));
+    Route route = TransitModelForTest.route(ROUTE_ID).build();
 
     EntityById<Route> routesById = new EntityById<>();
     routesById.add(route);
@@ -85,7 +85,7 @@ public class NoticeAssignmentMapperTest {
         )
     );
 
-    Trip trip = new Trip(TransitModelForTest.id("1"));
+    var trip = TransitModelForTest.trip("1").build();
     StopTime stopTime1 = createStopTime(1, trip);
     StopTime stopTime2 = createStopTime(2, trip);
 

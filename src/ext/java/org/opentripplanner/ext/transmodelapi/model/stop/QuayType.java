@@ -15,16 +15,18 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.util.I18NString;
 
 public class QuayType {
 
@@ -92,7 +94,14 @@ public class QuayType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> (((StopLocation) environment.getSource()).getDescription()))
+          .dataFetcher(environment -> {
+            I18NString description = (((StopLocation) environment.getSource()).getDescription());
+            if (description != null) {
+              Locale locale = TransmodelGraphQLUtils.getLocale(environment);
+              return description.toString(locale);
+            }
+            return null;
+          })
           .build()
       )
       .field(
@@ -125,9 +134,12 @@ public class QuayType {
           .description("Whether this quay is suitable for wheelchair boarding.")
           .dataFetcher(environment -> {
             var wheelChairBoarding =
-              (((StopLocation) environment.getSource()).getWheelchairBoarding());
+              (((StopLocation) environment.getSource()).getWheelchairAccessibility());
 
-            return Objects.requireNonNullElse(wheelChairBoarding, WheelchairBoarding.NO_INFORMATION)
+            return Objects.requireNonNullElse(
+              wheelChairBoarding,
+              WheelchairAccessibility.NO_INFORMATION
+            )
               .gtfsCode;
           })
           .build()

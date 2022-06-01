@@ -16,11 +16,9 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -31,7 +29,9 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
 
@@ -176,7 +176,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> blockId() {
-    return environment -> getSource(environment).getBlockId();
+    return environment -> getSource(environment).getGtfsBlockId();
   }
 
   @Override
@@ -260,10 +260,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<String> routeShortName() {
     return environment -> {
       Trip trip = getSource(environment);
-
-      return trip.getRouteShortName() != null
-        ? trip.getRouteShortName()
-        : trip.getRoute().getShortName();
+      return trip.getRoute().getShortName();
     };
   }
 
@@ -363,12 +360,12 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> tripHeadsign() {
-    return environment -> getSource(environment).getTripHeadsign();
+    return environment -> getSource(environment).getHeadsign();
   }
 
   @Override
   public DataFetcher<String> tripShortName() {
-    return environment -> getSource(environment).getTripShortName();
+    return environment -> getSource(environment).getShortName();
   }
 
   @Override

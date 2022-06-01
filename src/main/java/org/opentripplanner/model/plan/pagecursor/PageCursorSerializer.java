@@ -50,7 +50,7 @@ final class PageCursorSerializer {
 
   @Nullable
   public static PageCursor decode(String cursor) {
-    if (cursor == null) {
+    if (cursor == null || cursor.isBlank()) {
       return null;
     }
 

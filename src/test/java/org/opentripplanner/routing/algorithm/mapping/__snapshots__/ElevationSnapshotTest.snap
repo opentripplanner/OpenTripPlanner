@@ -114,6 +114,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -132,6 +135,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 343,
@@ -182,6 +188,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -200,6 +209,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 50,
@@ -896,6 +908,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -914,6 +929,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 343,
@@ -964,6 +982,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -982,6 +1003,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 50,
@@ -1355,6 +1379,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -1373,6 +1400,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 343,
@@ -1423,6 +1453,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -1441,6 +1474,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 50,
@@ -2137,6 +2173,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -2155,6 +2194,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 343,
@@ -2205,6 +2247,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -2223,6 +2268,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 50,
@@ -2731,6 +2779,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -2749,6 +2800,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 343,
@@ -2799,6 +2853,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "transitLeg": false,
@@ -2817,6 +2874,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
+            "networks": [
+              "test-network"
+            ],
             "vertexType": "BIKESHARE"
           },
           "generalizedCost": 334,

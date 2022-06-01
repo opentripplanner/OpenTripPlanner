@@ -21,6 +21,6 @@ public class BrandingMapper {
     }
     // Make an id from the url, the id is required
     var id = new FeedScopedId(route.getId().getAgencyId(), route.getBrandingUrl());
-    return Branding.of(id).setUrl(route.getBrandingUrl()).build();
+    return Branding.of(id).withUrl(route.getBrandingUrl()).build();
   }
 }

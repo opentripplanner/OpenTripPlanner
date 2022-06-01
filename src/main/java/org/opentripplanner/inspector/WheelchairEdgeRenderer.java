@@ -2,7 +2,7 @@ package org.opentripplanner.inspector;
 
 import java.awt.Color;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -57,14 +57,16 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
   public boolean renderVertex(Vertex v, EdgeVertexTileRenderer.VertexVisualAttributes attrs) {
     if (v instanceof TransitStopVertex) {
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() ==
-        WheelchairBoarding.NO_INFORMATION
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
+        WheelchairAccessibility.NO_INFORMATION
       ) attrs.color = NO_WHEELCHAIR_INFORMATION_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() == WheelchairBoarding.POSSIBLE
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
+        WheelchairAccessibility.POSSIBLE
       ) attrs.color = YES_WHEELCHAIR_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairBoarding() == WheelchairBoarding.NOT_POSSIBLE
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
+        WheelchairAccessibility.NOT_POSSIBLE
       ) attrs.color = NO_WHEELCHAIR_COLOR;
       attrs.label = v.getDefaultName();
     } else {

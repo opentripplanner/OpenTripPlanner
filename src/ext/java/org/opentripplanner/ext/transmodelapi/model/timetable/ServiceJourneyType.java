@@ -23,11 +23,11 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.TripTimesShortHelper;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class ServiceJourneyType {
@@ -113,7 +113,7 @@ public class ServiceJourneyType {
           .description(
             "Publicly announced code for service journey, differentiating it from other service journeys for the same line."
           )
-          .dataFetcher(environment -> ((trip(environment)).getTripShortName()))
+          .dataFetcher(environment -> ((trip(environment)).getShortName()))
           .build()
       )
       .field(
@@ -122,7 +122,7 @@ public class ServiceJourneyType {
           .name("privateCode")
           .type(Scalars.GraphQLString)
           .description("For internal use by operators.")
-          .dataFetcher(environment -> ((trip(environment)).getInternalPlanningCode()))
+          .dataFetcher(environment -> ((trip(environment)).getNetexInternalPlanningCode()))
           .build()
       )
       .field(
@@ -151,7 +151,7 @@ public class ServiceJourneyType {
             "DatedServiceJourney. We will create artificial DSJs for the old SJs."
           )
           .type(EnumTypes.SERVICE_ALTERATION)
-          .dataFetcher(environment -> trip(environment).getTripAlteration())
+          .dataFetcher(environment -> trip(environment).getNetexAlteration())
           .build()
       )
       .field(

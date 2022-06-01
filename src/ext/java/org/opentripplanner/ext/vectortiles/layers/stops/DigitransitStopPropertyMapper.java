@@ -57,14 +57,14 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
         })
         .collect(Collectors.toList())
     );
-
+    String desc = stop.getDescription() != null ? stop.getDescription().toString() : null;
     return List.of(
       new T2<>("gtfsId", stop.getId().toString()),
       // Name is I18NString now, we return default name
       new T2<>("name", stop.getName().toString()),
       new T2<>("code", stop.getCode()),
       new T2<>("platform", stop.getPlatformCode()),
-      new T2<>("desc", stop.getDescription()),
+      new T2<>("desc", desc),
       new T2<>(
         "parentStation",
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"

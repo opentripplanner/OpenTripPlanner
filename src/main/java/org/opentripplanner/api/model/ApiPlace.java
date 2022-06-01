@@ -1,6 +1,7 @@
 package org.opentripplanner.api.model;
 
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -70,6 +71,11 @@ public class ApiPlace {
    * In case the vertex is of type Bike sharing station.
    */
   public String bikeShareId;
+
+  /**
+   * The vehicle rental networks that are available at this place.
+   */
+  public List<String> networks;
 
   /**
    * In case the vertex is of type VEHICLEPARKING.

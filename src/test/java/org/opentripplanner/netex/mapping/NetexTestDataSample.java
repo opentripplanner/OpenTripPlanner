@@ -17,6 +17,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
@@ -68,7 +69,7 @@ class NetexTestDataSample {
   private final HierarchicalMapById<OperatingDay> operatingDaysById = new HierarchicalMapById<>();
   private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneyBySjId = ArrayListMultimap.create();
 
-  private final EntityById<org.opentripplanner.model.Route> otpRouteByid = new EntityById<>();
+  private final EntityById<org.opentripplanner.transit.model.network.Route> otpRouteByid = new EntityById<>();
 
   NetexTestDataSample() {
     final int[] stopTimes = { 0, 4, 10, 15 };
@@ -81,12 +82,7 @@ class NetexTestDataSample {
     JAXBElement<LineRefStructure> lineRef = createWrappedRef(line.getId(), LineRefStructure.class);
 
     // Add OTP Route (correspond to Netex Line)
-    {
-      org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route(
-        ID_FACTORY.createId(line.getId())
-      );
-      otpRouteByid.add(otpRoute);
-    }
+    otpRouteByid.add(TransitModelForTest.route(line.getId()).build());
 
     // Add Netex Route (not the same as an OTP Route)
     String routeId = "RUT:Route:1";
@@ -230,7 +226,7 @@ class NetexTestDataSample {
     return journeyPatternById;
   }
 
-  EntityById<org.opentripplanner.model.Route> getOtpRouteByid() {
+  EntityById<org.opentripplanner.transit.model.network.Route> getOtpRouteByid() {
     return otpRouteByid;
   }
 

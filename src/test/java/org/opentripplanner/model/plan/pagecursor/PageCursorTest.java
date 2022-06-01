@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan.pagecursor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
@@ -75,5 +76,12 @@ public class PageCursorTest {
     buf = subjectArriveBy.encode();
     before = PageCursor.decode(buf);
     assertEquals(subjectArriveBy.toString(), before.toString());
+  }
+
+  @Test
+  public void testDecodeEmptyCursor() {
+    assertNull(PageCursor.decode(null));
+    assertNull(PageCursor.decode(""));
+    assertNull(PageCursor.decode(" "));
   }
 }

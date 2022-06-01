@@ -4,7 +4,7 @@ import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -12,16 +12,16 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
@@ -38,8 +38,8 @@ import org.opentripplanner.util.time.TimeUtils;
 public class TestItineraryBuilder implements PlanTestConstants {
 
   public static final LocalDate SERVICE_DAY = LocalDate.of(2020, Month.FEBRUARY, 2);
-  public static final Route BUS_ROUTE = route(TransitMode.BUS);
-  public static final Route RAIL_ROUTE = route(TransitMode.RAIL);
+  public static final Route BUS_ROUTE = route("1").withMode(TransitMode.BUS).build();
+  public static final Route RAIL_ROUTE = route("2").withMode(TransitMode.RAIL).build();
 
   /**
    * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup the
@@ -133,7 +133,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     LocalDate serviceDate
   ) {
     return transit(
-      BUS_ROUTE,
+      BUS_ROUTE.copy().withShortName(Integer.toString(tripId)).build(),
       tripId,
       startTime,
       endTime,
@@ -197,16 +197,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /** Create a dummy trip */
   private static Trip trip(int id, Route route) {
-    Trip trip = new Trip(new FeedScopedId(FEED_ID, Integer.toString(id)));
-    trip.setRoute(route);
-    return trip;
-  }
-
-  /** Create a dummy route */
-  private static Route route(TransitMode mode) {
-    Route route = new Route(new FeedScopedId(FEED_ID, mode.name()));
-    route.setMode(mode);
-    return route;
+    return TransitModelForTest.trip(Integer.toString(id)).withRoute(route).build();
   }
 
   private static Place stop(Place source) {
@@ -231,7 +222,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     legCost += cost(1.0f, end - start) + BOARD_COST;
 
-    Trip trip = trip(tripId, route);
+    Trip trip = trip(tripId, route.copy().withShortName("" + tripId).build());
 
     final List<StopTime> stopTimes = new ArrayList<>();
     StopTime fromStopTime = new StopTime();

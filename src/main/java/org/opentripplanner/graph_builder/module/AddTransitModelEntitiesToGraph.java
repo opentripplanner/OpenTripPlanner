@@ -22,9 +22,8 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -38,6 +37,7 @@ import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -175,7 +175,8 @@ public class AddTransitModelEntitiesToGraph {
       stationElementNodes.put(boardingArea, boardingAreaVertex);
       if (boardingArea.getParentStop() != null) {
         var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
-        boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelchairBoarding.POSSIBLE;
+        boolean wheelchair =
+          boardingArea.getWheelchairAccessibility() == WheelchairAccessibility.POSSIBLE;
 
         PathwayEdge.lowCost(
           boardingAreaVertex,

@@ -17,24 +17,24 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded
@@ -172,13 +172,12 @@ public class NetexBundleSmokeTest {
     Map<FeedScopedId, Trip> map = trips.stream().collect(Collectors.toMap(Trip::getId, t -> t));
     Trip t = map.get(fId("RUT:ServiceJourney:12-101375-1001"));
 
-    assertEquals("Jernbanetorget", t.getTripHeadsign());
-    assertNull(t.getTripShortName());
+    assertEquals("Jernbanetorget", t.getHeadsign());
+    assertNull(t.getShortName());
     assertNotNull(t.getServiceId());
     assertEquals("Ruter", t.getOperator().getName());
-    assertEquals("Ruter", t.getTripOperator().getName());
     assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
-    assertEquals(WheelchairBoarding.NO_INFORMATION, t.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.NO_INFORMATION, t.getWheelchairBoarding());
     assertEquals(4, trips.size());
   }
 

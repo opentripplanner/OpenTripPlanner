@@ -64,7 +64,7 @@ public class SpeedTest {
     this.router = new Router(graph, RouterConfig.DEFAULT, timer.getRegistry());
     this.router.startup();
 
-    timer.setUp();
+    timer.setUp(opts.groupResultsByCategory());
   }
 
   public static void main(String[] args) {
@@ -115,9 +115,9 @@ public class SpeedTest {
     }
 
     // Filter test-cases based on tags. Include all test-cases which include ALL listed tags.
-    Collection<String> includeTags = opts.includeTags();
-    if (!includeTags.isEmpty()) {
-      cases = cases.stream().filter(tc -> tc.definition().tags().containsAll(includeTags)).toList();
+    Collection<String> categories = opts.includeCategories();
+    if (!categories.isEmpty()) {
+      cases = cases.stream().filter(c -> includeCategory(categories, c)).toList();
     }
     return cases;
   }
@@ -184,7 +184,9 @@ public class SpeedTest {
   private boolean runSingleTestCase(TestCase testCase, boolean ignoreResults) {
     try {
       if (!ignoreResults) {
-        System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
+        System.err.println(
+          ResultPrinter.headerLine("#" + testCase.definition().idAndDescription())
+        );
       }
 
       var speedTestRequest = new SpeedTestRequest(
@@ -245,5 +247,9 @@ public class SpeedTest {
 
   private List<TestCase> createNewSetOfTestCases() {
     return testCaseInputs.stream().map(in -> in.createTestCase(opts.skipCost())).toList();
+  }
+
+  private static boolean includeCategory(Collection<String> includeCategories, TestCaseInput c) {
+    return includeCategories.contains(c.definition().category());
   }
 }

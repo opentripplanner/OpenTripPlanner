@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import java.util.EnumSet;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 public enum TraverseMode {
   WALK,

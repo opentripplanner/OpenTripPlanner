@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
 import java.util.function.IntFunction;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class generate TransferPoints adapted to Raptor. The internal model {@link

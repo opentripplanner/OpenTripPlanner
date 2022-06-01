@@ -10,14 +10,13 @@ import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -50,8 +49,7 @@ public class TripMapperTest {
     var access = new AccessibilityAssessment();
 
     var transitBuilder = new OtpTransitServiceBuilder();
-    var route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -69,11 +67,11 @@ public class TripMapperTest {
     access.withLimitations(limitations);
     serviceJourney.withAccessibilityAssessment(access);
     serviceJourney.setLineRef(LINE_REF);
-    var trip = tripMapper.mapServiceJourney(serviceJourney);
+    var trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
     assertNotNull(trip, "trip must not be null");
     assertEquals(
       trip.getWheelchairBoarding(),
-      WheelchairBoarding.POSSIBLE,
+      WheelchairAccessibility.POSSIBLE,
       "Wheelchair accessibility not possible on trip"
     );
   }
@@ -81,8 +79,7 @@ public class TripMapperTest {
   @Test
   public void mapTrip() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
-    Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -99,7 +96,7 @@ public class TripMapperTest {
 
     serviceJourney.setLineRef(LINE_REF);
 
-    Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+    Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId(SERVICE_JOURNEY_ID));
   }
@@ -107,8 +104,7 @@ public class TripMapperTest {
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
-    Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
-    transitBuilder.getRoutes().add(route);
+    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
     journeyPattern.setRouteRef(new RouteRefStructure().withRef(ROUTE_ID));
@@ -138,7 +134,7 @@ public class TripMapperTest {
       Collections.emptySet()
     );
 
-    Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+    Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId("RUT:ServiceJourney:1"));
   }
@@ -151,5 +147,9 @@ public class TripMapperTest {
       createWrappedRef("RUT:JourneyPattern:1", JourneyPatternRefStructure.class)
     );
     return serviceJourney;
+  }
+
+  private String headsign() {
+    return "To Destination";
   }
 }

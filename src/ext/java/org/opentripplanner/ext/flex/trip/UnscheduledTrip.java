@@ -22,8 +22,8 @@ import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This type of FlexTrip is used when a taxi-type service is modeled, which operates in one or
