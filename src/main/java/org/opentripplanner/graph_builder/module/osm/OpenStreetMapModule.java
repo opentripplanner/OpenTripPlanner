@@ -252,8 +252,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         buildBikeParkAndRideAreas();
       }
 
-      extractPlatformCentroids();
-
       buildElevatorEdges(graph);
 
       unifyTurnRestrictions();
@@ -490,11 +488,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         graph.hasBikeRide = true;
       }
       LOG.info("Created {} bike P+R areas.", n);
-    }
-
-    private void extractPlatformCentroids() {
-      LOG.info("Extracting centroids from platforms");
-      osmdb.getBoardingLocationAreas().forEach(bl -> {});
     }
 
     private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {

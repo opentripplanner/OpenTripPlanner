@@ -84,11 +84,6 @@ public class OSMDatabase {
   /* All bike parking areas */
   private final List<Area> bikeParkingAreas = new ArrayList<>();
 
-  /**
-   * Boarding location ways where passengers wait for transit
-   */
-  private final List<Area> boardingLocationAreas = new ArrayList<>();
-
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
 
@@ -181,10 +176,6 @@ public class OSMDatabase {
 
   public Collection<Area> getBikeParkingAreas() {
     return Collections.unmodifiableCollection(bikeParkingAreas);
-  }
-
-  public Collection<Area> getBoardingLocationAreas() {
-    return List.copyOf(boardingLocationAreas);
   }
 
   public Collection<Long> getTurnRestrictionWayIds() {
@@ -879,12 +870,6 @@ public class OSMDatabase {
     }
     if (area.parent.isBikeParking()) {
       bikeParkingAreas.add(area);
-    }
-    if (
-      area.parent.isBoardingLocation() &&
-      !area.parent.getMultiTagValues(boardingAreaRefTags).isEmpty()
-    ) {
-      boardingLocationAreas.add(area);
     }
   }
 
