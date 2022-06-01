@@ -71,8 +71,6 @@ import org.slf4j.LoggerFactory;
  */
 public class WalkableAreaBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
-
   private final DataImportIssueStore issueStore;
 
   private final int maxAreaNodes;
@@ -168,7 +166,7 @@ public class WalkableAreaBuilder {
             .filter(IntersectionVertex.class::isInstance)
             .map(IntersectionVertex.class::cast)
         )
-        .forEach(edgeList::addVertex);
+        .forEach(edgeList.visibilityVertices::add);
 
       createNamedAreas(edgeList, ring, group.areas);
     }
