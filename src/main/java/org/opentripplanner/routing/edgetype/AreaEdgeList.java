@@ -32,10 +32,13 @@ public class AreaEdgeList implements Serializable {
   // to fix up areas after network linking.
   private final Polygon originalEdges;
 
+  public final Set<String> references;
+
   private final List<NamedArea> areas = new ArrayList<>();
 
-  public AreaEdgeList(Polygon originalEdges) {
+  public AreaEdgeList(Polygon originalEdges, Set<String> references) {
     this.originalEdges = originalEdges;
+    this.references = references;
   }
 
   /**
@@ -91,6 +94,10 @@ public class AreaEdgeList implements Serializable {
 
   public List<NamedArea> getAreas() {
     return areas;
+  }
+
+  public Geometry getGeometry() {
+    return originalEdges;
   }
 
   private void createSegments(

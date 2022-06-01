@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -69,7 +69,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (alreadyLinked) continue;
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
-        if (!connectVertexToStop(ts, streetIndex, graph.getLinker())) {
+        if (!connectVertexToStop(ts, streetIndex, graph.getLinker(), graph)) {
           LOG.debug("Could not connect {} at {}", ts.getStop().getCode(), ts.getCoordinate());
         } else {
           successes++;
@@ -129,7 +129,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private boolean connectVertexToStop(
     TransitStopVertex ts,
     StreetVertexIndex index,
-    VertexLinker linker
+    VertexLinker linker,
+    Graph graph
   ) {
     var stopCode = ts.getStop().getCode();
     var stopId = ts.getStop().getId().getId();
@@ -138,19 +139,33 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
-    var nearbyVertices = index.getVerticesForEnvelope(envelope).stream().toList();
-    var boardingLocations = getVerticesOfType(nearbyVertices, OsmBoardingLocationVertex.class);
+    var nearbyEdgeLists = index
+      .getEdgesForEnvelope(envelope)
+      .stream()
+      .filter(AreaEdge.class::isInstance)
+      .map(AreaEdge.class::cast)
+      .map(AreaEdge::getArea)
+      .collect(Collectors.toSet());
 
     // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code or id
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
-    for (var boardingLocation : boardingLocations) {
+    for (var edgeList : nearbyEdgeLists) {
       if (
-        (stopCode != null && boardingLocation.references.contains(stopCode)) ||
-        boardingLocation.references.contains(stopId)
+        (stopCode != null && edgeList.references.contains(stopCode)) ||
+        edgeList.references.contains(stopId)
       ) {
-        if (!boardingLocation.isConnectedToStreetNetwork()) {
-          boardingLocation.edgeList.addVertex(boardingLocation);
-        }
+        var label = "platform-centroid/osm/%s".formatted(edgeList.toString());
+        var centroid = edgeList.getGeometry().getCentroid();
+        var boardingLocation = new OsmBoardingLocationVertex(
+          graph,
+          label,
+          centroid.getX(),
+          centroid.getY(),
+          1l,
+          "centroid of",
+          edgeList.references
+        );
+        edgeList.addVertex(boardingLocation);
 
         new BoardingLocationToStopLink(ts, boardingLocation);
         new BoardingLocationToStopLink(boardingLocation, ts);

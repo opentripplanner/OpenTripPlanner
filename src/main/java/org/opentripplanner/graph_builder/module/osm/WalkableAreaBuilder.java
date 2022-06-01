@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,7 +46,6 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
@@ -132,9 +129,11 @@ public class WalkableAreaBuilder {
   public void buildWithoutVisibility(AreaGroup group) {
     Set<Edge> edges = new HashSet<>();
 
+    var references = getStopReferences(group);
+
     // create polygon and accumulate nodes for area
     for (Ring ring : group.outermostRings) {
-      AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon);
+      AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon, references);
       // the points corresponding to concave or hole vertices
       // or those linked to ways
       HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
@@ -189,31 +188,13 @@ public class WalkableAreaBuilder {
       )
       .collect(Collectors.toSet());
 
+    var references = getStopReferences(group);
+
     // create polygon and accumulate nodes for area
     for (Ring ring : group.outermostRings) {
       Polygon polygon = ring.jtsPolygon;
-      AreaEdgeList edgeList = new AreaEdgeList(polygon);
 
-      group.areas
-        .stream()
-        .filter(g -> g.parent.isBoardingLocation())
-        .forEach(g -> {
-          var references = g.parent.getMultiTagValues(Set.of("ref", "ref:IFOPT"));
-          var centroid = g.jtsMultiPolygon.getCentroid();
-          if (!references.isEmpty() && !centroid.isEmpty()) {
-            var label = "platform-centroid/osm/%s".formatted(g.parent.getId());
-            new OsmBoardingLocationVertex(
-              graph,
-              label,
-              centroid.getX(),
-              centroid.getY(),
-              g.parent.getId(),
-              g.parent.getTag("name"),
-              references,
-              edgeList
-            );
-          }
-        });
+      AreaEdgeList edgeList = new AreaEdgeList(polygon, references);
 
       // the points corresponding to concave or hole vertices
       // or those linked to ways
@@ -368,6 +349,14 @@ public class WalkableAreaBuilder {
       }
     }
     pruneAreaEdges(startingVertices, edges, ringEdges);
+  }
+
+  private Set<String> getStopReferences(AreaGroup group) {
+    return group.areas
+      .stream()
+      .filter(g -> g.parent.isBoardingLocation())
+      .flatMap(g -> g.parent.getMultiTagValues(Set.of("ref", "ref:IFOPT")).stream())
+      .collect(Collectors.toSet());
   }
 
   /**

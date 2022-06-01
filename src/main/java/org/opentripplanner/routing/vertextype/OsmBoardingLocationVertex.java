@@ -21,7 +21,6 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class OsmBoardingLocationVertex extends OsmVertex {
 
   public final Set<String> references;
-  public final AreaEdgeList edgeList;
 
   public OsmBoardingLocationVertex(
     Graph g,
@@ -30,12 +29,10 @@ public class OsmBoardingLocationVertex extends OsmVertex {
     double y,
     long nodeId,
     @Nullable String name,
-    Collection<String> references,
-    AreaEdgeList edgeList
+    Collection<String> references
   ) {
     super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
     this.references = Set.copyOf(references);
-    this.edgeList = edgeList;
   }
 
   public boolean isConnectedToStreetNetwork() {

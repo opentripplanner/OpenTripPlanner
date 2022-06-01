@@ -382,8 +382,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 coordinate.y,
                 nid,
                 name,
-                refs,
-                null
+                refs
               );
           }
         }
