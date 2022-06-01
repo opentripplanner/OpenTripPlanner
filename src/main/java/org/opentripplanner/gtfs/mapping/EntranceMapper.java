@@ -49,11 +49,18 @@ class EntranceMapper {
       base.getName()
     );
 
+    final I18NString desc = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "desc",
+      base.getId().getId(),
+      base.getDescription()
+    );
+
     return new Entrance(
       base.getId(),
       name,
       base.getCode(),
-      base.getDescription(),
+      desc,
       base.getCoordinate(),
       base.getWheelchairAccessibility(),
       base.getLevel()

@@ -76,7 +76,7 @@ public class EntranceMapperTest {
 
     assertEquals("A:E1", result.getId().toString());
     assertEquals(CODE, result.getCode());
-    assertEquals(DESC, result.getDescription());
+    assertEquals(DESC, result.getDescription().toString());
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
