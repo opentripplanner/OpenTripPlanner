@@ -115,6 +115,7 @@ public class GraphBuilder implements Runnable {
       }
       GtfsModule gtfsModule = new GtfsModule(gtfsBundles, config.getTransitServicePeriod());
       gtfsModule.setFareServiceFactory(config.fareServiceFactory);
+      gtfsModule.setDiscardMinTransferTimes(config.discardMinTransferTimes);
       graphBuilder.addModule(gtfsModule);
     }
 

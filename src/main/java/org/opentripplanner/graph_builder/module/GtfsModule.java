@@ -61,6 +61,7 @@ public class GtfsModule implements GraphBuilderModule {
   private DataImportIssueStore issueStore;
   private FareServiceFactory fareServiceFactory;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
+  private boolean discardMinTransferTimes;
 
   public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
     this.gtfsBundles = bundles;
@@ -106,6 +107,7 @@ public class GtfsModule implements GraphBuilderModule {
         GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
           gtfsBundle.getFeedId().getId(),
           issueStore,
+          discardMinTransferTimes,
           gtfsDao
         );
         mapper.mapStopTripAndRouteDatantoBuilder();
@@ -155,7 +157,9 @@ public class GtfsModule implements GraphBuilderModule {
     graph.calculateTransitCenter();
   }
 
-  /* Private Methods */
+  public void setDiscardMinTransferTimes(boolean discardMinTransferTimes) {
+    this.discardMinTransferTimes = discardMinTransferTimes;
+  }
 
   @Override
   public void checkInputs() {
@@ -163,6 +167,8 @@ public class GtfsModule implements GraphBuilderModule {
       bundle.checkInputs();
     }
   }
+
+  /* Private Methods */
 
   /**
    * This method have side-effects, the {@code stopTimesByTrip} is updated.

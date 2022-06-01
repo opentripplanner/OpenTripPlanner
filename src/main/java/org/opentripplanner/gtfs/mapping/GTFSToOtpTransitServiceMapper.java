@@ -65,14 +65,17 @@ public class GTFSToOtpTransitServiceMapper {
   private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
   private final TranslationHelper translationHelper;
+  private final boolean discardMinTransferTimes;
 
   public GTFSToOtpTransitServiceMapper(
     String feedId,
     DataImportIssueStore issueStore,
+    boolean discardMinTransferTimes,
     GtfsRelationalDao data
   ) {
     this.issueStore = issueStore;
     this.data = data;
+    this.discardMinTransferTimes = discardMinTransferTimes;
     translationHelper = new TranslationHelper();
     feedInfoMapper = new FeedInfoMapper(feedId);
     agencyMapper = new AgencyMapper(feedId);
@@ -139,6 +142,7 @@ public class GTFSToOtpTransitServiceMapper {
       stopMapper,
       tripMapper,
       builder.getStopTimesSortedByTrip(),
+      discardMinTransferTimes,
       issueStore
     );
     builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
