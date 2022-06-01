@@ -1,15 +1,16 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Objects;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.util.I18NString;
 
 class VertexAndName {
 
   private final I18NString name;
-  private final OsmVertex vertex;
+  private final IntersectionVertex vertex;
 
-  VertexAndName(I18NString name, OsmVertex vertex) {
+  VertexAndName(I18NString name, IntersectionVertex vertex) {
     this.name = name;
     this.vertex = vertex;
   }
@@ -18,7 +19,7 @@ class VertexAndName {
     return this.name;
   }
 
-  public OsmVertex getVertex() {
+  public IntersectionVertex getVertex() {
     return this.vertex;
   }
 

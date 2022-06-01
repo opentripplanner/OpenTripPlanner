@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -154,15 +155,21 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         (stopCode != null && edgeList.references.contains(stopCode)) ||
         edgeList.references.contains(stopId)
       ) {
-        var label = "platform-centroid/osm/%s".formatted(edgeList.toString());
+        var name = edgeList.getAreas().get(0).getName();
+        var label =
+          "platform-centroid/%s".formatted(
+              edgeList.visibilityVertices
+                .stream()
+                .map(IntersectionVertex::getLabel)
+                .collect(Collectors.joining("/"))
+            );
         var centroid = edgeList.getGeometry().getCentroid();
         var boardingLocation = new OsmBoardingLocationVertex(
           graph,
           label,
           centroid.getX(),
           centroid.getY(),
-          1l,
-          "centroid of",
+          name,
           edgeList.references
         );
         edgeList.addVertex(boardingLocation);

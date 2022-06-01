@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -18,7 +19,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * <p>
  * If the source is an area (way) then the centroid is computed and used.
  */
-public class OsmBoardingLocationVertex extends OsmVertex {
+public class OsmBoardingLocationVertex extends IntersectionVertex {
 
   public final Set<String> references;
 
@@ -27,16 +28,11 @@ public class OsmBoardingLocationVertex extends OsmVertex {
     String label,
     double x,
     double y,
-    long nodeId,
-    @Nullable String name,
+    @Nullable I18NString name,
     Collection<String> references
   ) {
-    super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
+    super(g, label, x, y, name);
     this.references = Set.copyOf(references);
-  }
-
-  public boolean isConnectedToStreetNetwork() {
-    return (getOutgoing().size() + getIncoming().size()) > 0;
   }
 
   @Override

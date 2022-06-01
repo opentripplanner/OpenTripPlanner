@@ -210,7 +210,7 @@ public class WalkableAreaBuilder {
       // or those linked to ways
       HashSet<OSMNode> visibilityNodes = new HashSet<>();
       HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
-      HashSet<OsmVertex> platformLinkingVertices = new HashSet<>();
+      HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       // we need to accumulate visibility points from all contained areas
       // inside this ring, but only for shared nodes; we don't care about
       // convexity, which we'll handle for the grouped area only.
@@ -230,7 +230,7 @@ public class WalkableAreaBuilder {
         Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
         if (nodes != null) {
           for (OSMNode node : nodes) {
-            OsmVertex vertex = handler.getVertexForOsmNode(node, areaEntity);
+            var vertex = handler.getVertexForOsmNode(node, areaEntity);
             platformLinkingVertices.add(vertex);
             visibilityNodes.add(node);
             startingNodes.add(node);
