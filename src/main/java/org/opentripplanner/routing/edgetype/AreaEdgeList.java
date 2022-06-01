@@ -126,8 +126,7 @@ public class AreaEdgeList implements Serializable {
         length,
         area.getPermission(),
         false,
-        this,
-        Set.of()
+        this
       );
       forward.setStreetClass(area.getStreetClass());
       AreaEdge backward = new AreaEdge(
@@ -138,8 +137,7 @@ public class AreaEdgeList implements Serializable {
         length,
         area.getPermission(),
         true,
-        this,
-        Set.of()
+        this
       );
       backward.setStreetClass(area.getStreetClass());
     }

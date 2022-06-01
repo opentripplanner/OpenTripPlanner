@@ -10,8 +10,6 @@ public class AreaEdge extends StreetEdge {
   private static final long serialVersionUID = 6761687673982054612L;
   private final AreaEdgeList area;
 
-  public final Set<String> references;
-
   public AreaEdge(
     IntersectionVertex startEndpoint,
     IntersectionVertex endEndpoint,
@@ -20,12 +18,10 @@ public class AreaEdge extends StreetEdge {
     double length,
     StreetTraversalPermission permissions,
     boolean back,
-    AreaEdgeList area,
-    Set<String> references
+    AreaEdgeList area
   ) {
     super(startEndpoint, endEndpoint, geometry, name, length, permissions, back);
     this.area = area;
-    this.references = Set.copyOf(references);
   }
 
   public AreaEdgeList getArea() {

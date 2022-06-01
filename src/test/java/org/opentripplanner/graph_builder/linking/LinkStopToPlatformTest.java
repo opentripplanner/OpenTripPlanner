@@ -123,8 +123,7 @@ public class LinkStopToPlatformTest {
       line.getLength(),
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       false,
-      area,
-      Set.of()
+      area
     );
   }
 }

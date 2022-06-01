@@ -499,12 +499,6 @@ public class WalkableAreaBuilder {
         endEndpoint.getLabel();
       I18NString name = handler.getNameForWay(areaEntity, label);
 
-      var stopReferences = Optional
-        .of(areaEntity)
-        .filter(OSMWithTags::isBoardingLocation)
-        .map(e -> e.getMultiTagValues(Set.of("ref", "ref:IFOPT")))
-        .orElseGet(Set::of);
-
       AreaEdge street = new AreaEdge(
         startEndpoint,
         endEndpoint,
@@ -513,8 +507,7 @@ public class WalkableAreaBuilder {
         length,
         areaPermissions,
         false,
-        edgeList,
-        stopReferences
+        edgeList
       );
       street.setCarSpeed(carSpeed);
 
@@ -545,8 +538,7 @@ public class WalkableAreaBuilder {
         length,
         areaPermissions,
         true,
-        edgeList,
-        stopReferences
+        edgeList
       );
       backStreet.setCarSpeed(carSpeed);
 
