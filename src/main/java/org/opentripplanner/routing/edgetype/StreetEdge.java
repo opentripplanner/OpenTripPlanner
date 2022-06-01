@@ -587,11 +587,6 @@ public class StreetEdge
     return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
   }
 
-  @Override
-  public boolean hasElevation() {
-    return hasElevationExtension();
-  }
-
   public void setStairs(boolean stairs) {
     flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
   }

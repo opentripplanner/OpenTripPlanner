@@ -7,18 +7,12 @@ import org.opentripplanner.routing.core.TraverseMode;
 public interface StreetCostCalculator {
   boolean isStairs();
 
-  boolean hasElevation();
-
   double getMaxSlope();
 
   boolean isWheelchairAccessible();
 
   default double addWheelchairCost(double cost, WheelchairAccessibilityRequest wheelchair) {
-    double slopeExceededBy = 0;
-
-    if (hasElevation()) {
-      slopeExceededBy = Math.abs(getMaxSlope()) - wheelchair.maxSlope();
-    }
+    var slopeExceededBy = Math.abs(getMaxSlope()) - wheelchair.maxSlope();
 
     if (slopeExceededBy > 0.00001) {
       double reluctance = wheelchair.slopeExceededReluctance();
