@@ -77,7 +77,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         }
       }
     }
-    LOG.info("Found {} OSM references which match a stop's id or code", successes);
+    LOG.info("Found {} OSM platform centroids which match a stop's id or code", successes);
   }
 
   @Override
