@@ -38,7 +38,7 @@ public class LocationMapper {
       NonLocalizedString.ofNullableOrElse(gtfsLocation.getName(), otpLocation.getId().toString())
     );
     otpLocation.setUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()));
-    otpLocation.setDescription(gtfsLocation.getDescription());
+    otpLocation.setDescription(NonLocalizedString.ofNullable(gtfsLocation.getDescription()));
     otpLocation.setZoneId(gtfsLocation.getZoneId());
     try {
       otpLocation.setGeometry(

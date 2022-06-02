@@ -23,7 +23,7 @@ public interface StopLocation {
   /** Name of the StopLocation, if provided */
   I18NString getName();
 
-  String getDescription();
+  I18NString getDescription();
 
   @Nullable
   I18NString getUrl();

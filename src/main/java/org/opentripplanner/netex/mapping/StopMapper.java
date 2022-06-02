@@ -12,6 +12,9 @@ import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.TranslatedString;
 import org.rutebanken.netex.model.Quay;
 
 class StopMapper {
@@ -47,7 +50,9 @@ class StopMapper {
       idFactory.createId(quay.getId()),
       parentStation.getName(),
       quay.getPublicCode(),
-      quay.getDescription() != null ? quay.getDescription().getValue() : null,
+      quay.getDescription() != null
+        ? new NonLocalizedString(quay.getDescription().getValue())
+        : null,
       WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
       wheelchair,
       null,
