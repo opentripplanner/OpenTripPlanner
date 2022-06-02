@@ -113,9 +113,12 @@ public class GraphBuilder implements Runnable {
         gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
         gtfsBundles.add(gtfsBundle);
       }
-      GtfsModule gtfsModule = new GtfsModule(gtfsBundles, config.getTransitServicePeriod());
-      gtfsModule.setFareServiceFactory(config.fareServiceFactory);
-      gtfsModule.setDiscardMinTransferTimes(config.discardMinTransferTimes);
+      GtfsModule gtfsModule = new GtfsModule(
+        gtfsBundles,
+        config.getTransitServicePeriod(),
+        config.fareServiceFactory,
+        config.discardMinTransferTimes
+      );
       graphBuilder.addModule(gtfsModule);
     }
 

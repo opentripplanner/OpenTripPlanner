@@ -58,28 +58,31 @@ public class GtfsModule implements GraphBuilderModule {
    */
   private final ServiceDateInterval transitPeriodLimit;
   private final List<GtfsBundle> gtfsBundles;
+  private final FareServiceFactory fareServiceFactory;
+  private final boolean discardMinTransferTimes;
   private DataImportIssueStore issueStore;
-  private FareServiceFactory fareServiceFactory;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
-  private boolean discardMinTransferTimes;
 
-  public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
+  public GtfsModule(
+    List<GtfsBundle> bundles,
+    ServiceDateInterval transitPeriodLimit,
+    FareServiceFactory fareServiceFactory,
+    boolean discardMinTransferTimes
+  ) {
     this.gtfsBundles = bundles;
     this.transitPeriodLimit = transitPeriodLimit;
+    this.fareServiceFactory = fareServiceFactory;
+    this.discardMinTransferTimes = discardMinTransferTimes;
+  }
+
+  public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
+    this(bundles, transitPeriodLimit, null, false);
   }
 
   public List<String> provides() {
     List<String> result = new ArrayList<>();
     result.add("transit");
     return result;
-  }
-
-  public List<String> getPrerequisites() {
-    return Collections.emptyList();
-  }
-
-  public void setFareServiceFactory(FareServiceFactory factory) {
-    fareServiceFactory = factory;
   }
 
   @Override
@@ -155,10 +158,6 @@ public class GtfsModule implements GraphBuilderModule {
     // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
     graph.hasTransit = graph.hasTransit || hasTransit;
     graph.calculateTransitCenter();
-  }
-
-  public void setDiscardMinTransferTimes(boolean discardMinTransferTimes) {
-    this.discardMinTransferTimes = discardMinTransferTimes;
   }
 
   @Override
