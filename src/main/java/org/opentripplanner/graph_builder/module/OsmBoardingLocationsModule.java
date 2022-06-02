@@ -1,31 +1,20 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.util.LocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +66,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         }
       }
     }
-    LOG.info("Found {} OSM platform centroids which match a stop's id or code", successes);
+    LOG.info("Found {} OSM references which match a stop's id or code", successes);
   }
 
   @Override
@@ -93,6 +82,27 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
+    // if the boarding location is an OSM node it's generated in the OSM processing step but we need
+    // link it here
+    var nearbyBoardingLocations = index
+      .getVerticesForEnvelope(envelope)
+      .stream()
+      .filter(OsmBoardingLocationVertex.class::isInstance)
+      .map(OsmBoardingLocationVertex.class::cast)
+      .collect(Collectors.toSet());
+
+    for (var boardingLocation : nearbyBoardingLocations) {
+      if (
+        (stopCode != null && boardingLocation.references.contains(stopCode)) ||
+        boardingLocation.references.contains(stopId)
+      ) {
+        linkBoardingLocationToStop(ts, stopCode, boardingLocation);
+        return true;
+      }
+    }
+
+    // if the boarding location is a OSM way (an area) then we are generating the vertex here and
+    // use the AreaEdgeList to link it to the correct vertices of the platform edge
     var nearbyEdgeLists = index
       .getEdgesForEnvelope(envelope)
       .stream()
@@ -127,18 +137,26 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         );
         edgeList.addVertex(boardingLocation);
 
-        new BoardingLocationToStopLink(ts, boardingLocation);
-        new BoardingLocationToStopLink(boardingLocation, ts);
-        LOG.debug(
-          "Connected {} ({}) to {} at {}",
-          ts,
-          stopCode,
-          boardingLocation.getLabel(),
-          boardingLocation.getCoordinate()
-        );
+        linkBoardingLocationToStop(ts, stopCode, boardingLocation);
         return true;
       }
     }
     return false;
+  }
+
+  private void linkBoardingLocationToStop(
+    TransitStopVertex ts,
+    String stopCode,
+    OsmBoardingLocationVertex boardingLocation
+  ) {
+    new BoardingLocationToStopLink(ts, boardingLocation);
+    new BoardingLocationToStopLink(boardingLocation, ts);
+    LOG.debug(
+      "Connected {} ({}) to {} at {}",
+      ts,
+      stopCode,
+      boardingLocation.getLabel(),
+      boardingLocation.getCoordinate()
+    );
   }
 }

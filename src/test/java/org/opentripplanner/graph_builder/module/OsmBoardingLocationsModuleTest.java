@@ -32,9 +32,6 @@ import org.opentripplanner.transit.model.network.TransitMode;
  */
 class OsmBoardingLocationsModuleTest {
 
-  File file = new File(ConstantsForTests.HERRENBERG_OSM);
-  Stop stop = Stop.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
-
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(
       true,
@@ -50,6 +47,9 @@ class OsmBoardingLocationsModuleTest {
     ),
     Arguments.of(false, Set.of("osm:node:768590748"))
   );
+  File file = new File(ConstantsForTests.HERRENBERG_OSM);
+  Stop platform = Stop.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
+  Stop busStop = Stop.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
 
   @ParameterizedTest(
     name = "add boarding locations and link them to platform edges when skipVisibility={0}"
@@ -66,10 +66,14 @@ class OsmBoardingLocationsModuleTest {
 
     osmModule.buildGraph(graph, extra);
 
-    var stopVertex = new TransitStopVertex(graph, stop, Set.of(TransitMode.RAIL));
+    var platformVertex = new TransitStopVertex(graph, platform, Set.of(TransitMode.RAIL));
+    var busVertex = new TransitStopVertex(graph, busStop, Set.of(TransitMode.BUS));
 
-    assertEquals(0, stopVertex.getIncoming().size());
-    assertEquals(0, stopVertex.getOutgoing().size());
+    assertEquals(0, busVertex.getIncoming().size());
+    assertEquals(0, busVertex.getOutgoing().size());
+
+    assertEquals(0, platformVertex.getIncoming().size());
+    assertEquals(0, platformVertex.getOutgoing().size());
 
     var boardingLocationsModule = new OsmBoardingLocationsModule();
     boardingLocationsModule.buildGraph(graph, extra);
@@ -77,13 +81,31 @@ class OsmBoardingLocationsModuleTest {
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(4, boardingLocations.size()); // 3 nodes plus one area centroid created by the module
 
-    assertEquals(1, stopVertex.getIncoming().size());
-    assertEquals(1, stopVertex.getOutgoing().size());
+    assertEquals(1, platformVertex.getIncoming().size());
+    assertEquals(1, platformVertex.getOutgoing().size());
+
+    assertEquals(1, busVertex.getIncoming().size());
+    assertEquals(1, busVertex.getOutgoing().size());
 
     var platformCentroids = boardingLocations
       .stream()
-      .filter(l -> l.references.contains(stop.getId().getId()))
+      .filter(l -> l.references.contains(platform.getId().getId()))
       .toList();
+
+    var busBoardingLocation = boardingLocations
+      .stream()
+      .filter(b -> b.references.contains(busStop.getId().getId()))
+      .findFirst()
+      .get();
+
+    Stream
+      .of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing())
+      .forEach(edges ->
+        assertEquals(
+          Set.of(BoardingLocationToStopLink.class, StreetEdge.class),
+          edges.stream().map(Edge::getClass).collect(Collectors.toSet())
+        )
+      );
 
     assertEquals(1, platformCentroids.size());
 
