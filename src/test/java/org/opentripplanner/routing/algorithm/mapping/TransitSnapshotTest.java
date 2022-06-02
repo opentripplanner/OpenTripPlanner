@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitModeFilter;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -130,7 +130,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowedTransitModeFilter.ofAllTransitModes()
+        AllowTransitModeFilter.ofAllTransitModes()
       );
     request.from = p1;
     request.to = p2;
@@ -148,7 +148,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowedTransitModeFilter.ofAllTransitModes()
+        AllowTransitModeFilter.ofAllTransitModes()
       );
     request.from = ps;
     request.to = p3;
@@ -167,7 +167,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowedTransitModeFilter.ofAllTransitModes()
+        AllowTransitModeFilter.ofAllTransitModes()
       );
     request.from = ptc;
     request.to = p3;

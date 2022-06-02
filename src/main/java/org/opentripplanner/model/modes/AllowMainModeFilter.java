@@ -1,16 +1,23 @@
 package org.opentripplanner.model.modes;
 
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
-class AllowedMainTransitModeFilter implements AllowedTransitModeFilter {
+class AllowMainModeFilter implements AllowTransitModeFilter {
 
   private final TransitMode mainMode;
 
-  public AllowedMainTransitModeFilter(TransitMode mainMode) {
+  AllowMainModeFilter(TransitMode mainMode) {
     this.mainMode = mainMode;
   }
 
-  public boolean allows(TransitMode transitMode, String netexSubMode) {
+  TransitMode mainMode() {
+    return mainMode;
+  }
+
+  @Override
+  public boolean allows(TransitMode transitMode, SubMode ignore) {
     return mainMode == transitMode;
   }
 
@@ -27,12 +34,12 @@ class AllowedMainTransitModeFilter implements AllowedTransitModeFilter {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AllowedMainTransitModeFilter that = (AllowedMainTransitModeFilter) o;
+    AllowMainModeFilter that = (AllowMainModeFilter) o;
     return mainMode == that.mainMode;
   }
 
   @Override
   public String toString() {
-    return "AllowedMainTransitModeFilter{ mainMode: " + mainMode + "}";
+    return ToStringBuilder.of(AllowMainModeFilter.class).addEnum("mainMode", mainMode).toString();
   }
 }

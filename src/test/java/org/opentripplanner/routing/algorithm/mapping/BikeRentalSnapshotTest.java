@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitModeFilter;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -115,7 +115,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         null,
-        AllowedTransitModeFilter.ofAllTransitModes()
+        AllowTransitModeFilter.ofAllTransitModes()
       );
     request.from = p1;
     request.to = p3;
@@ -138,7 +138,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.BIKE_RENTAL,
         null,
-        AllowedTransitModeFilter.ofAllTransitModes()
+        AllowTransitModeFilter.ofAllTransitModes()
       );
     request.from = p3;
     request.to = p1;

@@ -204,7 +204,7 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
     this.longName = original.getLongName();
     this.mode = original.getMode();
     this.gtfsType = original.getGtfsType();
-    this.netexSubmode = original.getNetexSubmode();
+    this.netexSubmode = original.getNetexSubmode().name();
     this.flexibleLineType = original.getFlexibleLineType();
     this.desc = original.getDesc();
     this.url = original.getUrl();

@@ -6,17 +6,16 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.mapping.support.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -81,7 +80,7 @@ class RouteMapper {
     builder.withLongName(line.getName().getValue());
     builder.withShortName(line.getPublicCode());
 
-    T2<TransitMode, String> mode;
+    MainAndSubMode mode;
     try {
       mode = transportModeMapper.map(line.getTransportMode(), line.getTransportSubmode());
     } catch (TransportModeMapper.UnsupportedModeException e) {
@@ -94,8 +93,8 @@ class RouteMapper {
       return null;
     }
 
-    builder.withMode(mode.first);
-    builder.withNetexSubmode(mode.second);
+    builder.withMode(mode.mainMode());
+    builder.withNetexSubmode(mode.subMode());
 
     if (line instanceof FlexibleLine_VersionStructure) {
       builder.withFlexibleLineType(

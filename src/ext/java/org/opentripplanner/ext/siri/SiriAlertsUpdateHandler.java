@@ -19,7 +19,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateM
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -365,7 +365,7 @@ public class SiriAlertsUpdateHandler {
                     vehicleJourneyRef.getValue(),
                     serviceDate,
                     TransitMode.RAIL,
-                    "railReplacementBus"
+                    SubMode.of("railReplacementBus")
                   );
               }
 

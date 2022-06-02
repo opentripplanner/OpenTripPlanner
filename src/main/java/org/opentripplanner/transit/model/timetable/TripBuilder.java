@@ -183,7 +183,7 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     this.operator = original.getOperator();
     this.serviceId = original.getServiceId();
     this.mode = original.getMode();
-    this.netexSubmode = original.getNetexSubmode();
+    this.netexSubmode = original.getNetexSubMode().name();
     this.shortName = original.getShortName();
     this.headsign = original.getHeadsign();
     this.gtfsBlockId = original.getGtfsBlockId();

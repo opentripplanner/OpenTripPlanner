@@ -38,7 +38,7 @@ import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitModeFilter;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
@@ -234,15 +234,15 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  private static List<ApiRequestMode> mapModes(Collection<AllowedTransitModeFilter> reqModes) {
+  private static List<ApiRequestMode> mapModes(Collection<AllowTransitModeFilter> reqModes) {
     List<ApiRequestMode> result = new ArrayList<>();
 
     if (ApiRequestMode.TRANSIT.getTransitModes().equals(reqModes)) {
       return List.of(ApiRequestMode.TRANSIT);
     }
 
-    for (AllowedTransitModeFilter allowedTransitMode : reqModes) {
-      Collection<AllowedTransitModeFilter> allowedTransitModes = Set.of(allowedTransitMode);
+    for (AllowTransitModeFilter allowedTransitMode : reqModes) {
+      Collection<AllowTransitModeFilter> allowedTransitModes = Set.of(allowedTransitMode);
       for (ApiRequestMode apiCandidate : ApiRequestMode.values()) {
         if (allowedTransitModes.equals(apiCandidate.getTransitModes())) {
           result.add(apiCandidate);
@@ -280,7 +280,7 @@ public abstract class SnapshotTestBase {
       .atZone(getRouter().graph.getTimeZone().toZoneId())
       .toLocalDateTime();
 
-    var transitModes = mapModes(request.modes.transitModes);
+    var transitModes = mapModes(request.modes.transitModeFilters);
 
     var modes = Stream
       .concat(

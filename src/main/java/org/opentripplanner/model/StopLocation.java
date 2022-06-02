@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
 
@@ -45,8 +46,8 @@ public interface StopLocation {
     return null;
   }
 
-  default String getVehicleSubmode() {
-    return null;
+  default SubMode getVehicleSubmode() {
+    return SubMode.UNKNOWN;
   }
 
   default double getLat() {

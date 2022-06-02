@@ -1,6 +1,9 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.network;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
+
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -23,7 +26,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
   // TODO: consolidate gtfsType and netexSubmode
   private final Integer gtfsType;
   private final Integer gtfsSortOrder;
-  private final String netexSubmode;
+  private final SubMode netexSubmode;
   private final String flexibleLineType;
   private final String desc;
   private final String url;
@@ -33,17 +36,19 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
 
   public Route(RouteBuilder builder) {
     super(builder.getId());
-    this.agency = builder.getAgency();
+    // Required fields
+    this.agency = requireNonNull(builder.getAgency());
+    this.mode = requireNonNull(builder.getMode());
+    this.netexSubmode = SubMode.getOrBuildAndCashForever(builder.getNetexSubmode());
+    this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
+
+    // Optional fields
     this.operator = builder.getOperator();
     this.branding = builder.getBranding();
-    this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
     this.shortName = builder.getShortName();
     this.longName = builder.getLongName();
-    this.mode = builder.getMode();
     this.gtfsType = builder.getGtfsType();
     this.gtfsSortOrder = builder.getGtfsSortOrder();
-
-    this.netexSubmode = builder.getNetexSubmode();
     this.flexibleLineType = builder.getFlexibleLineType();
     this.desc = builder.getDesc();
     this.url = builder.getUrl();
@@ -51,9 +56,8 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
     this.textColor = builder.getTextColor();
     this.bikesAllowed = builder.getBikesAllowed();
 
-    Objects.requireNonNull(this.agency);
-    Objects.requireNonNull(this.mode);
-    Objects.requireNonNull(getName());
+    // Make sure either short- or long- name is set
+    requireNonNull(getName());
   }
 
   public static RouteBuilder of(FeedScopedId id) {
@@ -143,8 +147,8 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
     return gtfsSortOrder;
   }
 
-  @Nullable
-  public String getNetexSubmode() {
+  @Nonnull
+  public SubMode getNetexSubmode() {
     return netexSubmode;
   }
 
@@ -179,7 +183,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
   public String getName() {
-    return Objects.requireNonNullElse(shortName, longName);
+    return requireNonNullElse(shortName, longName);
   }
 
   @Override

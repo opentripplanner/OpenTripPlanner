@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.modes.AllowedTransitModeFilter;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 
@@ -46,7 +46,7 @@ public class QualifiedModeSet implements Serializable {
     StreetMode transferMode = null;
 
     // Set transit modes
-    Set<AllowedTransitModeFilter> transitModes = qModes
+    Set<AllowTransitModeFilter> transitModes = qModes
       .stream()
       .flatMap(q -> q.mode.getTransitModes().stream())
       .collect(Collectors.toSet());
@@ -67,13 +67,14 @@ public class QualifiedModeSet implements Serializable {
         m.mode == ApiRequestMode.SCOOTER ||
         m.mode == ApiRequestMode.CAR
       )
-      .collect(Collectors.toList());
+      .toList();
 
     if (filteredModes.size() > 1) {
       List<QualifiedMode> filteredModesWithoutWalk = filteredModes
         .stream()
         .filter(Predicate.not(m -> m.mode == ApiRequestMode.WALK))
-        .collect(Collectors.toList());
+        .toList();
+
       if (filteredModesWithoutWalk.size() > 1) {
         throw new IllegalStateException(
           "Multiple non-walk modes provided " + filteredModesWithoutWalk

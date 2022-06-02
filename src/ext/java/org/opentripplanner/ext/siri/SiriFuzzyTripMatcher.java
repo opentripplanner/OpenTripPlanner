@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateM
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
@@ -247,7 +248,7 @@ public class SiriFuzzyTripMatcher {
     String internalPlanningCode,
     ServiceDate serviceDate,
     TransitMode mode,
-    String transportSubmode
+    SubMode transportSubmode
   ) {
     Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(internalPlanningCode);
 
@@ -312,7 +313,7 @@ public class SiriFuzzyTripMatcher {
 
         if (
           tripPattern != null &&
-          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, "railReplacementBus")
+          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, SubMode.of("railReplacementBus"))
         ) {
           if (trip.getNetexInternalPlanningCode() != null) {
             String internalPlanningCode = trip.getNetexInternalPlanningCode();

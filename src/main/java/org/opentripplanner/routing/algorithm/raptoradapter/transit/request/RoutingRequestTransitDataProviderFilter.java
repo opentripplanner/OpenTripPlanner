@@ -4,7 +4,7 @@ import java.util.BitSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.model.modes.AllowedTransitModeFilter;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -14,7 +14,6 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
@@ -35,7 +34,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     boolean requireBikesAllowed,
     WheelchairAccessibilityRequest accessibility,
     boolean includePlannedCancellations,
-    Set<AllowedTransitModeFilter> allowedTransitModes,
+    Set<AllowTransitModeFilter> allowedTransitModes,
     Set<FeedScopedId> bannedRoutes,
     Set<FeedScopedId> bannedTrips
   ) {
@@ -45,14 +44,11 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
 
-    // It is much faster to do a lookup in an EnumSet, so we use it if we don't want to filter
-    // using submodes
     transitModeIsAllowed =
-      (Trip trip) -> {
-        TransitMode transitMode = trip.getMode();
-        String netexSubmode = trip.getNetexSubmode();
-        return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
-      };
+      (Trip trip) ->
+        allowedTransitModes
+          .stream()
+          .anyMatch(m -> m.allows(trip.getMode(), trip.getNetexSubMode()));
   }
 
   public RoutingRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {
@@ -60,7 +56,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       request.modes.transferMode == StreetMode.BIKE,
       request.wheelchairAccessibility,
       request.includePlannedCancellations,
-      request.modes.transitModes,
+      request.modes.transitModeFilters,
       request.getBannedRoutes(graphIndex.getAllRoutes()),
       request.bannedTrips
     );

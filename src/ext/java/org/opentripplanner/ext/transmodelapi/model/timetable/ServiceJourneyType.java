@@ -99,10 +99,9 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("transportSubmode")
           .type(TRANSPORT_SUBMODE)
-          .dataFetcher(environment -> {
-            final String netexSubmode = ((trip(environment))).getNetexSubmode();
-            return netexSubmode != null ? TransmodelTransportSubmode.fromValue(netexSubmode) : null;
-          })
+          .dataFetcher(environment ->
+            TransmodelTransportSubmode.fromValue(((trip(environment))).getNetexSubMode())
+          )
           .build()
       )
       .field(

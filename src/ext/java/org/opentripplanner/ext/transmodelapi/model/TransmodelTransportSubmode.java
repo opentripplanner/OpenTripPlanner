@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import java.util.Arrays;
+import org.opentripplanner.transit.model.network.SubMode;
 
 public enum TransmodelTransportSubmode {
   UNKNOWN("unknown"),
@@ -133,10 +134,10 @@ public enum TransmodelTransportSubmode {
     this.value = value;
   }
 
-  public static TransmodelTransportSubmode fromValue(String value) {
+  public static TransmodelTransportSubmode fromValue(SubMode value) {
     return Arrays
       .stream(TransmodelTransportSubmode.values())
-      .filter(tp -> tp.getValue().equals(value))
+      .filter(tp -> tp.getValue().equals(value.name()))
       .findFirst()
       .orElse(null);
   }

@@ -207,7 +207,7 @@ public class FlexIntegrationTest {
     request.modes.egressMode = FLEXIBLE;
     if (onlyDirect) {
       request.modes.directMode = FLEXIBLE;
-      request.modes.transitModes = Set.of();
+      request.modes.transitModeFilters = Set.of();
     }
 
     var result = service.route(request, router);

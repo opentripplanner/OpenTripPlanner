@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.api.request;
 
-import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.opentripplanner.model.modes.AllowedTransitModeFilter;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 
 public class RequestModes {
 
@@ -13,7 +12,7 @@ public class RequestModes {
     StreetMode.WALK,
     StreetMode.WALK,
     StreetMode.WALK,
-    AllowedTransitModeFilter.ofAllTransitModes()
+    AllowTransitModeFilter.ofAllTransitModes()
   );
 
   @Nonnull
@@ -29,21 +28,21 @@ public class RequestModes {
   public StreetMode directMode;
 
   @Nonnull
-  public Set<AllowedTransitModeFilter> transitModes;
+  public Set<AllowTransitModeFilter> transitModeFilters;
 
   public RequestModes(
     StreetMode accessMode,
     StreetMode transferMode,
     StreetMode egressMode,
     StreetMode directMode,
-    Collection<AllowedTransitModeFilter> transitModes
+    Set<AllowTransitModeFilter> transitModeFilters
   ) {
     this.accessMode = (accessMode != null && accessMode.access) ? accessMode : StreetMode.NOT_SET;
     this.transferMode =
       (transferMode != null && transferMode.transfer) ? transferMode : StreetMode.NOT_SET;
     this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : StreetMode.NOT_SET;
     this.directMode = directMode != null ? directMode : StreetMode.NOT_SET;
-    this.transitModes = transitModes != null ? Set.copyOf(transitModes) : Set.of();
+    this.transitModeFilters = AllowTransitModeFilter.merge(transitModeFilters);
   }
 
   public boolean contains(StreetMode streetMode) {
@@ -64,7 +63,7 @@ public class RequestModes {
     if (accessMode != that.accessMode) return false;
     if (egressMode != that.egressMode) return false;
     if (directMode != that.directMode) return false;
-    return transitModes.equals(that.transitModes);
+    return transitModeFilters.equals(that.transitModeFilters);
   }
 
   @Override
@@ -73,7 +72,7 @@ public class RequestModes {
       .append("accessMode", accessMode)
       .append("egressMode", egressMode)
       .append("directMode", directMode)
-      .append("transitModes", transitModes)
+      .append("transitModes", transitModeFilters)
       .toString();
   }
 }

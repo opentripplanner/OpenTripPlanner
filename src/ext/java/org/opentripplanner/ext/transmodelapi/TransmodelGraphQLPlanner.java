@@ -6,13 +6,14 @@ import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
@@ -23,7 +24,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputTyp
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitModeFilter;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -282,26 +283,22 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("modes.directMode", directMode::set);
       callWith.argument("modes.transportModes", transportModes::set);
 
-      List<AllowedTransitModeFilter> transitModes = new ArrayList<>();
+      Set<AllowTransitModeFilter> transitModeFilters = new HashSet<>();
       if (transportModes.get() == null) {
-        transitModes.add(AllowedTransitModeFilter.ALLOWED_ALL_TRANSIT_MODES);
+        transitModeFilters.add(AllowTransitModeFilter.ALLOWED_ALL_TRANSIT_MODES);
       } else {
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
             TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
             if (modeWithSubmodes.containsKey("transportSubModes")) {
-              List<TransmodelTransportSubmode> transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
+              var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
                 "transportSubModes"
               );
               for (TransmodelTransportSubmode submode : transportSubModes) {
-                if (submode == TransmodelTransportSubmode.UNKNOWN) {
-                  transitModes.add(AllowedTransitModeFilter.ofUnknownSubModes(mainMode));
-                } else {
-                  transitModes.add(AllowedTransitModeFilter.of(mainMode, submode.getValue()));
-                }
+                transitModeFilters.add(AllowTransitModeFilter.of(mainMode, submode.getValue()));
               }
             } else {
-              transitModes.add(AllowedTransitModeFilter.fromMainModeEnum(mainMode));
+              transitModeFilters.add(AllowTransitModeFilter.of(mainMode, null));
             }
           }
         }
@@ -312,7 +309,7 @@ public class TransmodelGraphQLPlanner {
         accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
         egressMode.get(),
         directMode.get(),
-        transitModes
+        transitModeFilters
       );
     }
     return null;

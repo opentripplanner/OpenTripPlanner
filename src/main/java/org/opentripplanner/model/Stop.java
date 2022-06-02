@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -44,7 +45,7 @@ public final class Stop extends StationElement implements StopLocation {
    */
   private final TransitMode vehicleType;
 
-  private final String netexSubmode;
+  private final SubMode netexSubmode;
 
   private HashSet<BoardingArea> boardingAreas;
 
@@ -69,7 +70,7 @@ public final class Stop extends StationElement implements StopLocation {
     this.url = url;
     this.timeZone = timeZone;
     this.vehicleType = vehicleType;
-    this.netexSubmode = netexSubmode;
+    this.netexSubmode = SubMode.getOrBuildAndCashForever(netexSubmode);
   }
 
   public static Stop stopForTest(
@@ -169,7 +170,7 @@ public final class Stop extends StationElement implements StopLocation {
   }
 
   @Override
-  public String getVehicleSubmode() {
+  public SubMode getVehicleSubmode() {
     return netexSubmode;
   }
 

@@ -5,14 +5,13 @@ import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.mapping.support.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
@@ -113,7 +112,7 @@ class TripMapper {
     builder.withOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {
-      T2<TransitMode, String> transitMode = null;
+      MainAndSubMode transitMode = null;
       try {
         transitMode =
           transportModeMapper.map(
@@ -129,8 +128,8 @@ class TripMapper {
         );
         return null;
       }
-      builder.withMode(transitMode.first);
-      builder.withNetexSubmode(transitMode.second);
+      builder.withMode(transitMode.mainMode());
+      builder.withNetexSubmode(transitMode.subMode());
     }
 
     builder.withDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
