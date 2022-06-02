@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.model.Stop;
@@ -20,8 +20,10 @@ import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
@@ -33,11 +35,27 @@ class OsmBoardingLocationsModuleTest {
   File file = new File(ConstantsForTests.HERRENBERG_OSM);
   Stop stop = Stop.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
 
+  static Stream<Arguments> testCases = Stream.of(
+    Arguments.of(
+      true,
+      Set.of(
+        "osm:node:302563833",
+        "osm:node:3223067049",
+        "osm:node:302563836",
+        "osm:node:3223067680",
+        "osm:node:302563834",
+        "osm:node:768590748",
+        "osm:node:302563839"
+      )
+    ),
+    Arguments.of(false, Set.of("osm:node:768590748"))
+  );
+
   @ParameterizedTest(
-    name = "Should add boarding locations and link them to platform edges when skipVisibility={0}"
+    name = "add boarding locations and link them to platform edges when skipVisibility={0}"
   )
-  @ValueSource(booleans = { true, false })
-  void addAndLinkBoardingLocations(boolean skipVisibility) {
+  @VariableSource("testCases")
+  void addAndLinkBoardingLocations(boolean skipVisibility, Set<String> linkedVertices) {
     var graph = new Graph();
     var extra = new HashMap<Class<?>, Object>();
 
@@ -80,27 +98,25 @@ class OsmBoardingLocationsModuleTest {
         )
       );
 
-    /*
     assertEquals(
-      List.of("osm:node:768590748"),
+      linkedVertices,
       platform
         .getOutgoingStreetEdges()
         .stream()
         .map(Edge::getToVertex)
         .map(Vertex::getLabel)
-        .toList()
+        .collect(Collectors.toSet())
     );
 
     assertEquals(
-      List.of("osm:node:768590748"),
+      linkedVertices,
       platform
         .getIncomingStreetEdges()
         .stream()
         .map(Edge::getFromVertex)
         .map(Vertex::getLabel)
-        .toList()
+        .collect(Collectors.toSet())
     );
-     */
 
     platformCentroids
       .stream()

@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -24,13 +24,13 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
-public class TestStreetMatcher {
+public class StreetMatcherTest {
 
   static GeometryFactory gf = new GeometryFactory();
 
   private Graph graph;
 
-  @Before
+  @BeforeEach
   public void before() {
     graph = new Graph();
 
@@ -130,7 +130,6 @@ public class TestStreetMatcher {
       );
     match = matcher.match(geometry);
     assertNotNull(match);
-    System.out.println(match);
     assertEquals(4, match.size());
     assertEquals("ballard_20th", match.get(3).getToVertex().getLabel());
   }
