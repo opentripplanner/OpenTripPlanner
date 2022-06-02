@@ -70,6 +70,8 @@
     "Total Walk": "",
     "Total Bike": "",
     "Total drive": "",
+    "Elevation Gained": "",
+    "Elevation Lost": "",
     "Transfers": "Umsteigepunkt",
     "Fare": "Tarif",
     "Valid": "Gültig bis",
