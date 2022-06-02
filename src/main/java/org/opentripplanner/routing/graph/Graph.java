@@ -87,6 +87,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.MedianCalcForDoubles;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -778,14 +779,17 @@ public class Graph implements Serializable {
    */
   public void calculateTransitCenter() {
     if (hasTransit) {
-      Envelope tempEnvelope = new Envelope();
+      var vertices = getVerticesOfType(TransitStopVertex.class);
+      var medianCalculator = new MedianCalcForDoubles(vertices.size());
 
-      getVerticesOfType(TransitStopVertex.class)
-        .forEach(v -> {
-          tempEnvelope.expandToInclude(v.getLon(), v.getLat());
-        });
+      vertices.forEach(v -> medianCalculator.add(v.getLon()));
+      double lon = medianCalculator.median();
 
-      this.center = tempEnvelope.centre();
+      medianCalculator.reset();
+      vertices.forEach(v -> medianCalculator.add(v.getLat()));
+      double lat = medianCalculator.median();
+
+      this.center = new Coordinate(lon, lat);
     }
   }
 
