@@ -1,5 +1,5 @@
-PYBABEL=pybabel
-I18NEXT=i18next-conv
+PYBABEL=.venv/bin/pybabel
+I18NEXT=./node_modules/.bin/i18next-conv
 LOCALE_FOLDER=./src/client/i18n
 BABEL_CFG=$(LOCALE_FOLDER)/babel.cfg
 TEMPLATE_FILE=$(LOCALE_FOLDER)/messages.pot
