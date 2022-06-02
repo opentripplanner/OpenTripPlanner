@@ -506,7 +506,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         this,
         issueStore,
         maxAreaNodes,
-        platformEntriesLinking
+        platformEntriesLinking,
+        boardingAreaRefTags
       );
       if (skipVisibility) {
         for (AreaGroup group : areaGroups) {

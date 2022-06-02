@@ -48,8 +48,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.util.I18NString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
@@ -91,6 +89,7 @@ public class WalkableAreaBuilder {
   private final boolean platformEntriesLinking;
 
   private final List<OsmVertex> platformLinkingEndpoints;
+  private final Set<String> boardingLocationRefTags;
 
   public WalkableAreaBuilder(
     Graph graph,
@@ -99,7 +98,8 @@ public class WalkableAreaBuilder {
     Handler handler,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
-    boolean platformEntriesLinking
+    boolean platformEntriesLinking,
+    Set<String> boardingLocationRefTags
   ) {
     this.graph = graph;
     this.osmdb = osmdb;
@@ -108,6 +108,7 @@ public class WalkableAreaBuilder {
     this.issueStore = issueStore;
     this.maxAreaNodes = maxAreaNodes;
     this.platformEntriesLinking = platformEntriesLinking;
+    this.boardingLocationRefTags = boardingLocationRefTags;
     this.platformLinkingEndpoints =
       platformEntriesLinking
         ? graph
@@ -363,7 +364,7 @@ public class WalkableAreaBuilder {
     return group.areas
       .stream()
       .filter(g -> g.parent.isBoardingLocation())
-      .flatMap(g -> g.parent.getMultiTagValues(Set.of("ref", "ref:IFOPT")).stream())
+      .flatMap(g -> g.parent.getMultiTagValues(boardingLocationRefTags).stream())
       .collect(Collectors.toSet());
   }
 
