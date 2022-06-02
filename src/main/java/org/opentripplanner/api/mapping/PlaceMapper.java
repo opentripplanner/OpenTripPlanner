@@ -78,6 +78,8 @@ public class PlaceMapper {
     api.vertexType = VertexTypeMapper.mapVertexType(domain.vertexType);
     if (domain.vehicleRentalPlace != null) {
       api.bikeShareId = domain.vehicleRentalPlace.getStationId();
+      // for backwards-compatibility with the IBI frontend this always returns a list of a single item
+      api.networks = List.of(domain.vehicleRentalPlace.getNetwork());
     }
     if (domain.vehicleParkingWithEntrance != null) {
       api.vehicleParking = mapVehicleParking(domain.vehicleParkingWithEntrance);

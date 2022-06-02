@@ -68,8 +68,7 @@ public class RoutingWorker {
     request.applyPageCursor();
     this.request = request;
     this.router = router;
-    this.debugTimingAggregator =
-      new DebugTimingAggregator(router.meterRegistry, request.tags.getTimingTags());
+    this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.tags);
     this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
     this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
     this.additionalSearchDays =

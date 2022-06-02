@@ -11,7 +11,7 @@ import graphql.schema.GraphQLOutputType;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.Agency;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class AuthorityType {
 

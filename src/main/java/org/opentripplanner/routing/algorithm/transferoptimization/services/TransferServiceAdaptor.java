@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**

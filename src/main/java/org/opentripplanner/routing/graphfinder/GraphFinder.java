@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.graphfinder;
 
 import java.util.List;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
  * Common interface between different types of GraphFinders, currently two types exist, one which

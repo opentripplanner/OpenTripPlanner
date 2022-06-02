@@ -48,7 +48,9 @@ class StationMapper {
       name,
       WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid()),
       null,
-      stopPlace.getDescription() != null ? stopPlace.getDescription().getValue() : null,
+      stopPlace.getDescription() != null
+        ? new NonLocalizedString(stopPlace.getDescription().getValue())
+        : null,
       null,
       null,
       StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting())

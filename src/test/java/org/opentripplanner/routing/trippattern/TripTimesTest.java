@@ -1,32 +1,30 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.List;
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TripTimesTest {
 
-  private static final FeedScopedId TRIP_ID = new FeedScopedId("agency", "testTripId");
-  private static final FeedScopedId ROUTE_ID = new FeedScopedId("agency", "testRrouteId");
+  private static final String TRIP_ID = "testTripId";
 
-  private static final FeedScopedId STOP_A = new FeedScopedId("agency", "A"); // 0
-  private static final FeedScopedId STOP_B = new FeedScopedId("agency", "B"); // 1
-  private static final FeedScopedId STOP_C = new FeedScopedId("agency", "C"); // 2
-  private static final FeedScopedId STOP_D = new FeedScopedId("agency", "D"); // 3
-  private static final FeedScopedId STOP_E = new FeedScopedId("agency", "E"); // 4
-  private static final FeedScopedId STOP_F = new FeedScopedId("agency", "F"); // 5
-  private static final FeedScopedId STOP_G = new FeedScopedId("agency", "G"); // 6
-  private static final FeedScopedId STOP_H = new FeedScopedId("agency", "H"); // 7
+  private static final FeedScopedId STOP_A = TransitModelForTest.id("A"); // 0
+  private static final FeedScopedId STOP_B = TransitModelForTest.id("B"); // 1
+  private static final FeedScopedId STOP_C = TransitModelForTest.id("C"); // 2
+  private static final FeedScopedId STOP_D = TransitModelForTest.id("D"); // 3
+  private static final FeedScopedId STOP_E = TransitModelForTest.id("E"); // 4
+  private static final FeedScopedId STOP_F = TransitModelForTest.id("F"); // 5
+  private static final FeedScopedId STOP_G = TransitModelForTest.id("G"); // 6
+  private static final FeedScopedId STOP_H = TransitModelForTest.id("H"); // 7
 
   private static final FeedScopedId[] stops = {
     STOP_A,
@@ -42,7 +40,7 @@ public class TripTimesTest {
   private static final TripTimes originalTripTimes;
 
   static {
-    Trip trip = new Trip(TRIP_ID);
+    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 
@@ -130,8 +128,17 @@ public class TripTimesTest {
   }
 
   @Test
+  public void testNoData() {
+    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    updatedTripTimesA.setNoData(1);
+    assertFalse(updatedTripTimesA.isNoDataStop(0));
+    assertTrue(updatedTripTimesA.isNoDataStop(1));
+    assertFalse(updatedTripTimesA.isNoDataStop(2));
+  }
+
+  @Test
   public void testApply() {
-    Trip trip = new Trip(TRIP_ID);
+    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 

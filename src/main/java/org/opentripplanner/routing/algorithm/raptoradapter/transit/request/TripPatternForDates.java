@@ -3,8 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.model.WheelchairBoarding;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -19,6 +18,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of
@@ -56,7 +56,7 @@ public class TripPatternForDates
    */
   private final int[] departureTimes;
 
-  private final WheelchairBoarding[] wheelchairBoardings;
+  private final WheelchairAccessibility[] wheelchairBoardings;
 
   // bit arrays with boarding/alighting information for all stops on trip pattern
   private final BitSet boardingPossible;
@@ -87,7 +87,7 @@ public class TripPatternForDates
     this.numberOfTripSchedules = numberOfTripSchedules;
     this.isFrequencyBased = hasFrequencies;
 
-    wheelchairBoardings = new WheelchairBoarding[numberOfTripSchedules];
+    wheelchairBoardings = new WheelchairAccessibility[numberOfTripSchedules];
 
     final int nStops = tripPattern.getStopIndexes().length;
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
@@ -263,7 +263,7 @@ public class TripPatternForDates
       .toString();
   }
 
-  public WheelchairBoarding wheelchairBoardingForTrip(int index) {
+  public WheelchairAccessibility wheelchairBoardingForTrip(int index) {
     return wheelchairBoardings[index];
   }
 }

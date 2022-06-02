@@ -22,9 +22,9 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>23</otp.serialization.version.id>
+        <otp.serialization.version.id>26</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>26.2</geotools.version>
+        <geotools.version>26.4</geotools.version>
         <jackson.version>2.13.2</jackson.version>
         <jersey.version>2.34</jersey.version>
         <junit.version>5.8.2</junit.version>
@@ -367,6 +367,45 @@
                 </executions>
 
             </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <container>
+                        <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
+                        <entrypoint>/docker-entrypoint.sh</entrypoint>
+                        <volumes>
+                            <volume>
+                                /var/opentripplanner/
+                            </volume>
+                        </volumes>
+                        <ports>
+                            <port>8080</port>
+                            <port>8081</port>
+                        </ports>
+                    </container>
+                    <to>
+                        <image>${env.CONTAINER_REPO}</image>
+                        <auth>
+                            <username>${env.CONTAINER_REGISTRY_USER}</username>
+                            <password>${env.CONTAINER_REGISTRY_PASSWORD}</password>
+                        </auth>
+                    </to>
+                    <extraDirectories>
+                        <permissions>
+                            <permission>
+                                <file>/docker-entrypoint.sh</file>
+                                <mode>755</mode>
+                            </permission>
+                            <permission>
+                                <file>/var/opentripplanner/</file>
+                                <mode>755</mode>
+                            </permission>
+                        </permissions>
+                    </extraDirectories>
+                </configuration>
+            </plugin>
 
             <!-- compile the gtfs-realtime.proto file to Java code
                To update the proto file run the following command:
@@ -589,6 +628,12 @@
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>0.23.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

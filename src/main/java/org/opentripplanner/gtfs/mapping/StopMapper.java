@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import org.opentripplanner.model.FareZone;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.TranslationHelper;
@@ -57,6 +57,13 @@ class StopMapper {
       base.getName()
     );
 
+    final I18NString desc = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "desc",
+      base.getId().getId(),
+      base.getDescription()
+    );
+
     I18NString url = null;
 
     if (gtfsStop.getUrl() != null) {
@@ -73,9 +80,9 @@ class StopMapper {
       base.getId(),
       name,
       base.getCode(),
-      base.getDescription(),
+      desc,
       base.getCoordinate(),
-      base.getWheelchairBoarding(),
+      base.getWheelchairAccessibility(),
       base.getLevel(),
       gtfsStop.getPlatformCode(),
       fareZones,

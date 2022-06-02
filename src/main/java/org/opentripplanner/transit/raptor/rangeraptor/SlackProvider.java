@@ -17,7 +17,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 public interface SlackProvider {
   /**
    * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding the
-   * given trip pattern.
+   * given trip pattern. This should include {@code transferSlack} for all boardings except the
+   * first boarding in a path.
    * <p>
    * Implementation notes: In a forward-search the pattern is known, but not the trip.
    * <p>
@@ -36,9 +37,18 @@ public interface SlackProvider {
   int alightSlack(int slackIndex);
 
   /**
-   * Regular transfer slack should be added to all access and egress paths with one or more number
-   * of rides - like a flex-access. Alight-slack and board-slack is only added to {@link
+   * In most cases we do not need to consider the {@code transferSlack}, it is part of the
+   * {@link #boardSlack(int)} above. But there are exceptions, like adding slack to
+   * constrained transfers, access and egress.
+   * <p>
+   * Regular transfer slack should be added to all access and egress paths with one or more rides
+   * - like a flex-access. Alight-slack and board-slack is only added to {@link
    * RaptorTripPattern}s, not access or egress paths, even if they consist one or more rides.
+   * <p>
+   * Some constrained transfers should include transfer-slack, but not board- or alight-
+   * slack. This is true for constrained transfers with for example {@code minTransferTime}.
+   * <p>
+   * Unit: seconds.
    */
-  int accessEgressWithRidesTransferSlack();
+  int transferSlack();
 }

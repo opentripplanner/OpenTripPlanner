@@ -13,14 +13,15 @@ import java.util.Set;
 import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.Branding;
-import org.opentripplanner.model.GroupOfRoutes;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Branding;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.BrandingRefStructure;
@@ -40,8 +41,6 @@ public class RouteMapperTest {
   private static final String BRANDING_ID = "RUT:Branding:1";
   private static final String RUT_LINE_ID = "RUT:Line:1";
   private static final String RUT_FERRY_WITHOUT_BICYCLES_ID = "RUT:Line:2:NoBicycles";
-
-  private static final String TIME_ZONE = "GMT";
 
   private static final Set<String> EMPTY_FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
 
@@ -97,7 +96,7 @@ public class RouteMapperTest {
       transitBuilder.getGroupsOfRoutesByRouteId(),
       transitBuilder.getGroupOfRouteById(),
       netexIndex.readOnlyView(),
-      TIME_ZONE,
+      TransitModelForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -189,9 +188,7 @@ public class RouteMapperTest {
 
     transitBuilder
       .getBrandingsById()
-      .add(
-        new Branding(MappingSupport.ID_FACTORY.createId(BRANDING_ID), null, null, null, null, null)
-      );
+      .add(Branding.of(MappingSupport.ID_FACTORY.createId(BRANDING_ID)).build());
 
     Line line = createExampleLine();
 
@@ -204,7 +201,7 @@ public class RouteMapperTest {
       ArrayListMultimap.create(),
       new EntityById<>(),
       netexIndex.readOnlyView(),
-      TIME_ZONE,
+      TransitModelForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -240,7 +237,7 @@ public class RouteMapperTest {
       transitBuilder.getGroupsOfRoutesByRouteId(),
       transitBuilder.getGroupOfRouteById(),
       netexIndex.readOnlyView(),
-      TIME_ZONE,
+      TransitModelForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -276,10 +273,14 @@ public class RouteMapperTest {
   }
 
   private Agency createAgency() {
-    return new Agency(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID), "Ruter AS", TIME_ZONE);
+    return TransitModelForTest
+      .agency("Ruter AS")
+      .copy()
+      .withId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))
+      .build();
   }
 
   private GroupOfRoutes createGroupOfRoutes(String id) {
-    return new GroupOfRoutes(MappingSupport.ID_FACTORY.createId(id), null, null, null, null);
+    return GroupOfRoutes.of(MappingSupport.ID_FACTORY.createId(id)).build();
   }
 }

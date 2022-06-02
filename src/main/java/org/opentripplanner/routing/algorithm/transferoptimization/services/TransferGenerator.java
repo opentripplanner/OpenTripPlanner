@@ -12,11 +12,11 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * This class is responsible for finding all possible transfers between each pair of transit legs
@@ -140,12 +140,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       // Check whether traveller will have enough time to do the transfer
       // We have to do it here because every stop position may have unique transfer constraint
       // So it may be possible to transfer at stop position 2 but not on 1...
-      final int earliestDepartureTime = earliestDepartureTime(
-        from.time(),
-        SAME_STOP_TRANSFER_TIME,
-        tx
-      );
-      if (earliestDepartureTime > toTrip.departure(stopPos)) {
+      final int earliestBoardTime = calculateEarliestBoardTime(from, tx, SAME_STOP_TRANSFER_TIME);
+
+      if (earliestBoardTime > toTrip.departure(stopPos)) {
         continue;
       }
 
@@ -182,12 +179,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
         // Check whether traveller will have enough time to do the transfer
         // We have to do it here because every stopPos may have unique transfer constraint
         // So it may be possible to transfer at stop position 2 but not on 1 etc...
-        final int earliestDepartureTime = earliestDepartureTime(
-          from.time(),
-          it.durationInSeconds(),
-          tx
-        );
-        if (earliestDepartureTime > toTrip.departure(stopPos)) {
+        int earliestBoardTime = calculateEarliestBoardTime(from, tx, it.durationInSeconds());
+
+        if (earliestBoardTime > toTrip.departure(stopPos)) {
           continue;
         }
 
@@ -200,33 +194,40 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     return result;
   }
 
-  private int earliestDepartureTime(
-    int fromTime,
-    int transferDurationInSeconds,
-    @Nullable ConstrainedTransfer tx
+  /**
+   * This code duplicates the logic in
+   * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch},
+   * see the {@code findTimetableTripInfo(RaptorTimeTable, Iterable, int, int, int)}) method.
+   */
+  private int calculateEarliestBoardTime(
+    TripStopTime<T> from,
+    @Nullable ConstrainedTransfer tx,
+    int regularTransferDurationInSec
   ) {
-    // Ignore slack and walking-time for guaranteed and stay-seated transfers
-    if (tx != null && tx.getTransferConstraint().isFacilitated()) {
-      return fromTime;
-      // Ignore board and alight slack for min transfer time, but keep transfer slack
-    } else if (tx != null && tx.getTransferConstraint().isMinTransferTimeSet()) {
-      var minTransferTime = tx.getTransferConstraint().getMinTransferTime();
-      int transferDuration;
-      if (OTPFeature.MinimumTransferTimeIsDefinitive.isOn()) {
-        transferDuration = minTransferTime;
-      } else {
-        transferDuration = Math.max(minTransferTime, transferDurationInSeconds);
-      }
-      return fromTime + transferDuration + slackProvider.transferSlack();
-    } else {
-      return (
-        fromTime +
-        slackProvider.alightSlack(fromTrip.pattern().slackIndex()) +
-        transferDurationInSeconds +
-        slackProvider.transferSlack() +
-        slackProvider.boardSlack(toTrip.pattern().slackIndex())
-      );
+    if (tx == null) {
+      return calcRegularTransferEarliestBoardTime(from, regularTransferDurationInSec);
     }
+
+    return tx
+      .getTransferConstraint()
+      .calculateTransferTargetTime(
+        from.time(),
+        slackProvider.transferSlack(),
+        () -> calcRegularTransferEarliestBoardTime(from, regularTransferDurationInSec),
+        SearchDirection.FORWARD
+      );
+  }
+
+  private int calcRegularTransferEarliestBoardTime(
+    TripStopTime<T> from,
+    int transferDurationInSeconds
+  ) {
+    int transferDuration = slackProvider.calcRegularTransferDuration(
+      transferDurationInSeconds,
+      fromTrip.pattern().slackIndex(),
+      toTrip.pattern().slackIndex()
+    );
+    return from.time() + transferDuration;
   }
 
   @Nonnull

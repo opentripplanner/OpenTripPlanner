@@ -52,13 +52,20 @@ class BoardingAreaMapper {
       Optional.ofNullable(base.getName()).orElse(DEFAULT_NAME)
     );
 
+    final I18NString description = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "desc",
+      base.getId().getId(),
+      base.getDescription()
+    );
+
     return new BoardingArea(
       base.getId(),
       name,
       base.getCode(),
-      base.getDescription(),
+      description,
       base.getCoordinate(),
-      base.getWheelchairBoarding(),
+      base.getWheelchairAccessibility(),
       base.getLevel()
     );
   }

@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
  * A GraphQL query for retrieving data on DatedServiceJourneys
@@ -115,7 +115,7 @@ public class DatedServiceJourneyQuery {
         if (privateCodes != null && !privateCodes.isEmpty()) {
           stream =
             stream.filter(tripOnServiceDate ->
-              privateCodes.contains(tripOnServiceDate.getTrip().getInternalPlanningCode())
+              privateCodes.contains(tripOnServiceDate.getTrip().getNetexInternalPlanningCode())
             );
         }
 

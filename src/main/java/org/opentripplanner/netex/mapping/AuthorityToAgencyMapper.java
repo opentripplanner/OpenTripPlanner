@@ -2,8 +2,9 @@ package org.opentripplanner.netex.mapping;
 
 import static org.opentripplanner.netex.mapping.support.NetexObjectDecorator.withOptional;
 
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.AgencyBuilder;
 import org.rutebanken.netex.model.Authority;
 
 /**
@@ -32,20 +33,19 @@ class AuthorityToAgencyMapper {
    * Map authority and time zone to OTP agency.
    */
   Agency mapAuthorityToAgency(Authority source) {
-    Agency target = new Agency(
-      idFactory.createId(source.getId()),
-      source.getName().getValue(),
-      timeZone
-    );
+    AgencyBuilder target = Agency
+      .of(idFactory.createId(source.getId()))
+      .withName(source.getName().getValue())
+      .withTimezone(timeZone);
 
     withOptional(
       source.getContactDetails(),
       c -> {
-        target.setUrl(c.getUrl());
-        target.setPhone(c.getPhone());
+        target.withUrl(c.getUrl());
+        target.withPhone(c.getPhone());
       }
     );
-    return target;
+    return target.build();
   }
 
   /**
@@ -53,10 +53,13 @@ class AuthorityToAgencyMapper {
    * {@code "Dummy-" + timeZone}.
    */
   Agency createDummyAgency() {
-    Agency agency = new Agency(idFactory.createId(dummyAgencyId), "N/A", timeZone);
-    agency.setUrl("N/A");
-    agency.setPhone("N/A");
-    return agency;
+    return Agency
+      .of(idFactory.createId(dummyAgencyId))
+      .withName("N/A")
+      .withTimezone(timeZone)
+      .withUrl("N/A")
+      .withPhone("N/A")
+      .build();
   }
 
   String dummyAgencyId() {

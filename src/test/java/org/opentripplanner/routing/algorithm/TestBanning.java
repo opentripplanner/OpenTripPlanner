@@ -1,13 +1,16 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Arrays;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+
 import java.util.Collection;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
 
 /**
  * Test the banning and whitelisting functionality in the RoutingRequest.
@@ -21,14 +24,14 @@ public class TestBanning {
 
     RoutingRequest routingRequest = new RoutingRequest();
 
-    routingRequest.setBannedRoutesFromString("RB__RUT:Route:1");
-    routingRequest.setBannedAgenciesFromSting("RB:RUT:Agency:2");
+    routingRequest.setBannedRoutesFromString("F__RUT:Route:1");
+    routingRequest.setBannedAgenciesFromSting("F:RUT:Agency:2");
 
     Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
 
     Assert.assertEquals(2, bannedRoutes.size());
-    Assert.assertTrue(bannedRoutes.contains(new FeedScopedId("RB", "RUT:Route:1")));
-    Assert.assertTrue(bannedRoutes.contains(new FeedScopedId("RB", "RUT:Route:3")));
+    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
+    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
   }
 
   @Test
@@ -37,30 +40,23 @@ public class TestBanning {
 
     RoutingRequest routingRequest = new RoutingRequest();
 
-    routingRequest.setWhiteListedRoutesFromString("RB__RUT:Route:1");
-    routingRequest.setWhiteListedAgenciesFromSting("RB:RUT:Agency:2");
+    routingRequest.setWhiteListedRoutesFromString("F__RUT:Route:1");
+    routingRequest.setWhiteListedAgenciesFromSting("F:RUT:Agency:2");
 
     Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
 
     Assert.assertEquals(1, bannedRoutes.size());
-    Assert.assertTrue(bannedRoutes.contains(new FeedScopedId("RB", "RUT:Route:2")));
+    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
   }
 
-  private Collection<Route> getTestRoutes() {
-    Route route1 = new Route(new FeedScopedId("RB", "RUT:Route:1"));
-    route1.setLongName("");
-    Route route2 = new Route(new FeedScopedId("RB", "RUT:Route:2"));
-    route2.setLongName("");
-    Route route3 = new Route(new FeedScopedId("RB", "RUT:Route:3"));
-    route3.setLongName("");
+  private List<Route> getTestRoutes() {
+    Agency agency1 = TransitModelForTest.agency("A").copy().withId(id("RUT:Agency:1")).build();
+    Agency agency2 = TransitModelForTest.agency("B").copy().withId(id("RUT:Agency:2")).build();
 
-    Agency agency1 = new Agency(new FeedScopedId("RB", "RUT:Agency:1"), "A", "Europe/Paris");
-    Agency agency2 = new Agency(new FeedScopedId("RB", "RUT:Agency:2"), "B", "Europe/Paris");
-
-    route1.setAgency(agency1);
-    route2.setAgency(agency1);
-    route3.setAgency(agency2);
-
-    return Arrays.asList(route1, route2, route3);
+    return List.of(
+      TransitModelForTest.route("RUT:Route:1").withAgency(agency1).build(),
+      TransitModelForTest.route("RUT:Route:2").withAgency(agency1).build(),
+      TransitModelForTest.route("RUT:Route:3").withAgency(agency2).build()
+    );
   }
 }

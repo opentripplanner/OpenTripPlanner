@@ -1,25 +1,29 @@
 package org.opentripplanner.routing.core;
 
-import junit.framework.TestCase;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestSpecificTransfer extends TestCase {
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
+
+public class TestSpecificTransfer {
 
   /**
    * Test different specific transfers
    */
+  @Test
   public void testSpecificTransfer() {
     // Setup from trip with route
-    Route fromRoute = new Route(new FeedScopedId("A1", "R1"));
-    Trip fromTrip = new Trip(new FeedScopedId("A1", "T1"));
-    fromTrip.setRoute(fromRoute);
+    Route fromRoute = TransitModelForTest.route("R1").build();
+    Trip fromTrip = Trip.of(TransitModelForTest.id("T1")).withRoute(fromRoute).build();
 
     // Setup to trip with route
-    Route toRoute = new Route(new FeedScopedId("A1", "R2"));
-    Trip toTrip = new Trip(new FeedScopedId("A1", "T2"));
-    toTrip.setRoute(toRoute);
+    Route toRoute = TransitModelForTest.route("R2").build();
+    Trip toTrip = Trip.of(TransitModelForTest.id("T2")).withRoute(toRoute).build();
 
     // Create full SpecificTransfer
     SpecificTransfer s1 = new SpecificTransfer(
@@ -55,7 +59,7 @@ public class TestSpecificTransfer extends TestCase {
     SpecificTransfer s4 = new SpecificTransfer(
       fromRoute.getId(),
       toRoute.getId(),
-      new FeedScopedId("A1", "T3"),
+      TransitModelForTest.id("T3"),
       toTrip.getId(),
       4
     );

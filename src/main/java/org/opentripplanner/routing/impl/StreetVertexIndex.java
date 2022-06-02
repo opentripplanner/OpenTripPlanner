@@ -2,7 +2,6 @@ package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +33,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.ProgressTracker;
+import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,21 +204,36 @@ public class StreetVertexIndex {
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
-    // Check if Stop/StopCollection is found by FeedScopeId
-    if (location.stopId != null) {
-      Set<Vertex> transitStopVertices = graph.getStopVerticesById(location.stopId);
-      if (transitStopVertices != null) {
-        return transitStopVertices;
+    // Differentiate between driving and non-driving, as driving is not available from transit stops
+    TraverseMode nonTransitMode = getTraverseModeForLinker(options, endVertex);
+
+    if (nonTransitMode.isDriving()) {
+      // Fetch coordinate from stop, if not given in request
+      if (location.stopId != null && location.getCoordinate() == null) {
+        var coordinate = graph.getCoordinateById(location.stopId);
+        if (coordinate != null) {
+          location =
+            new GenericLocation(
+              location.label,
+              location.stopId,
+              coordinate.latitude(),
+              coordinate.longitude()
+            );
+        }
+      }
+    } else {
+      // Check if Stop/StopCollection is found by FeedScopeId
+      if (location.stopId != null) {
+        Set<Vertex> transitStopVertices = graph.getStopVerticesById(location.stopId);
+        if (transitStopVertices != null) {
+          return transitStopVertices;
+        }
       }
     }
 
     // Check if coordinate is provided and connect it to graph
-    Coordinate coordinate = location.getCoordinate();
-    if (coordinate != null) {
-      //return getClosestVertex(loc, options, endVertex);
-      return Collections.singleton(
-        createVertexFromLocation(location, options, endVertex, tempEdges)
-      );
+    if (location.getCoordinate() != null) {
+      return Set.of(createVertexFromLocation(location, options, endVertex, tempEdges));
     }
 
     return null;

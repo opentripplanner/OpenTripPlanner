@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.transit.model.network.BikeAccess;
 
 /**
  * Model bike access for GTFS trips.

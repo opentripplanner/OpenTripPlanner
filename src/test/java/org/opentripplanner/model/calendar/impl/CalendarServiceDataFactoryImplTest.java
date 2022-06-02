@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl.merge;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -21,16 +22,17 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (08.11.2017)
@@ -39,11 +41,9 @@ public class CalendarServiceDataFactoryImplTest {
 
   private static final String AGENCY = "agency";
 
-  private static final String FEED_ID = "F";
+  private static final FeedScopedId SERVICE_ALLDAYS_ID = id("alldays");
 
-  private static final FeedScopedId SERVICE_ALLDAYS_ID = new FeedScopedId(FEED_ID, "alldays");
-
-  private static final FeedScopedId SERVICE_WEEKDAYS_ID = new FeedScopedId(FEED_ID, "weekdays");
+  private static final FeedScopedId SERVICE_WEEKDAYS_ID = id("weekdays");
 
   private static final ServiceDate A_FRIDAY = new ServiceDate(2009, 1, 2);
 
@@ -71,12 +71,12 @@ public class CalendarServiceDataFactoryImplTest {
   }
 
   @Test
-  public void testDataGetServiceIds() throws IOException {
+  public void testDataGetServiceIds() {
     assertEquals("[F:alldays, F:weekdays]", toString(data.getServiceIds()));
   }
 
   @Test
-  public void testDataGetServiceDatesForServiceId() throws IOException {
+  public void testDataGetServiceDatesForServiceId() {
     List<ServiceDate> alldays = data.getServiceDatesForServiceId(SERVICE_ALLDAYS_ID);
     assertEquals(
       "[20090101, 20090102, 20090103, 20090104, 20090106, 20090107, 20090108]",
@@ -93,15 +93,12 @@ public class CalendarServiceDataFactoryImplTest {
   }
 
   @Test
-  public void testDataGetTimeZoneForAgencyId() throws IOException {
-    assertEquals(
-      "America/New_York",
-      data.getTimeZoneForAgencyId(new FeedScopedId(FEED_ID, AGENCY)).getID()
-    );
+  public void testDataGetTimeZoneForAgencyId() {
+    assertEquals("America/New_York", data.getTimeZoneForAgencyId(id(AGENCY)).getID());
   }
 
   @Test
-  public void testServiceGetServiceIdsOnDate() throws IOException {
+  public void testServiceGetServiceIdsOnDate() {
     Set<FeedScopedId> servicesOnFriday = calendarService.getServiceIdsOnDate(A_FRIDAY);
     assertEquals("[F:alldays, F:weekdays]", sort(servicesOnFriday).toString());
 
@@ -114,19 +111,19 @@ public class CalendarServiceDataFactoryImplTest {
   }
 
   @Test
-  public void testServiceGetServiceIds() throws IOException {
+  public void testServiceGetServiceIds() {
     Set<FeedScopedId> serviceIds = calendarService.getServiceIds();
     assertEquals("[F:alldays, F:weekdays]", sort(serviceIds).toString());
   }
 
   @Test
-  public void testServiceGetTimeZoneForAgencyId() throws IOException {
-    TimeZone result = calendarService.getTimeZoneForAgencyId(new FeedScopedId(FEED_ID, AGENCY));
+  public void testServiceGetTimeZoneForAgencyId() {
+    TimeZone result = calendarService.getTimeZoneForAgencyId(id(AGENCY));
     assertEquals("America/New_York", result.getID());
   }
 
   @Test
-  public void testServiceGetServiceDatesForServiceId() throws IOException {
+  public void testServiceGetServiceDatesForServiceId() {
     Set<ServiceDate> alldays = calendarService.getServiceDatesForServiceId(SERVICE_ALLDAYS_ID);
 
     assertTrue(alldays.contains(A_FRIDAY));
@@ -141,17 +138,19 @@ public class CalendarServiceDataFactoryImplTest {
   }
 
   private static GtfsContext createCtxBuilder() throws IOException {
-    GtfsContextBuilder ctxBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
+    GtfsContextBuilder ctxBuilder = contextBuilder(
+      TransitModelForTest.FEED_ID,
+      ConstantsForTests.FAKE_GTFS
+    );
     OtpTransitServiceBuilder builder = ctxBuilder
       .withDataImportIssueStore(new DataImportIssueStore(false))
       .getTransitBuilder();
-    Agency agency = agency(builder);
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(removeMondayFromAlldays());
     builder.getFareAttributes().add(createFareAttribute());
     builder.getFareRules().add(new FareRule());
-    builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
+    builder.getFeedInfos().add(FeedInfo.dummyForTest(TransitModelForTest.FEED_ID));
 
     return ctxBuilder.build();
   }
@@ -161,7 +160,7 @@ public class CalendarServiceDataFactoryImplTest {
   }
 
   private static FareAttribute createFareAttribute() {
-    return new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
+    return new FareAttribute(id("FA"));
   }
 
   private static ServiceCalendarDate removeMondayFromAlldays() {
@@ -180,8 +179,8 @@ public class CalendarServiceDataFactoryImplTest {
     return sort(c).get(0);
   }
 
-  private static <T extends Comparable<T>> String toString(Collection<T> c) {
-    return c.stream().sorted(comparing(T::toString)).collect(toList()).toString();
+  private static String toString(Collection<?> c) {
+    return c.stream().sorted(comparing(Object::toString)).toList().toString();
   }
 
   private static List<String> sevenFirstDays(List<ServiceDate> dates) {

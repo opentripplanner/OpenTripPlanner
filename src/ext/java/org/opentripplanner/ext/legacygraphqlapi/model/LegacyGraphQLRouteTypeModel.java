@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi.model;
 
-import org.opentripplanner.model.Agency;
+import org.opentripplanner.transit.model.organization.Agency;
 
 /**
  * Class for route types. If agency is defined, the object is the route for the specific agency.

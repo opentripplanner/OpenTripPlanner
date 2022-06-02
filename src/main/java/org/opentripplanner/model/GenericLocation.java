@@ -1,7 +1,9 @@
 package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.util.lang.StringUtils;
+import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
  * Represents a location that is to be used in a routing request. It can be either a from, to, or
@@ -64,7 +66,7 @@ public class GenericLocation {
   @Override
   public String toString() {
     ValueObjectToStringBuilder buf = ValueObjectToStringBuilder.of().skipNull();
-    if (label != null && !label.isBlank()) {
+    if (StringUtils.hasValue(label)) {
       buf.addText(label);
     }
     buf.addObj(stopId);

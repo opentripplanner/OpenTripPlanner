@@ -19,8 +19,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -36,6 +34,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
 
@@ -134,7 +134,31 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<String> desc() {
     return environment ->
-      getValue(environment, StopLocation::getDescription, Station::getDescription);
+      getValue(
+        environment,
+        stop -> LegacyGraphQLUtils.getTranslation(stop.getDescription(), environment),
+        station -> LegacyGraphQLUtils.getTranslation(station.getDescription(), environment)
+      );
+  }
+
+  @Override
+  public DataFetcher<String> url() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
+        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
+      );
+  }
+
+  @Override
+  public DataFetcher<Object> locationType() {
+    return environment -> getValue(environment, stop -> "STOP", station -> "STATION");
+  }
+
+  @Override
+  public DataFetcher<Object> parentStation() {
+    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
   }
 
   // TODO
@@ -170,11 +194,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Object> locationType() {
-    return environment -> getValue(environment, stop -> "STOP", station -> "STATION");
-  }
-
-  @Override
   public DataFetcher<Double> lon() {
     return environment -> getValue(environment, StopLocation::getLon, Station::getLon);
   }
@@ -187,11 +206,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
         station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
       );
-  }
-
-  @Override
-  public DataFetcher<Object> parentStation() {
-    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
   }
 
   @Override
@@ -411,16 +425,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<String> url() {
-    return environment ->
-      getValue(
-        environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
-      );
-  }
-
-  @Override
   public DataFetcher<String> vehicleMode() {
     return environment ->
       getValue(
@@ -469,7 +473,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
     return environment -> {
-      var boarding = getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
+      var boarding = getValue(
+        environment,
+        StopLocation::getWheelchairAccessibility,
+        station -> null
+      );
       return LegacyGraphQLUtils.toGraphQL(boarding);
     };
   }

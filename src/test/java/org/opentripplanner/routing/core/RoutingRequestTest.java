@@ -1,23 +1,27 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import java.util.List;
-import org.junit.Test;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class RoutingRequestTest {
 
-  private static final FeedScopedId AGENCY_ID = new FeedScopedId("F", "A1");
-  private static final FeedScopedId ROUTE_ID = new FeedScopedId("F", "R1");
-  private static final FeedScopedId OTHER_ID = new FeedScopedId("F", "X");
+  private static final FeedScopedId AGENCY_ID = TransitModelForTest.id("A1");
+  private static final FeedScopedId ROUTE_ID = TransitModelForTest.id("R1");
+  private static final FeedScopedId OTHER_ID = TransitModelForTest.id("X");
   public static final String TIMEZONE = "Europe/Paris";
 
   @Test
@@ -55,16 +59,31 @@ public class RoutingRequestTest {
   }
 
   @Test
-  public void testPreferencesPenaltyForRoute() {
-    Agency agency = new Agency(AGENCY_ID, "A", TIMEZONE);
-    Route route = new Route(ROUTE_ID);
-    route.setShortName("R");
-    route.setAgency(agency);
+  public void shouldCloneObjectFields() {
+    var req = new RoutingRequest();
 
-    Agency otherAgency = new Agency(OTHER_ID, "OtherA", TIMEZONE);
-    Route otherRoute = new Route(OTHER_ID);
-    otherRoute.setShortName("OtherR");
-    otherRoute.setAgency(otherAgency);
+    var clone = req.clone();
+
+    assertNotSame(clone, req);
+    assertNotSame(clone.itineraryFilters, req.itineraryFilters);
+    assertNotSame(clone.raptorDebugging, req.raptorDebugging);
+    assertNotSame(clone.raptorOptions, req.raptorOptions);
+
+    assertEquals(50, req.numItineraries);
+    assertEquals(50, clone.numItineraries);
+  }
+
+  @Test
+  public void testPreferencesPenaltyForRoute() {
+    Agency agency = agency("A").copy().withId(AGENCY_ID).withTimezone(TIMEZONE).build();
+    Route route = route(ROUTE_ID.getId()).withShortName("R").withAgency(agency).build();
+
+    Route otherRoute = route
+      .copy()
+      .withId(OTHER_ID)
+      .withShortName("OtherR")
+      .withAgency(agency.copy().withId(OTHER_ID).withName("OtherA").build())
+      .build();
 
     List<String> testCases = List.of(
       // !prefAgency | !prefRoute | unPrefA | unPrefR | expected cost
@@ -85,13 +104,13 @@ public class RoutingRequestTest {
       RoutingRequest routingRequest = tc.createRoutingRequest();
 
       assertEquals(
-        tc.toString(),
         tc.expectedCost,
-        routingRequest.preferencesPenaltyForRoute(route)
+        routingRequest.preferencesPenaltyForRoute(route),
+        tc.toString()
       );
 
       if (tc.prefAgency || tc.prefRoute) {
-        assertEquals(tc.toString(), 0, routingRequest.preferencesPenaltyForRoute(otherRoute));
+        assertEquals(0, routingRequest.preferencesPenaltyForRoute(otherRoute), tc.toString());
       }
     }
   }

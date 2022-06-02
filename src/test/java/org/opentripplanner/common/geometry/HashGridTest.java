@@ -4,19 +4,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
 
-public class HashGridTest extends TestCase {
+public class HashGridTest {
 
   /**
    * We perform a non-regression random test. We insert many random-envelop objects into both a hash
    * grid (OTP) and STRtree (JTS) spatial indexes. We check with many random query that the set of
    * returned objects is the same (after pruning because both could return false positives).
    */
+  @Test
   @SuppressWarnings("unchecked")
   public void testHashGridRandom() {
     final double X0 = -0.05;
@@ -56,7 +58,7 @@ public class HashGridTest extends TestCase {
         if (obj.envelope.intersects(searchEnv)) strtreeObjs2.add(obj);
       }
       boolean equals = hashGridObjs2.equals(strtreeObjs2);
-      assertTrue(equals);
+      Assertions.assertTrue(equals);
     }
   }
 

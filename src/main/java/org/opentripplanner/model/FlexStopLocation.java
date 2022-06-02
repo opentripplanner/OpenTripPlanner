@@ -2,6 +2,8 @@ package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -15,7 +17,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private I18NString name;
 
-  private String description;
+  private I18NString description;
 
   private Geometry geometry;
 
@@ -39,7 +41,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   }
 
   @Override
-  public String getDescription() {
+  public I18NString getDescription() {
     return description;
   }
 
@@ -88,7 +90,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     return false;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(I18NString description) {
     this.description = description;
   }
 

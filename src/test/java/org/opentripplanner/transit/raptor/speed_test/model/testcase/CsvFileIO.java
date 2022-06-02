@@ -16,9 +16,9 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 import org.slf4j.Logger;
@@ -209,7 +209,7 @@ public class CsvFileIO {
             Double.parseDouble(csvReader.get("toLat")),
             Double.parseDouble(csvReader.get("toLon"))
           ),
-          asSortedList(toArray(csvReader.get("tags"))),
+          csvReader.get("category"),
           new QualifiedModeSet(toArray(csvReader.get("modes"))).getRequestModes()
         );
         testCases.add(tc);

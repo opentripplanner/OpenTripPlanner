@@ -3,13 +3,13 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.time.LocalDate;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairBoarding;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This represents a single trip within a TripPattern, but with a time offset in seconds. This is
@@ -72,7 +72,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   }
 
   @Override
-  public WheelchairBoarding wheelchairBoarding() {
+  public WheelchairAccessibility wheelchairBoarding() {
     return pattern.wheelchairBoardingForTrip(tripIndexForDates);
   }
 

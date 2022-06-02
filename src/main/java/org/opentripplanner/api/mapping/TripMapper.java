@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TripMapper {
 
@@ -19,15 +19,15 @@ public class TripMapper {
     api.id = FeedScopedIdMapper.mapToApi(obj.getId());
     api.routeId = FeedScopedIdMapper.mapIdToApi(obj.getRoute());
     api.serviceId = FeedScopedIdMapper.mapToApi(obj.getServiceId());
-    api.tripShortName = obj.getTripShortName();
-    api.tripHeadsign = obj.getTripHeadsign();
-    api.routeShortName = obj.getRouteShortName();
+    api.tripShortName = obj.getShortName();
+    api.tripHeadsign = obj.getHeadsign();
+    api.routeShortName = obj.getRoute().getShortName();
     api.directionId = obj.getGtfsDirectionIdAsString(null);
-    api.blockId = obj.getBlockId();
+    api.blockId = obj.getGtfsBlockId();
     api.shapeId = FeedScopedIdMapper.mapToApi(obj.getShapeId());
     api.wheelchairAccessible = obj.getWheelchairBoarding().gtfsCode;
     api.bikesAllowed = BikeAccessMapper.mapToApi(obj.getBikesAllowed());
-    api.fareId = obj.getFareId();
+    api.fareId = obj.getGtfsFareId();
 
     return api;
   }
@@ -39,7 +39,7 @@ public class TripMapper {
 
     ApiTripShort api = new ApiTripShort();
     api.id = FeedScopedIdMapper.mapToApi(domain.getId());
-    api.tripHeadsign = domain.getTripHeadsign();
+    api.tripHeadsign = domain.getHeadsign();
     api.serviceId = FeedScopedIdMapper.mapToApi(domain.getServiceId());
     FeedScopedId shape = domain.getShapeId();
 

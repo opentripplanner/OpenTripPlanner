@@ -5,7 +5,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.model.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
 public class GroupOfLinesType {
 

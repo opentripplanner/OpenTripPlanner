@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.Test;
-import org.opentripplanner.model.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PrivateCodeStructure;

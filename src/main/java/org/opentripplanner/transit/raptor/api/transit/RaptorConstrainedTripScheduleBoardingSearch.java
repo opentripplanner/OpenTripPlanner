@@ -30,6 +30,7 @@ public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTri
   @Nullable
   RaptorTripScheduleBoardOrAlightEvent<T> find(
     RaptorTimeTable<T> targetTimetable,
+    int transferSlack,
     T sourceTrip,
     int sourceStopIndex,
     int prevTransitArrivalTime,

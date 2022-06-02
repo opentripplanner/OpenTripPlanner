@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -41,6 +42,11 @@ interface ConstrainedBoardingSearchStrategy {
    * </ol>
    */
   int plus(int v, int u);
+
+  /**
+   * Return the search direction for this strategy.
+   */
+  SearchDirection direction();
 
   /**
    * <ol>

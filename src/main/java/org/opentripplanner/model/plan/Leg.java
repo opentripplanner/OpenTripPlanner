@@ -7,19 +7,19 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

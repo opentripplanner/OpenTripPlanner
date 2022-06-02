@@ -5,11 +5,12 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class FrequencyEntryTest {
 
@@ -17,13 +18,13 @@ public class FrequencyEntryTest {
   private static final TripTimes tripTimes;
 
   static {
-    Trip trip = new Trip(new FeedScopedId("agency", "testtrip"));
+    Trip trip = TransitModelForTest.trip("testtrip").build();
 
     List<StopTime> stopTimes = new ArrayList<>();
 
     int time = 0;
     for (int i = 0; i < STOP_NUM; ++i) {
-      FeedScopedId id = new FeedScopedId("agency", i + "");
+      FeedScopedId id = TransitModelForTest.id(i + "");
 
       Stop stop = Stop.stopForTest(id.getId(), 0.0, 0.0);
 

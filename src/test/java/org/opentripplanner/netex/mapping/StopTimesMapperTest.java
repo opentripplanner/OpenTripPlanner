@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
@@ -30,7 +30,7 @@ public class StopTimesMapperTest {
   private static final BigInteger TWO = BigInteger.valueOf(2);
 
   private static final LocalTime QUARTER_PAST_FIVE = LocalTime.of(5, 15);
-  public static final Trip TRIP = new Trip(new FeedScopedId("F", "T1"));
+  public static final Trip TRIP = TransitModelForTest.trip("T1").build();
 
   @Test
   public void testCalculateOtpTime() {
@@ -68,9 +68,9 @@ public class StopTimesMapperTest {
     assertEquals(4, stopTimes.size());
 
     assertStop(stopTimes.get(0), "NSR:Quay:1", 18000, "Bergen", List.of("Stavanger"));
-    assertStop(stopTimes.get(1), "NSR:Quay:2", 18240, "Bergen", null);
+    assertStop(stopTimes.get(1), "NSR:Quay:2", 18240, "Bergen", List.of("Stavanger"));
     assertStop(stopTimes.get(2), "NSR:Quay:3", 18600, "Stavanger", List.of("Bergen"));
-    assertStop(stopTimes.get(3), "NSR:Quay:4", 18900, "Stavanger", null);
+    assertStop(stopTimes.get(3), "NSR:Quay:4", 18900, "Stavanger", List.of("Bergen"));
 
     Map<String, StopTime> map = result.stopTimeByNetexId;
 

@@ -7,19 +7,20 @@ import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -108,7 +109,7 @@ public class FlexibleTransitLeg implements Leg {
 
   @Override
   public String getHeadsign() {
-    return getTrip().getTripHeadsign();
+    return getTrip().getHeadsign();
   }
 
   @Override
@@ -209,9 +210,9 @@ public class FlexibleTransitLeg implements Leg {
       .addTimeCal("endTime", endTime)
       .addNum("distance", getDistanceMeters(), "m")
       .addNum("cost", generalizedCost)
-      .addEntityId("agencyId", getAgency())
-      .addEntityId("routeId", getRoute())
-      .addEntityId("tripId", getTrip())
+      .addObjOp("agencyId", getAgency(), TransitEntity::getId)
+      .addObjOp("routeId", getRoute(), TransitEntity::getId)
+      .addObjOp("tripId", getTrip(), TransitEntity::getId)
       .addObj("serviceDate", getServiceDate())
       .addObj("legGeometry", getLegGeometry())
       .addCol("transitAlerts", transitAlerts)

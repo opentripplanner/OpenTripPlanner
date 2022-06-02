@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
  * Created by mabu on 28.7.2015.

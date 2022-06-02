@@ -5,8 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import org.junit.Test;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class TransmodelMappingUtilTest {
 
@@ -30,10 +31,11 @@ public class TransmodelMappingUtilTest {
   }
 
   Agency agency(String feedScope, int id) {
-    return new Agency(
-      new FeedScopedId(feedScope, Integer.toString(id)),
-      "Agency " + id,
-      "Europe/Paris"
-    );
+    // We use the test builder to make sure we get back an agency with all required fields
+    return TransitModelForTest
+      .agency("Agency " + id)
+      .copy()
+      .withId(new FeedScopedId(feedScope, Integer.toString(id)))
+      .build();
   }
 }

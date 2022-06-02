@@ -46,16 +46,13 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -63,8 +60,6 @@ import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
@@ -88,6 +83,11 @@ import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.WorldEnvelope;
@@ -857,6 +857,38 @@ public class Graph implements Serializable {
     }
 
     return stops.stream().map(index.getStopVertexForStop()::get).collect(Collectors.toSet());
+  }
+
+  /**
+   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+   * @return The coordinate for the transit entity
+   */
+  public WgsCoordinate getCoordinateById(FeedScopedId id) {
+    // GroupOfStations
+    GroupOfStations groupOfStations = groupOfStationsById.get(id);
+    if (groupOfStations != null) {
+      return groupOfStations.getCoordinate();
+    }
+
+    // Multimodal station
+    MultiModalStation multiModalStation = multiModalStationById.get(id);
+    if (multiModalStation != null) {
+      return multiModalStation.getCoordinate();
+    }
+
+    // Station
+    Station station = stationById.get(id);
+    if (station != null) {
+      return station.getCoordinate();
+    }
+
+    // Single stop
+    var stop = index.getStopForId(id);
+    if (stop != null) {
+      return stop.getCoordinate();
+    }
+
+    return null;
   }
 
   /** An OBA Service Date is a local date without timezone, only year month and day. */

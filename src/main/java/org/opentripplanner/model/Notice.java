@@ -1,5 +1,8 @@
 package org.opentripplanner.model;
 
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+
 /**
  * This is an element that originates from the NeTEx specification and is described as "Text-based
  * notification describing circumstances which cannot be modelled as structured data." Any NeTEx

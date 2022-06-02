@@ -1,23 +1,19 @@
 package org.opentripplanner.model.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
@@ -25,6 +21,10 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -37,15 +37,14 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  */
 public class OtpTransitServiceBuilderLimitPeriodTest {
 
-  private static final String FEED_ID = "F";
   private static final ServiceDate D0 = new ServiceDate(2020, 1, 1);
   private static final ServiceDate D1 = new ServiceDate(2020, 1, 8);
   private static final ServiceDate D2 = new ServiceDate(2020, 1, 15);
   private static final ServiceDate D3 = new ServiceDate(2020, 1, 31);
-  private static final FeedScopedId SERVICE_C_IN = new FeedScopedId(FEED_ID, "CalSrvIn");
-  private static final FeedScopedId SERVICE_D_IN = new FeedScopedId(FEED_ID, "CalSrvDIn");
-  private static final FeedScopedId SERVICE_C_OUT = new FeedScopedId(FEED_ID, "CalSrvOut");
-  private static final FeedScopedId SERVICE_D_OUT = new FeedScopedId(FEED_ID, "CalSrvDOut");
+  private static final FeedScopedId SERVICE_C_IN = TransitModelForTest.id("CalSrvIn");
+  private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
+  private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
+  private static final FeedScopedId SERVICE_D_OUT = TransitModelForTest.id("CalSrvDOut");
   private static final Stop STOP_1 = Stop.stopForTest("Stop-1", 0.0, 0.0);
   private static final Stop STOP_2 = Stop.stopForTest("Stop-2", 0.0, 0.0);
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
@@ -55,7 +54,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   );
   private static final StopPattern STOP_PATTERN = new StopPattern(STOP_TIMES);
   private static int SEQ_NR = 0;
-  private final Route route = new Route(newId());
+  private final Route route = TransitModelForTest.route(newId().getId()).build();
   private final Trip tripCSIn = createTrip("TCalIn", SERVICE_C_IN);
   private final Trip tripCSOut = createTrip("TCalOut", SERVICE_C_OUT);
   private final Trip tripCSDIn = createTrip("TDateIn", SERVICE_D_IN);
@@ -64,7 +63,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   private TripPattern patternInT2;
   private OtpTransitServiceBuilder subject;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     subject = new OtpTransitServiceBuilder();
 
@@ -85,8 +84,6 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject.getStops().add(STOP_2);
 
     // Add Route
-    route.setGtfsType(3);
-    route.setMode(TransitMode.BUS);
     subject.getRoutes().add(route);
 
     // Add trips; one for each day and calendar
@@ -121,29 +118,29 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();
-    assertEquals(calendars.toString(), 1, calendars.size());
-    assertEquals(calendars.toString(), SERVICE_C_IN, calendars.get(0).getServiceId());
+    assertEquals(1, calendars.size(), calendars.toString());
+    assertEquals(SERVICE_C_IN, calendars.get(0).getServiceId(), calendars.toString());
 
     // Verify calendar dates
     List<ServiceCalendarDate> dates = subject.getCalendarDates();
-    assertEquals(dates.toString(), 1, dates.size());
-    assertEquals(dates.toString(), SERVICE_D_IN, dates.get(0).getServiceId());
+    assertEquals(1, dates.size(), dates.toString());
+    assertEquals(SERVICE_D_IN, dates.get(0).getServiceId(), dates.toString());
 
     // Verify trips
     EntityById<Trip> trips = subject.getTripsById();
-    assertEquals(trips.toString(), 2, trips.size());
-    assertTrue(trips.toString(), trips.containsKey(tripCSIn.getId()));
-    assertTrue(trips.toString(), trips.containsKey(tripCSDIn.getId()));
+    assertEquals(2, trips.size(), trips.toString());
+    assertTrue(trips.containsKey(tripCSIn.getId()), trips.toString());
+    assertTrue(trips.containsKey(tripCSDIn.getId()), trips.toString());
 
     // Verify patterns
     Collection<TripPattern> patterns = subject.getTripPatterns().get(STOP_PATTERN);
     assertEquals(2, patterns.size());
-    assertTrue(patterns.toString(), patterns.contains(patternInT1));
-    assertTrue(patterns.toString(), patterns.contains(patternInT2));
+    assertTrue(patterns.contains(patternInT1), patterns.toString());
+    assertTrue(patterns.contains(patternInT2), patterns.toString());
 
     // Verify trips in pattern (one trip is removed from patternInT1)
     assertEquals(1, patternInT1.scheduledTripsAsStream().count());
-    assertEquals(tripCSIn, patternInT1.scheduledTripsAsStream().findFirst().get());
+    assertEquals(tripCSIn, patternInT1.scheduledTripsAsStream().findFirst().orElseThrow());
 
     // Verify trips in pattern is unchanged (one trip)
     assertEquals(1, patternInT2.scheduledTripsAsStream().count());
@@ -179,12 +176,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private static FeedScopedId newId() {
-    return new FeedScopedId(FEED_ID, Integer.toString(++SEQ_NR));
+    return TransitModelForTest.id(Integer.toString(++SEQ_NR));
   }
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
-    FeedScopedId patternId = new FeedScopedId(
-      FEED_ID,
+    FeedScopedId patternId = TransitModelForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
     TripPattern p = new TripPattern(patternId, route, STOP_PATTERN);
@@ -197,10 +193,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private Trip createTrip(String id, FeedScopedId serviceId) {
-    Trip trip = new Trip(new FeedScopedId(FEED_ID, id));
-    trip.setServiceId(serviceId);
-    trip.setDirection(Direction.valueOfGtfsCode(1));
-    trip.setRoute(route);
-    return trip;
+    return TransitModelForTest
+      .trip(id)
+      .withServiceId(serviceId)
+      .withDirection(Direction.valueOfGtfsCode(1))
+      .withRoute(route)
+      .build();
   }
 }

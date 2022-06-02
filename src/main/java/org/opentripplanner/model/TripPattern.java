@@ -28,6 +28,11 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -467,7 +472,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
   /** Returns whether a given stop is wheelchair-accessible. */
   public boolean wheelchairAccessible(int stopIndex) {
-    return stopPattern.getStop(stopIndex).getWheelchairBoarding() == WheelchairBoarding.POSSIBLE;
+    return (
+      stopPattern.getStop(stopIndex).getWheelchairAccessibility() ==
+      WheelchairAccessibility.POSSIBLE
+    );
   }
 
   public PickDrop getAlightType(int stopIndex) {
@@ -637,7 +645,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     if (tripTimes == null) {
       return null;
     }
-    return tripTimes.getTrip().getTripHeadsign();
+    return tripTimes.getTrip().getHeadsign();
   }
 
   public String getStopHeadsign(int stopIndex) {

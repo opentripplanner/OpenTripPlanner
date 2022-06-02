@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.test.support.VariableSource;
@@ -40,14 +40,14 @@ public class WheelchairCostCalculatorTest {
   private final TestTripSchedule.Builder scheduleBuilder = TestTripSchedule.schedule("12:00 12:01");
 
   static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(WheelchairBoarding.POSSIBLE, 0),
-    Arguments.of(WheelchairBoarding.NO_INFORMATION, UNKNOWN_ACCESSIBILITY_COST),
-    Arguments.of(WheelchairBoarding.NOT_POSSIBLE, INACCESSIBLE_TRIP_COST)
+    Arguments.of(WheelchairAccessibility.POSSIBLE, 0),
+    Arguments.of(WheelchairAccessibility.NO_INFORMATION, UNKNOWN_ACCESSIBILITY_COST),
+    Arguments.of(WheelchairAccessibility.NOT_POSSIBLE, INACCESSIBLE_TRIP_COST)
   );
 
   @ParameterizedTest(name = "accessibility of {0} should add an extra cost of {1}")
   @VariableSource("testCases")
-  public void calculateExtraBoardingCost(WheelchairBoarding wcb, int expectedExtraCost) {
+  public void calculateExtraBoardingCost(WheelchairAccessibility wcb, int expectedExtraCost) {
     var schedule = scheduleBuilder.wheelchairBoarding(wcb).build();
 
     int defaultCost = calculateBoardingCost(schedule, defaultCostCalculator);

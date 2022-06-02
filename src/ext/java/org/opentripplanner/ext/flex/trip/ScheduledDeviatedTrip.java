@@ -25,8 +25,8 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop

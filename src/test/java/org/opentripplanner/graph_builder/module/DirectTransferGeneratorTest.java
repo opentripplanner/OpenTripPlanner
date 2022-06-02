@@ -16,13 +16,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -32,6 +29,9 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This creates a graph with trip patterns S0 - V0 | S11 - V11 --------> V21 - S21 |     \ S12 - V12
@@ -193,11 +193,11 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
           street(V11, V22, 110, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
           if (addPatterns) {
-            var agency = agency("Agency");
+            var agency = TransitModelForTest.agency("Agency");
 
             tripPattern(
               new TripPattern(
-                new FeedScopedId("Test", "TP1"),
+                TransitModelForTest.id("TP1"),
                 route("R1", TransitMode.BUS, agency),
                 new StopPattern(List.of(st(S11), st(S12)))
               )
@@ -205,7 +205,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
             tripPattern(
               new TripPattern(
-                new FeedScopedId("Test", "TP2"),
+                TransitModelForTest.id("TP2"),
                 route("R2", TransitMode.BUS, agency),
                 new StopPattern(List.of(st(S21), st(S22)))
               )

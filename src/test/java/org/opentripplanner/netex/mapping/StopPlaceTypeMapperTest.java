@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.StopPlace;

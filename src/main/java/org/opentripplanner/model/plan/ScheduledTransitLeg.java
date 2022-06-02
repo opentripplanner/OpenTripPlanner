@@ -14,15 +14,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
@@ -30,6 +25,12 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -357,9 +358,9 @@ public class ScheduledTransitLeg implements Leg {
       .addNum("distance", distanceMeters, "m")
       .addNum("cost", generalizedCost)
       .addNum("routeType", getRouteType())
-      .addEntityId("agencyId", getAgency())
-      .addEntityId("routeId", getRoute())
-      .addEntityId("tripId", getTrip())
+      .addObjOp("agencyId", getAgency(), TransitEntity::getId)
+      .addObjOp("routeId", getRoute(), TransitEntity::getId)
+      .addObjOp("tripId", getTrip(), TransitEntity::getId)
       .addStr("headsign", getHeadsign())
       .addObj("serviceDate", serviceDate)
       .addObj("legGeometry", legGeometry)

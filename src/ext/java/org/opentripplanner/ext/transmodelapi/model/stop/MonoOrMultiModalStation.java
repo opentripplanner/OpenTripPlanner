@@ -5,8 +5,9 @@ import java.util.TimeZone;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.transit.model.basic.TransitEntity;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class MonoOrMultiModalStation extends TransitEntity {
 
@@ -24,7 +25,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
   /**
    * Additional information about the station (if needed)
    */
-  private final String description;
+  private final I18NString description;
 
   /**
    * URL to a web page containing information about this particular station
@@ -56,7 +57,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     this.lat = multiModalStation.getLat();
     this.lon = multiModalStation.getLon();
     this.code = multiModalStation.getCode();
-    this.description = multiModalStation.getDescription();
+    this.description = NonLocalizedString.ofNullable(multiModalStation.getDescription());
     this.url = multiModalStation.getUrl();
     this.timezone = null;
     this.childStops = multiModalStation.getChildStops();
@@ -79,7 +80,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return code;
   }
 
-  public String getDescription() {
+  public I18NString getDescription() {
     return description;
   }
 

@@ -928,13 +928,16 @@ enum FilterPlaceType {
     """Departure rows"""
     DEPARTURE_ROW
 
-    """Bicycle rent stations"""
-    BICYCLE_RENT
+    """Old value for VEHICLE_RENT"""
+    BICYCLE_RENT @deprecated(reason: "Use VEHICLE_RENT instead as it's clearer that it also returns rental scooters, cars...")
 
-    """Bike parks"""
+    """Vehicle (bicycles, scooters, cars ...) rental stations and vehicles"""
+    VEHICLE_RENT
+
+    """Parking lots (not rental stations) that contain spaces for bicycles"""
     BIKE_PARK
 
-    """Car parks"""
+    """Parking lots that contain spaces for cars"""
     CAR_PARK
 }
 
@@ -2845,7 +2848,11 @@ type Stop implements Node & PlaceInterface {
     code: String
 
     """Description of the stop, usually a street name"""
-    desc: String
+    desc(
+        """If translated description is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses descriptions from stops.txt.
+        """
+        language: String): String
 
     """ID of the zone where this stop is located"""
     zoneId: String

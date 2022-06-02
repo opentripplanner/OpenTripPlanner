@@ -11,7 +11,8 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.util.ProgressTracker;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class FlexTripsMapper {
 
     ProgressTracker progress = ProgressTracker.track("Create flex trips", 500, tripSize);
 
-    for (org.opentripplanner.model.Trip trip : stopTimesByTrip.keys()) {
+    for (Trip trip : stopTimesByTrip.keys()) {
       /* Fetch the stop times for this trip. Copy the list since it's immutable. */
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 

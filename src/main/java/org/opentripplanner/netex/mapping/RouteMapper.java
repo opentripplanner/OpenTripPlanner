@@ -8,16 +8,18 @@ import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.Branding;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.GroupOfRoutes;
-import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.RouteBuilder;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Branding;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BrandingRefStructure;
 import org.rutebanken.netex.model.FlexibleLine_VersionStructure;
@@ -69,17 +71,15 @@ class RouteMapper {
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
   }
 
-  org.opentripplanner.model.Route mapRoute(Line_VersionStructure line) {
-    org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route(
-      idFactory.createId(line.getId())
-    );
+  Route mapRoute(Line_VersionStructure line) {
+    RouteBuilder builder = Route.of(idFactory.createId(line.getId()));
 
-    otpRoute.setGroupsOfRoutes(getGroupOfRoutes(line));
-    otpRoute.setAgency(findOrCreateAuthority(line));
-    otpRoute.setOperator(findOperator(line));
-    otpRoute.setBranding(findBranding(line));
-    otpRoute.setLongName(line.getName().getValue());
-    otpRoute.setShortName(line.getPublicCode());
+    builder.getGroupsOfRoutes().addAll(getGroupOfRoutes(line));
+    builder.withAgency(findOrCreateAuthority(line));
+    builder.withOperator(findOperator(line));
+    builder.withBranding(findBranding(line));
+    builder.withLongName(line.getName().getValue());
+    builder.withShortName(line.getPublicCode());
 
     T2<TransitMode, String> mode;
     try {
@@ -94,11 +94,11 @@ class RouteMapper {
       return null;
     }
 
-    otpRoute.setMode(mode.first);
-    otpRoute.setNetexSubmode(mode.second);
+    builder.withMode(mode.first);
+    builder.withNetexSubmode(mode.second);
 
     if (line instanceof FlexibleLine_VersionStructure) {
-      otpRoute.setFlexibleLineType(
+      builder.withFlexibleLineType(
         ((FlexibleLine_VersionStructure) line).getFlexibleLineType().value()
       );
     }
@@ -106,10 +106,10 @@ class RouteMapper {
     if (line.getPresentation() != null) {
       PresentationStructure presentation = line.getPresentation();
       if (presentation.getColour() != null) {
-        otpRoute.setColor(hexBinaryAdapter.marshal(presentation.getColour()));
+        builder.withColor(hexBinaryAdapter.marshal(presentation.getColour()));
       }
       if (presentation.getTextColour() != null) {
-        otpRoute.setTextColor(hexBinaryAdapter.marshal(presentation.getTextColour()));
+        builder.withTextColor(hexBinaryAdapter.marshal(presentation.getTextColour()));
       }
     }
 
@@ -124,13 +124,13 @@ class RouteMapper {
     // bicycles on board.
     if (line.getTransportMode().equals(AllVehicleModesOfTransportEnumeration.WATER)) {
       if (ferryIdsNotAllowedForBicycle.contains(line.getId())) {
-        otpRoute.setBikesAllowed(BikeAccess.NOT_ALLOWED);
+        builder.withBikesAllowed(BikeAccess.NOT_ALLOWED);
       } else {
-        otpRoute.setBikesAllowed(BikeAccess.ALLOWED);
+        builder.withBikesAllowed(BikeAccess.ALLOWED);
       }
     }
 
-    return otpRoute;
+    return builder.build();
   }
 
   private Collection<GroupOfRoutes> getGroupOfRoutes(Line_VersionStructure line) {

@@ -2,13 +2,12 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import java.util.LinkedList;
 import java.util.List;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * The responsibility of this class is to provide transfer constraints to the Raptor search for a
@@ -25,7 +24,7 @@ public final class ConstrainedBoardingSearch
    * these trips are probably a better match. We abort to avoid stepping through all trips, possibly
    * a large number (several days).
    */
-  private static final int ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS = 5;
+  private static final int ABORT_SEARCH_AFTER_N_VALID_NORMAL_TRIPS = 5;
 
   private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY = new ConstrainedBoardingSearchForward();
   private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
@@ -66,6 +65,7 @@ public final class ConstrainedBoardingSearch
   @Override
   public RaptorTripScheduleBoardOrAlightEvent<TripSchedule> find(
     RaptorTimeTable<TripSchedule> timetable,
+    int transferSlack,
     TripSchedule sourceTripSchedule,
     int sourceStopIndex,
     int prevTransitArrivalTime,
@@ -80,6 +80,7 @@ public final class ConstrainedBoardingSearch
     boolean found = findTimetableTripInfo(
       timetable,
       transfers,
+      transferSlack,
       currentTargetStopPos,
       prevTransitArrivalTime,
       earliestBoardTime
@@ -134,6 +135,7 @@ public final class ConstrainedBoardingSearch
   private boolean findTimetableTripInfo(
     RaptorTimeTable<TripSchedule> timetable,
     Iterable<TransferForPattern> transfers,
+    int transferSlack,
     int stopPos,
     int sourceTransitArrivalTime,
     int earliestBoardTime
@@ -160,36 +162,15 @@ public final class ConstrainedBoardingSearch
       for (TransferForPattern tx : transfers) {
         onTripTxConstraint = (TransferConstraint) tx.getTransferConstraint();
 
-        if (onTripTxConstraint.isFacilitated()) {
-          onTripEarliestBoardTime = sourceTransitArrivalTime;
-        }
-        // If NOT guaranteed or stay-seated the boarding is only allowed if there is
-        // enough time to do the transfer
-        else {
-          if (onTripTxConstraint.isMinTransferTimeSet()) {
-            int minTransferBoardTime = searchStrategy.plus(
-              sourceTransitArrivalTime,
-              onTripTxConstraint.getMinTransferTime()
-            );
-            // If this feature flag is switched on, then the minimum transfer time is
-            // not the minimum transfer time, but the definitive transfer time. Use
-            // this to override what we think the transfer will take according to OSM
-            // data, for example if you want to set a very low transfer time like
-            // 1 minute.
-            if (OTPFeature.MinimumTransferTimeIsDefinitive.isOn()) {
-              onTripEarliestBoardTime = minTransferBoardTime;
-            }
-            // Here we take the max(minTransferTime, osmWalkTransferTime) as the
-            // transfer time. If the minimum transfer time is 5 minutes, but according
-            // to OSM data it will take 7 minutes to walk then 7 minutes is chosen.
-            else {
-              onTripEarliestBoardTime =
-                searchStrategy.maxTime(earliestBoardTime, minTransferBoardTime);
-            }
-          } else {
-            onTripEarliestBoardTime = earliestBoardTime;
-          }
+        onTripEarliestBoardTime =
+          onTripTxConstraint.calculateTransferTargetTime(
+            sourceTransitArrivalTime,
+            transferSlack,
+            () -> earliestBoardTime,
+            searchStrategy.direction()
+          );
 
+        if (!onTripTxConstraint.isFacilitated()) {
           if (searchStrategy.timeIsBefore(time, onTripEarliestBoardTime)) {
             continue;
           }
@@ -211,7 +192,7 @@ public final class ConstrainedBoardingSearch
         onTripTxConstraint = TransferConstraint.REGULAR_TRANSFER;
         return true;
       }
-      if (nAllowedBoardings == ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS) {
+      if (nAllowedBoardings == ABORT_SEARCH_AFTER_N_VALID_NORMAL_TRIPS) {
         return false;
       }
     }

@@ -1,14 +1,12 @@
 package org.opentripplanner.model.transfer;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
-
-  static final String FEED_ID = "F";
 
   static final Station STATION = Station.stationForTest("Central Station", 60.0, 11.0);
 
@@ -22,15 +20,14 @@ public class TransferTestData {
   static final Stop STOP_S = Stop.stopForTest("S", 60.0, 11.0);
   static final Stop ANY_STOP = Stop.stopForTest("any", 60.0, 11.0);
 
-  static final Route ROUTE_1 = createRoute(1, "L1");
-  static final Route ROUTE_2 = createRoute(2, "L2");
-  static final Route ANY_ROUTE = createRoute(999, "any");
+  static final Route ROUTE_1 = TransitModelForTest.route("1").build();
+  static final Route ROUTE_2 = TransitModelForTest.route("2").build();
+  static final Route ANY_ROUTE = TransitModelForTest.route("ANY").build();
 
-  static final Trip TRIP_11 = createTrip(11, ROUTE_1);
-  static final Trip TRIP_12 = createTrip(12, ROUTE_1);
-  static final Trip TRIP_21 = createTrip(21, ROUTE_2);
-  static final Trip TRIP_22 = createTrip(22, ROUTE_2);
-  static final Trip ANY_TRIP = createTrip(999, ANY_ROUTE);
+  static final Trip TRIP_11 = TransitModelForTest.trip("11").withRoute(ROUTE_1).build();
+  static final Trip TRIP_12 = TransitModelForTest.trip("12").withRoute(ROUTE_1).build();
+  static final Trip TRIP_21 = TransitModelForTest.trip("21").withRoute(ROUTE_2).build();
+  static final Trip ANY_TRIP = TransitModelForTest.trip("999").withRoute(ANY_ROUTE).build();
 
   static final TransferPoint STATION_POINT = new StationTransferPoint(STATION);
 
@@ -51,21 +48,5 @@ public class TransferTestData {
     STOP_A.setParentStation(STATION);
     STATION.addChildStop(STOP_S);
     STOP_S.setParentStation(STATION);
-  }
-
-  private static Trip createTrip(int id, Route route) {
-    Trip t = new Trip(createId(id));
-    t.setRoute(route);
-    return t;
-  }
-
-  private static Route createRoute(int id, String name) {
-    Route r = new Route(createId(id));
-    r.setShortName(name);
-    return r;
-  }
-
-  private static FeedScopedId createId(int id) {
-    return new FeedScopedId(FEED_ID, String.valueOf(id));
   }
 }

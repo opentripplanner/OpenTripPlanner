@@ -3,9 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelchairBoarding;
-import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -13,6 +11,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This represents the connection between a street vertex and a transit vertex.
@@ -26,18 +25,26 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final T transitEntityVertex;
 
-  private final WheelchairBoarding wheelchairBoarding;
+  private final WheelchairAccessibility wheelchairAccessibility;
 
-  public StreetTransitEntityLink(StreetVertex fromv, T tov, WheelchairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(
+    StreetVertex fromv,
+    T tov,
+    WheelchairAccessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
-    this.wheelchairBoarding = wheelchairBoarding;
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public StreetTransitEntityLink(T fromv, StreetVertex tov, WheelchairBoarding wheelchairBoarding) {
+  public StreetTransitEntityLink(
+    T fromv,
+    StreetVertex tov,
+    WheelchairAccessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
-    this.wheelchairBoarding = wheelchairBoarding;
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   public Vertex getFromVertex() {
@@ -84,12 +91,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     if (accessibility.enabled()) {
       if (
         accessibility.stops().onlyConsiderAccessible() &&
-        wheelchairBoarding != WheelchairBoarding.POSSIBLE
+        wheelchairAccessibility != WheelchairAccessibility.POSSIBLE
       ) {
         return null;
-      } else if (wheelchairBoarding == WheelchairBoarding.NO_INFORMATION) {
+      } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
-      } else if (wheelchairBoarding == WheelchairBoarding.NOT_POSSIBLE) {
+      } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
         s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
       }
     }

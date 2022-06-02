@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-import static org.opentripplanner.model.WheelchairBoarding.NO_INFORMATION;
+import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,6 +10,8 @@ import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -50,9 +52,9 @@ public final class Stop extends StationElement implements StopLocation {
     FeedScopedId id,
     I18NString name,
     String code,
-    String description,
+    I18NString description,
     WgsCoordinate coordinate,
-    WheelchairBoarding wheelchairBoarding,
+    WheelchairAccessibility wheelchair,
     StopLevel level,
     String platformCode,
     Collection<FareZone> fareZones,
@@ -61,7 +63,7 @@ public final class Stop extends StationElement implements StopLocation {
     TransitMode vehicleType,
     String netexSubmode
   ) {
-    super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    super(id, name, code, description, coordinate, wheelchair, level);
     this.platformCode = platformCode;
     this.fareZones = fareZones;
     this.url = url;
@@ -72,25 +74,25 @@ public final class Stop extends StationElement implements StopLocation {
 
   public static Stop stopForTest(
     String idAndName,
-    WheelchairBoarding wheelChairBoarding,
+    WheelchairAccessibility wheelchair,
     double lat,
     double lon
   ) {
-    return stopForTest(idAndName, null, lat, lon, null, wheelChairBoarding);
+    return stopForTest(idAndName, null, lat, lon, null, wheelchair);
   }
 
   /**
    * @see #stopForTest(String, double, double, Station)
    */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
-    return stopForTest(idAndName, null, lat, lon, null, NO_INFORMATION);
+    return stopForTest(idAndName, (String) null, lat, lon, null);
   }
 
   /**
    * @see #stopForTest(String, double, double, Station)
    */
-  public static Stop stopForTest(String idAndName, String desc, double lat, double lon) {
-    return stopForTest(idAndName, desc, lat, lon, null, NO_INFORMATION);
+  public static Stop stopForTest(String idAndName, I18NString desc, double lat, double lon) {
+    return stopForTest(idAndName, desc, lat, lon, null);
   }
 
   /**
@@ -98,12 +100,29 @@ public final class Stop extends StationElement implements StopLocation {
    * coordinate. The feedId is static set to "F"
    */
   public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
-    return stopForTest(idAndName, null, lat, lon, parent, NO_INFORMATION);
+    return stopForTest(idAndName, (String) null, lat, lon, parent);
   }
 
   public static Stop stopForTest(
     String idAndName,
     String desc,
+    double lat,
+    double lon,
+    Station parent
+  ) {
+    return stopForTest(
+      idAndName,
+      NonLocalizedString.ofNullable(desc),
+      lat,
+      lon,
+      parent,
+      NO_INFORMATION
+    );
+  }
+
+  public static Stop stopForTest(
+    String idAndName,
+    I18NString desc,
     double lat,
     double lon,
     Station parent
@@ -117,11 +136,11 @@ public final class Stop extends StationElement implements StopLocation {
    */
   public static Stop stopForTest(
     String idAndName,
-    String desc,
+    I18NString desc,
     double lat,
     double lon,
     Station parent,
-    WheelchairBoarding wheelChairBoarding
+    WheelchairAccessibility wheelchair
   ) {
     var stop = new Stop(
       new FeedScopedId("F", idAndName),
@@ -129,7 +148,7 @@ public final class Stop extends StationElement implements StopLocation {
       idAndName,
       desc,
       new WgsCoordinate(lat, lon),
-      wheelChairBoarding,
+      wheelchair,
       null,
       null,
       null,

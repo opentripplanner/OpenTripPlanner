@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -12,12 +13,12 @@ public final class PathwayNode extends StationElement {
     FeedScopedId id,
     I18NString name,
     String code,
-    String description,
+    I18NString description,
     WgsCoordinate coordinate,
-    WheelchairBoarding wheelchairBoarding,
+    WheelchairAccessibility wheelchairAccessibility,
     StopLevel level
   ) {
-    super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    super(id, name, code, description, coordinate, wheelchairAccessibility, level);
   }
 
   @Override

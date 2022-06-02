@@ -1,13 +1,13 @@
 package org.opentripplanner.model.plan;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class PlaceTest {
@@ -15,7 +15,7 @@ public class PlaceTest {
   @Test
   public void sameLocationBasedOnInstance() {
     Place aPlace = Place.normal(60.0, 10.0, new NonLocalizedString("A Place"));
-    assertTrue("same instance", aPlace.sameLocation(aPlace));
+    assertTrue(aPlace.sameLocation(aPlace), "same instance");
   }
 
   @Test
@@ -28,10 +28,10 @@ public class PlaceTest {
     );
     Place otherPlace = Place.normal(65.0, 14.0, new NonLocalizedString("Other Place"));
 
-    assertTrue("same place", aPlace.sameLocation(samePlace));
-    assertTrue("same place(symmetric)", samePlace.sameLocation(aPlace));
-    assertFalse("other place", aPlace.sameLocation(otherPlace));
-    assertFalse("other place(symmetric)", otherPlace.sameLocation(aPlace));
+    assertTrue(aPlace.sameLocation(samePlace), "same place");
+    assertTrue(samePlace.sameLocation(aPlace), "same place(symmetric)");
+    assertFalse(aPlace.sameLocation(otherPlace), "other place");
+    assertFalse(otherPlace.sameLocation(aPlace), "other place(symmetric)");
   }
 
   @Test
@@ -43,10 +43,10 @@ public class PlaceTest {
     Place samePlace = place(s1);
     Place otherPlace = place(s2);
 
-    assertTrue("same place", aPlace.sameLocation(samePlace));
-    assertTrue("same place(symmetric)", samePlace.sameLocation(aPlace));
-    assertFalse("other place", aPlace.sameLocation(otherPlace));
-    assertFalse("other place(symmetric)", otherPlace.sameLocation(aPlace));
+    assertTrue(aPlace.sameLocation(samePlace), "same place");
+    assertTrue(samePlace.sameLocation(aPlace), "same place(symmetric)");
+    assertFalse(aPlace.sameLocation(otherPlace), "other place");
+    assertFalse(otherPlace.sameLocation(aPlace), "other place(symmetric)");
   }
 
   @Test
