@@ -36,7 +36,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ecs-cluster: open-trip-planner
-          ecs-service: format('open-trip-planner-{0}', github.event.inputs.environment)
+          ecs-service: ${{ format('open-trip-planner-{0}', github.event.inputs.environment) }}
           docker-tag: ${{ steps.build-push.outputs.docker-tag }}
           requires-secrets: 'false'
       
