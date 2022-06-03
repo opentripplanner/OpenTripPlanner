@@ -1,13 +1,25 @@
-name: Deploy to dev-green
+name: Deploy to ECS
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        type: environment # will be prod, dev or dev-green
+        required: true
+        default: dev-green
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment }}
+  cancel-in-progress: true
 
 jobs:
-  deploy-dev:
-    name: Deploy chosen branch to dev-green
+  deploy:
+    if: ${{ github.event.inputs.environment != 'prod' }}
+    name: Deploy ${{ github.ref }} to ${{ github.event.inputs.environment }}
+    environment:
+      name: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
-    concurrency: dev-green
 
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +36,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ecs-cluster: open-trip-planner
-          ecs-service: open-trip-planner-dev-green
+          ecs-service: format('open-trip-planner-{0}', github.event.inputs.environment)
           docker-tag: ${{ steps.build-push.outputs.docker-tag }}
           requires-secrets: 'false'
       
