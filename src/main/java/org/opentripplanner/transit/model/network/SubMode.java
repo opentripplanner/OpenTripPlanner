@@ -2,7 +2,9 @@ package org.opentripplanner.transit.model.network;
 
 import java.io.Serializable;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,8 +27,14 @@ public class SubMode implements Serializable {
   private static final int NONE_EXISTING_SUBMODE_INDEX = 1_000_000;
 
   private static final Logger LOG = LoggerFactory.getLogger(SubMode.class);
-  private static final AtomicInteger COUNTER = new AtomicInteger(0);
+
+  /**
+   * Note! This cache all submodes used in the static scheduled transit data. When
+   * serialized the static fields need to be explicit serialized, it is not enough
+   * to serialize the instances.
+   */
   private static final Map<String, SubMode> ALL = new ConcurrentHashMap<>();
+  private static final AtomicInteger COUNTER = new AtomicInteger(0);
 
   public static final SubMode UNKNOWN = getOrBuildAndCashForever("unknown");
 
@@ -48,7 +56,8 @@ public class SubMode implements Serializable {
     if (name == null) {
       return UNKNOWN;
     }
-    return ALL.computeIfAbsent(name, n -> new SubMode(n, NONE_EXISTING_SUBMODE_INDEX));
+    var subMode = ALL.get(name);
+    return subMode != null ? subMode : new SubMode(name, NONE_EXISTING_SUBMODE_INDEX);
   }
 
   /**
@@ -79,6 +88,19 @@ public class SubMode implements Serializable {
       }
     }
     return set;
+  }
+
+  public static List<SubMode> listAllCachedSubModes() {
+    return List.copyOf(ALL.values());
+  }
+
+  public static void deserializeSubModeCash(Collection<SubMode> subModes) {
+    int maxIndex = 0;
+    for (SubMode it : subModes) {
+      ALL.put(it.name(), it);
+      maxIndex = Math.max(maxIndex, it.index);
+    }
+    COUNTER.set(maxIndex+1);
   }
 
   public String name() {

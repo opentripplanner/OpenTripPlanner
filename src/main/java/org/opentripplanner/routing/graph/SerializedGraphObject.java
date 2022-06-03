@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
@@ -21,6 +22,7 @@ import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -54,11 +56,19 @@ public class SerializedGraphObject implements Serializable {
   /** Embed a router configuration inside the graph, for starting up with a single file. */
   public final RouterConfig routerConfig;
 
+  /**
+   * All submodes are cached in a static collection inside SubMode,
+   * hence we need to serialize that as well
+   */
+  public final List<SubMode> allTransitSubModes;
+
+
   public SerializedGraphObject(Graph graph, BuildConfig buildConfig, RouterConfig routerConfig) {
     this.graph = graph;
     this.edges = graph.getEdges();
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
+    this.allTransitSubModes = SubMode.listAllCachedSubModes();
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
@@ -134,6 +144,7 @@ public class SerializedGraphObject implements Serializable {
 
       Kryo kryo = KryoBuilder.create();
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
+      SubMode.deserializeSubModeCash(serObj.allTransitSubModes);
       Graph graph = serObj.graph;
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();
