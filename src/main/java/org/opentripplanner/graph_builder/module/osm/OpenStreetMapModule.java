@@ -859,19 +859,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private void buildBasicGraph() {
       /* build the street segment graph from OSM ways */
-      long wayIndex = 0;
       long wayCount = osmdb.getWays().size();
       ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
       LOG.info(progress.startMessage());
 
       WAY:for (OSMWay way : osmdb.getWays()) {
-        if (wayIndex % 10000 == 0) LOG.debug("ways=" + wayIndex + "/" + wayCount);
-        wayIndex++;
-
         WayProperties wayData = wayPropertySet.getDataForWay(way);
-
         setWayName(way);
-
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(
           way,
           wayData.getPermission(),

@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.util.time.DurationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for creating the internal data structure of {@link
@@ -23,6 +26,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
  * are only available at construction time.
  */
 class RaptorRoutingRequestTransitDataCreator {
+
+  private static final Logger LOG = LoggerFactory.getLogger(
+    RaptorRoutingRequestTransitDataCreator.class
+  );
 
   private final TransitLayer transitLayer;
   private final ZonedDateTime transitSearchTimeZero;
@@ -157,6 +164,7 @@ class RaptorRoutingRequestTransitDataCreator {
     TransitDataProviderFilter filter
   ) {
     List<TripPatternForDate> tripPatternForDates = new ArrayList<>();
+    long start = System.currentTimeMillis();
 
     // This filters trips by the search date as well as additional dates before and after
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
@@ -164,6 +172,13 @@ class RaptorRoutingRequestTransitDataCreator {
         filterActiveTripPatterns(transitLayer, departureDate.plusDays(d), d == 0, filter)
       );
     }
+
+    if (LOG.isInfoEnabled()) {
+      String time = DurationUtils.msToSecondsStr(System.currentTimeMillis() - start);
+      long count = tripPatternForDates.size();
+      LOG.info("Prepare Transit model performed in {}, count: {}.", time, count);
+    }
+
     return tripPatternForDates;
   }
 }
