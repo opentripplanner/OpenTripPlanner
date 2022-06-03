@@ -46,6 +46,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final String feedId;
   private final int qos;
   private final boolean fuzzyTripMatching;
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
   private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
   private final String configRef;
   private WriteToGraphCallback saveResultOnGraph;
@@ -60,6 +61,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     this.feedId = parameters.getFeedId();
     this.qos = parameters.getQos();
     this.fuzzyTripMatching = parameters.getFuzzyTripMatching();
+    this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
   }
 
   @Override
@@ -77,6 +79,9 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     // Set properties of realtime data snapshot source
     if (fuzzyTripMatching) {
       snapshotSource.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+    }
+    if (backwardsDelayPropagationType != null) {
+      snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;
     }
   }
 

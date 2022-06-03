@@ -41,6 +41,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   private final String feedId;
   private final boolean fuzzyTripMatching;
   /**
+   * Defines when delays are propagated to previous stops and if these stops are given
+   * the NO_DATA flag.
+   */
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
+  /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
@@ -74,6 +79,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.fuzzyTripMatching = parameters.fuzzyTripMatching();
+    this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
@@ -110,6 +116,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
     if (fuzzyTripMatcher != null) {
       snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
+    }
+    if (backwardsDelayPropagationType != null) {
+      snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;
     }
   }
 

@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
@@ -33,6 +34,7 @@ public class PollingStoptimeUpdaterConfig {
       c.asInt("maxSnapshotFrequencyMs", -1),
       c.asBoolean("purgeExpiredData", false),
       c.asBoolean("fuzzyTripMatching", false),
+      c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA),
       sourceType,
       c.asText("feedId", null),
       url,

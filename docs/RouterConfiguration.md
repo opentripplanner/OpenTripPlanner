@@ -416,6 +416,15 @@ Common to all updater entries that connect to a network resource is the `url` fi
             "frequencySec": 60,
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             "sourceType": "gtfs-http",
+            // Optional parameter for defining behaviour for propagating delays to previous stops.
+            // Default value is "REQUIRED_NO_DATA" which only propagates delays backwards when it is required
+            // to ensure that the times are increasing and it sets the NO_DATA flag on the stops so these
+            // automatically updated times are not exposed through APIs and the stops at the beginning
+            // that have not received any updates, will not be shown as realtime updated.
+            // Other options are "REQUIRED" (same as default, but NO_DATA flag is not set) and
+            // "ALWAYS" (propagates delays backwards on stops with no estimates
+            // regardless if it's required or not, and NO_DATA flag is not set).
+            "backwardsDelayPropagationType": "REQUIRED_NO_DATA",
             "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
             "feedId": "TriMet"
         },
