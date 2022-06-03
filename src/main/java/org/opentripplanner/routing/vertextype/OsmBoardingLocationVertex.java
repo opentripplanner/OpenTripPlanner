@@ -39,4 +39,8 @@ public class OsmBoardingLocationVertex extends IntersectionVertex {
   public String toString() {
     return ToStringBuilder.of(getClass()).addCol("references", references).toString();
   }
+
+  public boolean isConnectedToStreetNetwork() {
+    return (getOutgoing().size() + getIncoming().size()) > 0;
+  }
 }

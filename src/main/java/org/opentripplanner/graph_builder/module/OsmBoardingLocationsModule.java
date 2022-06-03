@@ -1,20 +1,29 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.LocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +105,23 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         (stopCode != null && boardingLocation.references.contains(stopCode)) ||
         boardingLocation.references.contains(stopId)
       ) {
+        if (!boardingLocation.isConnectedToStreetNetwork()) {
+          graph
+            .getLinker()
+            .linkVertexPermanently(
+              boardingLocation,
+              new TraverseModeSet(TraverseMode.WALK),
+              LinkingDirection.BOTH_WAYS,
+              (osmBoardingLocationVertex, splitVertex) -> {
+                // the OSM boarding location vertex is not connected to the street network, so we
+                // need to link it to the platform
+                return List.of(
+                  linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
+                  linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)
+                );
+              }
+            );
+        }
         linkBoardingLocationToStop(ts, stopCode, boardingLocation);
         return true;
       }
@@ -142,6 +168,19 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       }
     }
     return false;
+  }
+
+  private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
+    var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
+    return new StreetEdge(
+      from,
+      to,
+      line,
+      new LocalizedString("name.platform"),
+      SphericalDistanceLibrary.length(line),
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      false
+    );
   }
 
   private void linkBoardingLocationToStop(
