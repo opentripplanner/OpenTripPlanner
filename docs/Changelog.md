@@ -63,6 +63,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add gtfs stop description translations [#4158](https://github.com/opentripplanner/OpenTripPlanner/pull/4158)
 - Upgrade graphql-java to version 18 [#4194](https://github.com/opentripplanner/OpenTripPlanner/pull/4194)
 - Add option to discard min transfer times [#4195](https://github.com/opentripplanner/OpenTripPlanner/pull/4195)
+- Use negative delay from first stop in a GTFS RT update in previous stop times when required [#4035](https://github.com/opentripplanner/OpenTripPlanner/pull/4035)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
