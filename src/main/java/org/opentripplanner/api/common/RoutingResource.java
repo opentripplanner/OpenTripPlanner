@@ -165,19 +165,6 @@ public abstract class RoutingResource {
   protected Boolean wheelchair;
 
   /**
-   * The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.
-   * <p>
-   * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
-   *
-   * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-   * old functionality the same way, but we will try to map this parameter
-   * so it does work similar as before.
-   */
-  @Deprecated
-  @QueryParam("maxWalkDistance")
-  protected Double maxWalkDistance;
-
-  /**
    * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride
    * or kiss and ride). Defaults to unlimited.
    * <p>

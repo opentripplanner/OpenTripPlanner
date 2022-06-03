@@ -52,8 +52,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
- * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
- * route.
+ * itineraries.
  * <p>
  * All defaults should be specified here in the RoutingRequest, NOT as annotations on query
  * parameters in web services that create RoutingRequests. This establishes a priority chain for
