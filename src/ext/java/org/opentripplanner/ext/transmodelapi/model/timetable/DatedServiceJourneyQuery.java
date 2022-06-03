@@ -84,6 +84,15 @@ public class DatedServiceJourneyQuery {
           .name("authorities")
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("replacementFor")
+          .description(
+            "Get all DatedServiceJourneys, which are replacing any of the given DatedServiceJourneys ids"
+          )
+          .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
+      )
       .dataFetcher(environment -> {
         Stream<TripOnServiceDate> stream = GqlUtil
           .getRoutingService(environment)
@@ -97,6 +106,7 @@ public class DatedServiceJourneyQuery {
         var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
         var alterations = environment.<List<TripAlteration>>getArgument("alterations");
         var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
+        var replacementFor = mapIDsToDomainNullSafe(environment.getArgument("replacementFor"));
 
         if (!lines.isEmpty()) {
           stream =
@@ -136,6 +146,17 @@ public class DatedServiceJourneyQuery {
           stream =
             stream.filter(tripOnServiceDate ->
               authorities.contains(tripOnServiceDate.getTrip().getRoute().getAgency().getId())
+            );
+        }
+
+        if (!replacementFor.isEmpty()) {
+          stream =
+            stream.filter(tripOnServiceDate ->
+              !tripOnServiceDate.getReplacementFor().isEmpty() &&
+              tripOnServiceDate
+                .getReplacementFor()
+                .stream()
+                .anyMatch(replacement -> replacementFor.contains(replacement.getId()))
             );
         }
 
