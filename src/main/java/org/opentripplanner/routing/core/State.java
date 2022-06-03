@@ -9,7 +9,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class State implements Cloneable {
@@ -319,14 +319,14 @@ public class State implements Cloneable {
       editor.setBackMode(orig.getBackMode());
 
       if (orig.isRentingVehicle() && !orig.getBackState().isRentingVehicle()) {
-        var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
+        var stationVertex = ((VehicleRentalPlaceVertex) orig.vertex);
         editor.dropOffRentedVehicleAtStation(
           ((VehicleRentalEdge) edge).formFactor,
           stationVertex.getStation().getNetwork(),
           false
         );
       } else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
-        var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
+        var stationVertex = ((VehicleRentalPlaceVertex) orig.vertex);
         if (orig.getBackState().isRentingVehicleFromStation()) {
           editor.beginVehicleRentingAtStation(
             ((VehicleRentalEdge) edge).formFactor,

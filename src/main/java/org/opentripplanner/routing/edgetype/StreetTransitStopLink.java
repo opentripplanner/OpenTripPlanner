@@ -10,11 +10,11 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 
   public StreetTransitStopLink(StreetVertex fromv, TransitStopVertex tov) {
-    super(fromv, tov, tov.getWheelchairBoarding());
+    super(fromv, tov, tov.getWheelchairAccessibility());
   }
 
   public StreetTransitStopLink(TransitStopVertex fromv, StreetVertex tov) {
-    super(fromv, tov, fromv.getWheelchairBoarding());
+    super(fromv, tov, fromv.getWheelchairAccessibility());
   }
 
   protected int getStreetToStopTime() {

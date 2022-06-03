@@ -3,23 +3,21 @@ package org.opentripplanner.routing.core;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Route;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 
 public class RouteMatcherTest {
 
   @Test
   public void testRouteMatcher() {
-    Route r1 = new Route(new FeedScopedId("A1", "42"));
-    r1.setShortName("R1");
-    Route r2 = new Route(new FeedScopedId("A1", "43"));
-    r2.setShortName("R2");
-    Route r1b = new Route(new FeedScopedId("A2", "42"));
-    r1b.setShortName("R1");
-    Route r3 = new Route(new FeedScopedId("A1", "44"));
-    r3.setShortName("R3_b");
+    Route r1 = route("X").withId(new FeedScopedId("A1", "42")).withShortName("R1").build();
+    Route r2 = route("X").withId(new FeedScopedId("A1", "43")).withShortName("R2").build();
+    Route r1b = route("X").withId(new FeedScopedId("A2", "42")).withShortName("R1").build();
+    Route r3 = route("X").withId(new FeedScopedId("A1", "44")).withShortName("R3_b").build();
 
     RouteMatcher emptyMatcher = RouteMatcher.emptyMatcher();
     assertFalse(emptyMatcher.matches(r1));
@@ -74,8 +72,11 @@ public class RouteMatcherTest {
     }
     assertTrue(thrown);
 
-    Route r1c = new Route(new FeedScopedId("A_1", "R_42"));
-    r1c.setShortName("R_42");
+    Route r1c = TransitModelForTest
+      .route("X")
+      .withId(new FeedScopedId("A_1", "R_42"))
+      .withShortName("R_42")
+      .build();
 
     RouteMatcher matcherR1c = RouteMatcher.parse("A\\_1_R 42");
     assertTrue(matcherR1c.matches(r1c));

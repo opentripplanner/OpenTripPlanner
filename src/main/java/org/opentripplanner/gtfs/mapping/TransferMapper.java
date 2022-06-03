@@ -11,12 +11,10 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
 import org.opentripplanner.graph_builder.issues.InvalidGtfsTransfer;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
@@ -27,6 +25,8 @@ import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +94,7 @@ class TransferMapper {
   private final DataImportIssueStore issueStore;
 
   private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
+  private final boolean discardMinTransferTimes;
 
   TransferMapper(
     RouteMapper routeMapper,
@@ -101,6 +102,7 @@ class TransferMapper {
     StopMapper stopMapper,
     TripMapper tripMapper,
     TripStopTimes stopTimesByTrip,
+    boolean discardMinTransferTimes,
     DataImportIssueStore issueStore
   ) {
     this.routeMapper = routeMapper;
@@ -108,6 +110,7 @@ class TransferMapper {
     this.stopMapper = stopMapper;
     this.tripMapper = tripMapper;
     this.stopTimesByTrip = stopTimesByTrip;
+    this.discardMinTransferTimes = discardMinTransferTimes;
     this.issueStore = issueStore;
   }
 
@@ -195,7 +198,7 @@ class TransferMapper {
 
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
 
-    if (rhs.isMinTransferTimeSet()) {
+    if (!discardMinTransferTimes && rhs.isMinTransferTimeSet()) {
       builder.minTransferTime(rhs.getMinTransferTime());
     }
 
@@ -276,6 +279,6 @@ class TransferMapper {
     if (a == null || b == null) {
       return false;
     }
-    return a.getBlockId() != null && a.getBlockId().equals(b.getBlockId());
+    return a.getGtfsBlockId() != null && a.getGtfsBlockId().equals(b.getGtfsBlockId());
   }
 }

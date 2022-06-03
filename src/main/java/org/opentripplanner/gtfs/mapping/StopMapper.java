@@ -57,6 +57,13 @@ class StopMapper {
       base.getName()
     );
 
+    final I18NString desc = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "desc",
+      base.getId().getId(),
+      base.getDescription()
+    );
+
     I18NString url = null;
 
     if (gtfsStop.getUrl() != null) {
@@ -73,9 +80,9 @@ class StopMapper {
       base.getId(),
       name,
       base.getCode(),
-      base.getDescription(),
+      desc,
       base.getCoordinate(),
-      base.getWheelchairBoarding(),
+      base.getWheelchairAccessibility(),
       base.getLevel(),
       gtfsStop.getPlatformCode(),
       fareZones,

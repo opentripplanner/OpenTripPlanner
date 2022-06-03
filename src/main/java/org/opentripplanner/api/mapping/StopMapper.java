@@ -7,6 +7,7 @@ import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class StopMapper {
 
@@ -33,14 +34,16 @@ public class StopMapper {
     api.code = domain.getCode();
     api.name = domain.getName().toString();
     if (extended) {
-      api.desc = domain.getDescription();
+      String desc = domain.getDescription() != null ? domain.getDescription().toString() : null;
+      api.desc = desc;
       api.zoneId = domain.getFirstZoneAsString();
       api.url = I18NStringMapper.mapToApi(domain.getUrl(), null);
       api.locationType = 0;
       api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
       api.parentStation = mapToParentStationOldId(domain);
       //api.stopTimezone = stop.getTimezone();
-      api.wheelchairBoarding = WheelchairBoardingMapper.mapToApi(domain.getWheelchairBoarding());
+      api.wheelchairBoarding =
+        WheelchairAccessibilityMapper.mapToApi(domain.getWheelchairAccessibility());
       //api.direction = stop.getDirection();
     }
     return api;

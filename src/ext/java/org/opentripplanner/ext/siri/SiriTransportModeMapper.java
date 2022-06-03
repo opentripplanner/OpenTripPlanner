@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import java.util.List;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 public class SiriTransportModeMapper {

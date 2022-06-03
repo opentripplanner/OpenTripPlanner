@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan.pagecursor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
@@ -10,9 +11,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.TimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PageCursorTest {
 
@@ -27,7 +28,7 @@ public class PageCursorTest {
   private PageCursor subjectDepartAfter;
   private PageCursor subjectArriveBy;
 
-  @Before
+  @BeforeEach
   public void setup() {
     originalTimeZone = TimeZone.getDefault();
     TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
@@ -38,7 +39,7 @@ public class PageCursorTest {
       new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW);
   }
 
-  @After
+  @AfterEach
   public void teardown() {
     TimeZone.setDefault(originalTimeZone);
   }
@@ -75,5 +76,12 @@ public class PageCursorTest {
     buf = subjectArriveBy.encode();
     before = PageCursor.decode(buf);
     assertEquals(subjectArriveBy.toString(), before.toString());
+  }
+
+  @Test
+  public void testDecodeEmptyCursor() {
+    assertNull(PageCursor.decode(null));
+    assertNull(PageCursor.decode(""));
+    assertNull(PageCursor.decode(" "));
   }
 }

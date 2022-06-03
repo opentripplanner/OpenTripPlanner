@@ -6,7 +6,6 @@ import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -18,6 +17,7 @@ import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class is used to export transfers for human verification to a CSV file. This is useful when
@@ -155,7 +155,7 @@ public class TransfersReport {
       r.type = "Trip";
       r.entityId = trip.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
-      r.trip = trip.getTripHeadsign();
+      r.trip = trip.getHeadsign();
       var stop = ptn.getStop(tp.getStopPositionInPattern());
       addLocation(r, ptn, stop, trip, boarding);
     } else if (p instanceof RouteStopTransferPoint) {

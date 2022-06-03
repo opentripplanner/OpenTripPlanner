@@ -5,7 +5,6 @@ import static java.lang.Integer.min;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
@@ -17,6 +16,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
  * A GraphFinder which uses the street network to traverse the graph in order to find the nearest
@@ -63,7 +63,7 @@ public class StreetGraphFinder implements GraphFinder {
     SkipEdgeStrategy terminationStrategy = visitor.getSkipEdgeStrategy();
     findClosestUsingStreets(lat, lon, visitor, terminationStrategy);
     List<PlaceAtDistance> results = visitor.placesFound;
-    results.sort(Comparator.comparingDouble(pad -> pad.distance));
+    results.sort(Comparator.comparingDouble(PlaceAtDistance::distance));
     return results.subList(0, min(results.size(), maxResults));
   }
 

@@ -26,6 +26,7 @@ pages:
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
     - Getting OTP: 'Getting-OTP.md'
+    - Container image: 'Container-Image.md'
     - Configuration:
         - Introduction: 'Configuration.md'
         - Build: 'BuildConfiguration.md'

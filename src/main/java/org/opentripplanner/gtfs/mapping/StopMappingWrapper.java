@@ -6,7 +6,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.StopLevel;
 import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 
 /**
@@ -40,8 +40,8 @@ class StopMappingWrapper {
     return WgsCoordinateMapper.mapToDomain(stop);
   }
 
-  public WheelchairBoarding getWheelchairBoarding() {
-    return WheelchairBoarding.valueOfGtfsCode(stop.getWheelchairBoarding());
+  public WheelchairAccessibility getWheelchairAccessibility() {
+    return WheelchairAccessibility.valueOfGtfsCode(stop.getWheelchairBoarding());
   }
 
   public StopLevel getLevel() {

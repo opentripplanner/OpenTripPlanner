@@ -1,24 +1,21 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TripTimesTest {
 
-  private static final FeedScopedId TRIP_ID = TransitModelForTest.id("testTripId");
-  private static final FeedScopedId ROUTE_ID = TransitModelForTest.id("testRrouteId");
+  private static final String TRIP_ID = "testTripId";
 
   private static final FeedScopedId STOP_A = TransitModelForTest.id("A"); // 0
   private static final FeedScopedId STOP_B = TransitModelForTest.id("B"); // 1
@@ -43,7 +40,7 @@ public class TripTimesTest {
   private static final TripTimes originalTripTimes;
 
   static {
-    Trip trip = new Trip(TRIP_ID);
+    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 
@@ -141,7 +138,7 @@ public class TripTimesTest {
 
   @Test
   public void testApply() {
-    Trip trip = new Trip(TRIP_ID);
+    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 

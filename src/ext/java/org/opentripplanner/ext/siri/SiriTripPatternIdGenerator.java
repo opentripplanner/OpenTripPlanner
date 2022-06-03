@@ -2,9 +2,9 @@ package org.opentripplanner.ext.siri;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class generate a new id for new TripPatterns created real-time by the SIRI updaters. It is

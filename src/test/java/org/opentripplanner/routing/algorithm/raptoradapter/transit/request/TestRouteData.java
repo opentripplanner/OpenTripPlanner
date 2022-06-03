@@ -11,13 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -25,11 +22,19 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TestRouteData {
 
+  private final Agency agency = Agency
+    .of(TransitModelForTest.id("agency"))
+    .withName("Test Agency")
+    .build();
   private final Route route;
   private final List<Trip> trips;
   private final Map<Trip, List<StopTime>> stopTimesByTrip = new HashMap<>();
@@ -41,8 +46,13 @@ public class TestRouteData {
 
   public TestRouteData(String route, TransitMode mode, List<Stop> stops, String... times) {
     final Deduplicator deduplicator = new Deduplicator();
-    this.route = new Route(TransitModelForTest.id(route));
-    this.route.setMode(mode);
+    this.route =
+      Route
+        .of(TransitModelForTest.id(route))
+        .withAgency(agency)
+        .withMode(mode)
+        .withShortName(route)
+        .build();
     this.trips =
       Arrays
         .stream(times)
@@ -142,8 +152,10 @@ public class TestRouteData {
     List<Stop> stops,
     Deduplicator deduplicator
   ) {
-    var trip = new Trip(TransitModelForTest.id(route + "-" + stopTimesByTrip.size() + 1));
-    trip.setRoute(this.route);
+    var trip = Trip
+      .of(TransitModelForTest.id(route + "-" + stopTimesByTrip.size() + 1))
+      .withRoute(this.route)
+      .build();
     var stopTimes = stopTimes(trip, stops, tripTimes);
     this.stopTimesByTrip.put(trip, stopTimes);
     this.tripTimesByTrip.put(trip, new TripTimes(trip, stopTimes, deduplicator));

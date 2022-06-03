@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.network;
 
 import java.util.EnumSet;
 import java.util.Set;

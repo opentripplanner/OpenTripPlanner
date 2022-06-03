@@ -1,9 +1,6 @@
 package org.opentripplanner;
 
 import com.csvreader.CsvReader;
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.core.importer.ImportOption;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +38,7 @@ import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
@@ -265,8 +262,12 @@ public class ConstantsForTests {
     var bundle = new GtfsBundle(new File(file));
     bundle.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
 
-    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded());
-    module.setFareServiceFactory(fareServiceFactory);
+    var module = new GtfsModule(
+      List.of(bundle),
+      ServiceDateInterval.unbounded(),
+      fareServiceFactory,
+      false
+    );
 
     module.buildGraph(graph, new HashMap<>());
 
@@ -292,7 +293,7 @@ public class ConstantsForTests {
         station.realTimeData = false;
         station.isKeepingVehicleRentalAtDestinationAllowed = true;
 
-        VehicleRentalStationVertex stationVertex = new VehicleRentalStationVertex(graph, station);
+        VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(graph, station);
         new VehicleRentalEdge(stationVertex, vehicleType.formFactor);
 
         linker.linkVertexPermanently(
@@ -301,8 +302,8 @@ public class ConstantsForTests {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetVehicleRentalLink((VehicleRentalStationVertex) vertex, streetVertex),
-              new StreetVehicleRentalLink(streetVertex, (VehicleRentalStationVertex) vertex)
+              new StreetVehicleRentalLink((VehicleRentalPlaceVertex) vertex, streetVertex),
+              new StreetVehicleRentalLink(streetVertex, (VehicleRentalPlaceVertex) vertex)
             )
         );
       }

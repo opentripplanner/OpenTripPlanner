@@ -5,10 +5,10 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This filter marks itineraries, which use same trips for most of their legs, but where some

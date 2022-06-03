@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
-import graphql.TypeResolutionEnvironment;
+import graphql.execution.TypeResolutionParameters;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -17,30 +17,30 @@ public class LegacyGraphQLplaceAtDistanceImpl
 
   @Override
   public DataFetcher<Integer> distance() {
-    return environment -> (int) getSource(environment).distance;
+    return environment -> (int) getSource(environment).distance();
   }
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment -> {
       PlaceAtDistance placeAtDistance = getSource(environment);
-      Object place = placeAtDistance.place;
+      Object place = placeAtDistance.place();
       TypeResolver typeResolver = new LegacyGraphQLPlaceInterfaceTypeResolver();
 
       GraphQLInterfaceType placeInterface = (GraphQLInterfaceType) environment
         .getGraphQLSchema()
         .getType("PlaceInterface");
 
-      GraphQLObjectType placeType = typeResolver.getType(
-        new TypeResolutionEnvironment(
-          place,
-          environment.getArguments(),
-          environment.getMergedField(),
-          placeInterface,
-          environment.getGraphQLSchema(),
-          environment.getContext()
-        )
-      );
+      var resolution = new TypeResolutionParameters.Builder()
+        .value(place)
+        .argumentValues(environment::getArguments)
+        .field(environment.getMergedField())
+        .fieldType(placeInterface)
+        .schema(environment.getGraphQLSchema())
+        .graphQLContext(environment.getContext())
+        .build();
+
+      GraphQLObjectType placeType = typeResolver.getType(resolution);
 
       Relay.ResolvedGlobalId globalId = (Relay.ResolvedGlobalId) environment
         .getGraphQLSchema()
@@ -55,7 +55,7 @@ public class LegacyGraphQLplaceAtDistanceImpl
 
       return new Relay.ResolvedGlobalId(
         "placeAtDistance",
-        placeAtDistance.distance +
+        placeAtDistance.distance() +
         ";" +
         new Relay().toGlobalId(globalId.getType(), globalId.getId())
       );
@@ -64,7 +64,7 @@ public class LegacyGraphQLplaceAtDistanceImpl
 
   @Override
   public DataFetcher<Object> place() {
-    return environment -> getSource(environment).place;
+    return environment -> getSource(environment).place();
   }
 
   private PlaceAtDistance getSource(DataFetchingEnvironment environment) {

@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
@@ -31,12 +32,13 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.I18NString;
 
 public class StopPlaceType {
 
@@ -103,9 +105,15 @@ public class StopPlaceType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment ->
-            (((MonoOrMultiModalStation) environment.getSource()).getDescription())
-          )
+          .dataFetcher(environment -> {
+            I18NString description =
+              ((MonoOrMultiModalStation) environment.getSource()).getDescription();
+            if (description != null) {
+              Locale locale = TransmodelGraphQLUtils.getLocale(environment);
+              return (description.toString(locale));
+            }
+            return null;
+          })
           .build()
       )
       .field(

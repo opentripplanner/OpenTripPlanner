@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.time.TimeUtils;
 
 public final class Frequency implements Serializable {

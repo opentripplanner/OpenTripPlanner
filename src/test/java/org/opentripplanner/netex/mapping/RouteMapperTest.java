@@ -13,13 +13,13 @@ import java.util.Set;
 import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.GroupOfRoutes;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -276,11 +276,11 @@ public class RouteMapperTest {
     return TransitModelForTest
       .agency("Ruter AS")
       .copy()
-      .setId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))
+      .withId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))
       .build();
   }
 
   private GroupOfRoutes createGroupOfRoutes(String id) {
-    return new GroupOfRoutes(MappingSupport.ID_FACTORY.createId(id), null, null, null, null);
+    return GroupOfRoutes.of(MappingSupport.ID_FACTORY.createId(id)).build();
   }
 }

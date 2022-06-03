@@ -20,6 +20,7 @@ interactive_otp_main.json
 /otp
 /otp-ui
 Dockerfile
+.java-version
 
 # Directories
 .idea/

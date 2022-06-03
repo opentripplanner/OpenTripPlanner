@@ -1,10 +1,13 @@
 package org.opentripplanner.transit.model.organization;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
 
-public class BrandingBuilder {
+public class BrandingBuilder extends TransitEntityBuilder<Branding, BrandingBuilder> {
 
-  private FeedScopedId id;
   private String shortName;
   private String name;
   private String url;
@@ -12,36 +15,18 @@ public class BrandingBuilder {
   private String image;
 
   public BrandingBuilder(FeedScopedId id) {
-    this.id = id;
+    super(id);
   }
 
-  BrandingBuilder(Branding domain) {
-    this.id = domain.getId();
-    this.shortName = domain.getShortName();
-    this.name = domain.getName();
-    this.url = domain.getUrl();
-    this.description = domain.getDescription();
-    this.image = domain.getImage();
-  }
-
-  public Branding build() {
-    return new Branding(this);
-  }
-
-  public FeedScopedId getId() {
-    return id;
-  }
-
-  public BrandingBuilder setId(FeedScopedId id) {
-    this.id = id;
-    return this;
+  BrandingBuilder(@Nullable Branding original) {
+    super(original);
   }
 
   public String getShortName() {
     return shortName;
   }
 
-  public BrandingBuilder setShortName(String shortName) {
+  public BrandingBuilder withShortName(String shortName) {
     this.shortName = shortName;
     return this;
   }
@@ -50,7 +35,7 @@ public class BrandingBuilder {
     return name;
   }
 
-  public BrandingBuilder setName(String name) {
+  public BrandingBuilder withName(String name) {
     this.name = name;
     return this;
   }
@@ -59,7 +44,7 @@ public class BrandingBuilder {
     return url;
   }
 
-  public BrandingBuilder setUrl(String url) {
+  public BrandingBuilder withUrl(String url) {
     this.url = url;
     return this;
   }
@@ -68,7 +53,7 @@ public class BrandingBuilder {
     return description;
   }
 
-  public BrandingBuilder setDescription(String description) {
+  public BrandingBuilder withDescription(String description) {
     this.description = description;
     return this;
   }
@@ -77,8 +62,23 @@ public class BrandingBuilder {
     return image;
   }
 
-  public BrandingBuilder setImage(String image) {
+  public BrandingBuilder withImage(String image) {
     this.image = image;
     return this;
+  }
+
+  @NotNull
+  @Override
+  protected Branding buildFromValues() {
+    return new Branding(this);
+  }
+
+  @Override
+  protected void updateLocal(@Nonnull Branding original) {
+    this.shortName = original.getShortName();
+    this.name = original.getName();
+    this.url = original.getUrl();
+    this.description = original.getDescription();
+    this.image = original.getImage();
   }
 }

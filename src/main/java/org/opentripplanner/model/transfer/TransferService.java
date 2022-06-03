@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class represents all transfer information in the graph. Transfers are grouped by

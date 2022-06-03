@@ -22,9 +22,6 @@ otp.modules.planner.defaultQueryParams = {
     arriveBy                        : false,
     wheelchair                      : false,
     mode                            : "TRANSIT,WALK",
-    maxWalkDistance                 : 4828.032, // 3 mi.
-    metricDefaultMaxWalkDistance    : 5000, // meters
-    imperialDefaultMaxWalkDistance  : 4828.032, // 3 mile
     preferredRoutes                 : null,
     otherThanPreferredRoutesPenalty : 300,
     bannedTrips                     : null,
@@ -69,7 +66,6 @@ otp.modules.planner.PlannerModule =
     date                    : null,
     arriveBy                : false,
     mode                    : "TRANSIT,WALK",
-    maxWalkDistance         : null,
     preferredRoutes         : null,
     bannedTrips             : null,
     optimize                : null,
@@ -133,12 +129,6 @@ otp.modules.planner.PlannerModule =
         this.planTripFunction = this.planTrip;
 
         this.defaultQueryParams = _.clone(otp.modules.planner.defaultQueryParams);
-
-        if (otp.config.metric) {
-            this.defaultQueryParams.maxWalkDistance = this.defaultQueryParams.metricDefaultMaxWalkDistance;
-        } else {
-            this.defaultQueryParams.maxWalkDistance = this.defaultQueryParams.imperialDefaultMaxWalkDistance;
-        }
 
         _.extend(this.defaultQueryParams, this.getExtendedQueryParams());
 
@@ -345,7 +335,6 @@ otp.modules.planner.PlannerModule =
                 date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format(otp.config.apiDateFormat) : moment().format(otp.config.apiDateFormat),
                 mode: this.mode
             };
-            if(this.mode !== "CAR") _.extend(queryParams, { maxWalkDistance: this.maxWalkDistance} );
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
             if(this.preferredRoutes !== null) {

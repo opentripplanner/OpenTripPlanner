@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.model.WheelchairBoarding;
+import org.opentripplanner.model.WheelchairAccessibility;
 
 /**
  * The purpose of this interface is to provide information about the trip schedule. The trip is a
@@ -154,5 +154,5 @@ public interface RaptorTripSchedule {
    */
   int transitReluctanceFactorIndex();
 
-  WheelchairBoarding wheelchairBoarding();
+  WheelchairAccessibility wheelchairBoarding();
 }

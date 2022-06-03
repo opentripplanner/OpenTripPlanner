@@ -3,9 +3,9 @@ package org.opentripplanner.util;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
  * Class which creates "Travel by" options list from supported transit modes and which extra modes

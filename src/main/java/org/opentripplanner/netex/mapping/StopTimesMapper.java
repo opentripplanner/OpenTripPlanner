@@ -19,11 +19,11 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
@@ -69,6 +69,8 @@ class StopTimesMapper {
   private final ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById;
 
   private String currentHeadSign;
+
+  private List<String> currentHeadSignVias;
 
   StopTimesMapper(
     DataImportIssueStore issueStore,
@@ -164,6 +166,35 @@ class StopTimesMapper {
     }
 
     return result;
+  }
+
+  /**
+   * @return a map of stop-times indexed by the TimetabledPassingTime id.
+   */
+  @Nullable
+  String findTripHeadsign(JourneyPattern journeyPattern, TimetabledPassingTime firstPassingTime) {
+    String pointInJourneyPattern = firstPassingTime
+      .getPointInJourneyPatternRef()
+      .getValue()
+      .getRef();
+
+    var stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
+
+    if (stopPoint == null) {
+      return null;
+    }
+
+    if (stopPoint.getDestinationDisplayRef() == null) {
+      return null;
+    }
+
+    var destinationDisplay = destinationDisplayById.lookup(
+      stopPoint.getDestinationDisplayRef().getRef()
+    );
+
+    return destinationDisplay == null
+      ? null
+      : MultilingualStringMapper.nullableValueOf(destinationDisplay.getFrontText());
   }
 
   @Nullable
@@ -305,31 +336,31 @@ class StopTimesMapper {
           stopPoint.getDestinationDisplayRef().getRef()
         );
 
-        Vias_RelStructure viaValues = null;
-
         if (destinationDisplay != null) {
           currentHeadSign = destinationDisplay.getFrontText().getValue();
-          viaValues = destinationDisplay.getVias();
-        }
+          Vias_RelStructure viaValues = destinationDisplay.getVias();
+          if (viaValues != null && viaValues.getVia() != null) {
+            currentHeadSignVias =
+              viaValues
+                .getVia()
+                .stream()
+                .map(Via_VersionedChildStructure::getDestinationDisplayRef)
+                .filter(Objects::nonNull)
+                .map(VersionOfObjectRefStructure::getRef)
+                .filter(Objects::nonNull)
+                .map(destinationDisplayById::lookup)
+                .filter(Objects::nonNull)
+                .map(DestinationDisplay_VersionStructure::getFrontText)
+                .filter(Objects::nonNull)
+                .map(MultilingualString::getValue)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-        if (viaValues != null && viaValues.getVia() != null) {
-          vias =
-            viaValues
-              .getVia()
-              .stream()
-              .map(Via_VersionedChildStructure::getDestinationDisplayRef)
-              .filter(Objects::nonNull)
-              .map(VersionOfObjectRefStructure::getRef)
-              .filter(Objects::nonNull)
-              .map(destinationDisplayById::lookup)
-              .filter(Objects::nonNull)
-              .map(DestinationDisplay_VersionStructure::getFrontText)
-              .filter(Objects::nonNull)
-              .map(MultilingualString::getValue)
-              .collect(Collectors.toList());
-
-          if (vias.isEmpty()) {
-            vias = null;
+            if (currentHeadSignVias.isEmpty()) {
+              currentHeadSignVias = null;
+            }
+          } else {
+            currentHeadSignVias = null;
           }
         }
       }
@@ -347,7 +378,9 @@ class StopTimesMapper {
     if (currentHeadSign != null) {
       stopTime.setStopHeadsign(currentHeadSign);
     }
-    stopTime.setHeadsignVias(vias);
+    if (currentHeadSignVias != null) {
+      stopTime.setHeadsignVias(currentHeadSignVias);
+    }
     return stopTime;
   }
 

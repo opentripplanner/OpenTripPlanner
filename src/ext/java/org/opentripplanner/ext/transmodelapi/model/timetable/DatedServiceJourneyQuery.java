@@ -115,7 +115,7 @@ public class DatedServiceJourneyQuery {
         if (privateCodes != null && !privateCodes.isEmpty()) {
           stream =
             stream.filter(tripOnServiceDate ->
-              privateCodes.contains(tripOnServiceDate.getTrip().getInternalPlanningCode())
+              privateCodes.contains(tripOnServiceDate.getTrip().getNetexInternalPlanningCode())
             );
         }
 
