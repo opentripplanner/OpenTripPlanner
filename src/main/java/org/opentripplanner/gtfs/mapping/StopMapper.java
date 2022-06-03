@@ -57,12 +57,16 @@ class StopMapper {
       base.getName()
     );
 
-    final I18NString desc = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "desc",
-      base.getId().getId(),
-      base.getDescription()
-    );
+    I18NString desc = null;
+    if (gtfsStop.getDesc() != null) {
+      desc =
+        translationHelper.getTranslation(
+          org.onebusaway.gtfs.model.Stop.class,
+          "desc",
+          base.getId().getId(),
+          base.getDescription()
+        );
+    }
 
     I18NString url = null;
 
