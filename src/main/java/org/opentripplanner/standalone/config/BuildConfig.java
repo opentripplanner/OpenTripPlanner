@@ -316,6 +316,13 @@ public class BuildConfig {
   public final Set<String> boardingLocationTags;
 
   /**
+   * Should minimum transfer times in GTFS files be discarded. This is useful eg. when the minimum
+   * transfer time is only set for ticketing purposes, but we want to calculate the transfers always
+   * from OSM data.
+   */
+  public boolean discardMinTransferTimes;
+
+  /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
    * MissingNode.getInstance() will cause all the defaults to be applied. This could be done
    * automatically with the "reflective query scraper" but it's less type safe and less clear. Until
@@ -367,6 +374,7 @@ public class BuildConfig {
     maxAreaNodes = c.asInt("maxAreaNodes", 500);
     maxElevationPropagationMeters = c.asInt("maxElevationPropagationMeters", 2000);
     boardingLocationTags = c.asTextSet("boardingLocationTags", Set.of("ref"));
+    discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
 
     // List of complex parameters
     fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));

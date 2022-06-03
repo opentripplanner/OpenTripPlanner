@@ -48,8 +48,7 @@ otp.modules.planner.Itinerary = otp.Class({
     getIconSummaryHTML : function(padding) {
         var html = '';
         for(var i=0; i<this.itinData.legs.length; i++) {
-            var exceedsWalk = (this.itinData.legs[i].mode == "WALK" && this.itinData.legs[i].distance > this.tripPlan.queryParams.maxWalkDistance);
-            html += '<img src="images/mode/'+this.itinData.legs[i].mode.toLowerCase()+'.png" '+(exceedsWalk ? 'style="background:#f88; padding: 0px 2px;"' : "")+'>';
+            html += '<img src="images/mode/'+this.itinData.legs[i].mode.toLowerCase()+'.png" />';
             if(i < this.itinData.legs.length-1)
                 html += '<img src="images/mode/arrow.png" style="margin: 0px '+(padding || '3')+'px;">';
         }

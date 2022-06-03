@@ -1,9 +1,6 @@
 package org.opentripplanner;
 
 import com.csvreader.CsvReader;
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.core.importer.ImportOption;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -265,8 +262,12 @@ public class ConstantsForTests {
     var bundle = new GtfsBundle(new File(file));
     bundle.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
 
-    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded());
-    module.setFareServiceFactory(fareServiceFactory);
+    var module = new GtfsModule(
+      List.of(bundle),
+      ServiceDateInterval.unbounded(),
+      fareServiceFactory,
+      false
+    );
 
     module.buildGraph(graph, new HashMap<>());
 
