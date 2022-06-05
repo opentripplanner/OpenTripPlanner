@@ -95,6 +95,10 @@ public final class TranslationHelper {
     String recordSubId,
     String defaultValue
   ) {
+    if (defaultValue == null) {
+      return null;
+    }
+
     Field field;
     try {
       field = clazz.getDeclaredField(fieldName);
