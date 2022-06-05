@@ -70,7 +70,7 @@ public final class Stop extends StationElement implements StopLocation {
     this.url = url;
     this.timeZone = timeZone;
     this.vehicleType = vehicleType;
-    this.netexSubmode = SubMode.getOrBuildAndCashForever(netexSubmode);
+    this.netexSubmode = SubMode.getOrBuildAndCacheForever(netexSubmode);
   }
 
   public static Stop stopForTest(

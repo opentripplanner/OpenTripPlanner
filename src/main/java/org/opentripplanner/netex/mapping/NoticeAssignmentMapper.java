@@ -42,7 +42,7 @@ class NoticeAssignmentMapper {
 
   private final Map<String, StopTime> stopTimesByNetexId;
 
-  /** Note! The notce mapper cashes notices, making sure duplicates are not created. */
+  /** Note! The notice mapper caches notices, making sure duplicates are not created. */
   private final NoticeMapper noticeMapper;
 
   NoticeAssignmentMapper(

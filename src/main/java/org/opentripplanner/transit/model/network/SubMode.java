@@ -23,19 +23,19 @@ import org.slf4j.LoggerFactory;
  * but not routing.
  */
 public record SubMode(String name, int index) implements Serializable {
-  private static final int NONE_EXISTING_SUBMODE_INDEX = 1_000_000;
+  private static final int NONE_EXISTING_SUB_MODE_INDEX = 1_000_000;
 
   private static final Logger LOG = LoggerFactory.getLogger(SubMode.class);
 
   /**
-   * Note! This cache all submodes used in the static scheduled transit data. When
+   * Note! This cache all sub-modes used in the static scheduled transit data. When
    * serialized the static fields need to be explicit serialized, it is not enough
    * to serialize the instances.
    */
   private static final Map<String, SubMode> ALL = new ConcurrentHashMap<>();
   private static final AtomicInteger COUNTER = new AtomicInteger(0);
 
-  public static final SubMode UNKNOWN = getOrBuildAndCashForever("unknown");
+  public static final SubMode UNKNOWN = getOrBuildAndCacheForever("unknown");
 
   /**
    * This method is safe to use in a request scope. Usually you want to fetch an instant to
@@ -48,7 +48,7 @@ public record SubMode(String name, int index) implements Serializable {
       return UNKNOWN;
     }
     var subMode = ALL.get(name);
-    return subMode != null ? subMode : new SubMode(name, NONE_EXISTING_SUBMODE_INDEX);
+    return subMode != null ? subMode : new SubMode(name, NONE_EXISTING_SUB_MODE_INDEX);
   }
 
   /**
@@ -58,7 +58,7 @@ public record SubMode(String name, int index) implements Serializable {
    * The builders in the transit model take care of calling this method, so there is noreson to
    * call this method outside the transit model package.
    */
-  public static SubMode getOrBuildAndCashForever(String name) {
+  public static SubMode getOrBuildAndCacheForever(String name) {
     if (name == null) {
       return UNKNOWN;
     }
@@ -85,7 +85,7 @@ public record SubMode(String name, int index) implements Serializable {
     return List.copyOf(ALL.values());
   }
 
-  public static void deserializeSubModeCash(Collection<SubMode> subModes) {
+  public static void deserializeSubModeCache(Collection<SubMode> subModes) {
     int maxIndex = 0;
     for (SubMode it : subModes) {
       ALL.put(it.name(), it);

@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 class SubModeTest {
 
-  private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCashForever("localBus");
-  private static final SubMode NIGHT_BUS = SubMode.getOrBuildAndCashForever("nightBus");
+  private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCacheForever("localBus");
+  private static final SubMode NIGHT_BUS = SubMode.getOrBuildAndCacheForever("nightBus");
 
   @Test
   void of() {
@@ -25,7 +25,7 @@ class SubModeTest {
 
   @Test
   void build() {
-    SubMode subject = SubMode.getOrBuildAndCashForever("localBus");
+    SubMode subject = SubMode.getOrBuildAndCacheForever("localBus");
 
     assertSame(LOCAL_BUS, subject);
     assertEquals("localBus", subject.name());
@@ -57,9 +57,9 @@ class SubModeTest {
     assertEquals(NIGHT_BUS, SubMode.of("nightBus"));
     assertNotEquals(SubMode.UNKNOWN, NIGHT_BUS);
 
-    SubMode original = SubMode.of("not-cashed");
-    SubMode other = SubMode.of("not-cashed");
-    SubMode different = SubMode.of("not-cashed-different");
+    SubMode original = SubMode.of("not-cached");
+    SubMode other = SubMode.of("not-cached");
+    SubMode different = SubMode.of("not-cached-different");
 
     assertEquals(original, other);
     assertNotEquals(original, different);
@@ -68,7 +68,7 @@ class SubModeTest {
   @Test
   void testHashCode() {
     assertEquals(SubMode.of("nightBus").hashCode(), NIGHT_BUS.hashCode());
-    assertEquals(SubMode.of("not-cashed").hashCode(), SubMode.of("not-cashed").hashCode());
+    assertEquals(SubMode.of("not-cached").hashCode(), SubMode.of("not-cached").hashCode());
     assertNotEquals(LOCAL_BUS.hashCode(), NIGHT_BUS.hashCode());
   }
 

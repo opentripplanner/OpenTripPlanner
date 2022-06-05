@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.network.TransitMode;
 
 class AllowMainAndSubModeFilterTest {
 
-  private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCashForever("localBus");
+  private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCacheForever("localBus");
 
   private final AllowMainAndSubModeFilter subject = new AllowMainAndSubModeFilter(
     TransitMode.BUS,

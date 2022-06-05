@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.network.MainAndSubMode;
@@ -16,9 +15,9 @@ import org.opentripplanner.transit.model.network.TransitMode;
 
 class FilterFactoryTest {
 
-  private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCashForever("localBus");
-  private static final SubMode EXPRESS_BUS = SubMode.getOrBuildAndCashForever("expressBus");
-  private static final SubMode NIGHT_BUS = SubMode.getOrBuildAndCashForever("nightBus");
+  private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCacheForever("localBus");
+  private static final SubMode EXPRESS_BUS = SubMode.getOrBuildAndCacheForever("expressBus");
+  private static final SubMode NIGHT_BUS = SubMode.getOrBuildAndCacheForever("nightBus");
 
   @Test
   void createEmptySet() {

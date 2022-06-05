@@ -12,10 +12,10 @@ import org.opentripplanner.transit.model.network.TransitMode;
 
 class AllowMainAndSubModesFilterTest {
 
-  final SubMode SUBMODE_LOCAL = SubMode.getOrBuildAndCashForever("local");
-  final SubMode SUBMODE_REGIONAL = SubMode.getOrBuildAndCashForever("regional");
-  final SubMode SUBMODE_EXPRESS = SubMode.getOrBuildAndCashForever("express");
-  final SubMode SUBMODE_NIGHT = SubMode.getOrBuildAndCashForever("night");
+  final SubMode SUBMODE_LOCAL = SubMode.getOrBuildAndCacheForever("local");
+  final SubMode SUBMODE_REGIONAL = SubMode.getOrBuildAndCacheForever("regional");
+  final SubMode SUBMODE_EXPRESS = SubMode.getOrBuildAndCacheForever("express");
+  final SubMode SUBMODE_NIGHT = SubMode.getOrBuildAndCacheForever("night");
 
   final AllowMainAndSubModeFilter filter1 = new AllowMainAndSubModeFilter(
     TransitMode.BUS,

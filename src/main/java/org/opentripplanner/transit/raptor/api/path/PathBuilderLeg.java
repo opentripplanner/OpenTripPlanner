@@ -14,8 +14,8 @@ import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
- * This is the leg implementation for the {@link PathBuilder}. It Private inner class which help
- * cashing and calculating values before constructing a path.
+ * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
+ * help to cache and calculating values before constructing a path.
  */
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 

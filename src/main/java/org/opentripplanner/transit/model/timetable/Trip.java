@@ -55,7 +55,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
     this.serviceId = builder.getServiceId();
     this.shortName = builder.getShortName();
     this.mode = requireNonNullElse(builder.getMode(), route.getMode());
-    this.netexSubmode = SubMode.getOrBuildAndCashForever(builder.getNetexSubmode());
+    this.netexSubmode = SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode());
     this.headsign = builder.getHeadsign();
     this.shapeId = builder.getShapeId();
     this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);

@@ -39,7 +39,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> {
     // Required fields
     this.agency = requireNonNull(builder.getAgency());
     this.mode = requireNonNull(builder.getMode());
-    this.netexSubmode = SubMode.getOrBuildAndCashForever(builder.getNetexSubmode());
+    this.netexSubmode = SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode());
     this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
 
     // Optional fields

@@ -143,7 +143,7 @@ public class SerializedGraphObject implements Serializable {
 
       Kryo kryo = KryoBuilder.create();
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
-      SubMode.deserializeSubModeCash(serObj.allTransitSubModes);
+      SubMode.deserializeSubModeCache(serObj.allTransitSubModes);
       Graph graph = serObj.graph;
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();

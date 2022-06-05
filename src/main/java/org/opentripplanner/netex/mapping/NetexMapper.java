@@ -73,7 +73,7 @@ public class NetexMapper {
   private NetexEntityIndexReadOnlyView currentNetexIndex;
 
   /**
-   * Shared/cashed entity index, used by more than one mapper. This index provides alternative
+   * Shared/cached entity index, used by more than one mapper. This index provides alternative
    * indexes to netex entites, as well as global indexes to OTP domain objects needed in the mapping
    * process. Some of these indexes are feed scoped, and some are file group level scoped. As a rule
    * of tomb the indexes for OTP Model entities are global(small memory overhead), while the indexes
