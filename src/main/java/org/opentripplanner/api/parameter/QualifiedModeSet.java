@@ -6,10 +6,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
 
 /**
  * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift
@@ -46,10 +45,10 @@ public class QualifiedModeSet implements Serializable {
     StreetMode transferMode = null;
 
     // Set transit modes
-    Set<AllowTransitModeFilter> transitModes = qModes
+    List<MainAndSubMode> transitModes = qModes
       .stream()
-      .flatMap(q -> q.mode.getTransitModes().stream())
-      .collect(Collectors.toSet());
+      .flatMap(q -> q.mode.getTransitModes().stream().map(MainAndSubMode::new))
+      .toList();
 
     //  This is a best effort at mapping QualifiedModes to access/egress/direct StreetModes.
     //  It was unclear what exactly each combination of QualifiedModes should mean.

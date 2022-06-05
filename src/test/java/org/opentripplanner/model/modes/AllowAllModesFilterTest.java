@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.network.TransitMode;
 
 class AllowAllModesFilterTest {
 
-  private final AllowTransitModeFilter subject = AllowTransitModeFilter.ALLOWED_ALL_TRANSIT_MODES;
+  private final AllowTransitModeFilter subject = new AllowAllModesFilter();
 
   @Test
   void allows() {

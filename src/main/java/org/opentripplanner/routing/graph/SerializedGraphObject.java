@@ -62,7 +62,6 @@ public class SerializedGraphObject implements Serializable {
    */
   public final List<SubMode> allTransitSubModes;
 
-
   public SerializedGraphObject(Graph graph, BuildConfig buildConfig, RouterConfig routerConfig) {
     this.graph = graph;
     this.edges = graph.getEdges();

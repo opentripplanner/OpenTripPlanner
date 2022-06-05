@@ -3,15 +3,16 @@ package org.opentripplanner.routing.algorithm.mapping;
 import static java.util.Collections.emptySet;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
 
 @ExtendWith(SnapshotExtension.class)
 public class TransitSnapshotTest extends SnapshotTestBase {
@@ -74,7 +75,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        emptySet()
+        List.of()
       );
     request.from = p0;
     request.to = p2;
@@ -92,7 +93,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        emptySet()
+        List.of()
       );
     request.from = ps;
     request.to = p2;
@@ -110,7 +111,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        emptySet()
+        List.of()
       );
     request.from = ptc;
     request.to = p3;
@@ -130,7 +131,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowTransitModeFilter.ofAllTransitModes()
+        MainAndSubMode.all()
       );
     request.from = p1;
     request.to = p2;
@@ -148,7 +149,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowTransitModeFilter.ofAllTransitModes()
+        MainAndSubMode.all()
       );
     request.from = ps;
     request.to = p3;
@@ -167,7 +168,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        AllowTransitModeFilter.ofAllTransitModes()
+        MainAndSubMode.all()
       );
     request.from = ptc;
     request.to = p3;

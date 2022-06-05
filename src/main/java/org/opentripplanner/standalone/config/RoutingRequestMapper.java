@@ -101,7 +101,7 @@ public class RoutingRequestMapper {
     request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
     request.wheelchairSlopeTooSteepCostFactor =
       c.asDouble("wheelchairSlopeTooSteepCostFactor", dft.wheelchairSlopeTooSteepCostFactor);
-    request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes);
+    request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes());
     request.nonpreferredTransferCost =
       c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
     request.numItineraries = c.asInt("numItineraries", dft.numItineraries);

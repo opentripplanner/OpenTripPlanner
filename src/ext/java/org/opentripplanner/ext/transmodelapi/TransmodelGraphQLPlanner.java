@@ -6,6 +6,7 @@ import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -35,6 +36,8 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -283,9 +286,9 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("modes.directMode", directMode::set);
       callWith.argument("modes.transportModes", transportModes::set);
 
-      Set<AllowTransitModeFilter> transitModeFilters = new HashSet<>();
+      List<MainAndSubMode> transitModes = new ArrayList<>();
       if (transportModes.get() == null) {
-        transitModeFilters.add(AllowTransitModeFilter.ALLOWED_ALL_TRANSIT_MODES);
+        transitModes = MainAndSubMode.all();
       } else {
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
@@ -295,10 +298,10 @@ public class TransmodelGraphQLPlanner {
                 "transportSubModes"
               );
               for (TransmodelTransportSubmode submode : transportSubModes) {
-                transitModeFilters.add(AllowTransitModeFilter.of(mainMode, submode.getValue()));
+                transitModes.add(new MainAndSubMode(mainMode, SubMode.of(submode.getValue())));
               }
             } else {
-              transitModeFilters.add(AllowTransitModeFilter.of(mainMode, null));
+              transitModes.add(new MainAndSubMode(mainMode));
             }
           }
         }
@@ -309,7 +312,7 @@ public class TransmodelGraphQLPlanner {
         accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
         egressMode.get(),
         directMode.get(),
-        transitModeFilters
+        transitModes
       );
     }
     return null;

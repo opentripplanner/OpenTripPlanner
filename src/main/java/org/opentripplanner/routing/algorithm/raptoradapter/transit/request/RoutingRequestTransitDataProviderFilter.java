@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.model.WheelchairAccessibility;
@@ -14,6 +15,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
@@ -34,7 +36,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     boolean requireBikesAllowed,
     WheelchairAccessibilityRequest accessibility,
     boolean includePlannedCancellations,
-    Set<AllowTransitModeFilter> allowedTransitModes,
+    Collection<MainAndSubMode> allowedTransitModes,
     Set<FeedScopedId> bannedRoutes,
     Set<FeedScopedId> bannedTrips
   ) {
@@ -44,11 +46,11 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
 
+    final Set<AllowTransitModeFilter> modeFilters = AllowTransitModeFilter.of(allowedTransitModes);
+
     transitModeIsAllowed =
       (Trip trip) ->
-        allowedTransitModes
-          .stream()
-          .anyMatch(m -> m.allows(trip.getMode(), trip.getNetexSubMode()));
+        modeFilters.stream().anyMatch(m -> m.allows(trip.getMode(), trip.getNetexSubMode()));
   }
 
   public RoutingRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {
@@ -56,7 +58,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       request.modes.transferMode == StreetMode.BIKE,
       request.wheelchairAccessibility,
       request.includePlannedCancellations,
-      request.modes.transitModeFilters,
+      request.modes.transitModes,
       request.getBannedRoutes(graphIndex.getAllRoutes()),
       request.bannedTrips
     );
@@ -86,8 +88,10 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (requireBikesAllowed && bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
-      return false;
+    if (requireBikesAllowed) {
+      if (bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
+        return false;
+      }
     }
 
     if (wheelchairAccessibility.enabled()) {
@@ -99,9 +103,11 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       }
     }
 
-    //noinspection RedundantIfStatement
-    if (!includePlannedCancellations && trip.getNetexAlteration().isCanceledOrReplaced()) {
-      return false;
+    if (!includePlannedCancellations) {
+      //noinspection RedundantIfStatement
+      if (trip.getNetexAlteration().isCanceledOrReplaced()) {
+        return false;
+      }
     }
 
     return true;

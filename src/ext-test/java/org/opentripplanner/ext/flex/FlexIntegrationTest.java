@@ -205,9 +205,10 @@ public class FlexIntegrationTest {
     request.numItineraries = 10;
     request.searchWindow = Duration.ofHours(2);
     request.modes.egressMode = FLEXIBLE;
+
     if (onlyDirect) {
       request.modes.directMode = FLEXIBLE;
-      request.modes.transitModeFilters = Set.of();
+      request.modes.transitModes = List.of();
     }
 
     var result = service.route(request, router);

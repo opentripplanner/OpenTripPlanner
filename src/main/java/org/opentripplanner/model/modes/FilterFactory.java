@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
@@ -15,10 +16,20 @@ import org.opentripplanner.transit.model.network.TransitMode;
  * set of filters using an EnumSet for MainModes and BitSet for subModes. For further
  * details on the implementation se the comments in the code.
  */
-class FilterMerger {
+class FilterFactory {
+
+  private static final AllowAllModesFilter ALLOWED_ALL_TRANSIT_MODES = new AllowAllModesFilter();
 
   /** Utility class, prevent instantiation */
-  private FilterMerger() {}
+  private FilterFactory() {}
+
+  static AllowTransitModeFilter of(MainAndSubMode mode) {
+    if (mode.subMode() == null) {
+      return new AllowMainModeFilter(mode.mainMode());
+    } else {
+      return new AllowMainAndSubModeFilter(mode);
+    }
+  }
 
   /**
    * Merge a set of:
@@ -27,9 +38,11 @@ class FilterMerger {
    *   <li>{@link AllowMainAndSubModeFilter}
    * </ul>
    */
-  static Set<AllowTransitModeFilter> merge(Collection<AllowTransitModeFilter> filters) {
-    if (filters == null || filters.isEmpty()) {
-      return AllowTransitModeFilter.ofAllTransitModes();
+  static Set<AllowTransitModeFilter> create(Collection<MainAndSubMode> allowedModes) {
+    var filters = allowedModes.stream().map(FilterFactory::of).toList();
+
+    if (filters.isEmpty()) {
+      throw new IllegalArgumentException("Can not match an empty set of modes!");
     }
 
     if (filters.size() == 1) {
@@ -41,7 +54,7 @@ class FilterMerger {
       .collect(Collectors.groupingBy(Object::getClass));
 
     if (map.containsKey(AllowAllModesFilter.class)) {
-      return AllowTransitModeFilter.ofAllTransitModes();
+      return Set.of(ALLOWED_ALL_TRANSIT_MODES);
     }
 
     var result = new HashSet<AllowTransitModeFilter>();
@@ -49,7 +62,7 @@ class FilterMerger {
 
     // All main modes are included
     if (mainModeFilters.size() == TransitMode.values().length) {
-      return Set.of(AllowTransitModeFilter.ALLOWED_ALL_TRANSIT_MODES);
+      return Set.of(ALLOWED_ALL_TRANSIT_MODES);
     }
     // Merge filters if there are more than 2 mainMode filters
     else if (mainModeFilters.size() > 2) {

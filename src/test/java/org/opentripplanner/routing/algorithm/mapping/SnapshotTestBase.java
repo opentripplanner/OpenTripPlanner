@@ -48,6 +48,8 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.TestUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -234,17 +236,20 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  private static List<ApiRequestMode> mapModes(Collection<AllowTransitModeFilter> reqModes) {
+  private static List<ApiRequestMode> mapModes(Collection<MainAndSubMode> reqModes) {
+    Set<TransitMode> transitModes = reqModes
+      .stream()
+      .map(MainAndSubMode::mainMode)
+      .collect(Collectors.toSet());
     List<ApiRequestMode> result = new ArrayList<>();
 
-    if (ApiRequestMode.TRANSIT.getTransitModes().equals(reqModes)) {
+    if (ApiRequestMode.TRANSIT.getTransitModes().equals(transitModes)) {
       return List.of(ApiRequestMode.TRANSIT);
     }
 
-    for (AllowTransitModeFilter allowedTransitMode : reqModes) {
-      Collection<AllowTransitModeFilter> allowedTransitModes = Set.of(allowedTransitMode);
+    for (TransitMode it : transitModes) {
       for (ApiRequestMode apiCandidate : ApiRequestMode.values()) {
-        if (allowedTransitModes.equals(apiCandidate.getTransitModes())) {
+        if (apiCandidate.getTransitModes().contains(it)) {
           result.add(apiCandidate);
         }
       }
@@ -280,7 +285,7 @@ public abstract class SnapshotTestBase {
       .atZone(getRouter().graph.getTimeZone().toZoneId())
       .toLocalDateTime();
 
-    var transitModes = mapModes(request.modes.transitModeFilters);
+    var transitModes = mapModes(request.modes.transitModes);
 
     var modes = Stream
       .concat(

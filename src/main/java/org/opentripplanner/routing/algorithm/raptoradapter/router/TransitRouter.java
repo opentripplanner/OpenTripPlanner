@@ -80,7 +80,7 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.modes.transitModeFilters.isEmpty()) {
+    if (request.modes.transitModes.isEmpty()) {
       return new TransitRouterResult(List.of(), null);
     }
 

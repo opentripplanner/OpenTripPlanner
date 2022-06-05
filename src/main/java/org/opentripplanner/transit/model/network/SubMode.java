@@ -22,8 +22,7 @@ import org.slf4j.LoggerFactory;
  * This class is thread-safe, and the performance overhead should affect the graph built time,
  * but not routing.
  */
-public class SubMode implements Serializable {
-
+public record SubMode(String name, int index) implements Serializable {
   private static final int NONE_EXISTING_SUBMODE_INDEX = 1_000_000;
 
   private static final Logger LOG = LoggerFactory.getLogger(SubMode.class);
@@ -37,14 +36,6 @@ public class SubMode implements Serializable {
   private static final AtomicInteger COUNTER = new AtomicInteger(0);
 
   public static final SubMode UNKNOWN = getOrBuildAndCashForever("unknown");
-
-  private final String name;
-  private final int index;
-
-  private SubMode(String name, int index) {
-    this.name = name;
-    this.index = index;
-  }
 
   /**
    * This method is safe to use in a request scope. Usually you want to fetch an instant to
@@ -100,17 +91,13 @@ public class SubMode implements Serializable {
       ALL.put(it.name(), it);
       maxIndex = Math.max(maxIndex, it.index);
     }
-    COUNTER.set(maxIndex+1);
+    COUNTER.set(maxIndex + 1);
   }
 
-  public String name() {
-    return name;
-  }
-
-  public int index() {
-    return index;
-  }
-
+  /**
+   * Only name is used in the equals, not index, so we need to override the
+   * default record implementation of equals.
+   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -125,7 +112,7 @@ public class SubMode implements Serializable {
 
   @Override
   public int hashCode() {
-    return index;
+    return name.hashCode();
   }
 
   @Override

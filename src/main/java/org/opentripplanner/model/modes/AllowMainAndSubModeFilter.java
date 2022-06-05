@@ -2,6 +2,8 @@ package org.opentripplanner.model.modes;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
 import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -12,9 +14,13 @@ class AllowMainAndSubModeFilter implements AllowTransitModeFilter {
 
   private final SubMode subMode;
 
-  AllowMainAndSubModeFilter(@Nonnull TransitMode mainMode, @Nonnull SubMode subMode) {
+  AllowMainAndSubModeFilter(@Nonnull TransitMode mainMode, @Nullable SubMode subMode) {
     this.mainMode = mainMode;
     this.subMode = subMode;
+  }
+
+  AllowMainAndSubModeFilter(@Nonnull MainAndSubMode mode) {
+    this(mode.mainMode(), mode.subMode());
   }
 
   @Override
@@ -23,10 +29,12 @@ class AllowMainAndSubModeFilter implements AllowTransitModeFilter {
     return mainMode == transitMode && subMode == netexSubMode;
   }
 
+  @Nonnull
   TransitMode mainMode() {
     return mainMode;
   }
 
+  @Nullable
   SubMode subMode() {
     return subMode;
   }

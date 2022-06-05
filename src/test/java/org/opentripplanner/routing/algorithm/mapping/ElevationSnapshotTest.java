@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,13 +13,13 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
 
 @ExtendWith(SnapshotExtension.class)
 @ResourceLock(Resources.LOCALE)
@@ -66,7 +66,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directWalk() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = new RequestModes(null, null, null, StreetMode.WALK, Set.of());
+    request.modes = new RequestModes(null, null, null, StreetMode.WALK, List.of());
     request.from = p1;
     request.to = p4;
 
@@ -78,7 +78,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directBikeRental() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
+    request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, List.of());
     request.from = p1;
     request.to = p2;
 
@@ -94,7 +94,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.bikeTriangleTimeFactor = 0.3;
     request.bikeTriangleSlopeFactor = 0.4;
 
-    request.modes = new RequestModes(null, null, null, StreetMode.BIKE, Set.of());
+    request.modes = new RequestModes(null, null, null, StreetMode.BIKE, List.of());
     request.from = p1;
     request.to = p4;
     request.arriveBy = true;
@@ -113,7 +113,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         null,
-        AllowTransitModeFilter.ofAllTransitModes()
+        MainAndSubMode.all()
       );
     request.from = p1;
     request.to = p3;
@@ -136,7 +136,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         StreetMode.WALK,
         StreetMode.WALK,
         null,
-        AllowTransitModeFilter.ofAllTransitModes()
+        MainAndSubMode.all()
       );
     request.from = p3;
     request.to = p1;
