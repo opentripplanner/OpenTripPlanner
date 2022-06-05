@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.network.TransitMode;
  * Used to filter out modes for routing requests.
  */
 public interface AllowTransitModeFilter extends Serializable {
-  static Set<AllowTransitModeFilter> of(Collection<MainAndSubMode> modes) {
+  static AllowTransitModeFilter of(Collection<MainAndSubMode> modes) {
     return FilterFactory.create(modes);
   }
 

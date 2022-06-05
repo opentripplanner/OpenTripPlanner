@@ -76,10 +76,18 @@ public class RequestModes {
 
     RequestModes that = (RequestModes) o;
 
-    if (accessMode != that.accessMode) { return false; }
-    if (egressMode != that.egressMode) { return false; }
-    if (directMode != that.directMode) { return false; }
-    if (transferMode != that.transferMode) { return false; }
+    if (accessMode != that.accessMode) {
+      return false;
+    }
+    if (egressMode != that.egressMode) {
+      return false;
+    }
+    if (directMode != that.directMode) {
+      return false;
+    }
+    if (transferMode != that.transferMode) {
+      return false;
+    }
     return transitModes.equals(that.transitModes);
   }
 

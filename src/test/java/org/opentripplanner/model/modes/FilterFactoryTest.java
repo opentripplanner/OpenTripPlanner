@@ -34,9 +34,8 @@ class FilterFactoryTest {
       new MainAndSubMode(TransitMode.BUS, NIGHT_BUS)
     );
 
-    var resultSet = AllowTransitModeFilter.of(modes);
-    assertEquals(1, resultSet.size());
-    assertInstanceOf(AllowMainModeFilter.class, resultSet.iterator().next());
+    var result = (AllowMainModeFilter) AllowTransitModeFilter.of(modes);
+    assertEquals(TransitMode.BUS, result.mainMode());
   }
 
   @Test
@@ -46,9 +45,8 @@ class FilterFactoryTest {
     // Add one extra sub-mode filter, this should be removed because it is a subset of all
     modes.add(new MainAndSubMode(TransitMode.BUS, NIGHT_BUS));
 
-    var resultSet = AllowTransitModeFilter.of(modes);
-    assertEquals(1, resultSet.size());
-    assertInstanceOf(AllowAllModesFilter.class, resultSet.iterator().next());
+    var result = AllowTransitModeFilter.of(modes);
+    assertInstanceOf(AllowAllModesFilter.class, result);
   }
 
   @Test
@@ -56,14 +54,10 @@ class FilterFactoryTest {
     // Add all MainModes except AIRPLANE as separate filters
     var modes = TransitMode.transitModesExceptAirplane().stream().map(MainAndSubMode::new).toList();
 
-    var resultSet = AllowTransitModeFilter.of(modes);
-    assertEquals(1, resultSet.size());
-
-    // The cast wil throw an exception is not the correct type is returned
-    var filter = (AllowMainModesFilter) resultSet.iterator().next();
+    var result = (AllowMainModesFilter) AllowTransitModeFilter.of(modes);
 
     for (TransitMode mode : TransitMode.values()) {
-      assertEquals(mode != TransitMode.AIRPLANE, filter.allows(mode, SubMode.UNKNOWN));
+      assertEquals(mode != TransitMode.AIRPLANE, result.allows(mode, SubMode.UNKNOWN));
     }
   }
 
@@ -72,11 +66,10 @@ class FilterFactoryTest {
     // Add ALL MainModes as separate filters
     var modes = List.of(new MainAndSubMode(TransitMode.BUS, LOCAL_BUS));
 
-    var resultSet = AllowTransitModeFilter.of(modes);
-    assertEquals(1, resultSet.size());
-    var filter = (AllowMainAndSubModeFilter) resultSet.iterator().next();
-    assertEquals(TransitMode.BUS, filter.mainMode());
-    assertEquals(LOCAL_BUS, filter.subMode());
+    var result = (AllowMainAndSubModeFilter) AllowTransitModeFilter.of(modes);
+
+    assertEquals(TransitMode.BUS, result.mainMode());
+    assertEquals(LOCAL_BUS, result.subMode());
   }
 
   @Test
@@ -86,12 +79,11 @@ class FilterFactoryTest {
       new MainAndSubMode(TransitMode.BUS, NIGHT_BUS)
     );
 
-    var resultSet = List.copyOf(AllowTransitModeFilter.of(modes));
-    assertEquals(2, resultSet.size());
+    var result = AllowTransitModeFilter.of(modes);
 
-    assertTrue(allows(resultSet, TransitMode.BUS, LOCAL_BUS));
-    assertTrue(allows(resultSet, TransitMode.BUS, NIGHT_BUS));
-    assertFalse(allows(resultSet, TransitMode.BUS, SubMode.UNKNOWN));
+    assertTrue(result.allows(TransitMode.BUS, LOCAL_BUS));
+    assertTrue(result.allows(TransitMode.BUS, NIGHT_BUS));
+    assertFalse(result.allows(TransitMode.BUS, SubMode.UNKNOWN));
   }
 
   @Test
@@ -103,26 +95,10 @@ class FilterFactoryTest {
       new MainAndSubMode(TransitMode.BUS, NIGHT_BUS)
     );
 
-    var resultSet = AllowTransitModeFilter.of(modes);
-    assertEquals(1, resultSet.size());
-
-    var result = (AllowMainAndSubModesFilter) resultSet.iterator().next();
+    var result = (AllowMainAndSubModesFilter) AllowTransitModeFilter.of(modes);
 
     assertTrue(result.allows(TransitMode.BUS, LOCAL_BUS));
     assertFalse(result.allows(TransitMode.TRAM, LOCAL_BUS));
     assertFalse(result.allows(TransitMode.BUS, SubMode.UNKNOWN));
-  }
-
-  private static boolean allows(
-    Collection<AllowTransitModeFilter> filters,
-    TransitMode mainMode,
-    SubMode subMode
-  ) {
-    for (AllowTransitModeFilter it : filters) {
-      if (it.allows(mainMode, subMode)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

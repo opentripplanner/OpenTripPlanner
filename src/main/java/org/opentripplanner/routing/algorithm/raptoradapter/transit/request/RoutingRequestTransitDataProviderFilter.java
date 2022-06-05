@@ -26,7 +26,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean includePlannedCancellations;
 
-  private final Predicate<Trip> transitModeIsAllowed;
+  private final AllowTransitModeFilter transitModeFilter;
 
   private final Set<FeedScopedId> bannedRoutes;
 
@@ -45,12 +45,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
-
-    final Set<AllowTransitModeFilter> modeFilters = AllowTransitModeFilter.of(allowedTransitModes);
-
-    transitModeIsAllowed =
-      (Trip trip) ->
-        modeFilters.stream().anyMatch(m -> m.allows(trip.getMode(), trip.getNetexSubMode()));
+    this.transitModeFilter = AllowTransitModeFilter.of(allowedTransitModes);
   }
 
   public RoutingRequestTransitDataProviderFilter(RoutingRequest request, GraphIndex graphIndex) {
@@ -80,7 +75,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
     final Trip trip = tripTimes.getTrip();
-    if (!transitModeIsAllowed.test(trip)) {
+    if (!transitModeFilter.allows(trip.getMode(), trip.getNetexSubMode())) {
       return false;
     }
 

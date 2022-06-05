@@ -1,11 +1,10 @@
 package org.opentripplanner.model.modes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.transit.model.network.MainAndSubMode;
@@ -38,7 +37,7 @@ class FilterFactory {
    *   <li>{@link AllowMainAndSubModeFilter}
    * </ul>
    */
-  static Set<AllowTransitModeFilter> create(Collection<MainAndSubMode> allowedModes) {
+  static AllowTransitModeFilter create(Collection<MainAndSubMode> allowedModes) {
     var filters = allowedModes.stream().map(FilterFactory::of).toList();
 
     if (filters.isEmpty()) {
@@ -46,7 +45,7 @@ class FilterFactory {
     }
 
     if (filters.size() == 1) {
-      return Set.copyOf(filters);
+      return filters.get(0);
     }
 
     Map<Class<?>, List<AllowTransitModeFilter>> map = filters
@@ -54,25 +53,22 @@ class FilterFactory {
       .collect(Collectors.groupingBy(Object::getClass));
 
     if (map.containsKey(AllowAllModesFilter.class)) {
-      return Set.of(ALLOWED_ALL_TRANSIT_MODES);
+      return ALLOWED_ALL_TRANSIT_MODES;
     }
 
-    var result = new HashSet<AllowTransitModeFilter>();
+    // We uses a list here not a set to preserve the order. Duplicates are removed before
+    // returning the results - preserving the order.
+    var result = new ArrayList<AllowTransitModeFilter>();
     var mainModeFilters = stream(map, AllowMainModeFilter.class).collect(Collectors.toSet());
 
-    // All main modes are included
     if (mainModeFilters.size() == TransitMode.values().length) {
-      return Set.of(ALLOWED_ALL_TRANSIT_MODES);
-    }
-    // Merge filters if there are more than 2 mainMode filters
-    else if (mainModeFilters.size() > 2) {
+      return ALLOWED_ALL_TRANSIT_MODES;
+    } else if (mainModeFilters.size() == 1) {
+      result.addAll(mainModeFilters);
+    } else if (mainModeFilters.size() > 1) {
       result.add(new AllowMainModesFilter(mainModeFilters));
     }
-    // It there is just 1 or 2 main-mode filters, then add them. Iterating over 2 filter is
-    // probably as fast as looking up 2 enums in an EnumSet.
-    else if (mainModeFilters.size() > 0) {
-      result.addAll(mainModeFilters);
-    }
+    // else ignore empty list
 
     var subModeFiltersByMainMode = stream(map, AllowMainAndSubModeFilter.class)
       .collect(Collectors.groupingBy(AllowMainAndSubModeFilter::mainMode));
@@ -89,17 +85,19 @@ class FilterFactory {
 
       var subModeFilters = subModeFiltersByMainMode.get(mainMode);
 
-      // If there are more than 2 subMode filters for the same main mode, merge them together
-      if (subModeFilters.size() > 2) {
+      if (subModeFilters.size() == 1) {
+        result.addAll(subModeFilters);
+      } else if (subModeFilters.size() > 1) {
         result.add(new AllowMainAndSubModesFilter(subModeFilters));
       }
-      // It there is just 1 or 2 sub-mode filters, then add them. Iterating over 2 filter is
-      // probably as fast as looking up 2 indexes in a bitset.
-      else if (subModeFilters.size() > 0) {
-        result.addAll(subModeFilters);
-      }
+      // esle ignore empty
     }
-    return result;
+
+    if (result.size() == 1) {
+      return result.get(0);
+    }
+    // Remove duplicates and preserve order
+    return new FilterCollection(result.stream().distinct().toList());
   }
 
   @SuppressWarnings("unchecked")

@@ -61,7 +61,7 @@ class AllowMainAndSubModesFilterTest {
   @Test
   void testToString() {
     assertEquals(
-      "AllowMainAndSubModesFilter{mainMode: BUS, subModes: [local, regional, express]}",
+      "AllowMainAndSubModesFilter{mainMode: BUS, subModes: [express, local, regional]}",
       subject.toString()
     );
   }

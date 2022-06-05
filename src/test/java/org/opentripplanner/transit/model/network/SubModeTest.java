@@ -57,9 +57,9 @@ class SubModeTest {
     assertEquals(NIGHT_BUS, SubMode.of("nightBus"));
     assertNotEquals(SubMode.UNKNOWN, NIGHT_BUS);
 
-    SubMode original = SubMode.of("test");
-    SubMode other = SubMode.of("test");
-    SubMode different = SubMode.of("different");
+    SubMode original = SubMode.of("not-cashed");
+    SubMode other = SubMode.of("not-cashed");
+    SubMode different = SubMode.of("not-cashed-different");
 
     assertEquals(original, other);
     assertNotEquals(original, different);
@@ -67,7 +67,9 @@ class SubModeTest {
 
   @Test
   void testHashCode() {
-    assertEquals(NIGHT_BUS.index(), NIGHT_BUS.hashCode());
+    assertEquals(SubMode.of("nightBus").hashCode(), NIGHT_BUS.hashCode());
+    assertEquals(SubMode.of("not-cashed").hashCode(), SubMode.of("not-cashed").hashCode());
+    assertNotEquals(LOCAL_BUS.hashCode(), NIGHT_BUS.hashCode());
   }
 
   @Test
