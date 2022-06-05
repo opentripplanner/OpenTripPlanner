@@ -114,7 +114,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
               LinkingDirection.BOTH_WAYS,
               (osmBoardingLocationVertex, splitVertex) -> {
                 // the OSM boarding location vertex is not connected to the street network, so we
-                // need to link it to the platform
+                // need to link it first
                 return List.of(
                   linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
                   linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)

@@ -25,6 +25,7 @@ import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * We test that the platform area at Herrenberg station (https://www.openstreetmap.org/way/27558650)
@@ -50,6 +51,7 @@ class OsmBoardingLocationsModuleTest {
   File file = new File(ConstantsForTests.HERRENBERG_OSM);
   Stop platform = Stop.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
   Stop busStop = Stop.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
+  Stop floatingBusStop = Stop.stopForTest("floating-bus-stop", 48.59417, 8.86464);
 
   @ParameterizedTest(
     name = "add boarding locations and link them to platform edges when skipVisibility={0}"
@@ -60,7 +62,15 @@ class OsmBoardingLocationsModuleTest {
     var extra = new HashMap<Class<?>, Object>();
 
     var provider = new OpenStreetMapProvider(file, false);
-
+    var floatingBusVertex = new TransitStopVertex(graph, floatingBusStop, Set.of(TransitMode.BUS));
+    var floatingBoardingLocation = new OsmBoardingLocationVertex(
+      graph,
+      "floating-bus-stop",
+      floatingBusVertex.getX(),
+      floatingBusVertex.getY(),
+      new NonLocalizedString("bus stop not connected to street network"),
+      Set.of(floatingBusVertex.getStop().getId().getId())
+    );
     var osmModule = new OpenStreetMapModule(List.of(provider), Set.of("ref", "ref:IFOPT"));
     osmModule.skipVisibility = skipVisibility;
 
@@ -79,7 +89,7 @@ class OsmBoardingLocationsModuleTest {
     boardingLocationsModule.buildGraph(graph, extra);
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
-    assertEquals(4, boardingLocations.size()); // 3 nodes plus one area centroid created by the module
+    assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
 
     assertEquals(1, platformVertex.getIncoming().size());
     assertEquals(1, platformVertex.getOutgoing().size());
@@ -98,27 +108,21 @@ class OsmBoardingLocationsModuleTest {
       .findFirst()
       .get();
 
-    Stream
-      .of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing())
-      .forEach(edges ->
-        assertEquals(
-          Set.of(BoardingLocationToStopLink.class, StreetEdge.class),
-          edges.stream().map(Edge::getClass).collect(Collectors.toSet())
-        )
-      );
+    assertConnections(
+      busBoardingLocation,
+      Set.of(BoardingLocationToStopLink.class, StreetEdge.class)
+    );
+
+    assertConnections(
+      floatingBoardingLocation,
+      Set.of(BoardingLocationToStopLink.class, StreetEdge.class)
+    );
 
     assertEquals(1, platformCentroids.size());
 
     var platform = platformCentroids.get(0);
 
-    Stream
-      .of(platform.getIncoming(), platform.getOutgoing())
-      .forEach(edges ->
-        assertEquals(
-          Set.of(BoardingLocationToStopLink.class, AreaEdge.class),
-          edges.stream().map(Edge::getClass).collect(Collectors.toSet())
-        )
-      );
+    assertConnections(platform, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
 
     assertEquals(
       linkedVertices,
@@ -150,5 +154,16 @@ class OsmBoardingLocationsModuleTest {
       .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
       .filter(StreetEdge.class::isInstance)
       .forEach(e -> assertEquals("101;102", e.getName().toString()));
+  }
+
+  private void assertConnections(
+    OsmBoardingLocationVertex busBoardingLocation,
+    Set<Class<? extends Edge>> expected
+  ) {
+    Stream
+      .of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing())
+      .forEach(edges ->
+        assertEquals(expected, edges.stream().map(Edge::getClass).collect(Collectors.toSet()))
+      );
   }
 }
