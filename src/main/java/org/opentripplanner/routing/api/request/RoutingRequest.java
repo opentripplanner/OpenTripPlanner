@@ -25,7 +25,6 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
@@ -949,7 +948,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         arriveBy = false;
       }
       setDateTime(arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime);
-      modes.directMode = StreetMode.NOT_SET;
+      modes = modes.copy().withDirectMode(StreetMode.NOT_SET).build();
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }

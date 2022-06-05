@@ -17,7 +17,6 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -204,12 +203,15 @@ public class FlexIntegrationTest {
     request.to = to;
     request.numItineraries = 10;
     request.searchWindow = Duration.ofHours(2);
-    request.modes.egressMode = FLEXIBLE;
+
+    var modes = request.modes.copy();
+    modes.withEgressMode(FLEXIBLE);
 
     if (onlyDirect) {
-      request.modes.directMode = FLEXIBLE;
-      request.modes.transitModes = List.of();
+      modes.withDirectMode(FLEXIBLE);
+      modes.clearTransitMode();
     }
+    request.modes = modes.build();
 
     var result = service.route(request, router);
     var itineraries = result.getTripPlan().itineraries;

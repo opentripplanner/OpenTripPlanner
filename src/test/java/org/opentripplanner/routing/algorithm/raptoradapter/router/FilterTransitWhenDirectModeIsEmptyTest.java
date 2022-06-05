@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-import java.util.Set;
 import org.junit.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -14,7 +12,14 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsExistAndIsNotWalking() {
-    var modes = new RequestModes(null, null, null, StreetMode.BIKE, List.of());
+    var modes = RequestModes
+      .of()
+      .withAccessMode(null)
+      .withEgressMode(null)
+      .withDirectMode(StreetMode.BIKE)
+      .withTransferMode(null)
+      .clearTransitMode()
+      .build();
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 
@@ -25,7 +30,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsExistAndIsWalking() {
-    var modes = new RequestModes(null, null, null, StreetMode.WALK, List.of());
+    var modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitMode().build();
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 
@@ -36,7 +41,14 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsEmpty() {
-    var modes = new RequestModes(null, null, null, null, List.of());
+    var modes = RequestModes
+      .of()
+      .withAccessMode(null)
+      .withEgressMode(null)
+      .withDirectMode(null)
+      .withTransferMode(null)
+      .clearTransitMode()
+      .build();
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 

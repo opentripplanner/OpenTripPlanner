@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.transit.model.network.MainAndSubMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
  * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift
@@ -39,16 +40,14 @@ public class QualifiedModeSet implements Serializable {
   }
 
   public RequestModes getRequestModes() {
-    StreetMode accessMode = null;
-    StreetMode egressMode = null;
-    StreetMode directMode = null;
-    StreetMode transferMode = null;
+    RequestModesBuilder mBuilder = RequestModes.of().clearTransitMode();
 
     // Set transit modes
-    List<MainAndSubMode> transitModes = qModes
-      .stream()
-      .flatMap(q -> q.mode.getTransitModes().stream().map(MainAndSubMode::new))
-      .toList();
+    for (QualifiedMode qMode : qModes) {
+      for (TransitMode mainMode : qMode.mode.getTransitModes()) {
+        mBuilder.withTransitMode(mainMode);
+      }
+    }
 
     //  This is a best effort at mapping QualifiedModes to access/egress/direct StreetModes.
     //  It was unclear what exactly each combination of QualifiedModes should mean.
@@ -90,35 +89,23 @@ public class QualifiedModeSet implements Serializable {
     if (requestMode != null) {
       switch (requestMode.mode) {
         case WALK:
-          accessMode = StreetMode.WALK;
-          transferMode = StreetMode.WALK;
-          egressMode = StreetMode.WALK;
-          directMode = StreetMode.WALK;
+          mBuilder.withAllStreetModes(StreetMode.WALK);
           break;
         case BICYCLE:
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
-            accessMode = StreetMode.BIKE_RENTAL;
-            transferMode = StreetMode.BIKE_RENTAL;
-            egressMode = StreetMode.BIKE_RENTAL;
-            directMode = StreetMode.BIKE_RENTAL;
+            mBuilder.withAllStreetModes(StreetMode.BIKE_RENTAL);
           } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
-            accessMode = StreetMode.BIKE_TO_PARK;
-            transferMode = StreetMode.WALK;
-            egressMode = StreetMode.WALK;
-            directMode = StreetMode.BIKE_TO_PARK;
+            mBuilder.withAccessMode(StreetMode.BIKE_TO_PARK);
+            mBuilder.withEgressMode(StreetMode.WALK);
+            mBuilder.withDirectMode(StreetMode.BIKE_TO_PARK);
+            mBuilder.withTransferMode(StreetMode.WALK);
           } else {
-            accessMode = StreetMode.BIKE;
-            transferMode = StreetMode.BIKE;
-            egressMode = StreetMode.BIKE;
-            directMode = StreetMode.BIKE;
+            mBuilder.withAllStreetModes(StreetMode.BIKE);
           }
           break;
         case SCOOTER:
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
-            accessMode = StreetMode.SCOOTER_RENTAL;
-            transferMode = StreetMode.SCOOTER_RENTAL;
-            egressMode = StreetMode.SCOOTER_RENTAL;
-            directMode = StreetMode.SCOOTER_RENTAL;
+            mBuilder.withAllStreetModes(StreetMode.SCOOTER_RENTAL);
           } else {
             // Only supported as rental mode
             throw new IllegalArgumentException();
@@ -126,30 +113,27 @@ public class QualifiedModeSet implements Serializable {
           break;
         case CAR:
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
-            accessMode = StreetMode.CAR_RENTAL;
-            transferMode = StreetMode.CAR_RENTAL;
-            egressMode = StreetMode.CAR_RENTAL;
-            directMode = StreetMode.CAR_RENTAL;
+            mBuilder.withAllStreetModes(StreetMode.CAR_RENTAL);
           } else if (requestMode.qualifiers.contains(Qualifier.PARK)) {
-            accessMode = StreetMode.CAR_TO_PARK;
-            transferMode = StreetMode.WALK;
-            egressMode = StreetMode.WALK;
-            directMode = StreetMode.CAR_TO_PARK;
+            mBuilder.withAccessMode(StreetMode.CAR_TO_PARK);
+            mBuilder.withTransferMode(StreetMode.WALK);
+            mBuilder.withEgressMode(StreetMode.WALK);
+            mBuilder.withDirectMode(StreetMode.CAR_TO_PARK);
           } else if (requestMode.qualifiers.contains(Qualifier.PICKUP)) {
-            accessMode = StreetMode.WALK;
-            transferMode = StreetMode.WALK;
-            egressMode = StreetMode.CAR_PICKUP;
-            directMode = StreetMode.CAR_PICKUP;
+            mBuilder.withAccessMode(StreetMode.WALK);
+            mBuilder.withTransferMode(StreetMode.WALK);
+            mBuilder.withEgressMode(StreetMode.CAR_PICKUP);
+            mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
           } else if (requestMode.qualifiers.contains(Qualifier.DROPOFF)) {
-            accessMode = StreetMode.CAR_PICKUP;
-            transferMode = StreetMode.WALK;
-            egressMode = StreetMode.WALK;
-            directMode = StreetMode.CAR_PICKUP;
+            mBuilder.withAccessMode(StreetMode.CAR_PICKUP);
+            mBuilder.withTransferMode(StreetMode.WALK);
+            mBuilder.withEgressMode(StreetMode.WALK);
+            mBuilder.withDirectMode(StreetMode.CAR_PICKUP);
           } else {
-            accessMode = StreetMode.WALK;
-            transferMode = StreetMode.WALK;
-            egressMode = StreetMode.WALK;
-            directMode = StreetMode.CAR;
+            mBuilder.withAccessMode(StreetMode.WALK);
+            mBuilder.withTransferMode(StreetMode.WALK);
+            mBuilder.withEgressMode(StreetMode.WALK);
+            mBuilder.withDirectMode(StreetMode.CAR);
           }
           break;
       }
@@ -159,21 +143,16 @@ public class QualifiedModeSet implements Serializable {
     for (QualifiedMode qMode : qModes) {
       if (qMode.mode.equals(ApiRequestMode.FLEX)) {
         if (qMode.qualifiers.contains(Qualifier.ACCESS)) {
-          accessMode = StreetMode.FLEXIBLE;
+          mBuilder.withAccessMode(StreetMode.FLEXIBLE);
         } else if (qMode.qualifiers.contains(Qualifier.EGRESS)) {
-          egressMode = StreetMode.FLEXIBLE;
+          mBuilder.withEgressMode(StreetMode.FLEXIBLE);
         } else if (qMode.qualifiers.contains(Qualifier.DIRECT)) {
-          directMode = StreetMode.FLEXIBLE;
+          mBuilder.withDirectMode(StreetMode.FLEXIBLE);
         }
       }
     }
 
-    // If we search eg. Transit + flex access and egress, fallback to walking transfers
-    if (transferMode == null) {
-      transferMode = StreetMode.WALK;
-    }
-
-    return new RequestModes(accessMode, transferMode, egressMode, directMode, transitModes);
+    return mBuilder.build();
   }
 
   public String toString() {

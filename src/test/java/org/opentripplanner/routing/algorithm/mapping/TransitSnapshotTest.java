@@ -1,9 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static java.util.Collections.emptySet;
-
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -69,14 +66,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only() {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        List.of()
-      );
+    request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitMode().build();
     request.from = p0;
     request.to = p2;
 
@@ -88,13 +78,14 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        List.of()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.WALK)
+        .withTransferMode(StreetMode.WALK)
+        .clearTransitMode()
+        .build();
     request.from = ps;
     request.to = p2;
 
@@ -106,13 +97,14 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        List.of()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.WALK)
+        .withTransferMode(StreetMode.WALK)
+        .clearTransitMode()
+        .build();
     request.from = ptc;
     request.to = p3;
 
@@ -126,13 +118,14 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        MainAndSubMode.all()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.WALK)
+        .withTransferMode(StreetMode.WALK)
+        .withTransitModes(MainAndSubMode.all())
+        .build();
     request.from = p1;
     request.to = p2;
 
@@ -144,13 +137,14 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        MainAndSubMode.all()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.WALK)
+        .withTransferMode(StreetMode.WALK)
+        .withTransitModes(MainAndSubMode.all())
+        .build();
     request.from = ps;
     request.to = p3;
 
@@ -163,13 +157,14 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        MainAndSubMode.all()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.WALK)
+        .withTransferMode(StreetMode.WALK)
+        .withTransitModes(MainAndSubMode.all())
+        .build();
     request.from = ptc;
     request.to = p3;
 

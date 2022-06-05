@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
@@ -66,7 +65,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directWalk() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = new RequestModes(null, null, null, StreetMode.WALK, List.of());
+    request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitMode().build();
     request.from = p1;
     request.to = p4;
 
@@ -78,7 +77,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directBikeRental() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, List.of());
+    request.modes =
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
     request.from = p1;
     request.to = p2;
 
@@ -94,7 +94,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.bikeTriangleTimeFactor = 0.3;
     request.bikeTriangleSlopeFactor = 0.4;
 
-    request.modes = new RequestModes(null, null, null, StreetMode.BIKE, List.of());
+    request.modes = RequestModes.of().withDirectMode(StreetMode.BIKE).clearTransitMode().build();
     request.from = p1;
     request.to = p4;
     request.arriveBy = true;
@@ -108,13 +108,14 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.BIKE_RENTAL,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        null,
-        MainAndSubMode.all()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.BIKE_RENTAL)
+        .withEgressMode(StreetMode.WALK)
+        .withTransferMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.NOT_SET)
+        .withTransitModes(MainAndSubMode.all())
+        .build();
     request.from = p1;
     request.to = p3;
 
@@ -131,13 +132,14 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        null,
-        MainAndSubMode.all()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.WALK)
+        .withTransferMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.NOT_SET)
+        .withTransitModes(MainAndSubMode.all())
+        .build();
     request.from = p3;
     request.to = p1;
 

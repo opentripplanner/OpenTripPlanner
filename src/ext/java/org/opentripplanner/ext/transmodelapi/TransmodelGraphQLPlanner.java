@@ -6,15 +6,12 @@ import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
@@ -25,9 +22,9 @@ import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputTyp
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -37,7 +34,6 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.MainAndSubMode;
-import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -286,10 +282,20 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("modes.directMode", directMode::set);
       callWith.argument("modes.transportModes", transportModes::set);
 
-      List<MainAndSubMode> transitModes = new ArrayList<>();
+      RequestModesBuilder mBuilder = RequestModes
+        .of()
+        .withAccessMode(accessMode.get())
+        .withEgressMode(egressMode.get())
+        .withDirectMode(directMode.get());
+
+      mBuilder.withTransferMode(
+        accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK
+      );
+
       if (transportModes.get() == null) {
-        transitModes = MainAndSubMode.all();
+        mBuilder.withTransitModes(MainAndSubMode.all());
       } else {
+        mBuilder.clearTransitMode();
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
             TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
@@ -298,22 +304,15 @@ public class TransmodelGraphQLPlanner {
                 "transportSubModes"
               );
               for (TransmodelTransportSubmode submode : transportSubModes) {
-                transitModes.add(new MainAndSubMode(mainMode, SubMode.of(submode.getValue())));
+                mBuilder.withTransitMode(mainMode, submode.getValue());
               }
             } else {
-              transitModes.add(new MainAndSubMode(mainMode));
+              mBuilder.withTransitMode(mainMode);
             }
           }
         }
       }
-
-      return new RequestModes(
-        accessMode.get(),
-        accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
-        egressMode.get(),
-        directMode.get(),
-        transitModes
-      );
+      return mBuilder.build();
     }
     return null;
   }

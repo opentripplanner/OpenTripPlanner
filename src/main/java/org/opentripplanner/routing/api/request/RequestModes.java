@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +14,7 @@ public class RequestModes {
   /**
    * The RequestModes is mutable, so we need to keep a private default set of modes.
    */
-  private static final RequestModes defaultRequestModes = new RequestModes(
+  private static final RequestModes DEFAULTS = new RequestModes(
     StreetMode.WALK,
     StreetMode.WALK,
     StreetMode.WALK,
@@ -21,44 +23,54 @@ public class RequestModes {
   );
 
   @Nonnull
-  public StreetMode accessMode;
+  public final StreetMode accessMode;
 
   @Nonnull
-  public StreetMode egressMode;
+  public final StreetMode egressMode;
 
   @Nonnull
-  public StreetMode directMode;
+  public final StreetMode directMode;
 
   @Nonnull
-  public StreetMode transferMode;
+  public final StreetMode transferMode;
 
   @Nonnull
-  public List<MainAndSubMode> transitModes;
+  public final List<MainAndSubMode> transitModes;
 
-  public RequestModes(
+  private RequestModes(
     StreetMode accessMode,
-    StreetMode transferMode,
     StreetMode egressMode,
     StreetMode directMode,
+    StreetMode transferMode,
     Collection<MainAndSubMode> transitModes
   ) {
-    this.accessMode = (accessMode != null && accessMode.access) ? accessMode : StreetMode.NOT_SET;
-    this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : StreetMode.NOT_SET;
-    this.directMode = directMode != null ? directMode : StreetMode.NOT_SET;
-    this.transferMode =
-      (transferMode != null && transferMode.transfer) ? transferMode : StreetMode.NOT_SET;
+    this.accessMode = (accessMode != null && accessMode.access) ? accessMode : NOT_SET;
+    this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : NOT_SET;
+    this.directMode = directMode != null ? directMode : NOT_SET;
+    this.transferMode = (transferMode != null && transferMode.transfer) ? transferMode : NOT_SET;
     this.transitModes = transitModes == null ? MainAndSubMode.all() : List.copyOf(transitModes);
   }
 
-  public static RequestModes defaultRequestModes() {
-    // Clone default since this class is mutable
-    return new RequestModes(
-      defaultRequestModes.accessMode,
-      defaultRequestModes.transferMode,
-      defaultRequestModes.egressMode,
-      defaultRequestModes.directMode,
-      defaultRequestModes.transitModes
+  public RequestModes(RequestModesBuilder builder) {
+    this(
+      builder.accessMode(),
+      builder.egressMode(),
+      builder.directMode(),
+      builder.transferMode(),
+      builder.transitModes()
     );
+  }
+
+  public static RequestModesBuilder of() {
+    return DEFAULTS.copy();
+  }
+
+  public RequestModesBuilder copy() {
+    return new RequestModesBuilder(this);
+  }
+
+  public static RequestModes defaultRequestModes() {
+    return DEFAULTS;
   }
 
   public boolean contains(StreetMode streetMode) {

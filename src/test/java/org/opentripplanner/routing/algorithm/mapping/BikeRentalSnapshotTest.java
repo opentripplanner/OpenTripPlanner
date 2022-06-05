@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
@@ -61,7 +60,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   public void directBikeRental() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, List.of());
+    request.modes =
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
     request.from = p1;
     request.to = p2;
 
@@ -82,7 +82,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   public void directBikeRentalArrivingAtDestinationWithDepartAt() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, List.of());
+    request.modes =
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
     request.allowKeepingRentedVehicleAtDestination = true;
     request.from = p1;
     request.to = p2;
@@ -95,7 +96,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   public void directBikeRentalArrivingAtDestinationWithArriveBy() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, List.of());
+    request.modes =
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
     request.allowKeepingRentedVehicleAtDestination = true;
     request.from = p1;
     request.to = p2;
@@ -110,13 +112,14 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.BIKE_RENTAL,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        null,
-        MainAndSubMode.all()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.BIKE_RENTAL)
+        .withEgressMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.NOT_SET)
+        .withTransferMode(StreetMode.WALK)
+        .withTransitModes(MainAndSubMode.all())
+        .build();
     request.from = p1;
     request.to = p3;
 
@@ -133,13 +136,14 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.BIKE_RENTAL,
-        null,
-        MainAndSubMode.all()
-      );
+      RequestModes
+        .of()
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.BIKE_RENTAL)
+        .withTransferMode(StreetMode.WALK)
+        .withDirectMode(StreetMode.NOT_SET)
+        .withTransitModes(MainAndSubMode.all())
+        .build();
     request.from = p3;
     request.to = p1;
 
