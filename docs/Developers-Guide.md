@@ -11,7 +11,6 @@ Maven embedded, if so you may skip step 3.
 2. Checkout the desired branch `git checkout dev-2.x`
 3. Run `maven package`- this will download all dependencies, build the project and run tests.
 4. Open the project in your IDE.
-5. Import the _intellij-code-style.xml_ (IntelliJ IDE).
 
 ## Working on OTP in an IDE
 
@@ -61,9 +60,10 @@ There are several ways to get involved:
 
 * [File a bug or new feature request](http://github.com/openplans/OpenTripPlanner/issues/new).
 
-* Submit patches. If you're not yet a committer, please provide patches as pull requests citing the
-  relevant issue. Even when you do have push access to the repository, pull requests are a good way
-  to get feedback on changes.
+* Create pull requests citing the relevant issue.
+
+* Join developer meetings hosted twice a week. Check the specific times
+  on [this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com)
 
 ### Branches and Branch Protection
 
@@ -84,22 +84,14 @@ a different organization than the author. Merges will not occur into `master` fr
 that branch is sufficiently advanced and receives approval from the OTP project leadership
 committee.
 
-### Issues and commits
+### Issues
 
-All commits should reference a specific issue number (this was formally decided in issue #175). For
-example, `Simplify module X configuration #9999`. If no ticket exists for the feature or bug your
+If no ticket exists for the feature or bug your
 code implements or fixes, you
 should [create a new ticket](http://github.com/openplans/OpenTripPlanner/issues/new) prior to
 checking in, or ideally even prior to your development work since this provides a place to carry out
-implementation discussions (in the comments).
-
-GitHub will automatically update issues when commits are merged in: if your commit message includes
-the text
-` fixes #123 `, it will automatically append your message as a comment on the isse and close it. If
-you simply mention ` #123 ` in your message, your message will be appended to the issue but it will
-remain open. Many other expressions exist to close issues via commit messages.
-See [the GitHub help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/)
-.
+implementation discussions (in the comments). The created issue should be referenced in a pull
+request. For really minor and uncontroversial pull requests, it is ok to not create an issue.
 
 ### Unit tests using real OSM data
 
@@ -211,8 +203,9 @@ The OTP code style is described on a separate [style guide page](Codestyle.md).
 ## Continuous Integration
 
 The OpenTripPlanner project uses
-the [Travis CI continuous integration system](https://travis-ci.org/opentripplanner/OpenTripPlanner)
-. Any time a change is pushed to the main OpenTripPlanner repository on GitHub, this server will
+the [Github actions continuous integration system](https://github.com/opentripplanner/OpenTripPlanner/actions)
+. Any time a change is pushed to the main OpenTripPlanner repository on GitHub or to an open pull
+request, Github actions will
 compile and test the new code, providing feedback on the stability of the build.
 
 ### Changelog workflow
