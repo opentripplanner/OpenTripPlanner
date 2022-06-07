@@ -60,7 +60,7 @@ Other parameters are:
   penalty that is applied for wheelchair users. This should be quite high so that those are only
   chosen as a very last resort. default: 25
 - `maxSlope`: the maximum slope that a wheelchair user can use without incurring routing penalties (
-  leading to those ways being avoided). default: 0.0833 (8.33 %)
+  leading to those ways being avoided). default: 0.083 (8.3 %)
 - `slopeExceededReluctance`: the multiplier applied to how much you exceed the `maxSlope` and then
   again multiplied with the regular cost of the street. In other words: how steep should the cost
   increase when you exceed the maximum slope. default: 1.1
