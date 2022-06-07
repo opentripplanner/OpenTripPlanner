@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
-import graphql.TypeResolutionEnvironment;
+import graphql.execution.TypeResolutionParameters;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -31,16 +31,16 @@ public class LegacyGraphQLplaceAtDistanceImpl
         .getGraphQLSchema()
         .getType("PlaceInterface");
 
-      GraphQLObjectType placeType = typeResolver.getType(
-        new TypeResolutionEnvironment(
-          place,
-          environment.getArguments(),
-          environment.getMergedField(),
-          placeInterface,
-          environment.getGraphQLSchema(),
-          environment.getContext()
-        )
-      );
+      var resolution = new TypeResolutionParameters.Builder()
+        .value(place)
+        .argumentValues(environment::getArguments)
+        .field(environment.getMergedField())
+        .fieldType(placeInterface)
+        .schema(environment.getGraphQLSchema())
+        .graphQLContext(environment.getContext())
+        .build();
+
+      GraphQLObjectType placeType = typeResolver.getType(resolution);
 
       Relay.ResolvedGlobalId globalId = (Relay.ResolvedGlobalId) environment
         .getGraphQLSchema()

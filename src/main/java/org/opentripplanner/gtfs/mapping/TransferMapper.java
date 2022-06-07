@@ -94,6 +94,7 @@ class TransferMapper {
   private final DataImportIssueStore issueStore;
 
   private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
+  private final boolean discardMinTransferTimes;
 
   TransferMapper(
     RouteMapper routeMapper,
@@ -101,6 +102,7 @@ class TransferMapper {
     StopMapper stopMapper,
     TripMapper tripMapper,
     TripStopTimes stopTimesByTrip,
+    boolean discardMinTransferTimes,
     DataImportIssueStore issueStore
   ) {
     this.routeMapper = routeMapper;
@@ -108,6 +110,7 @@ class TransferMapper {
     this.stopMapper = stopMapper;
     this.tripMapper = tripMapper;
     this.stopTimesByTrip = stopTimesByTrip;
+    this.discardMinTransferTimes = discardMinTransferTimes;
     this.issueStore = issueStore;
   }
 
@@ -195,7 +198,7 @@ class TransferMapper {
 
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
 
-    if (rhs.isMinTransferTimeSet()) {
+    if (!discardMinTransferTimes && rhs.isMinTransferTimeSet()) {
       builder.minTransferTime(rhs.getMinTransferTime());
     }
 
