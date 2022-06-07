@@ -35,7 +35,7 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
       },
       "inaccessibleStreetReluctance": 25,
       "maxSlope": 0.08333,
-      "slopeExceededReluctance": 1.1,
+      "slopeExceededReluctance": 50,
       "stairsReluctance": 25
     }
   },
@@ -63,7 +63,8 @@ Other parameters are:
   leading to those ways being avoided). default: 0.083 (8.3 %)
 - `slopeExceededReluctance`: the multiplier applied to how much you exceed the `maxSlope` and then
   again multiplied with the regular cost of the street. In other words: how steep should the cost
-  increase when you exceed the maximum slope. default: 1.1
+  increase when you exceed the maximum slope. Since the percentages are expressed as fractions of 1 
+  (1% is `0.01`) you need a relatively high number. default: 50 
 - `stairsReluctance`: how much should a wheelchair user avoid stairs. This should be quite high so
   that they are used only as a last resort. default: 25
 

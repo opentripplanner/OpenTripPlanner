@@ -25,7 +25,7 @@ public abstract class StreetCostEdge extends Edge {
       double reluctance = wheelchair.slopeExceededReluctance();
       if (reluctance > 0) {
         // if we exceed the max slope the cost increases multiplied by how much you go over the maxSlope
-        var excessMultiplier = (slopeExceededBy * 1000) * reluctance;
+        var excessMultiplier = 1 + slopeExceededBy * reluctance;
         cost *= excessMultiplier;
       }
     }

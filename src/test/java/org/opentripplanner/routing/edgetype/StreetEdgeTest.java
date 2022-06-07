@@ -200,9 +200,9 @@ class StreetEdgeTest extends GraphRoutingTest {
     Arguments.of(0.07f, 5081), // no extra cost
     Arguments.of(0.08f, 5945), // no extra cost
     Arguments.of(0.09f, 6908), // no extra cost
-    Arguments.of(0.091f, 7708), // 0.1 % above the max slope, tiny extra cost
-    Arguments.of(0.0915f, 11645), // 0.15 % above the max slope, will incur larger cost
-    Arguments.of(0.11f, 194144) // 2 % above max slope, will incur very large cost
+    Arguments.of(0.091f, 7358), // 0.1 % above the max slope, tiny extra cost
+    Arguments.of(0.0915f, 7587), // 0.15 % above the max slope, will incur larger cost
+    Arguments.of(0.11f, 17649) // 2 % above max slope, will incur very large cost
   );
 
   /**
@@ -245,7 +245,7 @@ class StreetEdgeTest extends GraphRoutingTest {
         ofOnlyAccessible(),
         25,
         0.09,
-        1.1f,
+        50,
         10
       );
     State result = traverse(edge, req);

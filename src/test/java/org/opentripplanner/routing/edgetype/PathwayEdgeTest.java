@@ -122,10 +122,10 @@ class PathwayEdgeTest {
   static Stream<Arguments> slopeCases = Stream.of(
     Arguments.of(0.07, 120), // no extra cost
     Arguments.of(0.08, 120), // no extra cost
-    Arguments.of(0.09, 1320), // 1 % above max
-    Arguments.of(0.091, 1452), // 1.1 % above the max slope, tiny extra cost
-    Arguments.of(0.0915, 1518), // 1.15 % above the max slope, will incur larger cost
-    Arguments.of(0.11, 3960) // 3 % above max slope, will incur very large cost
+    Arguments.of(0.09, 179), // 1 % above max
+    Arguments.of(0.091, 185), // 1.1 % above the max slope, tiny extra cost
+    Arguments.of(0.0915, 188), // 1.15 % above the max slope, will incur larger cost
+    Arguments.of(0.11, 300) // 3 % above max slope, will incur very large cost
   );
 
   /**
@@ -169,7 +169,7 @@ class PathwayEdgeTest {
         ofOnlyAccessible(),
         25,
         0.08,
-        1.1f,
+        50,
         25
       );
     var state = new State(new RoutingContext(req, graph, from, to));

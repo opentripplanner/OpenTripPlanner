@@ -34,7 +34,7 @@ public record WheelchairAccessibilityRequest(
     // since most streets have no accessibility information, we don't add a cost for that
     25,
     0.0833333333333f, // ADA max wheelchair ramp slope is a good default.
-    1.1f,
+    50,
     100
   );
 
