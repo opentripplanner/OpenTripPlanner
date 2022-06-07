@@ -51,7 +51,7 @@ public class BrandingTest {
   }
 
   @Test
-  public void sameAs() {
+  void sameAs() {
     assertTrue(subject.sameValue(subject.copy().build()));
     assertFalse(subject.sameValue(subject.copy().withId(TransitModelForTest.id("X")).build()));
     assertFalse(subject.sameValue(subject.copy().withName("X").build()));

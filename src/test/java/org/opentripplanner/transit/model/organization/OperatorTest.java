@@ -34,13 +34,13 @@ class OperatorTest {
     copy = subject.copy().withName("v2").build();
 
     // The two objects are not he same instance, but is equal(sae id)
-    assertNotSame(copy, subject);
-    assertEquals(copy, subject);
+    assertNotSame(subject, copy);
+    assertEquals(subject, copy);
 
-    assertEquals(copy.getId().getId(), ID);
+    assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getName());
-    assertEquals(copy.getUrl(), URL);
-    assertEquals(copy.getPhone(), PHONE);
+    assertEquals(URL, copy.getUrl());
+    assertEquals(PHONE, copy.getPhone());
   }
 
   @Test

@@ -33,7 +33,7 @@ class AgencyTest {
 
   @Test
   void copy() {
-    assertEquals(subject.getId().getId(), ID);
+    assertEquals(ID, subject.getId().getId());
 
     // Make a copy, and set the same name (nothing is changed)
     var copy = subject.copy().withName(NAME).build();
@@ -44,10 +44,10 @@ class AgencyTest {
     copy = subject.copy().withName("v2").build();
 
     // The two objects are not he same instance, but is equal(sae id)
-    assertNotSame(copy, subject);
-    assertEquals(copy, subject);
+    assertNotSame(subject, copy);
+    assertEquals(subject, copy);
 
-    assertEquals(copy.getId().getId(), ID);
+    assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getName());
     assertEquals(URL, copy.getUrl());
     assertEquals(TIMEZONE, copy.getTimezone());
