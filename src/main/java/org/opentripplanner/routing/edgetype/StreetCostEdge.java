@@ -3,15 +3,22 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
-public interface StreetCostCalculator {
-  boolean isStairs();
+public abstract class StreetCostEdge extends Edge {
 
-  double getMaxSlope();
+  public StreetCostEdge(Vertex fromv, Vertex tov) {
+    super(fromv, tov);
+  }
 
-  boolean isWheelchairAccessible();
+  abstract boolean isStairs();
 
-  default double addWheelchairCost(double cost, WheelchairAccessibilityRequest wheelchair) {
+  abstract double getMaxSlope();
+
+  abstract boolean isWheelchairAccessible();
+
+  protected double addWheelchairCost(double cost, WheelchairAccessibilityRequest wheelchair) {
     var slopeExceededBy = Math.abs(getMaxSlope()) - wheelchair.maxSlope();
 
     if (slopeExceededBy > 0.00001) {
@@ -29,7 +36,7 @@ public interface StreetCostCalculator {
     return cost;
   }
 
-  default double computeReluctance(
+  protected double computeReluctance(
     RoutingRequest req,
     TraverseMode traverseMode,
     boolean walkingBike
