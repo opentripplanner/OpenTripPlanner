@@ -24,7 +24,10 @@ public class TransferMapperTest {
 
   private static final StationMapper STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);
 
-  private static final StopMapper STOP_MAPPER = new StopMapper(TRANSLATION_HELPER);
+  private static final StopMapper STOP_MAPPER = new StopMapper(
+    TRANSLATION_HELPER,
+    stationId -> null
+  );
 
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 

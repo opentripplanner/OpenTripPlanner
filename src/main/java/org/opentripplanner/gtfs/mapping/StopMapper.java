@@ -2,13 +2,14 @@ package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.function.Function;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.site.StopBuilder;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.TranslationHelper;
 
@@ -18,9 +19,11 @@ class StopMapper {
   private final Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
 
   private final TranslationHelper translationHelper;
+  private final Function<FeedScopedId, Station> stationLookUp;
 
-  StopMapper(TranslationHelper translationHelper) {
+  StopMapper(TranslationHelper translationHelper, Function<FeedScopedId, Station> stationLookUp) {
     this.translationHelper = translationHelper;
+    this.stationLookUp = stationLookUp;
   }
 
   Collection<Stop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
@@ -43,59 +46,58 @@ class StopMapper {
     }
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
+    StopBuilder builder = Stop
+      .of(base.getId())
+      .withCode(base.getCode())
+      .withCoordinate(base.getCoordinate())
+      .withWheelchairAccessibility(base.getWheelchairAccessibility())
+      .withLevel(base.getLevel())
+      .withPlatformCode(gtfsStop.getPlatformCode())
+      .withVehicleType(TransitModeMapper.mapMode(gtfsStop.getVehicleType()));
 
-    // Map single GTFS ZoneId to OTP TariffZone collection
-    Collection<FareZone> fareZones = getTariffZones(
-      gtfsStop.getZoneId(),
-      gtfsStop.getId().getAgencyId()
+    builder.withName(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "name",
+        base.getId().getId(),
+        base.getName()
+      )
     );
 
-    final I18NString name = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "name",
-      base.getId().getId(),
-      base.getName()
+    builder.withDescription(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "desc",
+        base.getId().getId(),
+        base.getDescription()
+      )
     );
-
-    final I18NString desc = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "desc",
-      base.getId().getId(),
-      base.getDescription()
-    );
-
-    I18NString url = null;
 
     if (gtfsStop.getUrl() != null) {
-      url =
+      builder.withUrl(
         translationHelper.getTranslation(
           org.onebusaway.gtfs.model.Stop.class,
           "url",
           base.getId().getId(),
           gtfsStop.getUrl()
-        );
+        )
+      );
     }
 
-    return new Stop(
-      base.getId(),
-      name,
-      base.getCode(),
-      desc,
-      base.getCoordinate(),
-      base.getWheelchairAccessibility(),
-      base.getLevel(),
-      gtfsStop.getPlatformCode(),
-      fareZones,
-      url,
-      gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-      TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
-      null
-    );
-  }
+    if (gtfsStop.getZoneId() != null) {
+      builder.addFareZones(
+        FareZone.of(new FeedScopedId(gtfsStop.getId().getAgencyId(), gtfsStop.getZoneId())).build()
+      );
+    }
 
-  private Collection<FareZone> getTariffZones(String zoneId, String agencyId) {
-    return zoneId != null
-      ? List.of(FareZone.of(new FeedScopedId(agencyId, zoneId)).build())
-      : List.of();
+    if (gtfsStop.getTimezone() != null) {
+      builder.withTimeZone(TimeZone.getTimeZone(gtfsStop.getTimezone()));
+    }
+
+    if (gtfsStop.getParentStation() != null) {
+      builder.withParentStation(stationLookUp.apply(base.getParentStationId()));
+    }
+
+    return builder.build();
   }
 }

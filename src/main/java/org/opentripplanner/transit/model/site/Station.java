@@ -18,7 +18,8 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.transit.model.base.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.TransitBuilder;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -26,22 +27,17 @@ import org.opentripplanner.util.I18NString;
  * bus terminal, or a bus station (with a bus stop at each side of the road). Equivalent to GTFS
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
-public class Station extends TransitEntity implements StopCollection, LogInfo {
+public class Station
+  extends TransitEntity2<Station, StationBuilder>
+  implements StopCollection, LogInfo {
 
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
   private final I18NString name;
-
   private final String code;
-
   private final I18NString description;
-
   private final WgsCoordinate coordinate;
-
   private final StopTransferPriority priority;
-  /**
-   * URL to a web page containing information about this particular station
-   */
   private final I18NString url;
   private final TimeZone timezone;
 
@@ -51,29 +47,28 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
 
   private GeometryCollection geometry;
 
-  public Station(
-    FeedScopedId id,
-    I18NString name,
-    WgsCoordinate coordinate,
-    String code,
-    I18NString description,
-    I18NString url,
-    TimeZone timezone,
-    StopTransferPriority priority
-  ) {
-    super(id);
-    this.name = name;
-    this.coordinate = coordinate;
-    this.code = code;
-    this.description = description;
-    this.url = url;
-    this.timezone = timezone;
-    this.priority = priority == null ? DEFAULT_PRIORITY : priority;
+  Station(StationBuilder builder) {
+    super(builder.getId());
+    // Required fields
+    this.name = Objects.requireNonNull(builder.getName());
+    this.coordinate = Objects.requireNonNull(builder.getCoordinate());
+    this.priority = Objects.requireNonNullElse(builder.getPriority(), DEFAULT_PRIORITY);
+
+    // Optional fields
+    this.code = builder.getCode();
+    this.description = builder.getDescription();
+    this.url = builder.getUrl();
+    this.timezone = builder.getTimezone();
+
     // Initialize the geometry with an empty set of children
     this.geometry = computeGeometry(coordinate, Set.of());
   }
 
-  public void addChildStop(Stop stop) {
+  public static StationBuilder of(FeedScopedId id) {
+    return new StationBuilder(id);
+  }
+
+  void addChildStop(Stop stop) {
     this.childStops.add(stop);
     this.geometry = computeGeometry(coordinate, childStops);
   }
@@ -117,6 +112,9 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
     return description;
   }
 
+  /**
+   * URL to a web page containing information about this particular station
+   */
   @Nullable
   public I18NString getUrl() {
     return url;
@@ -150,6 +148,32 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
     return geometry;
   }
 
+  @Override
+  @Nullable
+  public String logName() {
+    return name == null ? null : name.toString();
+  }
+
+  @Override
+  @Nonnull
+  public TransitBuilder<Station, StationBuilder> copy() {
+    return new StationBuilder(this);
+  }
+
+  @Override
+  public boolean sameValue(@Nonnull Station other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(name, other.name) &&
+      Objects.equals(code, other.code) &&
+      Objects.equals(description, other.description) &&
+      Objects.equals(coordinate, other.coordinate) &&
+      Objects.equals(priority, other.priority) &&
+      Objects.equals(url, other.url) &&
+      Objects.equals(timezone, other.timezone)
+    );
+  }
+
   private static GeometryCollection computeGeometry(
     WgsCoordinate coordinate,
     Set<StopLocation> childStops
@@ -172,11 +196,5 @@ public class Station extends TransitEntity implements StopCollection, LogInfo {
       ? new Geometry[] { stationPoint, convexHull }
       : new Geometry[] { convexHull };
     return getGeometryFactory().createGeometryCollection(geometries);
-  }
-
-  @Override
-  @Nullable
-  public String logName() {
-    return name == null ? null : name.toString();
   }
 }

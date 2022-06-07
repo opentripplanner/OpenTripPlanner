@@ -16,7 +16,7 @@ public class FareZone extends TransitEntity2<FareZone, FareZoneBuilder> {
 
   private final String name;
 
-  public FareZone(FareZoneBuilder builder) {
+  FareZone(FareZoneBuilder builder) {
     super(builder.getId());
     // Optional fields
     this.name = builder.name();
@@ -32,12 +32,13 @@ public class FareZone extends TransitEntity2<FareZone, FareZoneBuilder> {
   }
 
   @Override
-  public boolean sameValue(@Nonnull FareZone other) {
-    return getId().equals(other.getId()) && Objects.equals(name, other.name);
+  @Nonnull
+  public FareZoneBuilder copy() {
+    return new FareZoneBuilder(this);
   }
 
   @Override
-  public FareZoneBuilder copy() {
-    return new FareZoneBuilder(this);
+  public boolean sameValue(@Nonnull FareZone other) {
+    return getId().equals(other.getId()) && Objects.equals(name, other.name);
   }
 }

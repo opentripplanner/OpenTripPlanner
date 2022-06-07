@@ -49,7 +49,8 @@ public class StopAndStationMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
-  private final StopMapper subject = new StopMapper(new TranslationHelper());
+
+  private final StopMapper subject = new StopMapper(new TranslationHelper(), stationId -> null);
 
   static {
     STOP.setId(AGENCY_AND_ID);

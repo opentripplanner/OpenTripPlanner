@@ -33,11 +33,6 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
     return new ContactInfoBuilder();
   }
 
-  @Nonnull
-  public ContactInfoBuilder copy() {
-    return new ContactInfoBuilder(this);
-  }
-
   @Nullable
   public String getContactPerson() {
     return contactPerson;
@@ -71,6 +66,11 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
   @Nullable
   public String getAdditionalDetails() {
     return additionalDetails;
+  }
+
+  @Nonnull
+  public ContactInfoBuilder copy() {
+    return new ContactInfoBuilder(this);
   }
 
   @Override

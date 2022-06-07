@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.base;
 
 import java.io.Serializable;
+import java.util.Collection;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
@@ -44,6 +45,31 @@ public final class WgsCoordinate implements Serializable {
     throw new IllegalArgumentException(
       "Both 'latitude' and 'longitude' must have a value or both must be 'null'."
     );
+  }
+
+  /**
+   * Find the mean coordinate between the given set of {@code coordinates}.
+   */
+  public static WgsCoordinate mean(Collection<WgsCoordinate> coordinates) {
+    if (coordinates.isEmpty()) {
+      throw new IllegalArgumentException(
+        "Unable to calculate mean for an empty set of coordinates"
+      );
+    }
+    if (coordinates.size() == 1) {
+      return coordinates.iterator().next();
+    }
+
+    double n = coordinates.size();
+    double latitude = 0.0;
+    double longitude = 0.0;
+
+    for (WgsCoordinate c : coordinates) {
+      latitude += c.latitude();
+      longitude += c.longitude();
+    }
+
+    return new WgsCoordinate(latitude / n, longitude / n);
   }
 
   public double latitude() {

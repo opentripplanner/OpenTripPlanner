@@ -25,5 +25,6 @@ public interface TransitObject<E extends TransitObject<E, T>, T extends TransitB
    * <p>
    * TODO RTM - Document design "rules" in a package readme, when the design is set.
    */
+  @Nonnull
   TransitBuilder<E, T> copy();
 }

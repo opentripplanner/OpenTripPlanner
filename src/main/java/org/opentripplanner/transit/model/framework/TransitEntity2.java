@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.model.framework;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 
 /**
@@ -37,5 +39,12 @@ public abstract class TransitEntity2<
       return List.of();
     }
     return List.copyOf(list);
+  }
+
+  protected static <T> Set<T> setOfNullSafe(Collection<T> input) {
+    if (input == null || input.isEmpty()) {
+      return Set.of();
+    }
+    return Set.copyOf(input);
   }
 }

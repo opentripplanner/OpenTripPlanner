@@ -65,7 +65,7 @@ public class LinkStopToPlatformTest {
     edges.add(createAreaEdge(vertices.get(4), vertices.get(3), areaEdgeList, "edge 9"));
     edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
-    Stop stop = TransitModelForTest.stopForTest("TestStop", 59.13545, 10.22213);
+    Stop stop = TransitModelForTest.stop("TestStop").withCoordinate(59.13545, 10.22213).build();
 
     TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, null);
   }

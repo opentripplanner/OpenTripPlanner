@@ -34,11 +34,6 @@ public class Branding extends TransitEntity2<Branding, BrandingBuilder> implemen
     return new BrandingBuilder(id);
   }
 
-  @Override
-  public BrandingBuilder copy() {
-    return new BrandingBuilder(this);
-  }
-
   @Nullable
   public String getName() {
     return logName();
@@ -68,6 +63,12 @@ public class Branding extends TransitEntity2<Branding, BrandingBuilder> implemen
   @Nullable
   public String getDescription() {
     return description;
+  }
+
+  @Override
+  @Nonnull
+  public BrandingBuilder copy() {
+    return new BrandingBuilder(this);
   }
 
   @Override

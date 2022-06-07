@@ -48,8 +48,6 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
@@ -60,7 +58,6 @@ import org.opentripplanner.util.NonLocalizedString;
 
 public abstract class GraphRoutingTest {
 
-  public static final String TEST_FEED_ID = "testFeed";
   public static final String TEST_VEHICLE_RENTAL_NETWORK = "test network";
 
   public static String graphPathToString(GraphPath graphPath) {
@@ -209,33 +206,16 @@ public abstract class GraphRoutingTest {
 
     // -- Transit network (pathways, linking)
     public Entrance entranceEntity(String id, double latitude, double longitude) {
-      return new Entrance(
-        new FeedScopedId(TEST_FEED_ID, id),
-        new NonLocalizedString(id),
-        id,
-        null,
-        WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-        WheelchairAccessibility.NO_INFORMATION,
-        null
-      );
+      return Entrance
+        .of(TransitModelForTest.id(id))
+        .withName(new NonLocalizedString(id))
+        .withCode(id)
+        .withCoordinate(latitude, longitude)
+        .build();
     }
 
     public Stop stopEntity(String id, double latitude, double longitude) {
-      return new Stop(
-        new FeedScopedId(TEST_FEED_ID, id),
-        new NonLocalizedString(id),
-        id,
-        null,
-        WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-        WheelchairAccessibility.NO_INFORMATION,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      );
+      return TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
     }
 
     public TransitStopVertex stop(String id, double latitude, double longitude) {
@@ -392,7 +372,7 @@ public abstract class GraphRoutingTest {
     ) {
       var vehicleParking = VehicleParking
         .builder()
-        .id(new FeedScopedId(TEST_FEED_ID, id))
+        .id(TransitModelForTest.id(id))
         .x(x)
         .y(y)
         .bicyclePlaces(bicyclePlaces)
@@ -416,7 +396,7 @@ public abstract class GraphRoutingTest {
     ) {
       return builder ->
         builder
-          .entranceId(new FeedScopedId(TEST_FEED_ID, id))
+          .entranceId(TransitModelForTest.id(id))
           .name(new NonLocalizedString(id))
           .x(streetVertex.getX())
           .y(streetVertex.getY())

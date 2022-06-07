@@ -92,7 +92,7 @@ class StopAndStationMapper {
     // were deleted in never versions of the StopPlace
     for (StopPlace stopPlace : stopPlaceAllVersions) {
       for (Quay quay : listOfQuays(stopPlace)) {
-        addNewStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);
+        addStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);
       }
     }
   }
@@ -103,6 +103,7 @@ class StopAndStationMapper {
 
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
     Station station = stationMapper.map(stopPlace);
+
     if (stopPlace.getParentSiteRef() != null) {
       resultStationByMultiModalStationRfs.put(stopPlace.getParentSiteRef().getRef(), station);
     }
@@ -153,7 +154,7 @@ class StopAndStationMapper {
       .collect(toList());
   }
 
-  private void addNewStopToParentIfNotPresent(
+  private void addStopToParentIfNotPresent(
     Quay quay,
     Station station,
     Collection<FareZone> fareZones,
@@ -177,8 +178,6 @@ class StopAndStationMapper {
     if (stop == null) {
       return;
     }
-
-    station.addChildStop(stop);
 
     resultStops.add(stop);
     quaysAlreadyProcessed.add(quay.getId());

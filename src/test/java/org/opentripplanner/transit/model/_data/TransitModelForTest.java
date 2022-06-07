@@ -10,7 +10,9 @@ import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopBuilder;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
@@ -57,24 +59,22 @@ public class TransitModelForTest {
     return stopForTest(idAndName, null, lat, lon, null, wheelchair);
   }
 
-  /**
-   * @see #stopForTest(String, double, double, Station)
-   */
+  public static StopBuilder stop(String idAndName) {
+    return Stop
+      .of(id(idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withCode(idAndName)
+      .withCoordinate(new WgsCoordinate(60.0, 10.0));
+  }
+
   public static Stop stopForTest(String idAndName, double lat, double lon) {
     return stopForTest(idAndName, null, lat, lon, null, NO_INFORMATION);
   }
 
-  /**
-   * @see #stopForTest(String, double, double, Station)
-   */
   public static Stop stopForTest(String idAndName, String desc, double lat, double lon) {
     return stopForTest(idAndName, desc, lat, lon, null, NO_INFORMATION);
   }
 
-  /**
-   * Create a minimal Stop object for unit-test use, where the test only care about id, name and
-   * coordinate. The feedId is static set to "F"
-   */
   public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
     return stopForTest(idAndName, null, lat, lon, parent, NO_INFORMATION);
   }
@@ -89,10 +89,6 @@ public class TransitModelForTest {
     return stopForTest(idAndName, desc, lat, lon, parent, null);
   }
 
-  /**
-   * Create a minimal Stop object for unit-test use, where the test only care about id, name,
-   * description and coordinate. The feedId is static set to "F"
-   */
   public static Stop stopForTest(
     String idAndName,
     String desc,
@@ -101,39 +97,24 @@ public class TransitModelForTest {
     Station parent,
     WheelchairAccessibility wheelchair
   ) {
-    var stop = new Stop(
-      new FeedScopedId("F", idAndName),
-      new NonLocalizedString(idAndName),
-      idAndName,
-      NonLocalizedString.ofNullable(desc),
-      new WgsCoordinate(lat, lon),
-      wheelchair,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
-    stop.setParentStation(parent);
-    return stop;
+    return Stop
+      .of(id(idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withCode(idAndName)
+      .withDescription(NonLocalizedString.ofNullable(desc))
+      .withCoordinate(new WgsCoordinate(lat, lon))
+      .withWheelchairAccessibility(wheelchair)
+      .withParentStation(parent)
+      .build();
   }
 
-  /**
-   * Create a minimal Station object for unit-test use, where the test only care about id, name and
-   * coordinate. The feedId is static set to "F"
-   */
-  public static Station stationForTest(String idAndName, double lat, double lon) {
-    return new Station(
-      new FeedScopedId("F", idAndName),
-      new NonLocalizedString(idAndName),
-      new WgsCoordinate(lat, lon),
-      idAndName,
-      new NonLocalizedString("Station " + idAndName),
-      null,
-      null,
-      StopTransferPriority.ALLOWED
-    );
+  public static StationBuilder station(String idAndName) {
+    return Station
+      .of(new FeedScopedId(FEED_ID, idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withCode(idAndName)
+      .withCoordinate(60.0, 10.0)
+      .withDescription(new NonLocalizedString("Station " + idAndName))
+      .withPriority(StopTransferPriority.ALLOWED);
   }
 }

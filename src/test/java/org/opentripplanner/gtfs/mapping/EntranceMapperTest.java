@@ -46,7 +46,11 @@ public class EntranceMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
-  private final EntranceMapper subject = new EntranceMapper(new TranslationHelper());
+
+  private final EntranceMapper subject = new EntranceMapper(
+    new TranslationHelper(),
+    stationId -> null
+  );
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
@@ -90,13 +94,16 @@ public class EntranceMapperTest {
     input.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
+    input.setLat(LAT);
+    input.setLon(LON);
 
     Entrance result = subject.map(input);
 
     assertNotNull(result.getId());
+    assertNotNull(result.getCoordinate());
+    assertNotNull(result.getName());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertEquals(NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
     assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
@@ -109,10 +116,8 @@ public class EntranceMapperTest {
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
 
-    Entrance result = subject.map(input);
-
     // Exception expected because the entrence and the parent do not have a coordinate
-    assertThrows(IllegalStateException.class, () -> result.getCoordinate().latitude());
+    assertThrows(IllegalStateException.class, () -> subject.map(input));
   }
 
   /** Mapping the same object twice, should return the the same instance. */

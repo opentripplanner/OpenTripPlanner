@@ -11,6 +11,7 @@ public class StopLevel implements Serializable {
   private final String name;
   private final double index;
 
+  /** No builder for 2 args value object - simple to construct */
   public StopLevel(String name, double index) {
     this.name = name;
     this.index = index;

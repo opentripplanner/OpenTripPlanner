@@ -46,7 +46,10 @@ public class PathwayNodeMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
-  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
+  private final PathwayNodeMapper subject = new PathwayNodeMapper(
+    new TranslationHelper(),
+    stationId -> null
+  );
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_NODE);
@@ -89,13 +92,16 @@ public class PathwayNodeMapperTest {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_NODE);
     input.setId(AGENCY_AND_ID);
+    input.setLat(LAT);
+    input.setLon(LON);
 
     PathwayNode result = subject.map(input);
 
     assertNotNull(result.getId());
+    assertNotNull(result.getName());
+    assertNotNull(result.getCoordinate());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertEquals(PathwayNodeMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
     assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
@@ -107,9 +113,7 @@ public class PathwayNodeMapperTest {
     input.setLocationType(Stop.LOCATION_TYPE_NODE);
     input.setId(AGENCY_AND_ID);
 
-    PathwayNode result = subject.map(input);
-
-    assertThrows(IllegalStateException.class, () -> result.getCoordinate().latitude());
+    assertThrows(IllegalStateException.class, () -> subject.map(input));
   }
 
   /** Mapping the same object twice, should return the the same instance. */

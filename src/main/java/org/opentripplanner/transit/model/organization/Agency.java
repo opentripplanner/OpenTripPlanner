@@ -77,6 +77,7 @@ public final class Agency extends TransitEntity2<Agency, AgencyBuilder> implemen
   }
 
   @Override
+  @Nonnull
   public AgencyBuilder copy() {
     return new AgencyBuilder(this);
   }

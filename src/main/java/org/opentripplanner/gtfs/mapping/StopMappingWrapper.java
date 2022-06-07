@@ -50,4 +50,10 @@ class StopMappingWrapper {
     }
     return new StopLevel(stop.getLevel().getName(), stop.getLevel().getIndex());
   }
+
+  public FeedScopedId getParentStationId() {
+    return stop.getParentStation() == null
+      ? null
+      : new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation());
+  }
 }

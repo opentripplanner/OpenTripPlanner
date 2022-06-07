@@ -26,16 +26,24 @@ public class TripPatternTest {
    */
   @Test
   public void testSetHopGeometriesFromPattern() {
-    var stationOrigin = TransitModelForTest.stationForTest("S1", 0.0, 0.0);
-    var stationDestination = TransitModelForTest.stationForTest("S2", 1.0, 1.0);
-    var stopOrigin = TransitModelForTest.stopForTest("A1", 0.1, 0.1);
-    var stopNewOrigin = TransitModelForTest.stopForTest("A2", 0.2, 0.2);
-    var stopDestination = TransitModelForTest.stopForTest("C", 0.9, 0.9);
+    var stationOrigin = TransitModelForTest.station("S1").withCoordinate(0.0, 0.0).build();
+    var stationDestination = TransitModelForTest.station("S2").withCoordinate(1.0, 1.0).build();
+    var stopOrigin = TransitModelForTest
+      .stop("A1")
+      .withCoordinate(0.1, 0.1)
+      .withParentStation(stationOrigin)
+      .build();
+    var stopNewOrigin = TransitModelForTest
+      .stop("A2")
+      .withCoordinate(0.2, 0.2)
+      .withParentStation(stationOrigin)
+      .build();
+    var stopDestination = TransitModelForTest
+      .stop("C")
+      .withCoordinate(0.9, 0.9)
+      .withParentStation(stationDestination)
+      .build();
     var coordinate = new Coordinate(0.5, 0.5);
-
-    stopNewOrigin.setParentStation(stationOrigin);
-    stopOrigin.setParentStation(stationOrigin);
-    stopDestination.setParentStation(stationDestination);
 
     var originalTripPattern = setupTripPattern(stopOrigin, stopDestination);
     var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination);

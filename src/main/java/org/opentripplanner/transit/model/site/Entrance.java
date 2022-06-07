@@ -1,24 +1,32 @@
 package org.opentripplanner.transit.model.site;
 
-import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.I18NString;
 
 /**
  * A place where a station connects to the street network. Equivalent to GTFS stop location .
  */
-public final class Entrance extends StationElement {
+public final class Entrance extends StationElement<Entrance, EntranceBuilder> {
 
-  public Entrance(
-    FeedScopedId id,
-    I18NString name,
-    String code,
-    I18NString description,
-    WgsCoordinate coordinate,
-    WheelchairAccessibility wheelchairAccessibility,
-    StopLevel level
-  ) {
-    super(id, name, code, description, coordinate, wheelchairAccessibility, level);
+  Entrance(EntranceBuilder builder) {
+    super(builder);
+    // Verify coordinate is not null
+    Objects.requireNonNull(getCoordinate());
+  }
+
+  public static EntranceBuilder of(FeedScopedId id) {
+    return new EntranceBuilder(id);
+  }
+
+  @Override
+  @Nonnull
+  public EntranceBuilder copy() {
+    return new EntranceBuilder(this);
+  }
+
+  @Override
+  public boolean sameValue(@Nonnull Entrance other) {
+    return super.sameValue(other);
   }
 }

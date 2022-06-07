@@ -59,6 +59,7 @@ public class Operator extends TransitEntity2<Operator, OperatorBuilder> implemen
   }
 
   @Override
+  @Nonnull
   public OperatorBuilder copy() {
     return new OperatorBuilder(this);
   }

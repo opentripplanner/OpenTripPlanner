@@ -12,23 +12,50 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.opentripplanner.util.NonLocalizedString;
 
 public class StopIndexForRaptorTest {
 
   private final FeedScopedId ANY_ID = TransitModelForTest.id("1");
 
-  private final Stop STOP_0 = TransitModelForTest.stopForTest("ID-" + 1, 0.0, 0.0);
-  private final Stop STOP_1 = TransitModelForTest.stopForTest("ID-" + 2, 0.0, 0.0);
-  private final Stop STOP_2 = TransitModelForTest.stopForTest("ID-" + 3, 0.0, 0.0);
-  private final Stop STOP_3 = TransitModelForTest.stopForTest("ID-" + 4, 0.0, 0.0);
-  private final Stop STOP_4 = TransitModelForTest.stopForTest("ID-" + 5, 0.0, 0.0);
+  private final Station STATION_A = TransitModelForTest
+    .station("A")
+    .withPriority(StopTransferPriority.DISCOURAGED)
+    .build();
+  private final Station STATION_B = TransitModelForTest
+    .station("B")
+    .withPriority(StopTransferPriority.ALLOWED)
+    .build();
+  private final Station STATION_C = TransitModelForTest
+    .station("C")
+    .withPriority(StopTransferPriority.RECOMMENDED)
+    .build();
+  private final Station STATION_D = TransitModelForTest
+    .station("D")
+    .withPriority(StopTransferPriority.PREFERRED)
+    .build();
+
+  private final Stop STOP_0 = TransitModelForTest.stop("ID-" + 1).build();
+  private final Stop STOP_1 = TransitModelForTest
+    .stop("ID-" + 2)
+    .withParentStation(STATION_A)
+    .build();
+  private final Stop STOP_2 = TransitModelForTest
+    .stop("ID-" + 3)
+    .withParentStation(STATION_B)
+    .build();
+  private final Stop STOP_3 = TransitModelForTest
+    .stop("ID-" + 4)
+    .withParentStation(STATION_C)
+    .build();
+  private final Stop STOP_4 = TransitModelForTest
+    .stop("ID-" + 5)
+    .withParentStation(STATION_D)
+    .build();
 
   private final List<StopLocation> STOPS = Arrays.asList(STOP_0, STOP_1, STOP_2, STOP_3, STOP_4);
 
@@ -58,30 +85,12 @@ public class StopIndexForRaptorTest {
 
   @Test
   public void stopBoardAlightCosts() {
-    STOP_1.setParentStation(createStation("A", StopTransferPriority.DISCOURAGED));
-    STOP_2.setParentStation(createStation("B", StopTransferPriority.ALLOWED));
-    STOP_3.setParentStation(createStation("C", StopTransferPriority.RECOMMENDED));
-    STOP_4.setParentStation(createStation("D", StopTransferPriority.PREFERRED));
-
     StopIndexForRaptor stopIndex = new StopIndexForRaptor(STOPS, TransitTuningParameters.FOR_TEST);
 
     int[] result = stopIndex.stopBoardAlightCosts;
 
     // Expect cost with Raptor precision
     assertEquals("[6000, 360000, 6000, 2000, 0]", Arrays.toString(result));
-  }
-
-  Station createStation(String name, StopTransferPriority pri) {
-    return new Station(
-      ANY_ID,
-      new NonLocalizedString(name),
-      new WgsCoordinate(0, 0),
-      null,
-      null,
-      null,
-      null,
-      pri
-    );
   }
 
   private static List<StopTime> stopTimes(Stop... stops) {

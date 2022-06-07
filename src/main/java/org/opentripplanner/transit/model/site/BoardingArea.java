@@ -1,29 +1,28 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.site;
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.I18NString;
 
 /**
  * A place along a platform, where the vehicle van be boarded. Equivalent to GTFS stop location.
  */
-public final class BoardingArea extends StationElement {
+public final class BoardingArea extends StationElement<BoardingArea, BoardingAreaBuilder> {
 
-  private Stop parentStop;
+  private final Stop parentStop;
 
-  public BoardingArea(
-    FeedScopedId id,
-    I18NString name,
-    String code,
-    I18NString description,
-    WgsCoordinate coordinate,
-    WheelchairAccessibility wheelchairAccessibility,
-    StopLevel level
-  ) {
-    super(id, name, code, description, coordinate, wheelchairAccessibility, level);
+  BoardingArea(BoardingAreaBuilder builder) {
+    super(builder);
+    this.parentStop = Objects.requireNonNull(builder.parentStop());
+
+    // Verify coordinate is not null
+    Objects.requireNonNull(getCoordinate());
+  }
+
+  public static BoardingAreaBuilder of(FeedScopedId id) {
+    return new BoardingAreaBuilder(id);
   }
 
   /**
@@ -39,11 +38,19 @@ public final class BoardingArea extends StationElement {
   /**
    * Returns the parent stop this boarding area belongs to.
    */
+  @Nonnull
   public Stop getParentStop() {
     return parentStop;
   }
 
-  public void setParentStop(Stop parentStop) {
-    this.parentStop = parentStop;
+  @Override
+  @Nonnull
+  public BoardingAreaBuilder copy() {
+    return new BoardingAreaBuilder(this);
+  }
+
+  @Override
+  public boolean sameValue(@Nonnull BoardingArea other) {
+    return super.sameValue(other) && Objects.equals(parentStop, other.parentStop);
   }
 }
