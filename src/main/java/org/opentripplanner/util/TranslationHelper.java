@@ -81,6 +81,7 @@ public final class TranslationHelper {
     }
   }
 
+  @Nullable
   public I18NString getTranslation(
     @Nonnull Class<?> clazz,
     @Nonnull String fieldName,
@@ -90,6 +91,7 @@ public final class TranslationHelper {
     return getTranslation(clazz, fieldName, recordId, null, defaultValue);
   }
 
+  @Nullable
   public I18NString getTranslation(
     @Nonnull Class<?> clazz,
     @Nonnull String fieldName,
