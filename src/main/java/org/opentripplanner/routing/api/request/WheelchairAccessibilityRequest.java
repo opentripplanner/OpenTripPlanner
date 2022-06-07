@@ -1,5 +1,9 @@
 package org.opentripplanner.routing.api.request;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
 /**
  * @param slopeExceededReluctance What factor should be given to street edges, which are over the
  *                                max slope. The penalty is not static but scales with how much you
@@ -46,6 +50,24 @@ public record WheelchairAccessibilityRequest(
       elevator,
       inaccessibleStreetReluctance,
       maxSlope,
+      slopeExceededReluctance,
+      stairsReluctance
+    );
+  }
+
+  public WheelchairAccessibilityRequest round() {
+    double roundedMaxSlope = BigDecimal
+      .valueOf(maxSlope)
+      .setScale(3, RoundingMode.HALF_EVEN)
+      .round(MathContext.UNLIMITED)
+      .doubleValue();
+    return new WheelchairAccessibilityRequest(
+      enabled,
+      trip,
+      stop,
+      elevator,
+      inaccessibleStreetReluctance,
+      roundedMaxSlope,
       slopeExceededReluctance,
       stairsReluctance
     );
