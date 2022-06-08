@@ -128,9 +128,9 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
   }
 
   @Override
-  public boolean sameValue(@Nonnull Stop other) {
+  public boolean sameAs(@Nonnull Stop other) {
     return (
-      super.sameValue(other) &&
+      super.sameAs(other) &&
       Objects.equals(platformCode, other.platformCode) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timeZone, other.timeZone) &&

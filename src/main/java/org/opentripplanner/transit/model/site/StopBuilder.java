@@ -25,7 +25,7 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
 
   private String netexSubmode;
 
-  private final HashSet<BoardingArea> boardingAreas = new HashSet<>();
+  private final Set<BoardingArea> boardingAreas = new HashSet<>();
 
   private final Set<FareZone> fareZones = new HashSet<>();
 

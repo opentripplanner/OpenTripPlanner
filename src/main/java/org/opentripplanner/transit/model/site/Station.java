@@ -15,7 +15,7 @@ import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
@@ -162,7 +162,7 @@ public class Station
   }
 
   @Override
-  public boolean sameValue(@Nonnull Station other) {
+  public boolean sameAs(@Nonnull Station other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

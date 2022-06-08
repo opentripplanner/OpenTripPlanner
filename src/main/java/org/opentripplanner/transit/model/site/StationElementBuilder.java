@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
-import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.I18NString;

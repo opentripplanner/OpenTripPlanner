@@ -69,7 +69,7 @@ public class GroupOfRoutes
   }
 
   @Override
-  public boolean sameValue(@Nonnull GroupOfRoutes other) {
+  public boolean sameAs(@Nonnull GroupOfRoutes other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

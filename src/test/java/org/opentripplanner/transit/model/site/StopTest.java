@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -80,24 +80,24 @@ class StopTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameValue(subject.copy().build()));
-    assertFalse(subject.sameValue(subject.copy().withId(TransitModelForTest.id("X")).build()));
-    assertFalse(subject.sameValue(subject.copy().withName(new NonLocalizedString("X")).build()));
+    assertTrue(subject.sameAs(subject.copy().build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
-      subject.sameValue(subject.copy().withDescription(new NonLocalizedString("X")).build())
+      subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())
     );
-    assertFalse(subject.sameValue(subject.copy().withCoordinate(new WgsCoordinate(1, 1)).build()));
-    assertFalse(subject.sameValue(subject.copy().withUrl(new NonLocalizedString("X")).build()));
-    assertFalse(subject.sameValue(subject.copy().withNetexSubmode("X").build()));
-    assertFalse(subject.sameValue(subject.copy().withVehicleType(TransitMode.TRAM).build()));
+    assertFalse(subject.sameAs(subject.copy().withCoordinate(new WgsCoordinate(1, 1)).build()));
+    assertFalse(subject.sameAs(subject.copy().withUrl(new NonLocalizedString("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withNetexSubmode("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withVehicleType(TransitMode.TRAM).build()));
     assertFalse(
-      subject.sameValue(
+      subject.sameAs(
         subject
           .copy()
           .withTimeZone(TimeZone.getTimeZone(TransitModelForTest.OTHER_TIME_ZONE_ID))
           .build()
       )
     );
-    assertFalse(subject.sameValue(subject.copy().withPlatformCode("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withPlatformCode("X").build()));
   }
 }

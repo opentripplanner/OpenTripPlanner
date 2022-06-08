@@ -21,7 +21,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.

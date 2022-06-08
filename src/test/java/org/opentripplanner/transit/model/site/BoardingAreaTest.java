@@ -49,9 +49,11 @@ class BoardingAreaTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameValue(subject.copy().build()));
-    assertFalse(subject.sameValue(subject.copy().withId(TransitModelForTest.id("X")).build()));
-    assertFalse(subject.sameValue(subject.copy().withName(new NonLocalizedString("X")).build()));
-    assertFalse(subject.sameValue(subject.copy().withDescription(new NonLocalizedString("X")).build()));
+    assertTrue(subject.sameAs(subject.copy().build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
+    assertFalse(
+      subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())
+    );
   }
 }

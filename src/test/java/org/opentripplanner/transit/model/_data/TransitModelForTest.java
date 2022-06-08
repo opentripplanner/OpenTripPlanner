@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.model._data;
 
-import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
-import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;

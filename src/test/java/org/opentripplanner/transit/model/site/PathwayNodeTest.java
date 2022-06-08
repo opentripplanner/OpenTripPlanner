@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -65,11 +65,11 @@ class PathwayNodeTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameValue(subject.copy().build()));
-    assertFalse(subject.sameValue(subject.copy().withId(TransitModelForTest.id("X")).build()));
-    assertFalse(subject.sameValue(subject.copy().withName(new NonLocalizedString("X")).build()));
+    assertTrue(subject.sameAs(subject.copy().build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
-      subject.sameValue(subject.copy().withDescription(new NonLocalizedString("X")).build())
+      subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())
     );
   }
 }

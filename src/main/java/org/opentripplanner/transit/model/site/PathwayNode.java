@@ -26,7 +26,7 @@ public final class PathwayNode extends StationElement<PathwayNode, PathwayNodeBu
   }
 
   @Override
-  public boolean sameValue(@Nonnull PathwayNode other) {
-    return super.sameValue(other);
+  public boolean sameAs(@Nonnull PathwayNode other) {
+    return super.sameAs(other);
   }
 }

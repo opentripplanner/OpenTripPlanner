@@ -72,7 +72,7 @@ public class Branding extends TransitEntity2<Branding, BrandingBuilder> implemen
   }
 
   @Override
-  public boolean sameValue(@Nonnull Branding other) {
+  public boolean sameAs(@Nonnull Branding other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

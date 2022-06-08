@@ -45,10 +45,10 @@ class OperatorTest {
 
   @Test
   void sameAs() {
-    assertTrue(subject.sameValue(subject.copy().build()));
-    assertFalse(subject.sameValue(subject.copy().withId(TransitModelForTest.id("X")).build()));
-    assertFalse(subject.sameValue(subject.copy().withName("X").build()));
-    assertFalse(subject.sameValue(subject.copy().withUrl("X").build()));
-    assertFalse(subject.sameValue(subject.copy().withPhone("X").build()));
+    assertTrue(subject.sameAs(subject.copy().build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));
   }
 }

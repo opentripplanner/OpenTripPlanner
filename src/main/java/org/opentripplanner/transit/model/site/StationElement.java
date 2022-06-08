@@ -3,8 +3,8 @@ package org.opentripplanner.transit.model.site;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.util.I18NString;
 
@@ -148,7 +148,7 @@ public abstract class StationElement<
   }
 
   @Override
-  public boolean sameValue(@Nonnull E other) {
+  public boolean sameAs(@Nonnull E other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&

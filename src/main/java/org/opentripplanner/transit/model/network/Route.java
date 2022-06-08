@@ -65,7 +65,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   }
 
   @Override
-  public boolean sameValue(@Nonnull Route other) {
+  public boolean sameAs(@Nonnull Route other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.agency, other.agency) &&

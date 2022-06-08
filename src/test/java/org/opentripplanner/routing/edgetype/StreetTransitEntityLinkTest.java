@@ -2,9 +2,9 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NOT_POSSIBLE;
-import static org.opentripplanner.transit.model.base.WheelchairAccessibility.NO_INFORMATION;
-import static org.opentripplanner.transit.model.base.WheelchairAccessibility.POSSIBLE;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NOT_POSSIBLE;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.POSSIBLE;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;

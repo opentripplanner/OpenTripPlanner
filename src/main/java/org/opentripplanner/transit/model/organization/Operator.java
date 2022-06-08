@@ -65,7 +65,7 @@ public class Operator extends TransitEntity2<Operator, OperatorBuilder> implemen
   }
 
   @Override
-  public boolean sameValue(@Nonnull Operator other) {
+  public boolean sameAs(@Nonnull Operator other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

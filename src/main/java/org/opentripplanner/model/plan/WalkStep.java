@@ -9,7 +9,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.util.I18NString;
 
 /**

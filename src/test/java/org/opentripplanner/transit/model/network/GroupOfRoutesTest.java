@@ -51,11 +51,11 @@ public class GroupOfRoutesTest {
   public void sameValue() {
     // Make a copy, and set the same name (nothing is changed)
     var other = subject.copy().build();
-    assertTrue(subject.sameValue(other));
-    assertFalse(subject.sameValue(subject.copy().withId(TransitModelForTest.id("X")).build()));
-    assertFalse(subject.sameValue(subject.copy().withName("X").build()));
-    assertFalse(subject.sameValue(subject.copy().withDescription("X").build()));
-    assertFalse(subject.sameValue(subject.copy().withShortName("X").build()));
-    assertFalse(subject.sameValue(subject.copy().withPrivateCode("X").build()));
+    assertTrue(subject.sameAs(other));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withDescription("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withPrivateCode("X").build()));
   }
 }

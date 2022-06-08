@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TripAlteration;
-import org.opentripplanner.transit.model.base.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
@@ -209,7 +209,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
   }
 
   @Override
-  public boolean sameValue(@Nonnull Trip other) {
+  public boolean sameAs(@Nonnull Trip other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.operator, other.operator) &&

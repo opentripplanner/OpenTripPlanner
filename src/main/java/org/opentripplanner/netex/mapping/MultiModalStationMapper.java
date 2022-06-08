@@ -4,7 +4,7 @@ import java.util.Collection;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.base.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.util.NonLocalizedString;
 import org.rutebanken.netex.model.MultilingualString;

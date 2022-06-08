@@ -26,7 +26,7 @@ public final class Entrance extends StationElement<Entrance, EntranceBuilder> {
   }
 
   @Override
-  public boolean sameValue(@Nonnull Entrance other) {
-    return super.sameValue(other);
+  public boolean sameAs(@Nonnull Entrance other) {
+    return super.sameAs(other);
   }
 }

@@ -33,6 +33,6 @@ public abstract class AbstractBuilder<
     }
     // Make sure we only make a new object if it is changed.
     // Another approach is also to use the Deduplicator, but that is a hassle without DI in place.
-    return original.sameValue(b) ? original : b;
+    return original.sameAs(b) ? original : b;
   }
 }

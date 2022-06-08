@@ -64,7 +64,7 @@ class TariffZoneMapper {
     var existing = deduplicateCache
       .get(candidate.getId())
       .stream()
-      .filter(candidate::sameValue)
+      .filter(candidate::sameAs)
       .findFirst();
 
     if (existing.isPresent()) {

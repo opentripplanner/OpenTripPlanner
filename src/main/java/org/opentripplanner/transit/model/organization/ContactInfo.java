@@ -74,7 +74,7 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
   }
 
   @Override
-  public boolean sameValue(@Nonnull ContactInfo other) {
+  public boolean sameAs(@Nonnull ContactInfo other) {
     return equals(other);
   }
 

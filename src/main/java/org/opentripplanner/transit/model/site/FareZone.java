@@ -38,7 +38,7 @@ public class FareZone extends TransitEntity2<FareZone, FareZoneBuilder> {
   }
 
   @Override
-  public boolean sameValue(@Nonnull FareZone other) {
+  public boolean sameAs(@Nonnull FareZone other) {
     return getId().equals(other.getId()) && Objects.equals(name, other.name);
   }
 }

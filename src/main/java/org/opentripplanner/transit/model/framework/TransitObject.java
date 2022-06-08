@@ -10,7 +10,7 @@ public interface TransitObject<E extends TransitObject<E, T>, T extends TransitB
    * the same value. This is used to avoid creating new objects during transit model construction
    * and during RealTime updates.
    */
-  boolean sameValue(@Nonnull E other);
+  boolean sameAs(@Nonnull E other);
 
   /**
    * The copy method is used to mutate the existing object by creating a builder and setting

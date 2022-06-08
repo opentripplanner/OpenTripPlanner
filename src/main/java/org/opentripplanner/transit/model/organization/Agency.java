@@ -89,7 +89,7 @@ public final class Agency extends TransitEntity2<Agency, AgencyBuilder> implemen
   }
 
   @Override
-  public boolean sameValue(@Nonnull Agency other) {
+  public boolean sameAs(@Nonnull Agency other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

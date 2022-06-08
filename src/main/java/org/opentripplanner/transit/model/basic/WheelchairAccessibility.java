@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.base;
+package org.opentripplanner.transit.model.basic;
 
 public enum WheelchairAccessibility {
   NO_INFORMATION(0),
