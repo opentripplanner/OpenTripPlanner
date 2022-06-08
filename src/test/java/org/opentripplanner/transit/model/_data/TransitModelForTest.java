@@ -25,6 +25,8 @@ public class TransitModelForTest {
 
   public static final String FEED_ID = "F";
   public static final String TIME_ZONE_ID = "Europe/Paris";
+
+  public static final String OTHER_TIME_ZONE_ID = "America/Los_Angeles";
   public static final Agency AGENCY = Agency
     .of(id("A1"))
     .withName("Agency Test")

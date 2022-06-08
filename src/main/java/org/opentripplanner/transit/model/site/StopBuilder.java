@@ -35,6 +35,11 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
 
   StopBuilder(Stop original) {
     super(original);
+    this.platformCode = original.getPlatformCode();
+    this.url = original.getUrl();
+    this.timeZone = original.getTimeZone();
+    this.vehicleType = original.getVehicleType();
+    this.netexSubmode = original.getVehicleSubmode();
   }
 
   public String platformCode() {

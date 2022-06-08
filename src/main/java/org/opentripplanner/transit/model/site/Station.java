@@ -18,7 +18,6 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.transit.model.base.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.util.I18NString;
 
@@ -87,10 +86,12 @@ public class Station
     return childStops;
   }
 
+  @Override
   public double getLat() {
     return coordinate.latitude();
   }
 
+  @Override
   public double getLon() {
     return coordinate.longitude();
   }
@@ -156,7 +157,7 @@ public class Station
 
   @Override
   @Nonnull
-  public TransitBuilder<Station, StationBuilder> copy() {
+  public StationBuilder copy() {
     return new StationBuilder(this);
   }
 
@@ -167,7 +168,7 @@ public class Station
       Objects.equals(name, other.name) &&
       Objects.equals(code, other.code) &&
       Objects.equals(description, other.description) &&
-      Objects.equals(coordinate, other.coordinate) &&
+      getCoordinate().sameLocation(other.coordinate) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timezone, other.timezone)
