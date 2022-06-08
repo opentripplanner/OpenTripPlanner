@@ -2,7 +2,7 @@ package org.opentripplanner.common;
 
 import org.locationtech.jts.geom.Coordinate;
 
-public class OsmLinkGenerator {
+public class OsmUrlGenerator {
 
   public static String fromCoordinate(Coordinate c) {
     return fromCoordinate(c, 19);

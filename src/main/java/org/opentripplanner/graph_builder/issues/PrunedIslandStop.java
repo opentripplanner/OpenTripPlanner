@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.common.OsmLinkGenerator;
+import org.opentripplanner.common.OsmUrlGenerator;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -21,7 +21,7 @@ public class PrunedIslandStop implements DataImportIssue {
 
   @Override
   public String getHTMLMessage() {
-    var url = OsmLinkGenerator.fromCoordinate(vertex.getCoordinate());
+    var url = OsmUrlGenerator.fromCoordinate(vertex.getCoordinate());
     return "<a href=\"%s\">%s</a>".formatted(url, getMessage());
   }
 
