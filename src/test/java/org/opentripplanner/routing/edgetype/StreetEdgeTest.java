@@ -197,24 +197,29 @@ class StreetEdgeTest extends GraphRoutingTest {
   }
 
   static Stream<Arguments> slopeCases = Stream.of(
-    Arguments.of(0.07f, 5081), // no extra cost
-    Arguments.of(0.08f, 5945), // no extra cost
-    Arguments.of(0.09f, 6908), // no extra cost
-    Arguments.of(0.091f, 7358), // 0.1 % above the max slope, tiny extra cost
-    Arguments.of(0.0915f, 7587), // 0.15 % above the max slope, will incur larger cost
-    Arguments.of(0.11f, 17649) // 2 % above max slope, will incur very large cost
+    Arguments.of(0.07, 1, 5081), // no extra cost
+    Arguments.of(0.08, 1, 5945), // no extra cost
+    Arguments.of(0.09, 1, 6908), // no extra cost
+    Arguments.of(0.091, 1, 7708), // 0.1 % above the max slope, tiny extra cost
+    Arguments.of(0.091, 3, 9110), // 3 % above max slope, will incur very large cost
+    Arguments.of(0.0915, 1, 8116), // 0.1 % above the max slope, but high reluctance will large cost
+    Arguments.of(0.11, 0.5, 17649), // 2 % above max slope, but lowered reluctance
+    Arguments.of(0.11, 1, 26474), // 2 % above max slope, will incur very large cost
+    Arguments.of(0.12, 1, 37978) // 3 % above max slope, will incur very large cost
   );
 
   /**
    * This makes sure that when you exceed the max slope in a wheelchair there isn't a hard cut-off
    * but rather the cost increases proportional to how much you go over the maximum.
    * <p>
-   * In other words: 0.1 % over the limit only has a small cost but 2% over increases it
+   * In other words: 0.1 % over the limit only has a small cost but 1% over doubles the cost
    * dramatically to the point where it's only used as a last resort.
    */
-  @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
+  @ParameterizedTest(
+    name = "slope of {0} with maxSlopeExceededReluctance of {1} should lead to traversal costs of {2}"
+  )
   @VariableSource("slopeCases")
-  public void shouldScaleCostWithMaxSlope(float slope, long expectedCost) {
+  public void shouldScaleCostWithMaxSlope(double slope, double reluctance, long expectedCost) {
     double length = 1000;
     var edge = new StreetEdge(
       V1,
@@ -245,7 +250,7 @@ class StreetEdgeTest extends GraphRoutingTest {
         ofOnlyAccessible(),
         25,
         0.09,
-        50,
+        reluctance,
         10
       );
     State result = traverse(edge, req);

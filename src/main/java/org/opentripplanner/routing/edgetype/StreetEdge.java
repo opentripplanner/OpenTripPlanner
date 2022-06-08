@@ -1062,6 +1062,7 @@ public class StreetEdge
     return s1;
   }
 
+  @Nonnull
   private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
     double time = getEffectiveBikeDistance() / speed;
     double weight;
