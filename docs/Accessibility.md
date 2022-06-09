@@ -33,6 +33,9 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
         "unknownCost": 600,
         "inaccessibleCost": 3600
       },
+      "elevator": {
+        "onlyConsiderAccessible": false
+      },
       "inaccessibleStreetReluctance": 25,
       "maxSlope": 0.08333,
       "slopeExceededReluctance": 50,
@@ -47,7 +50,7 @@ The parameters for `stop`, `trip` and `elevator` mean the following:
 
 | name                     |                                                                                                | default |
 |--------------------------|------------------------------------------------------------------------------------------------|---------|
-| `onlyConsiderAccessible` | Whether to include unknown accessibility and inaccessible stops/trips/elevators in the search. | `false` |
+| `onlyConsiderAccessible` | Whether to exclude unknown accessibility and inaccessible stops/trips/elevators in the search. | `true`  |
 | `unknownCost`            | The cost to add if an entity has unknown wheelchair accessibility                              | 600     |
 | `inaccessibleCost`       | The cost to add if an entity is known to be inaccessible                                       | 3600    |
 
