@@ -77,21 +77,22 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
   static List<Leg> getKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
     // Sort legs descending on distance
     legs =
-      legs
-        .stream()
-        .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
-        .collect(Collectors.toList());
+      legs.stream().sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed()).toList();
+    if (legs.size() < 2) {
+      return legs;
+    }
     double sum = 0.0;
     int i = 0;
     while (sum < distanceLimitMeters) {
-      // If the transit legs is not long enough, threat the itinerary as non-transit
+      // If the transit legs are not long enough, treat the itinerary as non-transit
+      // TODO: why?
       if (i == legs.size()) {
         return List.of();
       }
       sum += legs.get(i).getDistanceMeters();
       ++i;
     }
-    return legs.stream().limit(i).collect(Collectors.toList());
+    return legs.stream().limit(i).toList();
   }
 
   /** Read-only access to key-set to allow unit-tests access. */

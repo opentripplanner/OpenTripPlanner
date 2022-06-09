@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import static org.opentripplanner.util.time.TimeUtils.time;
 
+import java.time.LocalDate;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -21,6 +22,9 @@ public interface PlanTestConstants {
   float BUS_SPEED = 12.5f;
   float RAIL_SPEED = 25.0f;
   float CAR_SPEED = 25.0f;
+
+  LocalDate DATE_1 = LocalDate.parse("2022-06-09");
+  LocalDate DATE_2 = LocalDate.parse("2022-06-10");
 
   // Time duration(D) constants, all values are in seconds
   int D1m = DurationUtils.durationInSeconds("1m");

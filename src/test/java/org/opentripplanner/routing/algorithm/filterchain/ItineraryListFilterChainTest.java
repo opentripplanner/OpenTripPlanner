@@ -11,9 +11,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import java.time.Instant;
 import java.util.List;
-import org.geotools.xml.xsi.XSISimpleTypes.ID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -130,6 +128,32 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_2, 52, 100, C).build();
 
     Itinerary i2 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_3, 52, 150, C).build();
+
+    List<Itinerary> input = List.of(i1, i2);
+
+    chain.filter(input);
+
+    assertFalse(i1.isFlaggedForDeletion());
+    assertTrue(i2.isFlaggedForDeletion());
+  }
+
+  @Test
+  public void removeDuplicateTripIsWithDifferentStops() {
+    ItineraryListFilterChain chain = createBuilder(false, false, 20)
+      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(0.85))
+      .build();
+
+    var i1 = newItinerary(A, T11_00)
+      .walk(T11_05, B)
+      .bus(11, T11_05, T11_10, 5, 10, E, DATE_1)
+      .walk(D5m, G)
+      .build();
+
+    var i2 = newItinerary(A, T11_00)
+      .walk(T11_05, B)
+      .bus(11, T11_05, T11_15, 5, 11, F, DATE_1)
+      .walk(D5m, G)
+      .build();
 
     List<Itinerary> input = List.of(i1, i2);
 

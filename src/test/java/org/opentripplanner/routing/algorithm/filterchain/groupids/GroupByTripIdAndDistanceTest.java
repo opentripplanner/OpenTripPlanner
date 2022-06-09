@@ -10,6 +10,7 @@ import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBy
 
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -46,9 +47,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
     Itinerary i = newItinerary(A)
       // 5 min bus ride
       .bus(11, T11_00, T11_05, B)
-      // 2 min buss ride
+      // 2 min bus ride
       .bus(21, T11_10, T11_12, C)
-      // 3 min buss ride
+      // 3 min bus ride
       .bus(31, T11_20, T11_23, D)
       .build();
 
@@ -60,7 +61,7 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
     double d3 = l3.getDistanceMeters();
 
     // These test relay on the internal sort by distance, which make the implementation
-    // a bit simpler, but strictly is not something the method grantees
+    // a bit simpler, but strictly is not something the method guarantees
     assertEquals(List.of(l1), getKeySetOfLegsByLimit(List.of(l1, l2, l3), d1 - 0.01));
     assertEquals(List.of(l1, l3), getKeySetOfLegsByLimit(List.of(l1, l2, l3), d1 + 0.01));
     assertEquals(List.of(l1, l3), getKeySetOfLegsByLimit(List.of(l1, l2, l3), d1 + d3 - 0.01));
@@ -77,6 +78,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
   }
 
   @Test
+  @Disabled(
+    "It's not clear why we should treat short transit legs as non-transit as it leads to this https://github.com/opentripplanner/OpenTripPlanner/issues/3462 "
+  )
   public void shortTransitShouldBeTreatedAsNonTransit() {
     GroupByTripIdAndDistance shortTransit = new GroupByTripIdAndDistance(
       // walk 30 minutes, bus 1 minute => walking account for more than 50% of the distance
@@ -172,6 +176,31 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
     assertFalse(g_21.match(g_11));
     assertFalse(g_11_21.match(g_31_11));
     assertFalse(g_31_11.match(g_11_21));
+  }
+
+  @Test
+  public void matchSameTripWithDifferentStops() {
+    GroupByTripIdAndDistance shorterLeg = new GroupByTripIdAndDistance(
+      newItinerary(A, T11_00)
+        .walk(T11_05, B)
+        .bus(11, T11_05, T11_10, 5, 10, E, DATE_1)
+        .walk(D5m, G)
+        .build(),
+      0.85
+    );
+    GroupByTripIdAndDistance longerLeg = new GroupByTripIdAndDistance(
+      newItinerary(A, T11_00)
+        .walk(T11_05, B)
+        .bus(11, T11_05, T11_15, 5, 11, F, DATE_1)
+        .walk(D5m, G)
+        .build(),
+      0.85
+    );
+
+    // Match itself
+    assertTrue(shorterLeg.match(shorterLeg));
+    // Match other with suffix leg
+    assertTrue(shorterLeg.match(longerLeg));
   }
 
   @Test
