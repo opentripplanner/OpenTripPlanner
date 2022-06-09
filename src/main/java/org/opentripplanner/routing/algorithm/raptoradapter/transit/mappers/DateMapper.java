@@ -42,11 +42,14 @@ public class DateMapper {
   }
 
   public static int secondsSinceStartOfService(
-    ZonedDateTime departureDate,
+    ZonedDateTime operatingDayDate,
     ZonedDateTime dateTime,
     ZoneId zoneId
   ) {
-    ZonedDateTime startOfService = asStartOfService(departureDate.toLocalDate(), zoneId);
+    ZonedDateTime startOfService = asStartOfService(
+      operatingDayDate.withZoneSameInstant(zoneId).toLocalDate(),
+      zoneId
+    );
     return (int) Duration.between(startOfService, dateTime).toSeconds();
   }
 
