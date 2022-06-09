@@ -73,11 +73,10 @@ public class RepairStopTimesForEachTripOperation {
       }
       if (!filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
+      } else {
+        interpolateStopTimes(stopTimes);
+        stopTimesByTrip.replace(trip, stopTimes);
       }
-
-      interpolateStopTimes(stopTimes);
-
-      stopTimesByTrip.replace(trip, stopTimes);
     }
   }
 
