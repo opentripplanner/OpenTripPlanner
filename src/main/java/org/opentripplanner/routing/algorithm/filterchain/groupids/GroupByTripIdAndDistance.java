@@ -106,7 +106,7 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
    * sets are different in size any extra elements are ignored.
    */
   private static boolean isTheSame(List<Leg> a, List<Leg> b) {
-    // If a and b is different in length, than we want to use the shortest list and
+    // If a and b is different in length, then we want to use the shortest list and
     // make sure all elements in it also exist in the other. We ignore the extra legs in
     // the longer list og legs. We do this by making sure 'a' is the shortest list, if not
     // we swap a and b.
