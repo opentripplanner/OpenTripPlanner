@@ -48,4 +48,24 @@ public class SameFirstOrLastTripFilterTest implements PlanTestConstants {
     // Would match with i3 and i4, but they are filtered out
     assertFalse(i5.isFlaggedForDeletion());
   }
+
+  @Test
+  public void testFilterLogicOnTripsThatAreAlreadyFlagged() {
+    final int ID_1 = 1;
+    final int ID_2 = 2;
+    final int ID_3 = 3;
+
+    Itinerary i1 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_2, 52, 100, C).build();
+    i1.flagForDeletion(null);
+
+    Itinerary i2 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_3, 52, 100, C).build();
+
+    List<Itinerary> input = List.of(i1, i2);
+
+    final SameFirstOrLastTripFilter filter = new SameFirstOrLastTripFilter();
+    filter.filter(input);
+
+    // i2 should not be flagged for deletion since i1 was already removed before applying the filter
+    assertFalse(i2.isFlaggedForDeletion());
+  }
 }
