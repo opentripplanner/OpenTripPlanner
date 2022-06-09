@@ -15,10 +15,8 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ github.event.inputs.environment != 'prod' }}
     name: Deploy ${{ github.ref }} to ${{ github.event.inputs.environment }}
-    environment:
-      name: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
 
     steps:
@@ -45,3 +43,5 @@ jobs:
         with:
           webhook-url: ${{ secrets.SLACK_WEBHOOK }}
           job-status: ${{ job.status }}
+          custom-message: |
+            `${{ github.ref }}` deployed to ${{ github.event.inputs.environment }}
