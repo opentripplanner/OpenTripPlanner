@@ -21,9 +21,9 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
 
   private TimeZone timeZone;
 
-  private TransitMode vehicleType;
+  private TransitMode gtfsVehicleType;
 
-  private String netexSubmode;
+  private String netexVehicleSubmode;
 
   private final Set<BoardingArea> boardingAreas = new HashSet<>();
 
@@ -38,8 +38,8 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
     this.platformCode = original.getPlatformCode();
     this.url = original.getUrl();
     this.timeZone = original.getTimeZone();
-    this.vehicleType = original.getVehicleType();
-    this.netexSubmode = original.getVehicleSubmode();
+    this.gtfsVehicleType = original.getGtfsVehicleType();
+    this.netexVehicleSubmode = original.getNetexVehicleSubmode();
   }
 
   public String platformCode() {
@@ -61,20 +61,20 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
   }
 
   public TransitMode vehicleType() {
-    return vehicleType;
+    return gtfsVehicleType;
   }
 
   public StopBuilder withVehicleType(TransitMode vehicleType) {
-    this.vehicleType = vehicleType;
+    this.gtfsVehicleType = vehicleType;
     return this;
   }
 
   public String netexSubmode() {
-    return netexSubmode;
+    return netexVehicleSubmode;
   }
 
   public StopBuilder withNetexSubmode(String netexSubmode) {
-    this.netexSubmode = netexSubmode;
+    this.netexVehicleSubmode = netexSubmode;
     return this;
   }
 

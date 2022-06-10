@@ -23,7 +23,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   private Integer gtfsSortOrder;
   private String netexSubmode;
   private String flexibleLineType;
-  private String desc;
+  private String description;
   private String url;
   private String color;
   private String textColor;
@@ -43,9 +43,10 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     this.longName = original.getLongName();
     this.mode = original.getMode();
     this.gtfsType = original.getGtfsType();
+    this.gtfsSortOrder = original.getGtfsSortOrder();
     this.netexSubmode = original.getNetexSubmode();
     this.flexibleLineType = original.getFlexibleLineType();
-    this.desc = original.getDesc();
+    this.description = original.getDescription();
     this.url = original.getUrl();
     this.color = original.getColor();
     this.textColor = original.getTextColor();
@@ -101,12 +102,12 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     return this;
   }
 
-  public String getDesc() {
-    return desc;
+  public String getDescription() {
+    return description;
   }
 
   public RouteBuilder withDescription(String desc) {
-    this.desc = desc;
+    this.description = desc;
     return this;
   }
 

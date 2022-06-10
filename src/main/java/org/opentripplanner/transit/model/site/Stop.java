@@ -26,9 +26,9 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   private final TimeZone timeZone;
 
-  private final TransitMode vehicleType;
+  private final TransitMode gtfsVehicleType;
 
-  private final String netexSubmode;
+  private final String netexVehicleSubmode;
 
   private final Set<BoardingArea> boardingAreas;
 
@@ -39,8 +39,8 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
     this.platformCode = builder.platformCode();
     this.url = builder.url();
     this.timeZone = builder.timeZone();
-    this.vehicleType = builder.vehicleType();
-    this.netexSubmode = builder.netexSubmode();
+    this.gtfsVehicleType = builder.vehicleType();
+    this.netexVehicleSubmode = builder.netexSubmode();
     this.boardingAreas = setOfNullSafe(builder.boardingAreas());
     this.fareZones = setOfNullSafe(builder.fareZones());
     if (isPartOfStation()) {
@@ -83,14 +83,14 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
    */
   @Override
   @Nullable
-  public TransitMode getVehicleType() {
-    return vehicleType;
+  public TransitMode getGtfsVehicleType() {
+    return gtfsVehicleType;
   }
 
   @Override
   @Nullable
-  public String getVehicleSubmode() {
-    return netexSubmode;
+  public String getNetexVehicleSubmode() {
+    return netexVehicleSubmode;
   }
 
   @Override
@@ -134,8 +134,8 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
       Objects.equals(platformCode, other.platformCode) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timeZone, other.timeZone) &&
-      Objects.equals(vehicleType, other.vehicleType) &&
-      Objects.equals(netexSubmode, other.netexSubmode) &&
+      Objects.equals(gtfsVehicleType, other.gtfsVehicleType) &&
+      Objects.equals(netexVehicleSubmode, other.netexVehicleSubmode) &&
       Objects.equals(boardingAreas, other.boardingAreas) &&
       Objects.equals(fareZones, other.fareZones)
     );

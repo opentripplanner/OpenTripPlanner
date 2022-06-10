@@ -50,12 +50,12 @@ public interface StopLocation extends LogInfo {
   }
 
   @Nullable
-  default TransitMode getVehicleType() {
+  default TransitMode getGtfsVehicleType() {
     return null;
   }
 
   @Nullable
-  default String getVehicleSubmode() {
+  default String getNetexVehicleSubmode() {
     return null;
   }
 

@@ -430,8 +430,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       getValue(
         environment,
         stop -> {
-          if (stop.getVehicleType() != null) {
-            return stop.getVehicleType().name();
+          if (stop.getGtfsVehicleType() != null) {
+            return stop.getGtfsVehicleType().name();
           }
           return getRoutingService(environment)
             .getPatternsForStop(stop)

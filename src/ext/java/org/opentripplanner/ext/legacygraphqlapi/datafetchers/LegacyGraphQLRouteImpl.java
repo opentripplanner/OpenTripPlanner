@@ -147,7 +147,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> desc() {
-    return environment -> getSource(environment).getDesc();
+    return environment -> getSource(environment).getDescription();
   }
 
   @Override

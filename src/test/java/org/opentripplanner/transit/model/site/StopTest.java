@@ -72,8 +72,8 @@ class StopTest {
     assertEquals(LEVEL.getIndex(), copy.getLevelIndex());
     assertEquals(WHEELCHAIR_ACCESSIBILITY, copy.getWheelchairAccessibility());
     // TODO inconsistent naming
-    assertEquals(NETEX_SUBMODE, copy.getVehicleSubmode());
-    assertEquals(VEHICLE_TYPE, copy.getVehicleType());
+    assertEquals(NETEX_SUBMODE, copy.getNetexVehicleSubmode());
+    assertEquals(VEHICLE_TYPE, copy.getGtfsVehicleType());
     assertEquals(TIME_ZONE, copy.getTimeZone());
     assertEquals(PLATFORM_CODE, copy.getPlatformCode());
   }

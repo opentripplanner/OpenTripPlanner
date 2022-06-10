@@ -145,7 +145,7 @@ public class StopPlaceType {
           .dataFetcher(environment ->
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
-              .map(StopLocation::getVehicleType)
+              .map(StopLocation::getGtfsVehicleType)
               .filter(Objects::nonNull)
               .collect(Collectors.toSet())
           )
@@ -160,7 +160,7 @@ public class StopPlaceType {
           .dataFetcher(environment ->
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
-              .map(StopLocation::getVehicleSubmode)
+              .map(StopLocation::getNetexVehicleSubmode)
               .filter(Objects::nonNull)
               .map(TransmodelTransportSubmode::fromValue)
               .collect(Collectors.toList())

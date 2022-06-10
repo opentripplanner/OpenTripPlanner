@@ -29,7 +29,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   private final Integer gtfsSortOrder;
   private final String netexSubmode;
   private final String flexibleLineType;
-  private final String desc;
+  private final String description;
   private final String url;
   private final String color;
   private final String textColor;
@@ -54,7 +54,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
     this.gtfsSortOrder = builder.getGtfsSortOrder();
     this.netexSubmode = builder.getNetexSubmode();
     this.flexibleLineType = builder.getFlexibleLineType();
-    this.desc = builder.getDesc();
+    this.description = builder.getDescription();
     this.url = builder.getUrl();
     this.color = builder.getColor();
     this.textColor = builder.getTextColor();
@@ -77,7 +77,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
       Objects.equals(this.gtfsType, other.gtfsType) &&
       Objects.equals(this.flexibleLineType, other.flexibleLineType) &&
       Objects.equals(this.netexSubmode, other.netexSubmode) &&
-      Objects.equals(this.desc, other.desc) &&
+      Objects.equals(this.description, other.description) &&
       Objects.equals(this.url, other.url) &&
       Objects.equals(this.color, other.color) &&
       Objects.equals(this.textColor, other.textColor) &&
@@ -133,8 +133,8 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   }
 
   @Nullable
-  public String getDesc() {
-    return desc;
+  public String getDescription() {
+    return description;
   }
 
   @Nullable
