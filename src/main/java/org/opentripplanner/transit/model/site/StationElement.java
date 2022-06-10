@@ -154,7 +154,7 @@ public abstract class StationElement<
       Objects.equals(name, other.getName()) &&
       Objects.equals(code, other.getCode()) &&
       Objects.equals(description, other.getDescription()) &&
-      getCoordinate().sameLocation(other.getCoordinate()) &&
+      Objects.equals(coordinate, other.getCoordinate()) &&
       Objects.equals(wheelchairAccessibility, other.getWheelchairAccessibility()) &&
       Objects.equals(level, other.level()) &&
       Objects.equals(parentStation, other.getParentStation())

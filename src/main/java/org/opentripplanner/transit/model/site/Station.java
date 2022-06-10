@@ -168,7 +168,7 @@ public class Station
       Objects.equals(name, other.name) &&
       Objects.equals(code, other.code) &&
       Objects.equals(description, other.description) &&
-      getCoordinate().sameLocation(other.coordinate) &&
+      Objects.equals(coordinate, other.coordinate) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timezone, other.timezone)

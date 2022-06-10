@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -23,6 +24,7 @@ class BoardingAreaTest {
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withParentStop(PARENT_STOP)
+    .withCoordinate(new WgsCoordinate(0.0, 0.0))
     .build();
 
   @Test

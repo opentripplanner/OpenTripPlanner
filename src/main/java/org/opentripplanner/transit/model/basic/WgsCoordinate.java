@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.basic;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
@@ -11,9 +12,6 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  * This is a ValueObject (design pattern).
  */
 public final class WgsCoordinate implements Serializable {
-
-  private static final String WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS =
-    "Use the 'sameLocation(..)' method to compare coordinates. See JavaDoc on 'equals(..)'";
 
   /**
    * A epsilon of 1E-7 gives a precision for coordinates at equator at 1.1 cm, which is good enough
@@ -89,6 +87,17 @@ public final class WgsCoordinate implements Serializable {
    * Compare to coordinates and return {@code true} if they are close together - have the same
    * location. The comparison uses an EPSILON of 1E-7 for each axis, for both latitude and
    * longitude.
+   *
+   * When we compare two coordinates we want to see if they are within a given distance,
+   * roughly within a square centimeter. This is not
+   * <em>transitive</em>, hence violating the equals/hasCode guideline. Consider 3 point along
+   * one of the axis:
+   * <pre>
+   *      | 8mm | 8mm |
+   *      x --- y --- z
+   *     </pre>
+   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is {@code true},
+   * but {@code x.sameLocation(z)} is {@code false}.
    */
   public boolean sameLocation(WgsCoordinate other) {
     if (this == other) {
@@ -98,42 +107,36 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
-   * @throws UnsupportedOperationException if called. See {@link #equals(Object)}
-   */
-  @Override
-  public int hashCode() {
-    throw new UnsupportedOperationException(WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS);
-  }
-
-  /**
-   * Not supported, throws UnsupportedOperationException. When we compare to coordinates we want see
-   * if they are within a given distance, roughly within a square centimeter. This is not
-   * <em>transitive</em>, hence violating the equals/hasCode guideline. Consider 3 point along
-   * one of the axis:
-   * <pre>
-   *  | 8mm | 8mm |
-   *  x --- y --- z
-   * </pre>
-   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is {@code true},
-   * but {@code x.sameLocation(z)} is {@code false}.
-   * <p>
-   * Use the {@link #sameLocation(WgsCoordinate)} method instead of equals, and never put this class
-   * in a Set or use it as a key in a Map.
-   *
-   * @throws UnsupportedOperationException if called.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    throw new UnsupportedOperationException(WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS);
-  }
-
-  /**
    * Return a string on the form: {@code "(60.12345, 11.12345)"}. Up to 5 digits are used after the
    * period(.), even if the coordinate is specified with a higher precision.
    */
   @Override
   public String toString() {
     return ValueObjectToStringBuilder.of().addCoordinate(latitude(), longitude()).toString();
+  }
+
+  /**
+   * Return true if the coordinates are numerically equal.
+   * Use {@link #sameLocation(WgsCoordinate)} instead for checking if coordinates are so close
+   * to each other that they are geographically identical for all practical purposes.
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    WgsCoordinate that = (WgsCoordinate) o;
+    return (
+      Double.compare(that.latitude, latitude) == 0 && Double.compare(that.longitude, longitude) == 0
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(latitude, longitude);
   }
 
   private static boolean isCloseTo(double a, double b) {
