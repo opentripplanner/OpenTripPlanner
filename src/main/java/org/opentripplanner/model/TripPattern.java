@@ -412,9 +412,9 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
   /**
    * Find the first stop position in pattern matching the given {@code stop}. The search start at
-   * position {@code 0}. Return a negative number if not found. Use {@link
-   * #findAlightStopPositionInPattern(StopLocation)} or {@link #findBoardingStopPositionInPattern(StopLocation)}
-   * if possible.
+   * position {@code 0}. Return a negative number if not found. Use
+   * {@link #findAlightStopPositionInPattern(StopLocation)} or
+   * {@link #findBoardingStopPositionInPattern(StopLocation)} if possible.
    */
   public int findStopPosition(StopLocation stop) {
     return stopPattern.findStopPosition(stop);
@@ -568,7 +568,12 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
    * trips/TripIds in the Timetable rather than the enclosing TripPattern.
    */
   public Stream<Trip> scheduledTripsAsStream() {
-    return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).distinct();
+    var trips = scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip);
+    var freqTrips = scheduledTimetable
+      .getFrequencyEntries()
+      .stream()
+      .map(e -> e.tripTimes.getTrip());
+    return Stream.concat(trips, freqTrips).distinct();
   }
 
   /**

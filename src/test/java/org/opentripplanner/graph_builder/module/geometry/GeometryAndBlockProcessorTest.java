@@ -1,11 +1,21 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
+import static graphql.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.gtfs.MockGtfs;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 
 public class GeometryAndBlockProcessorTest {
@@ -35,5 +45,30 @@ public class GeometryAndBlockProcessorTest {
     GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
 
     factory.run(graph);
+  }
+
+  @Test
+  public void addShapesForFrequencyTrips() {
+    var graph = new Graph();
+
+    var bundle = new GtfsBundle(new File(ConstantsForTests.FAKE_GTFS));
+    bundle.setFeedId(new GtfsFeedId.Builder().id("1").build());
+    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded(), null, false);
+
+    module.buildGraph(graph, new HashMap<>());
+
+    var frequencyTripPattern = graph
+      .getTripPatterns()
+      .stream()
+      .filter(p -> !p.getScheduledTimetable().getFrequencyEntries().isEmpty())
+      .toList();
+
+    assertEquals(1, frequencyTripPattern.size());
+
+    var id = frequencyTripPattern.get(0);
+
+    var pattern = graph.getTripPatternForId(id.getId());
+    assertNotNull(pattern.getGeometry());
+    assertNotNull(pattern.getHopGeometry(0));
   }
 }
