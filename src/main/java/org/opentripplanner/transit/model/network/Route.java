@@ -73,8 +73,10 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
       Objects.equals(this.groupsOfRoutes, other.groupsOfRoutes) &&
       Objects.equals(this.shortName, other.shortName) &&
       Objects.equals(this.longName, other.longName) &&
+      Objects.equals(this.branding, other.branding) &&
       Objects.equals(this.mode, other.mode) &&
       Objects.equals(this.gtfsType, other.gtfsType) &&
+      Objects.equals(this.gtfsSortOrder, other.gtfsSortOrder) &&
       Objects.equals(this.flexibleLineType, other.flexibleLineType) &&
       Objects.equals(this.netexSubmode, other.netexSubmode) &&
       Objects.equals(this.description, other.description) &&
