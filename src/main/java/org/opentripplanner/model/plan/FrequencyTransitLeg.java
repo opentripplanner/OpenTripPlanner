@@ -63,6 +63,20 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
   }
 
   @Override
+  public boolean isPartiallySameTransitLeg(Leg other) {
+    var same = super.isPartiallySameTransitLeg(other);
+    // frequency-based trips have all the same trip id, so we have to check that the start times
+    // are not equal
+    if (other instanceof FrequencyTransitLeg frequencyTransitLeg) {
+      var start = getTripTimes().getDepartureTime(0);
+      var otherStart = frequencyTransitLeg.getTripTimes().getDepartureTime(0);
+      return same && (start == otherStart);
+    } else {
+      return same;
+    }
+  }
+
+  @Override
   public List<StopArrival> getIntermediateStops() {
     List<StopArrival> visits = new ArrayList<>();
 
