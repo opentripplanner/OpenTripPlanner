@@ -24,18 +24,44 @@ public record WheelchairAccessibilityRequest(
   double slopeExceededReluctance,
   double stairsReluctance
 ) {
+  public static final WheelchairAccessibilityFeature DEFAULT_TRIP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
+  public static final WheelchairAccessibilityFeature DEFAULT_STOP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
+
+  /**
+   * It's very common for elevators in OSM to have unknown wheelchair accessibility since they are
+   * assumed to be so for that reason they only have a small default penalty for unknown
+   * accessibility
+   */
+  public static final WheelchairAccessibilityFeature DEFAULT_ELEVATOR_FEATURE = WheelchairAccessibilityFeature.ofCost(
+    20,
+    3600
+  );
+
+  /**
+   * Default reluctance for traversing a street that is tagged with wheelchair=no. Since most
+   * streets have no accessibility information, we don't have a separate cost for unknown.
+   */
+
+  public static final int DEFAULT_INACCESSIBLE_STREET_RELUCTANCE = 25;
+
+  /**
+   * ADA max wheelchair ramp slope is a good default.
+   */
+  public static final double DEFAULT_MAX_SLOPE = 0.083;
+
+  public static final int DEFAULT_SLOPE_EXCEEDED_RELUCTANCE = 1;
+
+  public static final int DEFAULT_STAIRS_RELUCTANCE = 100;
+
   public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
     false,
-    WheelchairAccessibilityFeature.ofOnlyAccessible(),
-    WheelchairAccessibilityFeature.ofOnlyAccessible(),
-    // it's very common for elevators in OSM to have unknown wheelchair accessibility since they are assumed to be so
-    // for that reason they only have a small default penalty for unknown accessibility
-    WheelchairAccessibilityFeature.ofCost(20, 3600),
-    // since most streets have no accessibility information, we don't add a cost for that
-    25,
-    0.083, // ADA max wheelchair ramp slope is a good default.
-    1,
-    100
+    DEFAULT_TRIP_FEATURE,
+    DEFAULT_STOP_FEATURE,
+    DEFAULT_ELEVATOR_FEATURE,
+    DEFAULT_INACCESSIBLE_STREET_RELUCTANCE,
+    DEFAULT_MAX_SLOPE,
+    DEFAULT_SLOPE_EXCEEDED_RELUCTANCE,
+    DEFAULT_STAIRS_RELUCTANCE
   );
 
   public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {
