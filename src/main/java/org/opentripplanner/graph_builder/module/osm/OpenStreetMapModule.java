@@ -94,6 +94,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private final List<OpenStreetMapProvider> providers;
   private final Set<String> boardingAreaRefTags;
   public boolean skipVisibility = false;
+
   // Members that can be set by clients.
   public boolean platformEntriesLinking = false;
   /**
@@ -104,21 +105,25 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Allows for arbitrary custom naming of edges.
    */
   public CustomNamer customNamer;
+
   /**
    * Ignore wheelchair accessibility information.
    */
   public boolean ignoreWheelchairAccessibility = false;
+
   /**
    * Whether we should create car P+R stations from OSM data. The default value is true. In normal
    * operation it is set by the JSON graph build configuration, but it is also initialized to "true"
    * here to provide the default behavior in tests.
    */
   public boolean staticParkAndRide = true;
+
   /**
    * Whether we should create bike P+R stations from OSM data. (default false)
    */
   public boolean staticBikeParkAndRide;
   public int maxAreaNodes = 500;
+
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
