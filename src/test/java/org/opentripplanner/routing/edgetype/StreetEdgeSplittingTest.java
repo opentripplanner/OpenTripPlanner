@@ -2,42 +2,30 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature.ofOnlyAccessible;
 
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.test.support.VariableSource;
 
-class StreetEdgeTest extends GraphRoutingTest {
+class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   private final Graph graph;
   private StreetVertex V1, V2;
   private StreetEdge streetEdge1, streetEdge2;
   private TurnRestriction originalTurnRestriction;
 
-  public StreetEdgeTest() {
+  public StreetEdgeSplittingTest() {
     graph = graph();
   }
 
@@ -194,182 +182,6 @@ class StreetEdgeTest extends GraphRoutingTest {
 
     disposableEdgeCollection.disposeEdges();
     assertOnlyOriginalRestrictionExists();
-  }
-
-  static Stream<Arguments> slopeCases = Stream.of(
-    // no extra cost
-    Arguments.of(0.07, 1, 5081),
-    // no extra cost
-    Arguments.of(0.08, 1, 5945),
-    // no extra cost
-    Arguments.of(0.09, 1, 6908),
-    // 0.1 % above the max slope, tiny extra cost
-    Arguments.of(0.091, 1, 7708),
-    // 3 % above max slope, will incur very large cost
-    Arguments.of(0.091, 3, 9110),
-    // 0.1 % above the max slope, but high reluctance will large cost
-    Arguments.of(0.0915, 1, 8116),
-    // 2 % above max slope, but lowered reluctance
-    Arguments.of(0.11, 0.5, 17649),
-    // 2 % above max slope, will incur very large cost
-    Arguments.of(0.11, 1, 26474),
-    // 3 % above max slope, will incur very large cost
-    Arguments.of(0.12, 1, 37978)
-  );
-
-  /**
-   * This makes sure that when you exceed the max slope in a wheelchair there isn't a hard cut-off
-   * but rather the cost increases proportional to how much you go over the maximum.
-   * <p>
-   * In other words: 0.1 % over the limit only has a small cost but 1% over doubles the cost
-   * dramatically to the point where it's only used as a last resort.
-   */
-  @ParameterizedTest(
-    name = "slope of {0} with maxSlopeExceededReluctance of {1} should lead to traversal costs of {2}"
-  )
-  @VariableSource("slopeCases")
-  public void shouldScaleCostWithMaxSlope(double slope, double reluctance, long expectedCost) {
-    double length = 1000;
-    var edge = new StreetEdge(
-      V1,
-      V2,
-      null,
-      "edge with elevation",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
-
-    Coordinate[] profile = new Coordinate[] {
-      new Coordinate(0, 0),
-      new Coordinate(length, slope * length),
-    };
-
-    PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-    StreetElevationExtension.addToEdge(edge, elev, true);
-
-    assertEquals(slope, edge.getMaxSlope(), 0.0001);
-
-    var req = new RoutingRequest();
-    req.wheelchairAccessibility =
-      new WheelchairAccessibilityRequest(
-        true,
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        25,
-        0.09,
-        reluctance,
-        10
-      );
-    State result = traverse(edge, req);
-    assertNotNull(result);
-    assertEquals(expectedCost, (long) result.weight);
-  }
-
-  static Stream<Arguments> stairsCases = Stream.of(
-    Arguments.of(1f, 22),
-    Arguments.of(1.5f, 33),
-    Arguments.of(3f, 67)
-  );
-
-  @ParameterizedTest(name = "stairs reluctance of of {0} should lead to traversal costs of {1}")
-  @VariableSource("stairsCases")
-  public void stairsReluctance(float stairsReluctance, long expectedCost) {
-    double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setStairs(true);
-
-    var req = new RoutingRequest();
-    req.stairsReluctance = stairsReluctance;
-
-    var result = traverse(edge, req);
-    assertEquals(expectedCost, (long) result.weight);
-
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req);
-    assertEquals(15, (long) notStairsResult.weight);
-  }
-
-  static Stream<Arguments> wheelchairStairsCases = Stream.of(
-    Arguments.of(1f, 22),
-    Arguments.of(10f, 225),
-    Arguments.of(100f, 2255)
-  );
-
-  @ParameterizedTest(
-    name = "wheelchair stairs reluctance of {0} should lead to traversal costs of {1}"
-  )
-  @VariableSource("wheelchairStairsCases")
-  public void wheelchairStairsReluctance(float stairsReluctance, long expectedCost) {
-    double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setStairs(true);
-
-    var req = new RoutingRequest();
-    req.wheelchairAccessibility =
-      new WheelchairAccessibilityRequest(
-        true,
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        25,
-        0,
-        1.1f,
-        stairsReluctance
-      );
-
-    var result = traverse(edge, req);
-    assertEquals(expectedCost, (long) result.weight);
-
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req);
-    assertEquals(15, (long) notStairsResult.weight);
-  }
-
-  static Stream<Arguments> inaccessibleStreetCases = Stream.of(
-    Arguments.of(1f, 15),
-    Arguments.of(10f, 150),
-    Arguments.of(100f, 1503)
-  );
-
-  @ParameterizedTest(
-    name = "an inaccessible street with the reluctance of {0} should lead to traversal costs of {1}"
-  )
-  @VariableSource("inaccessibleStreetCases")
-  public void inaccessibleStreet(float inaccessibleStreetReluctance, long expectedCost) {
-    double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setWheelchairAccessible(false);
-
-    var req = new RoutingRequest();
-    req.wheelchairAccessibility =
-      new WheelchairAccessibilityRequest(
-        true,
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        inaccessibleStreetReluctance,
-        0,
-        1.1f,
-        25
-      );
-
-    var result = traverse(edge, req);
-    assertEquals(expectedCost, (long) result.weight);
-
-    // reluctance should have no effect when the edge is accessible
-    edge.setWheelchairAccessible(true);
-    var accessibleResult = traverse(edge, req);
-    assertEquals(15, (long) accessibleResult.weight);
-  }
-
-  private State traverse(StreetEdge edge, RoutingRequest req) {
-    var ctx = new RoutingContext(req, graph, V1, V2);
-    var state = new State(ctx);
-
-    assertEquals(0, state.weight);
-    return edge.traverse(state);
   }
 
   private Graph graph() {
