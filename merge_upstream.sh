@@ -146,7 +146,7 @@ function rebaseAndMergeExtBranch() {
 
     if [[ "${STATUS}" == "${EXT_STATUS_REBASE}" || "${STATUS}" == "${EXT_STATUS_COMPILE}" ]] ; then
         # Reset status in case the test-compile fails. We need to do this because the status file
-        # is deleted after reading the status in the setup() function. 
+        # is deleted after reading the status in the setup() function.
         setStatus "${EXT_STATUS_COMPILE}"
 
         mvn clean test-compile
@@ -169,10 +169,10 @@ function rebaseAndMergeExtBranch() {
 
 function configHslCI() {
     git checkout "${DEVBRANCH}"
-    git checkout otp_ext_config .github
-    git checkout otp_ext_config Dockerfile
-    git checkout otp_ext_config Dockerfile.builder
-    git checkout otp_ext_config run.sh
+    git checkout otp2_ext_config .github
+    git checkout otp2_ext_config Dockerfile
+    git checkout otp2_ext_config Dockerfile.builder
+    git checkout otp2_ext_config run.sh
     git commit
     if [[ -z "${DRY_RUN}" ]] ; then
         git push -f
