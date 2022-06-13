@@ -197,15 +197,24 @@ class StreetEdgeTest extends GraphRoutingTest {
   }
 
   static Stream<Arguments> slopeCases = Stream.of(
-    Arguments.of(0.07, 1, 5081), // no extra cost
-    Arguments.of(0.08, 1, 5945), // no extra cost
-    Arguments.of(0.09, 1, 6908), // no extra cost
-    Arguments.of(0.091, 1, 7708), // 0.1 % above the max slope, tiny extra cost
-    Arguments.of(0.091, 3, 9110), // 3 % above max slope, will incur very large cost
-    Arguments.of(0.0915, 1, 8116), // 0.1 % above the max slope, but high reluctance will large cost
-    Arguments.of(0.11, 0.5, 17649), // 2 % above max slope, but lowered reluctance
-    Arguments.of(0.11, 1, 26474), // 2 % above max slope, will incur very large cost
-    Arguments.of(0.12, 1, 37978) // 3 % above max slope, will incur very large cost
+    // no extra cost
+    Arguments.of(0.07, 1, 5081),
+    // no extra cost
+    Arguments.of(0.08, 1, 5945),
+    // no extra cost
+    Arguments.of(0.09, 1, 6908),
+    // 0.1 % above the max slope, tiny extra cost
+    Arguments.of(0.091, 1, 7708),
+    // 3 % above max slope, will incur very large cost
+    Arguments.of(0.091, 3, 9110),
+    // 0.1 % above the max slope, but high reluctance will large cost
+    Arguments.of(0.0915, 1, 8116),
+    // 2 % above max slope, but lowered reluctance
+    Arguments.of(0.11, 0.5, 17649),
+    // 2 % above max slope, will incur very large cost
+    Arguments.of(0.11, 1, 26474),
+    // 3 % above max slope, will incur very large cost
+    Arguments.of(0.12, 1, 37978)
   );
 
   /**
