@@ -25,7 +25,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-public class PlainStreetEdgeTest {
+public class StreetEdgeTest {
 
   private Graph graph;
   private IntersectionVertex v0, v1, v2;
