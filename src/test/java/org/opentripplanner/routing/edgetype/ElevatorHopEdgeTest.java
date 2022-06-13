@@ -41,9 +41,12 @@ class ElevatorHopEdgeTest {
   }
 
   static Stream<Arguments> all = Stream.of(
-    Arguments.of(WheelchairAccessibility.POSSIBLE, 20), // no extra cost
-    Arguments.of(WheelchairAccessibility.NO_INFORMATION, 40), // low extra cost
-    Arguments.of(WheelchairAccessibility.NOT_POSSIBLE, 3620) // high extra cost
+    // no extra cost
+    Arguments.of(WheelchairAccessibility.POSSIBLE, 20),
+    // low extra cost
+    Arguments.of(WheelchairAccessibility.NO_INFORMATION, 40),
+    // high extra cost
+    Arguments.of(WheelchairAccessibility.NOT_POSSIBLE, 3620)
   );
 
   @ParameterizedTest(name = "{0} should allowed to traverse with a cost of {1}")
