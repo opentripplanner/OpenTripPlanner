@@ -4,7 +4,7 @@
 
 DEVBRANCH=dev-2.x
 REMOTE_REPO="`git remote -v  | grep "hsldevcom/OpenTripPlanner" | grep "push" | awk '{print $1;}'`"
-STATUS_FILE=".prepare_release.tmp"
+STATUS_FILE=".merge_upstream.tmp"
 STATUS=""
 DRY_RUN=""
 OTP_BASE=""
@@ -50,7 +50,7 @@ function setup() {
     git fetch ${REMOTE_REPO}
 }
 
-# This script create a status file '.prepare_release.tmp'. This file is used to resume the
+# This script create a status file '.merge_upstream.tmp'. This file is used to resume the
 # script in the same spot as where is left when the error occurred. This allow us to fix the
 # problem (merge conflict or compile error) and re-run the script to complete the proses.
 function resumePreviousExecution() {
@@ -174,13 +174,15 @@ function configHslCI() {
     git checkout otp_ext_config Dockerfile.builder
     git checkout otp_ext_config run.sh
     git commit
-    git push -f
+    if [[ -z "${DRY_RUN}" ]] ; then
+        git push -f
+    fi
 }
 
 function logSuccess() {
     echo ""
     echo "## ------------------------------------------------------------------------------------- ##"
-    echo "##   PREPARE RELEASE DONE  --  SUCCESS"
+    echo "##   UPSTREAM MERGE DONE  --  SUCCESS"
     echo "## ------------------------------------------------------------------------------------- ##"
     echo "   - '${REMOTE_REPO}/${DEVBRANCH}' reset to '${OTP_BASE}'"
     echo "   - 'otp2_ext_config' CI features added"
@@ -237,8 +239,8 @@ function printHelp() {
     echo "   --dryRun : Run script locally, nothing is pushed to remote server."
     echo ""
     echo "Usage:"
-    echo "  $ ./prepare_release otp/dev-2.x"
-    echo "  $ ./prepare_release --dryRun otp/dev-2.x"
+    echo "  $ ./merge_upstream.sh otp/dev-2.x"
+    echo "  $ ./merge_upstream.sh --dryRun otp/dev-2.x"
     echo ""
 }
 
