@@ -109,41 +109,17 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     assertEquals(expectedCost, (long) result.weight);
   }
 
-  static Stream<Arguments> stairsCases = Stream.of(
-    Arguments.of(1f, 22),
-    Arguments.of(1.5f, 33),
-    Arguments.of(3f, 67)
-  );
-
-  @ParameterizedTest(name = "stairs reluctance of of {0} should lead to traversal costs of {1}")
-  @VariableSource("stairsCases")
-  public void stairsReluctance(float stairsReluctance, long expectedCost) {
-    double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setStairs(true);
-
-    var req = new RoutingRequest();
-    req.stairsReluctance = stairsReluctance;
-
-    var result = traverse(edge, req);
-    assertEquals(expectedCost, (long) result.weight);
-
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req);
-    assertEquals(15, (long) notStairsResult.weight);
-  }
-
   static Stream<Arguments> wheelchairStairsCases = Stream.of(
-    Arguments.of(1f, 22),
-    Arguments.of(10f, 225),
-    Arguments.of(100f, 2255)
+    Arguments.of(1, 22),
+    Arguments.of(10, 225),
+    Arguments.of(100, 2255)
   );
 
   @ParameterizedTest(
     name = "wheelchair stairs reluctance of {0} should lead to traversal costs of {1}"
   )
   @VariableSource("wheelchairStairsCases")
-  public void wheelchairStairsReluctance(float stairsReluctance, long expectedCost) {
+  public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setStairs(true);
@@ -161,12 +137,14 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
         stairsReluctance
       );
 
+    req.walkReluctance = 1;
+
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);
 
     edge.setStairs(false);
     var notStairsResult = traverse(edge, req);
-    assertEquals(15, (long) notStairsResult.weight);
+    assertEquals(7, (long) notStairsResult.weight);
   }
 
   static Stream<Arguments> inaccessibleStreetCases = Stream.of(

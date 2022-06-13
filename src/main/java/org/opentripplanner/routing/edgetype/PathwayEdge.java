@@ -100,10 +100,9 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     if (time > 0) {
       double weight = time;
       if (options.wheelchairAccessibility.enabled()) {
-        weight *= options.walkReluctance;
         weight *=
           StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-            options.wheelchairAccessibility,
+            options,
             slope,
             wheelchairAccessible,
             isStairs()

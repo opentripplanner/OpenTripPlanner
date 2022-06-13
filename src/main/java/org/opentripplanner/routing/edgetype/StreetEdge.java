@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -20,7 +21,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -437,12 +437,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   @Override
   public double getDistanceMeters() {
     return length_mm / 1000.0;
-  }
-
-  private double getDistanceWithElevation() {
-    return hasElevationExtension()
-      ? elevationExtension.getDistanceWithElevation()
-      : getDistanceMeters();
   }
 
   @Override
@@ -918,6 +912,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     fromEdge.addTurnRestriction(splitTurnRestriction);
   }
 
+  private double getDistanceWithElevation() {
+    return hasElevationExtension()
+      ? elevationExtension.getDistanceWithElevation()
+      : getDistanceMeters();
+  }
+
   /**
    * return a StateEditor rather than a State so that we can make parking/mode switch modifications
    * for kiss-and-ride.
@@ -956,21 +956,13 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     var traversalCosts =
       switch (traverseMode) {
-        case BICYCLE -> bicycleTraversalCost(options, speed);
-        case WALK -> walkingTraversalCosts(options.wheelchairAccessibility, speed, walkingBike);
-        default -> new TraversalCosts(getDistanceMeters() / speed);
-    };
+        case BICYCLE, SCOOTER -> bicycleTraversalCost(options, speed);
+        case WALK -> walkingTraversalCosts(options, traverseMode, speed, walkingBike);
+        default -> otherTraversalCosts(options, traverseMode, walkingBike, speed);
+      };
 
     var time = traversalCosts.time();
     var weight = traversalCosts.weight();
-
-    weight *=
-      StreetEdgeReluctanceCalculator.computeReluctance(
-        options,
-        traverseMode,
-        walkingBike,
-        isStairs()
-      );
 
     var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
@@ -1065,6 +1057,25 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   }
 
   @Nonnull
+  private TraversalCosts otherTraversalCosts(
+    RoutingRequest options,
+    TraverseMode traverseMode,
+    boolean walkingBike,
+    double speed
+  ) {
+    var time = getDistanceMeters() / speed;
+    var weight =
+      time *
+      StreetEdgeReluctanceCalculator.computeReluctance(
+        options,
+        traverseMode,
+        walkingBike,
+        isStairs()
+      );
+    return new TraversalCosts(time, weight);
+  }
+
+  @Nonnull
   private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
     double time = getEffectiveBikeDistance() / speed;
     double weight;
@@ -1095,32 +1106,50 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
       }
       default -> weight = getDistanceMeters() / speed;
     }
+    var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(
+      req,
+      TraverseMode.BICYCLE,
+      false,
+      isStairs()
+    );
+    weight *= reluctance;
     return new TraversalCosts(time, weight);
   }
 
   @Nonnull
   private TraversalCosts walkingTraversalCosts(
-    WheelchairAccessibilityRequest wheelchairRequest,
+    RoutingRequest routingRequest,
+    TraverseMode traverseMode,
     double speed,
     boolean walkingBike
   ) {
+    Supplier<Double> nonWheelchairReluctance = () ->
+      StreetEdgeReluctanceCalculator.computeReluctance(
+        routingRequest,
+        traverseMode,
+        walkingBike,
+        isStairs()
+      );
+
     double time, weight;
-    if (wheelchairRequest.enabled()) {
+    if (routingRequest.wheelchairAccessibility.enabled()) {
       time = getEffectiveWalkDistance() / speed;
       weight =
         (getEffectiveBikeDistance() / speed) *
         StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          wheelchairRequest,
+          routingRequest,
           getMaxSlope(),
           isWheelchairAccessible(),
           isStairs()
         );
     } else if (walkingBike) {
       // take slopes into account when walking bikes
-      time = weight = getEffectiveBikeDistance() / speed;
+      time = weight = (getEffectiveBikeDistance() / speed);
+      weight *= nonWheelchairReluctance.get();
     } else {
       // take slopes into account when walking
-      time = weight = getEffectiveWalkDistance() / speed;
+      time = weight = (getEffectiveWalkDistance() / speed);
+      weight *= nonWheelchairReluctance.get();
     }
     return new TraversalCosts(time, weight);
   }
@@ -1167,9 +1196,5 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   }
 
   /** Tuple to return time and weight from calculation */
-  private record TraversalCosts(double time, double weight) {
-    public TraversalCosts(double time) {
-      this(time, time);
-    }
-  }
+  private record TraversalCosts(double time, double weight) {}
 }
