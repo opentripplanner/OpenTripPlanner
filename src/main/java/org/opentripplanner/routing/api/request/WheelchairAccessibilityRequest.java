@@ -24,15 +24,15 @@ public record WheelchairAccessibilityRequest(
   double slopeExceededReluctance,
   double stairsReluctance
 ) {
-  public static final WheelchairAccessibilityFeature DEFAULT_TRIP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
-  public static final WheelchairAccessibilityFeature DEFAULT_STOP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
+  private static final WheelchairAccessibilityFeature DEFAULT_TRIP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
+  private static final WheelchairAccessibilityFeature DEFAULT_STOP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
 
   /**
    * It's very common for elevators in OSM to have unknown wheelchair accessibility since they are
    * assumed to be so for that reason they only have a small default penalty for unknown
    * accessibility
    */
-  public static final WheelchairAccessibilityFeature DEFAULT_ELEVATOR_FEATURE = WheelchairAccessibilityFeature.ofCost(
+  private static final WheelchairAccessibilityFeature DEFAULT_ELEVATOR_FEATURE = WheelchairAccessibilityFeature.ofCost(
     20,
     3600
   );
@@ -42,16 +42,16 @@ public record WheelchairAccessibilityRequest(
    * streets have no accessibility information, we don't have a separate cost for unknown.
    */
 
-  public static final int DEFAULT_INACCESSIBLE_STREET_RELUCTANCE = 25;
+  private static final int DEFAULT_INACCESSIBLE_STREET_RELUCTANCE = 25;
 
   /**
    * ADA max wheelchair ramp slope is a good default.
    */
-  public static final double DEFAULT_MAX_SLOPE = 0.083;
+  private static final double DEFAULT_MAX_SLOPE = 0.083;
 
-  public static final int DEFAULT_SLOPE_EXCEEDED_RELUCTANCE = 1;
+  private static final int DEFAULT_SLOPE_EXCEEDED_RELUCTANCE = 1;
 
-  public static final int DEFAULT_STAIRS_RELUCTANCE = 100;
+  private static final int DEFAULT_STAIRS_RELUCTANCE = 100;
 
   public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
     false,
