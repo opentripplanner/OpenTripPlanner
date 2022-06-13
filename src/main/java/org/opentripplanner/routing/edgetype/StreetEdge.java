@@ -23,7 +23,6 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraversalCosts;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
@@ -43,9 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author novalis
  */
-public class StreetEdge
-  extends StreetCostEdge
-  implements BikeWalkableEdge, Cloneable, CarPickupableEdge {
+public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, CarPickupableEdge {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
   private static final long serialVersionUID = 1L;
@@ -956,19 +953,24 @@ public class StreetEdge
 
     // Automobiles have variable speeds depending on the edge type
     double speed = calculateSpeed(options, traverseMode, walkingBike);
-    var defaultTimeAndCost = getDistanceMeters() / speed;
 
     var traversalCosts =
       switch (traverseMode) {
         case BICYCLE -> bicycleTraversalCost(options, speed);
         case WALK -> walkingTraversalCosts(options.wheelchairAccessibility, speed, walkingBike);
-        default -> new TraversalCosts(defaultTimeAndCost, defaultTimeAndCost);
-      };
+        default -> new TraversalCosts(getDistanceMeters() / speed);
+    };
 
     var time = traversalCosts.time();
-    var weight = traversalCosts.cost();
+    var weight = traversalCosts.weight();
 
-    weight *= computeReluctance(options, traverseMode, walkingBike);
+    weight *=
+      StreetEdgeReluctanceCalculator.computeReluctance(
+        options,
+        traverseMode,
+        walkingBike,
+        isStairs()
+      );
 
     var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
@@ -1098,15 +1100,21 @@ public class StreetEdge
 
   @Nonnull
   private TraversalCosts walkingTraversalCosts(
-    WheelchairAccessibilityRequest wheelchair,
+    WheelchairAccessibilityRequest wheelchairRequest,
     double speed,
     boolean walkingBike
   ) {
     double time, weight;
-    if (wheelchair.enabled()) {
+    if (wheelchairRequest.enabled()) {
       time = getEffectiveWalkDistance() / speed;
-      weight = getEffectiveBikeDistance() / speed;
-      weight = addWheelchairCost(weight, wheelchair);
+      weight =
+        (getEffectiveBikeDistance() / speed) *
+        StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+          wheelchairRequest,
+          getMaxSlope(),
+          isWheelchairAccessible(),
+          isStairs()
+        );
     } else if (walkingBike) {
       // take slopes into account when walking bikes
       time = weight = getEffectiveBikeDistance() / speed;
@@ -1156,5 +1164,12 @@ public class StreetEdge
 
   private void writeObject(ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
+  }
+
+  /** Tuple to return time and weight from calculation */
+  private record TraversalCosts(double time, double weight) {
+    public TraversalCosts(double time) {
+      this(time, time);
+    }
   }
 }

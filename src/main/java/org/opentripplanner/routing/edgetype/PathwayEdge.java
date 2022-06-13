@@ -17,7 +17,7 @@ import org.opentripplanner.util.NonLocalizedString;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends StreetCostEdge implements BikeWalkableEdge {
+public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
   private static final long serialVersionUID = -3311099256178798982L;
@@ -98,18 +98,25 @@ public class PathwayEdge extends StreetCostEdge implements BikeWalkableEdge {
     }
 
     if (time > 0) {
-      double weight =
-        time *
-        computeReluctance(
-          options,
-          TraverseMode.WALK,
-          s0.getNonTransitMode() == TraverseMode.BICYCLE
-        );
-
+      double weight = time;
       if (options.wheelchairAccessibility.enabled()) {
-        weight = addWheelchairCost(weight, options.wheelchairAccessibility);
+        weight *= options.walkReluctance;
+        weight *=
+          StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+            options.wheelchairAccessibility,
+            slope,
+            wheelchairAccessible,
+            isStairs()
+          );
+      } else {
+        weight *=
+          StreetEdgeReluctanceCalculator.computeReluctance(
+            options,
+            TraverseMode.WALK,
+            s0.getNonTransitMode() == TraverseMode.BICYCLE,
+            isStairs()
+          );
       }
-
       s1.incrementTimeInSeconds(time);
       s1.incrementWeight(weight);
     } else {
@@ -157,18 +164,7 @@ public class PathwayEdge extends StreetCostEdge implements BikeWalkableEdge {
     return id;
   }
 
-  @Override
-  public boolean isStairs() {
+  private boolean isStairs() {
     return steps > 0;
-  }
-
-  @Override
-  public double getMaxSlope() {
-    return slope;
-  }
-
-  @Override
-  public boolean isWheelchairAccessible() {
-    return wheelchairAccessible;
   }
 }
