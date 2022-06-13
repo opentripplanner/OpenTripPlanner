@@ -21,11 +21,11 @@ public abstract class StreetCostEdge extends Edge {
   protected double addWheelchairCost(double cost, WheelchairAccessibilityRequest wheelchair) {
     var slopeExceededBy = Math.abs(getMaxSlope()) - wheelchair.maxSlope();
 
-    if (slopeExceededBy > 0.00001) {
+    if (slopeExceededBy > 0.0) {
       double reluctance = wheelchair.slopeExceededReluctance();
-      if (reluctance > 0) {
+      if (reluctance > 0.0) {
         // if we exceed the max slope the cost increases multiplied by how much you go over the maxSlope
-        var excessMultiplier = 1 + (100 * slopeExceededBy) * reluctance;
+        double excessMultiplier = 1.0 + (100.0 * slopeExceededBy) * reluctance;
         cost *= excessMultiplier;
       }
     }
