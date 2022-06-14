@@ -15,6 +15,7 @@ WORKDIR ${OTP_ROOT}
 
 ADD run.sh ${OTP_ROOT}/run.sh
 ADD target/*-shaded.jar ${OTP_ROOT}/otp-shaded.jar
+ADD logback-include-extensions.xml ${OTP_ROOT}/logback-include-extensions.xml
 
 ENV PORT=8080
 EXPOSE ${PORT}
