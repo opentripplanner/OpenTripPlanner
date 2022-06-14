@@ -57,23 +57,21 @@ class StationMapper {
       )
     );
 
-    if (rhs.getUrl() != null) {
-      builder.withUrl(
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Stop.class,
-          "url",
-          rhs.getId().getId(),
-          rhs.getUrl()
-        )
-      );
-    }
-
     builder.withDescription(
       translationHelper.getTranslation(
         org.onebusaway.gtfs.model.Stop.class,
         "desc",
         rhs.getId().getId(),
         rhs.getDesc()
+      )
+    );
+
+    builder.withUrl(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "url",
+        rhs.getId().getId(),
+        rhs.getUrl()
       )
     );
 

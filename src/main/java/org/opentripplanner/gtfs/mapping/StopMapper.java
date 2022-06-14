@@ -73,16 +73,14 @@ class StopMapper {
       )
     );
 
-    if (gtfsStop.getUrl() != null) {
-      builder.withUrl(
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Stop.class,
-          "url",
-          base.getId().getId(),
-          gtfsStop.getUrl()
-        )
-      );
-    }
+    builder.withUrl(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "url",
+        base.getId().getId(),
+        gtfsStop.getUrl()
+      )
+    );
 
     if (gtfsStop.getZoneId() != null) {
       builder.addFareZones(
