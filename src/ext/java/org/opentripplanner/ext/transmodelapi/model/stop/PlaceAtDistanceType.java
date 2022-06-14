@@ -72,6 +72,9 @@ public class PlaceAtDistanceType {
     String multiModalMode,
     RoutingService routingService
   ) {
+    // Make sure places is mutable
+    places = new ArrayList<>(places);
+
     if (placeTypes == null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
       // Convert quays to stop places
       List<PlaceAtDistance> stations = places
