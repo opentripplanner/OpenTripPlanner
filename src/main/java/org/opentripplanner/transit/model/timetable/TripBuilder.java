@@ -26,7 +26,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
   private String gtfsBlockId;
   private String gtfsFareId;
   private String netexInternalPlanningCode;
-  private TripAlteration netexAlteration = TripAlteration.PLANNED;
+  private TripAlteration netexAlteration;
 
   TripBuilder(FeedScopedId id) {
     super(id);
