@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Pulls upstream state (usually this should be opentripplanner/opentripplanner/dev-2.x)
+# Rebases local extension branches on top of pulled upstream and pushes rebased extensions
+# Replaces upstream CI actions with digitransit setup
+# Pushes the result (upstream + local modifications) to digitransit OTP dev-2.x branch
+# To apply this script, you need to set up upstream opentripplanner as remote (say a remote called otp)
+# First fetch the upstream: git fetch otp
+# Then run ./merge_upstream otp/dev-2.x
+# The result is that updated dev-2.x is pushed to our fork and gets deployed to development.
+
 #set -euo pipefail
 
 DEVBRANCH=dev-2.x
