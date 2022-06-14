@@ -6,13 +6,15 @@ TODO RTM - Add framework class diagram
 
 The `TransitService` is the main entry point for accessing all transit model objects. It may have 
 nested services or provide read-only access to key model classes. For changing the model a 
-service context should be created(obtained from the service). The context can then be used to get a
-builder for all _aggregate roots_[1]. For simplicity, we only allow _one_ context to be active at 
-any given time. Modifying, adding and deleting entities are **not** synchronized, so if more than 
-one thread are doing updates at concurrent, then the synchronization responsibility is put on the 
-client (graph builders and RealTimeSnapshot). When all modification are complete, then changes are
-made active by calling the `commit()` on the context. Before the `commit()` the changes are not 
-visible by e.g. the routing.
+`TransitEditorService` is created(obtained from the service). The editor can then be used to get a
+builder for all _aggregate roots_[1]. For simplicity, we only allow _one_ editor to be active at 
+any given time. 
+
+[TODO RTM, clarify] Modifying, adding and deleting entities are **not** synchronized, so if more 
+than one thread are doing updates at concurrent, then the synchronization responsibility is put on 
+the client (graph builders and RealTimeSnapshot). When all modification are complete, then changes 
+are made active by calling the `commit()` on the context. Before the `commit()` the changes are not 
+visible by e.g. the routing. [TODO Diagram]
 
 
 ### Transit Entities
@@ -26,7 +28,7 @@ roots_.
 All fields getters(except primitive types) should be annotated with `@Nullable` or `@Nonnull`. None 
 null field should be enforced in the Entity constructor by using `Objects.requireNonNull`, 
 `Objects.requireNonNullElse` or `ObjectUtils.ifNotNull`. We should enforce this for all fields 
-required in both GTFS and in the Nordic Netex Profile. For enumeration types using a special value
+required in both GTFS and in the Nordic NeTEx Profile. For enumeration types using a special value
 like `UNKNOWN` is preferred over making the field optional.
 
 
@@ -49,11 +51,11 @@ cyclic references.
 For all entities the `toString()` is implemented in `AbstractTransitEntity` in the following format:
 
 ```
-Type{id logName?}
+SIMPLE_CLASS_NAME{ID LOG_NAME?}
 ```
 
-The `logName` is optional. An entity can implement `LogInfo` to provide extra information in the
-`toString()` method. This is useful for including human recognizable information. The `logName`
+The `LOG_NAME` is optional. An entity can implement `LogInfo` to provide extra information in the
+`toString()` method. This is useful for including human recognizable information. The `LOG_NAME`
 does not need to identify the entity uniquely.
 
 
@@ -73,4 +75,4 @@ cyclic references.
 
 ### References
 
-1. [Model driven Design](https://en.wikipedia.org/wiki/Domain-driven_design)
+1. [Domain Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design)
