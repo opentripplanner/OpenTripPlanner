@@ -15,7 +15,7 @@ function main() {
     resetDevelop
     # digitransit currently has no extension features
     # rebaseAndMergeExtBranch otp2_ext_features
-    configHslCI
+    configDigitransitCI
     logSuccess
 }
 
@@ -167,13 +167,14 @@ function rebaseAndMergeExtBranch() {
     fi
 }
 
-function configHslCI() {
+function configDigitransitCI() {
     git checkout "${DEVBRANCH}"
+    rm -rf .github
     git checkout otp2_ext_config .github
     git checkout otp2_ext_config Dockerfile
     git checkout otp2_ext_config Dockerfile.builder
     git checkout otp2_ext_config run.sh
-    git commit
+    git commit -a -m "Configure Digitransit CI actions"
     if [[ -z "${DRY_RUN}" ]] ; then
         git push -f
     fi
