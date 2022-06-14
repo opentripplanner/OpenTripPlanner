@@ -7,8 +7,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
 
-  private static final long serialVersionUID = 1L;
-
   private static final double MISSING_VALUE = -999;
 
   private FeedScopedId shapeId;
@@ -95,7 +93,7 @@ public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
   @Override
   public String toString() {
     return (
-      "<ShapePoint " + getShapeId() + " #" + getSequence() + " (" + getLat() + "," + getLon() + ")>"
+      "ShapePoint{" + getShapeId() + " #" + getSequence() + " (" + getLat() + "," + getLon() + ")}"
     );
   }
 

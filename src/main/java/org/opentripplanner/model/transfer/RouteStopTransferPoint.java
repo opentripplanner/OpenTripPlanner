@@ -44,11 +44,11 @@ public final class RouteStopTransferPoint implements TransferPoint, Serializable
   public String toString() {
     return ValueObjectToStringBuilder
       .of()
-      .addText("<Route ")
+      .addText("RouteTP{")
       .addObj(route.getId())
       .addText(", stop ")
       .addObj(stop.getId())
-      .addText(">")
+      .addText("}")
       .toString();
   }
 }

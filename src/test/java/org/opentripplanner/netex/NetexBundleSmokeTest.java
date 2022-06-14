@@ -1,10 +1,10 @@
 package org.opentripplanner.netex;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.MultiModalStation;
@@ -158,12 +158,12 @@ public class NetexBundleSmokeTest {
     assertEquals("Jernbanetorget", p.getTripHeadsign());
     assertEquals("RB", p.getFeedId());
     assertEquals(
-      "[<Stop RB:NSR:Quay:7203 N/A>, <Stop RB:NSR:Quay:8027 N/A>]",
+      "[Stop{RB:NSR:Quay:7203 N/A}, Stop{RB:NSR:Quay:8027 N/A}]",
       p.getStops().toString()
     );
     assertEquals(
-      "[<Trip RB:RUT:ServiceJourney:12-101375-1000 12>]",
-      p.scheduledTripsAsStream().collect(Collectors.toList()).toString()
+      "[Trip{RB:RUT:ServiceJourney:12-101375-1000 12}]",
+      p.scheduledTripsAsStream().toList().toString()
     );
 
     // TODO OTP2 - Why?

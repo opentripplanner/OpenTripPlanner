@@ -14,6 +14,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,13 +62,13 @@ public abstract class Vertex implements Serializable, Cloneable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<").append(this.getLabel());
+    var sb = new StringBuilder();
+    sb.append("{").append(this.getLabel());
     if (this.getCoordinate() != null) {
       sb.append(" lat,lng=").append(this.getCoordinate().y);
       sb.append(",").append(this.getCoordinate().x);
     }
-    sb.append(">");
+    sb.append("}");
     return sb.toString();
   }
 

@@ -33,6 +33,6 @@ public class StopTransferPoint implements TransferPoint, Serializable {
   }
 
   public String toString() {
-    return "<Stop " + stop.getId() + ">";
+    return "StopTP{" + stop.getId() + "}";
   }
 }

@@ -42,13 +42,6 @@ public final class RouteStationTransferPoint implements TransferPoint, Serializa
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
-      .addText("<Route ")
-      .addObj(route.getId())
-      .addText(", station ")
-      .addObj(station.getId())
-      .addText(">")
-      .toString();
+    return "RouteTP{" + route.getId() + ", station " + station.getId() + '}';
   }
 }

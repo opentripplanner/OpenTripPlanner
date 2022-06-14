@@ -20,6 +20,16 @@ visible by e.g. the routing.
 All transit entities must have an ID. Transit entities ar "root" level are considered _aggregate
 roots_.
 
+
+#### @Nonnull and @Nullable entity fields
+
+All fields getters(except primitive types) should be annotated with `@Nullable` or `@Nonnull`. None 
+null field should be enforced in the Entity constructor by using `Objects.requireNonNull`, 
+`Objects.requireNonNullElse` or `ObjectUtils.ifNotNull`. We should enforce this for all fields 
+required in both GTFS and in the Nordic Netex Profile. For enumeration types using a special value
+like `UNKNOWN` is preferred over making the field optional.
+
+
 #### sameAs(), equals() and hashCode()
 
 `equals()` and `hashCode` uses type and `id` only, while `sameAs` is all fields including
@@ -39,12 +49,12 @@ cyclic references.
 For all entities the `toString()` is implemented in `AbstractTransitEntity` in the following format:
 
 ```
-<Type id logName?>
+Type{id logName?}
 ```
 
 The `logName` is optional. An entity can implement `LogInfo` to provide extra information in the
 `toString()` method. This is useful for including human recognizable information. The `logName`
-does not need to unique.
+does not need to identify the entity uniquely.
 
 
 ### Value Objects

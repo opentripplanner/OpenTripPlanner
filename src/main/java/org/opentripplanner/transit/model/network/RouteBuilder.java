@@ -200,11 +200,6 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   }
 
   @Override
-  public String toString() {
-    return "<Route " + getId() + " " + getName() + ">";
-  }
-
-  @Override
   protected Route buildFromValues() {
     return new Route(this);
   }

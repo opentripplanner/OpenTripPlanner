@@ -162,7 +162,7 @@ public final class ServiceCalendar implements Serializable {
 
   public String toString() {
     return (
-      "<ServiceCalendar " +
+      "ServiceCalendar{" +
       this.serviceId +
       " [" +
       this.monday +
@@ -172,7 +172,7 @@ public final class ServiceCalendar implements Serializable {
       this.friday +
       this.saturday +
       this.sunday +
-      "]>"
+      "]}"
     );
   }
 }

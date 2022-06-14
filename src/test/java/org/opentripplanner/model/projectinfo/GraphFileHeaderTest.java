@@ -77,8 +77,8 @@ public class GraphFileHeaderTest {
 
   @Test
   public void dump() {
-    assertEquals("<empty>", GraphFileHeader.prettyBytesToString(null));
-    assertEquals("<empty>", GraphFileHeader.prettyBytesToString(new byte[0]));
+    assertEquals("[empty]", GraphFileHeader.prettyBytesToString(null));
+    assertEquals("[empty]", GraphFileHeader.prettyBytesToString(new byte[0]));
     assertEquals(
       "41 6C 66 61 2D 31  \"Alfa-1\"",
       GraphFileHeader.prettyBytesToString(new byte[] { 'A', 'l', 'f', 'a', '-', '1' })

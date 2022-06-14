@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.framework;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
@@ -55,13 +56,14 @@ public abstract class TransitEntity implements Serializable {
    */
   @Override
   public final String toString() {
-    var buf = new StringBuilder("<");
-    buf.append(getClass().getSimpleName());
-    buf.append(' ').append(getId());
+    var buf = new StringBuilder(getClass().getSimpleName());
+
+    buf.append('{').append(getId());
+
     if ((this instanceof LogInfo n) && n.logName() != null) {
       buf.append(' ').append(n.logName());
     }
-    buf.append('>');
+    buf.append('}');
     return buf.toString();
   }
 }

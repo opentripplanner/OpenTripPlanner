@@ -43,11 +43,11 @@ public final class TripTransferPoint implements TransferPoint, Serializable {
   public String toString() {
     return ValueObjectToStringBuilder
       .of()
-      .addText("<Trip ")
+      .addText("TripTP{")
       .addObj(trip.getId())
       .addText(", stopPos ")
       .addNum(stopPositionInPattern)
-      .addText(">")
+      .addText("}")
       .toString();
   }
 }
