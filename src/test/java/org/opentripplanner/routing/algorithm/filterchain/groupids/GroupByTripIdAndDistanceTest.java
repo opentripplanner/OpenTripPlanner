@@ -173,6 +173,24 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
     assertFalse(g_31_11.match(g_11_21));
   }
 
+  @Test
+  public void notMatchFrequencyTripsWithDifferentStartTime() {
+    GroupByTripIdAndDistance g_11_00 = new GroupByTripIdAndDistance(
+      newItinerary(A).frequencyBus(11, T11_00, T11_05, B).build(),
+      0.9
+    );
+    GroupByTripIdAndDistance g_11_10 = new GroupByTripIdAndDistance(
+      newItinerary(A).frequencyBus(11, T11_10, T11_15, B).build(),
+      0.9
+    );
+
+    // Match itself
+    assertTrue(g_11_00.match(g_11_00));
+    // Match other with suffix leg
+    assertFalse(g_11_00.match(g_11_10));
+    assertFalse(g_11_10.match(g_11_00));
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void illegalRangeForPUpperBound() {
     new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991);
