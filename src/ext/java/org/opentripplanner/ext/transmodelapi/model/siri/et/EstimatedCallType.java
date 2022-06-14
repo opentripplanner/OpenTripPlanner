@@ -186,9 +186,9 @@ public class EstimatedCallType {
           .name("predictionInaccurate")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description(
-            "Whether the updated estimates are expected to be inaccurate. NOT IMPLEMENTED"
+            "Whether the updated estimates are expected to be inaccurate."
           )
-          .dataFetcher(environment -> false)
+          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).isPredictionInaccurate())
           .build()
       )
       .field(
