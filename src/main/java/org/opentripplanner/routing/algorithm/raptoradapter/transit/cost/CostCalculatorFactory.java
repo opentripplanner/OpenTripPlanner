@@ -4,15 +4,15 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 
 public class CostCalculatorFactory {
 
-  public static CostCalculator createCostCalculator(
+  public static <T extends DefaultTripSchedule> CostCalculator<T> createCostCalculator(
     McCostParams mcCostParams,
     int[] stopBoardAlightCosts
   ) {
-    CostCalculator calculator = new DefaultCostCalculator(mcCostParams, stopBoardAlightCosts);
+    CostCalculator<T> calculator = new DefaultCostCalculator<>(mcCostParams, stopBoardAlightCosts);
 
     if (mcCostParams.accessibilityRequirements().enabled()) {
       calculator =
-        new WheelchairCostCalculator(calculator, mcCostParams.accessibilityRequirements());
+        new WheelchairCostCalculator<>(calculator, mcCostParams.accessibilityRequirements());
     }
 
     return calculator;

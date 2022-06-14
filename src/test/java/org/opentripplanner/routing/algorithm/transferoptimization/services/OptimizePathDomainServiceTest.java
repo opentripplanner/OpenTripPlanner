@@ -38,7 +38,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     ALIGHT_SLACK
   );
 
-  public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
+  public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE,
