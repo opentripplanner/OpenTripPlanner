@@ -36,6 +36,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
 
@@ -230,10 +231,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         environment,
         stop -> {
           RoutingService routingService = getRoutingService(environment);
+          TransitService transitService = getTransitService(environment);
           LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args = new LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs(
             environment.getArguments()
           );
-          TripPattern pattern = routingService.getTripPatternForId(
+          TripPattern pattern = transitService.getTripPatternForId(
             FeedScopedId.parseId(args.getLegacyGraphQLId())
           );
 
@@ -433,7 +435,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           if (stop.getVehicleType() != null) {
             return stop.getVehicleType().name();
           }
-          return getRoutingService(environment)
+          return getTransitService(environment)
             .getPatternsForStop(stop)
             .stream()
             .map(TripPattern::getMode)
@@ -447,11 +449,12 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         },
         station -> {
           RoutingService routingService = getRoutingService(environment);
+          TransitService transitService = getTransitService(environment);
           return station
             .getChildStops()
             .stream()
             .flatMap(stop ->
-              routingService.getPatternsForStop(stop).stream().map(TripPattern::getMode)
+              transitService.getPatternsForStop(stop).stream().map(TripPattern::getMode)
             )
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
             .entrySet()
@@ -499,13 +502,17 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
     return getValue(
       environment,
-      stop -> getRoutingService(environment).getRoutesForStop(stop),
+      stop -> getTransitService(environment).getRoutesForStop(stop),
       station -> null
     );
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  }
+
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
   private <T> T getValue(

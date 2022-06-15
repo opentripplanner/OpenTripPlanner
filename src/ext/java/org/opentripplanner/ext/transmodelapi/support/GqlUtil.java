@@ -20,6 +20,7 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarF
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Provide some of the commonly used "chain" of methods. Like all ids should be created the same
@@ -53,6 +54,10 @@ public class GqlUtil {
 
   public static RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return ((TransmodelRequestContext) environment.getContext()).getRoutingService();
+  }
+
+  public static TransitService getTransitService(DataFetchingEnvironment environment) {
+    return ((TransmodelRequestContext) environment.getContext()).getTransitService();
   }
 
   public static GraphQLFieldDefinition newTransitIdField() {

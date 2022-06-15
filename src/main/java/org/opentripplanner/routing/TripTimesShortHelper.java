@@ -10,16 +10,18 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 
 public class TripTimesShortHelper {
 
   public static List<TripTimeOnDate> getTripTimesShort(
     RoutingService routingService,
+    TransitService transitService,
     Trip trip,
     ServiceDate serviceDate
   ) {
     final ServiceDay serviceDay = new ServiceDay(
-      routingService.getServiceCodes(),
+      transitService.getServiceCodes(),
       serviceDate,
       routingService.getCalendarService(),
       trip.getRoute().getAgency().getId()
@@ -31,18 +33,18 @@ public class TripTimesShortHelper {
 
       TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
       if (pattern == null) {
-        pattern = routingService.getPatternForTrip().get(trip);
+        pattern = transitService.getPatternForTrip().get(trip);
       }
       timetable = timetableSnapshot.resolve(pattern, serviceDate);
 
       // If realtime moved pattern back to original trip, fetch it instead
       if (timetable.getTripIndex(trip.getId()) == -1) {
-        pattern = routingService.getPatternForTrip().get(trip);
+        pattern = transitService.getPatternForTrip().get(trip);
         timetable = timetableSnapshot.resolve(pattern, serviceDate);
       }
     }
     if (timetable == null) {
-      timetable = routingService.getPatternForTrip().get(trip).getScheduledTimetable();
+      timetable = transitService.getPatternForTrip().get(trip).getScheduledTimetable();
     }
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes

@@ -26,6 +26,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 
 public class StopTimesHelper {
 
@@ -47,6 +48,7 @@ public class StopTimesHelper {
    */
   public static List<StopTimesInPattern> stopTimesForStop(
     RoutingService routingService,
+    TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     long startTime,
@@ -76,11 +78,12 @@ public class StopTimesHelper {
     ServiceDate[] serviceDates = dates.toArray(new ServiceDate[0]);
 
     // Fetch all patterns, including those from realtime sources
-    Collection<TripPattern> patterns = routingService.getPatternsForStop(stop, timetableSnapshot);
+    Collection<TripPattern> patterns = transitService.getPatternsForStop(stop, timetableSnapshot);
 
     for (TripPattern pattern : patterns) {
       Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
         routingService,
+        transitService,
         timetableSnapshot,
         stop,
         pattern,
@@ -108,6 +111,7 @@ public class StopTimesHelper {
    */
   public static List<StopTimesInPattern> stopTimesForStop(
     RoutingService routingService,
+    TransitService transitService,
     StopLocation stop,
     ServiceDate serviceDate,
     ArrivalDeparture arrivalDeparture
@@ -125,7 +129,7 @@ public class StopTimesHelper {
         tt = pattern.getScheduledTimetable();
       }
       ServiceDay sd = new ServiceDay(
-        routingService.getServiceCodes(),
+        transitService.getServiceCodes(),
         serviceDate,
         routingService.getCalendarService(),
         pattern.getRoute().getAgency().getId()
@@ -165,6 +169,7 @@ public class StopTimesHelper {
    */
   public static List<TripTimeOnDate> stopTimesForPatternAtStop(
     RoutingService routingService,
+    TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
@@ -184,6 +189,7 @@ public class StopTimesHelper {
     };
     Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
       routingService,
+      transitService,
       timetableSnapshot,
       stop,
       pattern,
@@ -216,6 +222,7 @@ public class StopTimesHelper {
 
   private static Queue<TripTimeOnDate> listTripTimeShortsForPatternAtStop(
     RoutingService routingService,
+    TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
@@ -249,7 +256,7 @@ public class StopTimesHelper {
     // Loop through all possible days
     for (ServiceDate serviceDate : serviceDates) {
       ServiceDay sd = new ServiceDay(
-        routingService.getServiceCodes(),
+        transitService.getServiceCodes(),
         serviceDate,
         routingService.getCalendarService(),
         pattern.getRoute().getAgency().getId()

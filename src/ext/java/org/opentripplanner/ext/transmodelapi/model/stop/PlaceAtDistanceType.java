@@ -18,8 +18,8 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.transit.service.TransitService;
 
 public class PlaceAtDistanceType {
 
@@ -70,7 +70,7 @@ public class PlaceAtDistanceType {
     List<TransmodelPlaceType> placeTypes,
     List<PlaceAtDistance> places,
     String multiModalMode,
-    RoutingService routingService
+    TransitService transitService
   ) {
     if (placeTypes == null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
       // Convert quays to stop places
@@ -79,7 +79,7 @@ public class PlaceAtDistanceType {
         // Find all stops
         .filter(p -> p.place() instanceof Stop)
         // Get their parent stations (possibly including multimodal parents)
-        .flatMap(p -> getStopPlaces(p, multiModalMode, routingService))
+        .flatMap(p -> getStopPlaces(p, multiModalMode, transitService))
         // Sort by distance
         .sorted(Comparator.comparing(PlaceAtDistance::distance))
         // Make sure each parent appears exactly once
@@ -103,7 +103,7 @@ public class PlaceAtDistanceType {
   private static Stream<PlaceAtDistance> getStopPlaces(
     PlaceAtDistance p,
     String multiModalMode,
-    RoutingService routingService
+    TransitService transitService
   ) {
     Station stopPlace = ((Stop) p.place()).getParentStation();
 
@@ -113,7 +113,7 @@ public class PlaceAtDistanceType {
 
     List<PlaceAtDistance> res = new ArrayList<>();
 
-    MultiModalStation multiModalStation = routingService
+    MultiModalStation multiModalStation = transitService
       .getMultiModalStationForStations()
       .get(stopPlace);
 

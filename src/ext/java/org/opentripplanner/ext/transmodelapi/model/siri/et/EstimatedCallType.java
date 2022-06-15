@@ -329,7 +329,7 @@ public class EstimatedCallType {
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getNoticesByEntity(tripTimeOnDate.getStopTimeKey());
           })
           .build()

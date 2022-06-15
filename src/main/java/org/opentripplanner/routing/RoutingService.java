@@ -1,6 +1,5 @@
 package org.opentripplanner.routing;
 
-import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
 import java.io.Serializable;
 import java.time.Instant;
@@ -18,18 +17,12 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -40,7 +33,6 @@ import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -69,12 +61,9 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
-import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
 /**
@@ -90,6 +79,9 @@ public class RoutingService {
 
   private final GraphFinder graphFinder;
 
+  // TODO refactoring: temporary reference to TransitService
+  private final TransitService transitService;
+
   /**
    * This should only be accessed through the getTimetableSnapshot method.
    */
@@ -99,6 +91,7 @@ public class RoutingService {
     this.graph = graph;
     this.graphIndex = graph.index;
     this.graphFinder = GraphFinder.getInstance(graph);
+    this.transitService = new DefaultTransitService(graph);
   }
 
   // TODO We should probably not have the Router as a parameter here
@@ -134,6 +127,7 @@ public class RoutingService {
   ) {
     return StopTimesHelper.stopTimesForStop(
       this,
+      transitService,
       lazyGetTimeTableSnapShot(),
       stop,
       startTime,
@@ -156,7 +150,13 @@ public class RoutingService {
     ServiceDate serviceDate,
     ArrivalDeparture arrivalDeparture
   ) {
-    return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);
+    return StopTimesHelper.stopTimesForStop(
+      this,
+      transitService,
+      stop,
+      serviceDate,
+      arrivalDeparture
+    );
   }
 
   /**
@@ -184,6 +184,7 @@ public class RoutingService {
   ) {
     return StopTimesHelper.stopTimesForPatternAtStop(
       this,
+      transitService,
       lazyGetTimeTableSnapShot(),
       stop,
       pattern,
@@ -423,39 +424,9 @@ public class RoutingService {
     return this.graph.removeEdgelessVertices();
   }
 
-  /** {@link Graph#getFeedIds()} */
-  public Collection<String> getFeedIds() {
-    return this.graph.getFeedIds();
-  }
-
-  /** {@link Graph#getAgencies()} */
-  public Collection<Agency> getAgencies() {
-    return this.graph.getAgencies();
-  }
-
-  /** {@link Graph#getFeedInfo(String)} ()} */
-  public FeedInfo getFeedInfo(String feedId) {
-    return this.graph.getFeedInfo(feedId);
-  }
-
-  /** {@link Graph#addAgency(String, Agency)} */
-  public void addAgency(String feedId, Agency agency) {
-    this.graph.addAgency(feedId, agency);
-  }
-
-  /** {@link Graph#addFeedInfo(FeedInfo)} */
-  public void addFeedInfo(FeedInfo info) {
-    this.graph.addFeedInfo(info);
-  }
-
   /** {@link Graph#getTimeZone()} */
   public TimeZone getTimeZone() {
     return this.graph.getTimeZone();
-  }
-
-  /** {@link Graph#getOperators()} */
-  public Collection<Operator> getOperators() {
-    return this.graph.getOperators();
   }
 
   /** {@link Graph#clearTimeZone()} */
@@ -508,16 +479,6 @@ public class RoutingService {
     return this.graph.getTransitServiceEnds();
   }
 
-  /** {@link Graph#getNoticesByElement()} */
-  public Multimap<TransitEntity, Notice> getNoticesByElement() {
-    return this.graph.getNoticesByElement();
-  }
-
-  /** {@link Graph#addNoticeAssignments(Multimap)} */
-  public void addNoticeAssignments(Multimap<TransitEntity, Notice> noticesByElement) {
-    this.graph.addNoticeAssignments(noticesByElement);
-  }
-
   /** {@link Graph#getDistanceBetweenElevationSamples()} */
   public double getDistanceBetweenElevationSamples() {
     return this.graph.getDistanceBetweenElevationSamples();
@@ -557,61 +518,6 @@ public class RoutingService {
     return this.graph.getVehicleParkingService();
   }
 
-  /** {@link Graph#getNoticesByEntity(TransitEntity)} */
-  public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
-    return this.graph.getNoticesByEntity(entity);
-  }
-
-  /** {@link Graph#getTripPatternForId(FeedScopedId)} */
-  public TripPattern getTripPatternForId(FeedScopedId id) {
-    return this.graph.getTripPatternForId(id);
-  }
-
-  /** {@link Graph#getTripPatterns()} */
-  public Collection<TripPattern> getTripPatterns() {
-    return this.graph.getTripPatterns();
-  }
-
-  /** {@link Graph#getNotices()} */
-  public Collection<Notice> getNotices() {
-    return this.graph.getNotices();
-  }
-
-  /** {@link Graph#getStopsByBoundingBox(double, double, double, double)} */
-  public Collection<StopLocation> getStopsByBoundingBox(
-    double minLat,
-    double minLon,
-    double maxLat,
-    double maxLon
-  ) {
-    return this.graph.getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
-  }
-
-  /** {@link Graph#getStopsInRadius(WgsCoordinate, double)} */
-  public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
-    return this.graph.getStopsInRadius(center, radius);
-  }
-
-  /** {@link Graph#getStationById(FeedScopedId)} */
-  public Station getStationById(FeedScopedId id) {
-    return this.graph.getStationById(id);
-  }
-
-  /** {@link Graph#getMultiModalStation(FeedScopedId)} */
-  public MultiModalStation getMultiModalStation(FeedScopedId id) {
-    return this.graph.getMultiModalStation(id);
-  }
-
-  /** {@link Graph#getStations()} */
-  public Collection<Station> getStations() {
-    return this.graph.getStations();
-  }
-
-  /** {@link Graph#getServiceCodes()} */
-  public Map<FeedScopedId, Integer> getServiceCodes() {
-    return this.graph.getServiceCodes();
-  }
-
   /** {@link Graph#getTransfersByStop(StopLocation)} */
   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
     return this.graph.getTransfersByStop(stop);
@@ -639,102 +545,9 @@ public class RoutingService {
     this.graph.setIntersectionTraversalCostModel(intersectionTraversalCostModel);
   }
 
-  /** {@link Graph#getLocationById(FeedScopedId)} */
-  public FlexStopLocation getLocationById(FeedScopedId id) {
-    return this.graph.getLocationById(id);
-  }
-
-  /** {@link Graph#getAllFlexStopsFlat()} */
-  public Set<StopLocation> getAllFlexStopsFlat() {
-    return this.graph.getAllFlexStopsFlat();
-  }
-
-  /** {@link GraphIndex#getAgencyForId(FeedScopedId)} */
-  public Agency getAgencyForId(FeedScopedId id) {
-    return this.graphIndex.getAgencyForId(id);
-  }
-
-  /** {@link GraphIndex#getStopForId(FeedScopedId)} */
-  public StopLocation getStopForId(FeedScopedId id) {
-    return this.graphIndex.getStopForId(id);
-  }
-
-  /** {@link GraphIndex#getRouteForId(FeedScopedId)} */
-  public Route getRouteForId(FeedScopedId id) {
-    return this.graphIndex.getRouteForId(id);
-  }
-
-  /** {@link GraphIndex#addRoutes(Route)} */
-  public void addRoutes(Route route) {
-    this.graphIndex.addRoutes(route);
-  }
-
-  /** {@link GraphIndex#getRoutesForStop(StopLocation)} */
-  public Set<Route> getRoutesForStop(StopLocation stop) {
-    return this.graphIndex.getRoutesForStop(stop);
-  }
-
-  /** {@link GraphIndex#getPatternsForStop(StopLocation)} */
-  public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
-    return this.graphIndex.getPatternsForStop(stop);
-  }
-
-  /** {@link GraphIndex#getPatternsForStop(StopLocation, TimetableSnapshot)} */
-  public Collection<TripPattern> getPatternsForStop(
-    StopLocation stop,
-    TimetableSnapshot timetableSnapshot
-  ) {
-    return this.graphIndex.getPatternsForStop(stop, timetableSnapshot);
-  }
-
-  /** {@link GraphIndex#getAllOperators()} */
-  public Collection<Operator> getAllOperators() {
-    return this.graphIndex.getAllOperators();
-  }
-
-  /** {@link GraphIndex#getOperatorForId()} */
-  public Map<FeedScopedId, Operator> getOperatorForId() {
-    return this.graphIndex.getOperatorForId();
-  }
-
-  /** {@link GraphIndex#getAllStops()} */
-  public Collection<StopLocation> getAllStops() {
-    return this.graphIndex.getAllStops();
-  }
-
-  /** {@link GraphIndex#getTripForId()} */
-  public Map<FeedScopedId, Trip> getTripForId() {
-    return this.graphIndex.getTripForId();
-  }
-
-  /** {@link GraphIndex#getAllRoutes()} */
-  public Collection<Route> getAllRoutes() {
-    return this.graphIndex.getAllRoutes();
-  }
-
   /** {@link GraphIndex#getStopVertexForStop()} */
   public Map<Stop, TransitStopVertex> getStopVertexForStop() {
     return this.graphIndex.getStopVertexForStop();
-  }
-
-  /** {@link GraphIndex#getPatternForTrip()} */
-  public Map<Trip, TripPattern> getPatternForTrip() {
-    return this.graphIndex.getPatternForTrip();
-  }
-
-  /** {@link GraphIndex#getPatternsForFeedId()} */
-  public Multimap<String, TripPattern> getPatternsForFeedId() {
-    return this.graphIndex.getPatternsForFeedId();
-  }
-
-  /** {@link GraphIndex#getPatternsForRoute()} */
-  public Multimap<Route, TripPattern> getPatternsForRoute() {
-    return this.graphIndex.getPatternsForRoute();
-  }
-
-  /** {@link GraphIndex#getMultiModalStationForStations()} */
-  public Map<Station, MultiModalStation> getMultiModalStationForStations() {
-    return this.graphIndex.getMultiModalStationForStations();
   }
 
   /** {@link GraphIndex#getStopSpatialIndex()} */
@@ -759,7 +572,7 @@ public class RoutingService {
 
   /**
    * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List,
-   * RoutingService)}
+   * RoutingService, TransitService)}
    */
   public List<PlaceAtDistance> findClosestPlaces(
     double lat,
@@ -773,7 +586,8 @@ public class RoutingService {
     List<String> filterByBikeRentalStations,
     List<String> filterByBikeParks,
     List<String> filterByCarParks,
-    RoutingService routingService
+    RoutingService routingService,
+    TransitService transitService
   ) {
     return this.graphFinder.findClosestPlaces(
         lat,
@@ -785,7 +599,8 @@ public class RoutingService {
         filterByStops,
         filterByRoutes,
         filterByBikeRentalStations,
-        routingService
+        routingService,
+        transitService
       );
   }
 

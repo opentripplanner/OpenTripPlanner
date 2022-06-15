@@ -23,6 +23,7 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import uk.org.ifopt.siri20.StopPlaceRef;
 import uk.org.siri.siri20.AffectedLineStructure;
@@ -56,6 +57,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   TransitAlertServiceImpl transitAlertService;
 
   RoutingService routingService;
+
+  TransitService transitService;
 
   @Test
   public void testSiriSxUpdateForStop() {
@@ -141,7 +144,9 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       transitAlertService = new TransitAlertServiceImpl(graph);
       alertsUpdateHandler.setTransitAlertService(transitAlertService);
 
-      alertsUpdateHandler.setSiriFuzzyTripMatcher(new SiriFuzzyTripMatcher(routingService));
+      alertsUpdateHandler.setSiriFuzzyTripMatcher(
+        new SiriFuzzyTripMatcher(routingService, transitService)
+      );
     }
   }
 

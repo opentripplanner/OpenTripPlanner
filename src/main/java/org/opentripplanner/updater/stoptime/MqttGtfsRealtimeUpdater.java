@@ -14,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -78,7 +79,11 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     // Set properties of realtime data snapshot source
     if (fuzzyTripMatching) {
-      snapshotSource.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+      snapshotSource.fuzzyTripMatcher =
+        new GtfsRealtimeFuzzyTripMatcher(
+          new RoutingService(graph),
+          new DefaultTransitService(graph)
+        );
     }
     if (backwardsDelayPropagationType != null) {
       snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;

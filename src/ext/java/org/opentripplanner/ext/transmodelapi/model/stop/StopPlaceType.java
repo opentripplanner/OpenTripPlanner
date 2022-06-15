@@ -38,6 +38,7 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.I18NString;
 
 public class StopPlaceType {
@@ -426,18 +427,18 @@ public class StopPlaceType {
     FeedScopedId id,
     DataFetchingEnvironment environment
   ) {
-    RoutingService routingService = GqlUtil.getRoutingService(environment);
+    TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Station station = routingService.getStationById(id);
+    Station station = transitService.getStationById(id);
 
     if (station != null) {
       return new MonoOrMultiModalStation(
         station,
-        routingService.getMultiModalStationForStations().get(station)
+        transitService.getMultiModalStationForStations().get(station)
       );
     }
 
-    MultiModalStation multiModalStation = routingService.getMultiModalStation(id);
+    MultiModalStation multiModalStation = transitService.getMultiModalStation(id);
 
     if (multiModalStation != null) {
       return new MonoOrMultiModalStation(multiModalStation);
@@ -456,8 +457,9 @@ public class StopPlaceType {
     DataFetchingEnvironment environment
   ) {
     final RoutingService routingService = GqlUtil.getRoutingService(environment);
+    final TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Stream<Station> stations = routingService
+    Stream<Station> stations = transitService
       .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
       .stream()
       .map(StopLocation::getParentStation)
@@ -476,7 +478,7 @@ public class StopPlaceType {
     if ("child".equals(multiModalMode)) {
       return stations
         .map(s -> {
-          MultiModalStation parent = routingService.getMultiModalStationForStations().get(s);
+          MultiModalStation parent = transitService.getMultiModalStationForStations().get(s);
           return new MonoOrMultiModalStation(s, parent);
         })
         .collect(Collectors.toList());
@@ -485,7 +487,7 @@ public class StopPlaceType {
     else if ("all".equals(multiModalMode)) {
       Set<MonoOrMultiModalStation> result = new HashSet<>();
       stations.forEach(it -> {
-        MultiModalStation p = routingService.getMultiModalStationForStations().get(it);
+        MultiModalStation p = transitService.getMultiModalStationForStations().get(it);
         result.add(new MonoOrMultiModalStation(it, p));
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
@@ -498,7 +500,7 @@ public class StopPlaceType {
     else if ("parent".equals(multiModalMode)) {
       Set<MonoOrMultiModalStation> result = new HashSet<>();
       stations.forEach(it -> {
-        MultiModalStation p = routingService.getMultiModalStationForStations().get(it);
+        MultiModalStation p = transitService.getMultiModalStationForStations().get(it);
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
         } else {

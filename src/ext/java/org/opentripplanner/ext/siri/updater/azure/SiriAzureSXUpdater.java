@@ -24,6 +24,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.alerts.TransitAlertProvider;
 import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
@@ -52,7 +53,10 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   public void setup(Graph graph) throws Exception {
     super.setup(graph);
     this.transitAlertService = new TransitAlertServiceImpl(graph);
-    SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
+    SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
+      new RoutingService(graph),
+      new DefaultTransitService(graph)
+    );
     if (updateHandler == null) {
       updateHandler = new SiriAlertsUpdateHandler(feedId, graph);
     }

@@ -116,7 +116,7 @@ public class QuayType {
               return new MonoOrMultiModalStation(
                 station,
                 GqlUtil
-                  .getRoutingService(environment)
+                  .getTransitService(environment)
                   .getMultiModalStationForStations()
                   .get(station)
               );
