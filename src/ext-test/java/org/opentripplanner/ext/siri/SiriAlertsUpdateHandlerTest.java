@@ -23,6 +23,7 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import uk.org.ifopt.siri20.StopPlaceRef;
@@ -134,6 +135,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void init() {
     if (routingService == null) {
       routingService = new RoutingService(graph);
+      transitService = new DefaultTransitService(graph);
       graph.updaterManager = new GraphUpdaterManager(graph, List.of());
     } else {
       transitAlertService.getAllAlerts().clear();
