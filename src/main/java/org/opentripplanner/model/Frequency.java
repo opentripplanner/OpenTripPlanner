@@ -10,8 +10,6 @@ import org.opentripplanner.util.time.TimeUtils;
 
 public final class Frequency implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private Trip trip;
 
   private int startTime;
@@ -95,17 +93,6 @@ public final class Frequency implements Serializable {
   }
 
   public String toString() {
-    if (trip.getId().getFeedId().equals("agency2")) {
-      return (
-        "<Frequency trip=" +
-        trip.getId() +
-        " start=" +
-        TimeUtils.timeToStrLong(startTime) +
-        " end=" +
-        TimeUtils.timeToStrLong(endTime) +
-        ">"
-      );
-    }
     return ToStringBuilder
       .of(Frequency.class)
       .addObjOp("trip", trip, TransitEntity::getId)
