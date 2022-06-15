@@ -11,7 +11,7 @@ document.
 
 Many agencies have the same problem: data on wheelchair-accessibility is, if it exists at all,
 patchy. If you only included trips and stops that are explicitly set to be wheelchair-accessible
-rather than unknown, it would be hard to get any result at all. For this reason OTP allows you to 
+rather than unknown, it would be hard to get any result at all. For this reason OTP allows you to
 configure which sort of unknown information should be taken into account.
 
 ## Configuration
@@ -23,32 +23,55 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
 {
   "routingDefaults": {
     "wheelchairAccessibility": {
-      "trips": {
+      "trip": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600
       },
-      "stops": {
+      "stop": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600
-      }
+      },
+      "elevator": {
+        "onlyConsiderAccessible": false
+      },
+      "inaccessibleStreetReluctance": 25,
+      "maxSlope": 0.08333,
+      "slopeExceededReluctance": 50,
+      "stairsReluctance": 25
     }
   },
   "updaters": []
 }
 ```
 
-The parameters for `stops` and `trips` mean the following:
+The parameters for `stop`, `trip` and `elevator` mean the following:
 
-| name                     |                                                                                      | default |
-|--------------------------|--------------------------------------------------------------------------------------|---------|
-| `onlyConsiderAccessible` | Whether to include unknown accessibility and inaccessible stops/trips in the search. | `false` |
-| `unknownCost`            | The cost to add if a stop/trip has unknown wheelchair accessibility                  | 600     |
-| `inaccessibleCost`       | The cost to add if a stop/trip is known to be inaccessible                           | 3600    |
+| name                     |                                                                                                | default |
+|--------------------------|------------------------------------------------------------------------------------------------|---------|
+| `onlyConsiderAccessible` | Whether to exclude unknown accessibility and inaccessible stops/trips/elevators in the search. | `true`  |
+| `unknownCost`            | The cost to add if an entity has unknown wheelchair accessibility                              | 600     |
+| `inaccessibleCost`       | The cost to add if an entity is known to be inaccessible                                       | 3600    |
 
-**Note**: Unless your accessibility data coverage is complete you will receive much better results by setting `onlyConsiderAccessible=true`, because
-otherwise you receive barely any results.
+**Note**: Unless your accessibility data coverage is complete you will receive much better results
+by setting `onlyConsiderAccessible=false`, because otherwise you receive barely any results.
+
+Other parameters are:
+
+- `inaccessibleStreetReluctance`: if a street is marked as wheelchair-inaccessible this is the
+  penalty that is applied for wheelchair users. This should be quite high so that those are only
+  chosen as a very last resort. default: 25
+- `maxSlope`: the maximum slope that a wheelchair user can use without incurring routing penalties (
+  leading to those ways being avoided). default: 0.083 (8.3 %)
+- `slopeExceededReluctance`: how steep should the cost increase when you exceed the maximum slope.
+  By default, every percent over the limit doubles the cost of the traversal, so if the regular cost
+  is 100, being 1 percent over the limit will lead to a cost of 200, 2 percent over will lead to 400
+  and so on.
+  If you want an even steeper increase then set a value higher than 1. If you want it shallower use
+  a value between 0 and 1. To disable the penalty set a value below 0. default: 1
+- `stairsReluctance`: how much should a wheelchair user avoid stairs. This should be quite high so
+  that they are used only as a last resort. default: 25
 
 ## Accessible transfers
 
@@ -66,15 +89,18 @@ in `build-config.json`:
     },
     {
       "modes": "WALK",
-      "wheelchairAccessibility": { "enabled": true }
+      "wheelchairAccessibility": {
+        "enabled": true
+      }
     }
   ]
 }
 ```
 
-This results in OTP calculating an accessible transfer if the default one is found to be inaccessible
-to wheelchair users.
+This results in OTP calculating an accessible transfer if the default one is found to be
+inaccessible to wheelchair users.
 
 ## Example
 
-A full configuration example is available at [`/docs/examples`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/docs/examples/ibi)
+A full configuration example is available
+at [`/docs/examples`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/docs/examples/ibi)

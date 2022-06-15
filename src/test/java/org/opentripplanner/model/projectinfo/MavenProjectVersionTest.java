@@ -1,10 +1,10 @@
 package org.opentripplanner.model.projectinfo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MavenProjectVersionTest {
 
@@ -24,10 +24,10 @@ public class MavenProjectVersionTest {
       )
       .forEach(tc -> {
         MavenProjectVersion v = MavenProjectVersion.parse(tc.input);
-        assertEquals(tc.input, tc.major, v.major);
-        assertEquals(tc.input, tc.minor, v.minor);
-        assertEquals(tc.input, tc.patch, v.patch);
-        assertEquals(tc.input, tc.qualifier, v.qualifier);
+        assertEquals(tc.major, v.major, tc.input);
+        assertEquals(tc.minor, v.minor, tc.input);
+        assertEquals(tc.patch, v.patch, tc.input);
+        assertEquals(tc.qualifier, v.qualifier, tc.input);
       });
   }
 

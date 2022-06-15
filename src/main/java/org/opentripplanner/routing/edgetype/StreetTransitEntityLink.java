@@ -90,14 +90,14 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     var accessibility = s0.getOptions().wheelchairAccessibility;
     if (accessibility.enabled()) {
       if (
-        accessibility.stops().onlyConsiderAccessible() &&
+        accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE
       ) {
         return null;
       } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
+        s1.incrementWeight(req.wheelchairAccessibility.stop().unknownCost());
       } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
+        s1.incrementWeight(req.wheelchairAccessibility.stop().inaccessibleCost());
       }
     }
 
