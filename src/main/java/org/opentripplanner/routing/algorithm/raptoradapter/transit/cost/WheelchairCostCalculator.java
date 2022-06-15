@@ -87,9 +87,9 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
     costIndex[wheelchair.ordinal()] =
       switch (wheelchair) {
         case POSSIBLE -> 0;
-        case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(requirements.trips().unknownCost());
+        case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(requirements.trip().unknownCost());
         case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(
-          requirements.trips().inaccessibleCost()
+          requirements.trip().inaccessibleCost()
         );
       };
   }

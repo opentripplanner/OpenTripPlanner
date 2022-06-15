@@ -84,7 +84,7 @@ public class DefaultRoutingRequestType {
           .name("maxSlope")
           .description("The maximum slope of streets for wheelchair trips.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.maxWheelchairSlope)
+          .dataFetcher(env -> request.wheelchairAccessibility.maxSlope())
           .build()
       )
       .field(
