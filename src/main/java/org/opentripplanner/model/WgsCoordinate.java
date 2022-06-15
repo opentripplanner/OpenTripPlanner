@@ -1,7 +1,9 @@
 package org.opentripplanner.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.util.lang.DoubleRounder;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
@@ -14,18 +16,13 @@ public final class WgsCoordinate implements Serializable {
   private static final String WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS =
     "Use the 'sameLocation(..)' method to compare coordinates. See JavaDoc on 'equals(..)'";
 
-  /**
-   * A epsilon of 1E-7 gives a precision for coordinates at equator at 1.1 cm, which is good enough
-   * for compering most coordinates in OTP.
-   */
-  private static final double EPSILON = 1E-7;
-
   private final double latitude;
   private final double longitude;
 
   public WgsCoordinate(double latitude, double longitude) {
-    this.latitude = latitude;
-    this.longitude = longitude;
+    // Normalize coordinates to precision around ~ 1 centimeters (7 decimals)
+    this.latitude = DoubleRounder.roundTo7Decimals(latitude);
+    this.longitude = DoubleRounder.roundTo7Decimals(longitude);
   }
 
   /**
@@ -68,7 +65,7 @@ public final class WgsCoordinate implements Serializable {
     if (this == other) {
       return true;
     }
-    return isCloseTo(latitude, other.latitude) && isCloseTo(longitude, other.longitude);
+    return Objects.equals(latitude, other.latitude) && Objects.equals(longitude, other.longitude);
   }
 
   /**
@@ -108,10 +105,5 @@ public final class WgsCoordinate implements Serializable {
   @Override
   public String toString() {
     return ValueObjectToStringBuilder.of().addCoordinate(latitude(), longitude()).toString();
-  }
-
-  private static boolean isCloseTo(double a, double b) {
-    double delta = Math.abs(a - b);
-    return delta < EPSILON;
   }
 }

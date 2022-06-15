@@ -10,6 +10,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.util.lang.DoubleRounder;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -63,11 +64,11 @@ public class StreetLeg implements Leg {
     this.mode = mode;
     this.startTime = startTime;
     this.endTime = endTime;
-    this.distanceMeters = distanceMeters;
+    this.distanceMeters = DoubleRounder.roundTo2Decimals(distanceMeters);
     this.from = from;
     this.to = to;
     this.generalizedCost = generalizedCost;
-    this.legElevation = elevation;
+    this.legElevation = normalizeElevation(elevation);
     this.legGeometry = geometry;
     this.walkSteps = walkSteps;
 
@@ -263,8 +264,22 @@ public class StreetLeg implements Leg {
         lastElevation = elevation;
       }
 
-      this.elevationGained = elevationGained;
-      this.elevationLost = elevationLost;
+      this.elevationGained = DoubleRounder.roundTo2Decimals(elevationGained);
+      this.elevationLost = DoubleRounder.roundTo2Decimals(elevationLost);
     }
+  }
+
+  private static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
+    return elevation == null
+      ? null
+      : elevation
+        .stream()
+        .map(it ->
+          P2.createPair(
+            DoubleRounder.roundTo2Decimals(it.first),
+            DoubleRounder.roundTo2Decimals(it.second)
+          )
+        )
+        .toList();
   }
 }

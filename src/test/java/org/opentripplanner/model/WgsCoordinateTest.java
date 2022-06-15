@@ -1,12 +1,20 @@
 package org.opentripplanner.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 
 public class WgsCoordinateTest {
+
+  @Test
+  public void normalize() {
+    WgsCoordinate c = new WgsCoordinate(1.123456789, 2.987654321);
+    assertEquals(1.1234568, c.latitude());
+    assertEquals(2.9876543, c.longitude());
+  }
 
   @Test
   public void testToString() {
@@ -17,21 +25,25 @@ public class WgsCoordinateTest {
 
   @Test
   public void testCoordinateEquals() {
-    WgsCoordinate a = new WgsCoordinate(5.0, 3.0);
+    WgsCoordinate a = new WgsCoordinate(5.000_000_3, 3.0);
 
     // Test latitude
-    WgsCoordinate sameLatitude = new WgsCoordinate(5.000_000_099, 3.0);
-    WgsCoordinate differentLatitude = new WgsCoordinate(5.000_000_101, 3.0);
+    WgsCoordinate sameLatitudeUpper = new WgsCoordinate(5.000_000_349, 3.0);
+    WgsCoordinate sameLatitudeLower = new WgsCoordinate(5.000_000_250, 3.0);
+    WgsCoordinate differentLatitude = new WgsCoordinate(5.000_000_350, 3.0);
 
-    Assert.assertTrue(a.sameLocation(sameLatitude));
-    Assert.assertFalse(a.sameLocation(differentLatitude));
+    assertTrue(a.sameLocation(sameLatitudeUpper));
+    assertTrue(a.sameLocation(sameLatitudeLower));
+    assertFalse(a.sameLocation(differentLatitude));
 
     // Test longitude
-    WgsCoordinate sameLongitude = new WgsCoordinate(5.0, 3.000_000_099);
-    WgsCoordinate differentLongitude = new WgsCoordinate(5.0, 3.000_000_101);
+    WgsCoordinate sameLongitudeUpper = new WgsCoordinate(5.000_000_3, 3.000_000_049);
+    WgsCoordinate sameLongitudeLover = new WgsCoordinate(5.000_000_3, 2.999_999_95);
+    WgsCoordinate differentLongitude = new WgsCoordinate(5.000_000_30, 3.000_000_05);
 
-    Assert.assertTrue(a.sameLocation(sameLongitude));
-    Assert.assertFalse(a.sameLocation(differentLongitude));
+    assertTrue(a.sameLocation(sameLongitudeUpper));
+    assertTrue(a.sameLocation(sameLongitudeLover));
+    assertFalse(a.sameLocation(differentLongitude));
   }
 
   @Test
@@ -45,7 +57,7 @@ public class WgsCoordinateTest {
     Coordinate jts = c.asJtsCoordinate();
 
     // Assert latitude is y, and longitude is x coordinate
-    Assert.assertEquals(latitude, jts.y, 1E-7);
-    Assert.assertEquals(longitude, jts.x, 1E-7);
+    assertEquals(latitude, jts.y, 1E-7);
+    assertEquals(longitude, jts.x, 1E-7);
   }
 }

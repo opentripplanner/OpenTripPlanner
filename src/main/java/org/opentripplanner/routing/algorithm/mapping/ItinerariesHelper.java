@@ -19,15 +19,18 @@ public class ItinerariesHelper {
         // was by removing a slope limit.
         OptionalDouble maxSlope = getMaxSlope(it);
         if (maxSlope.isPresent()) {
-          it.tooSloped = maxSlope.getAsDouble() > routingRequest.wheelchairAccessibility.maxSlope();
-          it.maxSlope = maxSlope.getAsDouble();
+          it.setTooSloped(
+            maxSlope.getAsDouble() > routingRequest.wheelchairAccessibility.maxSlope()
+          );
+          it.setMaxSlope(maxSlope.getAsDouble());
         }
       }
     }
   }
 
   private static OptionalDouble getMaxSlope(Itinerary it) {
-    return it.legs
+    return it
+      .getLegs()
       .stream()
       .filter(StreetLeg.class::isInstance)
       .map(StreetLeg.class::cast)

@@ -21,16 +21,18 @@ public class AccessibilityScoreFilterTest implements PlanTestConstants {
 
     List<Itinerary> input = List.of(i1, i2, i3);
 
-    input.forEach(i -> assertNull(i.accessibilityScore));
+    input.forEach(i -> assertNull(i.getAccessibilityScore()));
 
     var filter = new AccessibilityScoreFilter();
     var filtered = filter.filter(input);
 
     filtered.forEach(i -> {
-      assertNotNull(i.accessibilityScore);
-      i.legs.forEach(l -> {
-        assertNotNull(l.accessibilityScore());
-      });
+      assertNotNull(i.getAccessibilityScore());
+      i
+        .getLegs()
+        .forEach(l -> {
+          assertNotNull(l.accessibilityScore());
+        });
     });
   }
 }

@@ -17,7 +17,7 @@ public class GroupBySameFirstOrLastTrip implements GroupId<GroupBySameFirstOrLas
   private final List<Leg> keySet;
 
   public GroupBySameFirstOrLastTrip(Itinerary itinerary) {
-    keySet = itinerary.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+    keySet = itinerary.getLegs().stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
   }
 
   @Override

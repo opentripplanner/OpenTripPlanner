@@ -30,7 +30,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateM
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.spt.GraphPath;
 
 public class FlexRouter {
 
@@ -137,7 +136,7 @@ public class FlexRouter {
           if (itinerary != null) {
             var fareService = graph.getService(FareService.class);
             if (fareService != null) {
-              itinerary.fare = fareService.getCost(itinerary);
+              itinerary.setFare(fareService.getCost(itinerary));
             }
             itineraries.add(itinerary);
           }

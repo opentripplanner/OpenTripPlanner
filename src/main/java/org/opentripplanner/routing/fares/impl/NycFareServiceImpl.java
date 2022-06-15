@@ -315,7 +315,8 @@ public class NycFareServiceImpl implements FareService {
   }
 
   private static List<Ride> createRides(Itinerary itinerary) {
-    return itinerary.legs
+    return itinerary
+      .getLegs()
       .stream()
       .map(leg -> mapToRide(itinerary, leg))
       .filter(Objects::nonNull)

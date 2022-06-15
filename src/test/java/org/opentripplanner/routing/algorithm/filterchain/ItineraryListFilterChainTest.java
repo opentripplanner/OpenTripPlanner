@@ -11,9 +11,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import java.time.Instant;
 import java.util.List;
-import org.geotools.xml.xsi.XSISimpleTypes.ID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -75,11 +73,11 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     // Walk first, then transit sorted on arrival-time
     assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
-    assertTrue(i1.systemNotices.isEmpty());
-    assertFalse(i2.systemNotices.isEmpty());
-    assertFalse(i3.systemNotices.isEmpty());
-    assertEquals("transit-vs-street-filter", i2.systemNotices.get(0).tag);
-    assertEquals("latest-departure-time-limit", i3.systemNotices.get(0).tag);
+    assertTrue(i1.getSystemNotices().isEmpty());
+    assertFalse(i2.getSystemNotices().isEmpty());
+    assertFalse(i3.getSystemNotices().isEmpty());
+    assertEquals("transit-vs-street-filter", i2.getSystemNotices().get(0).tag);
+    assertEquals("latest-departure-time-limit", i3.getSystemNotices().get(0).tag);
   }
 
   @Test
