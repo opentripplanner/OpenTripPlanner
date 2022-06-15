@@ -24,7 +24,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
-public class TestStreetMatcher {
+public class StreetMatcherTest {
 
   static GeometryFactory gf = new GeometryFactory();
 
