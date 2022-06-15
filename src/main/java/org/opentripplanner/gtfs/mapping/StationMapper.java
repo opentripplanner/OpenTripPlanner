@@ -51,24 +51,19 @@ class StationMapper {
       rhs.getName()
     );
 
-    final I18NString description = translationHelper.getTranslation(
+    I18NString description = translationHelper.getTranslation(
       org.onebusaway.gtfs.model.Stop.class,
       "desc",
       rhs.getId().getId(),
       rhs.getDesc()
     );
 
-    I18NString url = null;
-
-    if (rhs.getUrl() != null) {
-      url =
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Stop.class,
-          "url",
-          rhs.getId().getId(),
-          rhs.getUrl()
-        );
-    }
+    I18NString url = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "url",
+      rhs.getId().getId(),
+      rhs.getUrl()
+    );
 
     return new Station(
       mapAgencyAndId(rhs.getId()),
