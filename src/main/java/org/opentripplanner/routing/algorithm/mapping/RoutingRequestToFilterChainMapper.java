@@ -27,7 +27,7 @@ public class RoutingRequestToFilterChainMapper {
     boolean maxNumberOfItinerariesCropHead,
     Consumer<Itinerary> maxLimitReachedSubscriber,
     boolean wheelchairAccessible,
-    float wheelchairMaxSlope
+    double wheelchairMaxSlope
   ) {
     var builder = new ItineraryListFilterChainBuilder(sortOrder);
 

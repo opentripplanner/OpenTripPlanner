@@ -53,7 +53,7 @@ public class ItineraryListFilterChainBuilder {
   private Instant latestDepartureTimeLimit = null;
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
-  private float wheelchairMaxSlope;
+  private double wheelchairMaxSlope;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -223,7 +223,7 @@ public class ItineraryListFilterChainBuilder {
 
   public ItineraryListFilterChainBuilder withAccessibilityScore(
     boolean enable,
-    float wheelchairMaxSlope
+    double wheelchairMaxSlope
   ) {
     this.accessibilityScore = enable;
     this.wheelchairMaxSlope = wheelchairMaxSlope;

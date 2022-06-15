@@ -9,6 +9,7 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.WheelchairEdge;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 /**
@@ -23,7 +24,7 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
  * calculating them on the backend makes life a little easier and changes are automatically applied
  * to all frontends.
  */
-public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements ItineraryListFilter {
+public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements ItineraryListFilter {
   public static Float compute(List<Leg> legs) {
     return legs
       .stream()
@@ -46,7 +47,12 @@ public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements Itin
     return sum / values.size();
   }
 
-  public static double accessibilityScore(WheelchairBoarding wheelchair) {
+  @Override
+  public List<Itinerary> filter(List<Itinerary> itineraries) {
+    return itineraries.stream().map(this::addAccessibilityScore).toList();
+  }
+
+  private static double accessibilityScore(WheelchairAccessibility wheelchair) {
     return switch (wheelchair) {
       case NO_INFORMATION -> 0.5;
       case POSSIBLE -> 1;
@@ -54,11 +60,10 @@ public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements Itin
     };
   }
 
-  public float compute(StreetLeg leg) {
-    var streetEdges = leg
-      .getWalkSteps()
+  private float compute(StreetLeg leg) {
+    var edges = leg.getWalkSteps().stream().map(s -> s.edges).toList();
+    var streetEdges = edges
       .stream()
-      .map(s -> s.edges)
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .toList();
@@ -90,27 +95,16 @@ public record AccessibilityScoreFilter(float wheelchairMaxSlope) implements Itin
 
     score += (0.5 - slopeMalus);
 
-    boolean allEdgesAreAccessible = streetEdges
+    boolean allEdgesAreAccessible = edges
       .stream()
-      .allMatch(StreetEdge::isWheelchairAccessible);
+      .filter(WheelchairEdge.class::isInstance)
+      .map(WheelchairEdge.class::cast)
+      .allMatch(WheelchairEdge::isWheelchairAccessible);
     if (allEdgesAreAccessible) {
       score += 0.5f;
     }
 
-
     return Math.max(score, 0);
-  }
-  public static double accessibilityScore(WheelchairAccessibility wheelchair) {
-    return switch (wheelchair) {
-      case NO_INFORMATION -> 0.5;
-      case POSSIBLE -> 1;
-      case NOT_POSSIBLE -> 0;
-    };
-  }
-
-  @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.stream().map(this::addAccessibilityScore).toList();
   }
 
   private Itinerary addAccessibilityScore(Itinerary i) {
