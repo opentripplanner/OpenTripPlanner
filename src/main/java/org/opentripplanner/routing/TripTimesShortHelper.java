@@ -23,11 +23,11 @@ public class TripTimesShortHelper {
     final ServiceDay serviceDay = new ServiceDay(
       transitService.getServiceCodes(),
       serviceDate,
-      routingService.getCalendarService(),
+      transitService.getCalendarService(),
       trip.getRoute().getAgency().getId()
     );
     Timetable timetable = null;
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
     if (timetableSnapshot != null) {
       // Check if realtime-data is available for trip
 

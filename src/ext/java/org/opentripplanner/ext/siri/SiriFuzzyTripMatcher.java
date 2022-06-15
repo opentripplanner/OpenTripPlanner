@@ -11,7 +11,6 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
@@ -51,12 +50,9 @@ public class SiriFuzzyTripMatcher {
   private static final Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
   private static final Set<String> nonExistingStops = new HashSet<>();
 
-  private final RoutingService routingService;
-
   private final TransitService transitService;
 
-  public SiriFuzzyTripMatcher(RoutingService routingService, TransitService transitService) {
-    this.routingService = routingService;
+  public SiriFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;
     initCache(this.transitService);
   }
@@ -199,7 +195,7 @@ public class SiriFuzzyTripMatcher {
       return trip.getId();
     } else {
       //Attempt to find trip using datedServiceJourneys
-      TripOnServiceDate tripOnServiceDate = routingService
+      TripOnServiceDate tripOnServiceDate = transitService
         .getTripOnServiceDateById()
         .get(new FeedScopedId(feedId, vehicleJourney));
       if (tripOnServiceDate != null) {
@@ -264,7 +260,7 @@ public class SiriFuzzyTripMatcher {
     for (Trip trip : cachedTripsBySiriId) {
       final TripPattern tripPattern = transitService.getPatternForTrip().get(trip);
       if (tripPattern.matchesModeOrSubMode(mode, transportSubmode)) {
-        Set<ServiceDate> serviceDates = routingService
+        Set<ServiceDate> serviceDates = transitService
           .getCalendarService()
           .getServiceDatesForServiceId(trip.getServiceId());
         if (
@@ -288,7 +284,7 @@ public class SiriFuzzyTripMatcher {
         return trip;
       } else {
         //Attempt to find trip using datedServiceJourneyId
-        TripOnServiceDate tripOnServiceDate = routingService
+        TripOnServiceDate tripOnServiceDate = transitService
           .getTripOnServiceDateById()
           .get(new FeedScopedId(feedId, serviceJourneyId));
         if (tripOnServiceDate != null) {
@@ -401,12 +397,12 @@ public class SiriFuzzyTripMatcher {
     int secondsSinceMidnight = DateMapper.secondsSinceStartOfService(
       arrivalTime,
       arrivalTime,
-      routingService.getTimeZone().toZoneId()
+      transitService.getTimeZone().toZoneId()
     );
     int secondsSinceMidnightYesterday = DateMapper.secondsSinceStartOfService(
       arrivalTime.minusDays(1),
       arrivalTime,
-      routingService.getTimeZone().toZoneId()
+      transitService.getTimeZone().toZoneId()
     );
 
     Set<Trip> trips = start_stop_tripCache.get(

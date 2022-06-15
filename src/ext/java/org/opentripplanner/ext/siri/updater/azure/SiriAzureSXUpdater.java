@@ -20,7 +20,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -54,7 +53,6 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
     super.setup(graph);
     this.transitAlertService = new TransitAlertServiceImpl(graph);
     SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
-      new RoutingService(graph),
       new DefaultTransitService(graph)
     );
     if (updateHandler == null) {

@@ -164,7 +164,7 @@ public class QuayType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(lineType))))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForStop(environment.getSource(), true)
               .stream()
               .map(pattern -> pattern.getRoute())
@@ -182,7 +182,7 @@ public class QuayType {
           .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForStop(environment.getSource(), true);
           })
           .build()

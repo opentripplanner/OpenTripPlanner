@@ -63,7 +63,7 @@ public class AlternativeLegs {
       ? List.of(toStop)
       : toStation.getChildStops();
 
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
 
     Comparator<ScheduledTransitLeg> legComparator = Comparator.comparing(
       ScheduledTransitLeg::getStartTime
@@ -138,7 +138,7 @@ public class AlternativeLegs {
       ServiceDay sd = new ServiceDay(
         transitService.getServiceCodes(),
         serviceDate,
-        routingService.getCalendarService(),
+        transitService.getCalendarService(),
         pattern.getRoute().getAgency().getId()
       );
 

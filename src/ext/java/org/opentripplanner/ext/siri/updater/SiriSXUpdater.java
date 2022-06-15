@@ -8,7 +8,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -75,7 +74,6 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   public void setup(Graph graph) {
     this.transitAlertService = new TransitAlertServiceImpl(graph);
     SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
-      new RoutingService(graph),
       new DefaultTransitService(graph)
     );
     if (updateHandler == null) {

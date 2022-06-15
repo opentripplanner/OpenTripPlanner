@@ -200,7 +200,7 @@ public class StopPlaceType {
                   .stream()
                   .filter(stop -> {
                     return !GqlUtil
-                      .getRoutingService(environment)
+                      .getTransitService(environment)
                       .getPatternsForStop(stop, true)
                       .isEmpty();
                   })
@@ -376,13 +376,13 @@ public class StopPlaceType {
     Collection<TransitMode> transitModes,
     DataFetchingEnvironment environment
   ) {
-    RoutingService routingService = GqlUtil.getRoutingService(environment);
+    TransitService transitService = GqlUtil.getTransitService(environment);
     boolean limitOnDestinationDisplay =
       departuresPerLineAndDestinationDisplay != null &&
       departuresPerLineAndDestinationDisplay > 0 &&
       departuresPerLineAndDestinationDisplay < numberOfDepartures;
 
-    List<StopTimesInPattern> stopTimesInPatterns = routingService.stopTimesForStop(
+    List<StopTimesInPattern> stopTimesInPatterns = transitService.stopTimesForStop(
       stop,
       startTimeSeconds,
       timeRage,
@@ -471,7 +471,7 @@ public class StopPlaceType {
     }
 
     if (TRUE.equals(filterByInUse)) {
-      stations = stations.filter(s -> isStopPlaceInUse(s, routingService));
+      stations = stations.filter(s -> isStopPlaceInUse(s, transitService));
     }
 
     // "child" - Only mono modal children stop places, not their multi modal parent stop
@@ -513,9 +513,9 @@ public class StopPlaceType {
     }
   }
 
-  public static boolean isStopPlaceInUse(StopCollection station, RoutingService routingService) {
+  public static boolean isStopPlaceInUse(StopCollection station, TransitService transitService) {
     for (var quay : station.getChildStops()) {
-      if (!routingService.getPatternsForStop(quay, true).isEmpty()) {
+      if (!transitService.getPatternsForStop(quay, true).isEmpty()) {
         return true;
       }
     }

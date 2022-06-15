@@ -306,7 +306,7 @@ public class EstimatedCallType {
           .type(datedServiceJourneyType)
           .dataFetcher(environment ->
             DatedServiceJourneyHelper.getTripOnServiceDate(
-              GqlUtil.getRoutingService(environment),
+              GqlUtil.getTransitService(environment),
               environment.<TripTimeOnDate>getSource().getTrip().getId(),
               environment.<TripTimeOnDate>getSource().getServiceDay()
             )

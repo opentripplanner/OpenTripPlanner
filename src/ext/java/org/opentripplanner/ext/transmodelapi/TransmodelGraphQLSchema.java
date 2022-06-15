@@ -672,7 +672,7 @@ public class TransmodelGraphQLSchema {
               .filter(stop -> {
                 boolean filterByInUse = TRUE.equals(environment.getArgument("filterByInUse"));
                 boolean inUse = !GqlUtil
-                  .getRoutingService(environment)
+                  .getTransitService(environment)
                   .getPatternsForStop(stop, true)
                   .isEmpty();
                 return !filterByInUse || inUse;
@@ -935,7 +935,7 @@ public class TransmodelGraphQLSchema {
                   .filter(placeAtDistance -> {
                     if (placeAtDistance.place() instanceof StopLocation stop) {
                       return !GqlUtil
-                        .getRoutingService(environment)
+                        .getTransitService(environment)
                         .getPatternsForStop(stop, true)
                         .isEmpty();
                     } else {
@@ -1279,7 +1279,7 @@ public class TransmodelGraphQLSchema {
                 (
                   activeServiceDates.isEmpty() ||
                   GqlUtil
-                    .getRoutingService(environment)
+                    .getTransitService(environment)
                     .getCalendarService()
                     .getServiceDatesForServiceId(t.getServiceId())
                     .stream()

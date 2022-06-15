@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
@@ -63,13 +62,13 @@ public class PatternAtStop {
    * @return A list of stop times
    */
   public List<TripTimeOnDate> getStoptimes(
-    RoutingService routingService,
+    TransitService transitService,
     long startTime,
     int timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
-    return routingService.stopTimesForPatternAtStop(
+    return transitService.stopTimesForPatternAtStop(
       stop,
       pattern,
       startTime,

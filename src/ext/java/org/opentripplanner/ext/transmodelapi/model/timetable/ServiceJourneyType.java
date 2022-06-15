@@ -69,7 +69,7 @@ public class ServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(gqlUtil.dateScalar)))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getCalendarService()
               .getServiceDatesForServiceId(((trip(environment)).getServiceId()))
               .stream()

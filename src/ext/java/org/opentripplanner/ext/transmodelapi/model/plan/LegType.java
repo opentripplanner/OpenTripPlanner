@@ -315,7 +315,7 @@ public class LegType {
             var serviceDate = leg(env).getServiceDate();
 
             return GqlUtil
-              .getRoutingService(env)
+              .getTransitService(env)
               .getTripOnServiceDateForTripAndDay(tripId, serviceDate);
           })
           .build()

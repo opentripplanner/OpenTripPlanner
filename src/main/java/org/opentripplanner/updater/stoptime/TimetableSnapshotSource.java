@@ -630,7 +630,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     tripBuilder.withRoute(route);
 
     // Find service ID running on this service date
-    final Set<FeedScopedId> serviceIds = routingService
+    final Set<FeedScopedId> serviceIds = transitService
       .getCalendarService()
       .getServiceIdsOnDate(serviceDate);
     if (serviceIds.isEmpty()) {
@@ -879,7 +879,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     } else {
       // Check whether service date is served by trip
-      final Set<FeedScopedId> serviceIds = routingService
+      final Set<FeedScopedId> serviceIds = transitService
         .getCalendarService()
         .getServiceIdsOnDate(serviceDate);
       if (!serviceIds.contains(trip.getServiceId())) {

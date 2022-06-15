@@ -28,7 +28,6 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
@@ -94,7 +93,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     tripPatternIdGenerator
   );
   private final TimeZone timeZone;
-  private final RoutingService routingService;
+
   private final TransitService transitService;
   private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
   private final TransitLayerUpdater transitLayerUpdater;
@@ -118,10 +117,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   public SiriTimetableSnapshotSource(final Graph graph) {
     timeZone = graph.getTimeZone();
-    routingService = new RoutingService(graph);
     transitService = new DefaultTransitService(graph);
     transitLayerUpdater = graph.transitLayerUpdater;
-    siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(routingService, transitService);
+    siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(transitService);
   }
 
   /**
@@ -1031,7 +1029,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return DateMapper.secondsSinceStartOfService(
       dateTime,
       dateTime,
-      routingService.getTimeZone().toZoneId()
+      transitService.getTimeZone().toZoneId()
     );
   }
 
@@ -1039,7 +1037,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return DateMapper.secondsSinceStartOfService(
       startOfService,
       dateTime,
-      routingService.getTimeZone().toZoneId()
+      transitService.getTimeZone().toZoneId()
     );
   }
 
@@ -1218,7 +1216,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Set<TripPattern> patterns = new HashSet<>();
     for (Trip currentTrip : matches) {
       TripPattern tripPattern = transitService.getPatternForTrip().get(currentTrip);
-      Set<ServiceDate> serviceDates = routingService
+      Set<ServiceDate> serviceDates = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(currentTrip.getServiceId());
 
@@ -1276,7 +1274,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private TripPattern getPatternForTrip(Trip trip, EstimatedVehicleJourney journey) {
-    Set<ServiceDate> serviceDates = routingService
+    Set<ServiceDate> serviceDates = transitService
       .getCalendarService()
       .getServiceDatesForServiceId(trip.getServiceId());
 
@@ -1385,7 +1383,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     List<Trip> results = new ArrayList<>();
     for (Trip trip : trips) {
-      Set<ServiceDate> serviceDatesForServiceId = routingService
+      Set<ServiceDate> serviceDatesForServiceId = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(trip.getServiceId());
 
@@ -1468,7 +1466,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     int departureInSecondsSinceMidnight = calculateSecondsSinceMidnight(date);
     Set<Trip> result = new HashSet<>();
     for (Trip trip : trips) {
-      Set<ServiceDate> serviceDatesForServiceId = routingService
+      Set<ServiceDate> serviceDatesForServiceId = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(trip.getServiceId());
       if (serviceDatesForServiceId.contains(serviceDate)) {
@@ -1495,7 +1493,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 times.getScheduledDepartureTime(stopNumber - 1) == departureInSecondsSinceMidnight
               ) {
                 if (
-                  routingService
+                  transitService
                     .getCalendarService()
                     .getServiceDatesForServiceId(times.getTrip().getServiceId())
                     .contains(serviceDate)

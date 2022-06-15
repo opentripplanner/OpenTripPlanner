@@ -22,7 +22,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -47,7 +46,6 @@ public class StopTimesHelper {
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
    */
   public static List<StopTimesInPattern> stopTimesForStop(
-    RoutingService routingService,
     TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
@@ -62,7 +60,7 @@ public class StopTimesHelper {
     }
     List<StopTimesInPattern> result = new ArrayList<>();
 
-    ZoneId zoneId = routingService.getTransitLayer().getTransitDataZoneId();
+    ZoneId zoneId = transitService.getTransitLayer().getTransitDataZoneId();
     LocalDate date = Instant.ofEpochSecond(startTime).atZone(zoneId).toLocalDate();
 
     // Number of days requested + the following day
@@ -82,7 +80,6 @@ public class StopTimesHelper {
 
     for (TripPattern pattern : patterns) {
       Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
-        routingService,
         transitService,
         timetableSnapshot,
         stop,
@@ -110,7 +107,6 @@ public class StopTimesHelper {
    * @param serviceDate Return all departures for the specified date
    */
   public static List<StopTimesInPattern> stopTimesForStop(
-    RoutingService routingService,
     TransitService transitService,
     StopLocation stop,
     ServiceDate serviceDate,
@@ -118,11 +114,11 @@ public class StopTimesHelper {
   ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
-    Collection<TripPattern> patternsForStop = routingService.getPatternsForStop(stop, true);
+    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop, true);
     for (TripPattern pattern : patternsForStop) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
       Timetable tt;
-      TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+      TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
       if (timetableSnapshot != null) {
         tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
@@ -131,7 +127,7 @@ public class StopTimesHelper {
       ServiceDay sd = new ServiceDay(
         transitService.getServiceCodes(),
         serviceDate,
-        routingService.getCalendarService(),
+        transitService.getCalendarService(),
         pattern.getRoute().getAgency().getId()
       );
       int sidx = 0;
@@ -168,7 +164,6 @@ public class StopTimesHelper {
    * @param arrivalDeparture   Filter by arrivals, departures, or both.
    */
   public static List<TripTimeOnDate> stopTimesForPatternAtStop(
-    RoutingService routingService,
     TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
@@ -188,7 +183,6 @@ public class StopTimesHelper {
       new ServiceDate(date).next(),
     };
     Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
-      routingService,
       transitService,
       timetableSnapshot,
       stop,
@@ -221,7 +215,6 @@ public class StopTimesHelper {
   }
 
   private static Queue<TripTimeOnDate> listTripTimeShortsForPatternAtStop(
-    RoutingService routingService,
     TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
@@ -258,7 +251,7 @@ public class StopTimesHelper {
       ServiceDay sd = new ServiceDay(
         transitService.getServiceCodes(),
         serviceDate,
-        routingService.getCalendarService(),
+        transitService.getCalendarService(),
         pattern.getRoute().getAgency().getId()
       );
       Timetable timetable;

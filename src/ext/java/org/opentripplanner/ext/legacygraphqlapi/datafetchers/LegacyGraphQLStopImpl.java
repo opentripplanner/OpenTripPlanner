@@ -230,7 +230,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       getValue(
         environment,
         stop -> {
-          RoutingService routingService = getRoutingService(environment);
           TransitService transitService = getTransitService(environment);
           LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args = new LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs(
             environment.getArguments()
@@ -245,7 +244,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
           // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-          return routingService.stopTimesForPatternAtStop(
+          return transitService.stopTimesForPatternAtStop(
             stop,
             pattern,
             args.getLegacyGraphQLStartTime(),
@@ -273,7 +272,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns() {
     return environment -> {
-      RoutingService routingService = getRoutingService(environment);
+      TransitService transitService = getTransitService(environment);
       var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
         environment.getArguments()
       );
@@ -281,7 +280,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
-        routingService.stopTimesForStop(
+        transitService.stopTimesForStop(
           stop,
           args.getLegacyGraphQLStartTime(),
           args.getLegacyGraphQLTimeRange(),
@@ -309,7 +308,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate() {
     return environment -> {
-      RoutingService routingService = getRoutingService(environment);
+      TransitService transitService = getTransitService(environment);
       var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForServiceDateArgs(
         environment.getArguments()
       );
@@ -323,7 +322,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
-        routingService.getStopTimesForStop(
+        transitService.getStopTimesForStop(
           stop,
           date,
           args.getLegacyGraphQLOmitNonPickups()
@@ -348,7 +347,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimesWithoutPatterns() {
     return environment -> {
-      RoutingService routingService = getRoutingService(environment);
+      TransitService transitService = getTransitService(environment);
       var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
         environment.getArguments()
       );
@@ -356,7 +355,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
       Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
-        routingService
+        transitService
           .stopTimesForStop(
             stop,
             args.getLegacyGraphQLStartTime(),
@@ -404,7 +403,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           )
             .getLegacyGraphQLMaxDistance();
 
-          return getRoutingService(environment)
+          return getTransitService(environment)
             .getTransfersByStop(stop)
             .stream()
             .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
@@ -494,7 +493,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {
     return getValue(
       environment,
-      stop -> getRoutingService(environment).getPatternsForStop(stop, true),
+      stop -> getTransitService(environment).getPatternsForStop(stop, true),
       station -> null
     );
   }

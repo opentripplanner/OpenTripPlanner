@@ -32,7 +32,7 @@ public record ScheduledTransitLegReference(
     }
 
     TripPattern tripPattern = null;
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
 
     // Check if pattern is changed by real-time updater
     if (timetableSnapshot != null) {
@@ -49,7 +49,7 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    Timetable timetable = routingService.getTimetableForTripPattern(tripPattern, serviceDate);
+    Timetable timetable = transitService.getTimetableForTripPattern(tripPattern, serviceDate);
 
     TripTimes tripTimes = timetable.getTripTimes(trip);
 

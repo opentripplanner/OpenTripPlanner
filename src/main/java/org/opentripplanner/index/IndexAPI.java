@@ -264,11 +264,10 @@ public class IndexAPI {
     @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
     @QueryParam("omitNonPickups") boolean omitNonPickups
   ) {
-    RoutingService routingService = createRoutingService();
     TransitService transitService = createTransitService();
     var stop = getStop(transitService, stopIdString);
 
-    return routingService
+    return transitService
       .stopTimesForStop(
         stop,
         startTime,
@@ -295,10 +294,9 @@ public class IndexAPI {
     @QueryParam("omitNonPickups") boolean omitNonPickups
   ) {
     TransitService transitService = createTransitService();
-    RoutingService routingService = createRoutingService();
     var stop = getStop(transitService, stopId);
     ServiceDate serviceDate = parseServiceDate("date", date);
-    List<StopTimesInPattern> stopTimes = routingService.getStopTimesForStop(
+    List<StopTimesInPattern> stopTimes = transitService.getStopTimesForStop(
       stop,
       serviceDate,
       omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
@@ -313,11 +311,10 @@ public class IndexAPI {
   @Path("/stops/{stopId}/transfers")
   public Collection<ApiTransfer> getTransfers(@PathParam("stopId") String stopId) {
     TransitService transitService = createTransitService();
-    RoutingService routingService = createRoutingService();
     var stop = getStop(transitService, stopId);
 
     // get the transfers for the stop
-    return routingService
+    return transitService
       .getTransfersByStop(stop)
       .stream()
       .map(TransferMapper::mapToApi)
@@ -451,11 +448,10 @@ public class IndexAPI {
   @Path("/trips/{tripId}/stoptimes")
   public List<ApiTripTimeShort> getStoptimesForTrip(@PathParam("tripId") String tripId) {
     TransitService transitService = createTransitService();
-    RoutingService routingService = createRoutingService();
     Trip trip = getTrip(transitService, tripId);
     TripPattern pattern = getTripPattern(transitService, trip);
     // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
-    Timetable table = routingService.getTimetableForTripPattern(pattern, null);
+    Timetable table = transitService.getTimetableForTripPattern(pattern, null);
     var tripTimesOnDate = TripTimeOnDate.fromTripTimes(table, trip);
     return TripTimeMapper.mapToApi(tripTimesOnDate);
   }
