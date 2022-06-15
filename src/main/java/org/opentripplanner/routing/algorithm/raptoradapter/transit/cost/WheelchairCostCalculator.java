@@ -16,13 +16,8 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
     @Nonnull CostCalculator<T> delegate,
     @Nonnull WheelchairAccessibilityRequest requirements
   ) {
-    // assign the costs for boarding a trip with the following accessibility values
-    wheelchairBoardingCost = new int[WheelchairAccessibility.values().length];
-    for (var it : WheelchairAccessibility.values()) {
-      setWheelchairCost(wheelchairBoardingCost, it, requirements);
-    }
-
     this.delegate = delegate;
+    this.wheelchairBoardingCost = createWheelchairCost(requirements);
   }
 
   @Override
@@ -79,18 +74,24 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
     return delegate.costEgress(egress);
   }
 
-  private static void setWheelchairCost(
-    int[] costIndex,
-    WheelchairAccessibility wheelchair,
-    WheelchairAccessibilityRequest requirements
-  ) {
-    costIndex[wheelchair.ordinal()] =
-      switch (wheelchair) {
-        case POSSIBLE -> 0;
-        case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(requirements.trip().unknownCost());
-        case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(
-          requirements.trip().inaccessibleCost()
-        );
-      };
+  /**
+   * Create the wheelchair costs for boarding a trip with all possible accessibility values
+   */
+  private static int[] createWheelchairCost(WheelchairAccessibilityRequest requirements) {
+    int[] costIndex = new int[WheelchairAccessibility.values().length];
+
+    for (var it : WheelchairAccessibility.values()) {
+      costIndex[it.ordinal()] =
+        switch (it) {
+          case POSSIBLE -> 0;
+          case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(
+            requirements.trip().unknownCost()
+          );
+          case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(
+            requirements.trip().inaccessibleCost()
+          );
+        };
+    }
+    return costIndex;
   }
 }
