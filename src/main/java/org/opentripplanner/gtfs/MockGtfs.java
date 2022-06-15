@@ -49,6 +49,7 @@ public class MockGtfs {
     var mapper = new GTFSToOtpTransitServiceMapper(
       "a0",
       new DataImportIssueStore(false),
+      false,
       reader == null ? gtfsDelegate.read() : gtfsDelegate.read(reader)
     );
     return mapper.getBuilder();

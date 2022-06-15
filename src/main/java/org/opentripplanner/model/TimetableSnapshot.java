@@ -132,7 +132,10 @@ public class TimetableSnapshot {
 
       if (tripTimesToRemove != null) {
         for (Timetable sortedTimetable : sortedTimetables) {
-          sortedTimetable.getTripTimes().remove(tripTimesToRemove);
+          boolean isDirty = sortedTimetable.getTripTimes().remove(tripTimesToRemove);
+          if (isDirty) {
+            dirtyTimetables.add(sortedTimetable);
+          }
         }
       }
     }

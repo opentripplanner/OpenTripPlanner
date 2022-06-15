@@ -52,8 +52,6 @@ public class Transfer {
 
     // it's a record (immutable) so can be safely reused
     rr.wheelchairAccessibility = request.wheelchairAccessibility;
-    rr.maxWheelchairSlope = request.maxWheelchairSlope;
-    rr.wheelchairSlopeTooSteepCostFactor = request.wheelchairSlopeTooSteepCostFactor;
 
     rr.walkSpeed = roundToHalf(request.walkSpeed);
     rr.bikeSpeed = roundToHalf(request.bikeSpeed);

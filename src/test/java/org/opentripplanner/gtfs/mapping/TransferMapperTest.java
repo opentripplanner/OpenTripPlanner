@@ -55,6 +55,7 @@ public class TransferMapperTest {
     STOP_MAPPER,
     TRIP_MAPPER,
     new TripStopTimes(),
+    false,
     issueStore
   );
 

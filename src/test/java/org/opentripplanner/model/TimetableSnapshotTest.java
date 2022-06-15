@@ -22,6 +22,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 
 public class TimetableSnapshotTest {
 
@@ -65,11 +66,18 @@ public class TimetableSnapshotTest {
     TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
     tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(
+      TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+    );
+    stopTimeUpdateBuilder.setDeparture(TripUpdate.StopTimeEvent.newBuilder().setDelay(2).build());
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -105,11 +113,20 @@ public class TimetableSnapshotTest {
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
         tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
         TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+        stopTimeUpdateBuilder.setStopSequence(2);
+        stopTimeUpdateBuilder.setScheduleRelationship(
+          TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+        );
+        stopTimeUpdateBuilder.setDeparture(
+          TripUpdate.StopTimeEvent.newBuilder().setDelay(5).build()
+        );
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -152,11 +169,20 @@ public class TimetableSnapshotTest {
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
         tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
         TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+        stopTimeUpdateBuilder.setStopSequence(2);
+        stopTimeUpdateBuilder.setScheduleRelationship(
+          TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+        );
+        stopTimeUpdateBuilder.setDeparture(
+          TripUpdate.StopTimeEvent.newBuilder().setDelay(10).build()
+        );
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -195,11 +221,18 @@ public class TimetableSnapshotTest {
     TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
     tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
     TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(
+      TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+    );
+    stopTimeUpdateBuilder.setDeparture(TripUpdate.StopTimeEvent.newBuilder().setDelay(15).build());
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -231,7 +264,12 @@ public class TimetableSnapshotTest {
   ) {
     TripTimesPatch tripTimesPatch = pattern
       .getScheduledTimetable()
-      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+      .createUpdatedTripTimes(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
     TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
     return resolver.update(pattern, updatedTripTimes, serviceDate);
   }

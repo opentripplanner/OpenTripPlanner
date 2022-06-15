@@ -1,11 +1,12 @@
 package org.opentripplanner.graph_builder.issues;
 
+import org.opentripplanner.common.OsmUrlGenerator;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class PrunedIslandStop implements DataImportIssue {
 
-  public static final String FMT = "Stop %s was mapped to a pruned sub graph";
+  public static final String FMT = "Stop %s was linked to a pruned sub graph";
 
   final Vertex vertex;
 
@@ -20,7 +21,8 @@ public class PrunedIslandStop implements DataImportIssue {
 
   @Override
   public String getHTMLMessage() {
-    return String.format(FMT, vertex.getLabel());
+    var url = OsmUrlGenerator.fromCoordinate(vertex.getCoordinate());
+    return "<a href=\"%s\">%s</a>".formatted(url, getMessage());
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 
 public class MqttGtfsRealtimeUpdaterConfig {
@@ -12,7 +13,8 @@ public class MqttGtfsRealtimeUpdaterConfig {
       c.asText("url"),
       c.asText("topic"),
       c.asInt("qos", 0),
-      c.asBoolean("fuzzyTripMatching", false)
+      c.asBoolean("fuzzyTripMatching", false),
+      c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );
   }
 }

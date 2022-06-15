@@ -25,14 +25,12 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
-import graphql.schema.GraphQLType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,7 +54,12 @@ import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeTy
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
 import org.opentripplanner.ext.transmodelapi.model.framework.SystemNoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ValidityPeriodType;
-import org.opentripplanner.ext.transmodelapi.model.network.*;
+import org.opentripplanner.ext.transmodelapi.model.network.DestinationDisplayType;
+import org.opentripplanner.ext.transmodelapi.model.network.GroupOfLinesType;
+import org.opentripplanner.ext.transmodelapi.model.network.JourneyPatternType;
+import org.opentripplanner.ext.transmodelapi.model.network.LineType;
+import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
+import org.opentripplanner.ext.transmodelapi.model.network.StopToStopGeometryType;
 import org.opentripplanner.ext.transmodelapi.model.plan.LegType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PathGuidanceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PlanPlaceType;
@@ -1547,12 +1550,14 @@ public class TransmodelGraphQLSchema {
       .field(DatedServiceJourneyQuery.createQuery(datedServiceJourneyType, gqlUtil))
       .build();
 
-    Set<GraphQLType> dictionary = new HashSet<>();
-    dictionary.add(placeInterface);
-    dictionary.add(timetabledPassingTime);
-    dictionary.add(Relay.pageInfoType);
-
-    return GraphQLSchema.newSchema().query(queryType).build(dictionary);
+    return GraphQLSchema
+      .newSchema()
+      .query(queryType)
+      .additionalType(placeInterface)
+      .additionalType(timetabledPassingTime)
+      .additionalType(Relay.pageInfoType)
+      .additionalDirective(gqlUtil.timingData)
+      .build();
   }
 
   private List<FeedScopedId> toIdList(List<String> ids) {
