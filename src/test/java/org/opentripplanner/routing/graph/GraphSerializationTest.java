@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graph;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.conveyal.object_differ.ObjectDiffer;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.JarFile;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;

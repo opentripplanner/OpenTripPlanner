@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.vertextype;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graph.Graph;
 public class BarrierVertexTest {
 
   @Test
-  public void testBarrierPermissions() throws Exception {
+  public void testBarrierPermissions() {
     OSMNode simpleBarier = new OSMNode();
     assertFalse(simpleBarier.isBollard());
     simpleBarier.addTag("barrier", "bollard");
@@ -105,9 +105,9 @@ public class BarrierVertexTest {
     assertTrue(bv_to_endVertex_forward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
     assertTrue(bv_to_endVertex_forward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
 
-    assertFalse(bv_to_endVertex_forward.canTraverseIncludingBarrier(TraverseMode.CAR));
-    assertTrue(bv_to_endVertex_forward.canTraverseIncludingBarrier(TraverseMode.BICYCLE));
-    assertTrue(bv_to_endVertex_forward.canTraverseIncludingBarrier(TraverseMode.WALK));
+    assertFalse(bv_to_endVertex_forward.canTraverse(TraverseMode.CAR));
+    assertTrue(bv_to_endVertex_forward.canTraverse(TraverseMode.BICYCLE));
+    assertTrue(bv_to_endVertex_forward.canTraverse(TraverseMode.WALK));
 
     StreetEdge endVertex_to_bv_backward = edge(endVertex, bv, 100, true);
 
@@ -115,9 +115,9 @@ public class BarrierVertexTest {
     assertTrue(endVertex_to_bv_backward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
     assertTrue(endVertex_to_bv_backward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
 
-    assertFalse(endVertex_to_bv_backward.canTraverseIncludingBarrier(TraverseMode.CAR));
-    assertTrue(endVertex_to_bv_backward.canTraverseIncludingBarrier(TraverseMode.BICYCLE));
-    assertTrue(endVertex_to_bv_backward.canTraverseIncludingBarrier(TraverseMode.WALK));
+    assertFalse(endVertex_to_bv_backward.canTraverse(TraverseMode.CAR));
+    assertTrue(endVertex_to_bv_backward.canTraverse(TraverseMode.BICYCLE));
+    assertTrue(endVertex_to_bv_backward.canTraverse(TraverseMode.WALK));
 
     StreetEdge bv_to_endVertex_backward = edge(bv, endVertex, 100, true);
 
@@ -125,9 +125,9 @@ public class BarrierVertexTest {
     assertTrue(bv_to_endVertex_backward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
     assertTrue(bv_to_endVertex_backward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
 
-    assertFalse(bv_to_endVertex_backward.canTraverseIncludingBarrier(TraverseMode.CAR));
-    assertTrue(bv_to_endVertex_backward.canTraverseIncludingBarrier(TraverseMode.BICYCLE));
-    assertTrue(bv_to_endVertex_backward.canTraverseIncludingBarrier(TraverseMode.WALK));
+    assertFalse(bv_to_endVertex_backward.canTraverse(TraverseMode.CAR));
+    assertTrue(bv_to_endVertex_backward.canTraverse(TraverseMode.BICYCLE));
+    assertTrue(bv_to_endVertex_backward.canTraverse(TraverseMode.WALK));
 
     StreetEdge endVertex_to_bv_forward = edge(endVertex, bv, 100, false);
 
@@ -135,9 +135,9 @@ public class BarrierVertexTest {
     assertTrue(endVertex_to_bv_forward.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
     assertTrue(endVertex_to_bv_forward.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
 
-    assertFalse(endVertex_to_bv_forward.canTraverseIncludingBarrier(TraverseMode.CAR));
-    assertTrue(endVertex_to_bv_forward.canTraverseIncludingBarrier(TraverseMode.BICYCLE));
-    assertTrue(endVertex_to_bv_forward.canTraverseIncludingBarrier(TraverseMode.WALK));
+    assertFalse(endVertex_to_bv_forward.canTraverse(TraverseMode.CAR));
+    assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.BICYCLE));
+    assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.WALK));
 
     //tests bollard which doesn't allow cycling
     BarrierVertex noBicycleBollard = new BarrierVertex(graph, "no_bike_bollard", 1.5, 1, 0);
@@ -148,9 +148,9 @@ public class BarrierVertexTest {
     assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
     assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
 
-    assertFalse(no_bike_to_endVertex.canTraverseIncludingBarrier(TraverseMode.CAR));
-    assertFalse(no_bike_to_endVertex.canTraverseIncludingBarrier(TraverseMode.BICYCLE));
-    assertTrue(no_bike_to_endVertex.canTraverseIncludingBarrier(TraverseMode.WALK));
+    assertFalse(no_bike_to_endVertex.canTraverse(TraverseMode.CAR));
+    assertFalse(no_bike_to_endVertex.canTraverse(TraverseMode.BICYCLE));
+    assertTrue(no_bike_to_endVertex.canTraverse(TraverseMode.WALK));
   }
 
   /**
