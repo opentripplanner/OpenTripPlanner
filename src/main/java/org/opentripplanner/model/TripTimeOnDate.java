@@ -162,6 +162,10 @@ public class TripTimeOnDate {
     );
   }
 
+  public boolean isPredictionInaccurate() {
+    return tripTimes.isPredictionInaccurate(stopIndex);
+  }
+
   /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
   public boolean isCanceledEffectively() {
     return (
