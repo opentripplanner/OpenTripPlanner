@@ -7,6 +7,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.transit.service.DefaultTransitService;
 
 public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
 
@@ -15,7 +16,8 @@ public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
     String feedId = graph.getFeedIds().iterator().next();
 
     GtfsRealtimeFuzzyTripMatcher matcher = new GtfsRealtimeFuzzyTripMatcher(
-      new RoutingService(graph)
+      new RoutingService(graph),
+      new DefaultTransitService(graph)
     );
     TripDescriptor trip1 = TripDescriptor
       .newBuilder()

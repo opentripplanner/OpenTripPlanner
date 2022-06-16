@@ -17,7 +17,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -59,8 +59,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinking(setup.apply(47.501, 19.04), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
     assertLinking(
       rr -> {
-        rr.from = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, "STOP"), null, null);
-        rr.to = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, "STOP"), null, null);
+        rr.from = new GenericLocation(null, TransitModelForTest.id("STOP"), null, null);
+        rr.to = new GenericLocation(null, TransitModelForTest.id("STOP"), null, null);
       },
       "E1E2 street",
       "D1D2 street",
@@ -180,8 +180,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   private void assertLinkedFromTo(String stopId, String streetName, StreetMode... streetModes) {
     assertLinking(
       rr -> {
-        rr.from = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, stopId), null, null);
-        rr.to = new GenericLocation(null, new FeedScopedId(TEST_FEED_ID, stopId), null, null);
+        rr.from = new GenericLocation(null, TransitModelForTest.id(stopId), null, null);
+        rr.to = new GenericLocation(null, TransitModelForTest.id(stopId), null, null);
       },
       streetName,
       streetName,

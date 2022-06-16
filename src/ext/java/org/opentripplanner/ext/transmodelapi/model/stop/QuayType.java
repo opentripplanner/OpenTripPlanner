@@ -19,13 +19,13 @@ import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.I18NString;
 
 public class QuayType {
@@ -116,7 +116,7 @@ public class QuayType {
               return new MonoOrMultiModalStation(
                 station,
                 GqlUtil
-                  .getRoutingService(environment)
+                  .getTransitService(environment)
                   .getMultiModalStationForStations()
                   .get(station)
               );
@@ -164,7 +164,7 @@ public class QuayType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(lineType))))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForStop(environment.getSource(), true)
               .stream()
               .map(pattern -> pattern.getRoute())
@@ -182,7 +182,7 @@ public class QuayType {
           .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForStop(environment.getSource(), true);
           })
           .build()

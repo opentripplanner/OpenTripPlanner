@@ -1,8 +1,8 @@
 package org.opentripplanner.api.mapping;
 
 import javax.ws.rs.BadRequestException;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 public class FeedScopedIdMapper {
 

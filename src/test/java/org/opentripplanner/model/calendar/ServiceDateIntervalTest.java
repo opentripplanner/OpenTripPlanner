@@ -1,11 +1,12 @@
 package org.opentripplanner.model.calendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ServiceDateIntervalTest {
 
@@ -15,9 +16,9 @@ public class ServiceDateIntervalTest {
   private final ServiceDate d3 = new ServiceDate(2020, 2, 1);
   private final ServiceDate d4 = new ServiceDate(2020, 2, 7);
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void constructorFailsIfEndIsBeforeTheStart() {
-    new ServiceDateInterval(d1.shift(1), d1);
+    assertThrows(IllegalArgumentException.class, () -> new ServiceDateInterval(d1.shift(1), d1));
   }
 
   @Test
@@ -53,35 +54,34 @@ public class ServiceDateIntervalTest {
 
     // First day overlap
     other = new ServiceDateInterval(d0, d1);
-    assertTrue(subject + " should overlap " + other, subject.overlap(other));
+    assertTrue(subject.overlap(other), subject + " should overlap " + other);
 
     // Last day overlap
     other = new ServiceDateInterval(d2, d3);
-    assertTrue(subject + " should overlap " + other, subject.overlap(other));
+    assertTrue(subject.overlap(other), subject + " should overlap " + other);
 
     // Same periods overlap
     other = new ServiceDateInterval(d1, d2);
-    assertTrue(subject + " should overlap " + other, subject.overlap(other));
+    assertTrue(subject.overlap(other), subject + " should overlap " + other);
 
     // Small period overlap part of large
     other = new ServiceDateInterval(d0, d4);
-    assertTrue(subject + " should overlap " + other, subject.overlap(other));
+    assertTrue(subject.overlap(other), subject + " should overlap " + other);
 
     // Period ending day before, do NOT overlap
     other = new ServiceDateInterval(d0, d1.shift(-1));
-    assertFalse(subject + " should not overlap " + other, subject.overlap(other));
+    assertFalse(subject.overlap(other), subject + " should not overlap " + other);
 
     // Period start day after, do NOT overlap
     other = new ServiceDateInterval(d2.shift(1), d3);
-    assertFalse(subject + " should not overlap " + other, subject.overlap(other));
+    assertFalse(subject.overlap(other), subject + " should not overlap " + other);
 
     // Period overlap with unlimited
     ServiceDateInterval unlimited = ServiceDateInterval.unbounded();
-    assertTrue(subject + " should overlap unlimited", subject.overlap(unlimited));
+    assertTrue(subject.overlap(unlimited), subject + " should overlap unlimited");
 
     // Unlimited overlap with unlimited
-    other = ServiceDateInterval.unbounded();
-    assertTrue("Unlimited should overlap it self", unlimited.overlap(unlimited));
+    assertTrue(unlimited.overlap(unlimited), "Unlimited should overlap it self");
   }
 
   @Test
@@ -107,9 +107,12 @@ public class ServiceDateIntervalTest {
     assertEquals(subject, subject.intersection(ServiceDateInterval.unbounded()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void intersectionFailsIfAUnionDoNotExist() {
-    new ServiceDateInterval(d0, d1).intersection(new ServiceDateInterval(d1.shift(1), d2));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new ServiceDateInterval(d0, d1).intersection(new ServiceDateInterval(d1.shift(1), d2))
+    );
   }
 
   @Test

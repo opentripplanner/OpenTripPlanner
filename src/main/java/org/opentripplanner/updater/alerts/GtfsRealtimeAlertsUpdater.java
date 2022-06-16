@@ -8,6 +8,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -64,7 +65,11 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   public void setup(Graph graph) {
     TransitAlertService transitAlertService = new TransitAlertServiceImpl(graph);
     if (fuzzyTripMatching) {
-      this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+      this.fuzzyTripMatcher =
+        new GtfsRealtimeFuzzyTripMatcher(
+          new RoutingService(graph),
+          new DefaultTransitService(graph)
+        );
     }
     this.transitAlertService = transitAlertService;
     if (updateHandler == null) {

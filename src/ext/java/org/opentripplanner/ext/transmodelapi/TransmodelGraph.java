@@ -19,6 +19,7 @@ import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,8 @@ class TransmodelGraph {
 
     TransmodelRequestContext transmodelRequestContext = new TransmodelRequestContext(
       router,
-      new RoutingService(router.graph)
+      new RoutingService(router.graph),
+      new DefaultTransitService(router.graph)
     );
 
     ExecutionInput executionInput = ExecutionInput

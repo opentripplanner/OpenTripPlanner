@@ -3,13 +3,13 @@ package org.opentripplanner.util;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.function.Function.identity;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.util.MapUtils.mapToList;
 
 import java.util.Collections;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (30.10.2017)

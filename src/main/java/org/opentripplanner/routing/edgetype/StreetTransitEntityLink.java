@@ -3,13 +3,13 @@ package org.opentripplanner.routing.edgetype;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -90,14 +90,14 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     var accessibility = s0.getOptions().wheelchairAccessibility;
     if (accessibility.enabled()) {
       if (
-        accessibility.stops().onlyConsiderAccessible() &&
+        accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE
       ) {
         return null;
       } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
+        s1.incrementWeight(req.wheelchairAccessibility.stop().unknownCost());
       } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
+        s1.incrementWeight(req.wheelchairAccessibility.stop().inaccessibleCost());
       }
     }
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.FakeGraph.addExtraStops;
 import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopGrid;
 import static org.opentripplanner.graph_builder.module.FakeGraph.buildGraphNoTransit;
@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -125,7 +125,7 @@ public class LinkingTest {
       TransitStopVertex other = (TransitStopVertex) g2.getVertex(ts.getLabel());
       List<StreetTransitStopLink> stls2 = outgoingStls(other);
 
-      assertEquals("Unequal number of links from stop " + ts, stls1.size(), stls2.size());
+      assertEquals(stls1.size(), stls2.size(), "Unequal number of links from stop " + ts);
 
       for (int i = 0; i < stls1.size(); i++) {
         Vertex v1 = stls1.get(i).getToVertex();

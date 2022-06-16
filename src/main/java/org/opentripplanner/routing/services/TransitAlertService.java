@@ -3,7 +3,7 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public interface TransitAlertService {
   void setAlerts(Collection<TransitAlert> alerts);

@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -90,6 +90,6 @@ public class StateEditorTest {
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NEGATIVE_INFINITY);
 
-    assertNull("Infinity weight increment", stateEditor.makeState());
+    assertNull(stateEditor.makeState(), "Infinity weight increment");
   }
 }

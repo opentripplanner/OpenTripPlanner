@@ -1,15 +1,16 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.calculateTotalDistance;
 import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.getKeySetOfLegsByLimit;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -191,13 +192,19 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
     assertFalse(g_11_10.match(g_11_00));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void illegalRangeForPUpperBound() {
-    new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
+    );
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void illegalRangeForPLowerBound() {
-    new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
+    );
   }
 }

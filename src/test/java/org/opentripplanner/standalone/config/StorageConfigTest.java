@@ -1,10 +1,10 @@
 package org.opentripplanner.standalone.config;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
 import java.io.IOException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class StorageConfigTest {
 

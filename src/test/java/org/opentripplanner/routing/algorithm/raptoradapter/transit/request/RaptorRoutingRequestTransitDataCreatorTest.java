@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
@@ -21,7 +20,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateM
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
@@ -124,7 +123,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
    */
   private static StopTime createStopTime() {
     var st = new StopTime();
-    st.setStop(Stop.stopForTest("Stop:1", 0.0, 0.0));
+    st.setStop(TransitModelForTest.stopForTest("Stop:1", 0.0, 0.0));
     return st;
   }
 

@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.model.PathwayNode;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.StationElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

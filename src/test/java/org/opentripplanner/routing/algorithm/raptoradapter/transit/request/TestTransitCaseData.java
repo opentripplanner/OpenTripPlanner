@@ -1,19 +1,26 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public final class TestTransitCaseData {
 
-  public static final Station STATION_A = Station.stationForTest("A", 60.0, 11.1);
-  public static final Station STATION_B = Station.stationForTest("B", 61.0, 11.5);
+  public static final Station STATION_A = TransitModelForTest
+    .station("A")
+    .withCoordinate(60.0, 11.1)
+    .build();
+  public static final Station STATION_B = TransitModelForTest
+    .station("B")
+    .withCoordinate(61.0, 11.5)
+    .build();
 
-  public static final Stop STOP_A = Stop.stopForTest("A", 60.0, 11.0, STATION_A);
-  public static final Stop STOP_B = Stop.stopForTest("B", 60.0, 11.2, STATION_B);
-  public static final Stop STOP_C = Stop.stopForTest("C", 61.0, 11.4);
-  public static final Stop STOP_D = Stop.stopForTest("D", 61.0, 11.6);
+  public static final Stop STOP_A = TransitModelForTest.stopForTest("A", 60.0, 11.0, STATION_A);
+  public static final Stop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.2, STATION_B);
+  public static final Stop STOP_C = TransitModelForTest.stopForTest("C", 61.0, 11.4);
+  public static final Stop STOP_D = TransitModelForTest.stopForTest("D", 61.0, 11.6);
 
   // Random order stop indexes - should be different from stopPos in pattern to
   // make sure code-under-test do not mix stopIndex and stopPosition
@@ -23,11 +30,6 @@ public final class TestTransitCaseData {
 
   public static final int OFFSET = 0;
 
-  static {
-    setupStationStopRelationship(STATION_A, STOP_A);
-    setupStationStopRelationship(STATION_B, STOP_B);
-  }
-
   public static int stopIndex(StopLocation stop) {
     for (int i = 0; i < RAPTOR_STOP_INDEX.length; ++i) {
       if (stop == RAPTOR_STOP_INDEX[i]) {
@@ -35,12 +37,5 @@ public final class TestTransitCaseData {
       }
     }
     throw new IllegalArgumentException();
-  }
-
-  private static void setupStationStopRelationship(Station station, Stop... stops) {
-    for (Stop stop : stops) {
-      station.addChildStop(stop);
-      stop.setParentStation(station);
-    }
   }
 }

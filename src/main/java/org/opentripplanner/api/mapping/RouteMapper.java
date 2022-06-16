@@ -32,7 +32,7 @@ public class RouteMapper {
       domain.getGtfsType() != null
         ? domain.getGtfsType()
         : RouteTypeMapper.mapToApi(domain.getMode());
-    api.desc = domain.getDesc();
+    api.desc = domain.getDescription();
     api.url = domain.getUrl();
     api.color = domain.getColor();
     api.textColor = domain.getTextColor();

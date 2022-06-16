@@ -48,7 +48,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   public static final int BOARD_COST_SEC = 60;
   public static final int TRANSFER_COST_SEC = 120;
   // The COST_CALCULATOR is not under test, so we use it to calculate correct cost values.
-  public static final DefaultCostCalculator COST_CALCULATOR = new DefaultCostCalculator(
+  public static final DefaultCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE,
@@ -92,13 +92,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
   // Wait at least 1m45s (45s BOARD_SLACK and 60s TRANSFER_SLACK)
   public static final int L1_TRANSIT_DURATION = L1_END - L1_START;
-  public static final int L1_COST_EX_WAIT = COST_CALCULATOR.transitArrivalCost(
-    COST_CALCULATOR.boardingCostRegularTransfer(false, L1_START, STOP_B, L1_START),
-    ZERO,
-    L1_TRANSIT_DURATION,
-    TRANSIT_RELUCTANCE_INDEX,
-    STOP_C
-  );
+
   // Transfers (C ~ Walk 2m ~ D) (Used in Case B only)
   public static final int TX2_START = time("10:20:15");
   public static final int TX2_END = time("10:22:15");
@@ -129,14 +123,26 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
   public static final String LINE_A = "A";
   public static final String LINE_B = "B";
+
   public static final TestTripSchedule TRIP_A = TestTripSchedule
     .schedule(pattern(LINE_A, STOP_A, STOP_D))
     .times(L1_START, L1_END)
+    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
+
   public static final TestTripSchedule TRIP_B = TestTripSchedule
     .schedule(pattern(LINE_B, STOP_B, STOP_C))
     .times(L1_START, L1_END)
+    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
+
+  public static final int L1_COST_EX_WAIT = COST_CALCULATOR.transitArrivalCost(
+    COST_CALCULATOR.boardingCostRegularTransfer(false, L1_START, STOP_B, L1_START),
+    ZERO,
+    L1_TRANSIT_DURATION,
+    TRIP_A,
+    STOP_C
+  );
 
   private static final int TOT_COST_A = toRaptorCost(2564);
   private static final int TOT_COST_W_OPENING_HOURS_A = toRaptorCost(3512);

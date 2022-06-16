@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -218,23 +219,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   }
 
   /**
-   * Checks if edge is accessible for wheelchair if needed according to tags or if slope is too
-   * big.
-   * <p>
-   * Then it checks if street can be traversed according to street permissions and start/end
-   * barriers. This is done with intersection of street and barrier permissions in {@link
-   * #canTraverseIncludingBarrier(TraverseMode)}
-   */
-  public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
-    if (mode.isWalking() && options.wheelchairAccessibility.enabled()) {
-      if (!isWheelchairAccessible()) {
-        return false;
-      }
-    }
-    return canTraverseIncludingBarrier(mode);
-  }
-
-  /**
    * This checks if start or end vertex is bollard If it is it creates intersection of street edge
    * permissions and from/to barriers. Then it checks if mode is allowed to traverse the edge.
    * <p>
@@ -243,9 +227,9 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
    * <p>
    * If start/end isn't bollard it just checks the street permissions.
    * <p>
-   * It is used in {@link #canTraverse(RoutingRequest, TraverseMode)}
+   * It is used in {@link #canTraverse(TraverseMode)}
    */
-  public boolean canTraverseIncludingBarrier(TraverseMode mode) {
+  public boolean canTraverse(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
     if (fromv instanceof BarrierVertex) {
       permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
@@ -273,8 +257,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     return hasElevationExtension() && elevationExtension.isFlattened();
   }
 
-  public float getMaxSlope() {
-    return hasElevationExtension() ? elevationExtension.getMaxSlope() : 0.0f;
+  public double getMaxSlope() {
+    return hasElevationExtension() ? elevationExtension.getMaxSlope() : 0.0d;
   }
 
   public boolean isNoThruTraffic(TraverseMode traverseMode) {
@@ -382,14 +366,14 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
     if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
-      if (canTraverse(options, TraverseMode.BICYCLE)) {
+      if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, options, TraverseMode.BICYCLE, false);
-      } else if (canTraverse(options, TraverseMode.WALK)) {
+      } else if (canTraverse(TraverseMode.WALK)) {
         editor = doTraverse(s0, options, TraverseMode.WALK, true);
       } else {
         return null;
       }
-    } else if (canTraverse(options, s0.getNonTransitMode())) {
+    } else if (canTraverse(s0.getNonTransitMode())) {
       editor = doTraverse(s0, options, s0.getNonTransitMode(), false);
     } else {
       editor = null;
@@ -453,12 +437,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   @Override
   public double getDistanceMeters() {
     return length_mm / 1000.0;
-  }
-
-  private double getDistanceWithElevation() {
-    return hasElevationExtension()
-      ? elevationExtension.getDistanceWithElevation()
-      : getDistanceMeters();
   }
 
   @Override
@@ -847,11 +825,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   }
 
   /**
-   * Get the immutable {@link List} of {@link TurnRestriction}s that belongs to this {@link
-   * StreetEdge}.
+   * Get the immutable {@link List} of {@link TurnRestriction}s that belongs to this
+   * {@link StreetEdge}.
    * <p>
-   * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction} or {@link
-   * StreetEdge#removeTurnRestriction} is called concurrently.
+   * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction} or
+   * {@link StreetEdge#removeTurnRestriction} is called concurrently.
    */
   @Nonnull
   public List<TurnRestriction> getTurnRestrictions() {
@@ -934,6 +912,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     fromEdge.addTurnRestriction(splitTurnRestriction);
   }
 
+  private double getDistanceWithElevation() {
+    return hasElevationExtension()
+      ? elevationExtension.getDistanceWithElevation()
+      : getDistanceMeters();
+  }
+
   /**
    * return a StateEditor rather than a State so that we can make parking/mode switch modifications
    * for kiss-and-ride.
@@ -963,83 +947,22 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
 
     /* Check whether this street allows the current mode. */
-    if (!canTraverse(options, traverseMode)) {
+    if (!canTraverse(traverseMode)) {
       return null;
     }
 
     // Automobiles have variable speeds depending on the edge type
     double speed = calculateSpeed(options, traverseMode, walkingBike);
 
-    double time;
-    double weight;
-    // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
-    switch (traverseMode) {
-      case BICYCLE:
-        time = getEffectiveBikeDistance() / speed;
-        switch (options.bicycleOptimizeType) {
-          case GREENWAYS:
-            weight = bicycleSafetyFactor * getDistanceMeters() / speed;
-            if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
-              // greenways are treated as even safer than they really are
-              weight *= 0.66;
-            }
-            break;
-          case SAFE:
-            weight = getEffectiveBicycleSafetyDistance() / speed;
-            break;
-          case FLAT:
-            /* see notes in StreetVertex on speed overhead */
-            weight = getEffectiveBikeDistanceForWorkCost() / speed;
-            break;
-          case QUICK:
-            weight = getEffectiveBikeDistance() / speed;
-            break;
-          case TRIANGLE:
-            double quick = getEffectiveBikeDistance();
-            double safety = getEffectiveBicycleSafetyDistance();
-            double slope = getEffectiveBikeDistanceForWorkCost();
-            weight =
-              quick *
-              options.bikeTriangleTimeFactor +
-              slope *
-              options.bikeTriangleSlopeFactor +
-              safety *
-              options.bikeTriangleSafetyFactor;
-            weight /= speed;
-            break;
-          default:
-            weight = getDistanceMeters() / speed;
-        }
-        break;
-      case WALK:
-        if (options.wheelchairAccessibility.enabled()) {
-          time = getEffectiveWalkDistance() / speed;
-          weight = getEffectiveBikeDistance() / speed;
+    var traversalCosts =
+      switch (traverseMode) {
+        case BICYCLE, SCOOTER -> bicycleTraversalCost(options, speed);
+        case WALK -> walkingTraversalCosts(options, traverseMode, speed, walkingBike);
+        default -> otherTraversalCosts(options, traverseMode, walkingBike, speed);
+      };
 
-          if (getMaxSlope() > options.maxWheelchairSlope) {
-            double tooSteepCostFactor = options.wheelchairSlopeTooSteepCostFactor;
-            if (tooSteepCostFactor < 0) {
-              return null;
-            }
-            weight *= tooSteepCostFactor;
-          }
-        } else if (walkingBike) {
-          // take slopes into account when walking bikes
-          time = weight = getEffectiveBikeDistance() / speed;
-        } else {
-          // take slopes into account when walking
-          time = weight = getEffectiveWalkDistance() / speed;
-        }
-        break;
-      default:
-        time = weight = getDistanceMeters() / speed;
-    }
-
-    if (isStairs()) {
-      weight *= options.stairsReluctance;
-    } else {
-      weight *= options.getReluctance(traverseMode, walkingBike);
-    }
+    var time = traversalCosts.time();
+    var weight = traversalCosts.weight();
 
     var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
@@ -1133,6 +1056,104 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     return s1;
   }
 
+  @Nonnull
+  private TraversalCosts otherTraversalCosts(
+    RoutingRequest options,
+    TraverseMode traverseMode,
+    boolean walkingBike,
+    double speed
+  ) {
+    var time = getDistanceMeters() / speed;
+    var weight =
+      time *
+      StreetEdgeReluctanceCalculator.computeReluctance(
+        options,
+        traverseMode,
+        walkingBike,
+        isStairs()
+      );
+    return new TraversalCosts(time, weight);
+  }
+
+  @Nonnull
+  private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
+    double time = getEffectiveBikeDistance() / speed;
+    double weight;
+    switch (req.bicycleOptimizeType) {
+      case GREENWAYS -> {
+        weight = bicycleSafetyFactor * getDistanceMeters() / speed;
+        if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
+          // greenways are treated as even safer than they really are
+          weight *= 0.66;
+        }
+      }
+      case SAFE -> weight = getEffectiveBicycleSafetyDistance() / speed;
+      case FLAT -> /* see notes in StreetVertex on speed overhead */weight =
+        getEffectiveBikeDistanceForWorkCost() / speed;
+      case QUICK -> weight = getEffectiveBikeDistance() / speed;
+      case TRIANGLE -> {
+        double quick = getEffectiveBikeDistance();
+        double safety = getEffectiveBicycleSafetyDistance();
+        double slope = getEffectiveBikeDistanceForWorkCost();
+        weight =
+          quick *
+          req.bikeTriangleTimeFactor +
+          slope *
+          req.bikeTriangleSlopeFactor +
+          safety *
+          req.bikeTriangleSafetyFactor;
+        weight /= speed;
+      }
+      default -> weight = getDistanceMeters() / speed;
+    }
+    var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(
+      req,
+      TraverseMode.BICYCLE,
+      false,
+      isStairs()
+    );
+    weight *= reluctance;
+    return new TraversalCosts(time, weight);
+  }
+
+  @Nonnull
+  private TraversalCosts walkingTraversalCosts(
+    RoutingRequest routingRequest,
+    TraverseMode traverseMode,
+    double speed,
+    boolean walkingBike
+  ) {
+    Supplier<Double> nonWheelchairReluctance = () ->
+      StreetEdgeReluctanceCalculator.computeReluctance(
+        routingRequest,
+        traverseMode,
+        walkingBike,
+        isStairs()
+      );
+
+    double time, weight;
+    if (routingRequest.wheelchairAccessibility.enabled()) {
+      time = getEffectiveWalkDistance() / speed;
+      weight =
+        (getEffectiveBikeDistance() / speed) *
+        StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+          routingRequest,
+          getMaxSlope(),
+          isWheelchairAccessible(),
+          isStairs()
+        );
+    } else if (walkingBike) {
+      // take slopes into account when walking bikes
+      time = weight = (getEffectiveBikeDistance() / speed);
+      weight *= nonWheelchairReluctance.get();
+    } else {
+      // take slopes into account when walking
+      time = weight = (getEffectiveWalkDistance() / speed);
+      weight *= nonWheelchairReluctance.get();
+    }
+    return new TraversalCosts(time, weight);
+  }
+
   /* The no-thru traffic support works by not allowing a transition from a no-thru area out of it.
    * It allows starting in a no-thru area by checking for a transition from a "normal"
    * (thru-traffic allowed) edge to a no-thru edge. Once a transition is recorded
@@ -1173,4 +1194,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
   private void writeObject(ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
   }
+
+  /** Tuple to return time and weight from calculation */
+  private record TraversalCosts(double time, double weight) {}
 }

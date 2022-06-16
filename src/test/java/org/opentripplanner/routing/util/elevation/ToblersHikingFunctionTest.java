@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.util.elevation;
 
 import static java.util.Locale.ROOT;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.util.elevation.ToblersHikingFunctionTest.TestCase.tc;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ToblersHikingFunctionTest {
 
@@ -37,7 +37,7 @@ public class ToblersHikingFunctionTest {
 
     for (TestCase it : testCases) {
       double distMultiplier = f.calculateHorizontalWalkingDistanceMultiplier(it.dx, it.dh);
-      assertEquals(it.describe(), it.expected, distMultiplier, 0.01);
+      assertEquals(it.expected, distMultiplier, 0.01, it.describe());
     }
   }
 

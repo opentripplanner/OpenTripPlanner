@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class BogusShapeGeometryCaught implements DataImportIssue {
 

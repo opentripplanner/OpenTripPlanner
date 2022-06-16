@@ -1,10 +1,11 @@
 package org.opentripplanner.standalone.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
@@ -12,9 +13,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.OtpAppException;
 
 public class ConfigLoaderTest {
@@ -25,12 +26,12 @@ public class ConfigLoaderTest {
   private static final String UTF_8 = "UTF-8";
   private File tempDir;
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     tempDir = Files.createTempDirectory("OtpDataStoreTest-").toFile();
   }
 
-  @After
+  @AfterEach
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void tearDown() {
     tempDir.delete();
@@ -78,7 +79,7 @@ public class ConfigLoaderTest {
     RouterConfig res = new ConfigLoader(tempDir).loadRouterConfig();
 
     // then: expect missing node
-    assertNull("Expect deafult value(null)", res.requestLogFile());
+    assertNull(res.requestLogFile(), "Expect deafult value(null)");
   }
 
   @Test
@@ -134,21 +135,19 @@ public class ConfigLoaderTest {
   /**
    * Test replacing environment variables in config fails on a unknown environment variable.
    */
-  @Test(expected = OtpAppException.class)
+  @Test
   public void testMissingEnvironmentVariable() {
-    ConfigLoader.nodeFromString(json("{ key: '${none_existing_env_variable}' }"), "test");
+    assertThrows(
+      OtpAppException.class,
+      () -> ConfigLoader.nodeFromString(json("{ key: '${none_existing_env_variable}' }"), "test")
+    );
   }
 
   @Test
   public void configFailsIfBaseDirectoryDoesNotExist() {
     File cfgDir = new File(tempDir, "cfg");
 
-    try {
-      new ConfigLoader(cfgDir);
-      fail("Expected to fail!");
-    } catch (Exception e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(cfgDir.getName()));
-    }
+    assertThrows(Exception.class, () -> new ConfigLoader(cfgDir), "" + cfgDir.getName());
   }
 
   @Test
@@ -156,12 +155,7 @@ public class ConfigLoaderTest {
     File file = new File(tempDir, "AFile.txt");
     FileUtils.write(file, "{}", UTF_8);
 
-    try {
-      new ConfigLoader(file);
-      fail("Expected to fail!");
-    } catch (Exception e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(file.getName()));
-    }
+    assertThrows(Exception.class, () -> new ConfigLoader(file), "" + file.getName());
   }
 
   private static String json(String text) {

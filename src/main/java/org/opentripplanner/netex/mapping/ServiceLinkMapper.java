@@ -15,7 +15,7 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;

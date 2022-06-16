@@ -17,7 +17,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * A GraphQL query for retrieving data on DatedServiceJourneys
@@ -34,7 +34,7 @@ public class DatedServiceJourneyQuery {
       .dataFetcher(environment -> {
         FeedScopedId id = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
 
-        return GqlUtil.getRoutingService(environment).getTripOnServiceDateById(id);
+        return GqlUtil.getTransitService(environment).getTripOnServiceDateById(id);
       })
       .build();
   }
@@ -95,7 +95,7 @@ public class DatedServiceJourneyQuery {
       )
       .dataFetcher(environment -> {
         Stream<TripOnServiceDate> stream = GqlUtil
-          .getRoutingService(environment)
+          .getTransitService(environment)
           .getTripOnServiceDateById()
           .values()
           .stream();

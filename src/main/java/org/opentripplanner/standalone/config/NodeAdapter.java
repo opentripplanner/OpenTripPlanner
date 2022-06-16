@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;

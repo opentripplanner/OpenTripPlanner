@@ -15,10 +15,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * OTP simple built-in geocoder used by the debug client.
