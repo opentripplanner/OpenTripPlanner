@@ -25,7 +25,7 @@ public class DefaultCostCalculatorTest {
     .build();
 
   private static final TestTripSchedule TRIP_2 = TestTripSchedule
-    .schedule("10:00 11:00")
+    .schedule(ANY_SCHEDULE)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_2)
     .build();
 
