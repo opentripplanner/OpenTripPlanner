@@ -52,7 +52,8 @@ public class StopTimesMapperTest {
   private static final Trip TRIP = new GtfsTestData().trip;
 
   private static final StopTime STOP_TIME = new StopTime();
-  private final StopMapper stopMapper = new StopMapper(new TranslationHelper());
+
+  private final StopMapper stopMapper = new StopMapper(new TranslationHelper(), stationId -> null);
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
   private final LocationMapper locationMapper = new LocationMapper();
   private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(

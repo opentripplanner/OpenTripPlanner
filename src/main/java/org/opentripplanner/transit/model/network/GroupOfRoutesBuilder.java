@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.network;
 
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize
@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
  * example divide lines into commercial and non-commercial groups.
  */
 public class GroupOfRoutesBuilder
-  extends TransitEntityBuilder<GroupOfRoutes, GroupOfRoutesBuilder> {
+  extends AbstractEntityBuilder<GroupOfRoutes, GroupOfRoutesBuilder> {
 
   private String privateCode;
   private String shortName;
@@ -21,8 +21,12 @@ public class GroupOfRoutesBuilder
     super(id);
   }
 
-  GroupOfRoutesBuilder(GroupOfRoutes original) {
+  GroupOfRoutesBuilder(@Nonnull GroupOfRoutes original) {
     super(original);
+    this.privateCode = original.getPrivateCode();
+    this.shortName = original.getShortName();
+    this.name = original.getName();
+    this.description = original.getDescription();
   }
 
   public String getPrivateCode() {
@@ -64,13 +68,5 @@ public class GroupOfRoutesBuilder
   @Override
   protected GroupOfRoutes buildFromValues() {
     return new GroupOfRoutes(this);
-  }
-
-  @Override
-  protected void updateLocal(@Nonnull GroupOfRoutes original) {
-    this.privateCode = original.getPrivateCode();
-    this.shortName = original.getShortName();
-    this.name = original.getName();
-    this.description = original.getDescription();
   }
 }

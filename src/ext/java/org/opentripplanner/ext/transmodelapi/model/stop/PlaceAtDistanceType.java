@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.TransitService;
 
 public class PlaceAtDistanceType {
@@ -72,6 +72,9 @@ public class PlaceAtDistanceType {
     String multiModalMode,
     TransitService transitService
   ) {
+    // Make sure places is mutable
+    places = new ArrayList<>(places);
+
     if (placeTypes == null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
       // Convert quays to stop places
       List<PlaceAtDistance> stations = places

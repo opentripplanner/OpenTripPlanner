@@ -8,7 +8,6 @@ public class LegacyGraphQLRequestContext {
 
   private final Router router;
   private final RoutingService routingService;
-
   private final TransitService transitService;
 
   public LegacyGraphQLRequestContext(

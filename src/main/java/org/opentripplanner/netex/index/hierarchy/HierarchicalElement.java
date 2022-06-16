@@ -60,6 +60,6 @@ public class HierarchicalElement<E> {
   @Override
   public String toString() {
     E value = get();
-    return value == null ? "<empty>" : value.toString();
+    return value == null ? "[empty]" : value.toString();
   }
 }

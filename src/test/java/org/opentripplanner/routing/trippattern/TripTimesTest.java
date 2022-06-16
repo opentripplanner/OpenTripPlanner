@@ -7,10 +7,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Test;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TripTimesTest {
@@ -47,7 +47,7 @@ public class TripTimesTest {
     for (int i = 0; i < stops.length; ++i) {
       StopTime stopTime = new StopTime();
 
-      Stop stop = Stop.stopForTest(stops[i].getId(), 0.0, 0.0);
+      Stop stop = TransitModelForTest.stopForTest(stops[i].getId(), 0.0, 0.0);
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
@@ -146,9 +146,9 @@ public class TripTimesTest {
     StopTime stopTime1 = new StopTime();
     StopTime stopTime2 = new StopTime();
 
-    Stop stop0 = Stop.stopForTest(stops[0].getId(), 0.0, 0.0);
-    Stop stop1 = Stop.stopForTest(stops[1].getId(), 0.0, 0.0);
-    Stop stop2 = Stop.stopForTest(stops[2].getId(), 0.0, 0.0);
+    Stop stop0 = TransitModelForTest.stopForTest(stops[0].getId(), 0.0, 0.0);
+    Stop stop1 = TransitModelForTest.stopForTest(stops[1].getId(), 0.0, 0.0);
+    Stop stop2 = TransitModelForTest.stopForTest(stops[2].getId(), 0.0, 0.0);
 
     stopTime0.setStop(stop0);
     stopTime0.setDepartureTime(0);

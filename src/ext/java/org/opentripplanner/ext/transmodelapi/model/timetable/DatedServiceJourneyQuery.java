@@ -17,7 +17,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * A GraphQL query for retrieving data on DatedServiceJourneys

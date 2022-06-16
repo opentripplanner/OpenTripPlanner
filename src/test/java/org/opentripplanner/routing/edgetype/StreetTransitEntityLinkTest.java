@@ -2,13 +2,12 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.model.WheelchairAccessibility.NOT_POSSIBLE;
-import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
-import static org.opentripplanner.model.WheelchairAccessibility.POSSIBLE;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NOT_POSSIBLE;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.POSSIBLE;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
@@ -17,33 +16,34 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.site.Stop;
 
 class StreetTransitEntityLinkTest {
 
   Graph graph = new Graph();
 
-  Stop inaccessibleStop = Stop.stopForTest(
+  Stop inaccessibleStop = TransitModelForTest.stopForTest(
     "A:inaccessible",
-    new NonLocalizedString("wheelchair inaccessible stop"),
+    "wheelchair inaccessible stop",
     10.001,
     10.001,
     null,
     NOT_POSSIBLE
   );
-  Stop accessibleStop = Stop.stopForTest(
+  Stop accessibleStop = TransitModelForTest.stopForTest(
     "A:accessible",
-    new NonLocalizedString("wheelchair accessible stop"),
+    "wheelchair accessible stop",
     10.001,
     10.001,
     null,
     POSSIBLE
   );
 
-  Stop unknownStop = Stop.stopForTest(
+  Stop unknownStop = TransitModelForTest.stopForTest(
     "A:unknown",
-    new NonLocalizedString("unknown"),
+    "unknown",
     10.001,
     10.001,
     null,
