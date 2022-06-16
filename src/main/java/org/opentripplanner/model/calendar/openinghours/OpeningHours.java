@@ -65,4 +65,10 @@ public class OpeningHours implements Comparable<OpeningHours> {
   public boolean contains(OpeningHours other) {
     return this.startTime <= other.startTime && other.endTime <= endTime;
   }
+
+  public boolean isOpen(int day, int secondsSinceMidnight) {
+    return (
+      days.get(day) && this.startTime <= secondsSinceMidnight && secondsSinceMidnight <= endTime
+    );
+  }
 }

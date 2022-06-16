@@ -19,7 +19,7 @@ public class OHSearchContext {
   }
 
   public boolean isOpen(OHCalendar calendar, long timeEpochSecond) {
-    return true;
+    return calendar.isOpen(timeEpochSecond);
   }
 
   public boolean canEnter(OHCalendar calendar, long epochSecond) {
@@ -27,6 +27,6 @@ public class OHSearchContext {
   }
 
   public boolean canExit(OHCalendar calendar, long epochSecond) {
-    return false;
+    return isOpen(calendar, epochSecond);
   }
 }

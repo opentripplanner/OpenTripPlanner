@@ -47,6 +47,8 @@ public class OHCalendarBuilder {
     // will still be sorted in the right order after day filtering
     Collections.sort(openingHours);
     return new OHCalendar(
+      startOfPeriod,
+      endOfPeriod,
       zoneId,
       deduplicator.deduplicateImmutableList(OpeningHours.class, openingHours)
     );

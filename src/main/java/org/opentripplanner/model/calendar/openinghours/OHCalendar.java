@@ -1,6 +1,10 @@
 package org.opentripplanner.model.calendar.openinghours;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -8,10 +12,35 @@ public class OHCalendar {
 
   private final ZoneId zoneId;
   private final List<OpeningHours> openingHours;
+  private final LocalDate startOfCalendar;
+  private final LocalDate endOfCalendar;
 
-  public OHCalendar(ZoneId zoneId, List<OpeningHours> openingHours) {
+  public OHCalendar(
+    LocalDate startOfCalendar,
+    LocalDate endOfCalendar,
+    ZoneId zoneId,
+    List<OpeningHours> openingHours
+  ) {
+    this.startOfCalendar = startOfCalendar;
+    this.endOfCalendar = endOfCalendar;
     this.zoneId = zoneId;
     this.openingHours = openingHours;
+  }
+
+  public boolean isOpen(long timeEpochSecond) {
+    ZonedDateTime searchDateTime = Instant.ofEpochSecond(timeEpochSecond).atZone(zoneId);
+    LocalDate searchDate = searchDateTime.toLocalDate();
+    int daysFromStart = (int) ChronoUnit.DAYS.between(startOfCalendar, searchDate);
+    int daysUntilEnd = (int) ChronoUnit.DAYS.between(searchDate, endOfCalendar);
+    if (daysFromStart < 0 || daysUntilEnd < 0) {
+      return false;
+    }
+    int secondsFromMidnight = searchDateTime.toLocalTime().toSecondOfDay();
+    return openingHours
+      .stream()
+      .anyMatch(openingHoursDefinition ->
+        openingHoursDefinition.isOpen(daysFromStart, secondsFromMidnight)
+      );
   }
 
   @Override
