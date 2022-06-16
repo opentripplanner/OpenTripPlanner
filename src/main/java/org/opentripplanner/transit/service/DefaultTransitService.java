@@ -43,6 +43,12 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
 
+/**
+ * Default implementation of the Transit Service and Transit Editor Service.
+ * A new instance of this class should be created for each request.
+ * This ensures that the same TimetableSnapshot is used for the
+ * duration of the request (which may involve several method calls).
+ */
 public class DefaultTransitService implements TransitEditorService {
 
   private final Graph graph;

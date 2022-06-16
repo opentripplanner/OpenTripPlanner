@@ -36,6 +36,9 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
 
+/**
+ * Entry point for read-only requests towards the transit API.
+ */
 public interface TransitService {
   Collection<String> getFeedIds();
 

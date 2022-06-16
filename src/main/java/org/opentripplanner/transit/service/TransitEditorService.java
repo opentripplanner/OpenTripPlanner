@@ -12,6 +12,9 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 
+/**
+ * Entry point for requests (both read-only and read-write) towards the transit API.
+ */
 public interface TransitEditorService extends TransitService {
   void addAgency(String feedId, Agency agency);
 

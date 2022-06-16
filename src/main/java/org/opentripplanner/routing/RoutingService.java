@@ -50,9 +50,7 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
 /**
- * This is the entry point of all API requests towards the OTP graph. A new instance of this class
- * should be created for each request. This ensures that the same TimetableSnapshot is used for the
- * duration of the request (which may involve several method calls).
+ * Entry point for requests towards the routing API.
  */
 public class RoutingService {
 
