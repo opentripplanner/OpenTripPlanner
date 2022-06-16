@@ -3,7 +3,7 @@ package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Note that I decided to call this class ServiceCalendar instead of Calendar, so as to avoid
@@ -162,7 +162,7 @@ public final class ServiceCalendar implements Serializable {
 
   public String toString() {
     return (
-      "<ServiceCalendar " +
+      "ServiceCalendar{" +
       this.serviceId +
       " [" +
       this.monday +
@@ -172,7 +172,7 @@ public final class ServiceCalendar implements Serializable {
       this.friday +
       this.saturday +
       this.sunday +
-      "]>"
+      "]}"
     );
   }
 }

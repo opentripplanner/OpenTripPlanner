@@ -26,8 +26,6 @@ import java.util.regex.Pattern;
  */
 public final class ServiceDate implements Serializable, Comparable<ServiceDate> {
 
-  private static final long serialVersionUID = 1L;
-
   private static final String MAX_TEXT = "MAX";
   private static final String MIN_TEXT = "MIN";
 

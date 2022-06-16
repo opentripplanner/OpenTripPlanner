@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.filterchain.filter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 /**
  * An experimental feature for calculating a numeric score between 0 and 1 which indicates how

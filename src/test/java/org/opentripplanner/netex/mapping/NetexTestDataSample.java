@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
@@ -13,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
@@ -184,7 +183,7 @@ class NetexTestDataSample {
     // Setup stops
     for (int i = 0; i < NUM_OF_STOPS; i++) {
       String stopId = "NSR:Quay:" + (i + 1);
-      stopsById.add(Stop.stopForTest(stopId, 60.0, 10.0));
+      stopsById.add(TransitModelForTest.stopForTest(stopId, 60.0, 10.0));
       quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
     }
   }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopCollection;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -96,10 +100,5 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
   public Collection<Station> getChildStations() {
     return this.childStations;
-  }
-
-  @Override
-  public String toString() {
-    return "<MultiModal station " + getId() + ">";
   }
 }

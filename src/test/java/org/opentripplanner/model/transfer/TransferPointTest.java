@@ -90,10 +90,10 @@ public class TransferPointTest {
 
   @Test
   public void testToString() {
-    assertEquals("<Station F:Central Station>", STATION_POINT.toString());
-    assertEquals("<Stop F:A>", STOP_POINT_A.toString());
-    assertEquals("<Route F:1, stop F:A>", ROUTE_POINT_1A.toString());
-    assertEquals("<Route F:1, station F:Central Station>", ROUTE_POINT_1S.toString());
-    assertEquals("<Trip F:21, stopPos 3>", TRIP_POINT_21_3.toString());
+    assertEquals("StationTP{F:Central Station}", STATION_POINT.toString());
+    assertEquals("StopTP{F:A}", STOP_POINT_A.toString());
+    assertEquals("RouteTP{F:1, stop F:A}", ROUTE_POINT_1A.toString());
+    assertEquals("RouteTP{F:1, station F:Central Station}", ROUTE_POINT_1S.toString());
+    assertEquals("TripTP{F:21, stopPos 3}", TRIP_POINT_21_3.toString());
   }
 }

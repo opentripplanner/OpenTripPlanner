@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.VehicleRentalStationInfo;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.State;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.

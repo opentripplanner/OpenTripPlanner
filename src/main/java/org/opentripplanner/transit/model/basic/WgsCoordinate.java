@@ -1,6 +1,7 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.basic;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.lang.DoubleRounder;
@@ -12,9 +13,6 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  * This is a ValueObject (design pattern).
  */
 public final class WgsCoordinate implements Serializable {
-
-  private static final String WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS =
-    "Use the 'sameLocation(..)' method to compare coordinates. See JavaDoc on 'equals(..)'";
 
   private final double latitude;
   private final double longitude;
@@ -43,6 +41,31 @@ public final class WgsCoordinate implements Serializable {
     );
   }
 
+  /**
+   * Find the mean coordinate between the given set of {@code coordinates}.
+   */
+  public static WgsCoordinate mean(Collection<WgsCoordinate> coordinates) {
+    if (coordinates.isEmpty()) {
+      throw new IllegalArgumentException(
+        "Unable to calculate mean for an empty set of coordinates"
+      );
+    }
+    if (coordinates.size() == 1) {
+      return coordinates.iterator().next();
+    }
+
+    double n = coordinates.size();
+    double latitude = 0.0;
+    double longitude = 0.0;
+
+    for (WgsCoordinate c : coordinates) {
+      latitude += c.latitude();
+      longitude += c.longitude();
+    }
+
+    return new WgsCoordinate(latitude / n, longitude / n);
+  }
+
   public double latitude() {
     return latitude;
   }
@@ -60,42 +83,20 @@ public final class WgsCoordinate implements Serializable {
    * Compare to coordinates and return {@code true} if they are close together - have the same
    * location. The comparison uses an EPSILON of 1E-7 for each axis, for both latitude and
    * longitude.
-   */
-  public boolean sameLocation(WgsCoordinate other) {
-    if (this == other) {
-      return true;
-    }
-    return Objects.equals(latitude, other.latitude) && Objects.equals(longitude, other.longitude);
-  }
-
-  /**
-   * @throws UnsupportedOperationException if called. See {@link #equals(Object)}
-   */
-  @Override
-  public int hashCode() {
-    throw new UnsupportedOperationException(WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS);
-  }
-
-  /**
-   * Not supported, throws UnsupportedOperationException. When we compare to coordinates we want see
-   * if they are within a given distance, roughly within a square centimeter. This is not
+   *
+   * When we compare two coordinates we want to see if they are within a given distance,
+   * roughly within a square centimeter. This is not
    * <em>transitive</em>, hence violating the equals/hasCode guideline. Consider 3 point along
    * one of the axis:
    * <pre>
-   *  | 8mm | 8mm |
-   *  x --- y --- z
-   * </pre>
+   *      | 8mm | 8mm |
+   *      x --- y --- z
+   *     </pre>
    * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is {@code true},
    * but {@code x.sameLocation(z)} is {@code false}.
-   * <p>
-   * Use the {@link #sameLocation(WgsCoordinate)} method instead of equals, and never put this class
-   * in a Set or use it as a key in a Map.
-   *
-   * @throws UnsupportedOperationException if called.
    */
-  @Override
-  public boolean equals(Object obj) {
-    throw new UnsupportedOperationException(WHY_COORDINATE_DO_NOT_HAVE_HASH_EQUALS);
+  public boolean sameLocation(WgsCoordinate other) {
+    return equals(other);
   }
 
   /**
@@ -105,5 +106,27 @@ public final class WgsCoordinate implements Serializable {
   @Override
   public String toString() {
     return ValueObjectToStringBuilder.of().addCoordinate(latitude(), longitude()).toString();
+  }
+
+  /**
+   * Return true if the coordinates are numerically equal. The coordinate latitude and longitude
+   * are rounded to the closest number of 1E-7 when constructed. This enforces two coordinates
+   * that is close together to be equals.
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    WgsCoordinate other = (WgsCoordinate) o;
+    return latitude == other.latitude && longitude == other.longitude;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(latitude, longitude);
   }
 }

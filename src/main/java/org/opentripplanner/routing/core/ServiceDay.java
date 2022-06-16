@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Represents a day of transit services. Intended for quickly checking whether a service is running

@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.error;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.response.RoutingError;
 
 public class RoutingValidationException extends RuntimeException {
-
-  private static final long serialVersionUID = 1L;
 
   private final List<RoutingError> routingErrors;
 
@@ -29,5 +29,10 @@ public class RoutingValidationException extends RuntimeException {
 
   public List<RoutingError> getRoutingErrors() {
     return routingErrors;
+  }
+
+  @Override
+  public String getMessage() {
+    return routingErrors.stream().map(Objects::toString).collect(Collectors.joining("\n"));
   }
 }
