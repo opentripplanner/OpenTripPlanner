@@ -3,6 +3,7 @@ package org.opentripplanner.util;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -34,6 +35,29 @@ public class NonLocalizedString implements I18NString, Serializable {
       return null;
     }
     return new NonLocalizedString(name);
+  }
+
+  /**
+   * Create a new instance from the given wrapper type, if the input is not {@code null}, else
+   * return {@code null}.
+   */
+  public static <W> NonLocalizedString ofNullable(
+    @Nullable W wrapper,
+    @Nonnull Function<W, String> getValueOp
+  ) {
+    return wrapper == null ? null : new NonLocalizedString(getValueOp.apply(wrapper));
+  }
+
+  /**
+   * Create a new instance from the given wrapper type, if the input is not {@code null}, else
+   * return {@code null}.
+   */
+  public static <W> NonLocalizedString ofNullable(
+    @Nullable W wrapper,
+    @Nonnull Function<W, String> getValueOp,
+    @Nonnull String defaultValue
+  ) {
+    return new NonLocalizedString(wrapper == null ? defaultValue : getValueOp.apply(wrapper));
   }
 
   /**

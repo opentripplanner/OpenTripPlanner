@@ -13,12 +13,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -26,11 +24,13 @@ import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 
@@ -40,7 +40,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
 
-  private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
+  private static final Stop STOP_FOR_TEST = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
 
   private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
     WheelchairAccessibilityRequest.DEFAULT;
@@ -57,8 +57,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
       ? WheelchairAccessibility.POSSIBLE
       : WheelchairAccessibility.NOT_POSSIBLE;
 
-    var firstStop = Stop.stopForTest("TEST:START", wheelchairBoarding, 0.0, 0.0);
-    var lastStop = Stop.stopForTest("TEST:END", wheelchairBoarding, 0.0, 0.0);
+    var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchairBoarding, 0.0, 0.0);
+    var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchairBoarding, 0.0, 0.0);
 
     var stopTimeStart = new StopTime();
     var stopTimeEnd = new StopTime();

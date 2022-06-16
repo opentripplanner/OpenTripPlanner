@@ -21,7 +21,6 @@ import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
@@ -30,7 +29,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateM
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class FlexRouter {
 

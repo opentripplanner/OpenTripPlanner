@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 

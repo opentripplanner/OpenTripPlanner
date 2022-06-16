@@ -6,7 +6,10 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
 import java.util.Collection;
-import org.junit.jupiter.api.Assertions;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.IntFunction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -19,9 +22,10 @@ import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.util.time.TimeUtils;
 
 public class OtpTransitServiceBuilderTest {
 
@@ -41,7 +45,7 @@ public class OtpTransitServiceBuilderTest {
 
     assertEquals(1, calendarDates.size());
     assertEquals(
-      "<CalendarDate serviceId=F:weekdays date=2017-08-31 exception=2>",
+      "ServiceCalendarDate{serviceId: F:weekdays, date: 2017-08-31, exception: 2}",
       first(calendarDates).toString()
     );
   }
@@ -51,17 +55,22 @@ public class OtpTransitServiceBuilderTest {
     Collection<ServiceCalendar> calendars = subject.getCalendars();
 
     assertEquals(2, calendars.size());
-    assertEquals("<ServiceCalendar F:alldays [1111111]>", first(calendars).toString());
+    assertEquals("ServiceCalendar{F:alldays [1111111]}", first(calendars).toString());
   }
 
   @Test
   public void testGetAllFrequencies() {
-    Collection<Frequency> frequencies = subject.getFrequencies();
+    List<Frequency> frequencies = subject
+      .getFrequencies()
+      .stream()
+      .sorted(frequencyComp())
+      .toList();
 
     assertEquals(2, frequencies.size());
+
     assertEquals(
-      "<Frequency trip=agency:15.1 start=06:00:00 end=10:00:01>",
-      first(frequencies).toString()
+      "Frequency{trip: agency:15.1, start: 6:00, end: 10:00:01}",
+      frequencies.get(0).toString()
     );
   }
 
@@ -70,7 +79,7 @@ public class OtpTransitServiceBuilderTest {
     Collection<Route> routes = subject.getRoutes().values();
 
     assertEquals(18, routes.size());
-    assertEquals("<Route agency:1 1>", first(routes).toString());
+    assertEquals("Route{agency:1 1}", first(routes).toString());
   }
 
   @Test
@@ -78,7 +87,7 @@ public class OtpTransitServiceBuilderTest {
     Collection<ShapePoint> shapePoints = subject.getShapePoints().values();
 
     assertEquals(9, shapePoints.size());
-    assertEquals("<ShapePoint F:4 #1 (41.0,-75.0)>", first(shapePoints).toString());
+    assertEquals("ShapePoint{F:4 #1 (41.0,-75.0)}", first(shapePoints).toString());
   }
 
   /* private methods */
@@ -111,5 +120,20 @@ public class OtpTransitServiceBuilderTest {
 
   private static <T> T first(Collection<? extends T> c) {
     return c.stream().min(comparing(T::toString)).orElse(null);
+  }
+
+  private static Comparator<Frequency> frequencyComp() {
+    return (l, r) -> {
+      int c;
+      c = l.getTrip().getId().toString().compareTo(r.getTrip().getId().toString());
+      if (c != 0) {
+        return c;
+      }
+      c = l.getStartTime() - r.getStartTime();
+      if (c != 0) {
+        return c;
+      }
+      return l.getEndTime() - r.getEndTime();
+    };
   }
 }

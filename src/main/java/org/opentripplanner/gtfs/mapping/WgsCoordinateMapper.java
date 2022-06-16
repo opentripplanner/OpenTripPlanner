@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 class WgsCoordinateMapper {
 

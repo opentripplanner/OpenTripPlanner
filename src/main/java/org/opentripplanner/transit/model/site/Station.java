@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 import static org.opentripplanner.common.geometry.GeometryUtils.getGeometryFactory;
 
@@ -9,37 +9,34 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
  * bus terminal, or a bus station (with a bus stop at each side of the road). Equivalent to GTFS
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
-public class Station extends TransitEntity implements StopCollection {
+public class Station
+  extends TransitEntity2<Station, StationBuilder>
+  implements StopCollection, LogInfo {
 
-  private static final long serialVersionUID = 1L;
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
   private final I18NString name;
-
   private final String code;
-
   private final I18NString description;
-
   private final WgsCoordinate coordinate;
-
   private final StopTransferPriority priority;
-  /**
-   * URL to a web page containing information about this particular station
-   */
   private final I18NString url;
   private final TimeZone timezone;
 
@@ -49,46 +46,28 @@ public class Station extends TransitEntity implements StopCollection {
 
   private GeometryCollection geometry;
 
-  public Station(
-    FeedScopedId id,
-    I18NString name,
-    WgsCoordinate coordinate,
-    String code,
-    I18NString description,
-    I18NString url,
-    TimeZone timezone,
-    StopTransferPriority priority
-  ) {
-    super(id);
-    this.name = name;
-    this.coordinate = coordinate;
-    this.code = code;
-    this.description = description;
-    this.url = url;
-    this.timezone = timezone;
-    this.priority = priority == null ? DEFAULT_PRIORITY : priority;
+  Station(StationBuilder builder) {
+    super(builder.getId());
+    // Required fields
+    this.name = Objects.requireNonNull(builder.getName());
+    this.coordinate = Objects.requireNonNull(builder.getCoordinate());
+    this.priority = Objects.requireNonNullElse(builder.getPriority(), DEFAULT_PRIORITY);
+
+    // Optional fields
+    this.code = builder.getCode();
+    this.description = builder.getDescription();
+    this.url = builder.getUrl();
+    this.timezone = builder.getTimezone();
+
     // Initialize the geometry with an empty set of children
     this.geometry = computeGeometry(coordinate, Set.of());
   }
 
-  /**
-   * Create a minimal Station object for unit-test use, where the test only care about id, name and
-   * coordinate. The feedId is static set to "F"
-   */
-  public static Station stationForTest(String idAndName, double lat, double lon) {
-    return new Station(
-      new FeedScopedId("F", idAndName),
-      new NonLocalizedString(idAndName),
-      new WgsCoordinate(lat, lon),
-      idAndName,
-      new NonLocalizedString("Station " + idAndName),
-      null,
-      null,
-      StopTransferPriority.ALLOWED
-    );
+  public static StationBuilder of(FeedScopedId id) {
+    return new StationBuilder(id);
   }
 
-  public void addChildStop(Stop stop) {
+  void addChildStop(Stop stop) {
     this.childStops.add(stop);
     this.geometry = computeGeometry(coordinate, childStops);
   }
@@ -97,41 +76,47 @@ public class Station extends TransitEntity implements StopCollection {
     return childStops.contains(stop);
   }
 
-  @Override
-  public String toString() {
-    return "<Station " + getId() + ">";
-  }
-
+  @Nonnull
   public I18NString getName() {
     return name;
   }
 
+  @Nonnull
   public Collection<StopLocation> getChildStops() {
     return childStops;
   }
 
+  @Override
   public double getLat() {
     return coordinate.latitude();
   }
 
+  @Override
   public double getLon() {
     return coordinate.longitude();
   }
 
+  @Nonnull
   public WgsCoordinate getCoordinate() {
     return coordinate;
   }
 
   /** Public facing station code (short text or number) */
+  @Nullable
   public String getCode() {
     return code;
   }
 
   /** Additional information about the station (if needed) */
+  @Nullable
   public I18NString getDescription() {
     return description;
   }
 
+  /**
+   * URL to a web page containing information about this particular station
+   */
+  @Nullable
   public I18NString getUrl() {
     return url;
   }
@@ -145,10 +130,12 @@ public class Station extends TransitEntity implements StopCollection {
    * that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of adding
    * 0 - zero cost.
    */
+  @Nonnull
   public StopTransferPriority getPriority() {
     return priority;
   }
 
+  @Nullable
   public TimeZone getTimezone() {
     return timezone;
   }
@@ -157,8 +144,35 @@ public class Station extends TransitEntity implements StopCollection {
    * A geometry collection that contains the center point and the convex hull of all the child
    * stops.
    */
+  @Nonnull
   public GeometryCollection getGeometry() {
     return geometry;
+  }
+
+  @Override
+  @Nullable
+  public String logName() {
+    return name == null ? null : name.toString();
+  }
+
+  @Override
+  @Nonnull
+  public StationBuilder copy() {
+    return new StationBuilder(this);
+  }
+
+  @Override
+  public boolean sameAs(@Nonnull Station other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(name, other.name) &&
+      Objects.equals(code, other.code) &&
+      Objects.equals(description, other.description) &&
+      Objects.equals(coordinate, other.coordinate) &&
+      Objects.equals(priority, other.priority) &&
+      Objects.equals(url, other.url) &&
+      Objects.equals(timezone, other.timezone)
+    );
   }
 
   private static GeometryCollection computeGeometry(

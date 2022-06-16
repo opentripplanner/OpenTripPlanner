@@ -1,8 +1,9 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
@@ -23,9 +24,8 @@ public abstract class TransitEntity implements Serializable {
 
   private final FeedScopedId id;
 
-  public TransitEntity(@NotNull FeedScopedId id) {
-    this.id = id;
-    Objects.requireNonNull(this.id);
+  public TransitEntity(@Nonnull FeedScopedId id) {
+    this.id = Objects.requireNonNull(id);
   }
 
   public final FeedScopedId getId() {
@@ -55,7 +55,15 @@ public abstract class TransitEntity implements Serializable {
    * Provide a default toString implementation with class name and id.
    */
   @Override
-  public String toString() {
-    return "<" + getClass().getSimpleName() + " " + getId() + ">";
+  public final String toString() {
+    var buf = new StringBuilder(getClass().getSimpleName());
+
+    buf.append('{').append(getId());
+
+    if ((this instanceof LogInfo n) && n.logName() != null) {
+      buf.append(' ').append(n.logName());
+    }
+    buf.append('}');
+    return buf.toString();
   }
 }

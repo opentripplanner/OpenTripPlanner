@@ -121,7 +121,7 @@ public class LineType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getDesc())
+          .dataFetcher(environment -> ((Route) environment.getSource()).getDescription())
           .build()
       )
       .field(

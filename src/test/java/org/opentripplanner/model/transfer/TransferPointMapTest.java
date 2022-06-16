@@ -9,7 +9,6 @@ import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1A
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1S;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2B;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2S;
-import static org.opentripplanner.model.transfer.TransferTestData.STATION;
 import static org.opentripplanner.model.transfer.TransferTestData.STATION_POINT;
 import static org.opentripplanner.model.transfer.TransferTestData.STOP_A;
 import static org.opentripplanner.model.transfer.TransferTestData.STOP_B;
@@ -21,7 +20,6 @@ import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_11_
 import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_21_3;
 
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TransferPointMapTest {
@@ -29,11 +27,6 @@ class TransferPointMapTest {
   private static final int ANY_STOP_POS = 999;
 
   final TransferPointMap<String> subject = new TransferPointMap<>();
-
-  @BeforeEach
-  void setup() {
-    STOP_A.setParentStation(STATION);
-  }
 
   @Test
   void addAndGetEmptyMap() {

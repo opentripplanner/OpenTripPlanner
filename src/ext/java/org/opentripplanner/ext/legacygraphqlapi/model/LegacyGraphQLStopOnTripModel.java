@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi.model;
 
-import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**

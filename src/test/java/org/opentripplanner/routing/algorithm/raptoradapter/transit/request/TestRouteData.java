@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
@@ -24,17 +22,14 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
-import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TestRouteData {
 
-  private final Agency agency = Agency
-    .of(TransitModelForTest.id("agency"))
-    .withName("Test Agency")
-    .build();
   private final Route route;
   private final List<Trip> trips;
   private final Map<Trip, List<StopTime>> stopTimesByTrip = new HashMap<>();
@@ -46,13 +41,7 @@ public class TestRouteData {
 
   public TestRouteData(String route, TransitMode mode, List<Stop> stops, String... times) {
     final Deduplicator deduplicator = new Deduplicator();
-    this.route =
-      Route
-        .of(TransitModelForTest.id(route))
-        .withAgency(agency)
-        .withMode(mode)
-        .withShortName(route)
-        .build();
+    this.route = TransitModelForTest.route(route).withMode(mode).withShortName(route).build();
     this.trips =
       Arrays
         .stream(times)

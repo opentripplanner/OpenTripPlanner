@@ -13,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
@@ -24,7 +23,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
@@ -49,9 +50,12 @@ class OsmBoardingLocationsModuleTest {
     Arguments.of(false, Set.of("osm:node:768590748"))
   );
   File file = new File(ConstantsForTests.HERRENBERG_OSM);
-  Stop platform = Stop.stopForTest("de:08115:4512:4:101", 48.59328, 8.86128);
-  Stop busStop = Stop.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
-  Stop floatingBusStop = Stop.stopForTest("floating-bus-stop", 48.59417, 8.86464);
+  Stop platform = TransitModelForTest
+    .stop("de:08115:4512:4:101")
+    .withCoordinate(48.59328, 8.86128)
+    .build();
+  Stop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
+  Stop floatingBusStop = TransitModelForTest.stopForTest("floating-bus-stop", 48.59417, 8.86464);
 
   @ParameterizedTest(
     name = "add boarding locations and link them to platform edges when skipVisibility={0}"

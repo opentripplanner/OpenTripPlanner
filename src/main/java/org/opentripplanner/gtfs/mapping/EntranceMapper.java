@@ -3,8 +3,10 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.Entrance;
-import org.opentripplanner.util.I18NString;
+import java.util.function.Function;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.TranslationHelper;
 
@@ -16,9 +18,14 @@ class EntranceMapper {
   private final Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
 
   private final TranslationHelper translationHelper;
+  private final Function<FeedScopedId, Station> stationLookUp;
 
-  EntranceMapper(TranslationHelper translationHelper) {
+  EntranceMapper(
+    TranslationHelper translationHelper,
+    Function<FeedScopedId, Station> stationLookUp
+  ) {
     this.translationHelper = translationHelper;
+    this.stationLookUp = stationLookUp;
   }
 
   Collection<Entrance> map(Collection<org.onebusaway.gtfs.model.Stop> allEntrances) {
@@ -42,28 +49,36 @@ class EntranceMapper {
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
-    final I18NString name = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "name",
-      base.getId().getId(),
-      base.getName()
+    var builder = Entrance
+      .of(base.getId())
+      .withCode(base.getCode())
+      .withCoordinate(base.getCoordinate())
+      .withWheelchairAccessibility(base.getWheelchairAccessibility())
+      .withLevel(base.getLevel());
+
+    builder.withName(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "name",
+        base.getId().getId(),
+        base.getName()
+      )
     );
 
-    final I18NString desc = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "desc",
-      base.getId().getId(),
-      base.getDescription()
-    );
+    builder =
+      builder.withDescription(
+        translationHelper.getTranslation(
+          org.onebusaway.gtfs.model.Stop.class,
+          "desc",
+          base.getId().getId(),
+          base.getDescription()
+        )
+      );
 
-    return new Entrance(
-      base.getId(),
-      name,
-      base.getCode(),
-      desc,
-      base.getCoordinate(),
-      base.getWheelchairAccessibility(),
-      base.getLevel()
-    );
+    if (gtfsStop.getParentStation() != null) {
+      builder.withParentStation(stationLookUp.apply(base.getParentStationId()));
+    }
+
+    return builder.build();
   }
 }

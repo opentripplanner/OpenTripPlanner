@@ -15,15 +15,15 @@ import java.util.stream.Collectors;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -92,7 +92,7 @@ class StopAndStationMapper {
     // were deleted in never versions of the StopPlace
     for (StopPlace stopPlace : stopPlaceAllVersions) {
       for (Quay quay : listOfQuays(stopPlace)) {
-        addNewStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);
+        addStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);
       }
     }
   }
@@ -103,6 +103,7 @@ class StopAndStationMapper {
 
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
     Station station = stationMapper.map(stopPlace);
+
     if (stopPlace.getParentSiteRef() != null) {
       resultStationByMultiModalStationRfs.put(stopPlace.getParentSiteRef().getRef(), station);
     }
@@ -153,7 +154,7 @@ class StopAndStationMapper {
       .collect(toList());
   }
 
-  private void addNewStopToParentIfNotPresent(
+  private void addStopToParentIfNotPresent(
     Quay quay,
     Station station,
     Collection<FareZone> fareZones,
@@ -177,8 +178,6 @@ class StopAndStationMapper {
     if (stop == null) {
       return;
     }
-
-    station.addChildStop(stop);
 
     resultStops.add(stop);
     quaysAlreadyProcessed.add(quay.getId());

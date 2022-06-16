@@ -2,8 +2,9 @@
 package org.opentripplanner.model;
 
 import java.io.Serializable;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public final class FareRule implements Serializable {
 
@@ -60,21 +61,12 @@ public final class FareRule implements Serializable {
   }
 
   public String toString() {
-    return (
-      "<FareRule " +
-      toStrOpt(" route=", route) +
-      toStrOpt(" origin=", originId) +
-      toStrOpt(" contains=", containsId) +
-      toStrOpt(" destination=", destinationId) +
-      ">"
-    );
-  }
-
-  private static String toStrOpt(String lbl, TransitEntity arg) {
-    return (arg == null ? "" : lbl + arg.getId());
-  }
-
-  private static String toStrOpt(String lbl, String arg) {
-    return (arg == null ? "" : lbl + '\'' + arg + '\'');
+    return ToStringBuilder
+      .of(FareRule.class)
+      .addObjOp("route", route, TransitEntity::getId)
+      .addObj("originId", originId)
+      .addObj("containsId", containsId)
+      .addObj("destinationId", destinationId)
+      .toString();
   }
 }

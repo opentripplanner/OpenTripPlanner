@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FeedScopedIdFactoryTest {
 

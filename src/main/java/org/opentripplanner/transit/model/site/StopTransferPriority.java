@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 /**
  * Categorize how suitable a Station or Transfer is it for transfer. The values arrange stops from

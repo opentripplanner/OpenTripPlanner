@@ -1,7 +1,11 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.basic;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -47,5 +51,19 @@ public class WgsCoordinateTest {
     // Assert latitude is y, and longitude is x coordinate
     Assert.assertEquals(latitude, jts.y, 1E-7);
     Assert.assertEquals(longitude, jts.x, 1E-7);
+  }
+
+  @Test
+  public void mean() {
+    var c1 = new WgsCoordinate(10.0, 5.0);
+    var c2 = new WgsCoordinate(20.0, -5.0);
+
+    var m = WgsCoordinate.mean(List.of(c1));
+    assertSame(c1, m);
+
+    var m1 = WgsCoordinate.mean(List.of(c1, c2));
+    assertTrue(new WgsCoordinate(15.0, 0.0).sameLocation(m1));
+
+    assertThrows(IllegalArgumentException.class, () -> WgsCoordinate.mean(List.of()));
   }
 }

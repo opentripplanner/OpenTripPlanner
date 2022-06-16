@@ -2,11 +2,7 @@ package org.opentripplanner.model.plan;
 
 import static org.opentripplanner.util.time.TimeUtils.time;
 
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.time.DurationUtils;
 
 public interface PlanTestConstants {
@@ -66,22 +62,7 @@ public interface PlanTestConstants {
   Place G = place("G", 9.5, 11.0);
   Place H = place("H", 10.0, 11.5);
 
-  private static Place place(String name, double lat, double lon) {
-    var stop = new Stop(
-      new FeedScopedId(TransitModelForTest.FEED_ID, name),
-      new NonLocalizedString(name),
-      null,
-      null,
-      WgsCoordinate.creatOptionalCoordinate(lat, lon),
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
-    return Place.forStop(stop);
+  static Place place(String name, double lat, double lon) {
+    return Place.forStop(TransitModelForTest.stop(name).withCoordinate(lat, lon).build());
   }
 }
