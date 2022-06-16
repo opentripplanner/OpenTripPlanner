@@ -26,20 +26,14 @@ public class GraphFileHeaderTest {
 
   @Test
   public void parseToShort() {
-    assertThrows(
-      OtpAppException.class,
-      () -> GraphFileHeader.parse(new byte[10])
-    );
+    assertThrows(OtpAppException.class, () -> GraphFileHeader.parse(new byte[10]));
   }
 
   @Test
   public void parseIllegalId() {
     String illegalVersionId = "€€€€€€";
     byte[] header = ("OpenTripPlannerGraph;" + illegalVersionId + ";").getBytes(CHARSET);
-    assertThrows(
-      OtpAppException.class,
-      () -> GraphFileHeader.parse(header)
-    );
+    assertThrows(OtpAppException.class, () -> GraphFileHeader.parse(header));
   }
 
   @Test
@@ -84,8 +78,8 @@ public class GraphFileHeaderTest {
 
   @Test
   public void dump() {
-    assertEquals("<empty>", GraphFileHeader.prettyBytesToString(null));
-    assertEquals("<empty>", GraphFileHeader.prettyBytesToString(new byte[0]));
+    assertEquals("[empty]", GraphFileHeader.prettyBytesToString(null));
+    assertEquals("[empty]", GraphFileHeader.prettyBytesToString(new byte[0]));
     assertEquals(
       "41 6C 66 61 2D 31  \"Alfa-1\"",
       GraphFileHeader.prettyBytesToString(new byte[] { 'A', 'l', 'f', 'a', '-', '1' })

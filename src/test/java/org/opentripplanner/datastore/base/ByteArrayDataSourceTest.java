@@ -64,9 +64,6 @@ public class ByteArrayDataSourceTest {
       .withBytes(BYTES);
 
     assertFalse(subject.isWritable());
-    assertThrows(
-      UnsupportedOperationException.class,
-      subject::asOutputStream
-    );
+    assertThrows(UnsupportedOperationException.class, subject::asOutputStream);
   }
 }

@@ -14,6 +14,8 @@ public class OtpProjectInfoTest {
   public void projectInfo() {
     OtpProjectInfo p = OtpProjectInfo.projectInfo();
 
+    System.out.println(p);
+
     p.otpConfigVersion = "1";
     assertEquals("1", p.otpConfigVersion);
     assertNull(p.buildConfigVersion);

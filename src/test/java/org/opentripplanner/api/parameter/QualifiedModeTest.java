@@ -25,7 +25,11 @@ public class QualifiedModeTest {
     }
   }
 
-  private void assertModeEquals(QualifiedMode qMode, ApiRequestMode mode, Set<Qualifier> qualifiers) {
+  private void assertModeEquals(
+    QualifiedMode qMode,
+    ApiRequestMode mode,
+    Set<Qualifier> qualifiers
+  ) {
     assertEquals(qMode.mode, mode);
     assertEquals(qMode.qualifiers, qualifiers);
   }

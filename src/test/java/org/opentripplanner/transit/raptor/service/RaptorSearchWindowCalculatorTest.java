@@ -161,10 +161,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void calculateNotDefinedIfMinTravelTimeNotSet() {
-    assertThrows(
-      IllegalArgumentException.class,
-      subject::calculate
-    );
+    assertThrows(IllegalArgumentException.class, subject::calculate);
   }
 
   @Test
@@ -177,10 +174,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void roundUpToNearestMinuteNotDefinedForNegativeNumbers() {
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> subject.roundUpToNearestMinute(-1)
-    );
+    assertThrows(IllegalArgumentException.class, () -> subject.roundUpToNearestMinute(-1));
   }
 
   @Test

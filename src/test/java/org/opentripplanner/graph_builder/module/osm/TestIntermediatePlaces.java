@@ -285,7 +285,7 @@ public class TestIntermediatePlaces {
         assertTrue(
           legIndex < itinerary.legs.size(),
           "Intermediate location was not an endpoint of any leg"
-          );
+        );
         leg = itinerary.legs.get(legIndex);
         legIndex++;
       } while (

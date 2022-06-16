@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public class TransmodelMappingUtilTest {
@@ -27,7 +27,7 @@ public class TransmodelMappingUtilTest {
           )
         ),
       "In case of a tie, A or B should be used"
-      );
+    );
   }
 
   Agency agency(String feedScope, int id) {

@@ -4,8 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.site.StopCollection;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -66,11 +69,6 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
 
   public void setPurposeOfGrouping(PurposeOfGrouping purposeOfGrouping) {
     this.purposeOfGrouping = purposeOfGrouping;
-  }
-
-  @Override
-  public String toString() {
-    return "<GroupOfStations " + getId() + ">";
   }
 
   /**

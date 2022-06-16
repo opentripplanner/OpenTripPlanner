@@ -82,7 +82,7 @@ public class ParetoSetWithMarkerTest {
       "{}",
       toString(subject.elementsAfterMarker()),
       "Empty set have no elements after marker"
-      );
+    );
 
     subject.add(v(5, 5));
     subject.markAtEndOfSet();
@@ -90,7 +90,7 @@ public class ParetoSetWithMarkerTest {
       "{}",
       toString(subject.elementsAfterMarker()),
       "Still empty - no elements after marker"
-      );
+    );
 
     subject.markAtEndOfSet();
     subject.add(v(3, 7));
@@ -98,7 +98,7 @@ public class ParetoSetWithMarkerTest {
       "[3, 7]",
       toString(subject.elementsAfterMarker()),
       "Return one element after marker"
-      );
+    );
   }
 
   @Test

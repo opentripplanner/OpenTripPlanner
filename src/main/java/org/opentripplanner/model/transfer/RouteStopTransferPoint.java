@@ -1,8 +1,8 @@
 package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 public final class RouteStopTransferPoint implements TransferPoint, Serializable {
@@ -44,11 +44,11 @@ public final class RouteStopTransferPoint implements TransferPoint, Serializable
   public String toString() {
     return ValueObjectToStringBuilder
       .of()
-      .addText("<Route ")
+      .addText("RouteTP{")
       .addObj(route.getId())
       .addText(", stop ")
       .addObj(stop.getId())
-      .addText(">")
+      .addText("}")
       .toString();
   }
 }

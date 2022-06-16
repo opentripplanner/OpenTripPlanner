@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
 import java.util.function.ToIntFunction;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -133,7 +133,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
    * Set cursor to stop followed by the give transit leg - this allows access to be time-shifted
    * according to the next transit boarding/departure time.
    */
-  public ArrivalView<T> stop(int round, int stop, @NotNull Transit<T> nextTransitLeg) {
+  public ArrivalView<T> stop(int round, int stop, @Nonnull Transit<T> nextTransitLeg) {
     var arrival = arrivals.get(round, stop);
 
     if (arrival.arrivedByAccessOnStreet()) {

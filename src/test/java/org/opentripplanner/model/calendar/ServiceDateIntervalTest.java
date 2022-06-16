@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class ServiceDateIntervalTest {
@@ -19,10 +18,7 @@ public class ServiceDateIntervalTest {
 
   @Test
   public void constructorFailsIfEndIsBeforeTheStart() {
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> new ServiceDateInterval(d1.shift(1), d1)
-    );
+    assertThrows(IllegalArgumentException.class, () -> new ServiceDateInterval(d1.shift(1), d1));
   }
 
   @Test

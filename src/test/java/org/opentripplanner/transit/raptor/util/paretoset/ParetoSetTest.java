@@ -77,10 +77,7 @@ public class ParetoSetTest {
     addOk(set, vector);
 
     // When vector is removed, expect an exception
-    assertThrows(
-      UnsupportedOperationException.class,
-      () -> set.remove(vector)
-    );
+    assertThrows(UnsupportedOperationException.class, () -> set.remove(vector));
   }
 
   @Test
@@ -490,11 +487,11 @@ public class ParetoSetTest {
         qualify,
         added,
         description +
-          " - qualify() and add() should return the same value. v0: " +
-          v0 +
-          ", v1: " +
-          v1
-        );
+        " - qualify() and add() should return the same value. v0: " +
+        v0 +
+        ", v1: " +
+        v1
+      );
       assertEquals(expected, set.toString(), description);
     }
   }

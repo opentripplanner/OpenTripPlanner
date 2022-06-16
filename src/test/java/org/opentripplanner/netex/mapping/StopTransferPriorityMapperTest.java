@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.StopTransferPriority;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
 
 public class StopTransferPriorityMapperTest {

@@ -1,6 +1,8 @@
-package org.opentripplanner.transit.model.basic;
+package org.opentripplanner.transit.model.framework;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 
 /**
@@ -23,7 +25,7 @@ import javax.annotation.Nonnull;
  * This class also enforce a strong type-safe relationship between entity and builder.
  */
 public abstract class TransitEntity2<
-  E extends TransitEntity2<E, B>, B extends TransitEntityBuilder<E, B>
+  E extends TransitEntity2<E, B>, B extends AbstractEntityBuilder<E, B>
 >
   extends TransitEntity
   implements TransitObject<E, B> {
@@ -37,5 +39,12 @@ public abstract class TransitEntity2<
       return List.of();
     }
     return List.copyOf(list);
+  }
+
+  protected static <T> Set<T> setOfNullSafe(Collection<T> input) {
+    if (input == null || input.isEmpty()) {
+      return Set.of();
+    }
+    return Set.copyOf(input);
   }
 }

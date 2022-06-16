@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
@@ -52,10 +52,7 @@ public class WgsCoordinateMapperTest {
       new SimplePoint_VersionStructure()
         .withLocation(new LocationStructure().withLongitude(LONGITUDE));
 
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> WgsCoordinateMapper.mapToDomain(p)
-    );
+    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 
   @Test
@@ -64,9 +61,6 @@ public class WgsCoordinateMapperTest {
     p =
       new SimplePoint_VersionStructure()
         .withLocation(new LocationStructure().withLatitude(LATITUDE));
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> WgsCoordinateMapper.mapToDomain(p)
-    );
+    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 }

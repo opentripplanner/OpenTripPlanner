@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.model.network;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -24,7 +26,6 @@ public class GroupOfRoutesTest {
     .build();
 
   @Test
-  @SuppressWarnings("ConstantConditions")
   public void copy() {
     // Make a copy, and set the same name (nothing is changed)
     var copy = subject.copy().withName(NAME).build();
@@ -47,17 +48,14 @@ public class GroupOfRoutesTest {
   }
 
   @Test
-  @SuppressWarnings("ConstantConditions")
-  public void testToString() {
-    assertEquals(
-      "GroupOfRoutes{" +
-      "id: F:Test:GroupOfLines:1, " +
-      "privateCode: 'test_private_code', " +
-      "shortName: 'test_short_name', " +
-      "name: 'test_name', " +
-      "description: 'description'" +
-      "}",
-      subject.toString()
-    );
+  public void sameValue() {
+    // Make a copy, and set the same name (nothing is changed)
+    var other = subject.copy().build();
+    assertTrue(subject.sameAs(other));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withDescription("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withPrivateCode("X").build()));
   }
 }

@@ -20,20 +20,20 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -157,10 +157,13 @@ public class NetexBundleSmokeTest {
     TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
     assertEquals("Jernbanetorget", p.getTripHeadsign());
     assertEquals("RB", p.getFeedId());
-    assertEquals("[<Stop RB:NSR:Quay:7203>, <Stop RB:NSR:Quay:8027>]", p.getStops().toString());
     assertEquals(
-      "[<Trip RB:RUT:ServiceJourney:12-101375-1000>]",
-      p.scheduledTripsAsStream().collect(Collectors.toList()).toString()
+      "[Stop{RB:NSR:Quay:7203 N/A}, Stop{RB:NSR:Quay:8027 N/A}]",
+      p.getStops().toString()
+    );
+    assertEquals(
+      "[Trip{RB:RUT:ServiceJourney:12-101375-1000 12}]",
+      p.scheduledTripsAsStream().toList().toString()
     );
 
     // TODO OTP2 - Why?

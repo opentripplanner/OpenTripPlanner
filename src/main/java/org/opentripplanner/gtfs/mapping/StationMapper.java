@@ -5,8 +5,8 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.util.TranslationHelper;
 
 /**
@@ -43,38 +43,41 @@ class StationMapper {
         rhs.getLocationType()
       );
     }
+    StationBuilder builder = Station
+      .of(mapAgencyAndId(rhs.getId()))
+      .withCoordinate(WgsCoordinateMapper.mapToDomain(rhs))
+      .withCode(rhs.getCode());
 
-    final I18NString name = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "name",
-      rhs.getId().getId(),
-      rhs.getName()
+    builder.withName(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "name",
+        rhs.getId().getId(),
+        rhs.getName()
+      )
     );
 
-    I18NString description = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "desc",
-      rhs.getId().getId(),
-      rhs.getDesc()
+    builder.withDescription(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "desc",
+        rhs.getId().getId(),
+        rhs.getDesc()
+      )
     );
 
-    I18NString url = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "url",
-      rhs.getId().getId(),
-      rhs.getUrl()
+    builder.withUrl(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "url",
+        rhs.getId().getId(),
+        rhs.getUrl()
+      )
     );
 
-    return new Station(
-      mapAgencyAndId(rhs.getId()),
-      name,
-      WgsCoordinateMapper.mapToDomain(rhs),
-      rhs.getCode(),
-      description,
-      url,
-      rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone()),
-      // Use default cost priority
-      null
-    );
+    if (rhs.getTimezone() != null) {
+      builder.withTimezone(TimeZone.getTimeZone(rhs.getTimezone()));
+    }
+    return builder.build();
   }
 }

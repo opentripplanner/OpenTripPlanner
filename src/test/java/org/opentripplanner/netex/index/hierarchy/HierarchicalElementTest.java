@@ -67,8 +67,8 @@ public class HierarchicalElementTest {
 
   @Test
   public void toStringTest() {
-    assertEquals("<empty>", child.toString());
-    assertEquals("<empty>", parent.toString());
+    assertEquals("[empty]", child.toString());
+    assertEquals("[empty]", parent.toString());
     parent.set(HELLO_MY_KING);
     assertEquals("Hello my king", child.toString());
     child.set(HELLO_MY_FRIEND);

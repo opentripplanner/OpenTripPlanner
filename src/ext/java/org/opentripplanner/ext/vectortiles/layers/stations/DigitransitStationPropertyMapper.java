@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 

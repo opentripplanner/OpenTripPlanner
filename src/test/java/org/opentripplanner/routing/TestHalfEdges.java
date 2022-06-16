@@ -22,7 +22,6 @@ import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -43,7 +42,9 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TestUtils;
 
@@ -157,9 +158,9 @@ public class TestHalfEdges {
         true
       );
 
-    Stop s1 = Stop.stopForTest("fleem station", 40.0099999, -74.005);
+    Stop s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
 
-    Stop s2 = Stop.stopForTest("morx station", 40.0099999, -74.002);
+    Stop s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
 
     station1 = new TransitStopVertex(graph, s1, null);
     station2 = new TransitStopVertex(graph, s2, null);
@@ -232,10 +233,7 @@ public class TestHalfEdges {
       .getShortestPathTree();
 
     GraphPath pathTr = spt2.getPath(end);
-    assertNotNull(
-      pathTr,
-      "There must be a path from tr to end"
-    );
+    assertNotNull(pathTr, "There must be a path from tr to end");
     assertTrue(
       pathBr.getWeight() > pathTr.getWeight(),
       "path from bottom to end must be longer than path from top to end"
