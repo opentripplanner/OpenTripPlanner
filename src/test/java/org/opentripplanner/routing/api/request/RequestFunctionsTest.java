@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.function.DoubleFunction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RequestFunctionsTest {
 
@@ -31,17 +31,16 @@ public class RequestFunctionsTest {
 
   @Test
   public void parseIllegalValue() {
-    try {
-      RequestFunctions.parse("not-a-function");
-      fail();
-    } catch (IllegalArgumentException e) {
-      assertEquals("Unable to parse function: 'not-a-function'", e.getMessage());
-    }
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RequestFunctions.parse("not-a-function"),
+      "Unable to parse function: 'not-a-function'"
+    );
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void parseIllegalNumber() {
     // Must use '.' as decimal separator, not ','
-    RequestFunctions.parse("3,0 + 2.0 x");
+    assertThrows(IllegalArgumentException.class, () -> RequestFunctions.parse("3,0 + 2.0 x"));
   }
 }

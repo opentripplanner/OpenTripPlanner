@@ -1,11 +1,11 @@
 package org.opentripplanner.util.logging;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ProgressTrackerTest {
 
@@ -25,7 +25,7 @@ public class ProgressTrackerTest {
     assertEquals("Pete progress: 2 done", msg);
 
     msg = p.completeMessage();
-    assertTrue(msg, msg.startsWith("Pete progress tracking complete. 2 done in"));
+    assertTrue(msg.startsWith("Pete progress tracking complete. 2 done in"), msg);
   }
 
   @Test
@@ -37,14 +37,13 @@ public class ProgressTrackerTest {
     msg = null;
     p.step(m -> msg = m);
     assertNull(msg, msg);
-    assertNull("Pete progress: 2 bytes of 200 bytes ( 1%)", msg);
+    assertNull(msg, "Pete progress: 2 bytes of 200 bytes ( 1%)");
 
-    msg = null;
     p.step(m -> msg = m);
     assertEquals("Pete progress: 2 bytes of 200 bytes ( 1%)", msg);
 
     msg = p.completeMessage();
-    assertTrue(msg, msg.startsWith("Pete progress tracking complete. 2 bytes done in"));
+    assertTrue(msg.startsWith("Pete progress tracking complete. 2 bytes done in"), msg);
   }
 
   @Test
@@ -62,7 +61,7 @@ public class ProgressTrackerTest {
     long time = System.currentTimeMillis() - start;
     // If test was able to run within the quiet period
     if (time < QUIET_PERIOD) {
-      assertFalse("No steps should log anything within the quiet period. Time: " + time, breakOut);
+      assertFalse(breakOut, "No steps should log anything within the quiet period. Time: " + time);
     }
   }
 

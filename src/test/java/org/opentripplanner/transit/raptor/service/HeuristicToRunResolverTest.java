@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
@@ -107,8 +107,8 @@ public class HeuristicToRunResolverTest {
       this::enableForward,
       this::enableReverse
     );
-    assertEquals(msg + " - Forward", forwardExpected, forward);
-    assertEquals(msg + " - Reverse", reverseExpected, reverse);
+    assertEquals(forwardExpected, forward, msg + " - Forward");
+    assertEquals(reverseExpected, reverse, msg + " - Reverse");
   }
 
   private void enableForward() {

@@ -1,6 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
@@ -40,26 +44,26 @@ class TripAssert {
   }
 
   void assertNoTripFound() {
-    Assert.assertNull("No trip expected, but trip found with index: " + result, result);
+    assertNull(result, "No trip expected, but trip found with index: " + result);
   }
 
   TripAssert assertTripFound() {
-    Assert.assertNotNull("Trip expected, but trip found", result);
+    assertNotNull(result, "Trip expected, but trip found");
     return this;
   }
 
   TripAssert withIndex(int expectedTripIndex) {
-    Assert.assertEquals("Trip index", expectedTripIndex, result.getTripIndex());
+    assertEquals(expectedTripIndex, result.getTripIndex(), "Trip index");
     return this;
   }
 
   TripAssert withBoardTime(int expectedBoardTime) {
-    Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().departure(stopPosition));
+    assertEquals(expectedBoardTime, result.getTrip().departure(stopPosition), "Board time");
     return this;
   }
 
-  TripAssert withAlightTime(int expectedBoardTime) {
-    Assert.assertEquals("Board time", expectedBoardTime, result.getTrip().arrival(stopPosition));
+  TripAssert withAlightTime(int expectedAlightTime) {
+    assertEquals(expectedAlightTime, result.getTrip().arrival(stopPosition), "Alight time");
     return this;
   }
 }

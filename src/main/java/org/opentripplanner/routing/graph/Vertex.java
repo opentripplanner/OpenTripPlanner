@@ -14,7 +14,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

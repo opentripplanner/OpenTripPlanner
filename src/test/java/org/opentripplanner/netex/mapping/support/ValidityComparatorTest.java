@@ -2,7 +2,7 @@ package org.opentripplanner.netex.mapping.support;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.util.Assert;
 import org.rutebanken.netex.model.ValidBetween;
 

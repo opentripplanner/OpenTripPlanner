@@ -3,7 +3,6 @@ package org.opentripplanner.model.transfer;
 import java.io.Serializable;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 public final class RouteStationTransferPoint implements TransferPoint, Serializable {
 

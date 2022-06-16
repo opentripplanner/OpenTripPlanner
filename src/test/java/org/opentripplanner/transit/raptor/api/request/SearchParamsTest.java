@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 public class SearchParamsTest {
@@ -70,11 +70,6 @@ public class SearchParamsTest {
   }
 
   public void assertParamNotValid(SearchParamsBuilder<TestTripSchedule> p, String msg) {
-    try {
-      p.build();
-      Assert.fail("Test case failed: " + msg);
-    } catch (IllegalArgumentException e) {
-      assertEquals(msg, e.getMessage());
-    }
+    assertThrows(IllegalArgumentException.class, p::build, msg);
   }
 }
