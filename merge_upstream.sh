@@ -23,7 +23,7 @@ function main() {
     resumePreviousExecution
     resetDevelop
     # digitransit currently has no extension features
-    # rebaseAndMergeExtBranch otp2_ext_features
+    # rebaseAndMergeExtBranch digitransit_ext_features
     configDigitransitCI
     logSuccess
 }
@@ -179,10 +179,10 @@ function rebaseAndMergeExtBranch() {
 function configDigitransitCI() {
     git checkout "${DEVBRANCH}"
     rm -rf .github
-    git checkout otp2_ext_config .github
-    git checkout otp2_ext_config Dockerfile
-    git checkout otp2_ext_config Dockerfile.builder
-    git checkout otp2_ext_config run.sh
+    git checkout origin/digitransit_ext_config .github
+    git checkout origin/digitransit_ext_config Dockerfile
+    git checkout origin/digitransit_ext_config Dockerfile.builder
+    git checkout origin/digitransit_ext_config run.sh
     git commit -a -m "Configure Digitransit CI actions"
     if [[ -z "${DRY_RUN}" ]] ; then
         git push -f
@@ -195,7 +195,7 @@ function logSuccess() {
     echo "##   UPSTREAM MERGE DONE  --  SUCCESS"
     echo "## ------------------------------------------------------------------------------------- ##"
     echo "   - '${REMOTE_REPO}/${DEVBRANCH}' reset to '${OTP_BASE}'"
-    echo "   - 'otp2_ext_config' CI features added"
+    echo "   - 'digitransit_ext_config' CI features added"
     echo ""
     echo ""
 }
