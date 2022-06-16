@@ -185,10 +185,10 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("predictionInaccurate")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .description(
-            "Whether the updated estimates are expected to be inaccurate. NOT IMPLEMENTED"
+          .description("Whether the updated estimates are expected to be inaccurate.")
+          .dataFetcher(environment ->
+            ((TripTimeOnDate) environment.getSource()).isPredictionInaccurate()
           )
-          .dataFetcher(environment -> false)
           .build()
       )
       .field(

@@ -66,6 +66,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use negative delay from first stop in a GTFS RT update in previous stop times when required [#4035](https://github.com/opentripplanner/OpenTripPlanner/pull/4035)
 - OTP2 no longer crashes on invalid GTFS stop time sequences [#4205](https://github.com/opentripplanner/OpenTripPlanner/pull/4205)
 - Update developers guide [#4203](https://github.com/opentripplanner/OpenTripPlanner/pull/4203)
+- Cost-based accessibility routing for streets [#4163](https://github.com/opentripplanner/OpenTripPlanner/pull/4163)
+- Expose SIRI ET PredictionInaccurate in Transmodel-API [#4217](https://github.com/opentripplanner/OpenTripPlanner/pull/4217)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
