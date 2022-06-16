@@ -6,11 +6,11 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public class AccessibilityScoreFilterTest implements PlanTestConstants {
 
@@ -19,17 +19,17 @@ public class AccessibilityScoreFilterTest implements PlanTestConstants {
     final int ID = 1;
 
     Itinerary i1 = newItinerary(A, 0)
-      .walk(20, Place.forStop(Stop.stopForTest("1:stop", 1d, 1d)))
+      .walk(20, Place.forStop(TransitModelForTest.stopForTest("1:stop", 1d, 1d)))
       .bus(ID, 0, 50, B)
       .bus(ID, 52, 100, C)
       .build();
     Itinerary i2 = newItinerary(A, 0)
-      .walk(20, Place.forStop(Stop.stopForTest("1:stop", 1d, 1d)))
+      .walk(20, Place.forStop(TransitModelForTest.stopForTest("1:stop", 1d, 1d)))
       .bus(ID, 0, 50, B)
       .bus(ID, 52, 100, C)
       .build();
     Itinerary i3 = newItinerary(A, 0)
-      .walk(20, Place.forStop(Stop.stopForTest("1:stop", 1d, 1d)))
+      .walk(20, Place.forStop(TransitModelForTest.stopForTest("1:stop", 1d, 1d)))
       .bus(ID, 0, 50, B)
       .bus(ID, 52, 100, C)
       .build();
