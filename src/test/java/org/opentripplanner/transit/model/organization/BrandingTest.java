@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -49,17 +51,13 @@ public class BrandingTest {
   }
 
   @Test
-  public void testToString() {
-    assertEquals(
-      "Branding{" +
-      "id: F:Branding:1, " +
-      "shortName: 'test_short_name', " +
-      "name: 'test_name', " +
-      "url: 'test_url', " +
-      "description: 'test_description', " +
-      "image: 'test_image'" +
-      "}",
-      subject.toString()
-    );
+  void sameAs() {
+    assertTrue(subject.sameAs(subject.copy().build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withDescription("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withImage("X").build()));
   }
 }

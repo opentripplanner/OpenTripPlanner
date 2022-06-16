@@ -10,12 +10,13 @@ public class AssertUtils {
    *
    * @throws IllegalArgumentException if given value is {@code null}, empty or only whitespace.
    */
-  public static void assertHasValue(String value) {
+  public static String assertHasValue(String value) {
     if (value == null || value.isBlank()) {
       throw new IllegalArgumentException(
         "Value can not be null, empty or just whitespace: " +
         (value == null ? "null" : "'" + value + "'")
       );
     }
+    return value;
   }
 }

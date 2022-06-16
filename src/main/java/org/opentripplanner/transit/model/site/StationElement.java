@@ -1,9 +1,11 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -11,7 +13,10 @@ import org.opentripplanner.util.I18NString;
  * of the fields are shared between the types, and eg. in pathways the namespace any of them can be
  * used as from and to.
  */
-public abstract class StationElement extends TransitEntity {
+public abstract class StationElement<
+  E extends StationElement<E, B>, B extends StationElementBuilder<E, B>
+>
+  extends TransitEntity2<E, B> {
 
   private final I18NString name;
 
@@ -25,25 +30,24 @@ public abstract class StationElement extends TransitEntity {
 
   private final StopLevel level;
 
-  private Station parentStation;
+  private final Station parentStation;
 
-  public StationElement(
-    FeedScopedId id,
-    I18NString name,
-    String code,
-    I18NString description,
-    WgsCoordinate coordinate,
-    WheelchairAccessibility wheelchairAccessibility,
-    StopLevel level
-  ) {
-    super(id);
-    this.name = name;
-    this.code = code;
-    this.description = description;
-    this.coordinate = coordinate;
+  StationElement(B builder) {
+    super(builder.getId());
+    // Required fields
+    this.name = builder.name();
     this.wheelchairAccessibility =
-      Objects.requireNonNullElse(wheelchairAccessibility, WheelchairAccessibility.NO_INFORMATION);
-    this.level = level;
+      Objects.requireNonNullElse(
+        builder.wheelchairAccessibility(),
+        WheelchairAccessibility.NO_INFORMATION
+      );
+
+    // Optional fields
+    this.coordinate = builder.coordinate();
+    this.code = builder.code();
+    this.description = builder.description();
+    this.level = builder.level();
+    this.parentStation = builder.parentStation();
   }
 
   /**
@@ -57,6 +61,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Public facing stop code (short text or number).
    */
+  @Nullable
   public String getCode() {
     return code;
   }
@@ -64,14 +69,26 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Additional information about the station element (if needed).
    */
+  @Nullable
   public I18NString getDescription() {
     return description;
+  }
+
+  /**
+   * The coordinate for the given stop element exist. The {@link #getCoordinate()} will use the
+   * parent station coordinate if not set, but this method will return based on this instance; Hence
+   * the {@link #getCoordinate()} might return a coordinate, while this method return {@code
+   * false}.
+   */
+  boolean isCoordinateSet() {
+    return coordinate != null;
   }
 
   /**
    * Center point/location for the station element. Returns the coordinate of the parent station, if
    * the coordinate is not defined for this station element.
    */
+  @Nonnull
   public WgsCoordinate getCoordinate() {
     if (coordinate != null) {
       return coordinate;
@@ -91,22 +108,27 @@ public abstract class StationElement extends TransitEntity {
   }
 
   /** Level name for elevator descriptions */
+  @Nullable
+  public StopLevel level() {
+    return level;
+  }
+
+  /** Level name for elevator descriptions */
+  @Nullable
   public String getLevelName() {
     return level == null ? null : level.getName();
   }
 
   /** Level index for hop counts in elevators. Is {@code null} if not set. */
+  @Nullable
   public Double getLevelIndex() {
     return level == null ? null : level.getIndex();
   }
 
   /** Parent station for the station element */
+  @Nullable
   public Station getParentStation() {
     return parentStation;
-  }
-
-  public void setParentStation(Station parentStation) {
-    this.parentStation = parentStation;
   }
 
   /** Return {@code true} if this stop (element) is part of a station, have a parent station. */
@@ -122,17 +144,20 @@ public abstract class StationElement extends TransitEntity {
     if (other == null) {
       return false;
     }
-
     return isPartOfStation() && parentStation.equals(other.getParentStation());
   }
 
-  /**
-   * The coordinate for the given stop element exist. The {@link #getCoordinate()} will use the
-   * parent station coordinate if not set, but this method will return based on this instance; Hence
-   * the {@link #getCoordinate()} might return a coordinate, while this method return {@code
-   * false}.
-   */
-  boolean isCoordinateSet() {
-    return coordinate != null;
+  @Override
+  public boolean sameAs(@Nonnull E other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(name, other.getName()) &&
+      Objects.equals(code, other.getCode()) &&
+      Objects.equals(description, other.getDescription()) &&
+      Objects.equals(coordinate, other.getCoordinate()) &&
+      Objects.equals(wheelchairAccessibility, other.getWheelchairAccessibility()) &&
+      Objects.equals(level, other.level()) &&
+      Objects.equals(parentStation, other.getParentStation())
+    );
   }
 }

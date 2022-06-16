@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Optional;
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;

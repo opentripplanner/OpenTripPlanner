@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -80,7 +80,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     return slackProvider;
   }
 
-  public void slackProvider(@NotNull RaptorSlackProvider slackProvider) {
+  public void slackProvider(@Nonnull RaptorSlackProvider slackProvider) {
     this.slackProvider = slackProvider;
   }
 

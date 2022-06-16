@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -8,11 +8,10 @@ import java.util.Objects;
  */
 public class StopLevel implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   private final String name;
   private final double index;
 
+  /** No builder for 2 args value object - simple to construct */
   public StopLevel(String name, double index) {
     this.name = name;
     this.index = index;

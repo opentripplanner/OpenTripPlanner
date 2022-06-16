@@ -32,7 +32,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 

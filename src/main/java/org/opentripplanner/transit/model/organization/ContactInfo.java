@@ -3,8 +3,7 @@ package org.opentripplanner.transit.model.organization;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import org.opentripplanner.transit.model.basic.TransitObject;
+import org.opentripplanner.transit.model.framework.TransitObject;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilder> {
@@ -18,6 +17,8 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
   private final String additionalDetails;
 
   public ContactInfo(ContactInfoBuilder builder) {
+    // Required fields - none
+    // Optional fields
     this.contactPerson = builder.getContactPerson();
     this.phoneNumber = builder.getPhoneNumber();
     this.eMail = builder.geteMail();
@@ -27,51 +28,53 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
     this.additionalDetails = builder.getAdditionalDetails();
   }
 
-  @NotNull
+  @Nonnull
   public static ContactInfoBuilder of() {
     return new ContactInfoBuilder();
   }
 
-  @NotNull
-  public static ContactInfoBuilder ofNullable(@Nullable ContactInfo ci) {
-    return new ContactInfoBuilder(ci);
-  }
-
-  @NotNull
-  public ContactInfoBuilder copy() {
-    return new ContactInfoBuilder(this);
-  }
-
+  @Nullable
   public String getContactPerson() {
     return contactPerson;
   }
 
+  @Nullable
   public String getPhoneNumber() {
     return phoneNumber;
   }
 
+  @Nullable
   public String geteMail() {
     return eMail;
   }
 
+  @Nullable
   public String getFaxNumber() {
     return faxNumber;
   }
 
+  @Nullable
   public String getInfoUrl() {
     return infoUrl;
   }
 
+  @Nullable
   public String getBookingUrl() {
     return bookingUrl;
   }
 
+  @Nullable
   public String getAdditionalDetails() {
     return additionalDetails;
   }
 
+  @Nonnull
+  public ContactInfoBuilder copy() {
+    return new ContactInfoBuilder(this);
+  }
+
   @Override
-  public boolean sameValue(@Nonnull ContactInfo other) {
+  public boolean sameAs(@Nonnull ContactInfo other) {
     return equals(other);
   }
 

@@ -6,10 +6,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

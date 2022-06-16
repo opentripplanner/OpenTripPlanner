@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * This is an element that originates from the NeTEx specification and is described as "Text-based
@@ -34,10 +34,5 @@ public class Notice extends TransitEntity {
 
   public void setPublicCode(String publicCode) {
     this.publicCode = publicCode;
-  }
-
-  @Override
-  public String toString() {
-    return "<Notice " + getId() + ">";
   }
 }

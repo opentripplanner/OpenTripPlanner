@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.util;
 
-import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.model.EncodedPolyline;
 
 public record EncodedPolylineBeanWithStops(

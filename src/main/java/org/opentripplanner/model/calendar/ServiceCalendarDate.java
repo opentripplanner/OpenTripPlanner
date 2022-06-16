@@ -3,7 +3,8 @@ package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * This class explicitly activate or disable a service by date. It can be used in two ways.
@@ -16,8 +17,6 @@ import org.opentripplanner.transit.model.basic.FeedScopedId;
  * This class is immutable.
  */
 public final class ServiceCalendarDate implements Serializable, Comparable<ServiceCalendarDate> {
-
-  private static final long serialVersionUID = 1L;
 
   /**
    * Service has been added for the specified date.
@@ -80,15 +79,12 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
 
   @Override
   public String toString() {
-    return (
-      "<CalendarDate serviceId=" +
-      this.serviceId +
-      " date=" +
-      this.date +
-      " exception=" +
-      this.exceptionType +
-      ">"
-    );
+    return ToStringBuilder
+      .of(ServiceCalendarDate.class)
+      .addObj("serviceId", this.serviceId)
+      .addObj("date", this.date)
+      .addObj("exception", this.exceptionType)
+      .toString();
   }
 
   /**

@@ -10,13 +10,15 @@ import org.opentripplanner._support.arch.Package;
 
 public class TransitModelArchitectureTest {
 
-  private static final Package BASIC = TRANSIT_MODEL.subPackage("basic");
+  private static final Package FRAMEWORK = TRANSIT_MODEL.subPackage("framework");
   private static final Package ORGANIZATION = TRANSIT_MODEL.subPackage("organization");
+  private static final Package NETWORK = TRANSIT_MODEL.subPackage("network");
 
   @Test
   void enforcePackageDependencies() {
-    BASIC.dependsOn(UTILS).verify();
-    ORGANIZATION.dependsOn(BASIC, UTILS).verify();
+    FRAMEWORK.dependsOn(UTILS).verify();
+    ORGANIZATION.dependsOn(UTILS, FRAMEWORK).verify();
+    NETWORK.dependsOn(UTILS, FRAMEWORK, ORGANIZATION).verify();
   }
 
   @Test
