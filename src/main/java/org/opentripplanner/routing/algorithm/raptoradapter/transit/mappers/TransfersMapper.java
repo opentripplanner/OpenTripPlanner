@@ -4,10 +4,10 @@ import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 class TransfersMapper {
 

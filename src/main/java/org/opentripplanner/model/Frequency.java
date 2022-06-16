@@ -3,12 +3,12 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 
 public final class Frequency implements Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private Trip trip;
 
@@ -93,14 +93,11 @@ public final class Frequency implements Serializable {
   }
 
   public String toString() {
-    return (
-      "<Frequency trip=" +
-      trip.getId() +
-      " start=" +
-      TimeUtils.timeToStrLong(startTime) +
-      " end=" +
-      TimeUtils.timeToStrLong(endTime) +
-      ">"
-    );
+    return ToStringBuilder
+      .of(Frequency.class)
+      .addObjOp("trip", trip, TransitEntity::getId)
+      .addServiceTime("start", startTime)
+      .addServiceTime("end", endTime)
+      .toString();
   }
 }

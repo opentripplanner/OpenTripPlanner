@@ -110,7 +110,7 @@ public class ConstrainedTransferTest {
   @Test
   public void testToString() {
     assertEquals(
-      "ConstrainedTransfer{from: <Stop F:A>, to: <Stop F:B>, constraint: {no constraints}}",
+      "ConstrainedTransfer{from: StopTP{F:A}, to: StopTP{F:B}, constraint: {no constraints}}",
       TX_A_TO_B.toString()
     );
   }

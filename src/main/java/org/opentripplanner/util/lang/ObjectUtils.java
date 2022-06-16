@@ -1,5 +1,6 @@
 package org.opentripplanner.util.lang;
 
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -14,5 +15,17 @@ public class ObjectUtils {
   @Nullable
   public static <T> T ifNotNull(@Nullable T value, @Nullable T defaultValue) {
     return value != null ? value : defaultValue;
+  }
+
+  @Nullable
+  public static <E, T> T ifNotNull(
+    @Nullable E entity,
+    Function<E, T> getter,
+    @Nullable T defaultValue
+  ) {
+    if (entity == null) {
+      return defaultValue;
+    }
+    return ifNotNull(getter.apply(entity), defaultValue);
   }
 }

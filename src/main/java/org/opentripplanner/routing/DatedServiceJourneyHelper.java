@@ -4,7 +4,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class DatedServiceJourneyHelper {
 

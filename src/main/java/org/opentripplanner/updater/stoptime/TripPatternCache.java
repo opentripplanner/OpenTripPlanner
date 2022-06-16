@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 

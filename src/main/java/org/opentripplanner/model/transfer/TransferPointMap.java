@@ -8,9 +8,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**

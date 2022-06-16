@@ -15,7 +15,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.util.NonLocalizedString;
 
 class VehicleParkingEdgeTest extends GraphRoutingTest {
@@ -194,7 +194,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   ) {
     return VehicleParking
       .builder()
-      .id(new FeedScopedId(TEST_FEED_ID, "VehicleParking"))
+      .id(TransitModelForTest.id("VehicleParking"))
       .bicyclePlaces(bicyclePlaces)
       .carPlaces(carPlaces)
       .availability(availability)
@@ -205,10 +205,6 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   private VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance() {
     String id = "Entrance";
     return builder ->
-      builder
-        .entranceId(new FeedScopedId(TEST_FEED_ID, id))
-        .name(new NonLocalizedString(id))
-        .x(0)
-        .y(0);
+      builder.entranceId(TransitModelForTest.id(id)).name(new NonLocalizedString(id)).x(0).y(0);
   }
 }

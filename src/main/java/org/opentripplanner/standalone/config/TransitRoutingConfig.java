@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.config;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 

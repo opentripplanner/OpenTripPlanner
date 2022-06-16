@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
 
 public class PlaceAtDistanceType {
 

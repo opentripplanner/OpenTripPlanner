@@ -1,6 +1,6 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 public class WheelchairAccessibilityMapper {
 
