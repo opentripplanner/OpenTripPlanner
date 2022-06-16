@@ -69,7 +69,7 @@ public class ServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(gqlUtil.dateScalar)))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getCalendarService()
               .getServiceDatesForServiceId(((trip(environment)).getServiceId()))
               .stream()
@@ -175,7 +175,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("journeyPattern")
           .type(journeyPatternType)
-          .dataFetcher(env -> GqlUtil.getRoutingService(env).getPatternForTrip().get(trip(env)))
+          .dataFetcher(env -> GqlUtil.getTransitService(env).getPatternForTrip().get(trip(env)))
           .build()
       )
       .field(
@@ -205,7 +205,7 @@ public class ServiceJourneyType {
             Integer last = environment.getArgument("last");
 
             List<StopLocation> stops = GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternForTrip()
               .get(trip(environment))
               .getStops();
@@ -239,7 +239,7 @@ public class ServiceJourneyType {
           .dataFetcher(env -> {
             Trip trip = trip(env);
             return TripTimeOnDate.fromTripTimes(
-              GqlUtil.getRoutingService(env).getPatternForTrip().get(trip).getScheduledTimetable(),
+              GqlUtil.getTransitService(env).getPatternForTrip().get(trip).getScheduledTimetable(),
               trip
             );
           })
@@ -272,6 +272,7 @@ public class ServiceJourneyType {
               .orElse(new ServiceDate());
             return TripTimesShortHelper.getTripTimesShort(
               GqlUtil.getRoutingService(environment),
+              GqlUtil.getTransitService(environment),
               trip(environment),
               serviceDate
             );
@@ -288,7 +289,7 @@ public class ServiceJourneyType {
           )
           .dataFetcher(environment -> {
             TripPattern tripPattern = GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternForTrip()
               .get(trip(environment));
             if (tripPattern == null) {
@@ -309,7 +310,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("notices")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
-          .dataFetcher(env -> GqlUtil.getRoutingService(env).getNoticesByEntity(trip(env)))
+          .dataFetcher(env -> GqlUtil.getTransitService(env).getNoticesByEntity(trip(env)))
           .build()
       )
       .field(

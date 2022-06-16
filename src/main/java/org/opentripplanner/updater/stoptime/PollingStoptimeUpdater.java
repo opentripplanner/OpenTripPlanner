@@ -4,6 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -96,7 +97,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   @Override
   public void setup(Graph graph) {
     if (fuzzyTripMatching) {
-      this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+      this.fuzzyTripMatcher =
+        new GtfsRealtimeFuzzyTripMatcher(
+          new RoutingService(graph),
+          new DefaultTransitService(graph)
+        );
     }
 
     // Only create a realtime data snapshot source if none exists already
