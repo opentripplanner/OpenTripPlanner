@@ -4,10 +4,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.DatedServiceJourney;
 
 /**

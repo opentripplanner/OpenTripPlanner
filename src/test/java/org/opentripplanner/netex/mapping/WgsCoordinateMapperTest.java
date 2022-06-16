@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import org.junit.Test;
-import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 

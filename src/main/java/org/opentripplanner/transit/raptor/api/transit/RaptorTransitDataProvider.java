@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 import java.util.Iterator;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * This interface defines the data needed by Raptor. It is the main/top-level interface and together
@@ -105,7 +105,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * method is used by Raptor to translate from the stop index to a string which should be short and
    * identify the stop given the related pattern, for example the stop name would be great.
    */
-  @NotNull
+  @Nonnull
   RaptorStopNameResolver stopNameResolver();
 
   /**

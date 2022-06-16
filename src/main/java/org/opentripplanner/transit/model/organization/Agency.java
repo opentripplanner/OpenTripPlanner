@@ -1,16 +1,19 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.organization;
 
+import static org.opentripplanner.util.lang.AssertUtils.assertHasValue;
+
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity2;
-import org.opentripplanner.util.lang.AssertUtils;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.
  */
-public final class Agency extends TransitEntity2<Agency, AgencyBuilder> {
+public final class Agency extends TransitEntity2<Agency, AgencyBuilder> implements LogInfo {
 
   private final String name;
   private final String timezone;
@@ -22,30 +25,28 @@ public final class Agency extends TransitEntity2<Agency, AgencyBuilder> {
 
   Agency(AgencyBuilder builder) {
     super(builder.getId());
-    this.name = builder.getName();
-    this.timezone = builder.getTimezone();
+    // Required fields
+    this.name = assertHasValue(builder.getName());
+    this.timezone = assertHasValue(builder.getTimezone());
+
+    // Optional fields
     this.url = builder.getUrl();
     this.lang = builder.getLang();
     this.phone = builder.getPhone();
     this.fareUrl = builder.getFareUrl();
     this.brandingUrl = builder.getBrandingUrl();
-
-    AssertUtils.assertHasValue(getName());
   }
 
-  public static AgencyBuilder of(FeedScopedId id) {
+  public static AgencyBuilder of(@Nonnull FeedScopedId id) {
     return new AgencyBuilder(id);
   }
 
-  public static AgencyBuilder ofNullable(Agency agency) {
-    return new AgencyBuilder(agency);
-  }
-
+  @Nonnull
   public String getName() {
-    return name;
+    return logName();
   }
 
-  @Nullable
+  @Nonnull
   public String getTimezone() {
     return timezone;
   }
@@ -75,17 +76,20 @@ public final class Agency extends TransitEntity2<Agency, AgencyBuilder> {
     return brandingUrl;
   }
 
-  public String toString() {
-    return "<Agency " + getId() + ">";
-  }
-
   @Override
+  @Nonnull
   public AgencyBuilder copy() {
     return new AgencyBuilder(this);
   }
 
   @Override
-  public boolean sameValue(Agency other) {
+  @Nonnull
+  public String logName() {
+    return name;
+  }
+
+  @Override
+  public boolean sameAs(@Nonnull Agency other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

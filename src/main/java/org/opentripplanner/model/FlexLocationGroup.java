@@ -2,13 +2,17 @@ package org.opentripplanner.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
-import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -16,7 +20,6 @@ import org.opentripplanner.util.I18NString;
  */
 public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
-  private static final long serialVersionUID = 1L;
   private final Set<StopLocation> stopLocations = new HashSet<>();
   private I18NString name;
   private GeometryCollection geometry = new GeometryCollection(
@@ -24,7 +27,7 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     GeometryUtils.getGeometryFactory()
   );
 
-  private Point centroid;
+  private WgsCoordinate centroid;
 
   public FlexLocationGroup(FeedScopedId id) {
     super(id);
@@ -45,6 +48,7 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
   }
 
   @Override
+  @Nullable
   public I18NString getUrl() {
     return null;
   }
@@ -58,8 +62,9 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
    * Returns the centroid of all stops and areas belonging to this location group.
    */
   @Override
+  @Nonnull
   public WgsCoordinate getCoordinate() {
-    return new WgsCoordinate(centroid.getY(), centroid.getX());
+    return centroid;
   }
 
   @Override
@@ -101,7 +106,7 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
       throw new RuntimeException("Unknown location type");
     }
     geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());
-    centroid = geometry.getCentroid();
+    centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
   }
 
   /**

@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
@@ -28,6 +26,8 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * A helper class to fetch previous/next alternative legs for a scheduled transit leg.

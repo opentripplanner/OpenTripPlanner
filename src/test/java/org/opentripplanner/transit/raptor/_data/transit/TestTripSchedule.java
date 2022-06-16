@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;

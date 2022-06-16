@@ -122,7 +122,7 @@ public class StateEditor {
   }
 
   public String toString() {
-    return "<StateEditor " + child + ">";
+    return "StateEditor{" + child + "}";
   }
 
   /* PUBLIC METHODS TO MODIFY A STATE BEFORE IT IS USED */

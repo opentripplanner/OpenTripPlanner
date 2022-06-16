@@ -9,6 +9,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -160,6 +161,10 @@ public class TripTimeOnDate {
       tripTimes.isCancelledStop(stopIndex) ||
       tripPattern.isBoardAndAlightAt(stopIndex, PickDrop.CANCELLED)
     );
+  }
+
+  public boolean isPredictionInaccurate() {
+    return tripTimes.isPredictionInaccurate(stopIndex);
   }
 
   /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
