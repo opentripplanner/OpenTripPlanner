@@ -10,8 +10,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransfe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.WheelchairCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -54,7 +52,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   private final ZonedDateTime transitSearchTimeZero;
 
-  private final CostCalculator generalizedCostCalculator;
+  private final CostCalculator<TripSchedule> generalizedCostCalculator;
 
   private final int validTransitDataStartTime;
 
@@ -72,7 +70,6 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transferService = transferService;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
-    var accessibility = routingContext.opt.wheelchairAccessibility;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
@@ -146,7 +143,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public CostCalculator multiCriteriaCostCalculator() {
+  public CostCalculator<TripSchedule> multiCriteriaCostCalculator() {
     return generalizedCostCalculator;
   }
 

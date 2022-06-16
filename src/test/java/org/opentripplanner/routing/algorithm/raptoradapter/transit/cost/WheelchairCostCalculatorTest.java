@@ -21,7 +21,7 @@ public class WheelchairCostCalculatorTest {
   private static final int TRANSFER_COST_SEC = 2;
   private static final double WAIT_RELUCTANCE_FACTOR = 0.5;
 
-  private final DefaultCostCalculator defaultCostCalculator = new DefaultCostCalculator(
+  private final DefaultCostCalculator<TestTripSchedule> defaultCostCalculator = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE_FACTOR,
@@ -29,7 +29,7 @@ public class WheelchairCostCalculatorTest {
     null
   );
 
-  private final WheelchairCostCalculator wheelchairCostCalculator = new WheelchairCostCalculator(
+  private final WheelchairCostCalculator<TestTripSchedule> wheelchairCostCalculator = new WheelchairCostCalculator<>(
     defaultCostCalculator,
     new WheelchairAccessibilityRequest(
       true,
@@ -63,7 +63,10 @@ public class WheelchairCostCalculatorTest {
     assertEquals(expected, wheelchairBoardCost);
   }
 
-  private int calculateBoardingCost(TestTripSchedule schedule, CostCalculator calc) {
+  private int calculateBoardingCost(
+    TestTripSchedule schedule,
+    CostCalculator<TestTripSchedule> calc
+  ) {
     return calc.boardingCost(true, 0, 5, 100, schedule, RaptorTransferConstraint.REGULAR_TRANSFER);
   }
 }

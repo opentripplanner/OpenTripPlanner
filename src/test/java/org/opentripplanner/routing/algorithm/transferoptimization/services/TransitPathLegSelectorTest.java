@@ -32,7 +32,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     ALIGHT_SLACK
   );
 
-  private static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
+  private static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     20,
     60,
     1.0,

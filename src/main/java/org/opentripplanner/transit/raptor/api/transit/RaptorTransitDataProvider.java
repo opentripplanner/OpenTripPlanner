@@ -86,7 +86,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   /**
    * Create/provide the cost criteria calculator.
    */
-  CostCalculator multiCriteriaCostCalculator();
+  CostCalculator<T> multiCriteriaCostCalculator();
 
   /**
    * Implement this method to provide a service to search for {@link RaptorTransferConstraint}. This
