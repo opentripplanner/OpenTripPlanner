@@ -10,6 +10,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A Graph finder used in conjunction with a graph, which does not have a street network included.
@@ -57,7 +58,8 @@ public class DirectGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService
+    RoutingService routingService,
+    TransitService transitService
   ) {
     throw new UnsupportedOperationException("Not implemented");
   }

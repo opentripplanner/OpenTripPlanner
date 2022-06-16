@@ -35,6 +35,8 @@ import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TripPatternCache tripPatternCache = new TripPatternCache();
   private final TimeZone timeZone;
   private final RoutingService routingService;
+
+  private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
   public int logFrequency = 2000;
@@ -108,6 +112,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return new TimetableSnapshotSource(
       graph.getTimeZone(),
       new RoutingService(graph),
+      new DefaultTransitService(graph),
       graph.transitLayerUpdater,
       graph.deduplicator,
       graph.getServiceCodes()
@@ -117,12 +122,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   public TimetableSnapshotSource(
     TimeZone timeZone,
     RoutingService routingService,
+    TransitService transitService,
     TransitLayerUpdater transitLayerUpdater,
     Deduplicator deduplicator,
     Map<FeedScopedId, Integer> serviceCodes
   ) {
     this.timeZone = timeZone;
     this.routingService = routingService;
+    this.transitService = transitService;
     this.transitLayerUpdater = transitLayerUpdater;
     this.deduplicator = deduplicator;
     this.serviceCodes = serviceCodes;
@@ -623,7 +630,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     tripBuilder.withRoute(route);
 
     // Find service ID running on this service date
-    final Set<FeedScopedId> serviceIds = routingService
+    final Set<FeedScopedId> serviceIds = transitService
       .getCalendarService()
       .getServiceIdsOnDate(serviceDate);
     if (serviceIds.isEmpty()) {
@@ -728,7 +735,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Create StopPattern
     final StopPattern stopPattern = new StopPattern(stopTimes);
 
-    final TripPattern originalTripPattern = routingService.getPatternForTrip().get(trip);
+    final TripPattern originalTripPattern = transitService.getPatternForTrip().get(trip);
     // Get cached trip pattern or create one if it doesn't exist yet
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
@@ -872,7 +879,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     } else {
       // Check whether service date is served by trip
-      final Set<FeedScopedId> serviceIds = routingService
+      final Set<FeedScopedId> serviceIds = transitService
         .getCalendarService()
         .getServiceIdsOnDate(serviceDate);
       if (!serviceIds.contains(trip.getServiceId())) {
@@ -973,8 +980,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return trip pattern or null if no trip pattern was found
    */
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
-    Trip trip = routingService.getTripForId().get(tripId);
-    return routingService.getPatternForTrip().get(trip);
+    Trip trip = transitService.getTripForId().get(tripId);
+    return transitService.getPatternForTrip().get(trip);
   }
 
   /**
@@ -983,7 +990,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return route or null if route can't be found in graph index
    */
   private Route getRouteForRouteId(FeedScopedId routeId) {
-    return routingService.getRouteForId(routeId);
+    return transitService.getRouteForId(routeId);
   }
 
   /**
@@ -992,7 +999,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return trip or null if trip can't be found in graph index
    */
   private Trip getTripForTripId(FeedScopedId tripId) {
-    return routingService.getTripForId().get(tripId);
+    return transitService.getTripForId().get(tripId);
   }
 
   /**
@@ -1001,7 +1008,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return stop or null if stop doesn't exist
    */
   private StopLocation getStopForStopId(FeedScopedId stopId) {
-    return routingService.getStopForId(stopId);
+    return transitService.getStopForId(stopId);
   }
 
   private static void warn(FeedScopedId id, String message, Object... params) {

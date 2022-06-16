@@ -1,10 +1,10 @@
 package org.opentripplanner.netex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
@@ -216,7 +216,9 @@ public class NetexBundleSmokeTest {
       .orElseThrow(IllegalStateException::new);
 
     List<Notice> list = list(map.get(key));
-    if (list.size() == 0) fail(
+    assertNotEquals(
+      0,
+      list.size(),
       "Notice not found: " + key + " -> <Notice " + code + ", " + text + ">\n\t" + map
     );
     Notice n = list.get(0);

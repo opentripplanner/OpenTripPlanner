@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping.calendar;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.mapping.calendar.DayOfWeekMapper.mapDayOfWeek;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.FRIDAY;
@@ -17,7 +17,7 @@ import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKEND;
 import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DayOfWeekMapperTest {
 

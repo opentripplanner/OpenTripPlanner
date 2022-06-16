@@ -17,6 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A GraphFinder which uses the street network to traverse the graph in order to find the nearest
@@ -48,10 +49,12 @@ public class StreetGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService
+    RoutingService routingService,
+    TransitService transitService
   ) {
     PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(
       routingService,
+      transitService,
       filterByModes,
       filterByPlaceTypes,
       filterByStops,

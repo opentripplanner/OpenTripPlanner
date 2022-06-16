@@ -6,7 +6,6 @@ import java.util.Objects;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.lang.ToStringBuilder;
-import org.opentripplanner.util.time.TimeUtils;
 
 public final class Frequency implements Serializable {
 

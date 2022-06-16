@@ -5,6 +5,7 @@ import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitService;
 
 public class DatedServiceJourneyHelper {
 
@@ -13,25 +14,25 @@ public class DatedServiceJourneyHelper {
    * the graph index
    */
   public static TripOnServiceDate getTripOnServiceDate(
-    RoutingService routingService,
+    TransitService transitService,
     FeedScopedId tripId,
     ServiceDate serviceDate
   ) {
     var tuple = new TripIdAndServiceDate(tripId, serviceDate);
-    if (routingService.getTimetableSnapshot() != null) {
+    if (transitService.getTimetableSnapshot() != null) {
       if (
-        routingService
+        transitService
           .getTimetableSnapshot()
           .getLastAddedTripOnServiceDateByTripIdAndServiceDate()
           .containsKey(tuple)
       ) {
-        return routingService
+        return transitService
           .getTimetableSnapshot()
           .getLastAddedTripOnServiceDateByTripIdAndServiceDate()
           .get(tuple);
       }
     }
-    return routingService.getTripOnServiceDateForTripAndDay().get(tuple);
+    return transitService.getTripOnServiceDateForTripAndDay().get(tuple);
   }
 
   /**
@@ -39,10 +40,10 @@ public class DatedServiceJourneyHelper {
    * the graph index
    */
   public static TripOnServiceDate getTripOnServiceDate(
-    RoutingService routingService,
+    TransitService transitService,
     FeedScopedId datedServiceJourneyId
   ) {
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
     if (
       timetableSnapshot != null &&
       timetableSnapshot.getLastAddedTripOnServiceDate().containsKey(datedServiceJourneyId)
@@ -50,6 +51,6 @@ public class DatedServiceJourneyHelper {
       return timetableSnapshot.getLastAddedTripOnServiceDate().get(datedServiceJourneyId);
     }
 
-    return routingService.getTripOnServiceDateById().get(datedServiceJourneyId);
+    return transitService.getTripOnServiceDateById().get(datedServiceJourneyId);
   }
 }

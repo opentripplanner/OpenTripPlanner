@@ -23,13 +23,16 @@ public class TestPathBuilder {
   private static final int BOARD_ALIGHT_OFFSET = 30;
 
   @Nullable
-  private final CostCalculator costCalculator;
+  private final CostCalculator<TestTripSchedule> costCalculator;
 
   private final int alightSlack;
   private PathBuilder<TestTripSchedule> builder;
   private int startTime;
 
-  public TestPathBuilder(int alightSlack, @Nullable CostCalculator costCalculator) {
+  public TestPathBuilder(
+    int alightSlack,
+    @Nullable CostCalculator<TestTripSchedule> costCalculator
+  ) {
     this.alightSlack = alightSlack;
     this.costCalculator = costCalculator;
   }

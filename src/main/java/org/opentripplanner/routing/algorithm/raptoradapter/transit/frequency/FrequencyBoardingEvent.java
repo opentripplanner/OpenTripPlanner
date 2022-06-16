@@ -2,14 +2,14 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * Represents a result of a {@link TripFrequencyBoardSearch}, with materialized {@link TripTimes}
  */
-final class FrequencyBoardingEvent<T extends RaptorTripSchedule>
+final class FrequencyBoardingEvent<T extends DefaultTripSchedule>
   extends FrequencyBoardOrAlightEvent<T> {
 
   public FrequencyBoardingEvent(

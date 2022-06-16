@@ -14,6 +14,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFeed {
 
@@ -66,7 +67,7 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   private List<Agency> getAgencies(DataFetchingEnvironment environment) {
     String id = getSource(environment);
-    return getRoutingService(environment)
+    return getTransitService(environment)
       .getAgencies()
       .stream()
       .filter(agency -> agency.getId().getFeedId().equals(id))
@@ -75,6 +76,10 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  }
+
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
   private String getSource(DataFetchingEnvironment environment) {

@@ -52,7 +52,7 @@ public class OperatorType {
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getAllRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getOperator(), environment.getSource()))
@@ -68,7 +68,7 @@ public class OperatorType {
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTripForId()
               .values()
               .stream()

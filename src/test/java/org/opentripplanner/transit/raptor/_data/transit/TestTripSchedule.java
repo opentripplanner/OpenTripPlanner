@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor._data.transit;
 
 import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -13,7 +14,7 @@ import org.opentripplanner.util.time.TimeUtils;
  * <p>
  * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
-public class TestTripSchedule implements RaptorTripSchedule {
+public class TestTripSchedule implements DefaultTripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
   private final RaptorTripPattern pattern;

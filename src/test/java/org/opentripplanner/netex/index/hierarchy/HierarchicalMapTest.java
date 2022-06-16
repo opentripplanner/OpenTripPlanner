@@ -1,9 +1,9 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.index.hierarchy.E.EASTWOOD;
 import static org.opentripplanner.netex.index.hierarchy.E.REAGAN;
 import static org.opentripplanner.netex.index.hierarchy.E.SCHWARZENEGGER;
@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.netex.index.api.HMapValidationRule;
 
@@ -52,7 +52,7 @@ public class HierarchicalMapTest {
   private final HierarchicalMap<String, E> state = new HierarchicalMap<>(country);
   private final HierarchicalMap<String, E> city = new HierarchicalMap<>(state);
 
-  @Before
+  @BeforeEach
   public void setup() {
     country.add(PRESIDENT, REAGAN);
     state.add(GOVERNOR, SCHWARZENEGGER);
@@ -193,7 +193,7 @@ public class HierarchicalMapTest {
     // Remove GOVERNOR -> expect size to decrement by one
     state.localRemove(GOVERNOR);
     assertEquals(originalCitySize - 1, city.size());
-    assertNull("GOVERNOR is removed from office", state.localGet(GOVERNOR));
+    assertNull(state.localGet(GOVERNOR), "GOVERNOR is removed from office");
   }
 
   @Test

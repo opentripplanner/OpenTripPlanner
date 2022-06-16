@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLRouteTypeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLRouteType {
@@ -27,7 +27,7 @@ public class LegacyGraphQLRouteTypeImpl
   public DataFetcher<Iterable<Route>> routes() {
     return environment -> {
       Agency agency = getSource(environment).getAgency();
-      return getRoutingService(environment)
+      return getTransitService(environment)
         .getAllRoutes()
         .stream()
         .filter(route ->
@@ -39,8 +39,8 @@ public class LegacyGraphQLRouteTypeImpl
     };
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
   private LegacyGraphQLRouteTypeModel getSource(DataFetchingEnvironment environment) {

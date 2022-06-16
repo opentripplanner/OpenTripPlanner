@@ -1,10 +1,10 @@
 package org.opentripplanner.model.calendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ServiceDateTest {
 
@@ -127,8 +127,8 @@ public class ServiceDateTest {
     while (i.isBefore(end)) {
       ServiceDate day = new ServiceDate(i);
       assertTrue(
-        "Hash is increasing for " + day + " : " + day.hashCode() + ", last: " + lastHash,
-        day.hashCode() > lastHash
+        day.hashCode() > lastHash,
+        "Hash is increasing for " + day + " : " + day.hashCode() + ", last: " + lastHash
       );
       lastHash = day.hashCode();
       i = i.plusDays(1);
@@ -146,10 +146,7 @@ public class ServiceDateTest {
       new int[] { 2000, 1, 32 }
     );
     for (int[] a : illegalValues) {
-      try {
-        new ServiceDate(a[0], a[1], a[2]);
-        fail("Date outside range test failed: " + Arrays.toString(a));
-      } catch (IllegalArgumentException ignore) {}
+      assertThrows(IllegalArgumentException.class, () -> new ServiceDate(a[0], a[1], a[2]));
     }
   }
 
@@ -167,14 +164,13 @@ public class ServiceDateTest {
     assertEquals(3, subject.getMonth());
     assertEquals(12, subject.getDay());
 
-    try {
-      // Even though this is a valid date, we only support parsing of dates with
-      // 4 digits in the year
-      ServiceDate.parseString("0-03-12");
-      fail("Expected ParseException");
-    } catch (ParseException e) {
-      assertEquals("error parsing date: 0-03-12", e.getMessage());
-    }
+    // Even though this is a valid date, we only support parsing of dates with
+    // 4 digits in the year
+    assertThrows(
+      ParseException.class,
+      () -> ServiceDate.parseString("0-03-12"),
+      "error parsing date: 0-03-12"
+    );
   }
 
   @Test

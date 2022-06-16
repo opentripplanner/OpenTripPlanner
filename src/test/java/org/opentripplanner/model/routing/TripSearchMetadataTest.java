@@ -1,10 +1,10 @@
 package org.opentripplanner.model.routing;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.Instant;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
 public class TripSearchMetadataTest {

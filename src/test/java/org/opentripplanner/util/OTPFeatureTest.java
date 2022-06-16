@@ -1,23 +1,18 @@
 package org.opentripplanner.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.configure.OTPConfiguration;
 
 public class OTPFeatureTest {
 
   private final OTPFeature subject = OTPFeature.APIBikeRental;
-  private final Map<OTPFeature, Boolean> backupValues = new HashMap<>();
 
   @Test
   public void on() {
