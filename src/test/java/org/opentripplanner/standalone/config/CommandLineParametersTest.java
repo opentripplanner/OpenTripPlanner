@@ -1,14 +1,14 @@
 package org.opentripplanner.standalone.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.beust.jcommander.ParameterException;
 import java.io.File;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CommandLineParametersTest {
 
@@ -16,7 +16,7 @@ public class CommandLineParametersTest {
 
   private CommandLineParameters subject;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     subject = CommandLineParameters.createCliForTest(BASE_DIR);
     subject.port = 13524;
@@ -28,10 +28,10 @@ public class CommandLineParametersTest {
     assertEquals(BASE_DIR, subject.getBaseDirectory());
   }
 
-  @Test(expected = ParameterException.class)
+  @Test
   public void baseDirectoryIsRequired() {
     subject = new CommandLineParameters();
-    subject.inferAndValidate();
+    assertThrows(ParameterException.class, () -> subject.inferAndValidate());
   }
 
   @Test
@@ -125,9 +125,9 @@ public class CommandLineParametersTest {
     subject.inferAndValidate();
   }
 
-  @Test(expected = ParameterException.class)
+  @Test
   public void validateAtLeastOnParametersSet() {
-    subject.inferAndValidate();
+    assertThrows(ParameterException.class, () -> subject.inferAndValidate());
   }
 
   @Test
@@ -205,12 +205,7 @@ public class CommandLineParametersTest {
     }
 
     void expectNotValid() {
-      try {
-        subject.inferAndValidate();
-        fail("Exception expected.");
-      } catch (ParameterException e) {
-        // expected
-      }
+      assertThrows(ParameterException.class, () -> subject.inferAndValidate());
     }
   }
 }

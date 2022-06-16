@@ -1,8 +1,8 @@
 package org.opentripplanner.datastore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.datastore.FileType.CONFIG;
 import static org.opentripplanner.datastore.FileType.DEM;
 import static org.opentripplanner.datastore.FileType.GRAPH;
@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.OTPConfiguration;
@@ -52,13 +52,13 @@ public class OtpDataStoreTest {
 
   private File baseDir;
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     // Create a base path for this test - correspond to OTP BASE_PATH
     baseDir = Files.createTempDirectory("OtpDataStoreTest-").toFile();
   }
 
-  @After
+  @AfterEach
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void tearDown() {
     baseDir.delete();
@@ -217,15 +217,15 @@ public class OtpDataStoreTest {
     assertEquals(type, source.type());
     assertEquals(name, source.name());
     assertTrue(source.exists());
-    assertTrue("Last modified: " + source.lastModified(), source.lastModified() > D2000_01_01);
+    assertTrue(source.lastModified() > D2000_01_01, "Last modified: " + source.lastModified());
   }
 
   private static void assertExistingSources(Collection<DataSource> sources, String... names) {
-    assertEquals("Size of: " + sources, names.length, sources.size());
+    assertEquals(names.length, sources.size(), "Size of: " + sources);
     List<String> nameList = Arrays.asList(names);
 
     for (DataSource source : sources) {
-      assertTrue(source.name(), nameList.contains(source.name()));
+      assertTrue(nameList.contains(source.name()), source.name());
     }
   }
 
@@ -234,7 +234,7 @@ public class OtpDataStoreTest {
     assertEquals(REPORT_FILENAME, report.name());
     assertTrue(report.exists());
     assertTrue(report.isWritable());
-    assertEquals(report.content().toString(), 1, report.content().size());
+    assertEquals(1, report.content().size(), report.content().toString());
   }
 
   private List<String> listFilesByRelativeName(OtpDataStore store, File baseDir, File dataDir) {

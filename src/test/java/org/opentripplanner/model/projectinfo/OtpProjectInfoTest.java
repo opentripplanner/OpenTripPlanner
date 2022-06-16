@@ -1,12 +1,12 @@
 package org.opentripplanner.model.projectinfo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OtpProjectInfoTest {
 
@@ -24,7 +24,7 @@ public class OtpProjectInfoTest {
     assertTrue(p.version.patch >= 0);
 
     if (!"UNKNOWN".equals(p.versionControl.branch)) {
-      assertTrue(p.versionControl.commit, p.versionControl.commit.matches("[a-f0-9]{8,}"));
+      assertTrue(p.versionControl.commit.matches("[a-f0-9]{8,}"), p.versionControl.commit);
       assertNotNull(p.versionControl.branch);
       assertNotNull(p.versionControl.buildTime);
       assertNotNull(p.versionControl.commitTime);

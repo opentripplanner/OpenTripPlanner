@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -30,7 +30,7 @@ public class TestStreetMatcher {
 
   private Graph graph;
 
-  @Before
+  @BeforeEach
   public void before() {
     graph = new Graph();
 

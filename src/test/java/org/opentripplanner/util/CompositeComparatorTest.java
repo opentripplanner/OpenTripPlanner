@@ -1,10 +1,11 @@
 package org.opentripplanner.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CompositeComparatorTest {
 
@@ -24,7 +25,7 @@ public class CompositeComparatorTest {
 
     list.sort(comparator);
 
-    Assert.assertEquals(List.of(b, b, a, d, d, c), list);
+    assertEquals(List.of(b, b, a, d, d, c), list);
   }
 
   private static class A {
