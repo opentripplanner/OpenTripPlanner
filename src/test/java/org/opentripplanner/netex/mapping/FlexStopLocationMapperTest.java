@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.transit.model._data.TransitModelForTest;

@@ -10,6 +10,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
@@ -22,11 +23,17 @@ import org.opentripplanner.util.time.TimeUtils;
 public class GtfsRealtimeFuzzyTripMatcher {
 
   private final RoutingService routingService;
+
+  private final TransitService transitService;
   private BitSet servicesRunningForDate;
   private ServiceDate date;
 
-  public GtfsRealtimeFuzzyTripMatcher(RoutingService routingService) {
+  public GtfsRealtimeFuzzyTripMatcher(
+    RoutingService routingService,
+    TransitService transitService
+  ) {
     this.routingService = routingService;
+    this.transitService = transitService;
   }
 
   public TripDescriptor match(String feedId, TripDescriptor trip) {
@@ -50,7 +57,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
     } catch (ParseException e) {
       return trip;
     }
-    Route route = routingService.getRouteForId(routeId);
+    Route route = transitService.getRouteForId(routeId);
     if (route == null) {
       return trip;
     }
@@ -79,7 +86,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
       // TODO: This is slow, we should either precalculate or cache these for all dates in graph
       this.servicesRunningForDate = routingService.getServicesRunningForDate(date);
     }
-    for (TripPattern pattern : routingService.getPatternsForRoute().get(route)) {
+    for (TripPattern pattern : transitService.getPatternsForRoute().get(route)) {
       if (pattern.getDirection().gtfsCode != direction) continue;
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {
         if (

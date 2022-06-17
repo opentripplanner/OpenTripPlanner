@@ -102,6 +102,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -444,14 +445,14 @@ public class TransmodelGraphQLSchema {
                 .map(id -> StopPlaceType.fetchStopPlaceById(id, env))
                 .collect(Collectors.toList());
             }
-            RoutingService routingService = GqlUtil.getRoutingService(env);
-            return routingService
+            TransitService transitService = GqlUtil.getTransitService(env);
+            return transitService
               .getStations()
               .stream()
               .map(station ->
                 new MonoOrMultiModalStation(
                   station,
-                  routingService.getMultiModalStationForStations().get(station)
+                  transitService.getMultiModalStationForStations().get(station)
                 )
               )
               .collect(Collectors.toList());
@@ -555,7 +556,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getStopForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
           .build()
@@ -590,12 +591,13 @@ public class TransmodelGraphQLSchema {
                 throw new IllegalArgumentException("Unable to combine other filters with ids");
               }
               RoutingService routingService = GqlUtil.getRoutingService(environment);
+              TransitService transitService = GqlUtil.getTransitService(environment);
               return ((List<String>) environment.getArgument("ids")).stream()
-                .map(id -> routingService.getStopForId(TransitIdMapper.mapIDToDomain(id)))
+                .map(id -> transitService.getStopForId(TransitIdMapper.mapIDToDomain(id)))
                 .collect(Collectors.toList());
             }
             if (environment.getArgument("name") == null) {
-              return GqlUtil.getRoutingService(environment).getAllStops();
+              return GqlUtil.getTransitService(environment).getAllStops();
             }
             //                            else {
             //                                return index.getLuceneIndex().query(environment.getArgument("name"), true, true, false)
@@ -655,7 +657,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getStopsByBoundingBox(
                 environment.getArgument("minimumLatitude"),
                 environment.getArgument("minimumLongitude"),
@@ -670,7 +672,7 @@ public class TransmodelGraphQLSchema {
               .filter(stop -> {
                 boolean filterByInUse = TRUE.equals(environment.getArgument("filterByInUse"));
                 boolean inUse = !GqlUtil
-                  .getRoutingService(environment)
+                  .getTransitService(environment)
                   .getPatternsForStop(stop, true)
                   .isEmpty();
                 return !filterByInUse || inUse;
@@ -922,7 +924,8 @@ public class TransmodelGraphQLSchema {
                   filterByBikeRentalStations,
                   filterByBikeParks,
                   filterByCarParks,
-                  GqlUtil.getRoutingService(environment)
+                  GqlUtil.getRoutingService(environment),
+                  GqlUtil.getTransitService(environment)
                 );
 
             if (TRUE.equals(environment.getArgument("filterByInUse"))) {
@@ -932,7 +935,7 @@ public class TransmodelGraphQLSchema {
                   .filter(placeAtDistance -> {
                     if (placeAtDistance.place() instanceof StopLocation stop) {
                       return !GqlUtil
-                        .getRoutingService(environment)
+                        .getTransitService(environment)
                         .getPatternsForStop(stop, true)
                         .isEmpty();
                     } else {
@@ -948,7 +951,7 @@ public class TransmodelGraphQLSchema {
                   placeTypes,
                   places,
                   environment.getArgument("multiModalMode"),
-                  GqlUtil.getRoutingService(environment)
+                  GqlUtil.getTransitService(environment)
                 )
                 .stream()
                 .limit(orgMaxResults)
@@ -979,7 +982,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getAgencyForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
           .build()
@@ -992,7 +995,7 @@ public class TransmodelGraphQLSchema {
           .withDirective(gqlUtil.timingData)
           .type(new GraphQLNonNull(new GraphQLList(authorityType)))
           .dataFetcher(environment -> {
-            return new ArrayList<>(GqlUtil.getRoutingService(environment).getAgencies());
+            return new ArrayList<>(GqlUtil.getTransitService(environment).getAgencies());
           })
           .build()
       )
@@ -1012,7 +1015,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getOperatorForId()
               .get(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
@@ -1026,7 +1029,7 @@ public class TransmodelGraphQLSchema {
           .withDirective(gqlUtil.timingData)
           .type(new GraphQLNonNull(new GraphQLList(operatorType)))
           .dataFetcher(environment -> {
-            return new ArrayList<>(GqlUtil.getRoutingService(environment).getAllOperators());
+            return new ArrayList<>(GqlUtil.getTransitService(environment).getAllOperators());
           })
           .build()
       )
@@ -1050,7 +1053,7 @@ public class TransmodelGraphQLSchema {
               return null;
             }
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getRouteForId(TransitIdMapper.mapIDToDomain(id));
           })
           .build()
@@ -1123,11 +1126,11 @@ public class TransmodelGraphQLSchema {
               return ((List<String>) environment.getArgument("ids")).stream()
                 .map(id1 -> TransitIdMapper.mapIDToDomain(id1))
                 .map(id -> {
-                  return GqlUtil.getRoutingService(environment).getRouteForId(id);
+                  return GqlUtil.getTransitService(environment).getRouteForId(id);
                 })
                 .collect(Collectors.toList());
             }
-            Stream<Route> stream = GqlUtil.getRoutingService(environment).getAllRoutes().stream();
+            Stream<Route> stream = GqlUtil.getTransitService(environment).getAllRoutes().stream();
 
             if ((boolean) environment.getArgument("flexibleOnly")) {
               stream =
@@ -1196,7 +1199,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTripForId()
               .get(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
@@ -1256,7 +1259,7 @@ public class TransmodelGraphQLSchema {
             // TODO OTP2 - Use FeedScoped ID
             List<String> authorities = environment.getArgument("authorities");
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTripForId()
               .values()
               .stream()
@@ -1276,7 +1279,7 @@ public class TransmodelGraphQLSchema {
                 (
                   activeServiceDates.isEmpty() ||
                   GqlUtil
-                    .getRoutingService(environment)
+                    .getTransitService(environment)
                     .getCalendarService()
                     .getServiceDatesForServiceId(t.getServiceId())
                     .stream()
@@ -1532,7 +1535,10 @@ public class TransmodelGraphQLSchema {
             if (ref == null) {
               return null;
             }
-            return ref.getLeg(GqlUtil.getRoutingService(environment));
+            return ref.getLeg(
+              GqlUtil.getRoutingService(environment),
+              GqlUtil.getTransitService(environment)
+            );
           })
           .build()
       )

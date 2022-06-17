@@ -1,11 +1,12 @@
 package org.opentripplanner.standalone.config;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.standalone.config.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.projectinfo.MavenProjectVersion;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.model.projectinfo.VersionControlInfo;
@@ -25,7 +26,7 @@ public class EnvironmentVariableReplacerTest {
    * with less than 30 characters. We do this to make it easier for humans to see what is going on,
    * if a test fails. This constraint is just to make the text involved more readable.
    */
-  @Before
+  @BeforeEach
   public void setup() {
     Map.Entry<String, String> envVar = System
       .getenv()
@@ -117,8 +118,15 @@ public class EnvironmentVariableReplacerTest {
   /**
    * Test replacing environment variable fails for unknown environment variable.
    */
-  @Test(expected = OtpAppException.class)
+  @Test
   public void testMissingEnvironmentVariable() {
-    ConfigLoader.nodeFromString("None existing env.var: '${none_existing_env_variable}'.", "test");
+    assertThrows(
+      OtpAppException.class,
+      () ->
+        ConfigLoader.nodeFromString(
+          "None existing env.var: '${none_existing_env_variable}'.",
+          "test"
+        )
+    );
   }
 }

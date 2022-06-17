@@ -19,6 +19,7 @@ import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A TraverseVisitor used in finding various types of places while walking the street graph.
@@ -27,6 +28,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
   public final List<PlaceAtDistance> placesFound = new ArrayList<>();
   private final RoutingService routingService;
+
+  private final TransitService transitService;
   private final Set<TransitMode> filterByModes;
   private final Set<FeedScopedId> filterByStops;
   private final Set<FeedScopedId> filterByRoutes;
@@ -61,6 +64,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    */
   public PlaceFinderTraverseVisitor(
     RoutingService routingService,
+    TransitService transitService,
     List<TransitMode> filterByModes,
     List<PlaceType> filterByPlaceTypes,
     List<FeedScopedId> filterByStops,
@@ -70,6 +74,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     double radiusMeters
   ) {
     this.routingService = routingService;
+    this.transitService = transitService;
     this.filterByModes = toSet(filterByModes);
     this.filterByStops = toSet(filterByStops);
     this.filterByRoutes = toSet(filterByRoutes);
@@ -160,7 +165,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   }
 
   private boolean stopHasRoutesWithMode(Stop stop, Set<TransitMode> modes) {
-    return routingService
+    return transitService
       .getPatternsForStop(stop)
       .stream()
       .map(TripPattern::getMode)
@@ -183,7 +188,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
   private void handlePatternsAtStop(Stop stop, double distance) {
     if (includePatternAtStops) {
-      List<TripPattern> patterns = routingService
+      List<TripPattern> patterns = transitService
         .getPatternsForStop(stop)
         .stream()
         .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))

@@ -14,6 +14,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.DefaultTransitService;
 
 /**
  * Check that the correct alternative legs are found, and that the search traverses the date
@@ -29,6 +30,7 @@ class AlternativeLegsTest extends GtfsTest {
   @Test
   void testPreviousLegs() throws Exception {
     var routingService = new RoutingService(graph);
+    var transitService = new DefaultTransitService(graph);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(this.feedId.getId(), "1.2"),
@@ -36,12 +38,13 @@ class AlternativeLegsTest extends GtfsTest {
       1,
       2
     )
-      .getLeg(routingService);
+      .getLeg(routingService, transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       3,
       routingService,
+      transitService,
       true,
       AlternativeLegsFilter.NO_FILTER
     );
@@ -65,6 +68,7 @@ class AlternativeLegsTest extends GtfsTest {
   @Test
   void testNextLegs() throws Exception {
     var routingService = new RoutingService(graph);
+    var transitService = new DefaultTransitService(graph);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(this.feedId.getId(), "2.2"),
@@ -72,12 +76,13 @@ class AlternativeLegsTest extends GtfsTest {
       0,
       1
     )
-      .getLeg(routingService);
+      .getLeg(routingService, transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       3,
       routingService,
+      transitService,
       false,
       AlternativeLegsFilter.NO_FILTER
     );

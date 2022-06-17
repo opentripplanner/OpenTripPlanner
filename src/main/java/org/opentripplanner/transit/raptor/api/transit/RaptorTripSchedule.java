@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 /**
  * The purpose of this interface is to provide information about the trip schedule. The trip is a
@@ -148,11 +147,4 @@ public interface RaptorTripSchedule {
 
     return stops;
   }
-
-  /**
-   * This index is used to lookup the transit factor/reluctance to be used with this trip schedule.
-   */
-  int transitReluctanceFactorIndex();
-
-  WheelchairAccessibility wheelchairBoarding();
 }

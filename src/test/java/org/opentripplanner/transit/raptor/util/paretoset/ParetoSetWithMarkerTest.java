@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.StreamSupport;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ParetoSetWithMarkerTest {
 
@@ -79,25 +79,25 @@ public class ParetoSetWithMarkerTest {
   @Test
   public void iteratorFromMark() {
     assertEquals(
-      "Empty set have no elements after marker",
       "{}",
-      toString(subject.elementsAfterMarker())
+      toString(subject.elementsAfterMarker()),
+      "Empty set have no elements after marker"
     );
 
     subject.add(v(5, 5));
     subject.markAtEndOfSet();
     assertEquals(
-      "Still empty - no elements after marker",
       "{}",
-      toString(subject.elementsAfterMarker())
+      toString(subject.elementsAfterMarker()),
+      "Still empty - no elements after marker"
     );
 
     subject.markAtEndOfSet();
     subject.add(v(3, 7));
     assertEquals(
-      "Return one element after marker",
       "[3, 7]",
-      toString(subject.elementsAfterMarker())
+      toString(subject.elementsAfterMarker()),
+      "Return one element after marker"
     );
   }
 

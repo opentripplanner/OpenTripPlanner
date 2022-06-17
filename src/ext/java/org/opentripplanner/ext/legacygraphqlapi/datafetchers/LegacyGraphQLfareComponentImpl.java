@@ -5,9 +5,9 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLfareComponentImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLFareComponent {
@@ -30,16 +30,16 @@ public class LegacyGraphQLfareComponentImpl
   @Override
   public DataFetcher<Iterable<Route>> routes() {
     return environment -> {
-      RoutingService routingService = getRoutingService(environment);
+      TransitService transitService = getTransitService(environment);
       return getSource(environment)
         .routes.stream()
-        .map(routingService::getRouteForId)
+        .map(transitService::getRouteForId)
         .collect(Collectors.toList());
     };
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
   private FareComponent getSource(DataFetchingEnvironment environment) {

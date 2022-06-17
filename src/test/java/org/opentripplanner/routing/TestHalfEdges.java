@@ -1,20 +1,18 @@
 package org.opentripplanner.routing;
 
 import static com.google.common.collect.Iterables.filter;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -52,8 +50,8 @@ import org.opentripplanner.util.TestUtils;
 
 public class TestHalfEdges {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  //@Rule
+  //public final ExpectedException exception = ExpectedException.none();
 
   Graph graph;
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
@@ -69,7 +67,7 @@ public class TestHalfEdges {
     return factory.createLineString(cs);
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     graph = new Graph();
     // a 0.1 degree x 0.1 degree square
@@ -227,7 +225,7 @@ public class TestHalfEdges {
       .getShortestPathTree();
 
     GraphPath pathBr = spt1.getPath(end);
-    assertNotNull("There must be a path from br to end", pathBr);
+    assertNotNull(pathBr, "There must be a path from br to end");
 
     ShortestPathTree spt2 = AStarBuilder
       .oneToOne()
@@ -235,10 +233,10 @@ public class TestHalfEdges {
       .getShortestPathTree();
 
     GraphPath pathTr = spt2.getPath(end);
-    assertNotNull("There must be a path from tr to end", pathTr);
+    assertNotNull(pathTr, "There must be a path from tr to end");
     assertTrue(
-      "path from bottom to end must be longer than path from top to end",
-      pathBr.getWeight() > pathTr.getWeight()
+      pathBr.getWeight() > pathTr.getWeight(),
+      "path from bottom to end must be longer than path from top to end"
     );
 
     ShortestPathTree spt = AStarBuilder
@@ -247,7 +245,7 @@ public class TestHalfEdges {
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
-    assertNotNull("There must be a path from start to end", path);
+    assertNotNull(path, "There must be a path from start to end");
 
     // the bottom is not part of the shortest path
     for (State s : path.states) {
@@ -263,7 +261,7 @@ public class TestHalfEdges {
         .getShortestPathTree();
 
     path = spt.getPath(start);
-    assertNotNull("There must be a path from start to end (looking back)", path);
+    assertNotNull(path, "There must be a path from start to end (looking back)");
 
     // the bottom edge is not part of the shortest path
     for (State s : path.states) {
@@ -308,7 +306,7 @@ public class TestHalfEdges {
         .getShortestPathTree();
 
     path = spt.getPath(start);
-    assertNotNull("There must be a path from top to bottom along the right", path);
+    assertNotNull(path, "There must be a path from top to bottom along the right");
 
     // the left edge is not part of the shortest path (even though the bike must be walked along the right)
     for (State s : path.states) {
@@ -347,7 +345,7 @@ public class TestHalfEdges {
         .getShortestPathTree();
 
     path = spt.getPath(start);
-    assertNotNull("There must be a path from top to bottom", path);
+    assertNotNull(path, "There must be a path from top to bottom");
 
     // the right edge is not part of the shortest path, e
     for (State s : path.states) {
@@ -405,7 +403,7 @@ public class TestHalfEdges {
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
-    assertNotNull("There must be a path from start to end", path);
+    assertNotNull(path, "There must be a path from start to end");
     assertEquals(1, path.edges.size());
     tempEdges.disposeEdges();
     connection.disposeEdges();
@@ -454,7 +452,7 @@ public class TestHalfEdges {
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
-    assertNotNull("There must be a path from start to end", path);
+    assertNotNull(path, "There must be a path from start to end");
     assertTrue(path.edges.size() > 1);
     tempEdges.disposeEdges();
     connection.disposeEdges();
@@ -577,8 +575,8 @@ public class TestHalfEdges {
     );
     assertNotNull(start);
     assertTrue(
-      "wheelchair accessibility is correctly set (splitting)",
-      start.isWheelchairAccessible()
+      start.isWheelchairAccessible(),
+      "wheelchair accessibility is correctly set (splitting)"
     );
 
     Collection<Edge> edges = start.getOutgoing();

@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.TranslatedString;
 
 public class PtSituationElementType {
@@ -59,7 +59,7 @@ public class PtSituationElementType {
           .description("Get affected authority for this situation element")
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getAgencyForId(
                 ((TransitAlert) environment.getSource()).getEntities()
                   .stream()
@@ -78,13 +78,13 @@ public class PtSituationElementType {
           .name("lines")
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment -> {
-            RoutingService routingService = GqlUtil.getRoutingService(environment);
+            TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).getEntities()
               .stream()
               .filter(EntitySelector.Route.class::isInstance)
               .map(EntitySelector.Route.class::cast)
               .map(entitySelector -> entitySelector.routeId)
-              .map(routeId -> routingService.getRouteForId(routeId))
+              .map(routeId -> transitService.getRouteForId(routeId))
               .collect(Collectors.toList());
           })
           .build()
@@ -95,13 +95,13 @@ public class PtSituationElementType {
           .name("serviceJourneys")
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment -> {
-            RoutingService routingService = GqlUtil.getRoutingService(environment);
+            TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).getEntities()
               .stream()
               .filter(EntitySelector.Trip.class::isInstance)
               .map(EntitySelector.Trip.class::cast)
               .map(entitySelector -> entitySelector.tripId)
-              .map(tripId -> routingService.getTripForId().get(tripId))
+              .map(tripId -> transitService.getTripForId().get(tripId))
               .collect(Collectors.toList());
           })
           .build()
@@ -112,13 +112,13 @@ public class PtSituationElementType {
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
           .dataFetcher(environment -> {
-            RoutingService routingService = GqlUtil.getRoutingService(environment);
+            TransitService transitService = GqlUtil.getTransitService(environment);
             return ((TransitAlert) environment.getSource()).getEntities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
               .map(entitySelector -> entitySelector.stopId)
-              .map(stopId -> routingService.getStopForId(stopId))
+              .map(stopId -> transitService.getStopForId(stopId))
               .collect(Collectors.toList());
           })
           .build()
@@ -272,7 +272,7 @@ public class PtSituationElementType {
           .deprecate("Not yet officially supported. May be removed or renamed.")
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getAgencyForId(
                 ((TransitAlert) environment.getSource()).getEntities()
                   .stream()

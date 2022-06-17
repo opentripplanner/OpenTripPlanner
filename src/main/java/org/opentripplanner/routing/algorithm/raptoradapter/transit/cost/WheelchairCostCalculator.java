@@ -1,34 +1,23 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NOT_POSSIBLE;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.POSSIBLE;
-
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
-public class WheelchairCostCalculator implements CostCalculator {
+public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
 
-  private final CostCalculator delegate;
+  private final CostCalculator<T> delegate;
   private final int[] wheelchairBoardingCost;
 
   public WheelchairCostCalculator(
-    @Nonnull CostCalculator delegate,
+    @Nonnull CostCalculator<T> delegate,
     @Nonnull WheelchairAccessibilityRequest requirements
   ) {
-    // assign the costs for boarding a trip with the following accessibility values
-    wheelchairBoardingCost = new int[3];
-    wheelchairBoardingCost[POSSIBLE.ordinal()] = 0;
-    wheelchairBoardingCost[NO_INFORMATION.ordinal()] =
-      RaptorCostConverter.toRaptorCost(requirements.trip().unknownCost());
-    wheelchairBoardingCost[NOT_POSSIBLE.ordinal()] =
-      RaptorCostConverter.toRaptorCost(requirements.trip().inaccessibleCost());
-
     this.delegate = delegate;
+    this.wheelchairBoardingCost = createWheelchairCost(requirements);
   }
 
   @Override
@@ -37,7 +26,7 @@ public class WheelchairCostCalculator implements CostCalculator {
     int prevArrivalTime,
     int boardStop,
     int boardTime,
-    RaptorTripSchedule trip,
+    T trip,
     RaptorTransferConstraint transferConstraints
   ) {
     int defaultCost = delegate.boardingCost(
@@ -55,8 +44,8 @@ public class WheelchairCostCalculator implements CostCalculator {
   }
 
   @Override
-  public int onTripRelativeRidingCost(int boardTime, int transitFactorIndex) {
-    return delegate.onTripRelativeRidingCost(boardTime, transitFactorIndex);
+  public int onTripRelativeRidingCost(int boardTime, T tripScheduledBoarded) {
+    return delegate.onTripRelativeRidingCost(boardTime, tripScheduledBoarded);
   }
 
   @Override
@@ -64,16 +53,10 @@ public class WheelchairCostCalculator implements CostCalculator {
     int boardCost,
     int alightSlack,
     int transitTime,
-    int transitFactorIndex,
+    T trip,
     int toStop
   ) {
-    return delegate.transitArrivalCost(
-      boardCost,
-      alightSlack,
-      transitTime,
-      transitFactorIndex,
-      toStop
-    );
+    return delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStop);
   }
 
   @Override
@@ -89,5 +72,26 @@ public class WheelchairCostCalculator implements CostCalculator {
   @Override
   public int costEgress(RaptorTransfer egress) {
     return delegate.costEgress(egress);
+  }
+
+  /**
+   * Create the wheelchair costs for boarding a trip with all possible accessibility values
+   */
+  private static int[] createWheelchairCost(WheelchairAccessibilityRequest requirements) {
+    int[] costIndex = new int[WheelchairAccessibility.values().length];
+
+    for (var it : WheelchairAccessibility.values()) {
+      costIndex[it.ordinal()] =
+        switch (it) {
+          case POSSIBLE -> 0;
+          case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(
+            requirements.trip().unknownCost()
+          );
+          case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(
+            requirements.trip().inaccessibleCost()
+          );
+        };
+    }
+    return costIndex;
   }
 }
