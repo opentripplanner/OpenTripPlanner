@@ -39,7 +39,7 @@ public class ItineraryMapper {
     api.generalizedCost = domain.getGeneralizedCost();
     api.elevationLost = domain.getElevationLost();
     api.elevationGained = domain.getElevationGained();
-    api.transfers = domain.getnTransfers();
+    api.transfers = domain.getNumberOfTransfers();
     api.tooSloped = domain.isTooSloped();
     api.arrivedAtDestinationWithRentedBicycle = domain.isArrivedAtDestinationWithRentedVehicle();
     api.fare = domain.getFare();

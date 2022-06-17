@@ -31,7 +31,7 @@ public class PatternInterlineDwellTest extends GtfsTest {
 
     assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route1");
     assertEquals(itinerary.getLegs().get(1).getRoute().getId().getId(), "route1");
-    assertEquals(0, itinerary.getnTransfers());
+    assertEquals(0, itinerary.getNumberOfTransfers());
   }
   // TODO test for trips on the same block with no transfer allowed (Trimet special case)
 

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.util.lang.DoubleRounder;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -19,34 +19,34 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public class Itinerary {
 
+  /* final primitive properties */
   private final int durationSeconds;
-
   private final int transitTimeSeconds;
-
-  private final int nTransfers;
-
+  private final int numberOfTransfers;
   private final int waitingTimeSeconds;
   private final double nonTransitDistanceMeters;
   private final boolean walkOnly;
   private final boolean streetOnly;
-  private final List<SystemNotice> systemNotices = new ArrayList<>();
-  private List<Leg> legs;
+  private final int nonTransitTimeSeconds;
 
-  private Float accessibilityScore;
-  private int nonTransitTimeSeconds;
-
+  /* mutable primitive properties */
   private Double elevationLost = 0.0;
-
   private Double elevationGained = 0.0;
   private int generalizedCost = -1;
   private int waitTimeOptimizedCost = -1;
   private int transferPriorityCost = -1;
-
   private boolean tooSloped = false;
-
   private Double maxSlope = null;
-
   private boolean arrivedAtDestinationWithRentedVehicle = false;
+
+  /* Sandbox experimental properties */
+  private Float accessibilityScore;
+
+  /* other properties */
+
+  private final List<SystemNotice> systemNotices = new ArrayList<>();
+  private List<Leg> legs;
+
   private Fare fare = new Fare();
 
   public Itinerary(List<Leg> legs) {
@@ -55,10 +55,10 @@ public class Itinerary {
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
     this.durationSeconds = totals.totalDurationSeconds;
-    this.nTransfers = totals.transfers();
+    this.numberOfTransfers = totals.transfers();
     this.transitTimeSeconds = totals.transitTimeSeconds;
-    this.setNonTransitTimeSeconds(totals.nonTransitTimeSeconds);
-    this.nonTransitDistanceMeters = totals.nonTransitDistanceMeters;
+    this.nonTransitTimeSeconds = totals.nonTransitTimeSeconds;
+    this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
     this.waitingTimeSeconds = totals.waitingTimeSeconds;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
@@ -204,7 +204,7 @@ public class Itinerary {
       .addStr("to", lastLeg().getTo().toStringShort())
       .addTimeCal("start", firstLeg().getStartTime())
       .addTimeCal("end", lastLeg().getEndTime())
-      .addNum("nTransfers", nTransfers, -1)
+      .addNum("nTransfers", numberOfTransfers, -1)
       .addDurationSec("duration", durationSeconds)
       .addNum("generalizedCost", generalizedCost)
       .addDurationSec("nonTransitTime", nonTransitTimeSeconds)
@@ -271,8 +271,8 @@ public class Itinerary {
   /**
    * The number of transfers this trip has.
    */
-  public int getnTransfers() {
-    return nTransfers;
+  public int getNumberOfTransfers() {
+    return numberOfTransfers;
   }
 
   /**
@@ -355,10 +355,6 @@ public class Itinerary {
     return nonTransitTimeSeconds;
   }
 
-  public void setNonTransitTimeSeconds(int nonTransitTimeSeconds) {
-    this.nonTransitTimeSeconds = nonTransitTimeSeconds;
-  }
-
   /**
    * How much elevation is lost, in total, over the course of the trip, in meters. As an example, a
    * trip that went from the top of Mount Everest straight down to sea level, then back up K2, then
@@ -369,7 +365,7 @@ public class Itinerary {
   }
 
   public void setElevationLost(Double elevationLost) {
-    this.elevationLost = elevationLost;
+    this.elevationLost = DoubleUtils.roundTo2Decimals(elevationLost);
   }
 
   /**
@@ -381,7 +377,7 @@ public class Itinerary {
   }
 
   public void setElevationGained(Double elevationGained) {
-    this.elevationGained = DoubleRounder.roundTo2Decimals(elevationGained);
+    this.elevationGained = DoubleUtils.roundTo2Decimals(elevationGained);
   }
 
   /**
@@ -451,7 +447,7 @@ public class Itinerary {
   }
 
   public void setMaxSlope(Double maxSlope) {
-    this.maxSlope = DoubleRounder.roundTo2Decimals(maxSlope);
+    this.maxSlope = DoubleUtils.roundTo2Decimals(maxSlope);
   }
 
   /**

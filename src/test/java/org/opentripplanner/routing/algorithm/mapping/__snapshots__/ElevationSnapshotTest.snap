@@ -276,7 +276,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.428,
+          "distance": 1629.43,
           "endTime": "2009-10-21T23:30:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:20:25.000+00:00",
@@ -475,7 +475,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1000,
       "elevationGained": 3.15,
-      "elevationLost": 3.9299999999999997,
+      "elevationLost": 3.93,
       "endTime": "2009-10-21T23:40:10.000+00:00",
       "fare": {
         "details": {
@@ -790,7 +790,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "transfers": 0,
       "transitTime": 791,
       "waitingTime": 0,
-      "walkDistance": 270.09000000000003,
+      "walkDistance": 270.09,
       "walkLimitExceeded": false,
       "walkTime": 209
     },
@@ -1070,7 +1070,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.428,
+          "distance": 1629.43,
           "endTime": "2009-10-21T23:43:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:33:25.000+00:00",
@@ -1541,7 +1541,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.428,
+          "distance": 1629.43,
           "endTime": "2009-10-21T23:52:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:42:25.000+00:00",
@@ -1740,7 +1740,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1000,
       "elevationGained": 3.15,
-      "elevationLost": 3.9299999999999997,
+      "elevationLost": 3.93,
       "endTime": "2009-10-21T23:56:10.000+00:00",
       "fare": {
         "details": {
@@ -2055,7 +2055,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
       "transfers": 0,
       "transitTime": 791,
       "waitingTime": 0,
-      "walkDistance": 270.09000000000003,
+      "walkDistance": 270.09,
       "walkLimitExceeded": false,
       "walkTime": 209
     },
@@ -2335,7 +2335,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1629.428,
+          "distance": 1629.43,
           "endTime": "2009-10-22T00:01:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:51:25.000+00:00",
@@ -2540,7 +2540,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 724,
       "elevationGained": 18.9,
-      "elevationLost": 86.14419754028322,
+      "elevationLost": 30.64,
       "endTime": "2009-10-21T23:10:00.000+00:00",
       "fare": {
         "details": { },
@@ -2563,7 +2563,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           },
           "generalizedCost": 1374,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1032,60.2,1190,55.5,1430,55.5,1506,40.4,1849,40.4,1919,37.3,1931,37.3,2078,55.5,2503,55.5,2503,0.0,2635,0.0",
+          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1032,60.2,1190,55.5,1430,55.5,1506,40.4,1849,40.4,1919,37.3,1931,37.3,2078,55.5,2503,55.5,2503,NaN,2635,NaN",
           "legGeometry": {
             "length": 59,
             "points": "}f{tGv}{kVC?mCBmCDoCDmCDmCBoCDmCDkCDoCB_CBM@iGEE@MB[H}@@s@@GsKAkCCkCA}BCkE?EAcEoCB{BBS@K?wDD}@@I?IAECKMKOIKyAmBCCQScB`DeAzBOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
@@ -2697,7 +2697,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 459,
       "elevationGained": 12.88,
-      "elevationLost": 38.14118957519532,
+      "elevationLost": 38.14,
       "endTime": "2009-10-21T23:17:39.000+00:00",
       "fare": {
         "details": { },
@@ -2949,7 +2949,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 819.0799999999999,
+      "walkDistance": 819.08,
       "walkLimitExceeded": false,
       "walkTime": 459
     }
@@ -2963,7 +2963,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1863,
       "elevationGained": 0.7,
-      "elevationLost": 67.94419754028323,
+      "elevationLost": 12.44,
       "endTime": "2009-10-21T23:41:03.000+00:00",
       "fare": {
         "details": { },
@@ -2986,7 +2986,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
           },
           "generalizedCost": 3648,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1466,60.2,1540,55.5,2299,55.5,2299,0.0,2432,0.0",
+          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,240,60.2,1466,60.2,1540,55.5,2299,55.5,2299,NaN,2432,NaN",
           "legGeometry": {
             "length": 62,
             "points": "}f{tGv}{kVC?mCBmCDoCDmCDmCBoCDmCDkCDoCB_CBM@iGEE@MB[H}@@s@@oCDmCBC@eCBK@SBWDeCZ]eFYyDEu@C_@Ce@Gm@EeAMmBGiAGoAWWg@s@EEGKIM]i@k@w@A?QWOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
@@ -3120,7 +3120,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1125,
       "elevationGained": 15.03,
-      "elevationLost": 4.2299999999999995,
+      "elevationLost": 4.23,
       "endTime": "2009-10-21T23:31:21.000+00:00",
       "fare": {
         "details": {
@@ -3244,7 +3244,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1631.031,
+          "distance": 1631.03,
           "endTime": "2009-10-21T23:23:32.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:14:50.000+00:00",
@@ -4033,7 +4033,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2232.311,
+          "distance": 2232.31,
           "endTime": "2009-10-21T23:29:50.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:21:53.000+00:00",
@@ -4408,7 +4408,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2504.417,
+          "distance": 2504.42,
           "endTime": "2009-10-21T23:42:47.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:29:00.000+00:00",
@@ -4724,7 +4724,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1125,
       "elevationGained": 15.03,
-      "elevationLost": 4.2299999999999995,
+      "elevationLost": 4.23,
       "endTime": "2009-10-21T23:46:21.000+00:00",
       "fare": {
         "details": {
@@ -4848,7 +4848,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1631.031,
+          "distance": 1631.03,
           "endTime": "2009-10-21T23:38:32.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:29:50.000+00:00",

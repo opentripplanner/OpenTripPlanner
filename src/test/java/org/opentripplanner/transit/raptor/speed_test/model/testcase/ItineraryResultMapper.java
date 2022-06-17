@@ -129,7 +129,7 @@ class ItineraryResultMapper {
 
     return new Result(
       testCaseId,
-      itinerary.getnTransfers(),
+      itinerary.getNumberOfTransfers(),
       itinerary.getDurationSeconds(),
       itinerary.getGeneralizedCost(),
       itinerary

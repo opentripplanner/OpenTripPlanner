@@ -18,7 +18,7 @@ public class ItineraryTest implements PlanTestConstants {
 
     // Expected fields on itinerary set
     assertEquals(300, result.getDurationSeconds());
-    assertEquals(0, result.getnTransfers());
+    assertEquals(0, result.getNumberOfTransfers());
     assertEquals(600, result.getGeneralizedCost());
     assertEquals(0, result.getTransitTimeSeconds());
     assertEquals(300, result.getNonTransitTimeSeconds());
@@ -41,7 +41,7 @@ public class ItineraryTest implements PlanTestConstants {
     Itinerary result = newItinerary(A).bus(55, T11_00, T11_10, B).build();
 
     assertEquals(600, result.getDurationSeconds());
-    assertEquals(0, result.getnTransfers());
+    assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
     assertEquals(600, result.getTransitTimeSeconds());
     assertEquals(0, result.getNonTransitTimeSeconds());
@@ -65,7 +65,7 @@ public class ItineraryTest implements PlanTestConstants {
     Itinerary result = newItinerary(A).rail(20, T11_05, T11_15, B).build();
 
     assertEquals(600, result.getDurationSeconds());
-    assertEquals(0, result.getnTransfers());
+    assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
     assertEquals(600, result.getTransitTimeSeconds());
     assertEquals(0, result.getNonTransitTimeSeconds());
@@ -93,7 +93,7 @@ public class ItineraryTest implements PlanTestConstants {
       .rail(110, T11_15, T11_30, D)
       .build();
 
-    assertEquals(1, itinerary.getnTransfers());
+    assertEquals(1, itinerary.getNumberOfTransfers());
     assertEquals(28 * 60, itinerary.getDurationSeconds());
     assertEquals(20 * 60, itinerary.getTransitTimeSeconds());
     assertEquals(60, itinerary.getNonTransitTimeSeconds());
@@ -115,7 +115,7 @@ public class ItineraryTest implements PlanTestConstants {
       .build();
 
     assertEquals(1080, result.getDurationSeconds());
-    assertEquals(0, result.getnTransfers());
+    assertEquals(0, result.getNumberOfTransfers());
     assertEquals(600, result.getTransitTimeSeconds());
     assertEquals(300, result.getNonTransitTimeSeconds());
     assertEquals(180, result.getWaitingTimeSeconds());
@@ -138,7 +138,7 @@ public class ItineraryTest implements PlanTestConstants {
       .build();
 
     assertEquals(3060, result.getDurationSeconds());
-    assertEquals(2, result.getnTransfers());
+    assertEquals(2, result.getNumberOfTransfers());
     assertEquals(2040, result.getTransitTimeSeconds());
     assertEquals(360, result.getNonTransitTimeSeconds());
     assertEquals(660, result.getWaitingTimeSeconds());

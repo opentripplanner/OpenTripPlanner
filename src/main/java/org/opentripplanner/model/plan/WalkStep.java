@@ -97,6 +97,7 @@ public class WalkStep {
 
   public VehicleRentalStationInfo vehicleRentalOffStation;
 
+
   public static RelativeDirection getRelativeDirection(
     double lastAngle,
     double thisAngle,

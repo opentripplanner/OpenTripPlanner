@@ -1,8 +1,10 @@
 package org.opentripplanner.util.lang;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javax.annotation.Nullable;
 
-public class DoubleRounder {
+public class DoubleUtils {
 
   /**
    * Useful for coordinates, round of to ~ 1 cm.
@@ -15,7 +17,7 @@ public class DoubleRounder {
    * Useful for coordinates, round of to ~ 1 cm.
    */
   public static double roundTo7Decimals(double value) {
-    return roundToNDecimals(value, 10_000_000.0);
+    return roundToNDecimals(value, 7);
   }
 
   /**
@@ -29,10 +31,13 @@ public class DoubleRounder {
    * Round to a decimal number with 2 digits precision
    */
   public static double roundTo2Decimals(double value) {
-    return roundToNDecimals(value, 100.0);
+    return roundToNDecimals(value, 2);
   }
 
-  public static double roundToNDecimals(double value, double factor) {
-    return Math.round(value * factor) / factor;
+  public static double roundToNDecimals(double value, int places) {
+    if (Double.isNaN(value) || Double.isInfinite(value)) {
+      return value;
+    }
+    return BigDecimal.valueOf(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
   }
 }
