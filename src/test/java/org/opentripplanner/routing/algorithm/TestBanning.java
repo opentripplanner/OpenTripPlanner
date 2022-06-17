@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -29,9 +30,9 @@ public class TestBanning {
 
     Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
 
-    Assert.assertEquals(2, bannedRoutes.size());
-    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
-    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
+    assertEquals(2, bannedRoutes.size());
+    assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
+    assertTrue(bannedRoutes.contains(id("RUT:Route:3")));
   }
 
   @Test
@@ -45,8 +46,8 @@ public class TestBanning {
 
     Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
 
-    Assert.assertEquals(1, bannedRoutes.size());
-    Assert.assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
+    assertEquals(1, bannedRoutes.size());
+    assertTrue(bannedRoutes.contains(id("RUT:Route:2")));
   }
 
   private List<Route> getTestRoutes() {

@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.index.hierarchy.E.EASTWOOD;
 import static org.opentripplanner.netex.index.hierarchy.E.SCHWARZENEGGER;
 import static org.opentripplanner.netex.index.hierarchy.SetSupport.sort;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This test extends the tests performed in {@link HierarchicalMapTest} with respect to the few
@@ -51,21 +51,19 @@ public class HierarchicalMapByIdTest {
     assertEquals(EASTWOOD, child.lookup(EASTWOOD.getId()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void addEntityWithIllegalKeyArgument() {
     // Prevent using add method with (key, value) -> the key is given: the ID.
-    child.add("Illegal key", EASTWOOD);
-    fail("Expected an exception, but did not get one.");
+    assertThrows(IllegalArgumentException.class, () -> child.add("Illegal key", EASTWOOD));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void addEntitiesWithIllegalKeyArgument() {
     Map<String, E> input = new HashMap<>();
     input.put("A", EASTWOOD);
 
     // Prevent using add method with (key, value) -> the key is given: the ID.
-    child.addAll(input);
-    fail("Expected an exception, but did not get one.");
+    assertThrows(IllegalArgumentException.class, () -> child.addAll(input));
   }
 
   @Test

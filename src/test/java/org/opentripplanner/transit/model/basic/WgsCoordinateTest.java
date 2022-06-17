@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.model.basic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 
 public class WgsCoordinateTest {
@@ -27,15 +27,15 @@ public class WgsCoordinateTest {
     WgsCoordinate sameLatitude = new WgsCoordinate(5.000_000_099, 3.0);
     WgsCoordinate differentLatitude = new WgsCoordinate(5.000_000_101, 3.0);
 
-    Assert.assertTrue(a.sameLocation(sameLatitude));
-    Assert.assertFalse(a.sameLocation(differentLatitude));
+    assertTrue(a.sameLocation(sameLatitude));
+    assertFalse(a.sameLocation(differentLatitude));
 
     // Test longitude
     WgsCoordinate sameLongitude = new WgsCoordinate(5.0, 3.000_000_099);
     WgsCoordinate differentLongitude = new WgsCoordinate(5.0, 3.000_000_101);
 
-    Assert.assertTrue(a.sameLocation(sameLongitude));
-    Assert.assertFalse(a.sameLocation(differentLongitude));
+    assertTrue(a.sameLocation(sameLongitude));
+    assertFalse(a.sameLocation(differentLongitude));
   }
 
   @Test
@@ -49,8 +49,8 @@ public class WgsCoordinateTest {
     Coordinate jts = c.asJtsCoordinate();
 
     // Assert latitude is y, and longitude is x coordinate
-    Assert.assertEquals(latitude, jts.y, 1E-7);
-    Assert.assertEquals(longitude, jts.x, 1E-7);
+    assertEquals(latitude, jts.y, 1E-7);
+    assertEquals(longitude, jts.x, 1E-7);
   }
 
   @Test

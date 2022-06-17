@@ -10,7 +10,7 @@ import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 
 import java.util.Set;
 import javax.ws.rs.BadRequestException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
 
 public class QualifiedModeSetTest {

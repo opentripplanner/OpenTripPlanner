@@ -38,7 +38,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
   public OptimizedPathTail(
     RaptorSlackProvider slackProvider,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,
     double extraStopBoardAlightCostsFactor,

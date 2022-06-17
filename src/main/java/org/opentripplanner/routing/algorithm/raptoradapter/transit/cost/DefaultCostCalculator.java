@@ -5,14 +5,14 @@ import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
  * <p/>
  * This class is immutable and thread safe.
  */
-public final class DefaultCostCalculator implements CostCalculator {
+public final class DefaultCostCalculator<T extends DefaultTripSchedule>
+  implements CostCalculator<T> {
 
   private final int boardCostOnly;
   private final int transferCostOnly;
@@ -65,7 +65,7 @@ public final class DefaultCostCalculator implements CostCalculator {
     int prevArrivalTime,
     int boardStop,
     int boardTime,
-    RaptorTripSchedule trip,
+    T trip,
     RaptorTransferConstraint transferConstraints
   ) {
     if (transferConstraints.isRegularTransfer()) {
@@ -83,12 +83,12 @@ public final class DefaultCostCalculator implements CostCalculator {
   }
 
   @Override
-  public int onTripRelativeRidingCost(int boardTime, int transitFactorIndex) {
+  public int onTripRelativeRidingCost(int boardTime, DefaultTripSchedule tripScheduledBoarded) {
     // The relative-transit-time is time spent on transit. We do not know the alight-stop, so
     // it is impossible to calculate the "correct" time. But the only thing that maters is that
     // the relative difference between to boardings are correct, assuming riding the same trip.
     // So, we can use the negative board time as relative-transit-time.
-    return -boardTime * transitFactors.factor(transitFactorIndex);
+    return -boardTime * transitFactors.factor(tripScheduledBoarded.transitReluctanceFactorIndex());
   }
 
   @Override
@@ -96,12 +96,12 @@ public final class DefaultCostCalculator implements CostCalculator {
     int boardCost,
     int alightSlack,
     int transitTime,
-    int transitFactorIndex,
+    T trip,
     int toStop
   ) {
     int cost =
       boardCost +
-      transitFactors.factor(transitFactorIndex) *
+      transitFactors.factor(trip.transitReluctanceFactorIndex()) *
       transitTime +
       waitFactor *
       alightSlack;
@@ -203,12 +203,11 @@ public final class DefaultCostCalculator implements CostCalculator {
       // For a guaranteed transfer we skip board- and transfer-cost
       final int boardWaitTime = boardTime - prevArrivalTime;
 
-      int cost = waitFactor * boardWaitTime;
-
       // StopTransferCost is NOT added to the cost here. This is because a trip-to-trip constrained transfer take
       // precedence over stop-to-stop transfer priority (NeTEx station transfer priority).
-      return cost;
+      return waitFactor * boardWaitTime;
     }
+
     // fallback to regular transfer
     return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime);
   }

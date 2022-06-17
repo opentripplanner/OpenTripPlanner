@@ -10,6 +10,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A reference which can be used to rebuild an exact copy of a {@link ScheduledTransitLeg} using the
@@ -23,15 +24,15 @@ public record ScheduledTransitLegReference(
 )
   implements LegReference {
   @Override
-  public ScheduledTransitLeg getLeg(RoutingService routingService) {
-    Trip trip = routingService.getTripForId().get(tripId);
+  public ScheduledTransitLeg getLeg(RoutingService routingService, TransitService transitService) {
+    Trip trip = transitService.getTripForId().get(tripId);
 
     if (trip == null) {
       return null;
     }
 
     TripPattern tripPattern = null;
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
 
     // Check if pattern is changed by real-time updater
     if (timetableSnapshot != null) {
@@ -40,7 +41,7 @@ public record ScheduledTransitLegReference(
 
     // Otherwise use scheduled pattern
     if (tripPattern == null) {
-      tripPattern = routingService.getPatternForTrip().get(trip);
+      tripPattern = transitService.getPatternForTrip().get(trip);
     }
 
     // no matching pattern found anywhere
@@ -48,7 +49,7 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    Timetable timetable = routingService.getTimetableForTripPattern(tripPattern, serviceDate);
+    Timetable timetable = transitService.getTimetableForTripPattern(tripPattern, serviceDate);
 
     TripTimes tripTimes = timetable.getTripTimes(trip);
 

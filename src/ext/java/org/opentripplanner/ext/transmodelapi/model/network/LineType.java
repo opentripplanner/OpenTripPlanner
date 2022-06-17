@@ -150,7 +150,7 @@ public class LineType {
           .type(new GraphQLList(journeyPatternType))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForRoute()
               .get(environment.getSource());
           })
@@ -163,7 +163,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForRoute()
               .get(environment.getSource())
               .stream()
@@ -181,7 +181,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment -> {
             List<Trip> result = GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForRoute()
               .get(environment.getSource())
               .stream()
@@ -213,7 +213,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
             Route route = environment.getSource();
-            return GqlUtil.getRoutingService(environment).getNoticesByEntity(route);
+            return GqlUtil.getTransitService(environment).getNoticesByEntity(route);
           })
           .build()
       )

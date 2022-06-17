@@ -1,15 +1,15 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.D1m;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;

@@ -51,7 +51,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   protected final RaptorTransitDataProvider<T> transit;
 
   private final TransitCalculator<T> calculator;
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
   private final RaptorTuningParameters tuningParameters;
   private final RoundTracker roundTracker;
   private final PathMapper<T> pathMapper;
@@ -150,7 +150,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   @Nullable
-  public CostCalculator costCalculator() {
+  public CostCalculator<T> costCalculator() {
     return costCalculator;
   }
 
@@ -272,7 +272,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
     RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
-    CostCalculator costCalculator,
+    CostCalculator<S> costCalculator,
     RaptorStopNameResolver stopNameResolver,
     RaptorRequest<S> request,
     WorkerLifeCycle lifeCycle

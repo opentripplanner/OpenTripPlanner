@@ -1,10 +1,11 @@
 package org.opentripplanner.api.parameter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class QualifiedModeTest {
 
@@ -18,14 +19,18 @@ public class QualifiedModeTest {
       .orElse("X");
 
     for (ApiRequestMode mode : ApiRequestMode.values()) {
-      assertEquals(new QualifiedMode(mode.name()), mode, Set.of());
-      assertEquals(new QualifiedMode(mode + "_RENT"), mode, Set.of(Qualifier.RENT));
-      assertEquals(new QualifiedMode(mode + "_" + ALL_QUALIFIERS_STR), mode, ALL_QUALIFIERS);
+      assertModeEquals(new QualifiedMode(mode.name()), mode, Set.of());
+      assertModeEquals(new QualifiedMode(mode + "_RENT"), mode, Set.of(Qualifier.RENT));
+      assertModeEquals(new QualifiedMode(mode + "_" + ALL_QUALIFIERS_STR), mode, ALL_QUALIFIERS);
     }
   }
 
-  private void assertEquals(QualifiedMode qMode, ApiRequestMode mode, Set<Qualifier> qualifiers) {
-    Assert.assertEquals(qMode.mode, mode);
-    Assert.assertEquals(qMode.qualifiers, qualifiers);
+  private void assertModeEquals(
+    QualifiedMode qMode,
+    ApiRequestMode mode,
+    Set<Qualifier> qualifiers
+  ) {
+    assertEquals(qMode.mode, mode);
+    assertEquals(qMode.qualifiers, qualifiers);
   }
 }

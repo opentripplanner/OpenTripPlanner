@@ -27,6 +27,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegType {
@@ -313,7 +314,7 @@ public class LegType {
             var serviceDate = leg(env).getServiceDate();
 
             return GqlUtil
-              .getRoutingService(env)
+              .getTransitService(env)
               .getTripOnServiceDateForTripAndDay(tripId, serviceDate);
           })
           .build()
@@ -477,10 +478,12 @@ public class LegType {
             }
             int previous = env.getArgument("previous");
             RoutingService routingService = GqlUtil.getRoutingService(env);
+            TransitService transitService = GqlUtil.getTransitService(env);
             return AlternativeLegs.getAlternativeLegs(
               leg,
               previous,
               routingService,
+              transitService,
               true,
               env.getArgument("filter")
             );
@@ -519,10 +522,12 @@ public class LegType {
             }
             int next = env.getArgument("next");
             RoutingService routingService = GqlUtil.getRoutingService(env);
+            TransitService transitService = GqlUtil.getTransitService(env);
             return AlternativeLegs.getAlternativeLegs(
               leg,
               next,
               routingService,
+              transitService,
               false,
               env.getArgument("filter")
             );

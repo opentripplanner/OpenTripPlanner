@@ -45,7 +45,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private final TransitCalculator<T> transitCalculator;
 
   @Nullable
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
 
   private final SlackProvider slackProvider;
   private final PathMapper<T> pathMapper;
@@ -57,7 +57,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   public DestinationArrivalPaths(
     ParetoComparator<Path<T>> paretoComparator,
     TransitCalculator<T> transitCalculator,
-    @Nullable CostCalculator costCalculator,
+    @Nullable CostCalculator<T> costCalculator,
     SlackProvider slackProvider,
     PathMapper<T> pathMapper,
     DebugHandlerFactory<T> debugHandlerFactory,

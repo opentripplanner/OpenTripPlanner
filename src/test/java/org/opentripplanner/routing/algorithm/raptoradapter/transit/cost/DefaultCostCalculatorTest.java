@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 public class DefaultCostCalculatorTest {
 
@@ -16,8 +17,19 @@ public class DefaultCostCalculatorTest {
   private static final int TRANSIT_RELUCTANCE_2 = 1;
   private static final int STOP_A = 0;
   private static final int STOP_B = 1;
+  private static final String ANY_SCHEDULE = "10:00 11:00";
 
-  private final DefaultCostCalculator subject = new DefaultCostCalculator(
+  private static final TestTripSchedule TRIP_1 = TestTripSchedule
+    .schedule(ANY_SCHEDULE)
+    .transitReluctanceIndex(TRANSIT_RELUCTANCE_1)
+    .build();
+
+  private static final TestTripSchedule TRIP_2 = TestTripSchedule
+    .schedule(ANY_SCHEDULE)
+    .transitReluctanceIndex(TRANSIT_RELUCTANCE_2)
+    .build();
+
+  private final DefaultCostCalculator<TestTripSchedule> subject = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE_FACTOR,
@@ -40,40 +52,20 @@ public class DefaultCostCalculatorTest {
 
   @Test
   public void transitArrivalCost() {
-    assertEquals(0, subject.transitArrivalCost(0, 0, 0, TRANSIT_RELUCTANCE_1, STOP_A), "Zero cost");
-    assertEquals(
-      1000,
-      subject.transitArrivalCost(1000, 0, 0, TRANSIT_RELUCTANCE_1, STOP_A),
-      "Board cost"
-    );
-    assertEquals(
-      50,
-      subject.transitArrivalCost(0, 1, 0, TRANSIT_RELUCTANCE_1, STOP_A),
-      "Alight wait time cost"
-    );
-    assertEquals(
-      100,
-      subject.transitArrivalCost(0, 0, 1, TRANSIT_RELUCTANCE_1, STOP_A),
-      "Transit time cost"
-    );
-    assertEquals(
-      25,
-      subject.transitArrivalCost(0, 0, 0, TRANSIT_RELUCTANCE_1, STOP_B),
-      "Alight stop cost"
-    );
-    assertEquals(
-      1175,
-      subject.transitArrivalCost(1000, 1, 1, TRANSIT_RELUCTANCE_1, STOP_B),
-      "Total cost"
-    );
+    assertEquals(0, subject.transitArrivalCost(0, 0, 0, TRIP_1, STOP_A), "Zero cost");
+    assertEquals(1000, subject.transitArrivalCost(1000, 0, 0, TRIP_1, STOP_A), "Board cost");
+    assertEquals(50, subject.transitArrivalCost(0, 1, 0, TRIP_1, STOP_A), "Alight wait time cost");
+    assertEquals(100, subject.transitArrivalCost(0, 0, 1, TRIP_1, STOP_A), "Transit time cost");
+    assertEquals(25, subject.transitArrivalCost(0, 0, 0, TRIP_1, STOP_B), "Alight stop cost");
+    assertEquals(1175, subject.transitArrivalCost(1000, 1, 1, TRIP_1, STOP_B), "Total cost");
   }
 
   @Test
   public void onTripRidingCost() {
-    assertEquals(0, subject.onTripRelativeRidingCost(0, TRANSIT_RELUCTANCE_1), "Board cost");
-    assertEquals(0, subject.onTripRelativeRidingCost(0, TRANSIT_RELUCTANCE_2), "Board cost");
-    assertEquals(-100, subject.onTripRelativeRidingCost(1, TRANSIT_RELUCTANCE_1), "Board cost");
-    assertEquals(-80, subject.onTripRelativeRidingCost(1, TRANSIT_RELUCTANCE_2), "Board cost");
+    assertEquals(0, subject.onTripRelativeRidingCost(0, TRIP_1), "Board cost");
+    assertEquals(0, subject.onTripRelativeRidingCost(0, TRIP_2), "Board cost");
+    assertEquals(-100, subject.onTripRelativeRidingCost(1, TRIP_1), "Board cost");
+    assertEquals(-80, subject.onTripRelativeRidingCost(1, TRIP_2), "Board cost");
   }
 
   @Test
