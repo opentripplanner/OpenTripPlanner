@@ -28,9 +28,8 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
   }
 
   @Override
-  public boolean allows(TransitMode transitMode, SubMode netexSubMode) {
-    // SubModes are deduplicated, so it is safe to use "==" here
-    return mainMode == transitMode && subModes.get(netexSubMode.index());
+  public boolean allows(TransitMode transitMode, SubMode subMode) {
+    return mainMode == transitMode && includesSubMode(subMode);
   }
 
   @Override
@@ -65,5 +64,9 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
       .addEnum("mainMode", mainMode)
       .addCol("subModes", subModes)
       .toString();
+  }
+
+  private boolean includesSubMode(SubMode subMode) {
+    return subModes.get(subMode.index());
   }
 }
