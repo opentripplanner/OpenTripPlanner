@@ -79,7 +79,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.StdRangeRaptorWor
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimesOnlyStopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.SimpleBestNumberOfTransfers;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.util.time.DurationUtils;
 
 @Path("/traveltime")
@@ -95,9 +94,8 @@ public class TravelTimeResource {
   private final Instant endTime;
   private final ZonedDateTime startOfTime;
   private final TravelTimeRequest traveltimeRequest;
-  private final long start;
   private BestTimes bestTimes;
-  private SearchContext<TripSchedule> raptorContext;
+  private int unreachedTime;
 
   public TravelTimeResource(
     @Context OTPServer otpServer,
@@ -106,7 +104,6 @@ public class TravelTimeResource {
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
     @QueryParam("modes") String modes
   ) {
-    start = System.currentTimeMillis();
     router = otpServer.getRouter();
     transitLayer = router.graph.getRealtimeTransitLayer();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
@@ -221,8 +218,6 @@ public class TravelTimeResource {
   }
 
   private ZSampleGrid<WTWD> getSampleGrid() {
-    long preAccess = System.currentTimeMillis();
-
     final RoutingRequest accessRequest = routingRequest.clone();
 
     accessRequest.maxAccessEgressDuration = traveltimeRequest.maxAccessDuration;
@@ -230,11 +225,7 @@ public class TravelTimeResource {
     try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
 
-      final long postAccess = System.currentTimeMillis();
-
       getRaptorWorker(accessList).route();
-
-      final long postRaptor = System.currentTimeMillis();
 
       RoutingContext routingContext = new RoutingContext(
         routingRequest,
@@ -277,8 +268,6 @@ public class TravelTimeResource {
       initialStates.add(new State(vertex, startTime, routingContext, stateData));
     }
 
-    final int unreachedTime = raptorContext.calculator().unreachedTime();
-
     for (int i = 0; i < transitLayer.getStopIndex().size(); i++) {
       final int onBoardTime = bestTimes.onBoardTime(i);
       if (onBoardTime != unreachedTime) {
@@ -312,9 +301,10 @@ public class TravelTimeResource {
       .constrainedTransfersEnabled(false) // TODO: Not compatible with best times
       .build();
 
-    raptorContext = router.raptorConfig.context(requestTransitDataProvider, request);
+    var raptorContext = router.raptorConfig.context(requestTransitDataProvider, request);
+    this.unreachedTime = raptorContext.calculator().unreachedTime();
 
-    bestTimes =
+    this.bestTimes =
       new BestTimes(raptorContext.nStops(), raptorContext.calculator(), raptorContext.lifeCycle());
 
     final SimpleBestNumberOfTransfers simpleBestNumberOfTransfers = new SimpleBestNumberOfTransfers(
