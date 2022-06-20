@@ -13,23 +13,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class wrap a string and create an index for it, so we can use BitSet for matching a
- * trip netexSubMode. SubModes are used in trip filtering for every request.
+ * This class wraps a string and creates an index for it, so we can use a BitSet for matching a
+ * trip netex SubMode. SubModes are used in trip filtering for every request.
  * <p>
- * Naming, this class is named SubMode, not NetexSubMode because we want to migrate gtfsRouteType
+ * Naming; This class is named SubMode, not NetexSubMode because we want to migrate gtfsRouteType
  * into the same concept.
  * <p>
  * This class is thread-safe, and the performance overhead should affect the graph built time,
  * but not routing.
  */
 public record SubMode(String name, int index) implements Serializable {
-  private static final int NONE_EXISTING_SUB_MODE_INDEX = 1_000_000;
+  private static final int NON_EXISTING_SUB_MODE_INDEX = 1_000_000;
 
   private static final Logger LOG = LoggerFactory.getLogger(SubMode.class);
 
   /**
-   * Note! This cache all sub-modes used in the static scheduled transit data. When
-   * serialized the static fields need to be explicit serialized, it is not enough
+   * Note! This caches all sub-modes used in the static scheduled transit data. When
+   * serializing the static fields need to be explicitly serialized, it is not enough
    * to serialize the instances.
    */
   private static final Map<String, SubMode> ALL = new ConcurrentHashMap<>();
@@ -48,15 +48,15 @@ public record SubMode(String name, int index) implements Serializable {
       return UNKNOWN;
     }
     var subMode = ALL.get(name);
-    return subMode != null ? subMode : new SubMode(name, NONE_EXISTING_SUB_MODE_INDEX);
+    return subMode != null ? subMode : new SubMode(name, NON_EXISTING_SUB_MODE_INDEX);
   }
 
   /**
-   * Make sure to use this during graph build or creating new Trips in realTime updates. Do NOT
-   * use this in an OTP routing request - that may lead to memory leaks.
+   * Make sure to use this during graph build or when creating new Trips in realTime
+   * updates. Do NOT use this in an OTP routing request - that will lead to memory leaks.
    * <p>
-   * The builders in the transit model take care of calling this method, so there is noreson to
-   * call this method outside the transit model package.
+   * The builders in the transit model take care of calling this method, so there is no
+   * reason to call this method outside the transit model package.
    */
   public static SubMode getOrBuildAndCacheForever(String name) {
     if (name == null) {

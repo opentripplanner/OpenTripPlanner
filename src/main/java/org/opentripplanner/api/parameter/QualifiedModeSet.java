@@ -40,7 +40,7 @@ public class QualifiedModeSet implements Serializable {
   }
 
   public RequestModes getRequestModes() {
-    RequestModesBuilder mBuilder = RequestModes.of().clearTransitMode();
+    RequestModesBuilder mBuilder = RequestModes.of().clearTransitModes();
 
     // Set transit modes
     for (QualifiedMode qMode : qModes) {

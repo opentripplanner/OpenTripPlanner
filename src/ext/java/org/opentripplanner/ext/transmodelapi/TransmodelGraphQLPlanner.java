@@ -295,7 +295,7 @@ public class TransmodelGraphQLPlanner {
       if (transportModes.get() == null) {
         mBuilder.withTransitModes(MainAndSubMode.all());
       } else {
-        mBuilder.clearTransitMode();
+        mBuilder.clearTransitModes();
         for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
           if (modeWithSubmodes.containsKey("transportMode")) {
             TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");

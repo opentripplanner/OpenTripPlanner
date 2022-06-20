@@ -11,9 +11,9 @@ import org.opentripplanner.transit.model.network.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 /**
- * This utility merge a set of MainMode and MainAndSubMode Filters into a more optimized
+ * This utility merges a set of MainMode and MainAndSubMode Filters into a more optimized
  * set of filters using an EnumSet for MainModes and BitSet for subModes. For further
- * details on the implementation se the comments in the code.
+ * details on the implementation see the comments in the code.
  */
 class FilterFactory {
 

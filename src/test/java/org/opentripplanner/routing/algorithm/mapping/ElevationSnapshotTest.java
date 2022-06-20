@@ -65,7 +65,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directWalk() {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitMode().build();
+    request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitModes().build();
     request.from = p1;
     request.to = p4;
 
@@ -78,7 +78,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
-      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.from = p1;
     request.to = p2;
 
@@ -94,7 +94,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.bikeTriangleTimeFactor = 0.3;
     request.bikeTriangleSlopeFactor = 0.4;
 
-    request.modes = RequestModes.of().withDirectMode(StreetMode.BIKE).clearTransitMode().build();
+    request.modes = RequestModes.of().withDirectMode(StreetMode.BIKE).clearTransitModes().build();
     request.from = p1;
     request.to = p4;
     request.arriveBy = true;

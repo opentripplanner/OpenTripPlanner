@@ -31,7 +31,7 @@ public class QualifiedModeSetTest {
         .withEgressMode(WALK)
         .withDirectMode(WALK)
         .withTransferMode(WALK)
-        .clearTransitMode()
+        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -42,7 +42,7 @@ public class QualifiedModeSetTest {
     QualifiedModeSet modeSet = new QualifiedModeSet(new String[] { "WALK", "WALK", "WALK" });
     assertEquals(Set.of(new QualifiedMode("WALK")), modeSet.qModes);
     assertEquals(
-      RequestModes.of().withAllStreetModes(WALK).clearTransitMode().build(),
+      RequestModes.of().withAllStreetModes(WALK).clearTransitModes().build(),
       modeSet.getRequestModes()
     );
   }
@@ -52,7 +52,7 @@ public class QualifiedModeSetTest {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK,BICYCLE");
     assertEquals(Set.of(new QualifiedMode("WALK"), new QualifiedMode("BICYCLE")), modeSet.qModes);
     assertEquals(
-      RequestModes.of().withAllStreetModes(BIKE).clearTransitMode().build(),
+      RequestModes.of().withAllStreetModes(BIKE).clearTransitModes().build(),
       modeSet.getRequestModes()
     );
   }
@@ -65,7 +65,7 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      RequestModes.of().withAllStreetModes(BIKE_RENTAL).clearTransitMode().build(),
+      RequestModes.of().withAllStreetModes(BIKE_RENTAL).clearTransitModes().build(),
       modeSet.getRequestModes()
     );
   }
@@ -84,7 +84,7 @@ public class QualifiedModeSetTest {
         .withEgressMode(WALK)
         .withDirectMode(BIKE_TO_PARK)
         .withTransferMode(WALK)
-        .clearTransitMode()
+        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -101,7 +101,7 @@ public class QualifiedModeSetTest {
         .withEgressMode(BIKE)
         .withDirectMode(BIKE)
         .withTransferMode(BIKE)
-        .clearTransitMode()
+        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -133,7 +133,7 @@ public class QualifiedModeSetTest {
         .withEgressMode(FLEXIBLE)
         .withDirectMode(FLEXIBLE)
         .withTransferMode(WALK)
-        .clearTransitMode()
+        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );
@@ -153,7 +153,7 @@ public class QualifiedModeSetTest {
         .withEgressMode(FLEXIBLE)
         .withDirectMode(BIKE_TO_PARK)
         .withTransferMode(WALK)
-        .clearTransitMode()
+        .clearTransitModes()
         .build(),
       modeSet.getRequestModes()
     );

@@ -80,7 +80,7 @@ public class RequestModesBuilder {
     return this;
   }
 
-  public RequestModesBuilder clearTransitMode() {
+  public RequestModesBuilder clearTransitModes() {
     this.transitModes.clear();
     return this;
   }

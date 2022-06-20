@@ -15,7 +15,7 @@ import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
- * help to cache and calculating values before constructing a path.
+ * helps to cache and calculate values before constructing a path.
  */
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 

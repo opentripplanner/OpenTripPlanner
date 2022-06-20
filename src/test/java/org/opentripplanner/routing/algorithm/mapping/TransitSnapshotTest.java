@@ -66,7 +66,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only() {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitMode().build();
+    request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitModes().build();
     request.from = p0;
     request.to = p2;
 
@@ -84,7 +84,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         .withEgressMode(StreetMode.WALK)
         .withDirectMode(StreetMode.WALK)
         .withTransferMode(StreetMode.WALK)
-        .clearTransitMode()
+        .clearTransitModes()
         .build();
     request.from = ps;
     request.to = p2;
@@ -103,7 +103,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         .withEgressMode(StreetMode.WALK)
         .withDirectMode(StreetMode.WALK)
         .withTransferMode(StreetMode.WALK)
-        .clearTransitMode()
+        .clearTransitModes()
         .build();
     request.from = ptc;
     request.to = p3;

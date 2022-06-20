@@ -61,7 +61,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
-      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.from = p1;
     request.to = p2;
 
@@ -83,7 +83,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
-      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.allowKeepingRentedVehicleAtDestination = true;
     request.from = p1;
     request.to = p2;
@@ -97,7 +97,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
-      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitMode().build();
+      RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.allowKeepingRentedVehicleAtDestination = true;
     request.from = p1;
     request.to = p2;

@@ -209,7 +209,7 @@ public class FlexIntegrationTest {
 
     if (onlyDirect) {
       modes.withDirectMode(FLEXIBLE);
-      modes.clearTransitMode();
+      modes.clearTransitModes();
     }
     request.modes = modes.build();
 
