@@ -34,9 +34,17 @@ public class VehicleParkingDataSourceFactory {
       case KML:
         return new KmlBikeParkDataSource((KmlUpdaterParameters) parameters);
       case PARK_API:
-        return new CarParkAPIUpdater((ParkAPIUpdaterParameters) parameters);
+        return new CarParkAPIUpdater(
+          (ParkAPIUpdaterParameters) parameters,
+          openingHoursCalendarService,
+          zoneId
+        );
       case BICYCLE_PARK_API:
-        return new BicycleParkAPIUpdater((ParkAPIUpdaterParameters) parameters);
+        return new BicycleParkAPIUpdater(
+          (ParkAPIUpdaterParameters) parameters,
+          openingHoursCalendarService,
+          zoneId
+        );
     }
     throw new IllegalArgumentException(
       "Unknown vehicle parking source type: " + parameters.getSourceType()
