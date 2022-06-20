@@ -1,5 +1,6 @@
 package org.opentripplanner.model.calendar.openinghours;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.BitSet;
 import java.util.Objects;
@@ -7,7 +8,7 @@ import org.opentripplanner.util.time.TimeUtils;
 
 /**
  */
-public class OpeningHours implements Comparable<OpeningHours> {
+public class OpeningHours implements Comparable<OpeningHours>, Serializable {
 
   private final String periodDescription;
   private final int startTime;

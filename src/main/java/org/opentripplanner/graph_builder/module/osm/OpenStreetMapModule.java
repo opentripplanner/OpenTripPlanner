@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import ch.poole.openinghoursparser.OpeningHoursParseException;
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
@@ -34,6 +35,8 @@ import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPo
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.calendar.openinghours.OHCalendar;
+import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -92,6 +95,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    */
   private final List<OpenStreetMapProvider> providers;
   private DataImportIssueStore issueStore;
+  private OSMOpeningHoursParser osmOpeningHoursParser;
   public boolean skipVisibility = false;
 
   // Members that can be set by clients.
@@ -166,6 +170,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     DataImportIssueStore issueStore
   ) {
     this.issueStore = issueStore;
+    this.osmOpeningHoursParser =
+      new OSMOpeningHoursParser(
+        graph.getOpeningHoursCalendarService(),
+        graph.getTimeZone().toZoneId()
+      );
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
@@ -725,6 +734,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         carCapacity.orElse(0) > 0;
       var wheelchairAccessibleCarPlaces = wheelchairAccessibleCarCapacity.orElse(0) > 0;
 
+      var openingHours = parseOpeningHours(entity);
+
       var id = new FeedScopedId(
         VEHICLE_PARKING_OSM_FEED_ID,
         String.format("%s/%d", entity.getClass().getSimpleName(), entity.getId())
@@ -755,12 +766,29 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         .y(lat)
         .tags(tags)
         .detailsUrl(entity.getTag("website"))
+        .openingHoursCalendar(openingHours)
         .bicyclePlaces(bicyclePlaces)
         .carPlaces(carPlaces)
         .wheelchairAccessibleCarPlaces(wheelchairAccessibleCarPlaces)
         .capacity(vehicleParkingSpaces)
         .entrances(entrances)
         .build();
+    }
+
+    private OHCalendar parseOpeningHours(OSMWithTags entity) {
+      final var openingHoursTag = entity.getTag("opening_hours");
+      if (openingHoursTag != null) {
+        try {
+          return osmOpeningHoursParser.parseOpeningHours(openingHoursTag);
+        } catch (OpeningHoursParseException e) {
+          issueStore.add(
+            "OSMOpeningHoursUnparsed",
+            "OSM object with id '%s' has an invalid opening_hours value, it will always be open",
+            entity.getId()
+          );
+        }
+      }
+      return null;
     }
 
     private I18NString nameParkAndRideEntity(OSMWithTags osmWithTags) {

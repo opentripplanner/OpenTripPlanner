@@ -1,14 +1,16 @@
 package org.opentripplanner.model.calendar.openinghours;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
-public class OHCalendar {
+public class OHCalendar implements Serializable {
 
   private final ZoneId zoneId;
   private final List<OpeningHours> openingHours;
@@ -41,6 +43,28 @@ public class OHCalendar {
       .anyMatch(openingHoursDefinition ->
         openingHoursDefinition.isOpen(daysFromStart, secondsFromMidnight)
       );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(zoneId, openingHours, startOfCalendar, endOfCalendar);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final OHCalendar that = (OHCalendar) o;
+    return (
+      openingHours.equals(that.openingHours) &&
+      zoneId.equals(that.zoneId) &&
+      startOfCalendar.equals(that.startOfCalendar) &&
+      endOfCalendar.equals(that.endOfCalendar)
+    );
   }
 
   @Override
