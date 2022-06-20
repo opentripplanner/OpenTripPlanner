@@ -43,7 +43,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.time.DateUtils;
@@ -52,8 +52,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
- * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
- * route.
+ * itineraries.
  * <p>
  * All defaults should be specified here in the RoutingRequest, NOT as annotations on query
  * parameters in web services that create RoutingRequests. This establishes a priority chain for
@@ -246,11 +245,14 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
    */
   public boolean arriveBy = false;
+
   /**
    * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
    */
+  @Nonnull
   public WheelchairAccessibilityRequest wheelchairAccessibility =
     WheelchairAccessibilityRequest.DEFAULT;
+
   /**
    * The maximum number of itineraries to return. In OTP1 this parameter terminates the search, but
    * in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is a post
@@ -262,14 +264,6 @@ public class RoutingRequest implements Cloneable, Serializable {
    * be returned. Consider tuning the search-window instead of setting this to a small value.
    */
   public int numItineraries = 50;
-  /** The maximum slope of streets for wheelchair trips. */
-  public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
-
-  /**
-   * What penalty factor should be given to street edges, which are over the max slope.
-   * Set to negative for disable routing on too steep edges.
-   */
-  public double wheelchairSlopeTooSteepCostFactor = 10.0;
 
   /** Whether the planner should return intermediate stops lists for transit legs. */
   public boolean showIntermediateStops = false;
@@ -1162,22 +1156,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     ret.setArriveBy(!ret.arriveBy);
     ret.useVehicleRentalAvailabilityInformation = false;
     return ret;
-  }
-
-  /**
-   * The road speed for a specific traverse mode.
-   */
-  public double getReluctance(TraverseMode mode, boolean walkingBike) {
-    switch (mode) {
-      case WALK:
-        return walkingBike ? bikeWalkingReluctance : walkReluctance;
-      case BICYCLE:
-        return bikeReluctance;
-      case CAR:
-        return carReluctance;
-      default:
-        throw new IllegalArgumentException("getReluctance(): Invalid mode " + mode);
-    }
   }
 
   /**

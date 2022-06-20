@@ -35,12 +35,12 @@ import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.PrefixCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
-import org.opentripplanner.model.StopCollection;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StopCollection;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.I18NString;
 
 public class LuceneIndex implements Serializable {

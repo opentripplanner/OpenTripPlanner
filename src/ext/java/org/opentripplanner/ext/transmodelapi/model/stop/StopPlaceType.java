@@ -28,16 +28,17 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopCollection;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopCollection;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.I18NString;
 
 public class StopPlaceType {
@@ -145,7 +146,7 @@ public class StopPlaceType {
           .dataFetcher(environment ->
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
-              .map(StopLocation::getVehicleType)
+              .map(StopLocation::getGtfsVehicleType)
               .filter(Objects::nonNull)
               .collect(Collectors.toSet())
           )
@@ -160,7 +161,7 @@ public class StopPlaceType {
           .dataFetcher(environment ->
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
-              .map(StopLocation::getVehicleSubmode)
+              .map(StopLocation::getNetexVehicleSubmode)
               .filter(Objects::nonNull)
               .map(TransmodelTransportSubmode::fromValue)
               .collect(Collectors.toList())
@@ -199,7 +200,7 @@ public class StopPlaceType {
                   .stream()
                   .filter(stop -> {
                     return !GqlUtil
-                      .getRoutingService(environment)
+                      .getTransitService(environment)
                       .getPatternsForStop(stop, true)
                       .isEmpty();
                   })
@@ -375,13 +376,13 @@ public class StopPlaceType {
     Collection<TransitMode> transitModes,
     DataFetchingEnvironment environment
   ) {
-    RoutingService routingService = GqlUtil.getRoutingService(environment);
+    TransitService transitService = GqlUtil.getTransitService(environment);
     boolean limitOnDestinationDisplay =
       departuresPerLineAndDestinationDisplay != null &&
       departuresPerLineAndDestinationDisplay > 0 &&
       departuresPerLineAndDestinationDisplay < numberOfDepartures;
 
-    List<StopTimesInPattern> stopTimesInPatterns = routingService.stopTimesForStop(
+    List<StopTimesInPattern> stopTimesInPatterns = transitService.stopTimesForStop(
       stop,
       startTimeSeconds,
       timeRage,
@@ -426,18 +427,18 @@ public class StopPlaceType {
     FeedScopedId id,
     DataFetchingEnvironment environment
   ) {
-    RoutingService routingService = GqlUtil.getRoutingService(environment);
+    TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Station station = routingService.getStationById(id);
+    Station station = transitService.getStationById(id);
 
     if (station != null) {
       return new MonoOrMultiModalStation(
         station,
-        routingService.getMultiModalStationForStations().get(station)
+        transitService.getMultiModalStationForStations().get(station)
       );
     }
 
-    MultiModalStation multiModalStation = routingService.getMultiModalStation(id);
+    MultiModalStation multiModalStation = transitService.getMultiModalStation(id);
 
     if (multiModalStation != null) {
       return new MonoOrMultiModalStation(multiModalStation);
@@ -456,8 +457,9 @@ public class StopPlaceType {
     DataFetchingEnvironment environment
   ) {
     final RoutingService routingService = GqlUtil.getRoutingService(environment);
+    final TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Stream<Station> stations = routingService
+    Stream<Station> stations = transitService
       .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
       .stream()
       .map(StopLocation::getParentStation)
@@ -469,14 +471,14 @@ public class StopPlaceType {
     }
 
     if (TRUE.equals(filterByInUse)) {
-      stations = stations.filter(s -> isStopPlaceInUse(s, routingService));
+      stations = stations.filter(s -> isStopPlaceInUse(s, transitService));
     }
 
     // "child" - Only mono modal children stop places, not their multi modal parent stop
     if ("child".equals(multiModalMode)) {
       return stations
         .map(s -> {
-          MultiModalStation parent = routingService.getMultiModalStationForStations().get(s);
+          MultiModalStation parent = transitService.getMultiModalStationForStations().get(s);
           return new MonoOrMultiModalStation(s, parent);
         })
         .collect(Collectors.toList());
@@ -485,7 +487,7 @@ public class StopPlaceType {
     else if ("all".equals(multiModalMode)) {
       Set<MonoOrMultiModalStation> result = new HashSet<>();
       stations.forEach(it -> {
-        MultiModalStation p = routingService.getMultiModalStationForStations().get(it);
+        MultiModalStation p = transitService.getMultiModalStationForStations().get(it);
         result.add(new MonoOrMultiModalStation(it, p));
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
@@ -498,7 +500,7 @@ public class StopPlaceType {
     else if ("parent".equals(multiModalMode)) {
       Set<MonoOrMultiModalStation> result = new HashSet<>();
       stations.forEach(it -> {
-        MultiModalStation p = routingService.getMultiModalStationForStations().get(it);
+        MultiModalStation p = transitService.getMultiModalStationForStations().get(it);
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
         } else {
@@ -511,9 +513,9 @@ public class StopPlaceType {
     }
   }
 
-  public static boolean isStopPlaceInUse(StopCollection station, RoutingService routingService) {
+  public static boolean isStopPlaceInUse(StopCollection station, TransitService transitService) {
     for (var quay : station.getChildStops()) {
-      if (!routingService.getPatternsForStop(quay, true).isEmpty()) {
+      if (!transitService.getPatternsForStop(quay, true).isEmpty()) {
         return true;
       }
     }

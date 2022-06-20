@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 

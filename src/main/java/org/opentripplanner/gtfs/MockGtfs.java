@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class MockGtfs {
 
@@ -49,6 +49,7 @@ public class MockGtfs {
     var mapper = new GTFSToOtpTransitServiceMapper(
       "a0",
       new DataImportIssueStore(false),
+      false,
       reader == null ? gtfsDelegate.read() : gtfsDelegate.read(reader)
     );
     return mapper.getBuilder();

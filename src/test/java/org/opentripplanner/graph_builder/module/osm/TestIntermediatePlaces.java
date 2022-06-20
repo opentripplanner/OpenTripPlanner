@@ -1,17 +1,17 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.util.List;
 import java.util.TimeZone;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -36,7 +36,7 @@ import org.opentripplanner.standalone.server.Router;
  * Tests for planning with intermediate places
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
-@Ignore
+@Disabled
 public class TestIntermediatePlaces {
 
   /**
@@ -52,7 +52,7 @@ public class TestIntermediatePlaces {
 
   private static GraphPathToItineraryMapper graphPathToItineraryMapper;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUp() {
     try {
       graph = FakeGraph.buildGraphNoTransit();
@@ -100,7 +100,7 @@ public class TestIntermediatePlaces {
   }
 
   @Test
-  @Ignore
+  @Disabled
   public void testOneIntermediatePlace() {
     GenericLocation fromLocation = new GenericLocation(39.93080, -82.98522);
     GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
@@ -123,7 +123,7 @@ public class TestIntermediatePlaces {
   }
 
   @Test
-  @Ignore
+  @Disabled
   public void testTwoIntermediatePlaces() {
     GenericLocation fromLocation = new GenericLocation(39.93080, -82.98522);
     GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
@@ -283,8 +283,8 @@ public class TestIntermediatePlaces {
       Leg leg;
       do {
         assertTrue(
-          "Intermediate location was not an endpoint of any leg",
-          legIndex < itinerary.legs.size()
+          legIndex < itinerary.legs.size(),
+          "Intermediate location was not an endpoint of any leg"
         );
         leg = itinerary.legs.get(legIndex);
         legIndex++;

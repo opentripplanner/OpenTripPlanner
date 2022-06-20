@@ -16,7 +16,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
@@ -25,10 +24,11 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -166,17 +166,33 @@ public class ScheduledTransitLeg implements Leg {
 
   @Override
   public int getDepartureDelay() {
-    return tripTimes.getDepartureDelay(boardStopPosInPattern);
+    return (
+        tripTimes.isCancelledStop(boardStopPosInPattern) ||
+        tripTimes.isNoDataStop(boardStopPosInPattern)
+      )
+      ? 0
+      : tripTimes.getDepartureDelay(boardStopPosInPattern);
   }
 
   @Override
   public int getArrivalDelay() {
-    return tripTimes.getArrivalDelay(alightStopPosInPattern);
+    return (
+        tripTimes.isCancelledStop(alightStopPosInPattern) ||
+        tripTimes.isNoDataStop(alightStopPosInPattern)
+      )
+      ? 0
+      : tripTimes.getArrivalDelay(alightStopPosInPattern);
   }
 
   @Override
   public boolean getRealTime() {
-    return !tripTimes.isScheduled();
+    return (
+      !tripTimes.isScheduled() &&
+      (
+        !tripTimes.isNoDataStop(boardStopPosInPattern) ||
+        !tripTimes.isNoDataStop(alightStopPosInPattern)
+      )
+    );
   }
 
   @Override

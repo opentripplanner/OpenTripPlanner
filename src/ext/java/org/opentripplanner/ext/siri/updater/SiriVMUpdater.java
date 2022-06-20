@@ -4,8 +4,8 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -100,7 +100,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
   @Override
   public void setup(Graph graph) {
     if (fuzzyTripMatching) {
-      this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
+      this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(graph));
     }
     // Only create a realtime data snapshot source if none exists already
     // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
@@ -120,7 +120,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
       snapshotSource.purgeExpiredData = purgeExpiredData;
     }
     if (siriFuzzyTripMatcher != null) {
-      siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
+      siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(graph));
     }
   }
 

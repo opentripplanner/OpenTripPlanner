@@ -11,6 +11,7 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   private final int maxSnapshotFrequencyMs;
   private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
   // Source
   private final DataSourceType sourceType;
@@ -25,6 +26,7 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
     int maxSnapshotFrequencyMs,
     boolean purgeExpiredData,
     boolean fuzzyTripMatching,
+    BackwardsDelayPropagationType backwardsDelayPropagationType,
     DataSourceType sourceType,
     String feedId,
     String httpSourceUrl,
@@ -36,6 +38,7 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
     this.maxSnapshotFrequencyMs = maxSnapshotFrequencyMs;
     this.purgeExpiredData = purgeExpiredData;
     this.fuzzyTripMatching = fuzzyTripMatching;
+    this.backwardsDelayPropagationType = backwardsDelayPropagationType;
     this.sourceType = sourceType;
     this.feedId = feedId;
     this.httpSourceUrl = httpSourceUrl;
@@ -74,6 +77,10 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
 
   boolean fuzzyTripMatching() {
     return fuzzyTripMatching;
+  }
+
+  BackwardsDelayPropagationType getBackwardsDelayPropagationType() {
+    return backwardsDelayPropagationType;
   }
 
   GtfsRealtimeFileTripUpdateSource.Parameters fileSourceParameters() {

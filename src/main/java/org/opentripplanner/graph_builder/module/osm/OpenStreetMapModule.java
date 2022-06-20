@@ -71,7 +71,8 @@ import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedStringFormat;
 import org.opentripplanner.util.NonLocalizedString;
@@ -94,8 +95,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Providers of OSM data.
    */
   private final List<OpenStreetMapProvider> providers;
-  private DataImportIssueStore issueStore;
+
   private OSMOpeningHoursParser osmOpeningHoursParser;
+
+  private final Set<String> boardingAreaRefTags;
+
   public boolean skipVisibility = false;
 
   // Members that can be set by clients.
@@ -125,17 +129,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * Whether we should create bike P+R stations from OSM data. (default false)
    */
   public boolean staticBikeParkAndRide;
-
-  private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
-
   public int maxAreaNodes = 500;
+
   /**
    * Whether ways tagged foot/bicycle=discouraged should be marked as inaccessible
    */
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
-
-  private final Set<String> boardingAreaRefTags;
+  private DataImportIssueStore issueStore;
+  private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
   /**
    * Construct and set providers all at once.
@@ -624,20 +626,20 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         var accessVertex = access.getVertex();
         for (Edge incoming : accessVertex.getIncoming()) {
           if (incoming instanceof StreetEdge streetEdge) {
-            if (streetEdge.canTraverse(walkReq, TraverseMode.WALK)) {
+            if (streetEdge.canTraverse(TraverseMode.WALK)) {
               walkAccessibleIn = true;
             }
-            if (streetEdge.canTraverse(driveReq, TraverseMode.CAR)) {
+            if (streetEdge.canTraverse(TraverseMode.CAR)) {
               carAccessibleIn = true;
             }
           }
         }
         for (Edge outgoing : accessVertex.getOutgoing()) {
           if (outgoing instanceof StreetEdge streetEdge) {
-            if (streetEdge.canTraverse(walkReq, TraverseMode.WALK)) {
+            if (streetEdge.canTraverse(TraverseMode.WALK)) {
               walkAccessibleOut = true;
             }
-            if (streetEdge.canTraverse(driveReq, TraverseMode.CAR)) {
+            if (streetEdge.canTraverse(TraverseMode.CAR)) {
               carAccessibleOut = true;
             }
           }
@@ -1104,11 +1106,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
         int travelTime = parseDuration(node).orElse(-1);
 
-        boolean wheelchairAccessible = !node.isTagFalse("wheelchair");
+        var wheelchair = node.getWheelchairAccessibility();
 
         createElevatorHopEdges(
           onboardVertices,
-          wheelchairAccessible,
+          wheelchair,
           node.isTagTrue("bicycle"),
           levels.length,
           travelTime
@@ -1127,7 +1129,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
           )
           .boxed()
-          .collect(Collectors.toList());
+          .toList();
 
         ArrayList<Vertex> onboardVertices = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) {
@@ -1146,11 +1148,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         int travelTime = parseDuration(elevatorWay).orElse(-1);
         int levels = nodes.size();
-        boolean wheelchairAccessible = !elevatorWay.isTagFalse("wheelchair");
+        var wheelchair = elevatorWay.getWheelchairAccessibility();
 
         createElevatorHopEdges(
           onboardVertices,
-          wheelchairAccessible,
+          wheelchair,
           elevatorWay.isTagTrue("bicycle"),
           levels,
           travelTime
@@ -1212,7 +1214,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private void createElevatorHopEdges(
       ArrayList<Vertex> onboardVertices,
-      boolean wheelchairAccessible,
+      WheelchairAccessibility wheelchair,
       boolean bicycleAllowed,
       int levels,
       int travelTime
@@ -1227,17 +1229,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           ? StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
           : StreetTraversalPermission.PEDESTRIAN;
 
-        ElevatorHopEdge foreEdge;
-        ElevatorHopEdge backEdge;
         if (travelTime > -1 && levels > 0) {
-          foreEdge = new ElevatorHopEdge(from, to, permission, levels, travelTime);
-          backEdge = new ElevatorHopEdge(to, from, permission, levels, travelTime);
+          ElevatorHopEdge.bidirectional(from, to, permission, wheelchair, levels, travelTime);
         } else {
-          foreEdge = new ElevatorHopEdge(from, to, permission);
-          backEdge = new ElevatorHopEdge(to, from, permission);
+          ElevatorHopEdge.bidirectional(from, to, permission, wheelchair);
         }
-        foreEdge.wheelchairAccessible = wheelchairAccessible;
-        backEdge.wheelchairAccessible = wheelchairAccessible;
       }
     }
 

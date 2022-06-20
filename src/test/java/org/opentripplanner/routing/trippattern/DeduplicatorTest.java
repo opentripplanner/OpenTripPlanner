@@ -1,17 +1,18 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("StringOperationCanBeSimplified")
 public class DeduplicatorTest {
@@ -48,7 +49,7 @@ public class DeduplicatorTest {
 
   private final Deduplicator subject = new Deduplicator();
 
-  @Before
+  @BeforeEach
   public void assertSetup() {
     assertNotSame(BIT_SET, BIT_SET_2);
     assertNotSame(INT_ARRAY, INT_ARRAY_2);
@@ -166,8 +167,8 @@ public class DeduplicatorTest {
 
     // The order which each generic type occur in the toString is undefined; hence the *contains*
     var value = subject.toString();
-    assertTrue(value, value.contains("LocalTime: 1(2)"));
-    assertTrue(value, value.contains("LocalDate: 1(2)"));
+    assertTrue(value.contains("LocalTime: 1(2)"), value);
+    assertTrue(value.contains("LocalDate: 1(2)"), value);
 
     subject.reset();
     // After reset the "new" value is used
@@ -187,10 +188,10 @@ public class DeduplicatorTest {
 
     // The order which each generic type occur in the toString is undefined; hence the *contains*
     var value = subject.toString();
-    assertTrue(value, value.contains("LocalTime: 1(2)"));
-    assertTrue(value, value.contains("LocalDate: 1(1)"));
-    assertTrue(value, value.contains("List<LocalTime>: 2(4)"));
-    assertTrue(value, value.contains("List<LocalDate>: 1(2)"));
+    assertTrue(value.contains("LocalTime: 1(2)"), value);
+    assertTrue(value.contains("LocalDate: 1(1)"), value);
+    assertTrue(value.contains("List<LocalTime>: 2(4)"), value);
+    assertTrue(value.contains("List<LocalDate>: 1(2)"), value);
 
     subject.reset();
     // After reset the "new" value is used

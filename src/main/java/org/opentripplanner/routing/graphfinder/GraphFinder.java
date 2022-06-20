@@ -3,8 +3,9 @@ package org.opentripplanner.routing.graphfinder;
 import java.util.List;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Common interface between different types of GraphFinders, currently two types exist, one which
@@ -61,6 +62,7 @@ public interface GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService
+    RoutingService routingService,
+    TransitService transitService
   );
 }

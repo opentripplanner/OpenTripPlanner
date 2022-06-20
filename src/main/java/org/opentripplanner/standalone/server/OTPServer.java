@@ -5,6 +5,8 @@ import org.geotools.util.WeakCollectionCleaner;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,10 @@ public class OTPServer {
    */
   public RoutingService createRoutingRequestService() {
     return new RoutingService(router.graph);
+  }
+
+  public TransitService createTransitRequestService() {
+    return new DefaultTransitService(router.graph);
   }
 
   /**

@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Notice;
 
@@ -45,6 +45,6 @@ public class NoticeMapperTest {
 
     // Then
     assertEquals(NOTICE_ID, otpNotice.getId().getId());
-    assertEquals("Not Albatross", NOTICE_TEXT, otpNotice.getText());
+    assertEquals(NOTICE_TEXT, otpNotice.getText(), "Not Albatross");
   }
 }

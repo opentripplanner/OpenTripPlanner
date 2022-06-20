@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -14,7 +13,8 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -109,7 +109,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
     if (wheelchairAccessibility.enabled()) {
       if (
-        wheelchairAccessibility.trips().onlyConsiderAccessible() &&
+        wheelchairAccessibility.trip().onlyConsiderAccessible() &&
         trip.getWheelchairBoarding() != WheelchairAccessibility.POSSIBLE
       ) {
         return false;
@@ -133,7 +133,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     // consider those stops which have the correct accessibility values then use only this for
     // checking whether to board/alight
     if (
-      wheelchairAccessibility.enabled() && wheelchairAccessibility.stops().onlyConsiderAccessible()
+      wheelchairAccessibility.enabled() && wheelchairAccessibility.stop().onlyConsiderAccessible()
     ) {
       var copy = (BitSet) boardingPossible.clone();
       // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair

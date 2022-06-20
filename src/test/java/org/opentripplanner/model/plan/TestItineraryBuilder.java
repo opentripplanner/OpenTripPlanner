@@ -140,7 +140,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
       fromStopIndex,
       toStopIndex,
       to,
-      serviceDate
+      serviceDate,
+      null
     );
   }
 
@@ -178,6 +179,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       TRIP_FROM_STOP_INDEX,
       TRIP_TO_STOP_INDEX,
       to,
+      null,
       null
     );
   }
@@ -191,6 +193,20 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Itinerary itinerary = new Itinerary(legs);
     itinerary.generalizedCost = cost;
     return itinerary;
+  }
+
+  public TestItineraryBuilder frequencyBus(int tripId, int startTime, int endTime, Place to) {
+    return transit(
+      RAIL_ROUTE,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      600
+    );
   }
 
   /* private methods */
@@ -212,7 +228,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int fromStopIndex,
     int toStopIndex,
     Place to,
-    LocalDate serviceDate
+    LocalDate serviceDate,
+    Integer headwaySecs
   ) {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");
@@ -249,20 +266,42 @@ public class TestItineraryBuilder implements PlanTestConstants {
     final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
-    ScheduledTransitLeg leg = new ScheduledTransitLeg(
-      tripTimes,
-      tripPattern,
-      fromStopIndex,
-      toStopIndex,
-      newTime(start),
-      newTime(end),
-      serviceDate != null ? serviceDate : SERVICE_DAY,
-      UTC,
-      null,
-      null,
-      legCost,
-      null
-    );
+    ScheduledTransitLeg leg;
+
+    if (headwaySecs != null) {
+      leg =
+        new FrequencyTransitLeg(
+          tripTimes,
+          tripPattern,
+          fromStopIndex,
+          toStopIndex,
+          newTime(start),
+          newTime(end),
+          serviceDate != null ? serviceDate : SERVICE_DAY,
+          UTC,
+          null,
+          null,
+          legCost,
+          headwaySecs,
+          null
+        );
+    } else {
+      leg =
+        new ScheduledTransitLeg(
+          tripTimes,
+          tripPattern,
+          fromStopIndex,
+          toStopIndex,
+          newTime(start),
+          newTime(end),
+          serviceDate != null ? serviceDate : SERVICE_DAY,
+          UTC,
+          null,
+          null,
+          legCost,
+          null
+        );
+    }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
 

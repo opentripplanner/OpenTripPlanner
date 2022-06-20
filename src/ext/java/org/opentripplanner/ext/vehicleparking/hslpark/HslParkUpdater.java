@@ -8,7 +8,7 @@ import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarServi
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.util.xml.JsonDataListDownloader;
 

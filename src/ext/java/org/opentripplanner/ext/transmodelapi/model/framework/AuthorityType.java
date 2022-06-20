@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.framework;
 
 import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.getRoutingService;
+import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.getTransitService;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
@@ -68,7 +69,7 @@ public class AuthorityType {
           .withDirective(gqlUtil.timingData)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment ->
-            getRoutingService(environment)
+            getTransitService(environment)
               .getAllRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getAgency(), environment.getSource()))

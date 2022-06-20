@@ -6,10 +6,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -60,6 +60,20 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
   @Override
   public Integer getHeadway() {
     return frequencyHeadwayInSeconds;
+  }
+
+  @Override
+  public boolean isPartiallySameTransitLeg(Leg other) {
+    var same = super.isPartiallySameTransitLeg(other);
+    // frequency-based trips have all the same trip id, so we have to check that the start times
+    // are not equal
+    if (other instanceof FrequencyTransitLeg frequencyTransitLeg) {
+      var start = getTripTimes().getDepartureTime(0);
+      var otherStart = frequencyTransitLeg.getTripTimes().getDepartureTime(0);
+      return same && (start == otherStart);
+    } else {
+      return same;
+    }
   }
 
   @Override

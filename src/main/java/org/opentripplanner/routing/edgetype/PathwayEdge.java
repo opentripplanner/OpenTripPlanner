@@ -10,7 +10,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -19,9 +19,8 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
-  private static final long serialVersionUID = -3311099256178798982L;
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
-
+  private static final long serialVersionUID = -3311099256178798982L;
   private final I18NString name;
   private final int traversalTime;
   private final double distance;
@@ -88,36 +87,35 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
     /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     int time = traversalTime;
-    if (options.wheelchairAccessibility.enabled()) {
-      if (!this.wheelchairAccessible) {
-        return null;
-      }
-    }
 
     if (time == 0) {
       if (distance > 0) {
         time = (int) (distance * options.walkSpeed);
-      } else if (steps > 0) {
+      } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
         time = (int) (0.4 * Math.abs(steps) * options.walkSpeed);
       }
     }
 
     if (time > 0) {
-      double weight =
-        time *
-        options.getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
-
+      double weight = time;
       if (options.wheelchairAccessibility.enabled()) {
-        if (this.slope > options.maxWheelchairSlope) {
-          double tooSteepCostFactor = options.wheelchairSlopeTooSteepCostFactor;
-          if (tooSteepCostFactor < 0) {
-            return null;
-          }
-          weight *= tooSteepCostFactor;
-        }
+        weight *=
+          StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+            options,
+            slope,
+            wheelchairAccessible,
+            isStairs()
+          );
+      } else {
+        weight *=
+          StreetEdgeReluctanceCalculator.computeReluctance(
+            options,
+            TraverseMode.WALK,
+            s0.getNonTransitMode() == TraverseMode.BICYCLE,
+            isStairs()
+          );
       }
-
       s1.incrementTimeInSeconds(time);
       s1.incrementWeight(weight);
     } else {
@@ -163,5 +161,9 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
   public FeedScopedId getId() {
     return id;
+  }
+
+  private boolean isStairs() {
+    return steps > 0;
   }
 }
