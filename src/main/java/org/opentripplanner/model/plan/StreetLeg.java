@@ -274,7 +274,7 @@ public class StreetLeg implements Leg {
     return DoubleUtils.roundTo2Decimals(sum);
   }
 
-  private static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
+  static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
     return elevation == null
       ? null
       : elevation

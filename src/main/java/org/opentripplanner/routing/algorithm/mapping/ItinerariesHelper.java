@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
@@ -36,7 +37,7 @@ public class ItinerariesHelper {
       .map(StreetLeg.class::cast)
       .map(StreetLeg::getWalkSteps)
       .flatMap(List::stream)
-      .map(step -> step.edges)
+      .map(WalkStep::getEdges)
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .mapToDouble(StreetEdge::getMaxSlope)

@@ -20,6 +20,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -78,7 +79,7 @@ public class BarrierRoutingTest {
                     .get(0)
                     .getWalkSteps()
                     .stream()
-                    .map(step -> step.walkingBike)
+                    .map(WalkStep::isWalkingBike)
                     .collect(Collectors.toList())
                 )
             )
