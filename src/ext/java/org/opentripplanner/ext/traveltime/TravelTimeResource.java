@@ -348,7 +348,7 @@ public class TravelTimeResource {
       raptorContext.roundProvider(),
       raptorContext.calculator(),
       raptorContext.createLifeCyclePublisher(),
-      raptorContext.timers(),
+      raptorContext.performanceTimers(),
       raptorContext.enableConstrainedTransfers()
     );
   }

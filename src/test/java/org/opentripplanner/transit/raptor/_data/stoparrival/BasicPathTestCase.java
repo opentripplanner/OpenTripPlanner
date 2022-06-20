@@ -27,8 +27,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 /**
  * This class is used to create a journeys with stop arrivals.

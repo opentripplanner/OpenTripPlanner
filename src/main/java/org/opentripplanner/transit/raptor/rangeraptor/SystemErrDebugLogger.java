@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
@@ -22,6 +21,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -123,7 +123,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
         TimeUtils.timeToStrLong(p.egressLeg().toTime()),
         DurationUtils.durationToStr(p.durationInSeconds()),
-        numFormat.format(RaptorCostConverter.toOtpDomainCost(p.generalizedCost())),
+        OtpNumberFormat.formatCost(p.generalizedCost()),
         details(e.action().toString(), e.reason(), e.element().toString())
       )
     );

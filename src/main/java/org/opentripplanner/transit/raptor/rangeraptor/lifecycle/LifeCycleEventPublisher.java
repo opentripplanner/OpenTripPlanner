@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle;
+package org.opentripplanner.transit.raptor.rangeraptor.lifecycle;
 
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -25,12 +26,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ForwardPathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 /**
  * The search context is used to hold search scoped instances and to pass these to who ever need
@@ -55,7 +55,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final RaptorTuningParameters tuningParameters;
   private final RoundTracker roundTracker;
   private final PathMapper<T> pathMapper;
-  private final WorkerPerformanceTimers timers;
   private final DebugHandlerFactory<T> debugFactory;
   private final EgressPaths egressPaths;
   private final AccessPaths accessPaths;
@@ -65,8 +64,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   public SearchContext(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit,
-    WorkerPerformanceTimers timers
+    RaptorTransitDataProvider<T> transit
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
@@ -94,7 +92,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
         request,
         lifeCycle()
       );
-    this.timers = timers;
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
   }
 
@@ -154,12 +151,12 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return costCalculator;
   }
 
-  public WorkerPerformanceTimers timers() {
-    return timers;
-  }
-
   public DebugHandlerFactory<T> debugFactory() {
     return debugFactory;
+  }
+
+  public RaptorTimers performanceTimers() {
+    return request.performanceTimers();
   }
 
   /** Number of stops in transit graph. */

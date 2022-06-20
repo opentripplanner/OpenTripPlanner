@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.util;
 
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -76,16 +75,16 @@ public class PathStringBuilder {
   }
 
   public PathStringBuilder transit(
-    TraverseMode mode,
+    String modeName,
     String trip,
     ZonedDateTime fromTime,
     ZonedDateTime toTime
   ) {
-    return start().append(mode.name()).space().append(trip).space().time(fromTime, toTime).end();
+    return start().append(modeName).space().append(trip).space().time(fromTime, toTime).end();
   }
 
-  public PathStringBuilder other(TraverseMode mode, ZonedDateTime fromTime, ZonedDateTime toTime) {
-    return start().append(mode.name()).space().time(fromTime, toTime).end();
+  public PathStringBuilder other(String modeName, ZonedDateTime fromTime, ZonedDateTime toTime) {
+    return start().append(modeName).space().time(fromTime, toTime).end();
   }
 
   public PathStringBuilder timeAndCostCentiSec(int fromTime, int toTime, int generalizedCost) {

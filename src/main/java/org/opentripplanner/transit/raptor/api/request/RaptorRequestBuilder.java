@@ -1,11 +1,13 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import static org.opentripplanner.transit.raptor.api.request.Optimization.PARALLEL;
+import static org.opentripplanner.transit.raptor.api.request.Optimization.PARETO_CHECK_AGAINST_DESTINATION;
+
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.api.request.RoutingTag;
+import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -25,12 +27,15 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   // Search
   private final SearchParamsBuilder<T> searchParams;
   private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
-  // Tags, currently used for Micrometer tagging
-  private final Set<RoutingTag> tags;
+
   // Debug
   private final DebugRequestBuilder debug;
   private SearchDirection searchDirection;
   private RaptorSlackProvider slackProvider;
+
+  // Performance monitoring
+  private RaptorTimers performanceTimers;
+
   // Algorithm
   private RaptorProfile profile;
 
@@ -48,7 +53,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     this.optimizations.addAll(defaults.optimizations());
 
     // Timer
-    tags = new HashSet<>(defaults.tags());
+    this.performanceTimers = defaults.performanceTimers();
 
     // Debug
     this.debug = new DebugRequestBuilder(defaults.debug());
@@ -103,13 +108,13 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     return this;
   }
 
-  public RaptorRequestBuilder<T> addTags(Collection<RoutingTag> tags) {
-    this.tags.addAll(tags);
-    return this;
+  public RaptorTimers performanceTimers() {
+    return performanceTimers;
   }
 
-  public Set<RoutingTag> tags() {
-    return tags;
+  public RaptorRequestBuilder<T> performanceTimers(RaptorTimers performanceTimers) {
+    this.performanceTimers = performanceTimers;
+    return this;
   }
 
   public DebugRequestBuilder debug() {
@@ -118,5 +123,37 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
   public RaptorRequest<T> build() {
     return new RaptorRequest<>(this);
+  }
+
+  /**
+   * Generate a name to the RaptorRouting request that can be used in debugging, logging
+   * and/or performance monitoring.
+   * <p>
+   * Note! The {@code profile}, {@code searchDirection}, {@code optimizations} is used to
+   * make a unique alias - so set them before calling the method.
+   */
+  public String generateAlias() {
+    return generateRequestAlias(profile, searchDirection, optimizations);
+  }
+
+  static String generateRequestAlias(
+    RaptorProfile profile,
+    SearchDirection searchDirection,
+    Collection<Optimization> optimizations
+  ) {
+    String name = profile.abbreviation();
+
+    if (searchDirection.isInReverse()) {
+      name += "-Rev";
+    }
+    if (PARALLEL.isOneOf(optimizations)) {
+      // Run search in parallel
+      name += "-LL";
+    }
+    if (PARETO_CHECK_AGAINST_DESTINATION.isOneOf(optimizations)) {
+      // Heuristic to prune on pareto optimal Destination arrivals
+      name += "-DP";
+    }
+    return name;
   }
 }

@@ -16,4 +16,6 @@ public interface OtpArchitectureModules {
 
   Package TRANSIT = OTP_ROOT.subPackage("transit");
   Package TRANSIT_MODEL = TRANSIT.subPackage("model");
+
+  Package RAPTOR = TRANSIT.subPackage("raptor");
 }

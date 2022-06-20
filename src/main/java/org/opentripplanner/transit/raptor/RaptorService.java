@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.transit.raptor.service.RangeRaptorDynamicSearch;
 import org.slf4j.Logger;

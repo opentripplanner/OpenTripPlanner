@@ -16,7 +16,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
