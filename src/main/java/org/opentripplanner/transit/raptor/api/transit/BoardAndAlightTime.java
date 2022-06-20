@@ -1,7 +1,6 @@
-package org.opentripplanner.transit.raptor.api.view;
+package org.opentripplanner.transit.raptor.api.transit;
 
 import java.util.Objects;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**

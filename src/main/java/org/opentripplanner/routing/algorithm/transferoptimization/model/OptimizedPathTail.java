@@ -7,11 +7,11 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.transit.raptor.api.path.PathBuilder;
 import org.opentripplanner.transit.raptor.api.path.PathBuilderLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**

@@ -269,7 +269,7 @@ public class TravelTimeResource {
     }
 
     for (int i = 0; i < transitLayer.getStopIndex().size(); i++) {
-      final int onBoardTime = bestTimes.onBoardTime(i);
+      final int onBoardTime = bestTimes.transitArrivalTime(i);
       if (onBoardTime != unreachedTime) {
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {

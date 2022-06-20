@@ -78,7 +78,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   @Override
   public BitSetIterator stopsTouchedByTransitCurrentRound() {
-    return bestTimes.onBoardStopArrivalsReachedCurrentRound();
+    return bestTimes.reachedByTransitCurrentRound();
   }
 
   @Override
@@ -100,7 +100,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     }
 
     boolean reachedOnBoard =
-      accessPath.stopReachedOnBoard() && newOnBoardBestTime(stop, arrivalTime);
+      accessPath.stopReachedOnBoard() && newBestTransitArrivalTime(stop, arrivalTime);
     boolean bestTime = newOverallBestTime(stop, arrivalTime);
 
     if (reachedOnBoard || bestTime) {
@@ -115,7 +115,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
    */
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-    int arrivalTimeTransit = bestTimes.onBoardTime(fromStop);
+    int arrivalTimeTransit = bestTimes.transitArrivalTime(fromStop);
     while (transfers.hasNext()) {
       transferToStop(arrivalTimeTransit, fromStop, transfers.next());
     }
@@ -162,7 +162,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
       return;
     }
 
-    if (newOnBoardBestTime(stop, arrivalTime)) {
+    if (newBestTransitArrivalTime(stop, arrivalTime)) {
       // transitTimes upper bounds bestTimes
       final boolean newOverallBestTime = newOverallBestTime(stop, arrivalTime);
       stopArrivalsState.setNewBestTransitTime(
@@ -210,8 +210,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return bestTimes.updateNewBestTime(stop, alightTime);
   }
 
-  private boolean newOnBoardBestTime(int stop, int alightTime) {
-    return bestTimes.updateOnBoardBestTime(stop, alightTime);
+  private boolean newBestTransitArrivalTime(int stop, int alightTime) {
+    return bestTimes.updateBestTransitArrivalTime(stop, alightTime);
   }
 
   private boolean exceedsTimeLimit(int time) {

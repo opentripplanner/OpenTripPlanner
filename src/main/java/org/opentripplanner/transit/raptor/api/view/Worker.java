@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 public interface Worker<T extends RaptorTripSchedule> {
   /**
-   * Perform the reouting request.
+   * Perform the routing request.
    *
    * @return All paths found. Am empty set is returned if no patha are forund or the algorithm do
    * not collect paths.
