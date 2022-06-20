@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -56,4 +57,9 @@ public interface WorkerState<T extends RaptorTripSchedule> {
    * @return return all paths found in the search.
    */
   Collection<Path<T>> extractPaths();
+
+  /**
+   * Get arrival statistics for each stop reached in the search.
+   */
+  StopArrivals extractStopArrivals();
 }

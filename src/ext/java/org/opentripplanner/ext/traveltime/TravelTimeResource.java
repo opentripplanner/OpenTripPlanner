@@ -68,17 +68,13 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.view.Worker;
-import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StdRangeRaptorWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimesOnlyStopArrivalsState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.SimpleBestNumberOfTransfers;
 import org.opentripplanner.util.time.DurationUtils;
 
 @Path("/traveltime")
@@ -94,8 +90,6 @@ public class TravelTimeResource {
   private final Instant endTime;
   private final ZonedDateTime startOfTime;
   private final TravelTimeRequest traveltimeRequest;
-  private BestTimes bestTimes;
-  private int unreachedTime;
 
   public TravelTimeResource(
     @Context OTPServer otpServer,
@@ -225,7 +219,7 @@ public class TravelTimeResource {
     try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
 
-      getRaptorWorker(accessList).route();
+      var arrivals = route(accessList).getArrivals();
 
       RoutingContext routingContext = new RoutingContext(
         routingRequest,
@@ -237,7 +231,7 @@ public class TravelTimeResource {
         .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
         .setContext(routingContext)
         .setDominanceFunction(new DominanceFunction.EarliestArrival())
-        .setInitialStates(getInitialStates(temporaryVertices, routingContext))
+        .setInitialStates(getInitialStates(arrivals, temporaryVertices, routingContext))
         .getShortestPathTree();
 
       return SampleGridRenderer.getSampleGrid(spt, traveltimeRequest);
@@ -257,6 +251,7 @@ public class TravelTimeResource {
   }
 
   private List<State> getInitialStates(
+    StopArrivals arrivals,
     TemporaryVerticesContainer temporaryVertices,
     RoutingContext routingContext
   ) {
@@ -269,13 +264,13 @@ public class TravelTimeResource {
     }
 
     for (int i = 0; i < transitLayer.getStopIndex().size(); i++) {
-      final int onBoardTime = bestTimes.transitArrivalTime(i);
-      if (onBoardTime != unreachedTime) {
+      if (arrivals.reachedByTransit(i)) {
+        final int arrivalTime = arrivals.bestTransitArrivalTime(i);
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {
           Vertex v = router.graph.index.getStopVertexForStop().get(stop);
           if (v != null) {
-            Instant time = startOfTime.plusSeconds(onBoardTime).toInstant();
+            Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
             State s = new State(v, time, routingContext, stateData.clone());
             s.weight = startTime.until(time, ChronoUnit.SECONDS);
             // TODO: This shouldn't be overridden in state initialization
@@ -288,7 +283,7 @@ public class TravelTimeResource {
     return initialStates;
   }
 
-  private Worker<TripSchedule> getRaptorWorker(Collection<? extends RaptorTransfer> accessList) {
+  private RaptorResponse<TripSchedule> route(Collection<? extends RaptorTransfer> accessList) {
     final RaptorRequest<TripSchedule> request = new RaptorRequestBuilder<TripSchedule>()
       .profile(RaptorProfile.BEST_TIME)
       .searchParams()
@@ -301,46 +296,9 @@ public class TravelTimeResource {
       .constrainedTransfersEnabled(false) // TODO: Not compatible with best times
       .build();
 
-    var raptorContext = router.raptorConfig.context(requestTransitDataProvider, request);
-    this.unreachedTime = raptorContext.calculator().unreachedTime();
+    var raptorService = new RaptorService<>(router.raptorConfig);
 
-    this.bestTimes =
-      new BestTimes(raptorContext.nStops(), raptorContext.calculator(), raptorContext.lifeCycle());
-
-    final SimpleBestNumberOfTransfers simpleBestNumberOfTransfers = new SimpleBestNumberOfTransfers(
-      raptorContext.nStops(),
-      raptorContext.roundProvider()
-    );
-
-    final BestTimesOnlyStopArrivalsState<TripSchedule> stopArrivalsState = new BestTimesOnlyStopArrivalsState<>(
-      bestTimes,
-      simpleBestNumberOfTransfers
-    );
-
-    final StdRangeRaptorWorkerState<TripSchedule> workerState = new StdRangeRaptorWorkerState<>(
-      raptorContext.calculator(),
-      bestTimes,
-      stopArrivalsState,
-      () -> false
-    );
-
-    final ArrivalTimeRoutingStrategy<TripSchedule> transitWorker = new ArrivalTimeRoutingStrategy<>(
-      raptorContext.calculator(),
-      workerState
-    );
-
-    return new RangeRaptorWorker<>(
-      workerState,
-      transitWorker,
-      raptorContext.transit(),
-      raptorContext.slackProvider(),
-      raptorContext.accessPaths(),
-      raptorContext.roundProvider(),
-      raptorContext.calculator(),
-      raptorContext.createLifeCyclePublisher(),
-      raptorContext.performanceTimers(),
-      raptorContext.enableConstrainedTransfers()
-    );
+    return raptorService.route(request, requestTransitDataProvider);
   }
 
   static SimpleFeatureType makeContourSchema() {

@@ -105,4 +105,9 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule>
   public Collection<Path<T>> extractPaths() {
     return delegate.extractPaths();
   }
+
+  @Override
+  public int calculateMinNumberOfTransfers(int stopIndex) {
+    return delegate.calculateMinNumberOfTransfers(stopIndex);
+  }
 }

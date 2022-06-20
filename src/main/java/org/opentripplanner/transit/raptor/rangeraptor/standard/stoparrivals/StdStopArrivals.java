@@ -11,12 +11,12 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StopArrivals<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
+public final class StdStopArrivals<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
 
   private final StopArrivalState<T>[][] arrivals;
   private final RoundProvider roundProvider;
 
-  public StopArrivals(int nRounds, int nStops, RoundProvider roundProvider) {
+  public StdStopArrivals(int nRounds, int nStops, RoundProvider roundProvider) {
     this.roundProvider = roundProvider;
     //noinspection unchecked
     this.arrivals = (StopArrivalState<T>[][]) new StopArrivalState[nRounds][nStops];

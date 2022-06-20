@@ -22,8 +22,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.SimpleB
 import org.opentripplanner.transit.raptor.rangeraptor.standard.debug.DebugStopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicsAdapter;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StdStopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StdStopArrivalsState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
@@ -41,7 +41,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private final PathConfig<T> pathConfig;
 
   private BestTimes bestTimes = null;
-  private StopArrivals<T> arrivals = null;
+  private StdStopArrivals<T> arrivals = null;
   private ArrivedAtDestinationCheck destinationCheck = null;
   private BestNumberOfTransfers bestNumberOfTransfers = null;
 
@@ -161,9 +161,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     }
   }
 
-  private StopArrivals<T> stopArrivals() {
+  private StdStopArrivals<T> stopArrivals() {
     if (arrivals == null) {
-      arrivals = new StopArrivals<>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider());
+      arrivals = new StdStopArrivals<>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider());
       setBestNumberOfTransfers(arrivals);
     }
     return arrivals;

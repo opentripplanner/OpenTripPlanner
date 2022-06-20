@@ -2,8 +2,10 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import java.util.BitSet;
 import java.util.List;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -17,7 +19,7 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StopArrivals<T extends RaptorTripSchedule> {
+public final class McStopArrivals<T extends RaptorTripSchedule> implements StopArrivals {
 
   private final StopArrivalParetoSet<T>[] arrivals;
   private final BitSet touchedStops;
@@ -28,7 +30,7 @@ public final class StopArrivals<T extends RaptorTripSchedule> {
    * Set the time at a transit index iff it is optimal. This sets both the best time and the
    * transfer time
    */
-  public StopArrivals(
+  public McStopArrivals(
     int nStops,
     EgressPaths egressPaths,
     DestinationArrivalPaths<T> paths,
@@ -41,6 +43,45 @@ public final class StopArrivals<T extends RaptorTripSchedule> {
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
     glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
+  }
+
+  @Override
+  public boolean reached(int stopIndex) {
+    return arrivals[stopIndex] != null && !arrivals[stopIndex].isEmpty();
+  }
+
+  @Override
+  public int bestArrivalTime(int stopIndex) {
+    return arrivals[stopIndex].stream()
+      .mapToInt(AbstractStopArrival::arrivalTime)
+      .min()
+      .orElseThrow();
+  }
+
+  @Override
+  public boolean reachedByTransit(int stopIndex) {
+    return (
+      arrivals[stopIndex] != null &&
+      arrivals[stopIndex].stream().anyMatch(ArrivalView::arrivedByTransit)
+    );
+  }
+
+  @Override
+  public int bestTransitArrivalTime(int stopIndex) {
+    return arrivals[stopIndex].stream()
+      .filter(ArrivalView::arrivedByTransit)
+      .mapToInt(AbstractStopArrival::arrivalTime)
+      .min()
+      .orElseThrow();
+  }
+
+  @Override
+  public int smallestNumberOfTransfers(int stopIndex) {
+    return arrivals[stopIndex].stream()
+      .filter(ArrivalView::arrivedByTransit)
+      .mapToInt(AbstractStopArrival::numberOfTransfers)
+      .min()
+      .orElseThrow();
   }
 
   boolean updateExist() {

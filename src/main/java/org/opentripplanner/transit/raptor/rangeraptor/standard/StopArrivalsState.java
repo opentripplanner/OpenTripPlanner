@@ -23,7 +23,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface StopArrivalsState<T extends RaptorTripSchedule> {
+public interface StopArrivalsState<T extends RaptorTripSchedule> extends BestNumberOfTransfers {
   void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime);
 
   default void rejectAccessTime(int arrivalTime, RaptorTransfer access) {}

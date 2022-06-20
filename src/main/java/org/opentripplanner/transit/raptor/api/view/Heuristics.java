@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.api.view;
 
 /**
- * The heuristics is used in the multi-criteria search and can be generated using the standard
- * search. This interface decople these two implementations and make it possible to implement more
- * than one heuristics data provider.
+ * The heuristics are used in the multi-criteria search and can be generated using the standard
+ * search. This interface decouple these two implementations and make it possible to implement more
+ * than one heuristic data provider.
  */
 public interface Heuristics {
   /**
@@ -36,7 +36,7 @@ public interface Heuristics {
   int[] bestNumOfTransfersToIntArray(int unreached);
 
   /**
-   * The number of stops in the heuristics. This include all stops also stops not reached.
+   * The number of stops in the heuristics. This includes all stops also stops not reached.
    */
   int size();
 
@@ -56,10 +56,10 @@ public interface Heuristics {
    * because there most likely exist journeys with a lower wait-time. The access is NOT time-shift
    * before computing this value.
    *
-   * <p>This would be suitable for calculating a search-time-window, because it give an
-   * estimate for the expected wait-time. In a low frequency transit area the wait-time might be
-   * much larger then the {@link #bestOverallJourneyTravelDuration()}, and in these cases this gives
-   * a better starting point for the search-time-window calculation.
+   * <p>This would be suitable for calculating a search-time-window, because it gives an estimate
+   * for the expected wait-time. In a low frequency transit area the wait-time might be much larger
+   * than the {@link #bestOverallJourneyTravelDuration()}, and in these cases this gives a better
+   * starting point for the search-time-window calculation.
    */
   int minWaitTimeForJourneysReachingDestination();
 

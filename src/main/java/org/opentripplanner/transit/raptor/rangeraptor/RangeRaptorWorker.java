@@ -4,6 +4,7 @@ import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
 import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
@@ -131,10 +132,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    * Werneck. “Round-Based Public Transit Routing,” January 1, 2012.
    * http://research.microsoft.com/pubs/156567/raptor_alenex.pdf.
    *
-   * @return a unique set of paths
    */
   @Override
-  public Collection<Path<T>> route() {
+  public void route() {
     timers.route(() -> {
       lifeCycle.notifyRouteSearchStart(calculator.searchForward());
       transitData.setup();
@@ -152,7 +152,16 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         inFirstIteration = false;
       }
     });
+  }
+
+  @Override
+  public Collection<Path<T>> paths() {
     return state.extractPaths();
+  }
+
+  @Override
+  public StopArrivals stopArrivals() {
+    return state.extractStopArrivals();
   }
 
   /**

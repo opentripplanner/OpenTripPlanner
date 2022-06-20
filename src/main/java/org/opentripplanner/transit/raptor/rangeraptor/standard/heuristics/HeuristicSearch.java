@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics;
 
 import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
@@ -27,8 +28,18 @@ public class HeuristicSearch<T extends RaptorTripSchedule> implements Worker<T> 
   }
 
   @Override
-  public Collection<Path<T>> route() {
-    return worker.route();
+  public void route() {
+    worker.route();
+  }
+
+  @Override
+  public Collection<Path<T>> paths() {
+    return worker.paths();
+  }
+
+  @Override
+  public StopArrivals stopArrivals() {
+    return worker.stopArrivals();
   }
 
   public boolean destinationReached() {

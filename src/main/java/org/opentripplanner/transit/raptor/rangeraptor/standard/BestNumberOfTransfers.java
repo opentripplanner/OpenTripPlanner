@@ -22,5 +22,5 @@ public interface BestNumberOfTransfers {
    * reachable via a street access/egress 0 for a stop which can be reached via a single transit leg
    * 1 for a stop which can be reached via two separate transit legs
    */
-  int calculateMinNumberOfTransfers(int stop);
+  int calculateMinNumberOfTransfers(int stopIndex);
 }

@@ -50,6 +50,13 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   int round();
 
   /**
+   * Return number of transfers used to reach the stop.
+   */
+  default int numberOfTransfers() {
+    return round() - 1;
+  }
+
+  /**
    * {@code true} if this arrival represents a simple access arrival without any embedded rides.
    * FLEX access should not be added in round 0 (the first round).
    * <p>

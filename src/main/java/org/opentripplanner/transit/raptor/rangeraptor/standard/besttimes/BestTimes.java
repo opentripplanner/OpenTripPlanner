@@ -100,7 +100,7 @@ public final class BestTimes {
   /**
    * @return return true if stop is reached.
    */
-  public boolean isStopReachedOnBoard(int stop) {
+  public boolean isStopReachedByTransit(int stop) {
     return transitArrivalTime(stop) != calculator.unreachedTime();
   }
 

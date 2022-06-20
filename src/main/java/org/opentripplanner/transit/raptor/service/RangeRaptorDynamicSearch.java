@@ -5,14 +5,12 @@ import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FOR
 import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder;
@@ -78,6 +76,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     } catch (DestinationNotReachedException e) {
       return new RaptorResponse<>(
         Collections.emptyList(),
+        null,
         originalRequest,
         // If a trip exist(forward heuristics succeed), but is outside the calculated
         // search-window, then set the search-window params as if the request was
@@ -139,10 +138,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     }
 
     // Route
-    Collection<Path<T>> paths = worker.route();
+    worker.route();
 
     // create and return response
-    return new RaptorResponse<>(paths, originalRequest, request);
+    return new RaptorResponse<>(worker.paths(), worker.stopArrivals(), originalRequest, request);
   }
 
   private boolean isItPossibleToRunHeuristicsInParallel() {
