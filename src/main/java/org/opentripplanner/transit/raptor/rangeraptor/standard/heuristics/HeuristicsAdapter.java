@@ -7,7 +7,7 @@ import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;

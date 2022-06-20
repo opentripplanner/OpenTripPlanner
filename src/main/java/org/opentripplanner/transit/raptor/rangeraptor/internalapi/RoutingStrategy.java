@@ -1,10 +1,11 @@
-package org.opentripplanner.transit.raptor.rangeraptor;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 import java.util.function.IntConsumer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
+import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
 
 /**
  * Provides alternative implementations of some logic within the {@link RangeRaptorWorker}.

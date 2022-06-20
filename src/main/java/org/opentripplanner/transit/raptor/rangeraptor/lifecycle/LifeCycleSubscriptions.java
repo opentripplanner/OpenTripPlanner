@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 /**
  * The responsibility of this class is to collect all life-cycle subscriptions, and implement the

@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 /**

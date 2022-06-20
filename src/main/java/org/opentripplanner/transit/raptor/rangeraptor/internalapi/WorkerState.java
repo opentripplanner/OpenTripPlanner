@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -6,6 +6,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
 
 /**
  * The contract the state must implement for the {@link RangeRaptorWorker} to do its job. This allow

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
-import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 

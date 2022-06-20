@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 

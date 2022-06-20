@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.view;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 /**
  * This interface serve as a debug handler for the Worker and State classes. They ues this interface

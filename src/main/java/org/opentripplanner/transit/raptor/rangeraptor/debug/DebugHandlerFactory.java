@@ -6,9 +6,9 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.DebugHandler;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
-import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
 /**

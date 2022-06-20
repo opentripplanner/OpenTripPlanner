@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 /**
  * Keep track of current Raptor round. The provider is injected where needed instead of passing the

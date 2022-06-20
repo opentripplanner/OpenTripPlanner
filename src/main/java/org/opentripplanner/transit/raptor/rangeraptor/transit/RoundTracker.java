@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 /**
  * Round tracker to keep track of round index and when to stop exploring new rounds.

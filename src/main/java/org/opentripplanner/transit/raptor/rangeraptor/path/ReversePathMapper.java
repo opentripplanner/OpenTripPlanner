@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTrans
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 /**

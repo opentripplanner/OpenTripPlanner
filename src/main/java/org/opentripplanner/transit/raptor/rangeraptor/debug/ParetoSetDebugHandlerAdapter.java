@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.debug;
 
-import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
