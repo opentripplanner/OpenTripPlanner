@@ -32,12 +32,7 @@ otp.core.Map = otp.Class({
         var this_ = this;
         this.webapp = webapp;
 
-        const baseLayerId = this.webapp.urlParams.baseLayer || otp.config.baseLayers.find(m => m.isDefault).name;
-        this.currentBaseLayer = baseLayerId;
 
-        //var baseLayers = {};
-        var defaultBaseLayer = null;
-        
         for(var i=0; i<otp.config.baseLayers.length; i++) { //otp.config.baseLayers.length-1; i >= 0; i--) {
             var layerConfig = otp.config.baseLayers[i];
 
@@ -48,17 +43,18 @@ otp.core.Map = otp.Class({
             var layer = new L.TileLayer(layerConfig.tileUrl, layerProps);
 
 	        this.baseLayers[layerConfig.name] = layer;
-            const id = layerConfig.name;
-            if(id === baseLayerId) defaultBaseLayer = layer;
-	        
+
 	        if(typeof layerConfig.getTileUrl != 'undefined') {
         	    layer.getTileUrl = otp.config.getTileUrl;
             }
         }
-        
+        const selectedLayer = otp.config.baseLayers.find(l => l.name === this.webapp.urlParams.baseLayer) || otp.config.baseLayers.find(m => m.isDefault);
+        this.currentBaseLayer = selectedLayer.name;
+
+        const baseLayer = this.baseLayers[this.currentBaseLayer];
 
         var mapProps = { 
-            layers  : [ defaultBaseLayer ],
+            layers  : [ baseLayer ],
             center : (otp.config.initLatLng || new L.LatLng(0,0)),
             zoom : (otp.config.initZoom || 2),
             zoomControl : false
