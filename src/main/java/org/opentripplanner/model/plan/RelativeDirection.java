@@ -20,7 +20,6 @@ public enum RelativeDirection {
   UTURN_LEFT,
   UTURN_RIGHT;
 
-
   public static RelativeDirection calculate(
     double lastAngle,
     double thisAngle,
@@ -29,7 +28,7 @@ public enum RelativeDirection {
     return calculate(thisAngle - lastAngle, roundabout);
   }
 
-    public static RelativeDirection calculate(double angle, boolean roundabout) {
+  public static RelativeDirection calculate(double angle, boolean roundabout) {
     double cwAngle = angle;
     if (cwAngle < 0) {
       cwAngle += Math.PI * 2;
