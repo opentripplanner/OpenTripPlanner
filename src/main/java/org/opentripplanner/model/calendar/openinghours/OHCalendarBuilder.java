@@ -110,14 +110,24 @@ public class OHCalendarBuilder {
       return openingDaysClone;
     }
 
+    /**
+     * Adds the given description addition to the end of the current description
+     */
     private void appendDescription(String descriptionAddition) {
       periodDescription = periodDescription + descriptionAddition;
     }
 
+    /**
+     * @return if the builder has any days set as open
+     */
     public boolean isEverOn() {
       return !openingDays.isEmpty();
     }
 
+    /**
+     * Sets the defined date as open if it's within the defined period. If the builder is set be
+     * for times after midnight, the date is shifted one day forward.
+     */
     public OpeningHoursBuilder on(LocalDate date) {
       var shiftedDate = date.plusDays(isAfterMidnight ? 1 : 0);
       if (shiftedDate.isBefore(startOfPeriod) || shiftedDate.isAfter(endOfPeriod)) {
@@ -127,6 +137,10 @@ public class OHCalendarBuilder {
       return this;
     }
 
+    /**
+     * Sets the defined week day to be open on every instance it exists within the defined period.
+     * If the builder is set be for times after midnight, the weekday is shifted one day forward.
+     */
     public OpeningHoursBuilder on(DayOfWeek dayOfWeek) {
       var shiftedDayOfWeek = dayOfWeek.plus(isAfterMidnight ? 1 : 0);
       // This counts how many days there are in between the startOfPeriod and
@@ -142,6 +156,11 @@ public class OHCalendarBuilder {
       return this;
     }
 
+    /**
+     * Sets every weekday in the range be open on every instance they exist within the defined period.
+     * The range is inclusive in both ends.
+     * If the builder is set be for times after midnight, the weekdays are shifted one day forward.
+     */
     public OpeningHoursBuilder on(DayOfWeek fromDayOfWeek, DayOfWeek untilDayOfWeek) {
       if (fromDayOfWeek == null) {
         return this;
@@ -161,6 +180,12 @@ public class OHCalendarBuilder {
       return this;
     }
 
+    /**
+     * Sets every weekday in the range be open on every instance they exist within the defined period
+     * on the defined month range. Both ranges are inclusive in both ends.
+     * If the builder is set be for times after midnight, the days are shifted one day forward
+     * so that first day of the first month is never on but the first day after the last month can be.
+     */
     public OpeningHoursBuilder on(
       Month fromMonth,
       Month untilMonth,
@@ -218,6 +243,10 @@ public class OHCalendarBuilder {
       return this;
     }
 
+    /**
+     * Sets the days that are true in the given {@link BitSet} to be on without setting any days off.
+     * If the builder is set be for times after midnight, the days are not shifted in this case.
+     */
     public OpeningHoursBuilder on(BitSet days) {
       if (days.size() != openingDays.size()) {
         return this;
@@ -226,11 +255,19 @@ public class OHCalendarBuilder {
       return this;
     }
 
+    /**
+     * Sets every day to be on.
+     */
     public OpeningHoursBuilder everyDay() {
       openingDays.set(0, daysInPeriod);
       return this;
     }
 
+    /**
+     * Sets the days that are true in the given {@link BitSet} to be off.
+     * If the builder is set be for times after midnight, the days are not shifted in this case.
+     * TODO timeshifting is probably actually needed
+     */
     public OpeningHoursBuilder off(BitSet daysOff, String offDescription) {
       if (openingDays.intersects(daysOff)) {
         openingDays.andNot(daysOff);
@@ -239,6 +276,9 @@ public class OHCalendarBuilder {
       return this;
     }
 
+    /**
+     * Adds the opening hours to the {@link OHCalendar} that is being build here.
+     */
     public OHCalendarBuilder add() {
       var days = deduplicator.deduplicateBitSet(openingDays);
       var hours = deduplicator.deduplicateObject(
