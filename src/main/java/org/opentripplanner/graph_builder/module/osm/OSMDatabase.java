@@ -247,6 +247,18 @@ public class OSMDatabase {
     }
   }
 
+  public boolean isClosed(OSMWay way) {
+    TLongList nodeRefs = way.getNodeRefs();
+    int size = nodeRefs.size();
+
+    if (size > 2) {
+      long a = nodeRefs.get(0);
+      long b = nodeRefs.get(size - 1);
+      return a == b;
+    }
+    return false;
+  }
+
   public void addWay(OSMWay way) {
     /* only add ways once */
     long wayId = way.getId();
@@ -278,7 +290,7 @@ public class OSMDatabase {
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
         way.isTag("amenity", "bicycle_parking") ||
-        way.isBoardingLocation()
+        (way.isBoardingLocation() && isClosed(way)) // all platforms are not areas!
       ) &&
       way.getNodeRefs().size() > 2
     ) {
