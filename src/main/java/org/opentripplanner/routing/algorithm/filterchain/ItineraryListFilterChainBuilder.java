@@ -221,6 +221,10 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  /**
+   * Enable the IBI feature for calculating a very simple numeric accessibility score between 0 and
+   * 1 for each leg in the itinerary.
+   */
   public ItineraryListFilterChainBuilder withAccessibilityScore(
     boolean enable,
     double wheelchairMaxSlope

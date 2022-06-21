@@ -41,7 +41,7 @@ public class StreetLeg implements Leg {
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
 
-  private Float accessibilityScore;
+  private final Float accessibilityScore;
 
   public StreetLeg(
     TraverseMode mode,
@@ -222,6 +222,27 @@ public class StreetLeg implements Leg {
     return copy;
   }
 
+  public StreetLeg withAccessibilityScore(float accessibilityScore) {
+    var copy = new StreetLeg(
+      mode,
+      startTime,
+      endTime,
+      from,
+      to,
+      distanceMeters,
+      generalizedCost,
+      legGeometry,
+      legElevation,
+      walkSteps,
+      accessibilityScore
+    );
+    copy.setPathwayId(pathwayId);
+    copy.setWalkingBike(walkingBike);
+    copy.setRentedVehicle(rentedVehicle);
+    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
+    return copy;
+  }
+
   @Override
   @Nullable
   public Float accessibilityScore() {
@@ -253,27 +274,6 @@ public class StreetLeg implements Leg {
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
       .toString();
-  }
-
-  public StreetLeg withAccessibilityScore(float accessibilityScore) {
-    var copy = new StreetLeg(
-      mode,
-      startTime,
-      endTime,
-      from,
-      to,
-      distanceMeters,
-      generalizedCost,
-      legGeometry,
-      legElevation,
-      walkSteps,
-      accessibilityScore
-    );
-    copy.setPathwayId(pathwayId);
-    copy.setWalkingBike(walkingBike);
-    copy.setRentedVehicle(rentedVehicle);
-    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
-    return copy;
   }
 
   private static Double calculateElevationGained(List<P2<Double>> legElevation) {
