@@ -118,19 +118,21 @@ public class RaptorPathToItineraryMapper {
     // Map egress leg
     EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
     Itinerary mapped = mapEgressLeg(egressPathLeg);
-    legs.addAll(mapped == null ? List.of() : mapped.legs);
+    legs.addAll(mapped == null ? List.of() : mapped.getLegs());
 
     Itinerary itinerary = new Itinerary(legs);
 
     // Map general itinerary fields
-    itinerary.generalizedCost = toOtpDomainCost(path.generalizedCost());
-    itinerary.arrivedAtDestinationWithRentedVehicle =
-      mapped != null && mapped.arrivedAtDestinationWithRentedVehicle;
+    itinerary.setGeneralizedCost(toOtpDomainCost(path.generalizedCost()));
+    itinerary.setArrivedAtDestinationWithRentedVehicle(
+      mapped != null && mapped.isArrivedAtDestinationWithRentedVehicle()
+    );
 
     if (optimizedPath != null) {
-      itinerary.waitTimeOptimizedCost =
-        toOtpDomainCost(optimizedPath.generalizedCostWaitTimeOptimized());
-      itinerary.transferPriorityCost = toOtpDomainCost(optimizedPath.transferPriorityCost());
+      itinerary.setWaitTimeOptimizedCost(
+        toOtpDomainCost(optimizedPath.generalizedCostWaitTimeOptimized())
+      );
+      itinerary.setTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
     }
 
     return itinerary;
@@ -147,11 +149,13 @@ public class RaptorPathToItineraryMapper {
 
     Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
-    if (subItinerary.legs.isEmpty()) {
+    if (subItinerary.getLegs().isEmpty()) {
       return List.of();
     }
 
-    return subItinerary.withTimeShiftToStartAt(createZonedDateTime(accessPathLeg.fromTime())).legs;
+    return subItinerary
+      .withTimeShiftToStartAt(createZonedDateTime(accessPathLeg.fromTime()))
+      .getLegs();
   }
 
   private Leg mapTransitLeg(
@@ -239,7 +243,7 @@ public class RaptorPathToItineraryMapper {
 
     Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
-    if (subItinerary.legs.isEmpty()) {
+    if (subItinerary.getLegs().isEmpty()) {
       return null;
     }
 
@@ -297,11 +301,11 @@ public class RaptorPathToItineraryMapper {
 
       Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
-      if (subItinerary.legs.isEmpty()) {
+      if (subItinerary.getLegs().isEmpty()) {
         return List.of();
       }
 
-      return subItinerary.legs;
+      return subItinerary.getLegs();
     }
   }
 

@@ -139,7 +139,7 @@ public class PlannerResource extends RoutingResource {
       sb.append(' ');
       if (res != null) {
         for (Itinerary it : res.getTripPlan().itineraries) {
-          sb.append(it.durationSeconds);
+          sb.append(it.getDurationSeconds());
           sb.append(' ');
         }
       }

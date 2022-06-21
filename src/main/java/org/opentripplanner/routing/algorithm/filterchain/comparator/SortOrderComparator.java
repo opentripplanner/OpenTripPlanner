@@ -29,8 +29,12 @@ public class SortOrderComparator extends CompositeComparator<Itinerary> {
   static final Comparator<Itinerary> ARRIVAL_TIME_COMP = comparing(Itinerary::endTime);
   static final Comparator<Itinerary> DEPARTURE_TIME_COMP = comparing(Itinerary::startTime)
     .reversed();
-  static final Comparator<Itinerary> GENERALIZED_COST_COMP = comparingInt(a -> a.generalizedCost);
-  static final Comparator<Itinerary> NUM_OF_TRANSFERS_COMP = comparingInt(a -> a.nTransfers);
+  static final Comparator<Itinerary> GENERALIZED_COST_COMP = comparingInt(
+    Itinerary::getGeneralizedCost
+  );
+  static final Comparator<Itinerary> NUM_OF_TRANSFERS_COMP = comparingInt(
+    Itinerary::getNumberOfTransfers
+  );
 
   private static final SortOrderComparator STREET_AND_ARRIVAL_TIME = new SortOrderComparator(
     STREET_ONLY_FIRST_COMP,

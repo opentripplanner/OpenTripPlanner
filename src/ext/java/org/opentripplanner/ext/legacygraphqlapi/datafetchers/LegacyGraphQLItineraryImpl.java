@@ -16,22 +16,22 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
-    return environment -> getSource(environment).arrivedAtDestinationWithRentedVehicle;
+    return environment -> getSource(environment).isArrivedAtDestinationWithRentedVehicle();
   }
 
   @Override
   public DataFetcher<Long> duration() {
-    return environment -> (long) getSource(environment).durationSeconds;
+    return environment -> (long) getSource(environment).getDurationSeconds();
   }
 
   @Override
   public DataFetcher<Double> elevationGained() {
-    return environment -> getSource(environment).elevationGained;
+    return environment -> getSource(environment).getElevationGained();
   }
 
   @Override
   public DataFetcher<Double> elevationLost() {
-    return environment -> getSource(environment).elevationLost;
+    return environment -> getSource(environment).getElevationLost();
   }
 
   @Override
@@ -42,7 +42,7 @@ public class LegacyGraphQLItineraryImpl
   @Override
   public DataFetcher<Iterable<Map<String, Object>>> fares() {
     return environment -> {
-      Fare fare = getSource(environment).fare;
+      Fare fare = getSource(environment).getFare();
       if (fare == null) {
         return null;
       }
@@ -62,12 +62,12 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Integer> generalizedCost() {
-    return environment -> getSource(environment).generalizedCost;
+    return environment -> getSource(environment).getGeneralizedCost();
   }
 
   @Override
   public DataFetcher<Iterable<Leg>> legs() {
-    return environment -> getSource(environment).legs;
+    return environment -> getSource(environment).getLegs();
   }
 
   @Override
@@ -77,22 +77,22 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Iterable<SystemNotice>> systemNotices() {
-    return environment -> getSource(environment).systemNotices;
+    return environment -> getSource(environment).getSystemNotices();
   }
 
   @Override
   public DataFetcher<Long> waitingTime() {
-    return environment -> (long) getSource(environment).waitingTimeSeconds;
+    return environment -> (long) getSource(environment).getWaitingTimeSeconds();
   }
 
   @Override
   public DataFetcher<Double> walkDistance() {
-    return environment -> getSource(environment).nonTransitDistanceMeters;
+    return environment -> getSource(environment).getNonTransitDistanceMeters();
   }
 
   @Override
   public DataFetcher<Long> walkTime() {
-    return environment -> (long) getSource(environment).nonTransitTimeSeconds;
+    return environment -> (long) getSource(environment).getNonTransitTimeSeconds();
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

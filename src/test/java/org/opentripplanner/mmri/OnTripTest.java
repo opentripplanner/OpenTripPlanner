@@ -31,7 +31,7 @@ public class OnTripTest extends GtfsTest {
       2
     );
 
-    Leg[] legs = itinerary.legs.toArray(new Leg[2]);
+    Leg[] legs = itinerary.getLegs().toArray(new Leg[2]);
 
     validateLeg(legs[0], 1388530920000L, 1388531040000L, "2f3", null, null);
     validateLeg(legs[1], 1388531160000L, 1388531340000L, "2f2", "2f3", null);

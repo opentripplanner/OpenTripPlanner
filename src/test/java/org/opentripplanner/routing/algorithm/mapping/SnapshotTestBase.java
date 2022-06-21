@@ -140,16 +140,16 @@ public abstract class SnapshotTestBase {
       System.out.printf(
         "Itinerary %2d - duration: %s [%5d] (effective: %s [%5d]) - wait time: %d seconds, transit time: %d seconds\n",
         i,
-        TimeUtils.timeToStrCompact(itinerary.durationSeconds),
-        itinerary.durationSeconds,
+        TimeUtils.timeToStrCompact(itinerary.getDurationSeconds()),
+        itinerary.getDurationSeconds(),
         TimeUtils.timeToStrCompact(itinerary.effectiveDurationSeconds()),
         itinerary.effectiveDurationSeconds(),
-        itinerary.waitingTimeSeconds,
-        itinerary.transitTimeSeconds
+        itinerary.getWaitingTimeSeconds(),
+        itinerary.getTransitTimeSeconds()
       );
 
-      for (int j = 0; j < itinerary.legs.size(); j++) {
-        Leg leg = itinerary.legs.get(j);
+      for (int j = 0; j < itinerary.getLegs().size(); j++) {
+        Leg leg = itinerary.getLegs().get(j);
         String mode = leg.getMode().isTransit() ? "T" : leg.getMode().name().substring(0, 1);
         System.out.printf(
           " - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n",

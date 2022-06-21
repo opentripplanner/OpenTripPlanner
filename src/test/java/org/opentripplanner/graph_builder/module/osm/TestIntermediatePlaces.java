@@ -265,11 +265,11 @@ public class TestIntermediatePlaces {
       assertTrue(1 <= plan.itineraries.size());
       for (Itinerary itinerary : plan.itineraries) {
         validateIntermediatePlacesVisited(itinerary, via);
-        assertTrue(via.length < itinerary.legs.size());
+        assertTrue(via.length < itinerary.getLegs().size());
         validateLegsTemporally(request, itinerary);
         validateLegsSpatially(plan, itinerary);
         if (modes.contains(TraverseMode.TRANSIT)) {
-          assertTrue(itinerary.transitTimeSeconds > 0);
+          assertTrue(itinerary.getTransitTimeSeconds() > 0);
         }
       }
     }
@@ -283,10 +283,10 @@ public class TestIntermediatePlaces {
       Leg leg;
       do {
         assertTrue(
-          legIndex < itinerary.legs.size(),
+          legIndex < itinerary.getLegs().size(),
           "Intermediate location was not an endpoint of any leg"
         );
-        leg = itinerary.legs.get(legIndex);
+        leg = itinerary.getLegs().get(legIndex);
         legIndex++;
       } while (
         Math.abs(leg.getTo().coordinate.latitude() - location.lat) > DELTA ||
@@ -298,7 +298,7 @@ public class TestIntermediatePlaces {
   // Check that the end point of a leg is also the start point of the next leg
   private void validateLegsSpatially(TripPlan plan, Itinerary itinerary) {
     Place place = plan.from;
-    for (Leg leg : itinerary.legs) {
+    for (Leg leg : itinerary.getLegs()) {
       assertEquals(place.coordinate, leg.getFrom().coordinate);
       place = leg.getTo();
     }
@@ -310,27 +310,27 @@ public class TestIntermediatePlaces {
     Instant departTime;
     Instant arriveTime;
     if (request.arriveBy) {
-      departTime = itinerary.legs.get(0).getStartTime().toInstant();
+      departTime = itinerary.getLegs().get(0).getStartTime().toInstant();
       arriveTime = request.getDateTime();
     } else {
       departTime = request.getDateTime();
-      arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).getEndTime().toInstant();
+      arriveTime = itinerary.getLegs().get(itinerary.getLegs().size() - 1).getEndTime().toInstant();
     }
     long sumOfDuration = 0;
-    for (Leg leg : itinerary.legs) {
+    for (Leg leg : itinerary.getLegs()) {
       assertFalse(departTime.isAfter(leg.getStartTime().toInstant()));
       assertFalse(leg.getStartTime().isAfter(leg.getEndTime()));
 
       departTime = leg.getEndTime().toInstant();
       sumOfDuration += leg.getDuration();
     }
-    sumOfDuration += itinerary.waitingTimeSeconds;
+    sumOfDuration += itinerary.getWaitingTimeSeconds();
 
     assertFalse(departTime.isAfter(arriveTime));
 
     // Check the total duration of the legs,
-    int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors
-    assertEquals(sumOfDuration, itinerary.durationSeconds, accuracy);
+    int accuracy = itinerary.getLegs().size(); // allow 1 second per leg for rounding errors
+    assertEquals(sumOfDuration, itinerary.getDurationSeconds(), accuracy);
   }
 
   private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {

@@ -17,7 +17,7 @@ public class LegTest implements PlanTestConstants {
     .build();
 
   private final Leg WALK_LEG = ITINERARY.firstLeg();
-  private final Leg BUS_LEG = ITINERARY.legs.get(1);
+  private final Leg BUS_LEG = ITINERARY.getLegs().get(1);
   private final Leg BICYCLE_LEG = ITINERARY.lastLeg();
 
   @Test

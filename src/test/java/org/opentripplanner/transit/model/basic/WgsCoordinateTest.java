@@ -13,6 +13,13 @@ import org.locationtech.jts.geom.Coordinate;
 public class WgsCoordinateTest {
 
   @Test
+  public void normalize() {
+    WgsCoordinate c = new WgsCoordinate(1.123456789, 2.987654321);
+    assertEquals(1.1234568, c.latitude());
+    assertEquals(2.9876543, c.longitude());
+  }
+
+  @Test
   public void testToString() {
     WgsCoordinate c = new WgsCoordinate(1.123456789, 2.987654321);
     assertEquals("(1.12346, 2.98765)", c.toString());
@@ -21,20 +28,24 @@ public class WgsCoordinateTest {
 
   @Test
   public void testCoordinateEquals() {
-    WgsCoordinate a = new WgsCoordinate(5.0, 3.0);
+    WgsCoordinate a = new WgsCoordinate(5.000_000_3, 3.0);
 
     // Test latitude
-    WgsCoordinate sameLatitude = new WgsCoordinate(5.000_000_099, 3.0);
-    WgsCoordinate differentLatitude = new WgsCoordinate(5.000_000_101, 3.0);
+    WgsCoordinate sameLatitudeUpper = new WgsCoordinate(5.000_000_349, 3.0);
+    WgsCoordinate sameLatitudeLower = new WgsCoordinate(5.000_000_250, 3.0);
+    WgsCoordinate differentLatitude = new WgsCoordinate(5.000_000_350, 3.0);
 
-    assertTrue(a.sameLocation(sameLatitude));
+    assertTrue(a.sameLocation(sameLatitudeUpper));
+    assertTrue(a.sameLocation(sameLatitudeLower));
     assertFalse(a.sameLocation(differentLatitude));
 
     // Test longitude
-    WgsCoordinate sameLongitude = new WgsCoordinate(5.0, 3.000_000_099);
-    WgsCoordinate differentLongitude = new WgsCoordinate(5.0, 3.000_000_101);
+    WgsCoordinate sameLongitudeUpper = new WgsCoordinate(5.000_000_3, 3.000_000_049);
+    WgsCoordinate sameLongitudeLover = new WgsCoordinate(5.000_000_3, 2.999_999_95);
+    WgsCoordinate differentLongitude = new WgsCoordinate(5.000_000_30, 3.000_000_05);
 
-    assertTrue(a.sameLocation(sameLongitude));
+    assertTrue(a.sameLocation(sameLongitudeUpper));
+    assertTrue(a.sameLocation(sameLongitudeLover));
     assertFalse(a.sameLocation(differentLongitude));
   }
 
