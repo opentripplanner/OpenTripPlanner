@@ -115,9 +115,14 @@ public class OSMOpeningHoursParser {
           )
         );
       } else if (!rule.isAdditive()) {
-        openingHoursBuildersForRule.forEach(openingHoursBuilder ->
-          editPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
-        );
+        openingHoursBuildersForRule
+          .stream()
+          // If a builder is after midnight, there is always another one that can be used to set days
+          // off in other builders without having to shift the days in two directions
+          .filter(openingHoursBuilder -> !openingHoursBuilder.isAfterMidnight())
+          .forEach(openingHoursBuilder ->
+            editPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
+          );
       }
       if (isOpenRule(rule)) {
         openingHoursBuilders.addAll(
@@ -349,7 +354,7 @@ public class OSMOpeningHoursParser {
     previousOpeningHoursBuilders
       .stream()
       .forEach(openingHoursBuilder ->
-        openingHoursBuilder.off(
+        openingHoursBuilder.offWithTimeShift(
           newOpeningHoursBuilder.getOpeningDays(),
           newOpeningHoursBuilder.getPeriodDescription()
         )

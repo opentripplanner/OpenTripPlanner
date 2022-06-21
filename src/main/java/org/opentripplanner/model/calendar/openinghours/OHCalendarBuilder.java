@@ -72,7 +72,7 @@ public class OHCalendarBuilder {
     private String periodDescription;
     private final LocalTime startTime;
     private final LocalTime endTime;
-    private boolean isAfterMidnight;
+    private boolean afterMidnight;
 
     private final BitSet openingDays = new BitSet(daysInPeriod);
 
@@ -80,12 +80,12 @@ public class OHCalendarBuilder {
       String periodDescription,
       LocalTime startTime,
       LocalTime endTime,
-      boolean isAfterMidnight
+      boolean afterMidnight
     ) {
       this.periodDescription = periodDescription;
       this.startTime = startTime;
       this.endTime = endTime;
-      this.isAfterMidnight = isAfterMidnight;
+      this.afterMidnight = afterMidnight;
     }
 
     public BitSet getOpeningDays() {
@@ -110,6 +110,10 @@ public class OHCalendarBuilder {
       return openingDaysClone;
     }
 
+    public boolean isAfterMidnight() {
+      return afterMidnight;
+    }
+
     /**
      * Adds the given description addition to the end of the current description
      */
@@ -129,7 +133,7 @@ public class OHCalendarBuilder {
      * for times after midnight, the date is shifted one day forward.
      */
     public OpeningHoursBuilder on(LocalDate date) {
-      var shiftedDate = date.plusDays(isAfterMidnight ? 1 : 0);
+      var shiftedDate = date.plusDays(afterMidnight ? 1 : 0);
       if (shiftedDate.isBefore(startOfPeriod) || shiftedDate.isAfter(endOfPeriod)) {
         return this;
       }
@@ -142,7 +146,7 @@ public class OHCalendarBuilder {
      * If the builder is set be for times after midnight, the weekday is shifted one day forward.
      */
     public OpeningHoursBuilder on(DayOfWeek dayOfWeek) {
-      var shiftedDayOfWeek = dayOfWeek.plus(isAfterMidnight ? 1 : 0);
+      var shiftedDayOfWeek = dayOfWeek.plus(afterMidnight ? 1 : 0);
       // This counts how many days there are in between the startOfPeriod and
       // when the specified dayOfWeek occurs for the first time. Maybe there is a cleaner way to do this.
       int rawWeekDayDifference = shiftedDayOfWeek.compareTo(startOfPeriod.getDayOfWeek());
@@ -222,7 +226,7 @@ public class OHCalendarBuilder {
         }
       }
 
-      var dateToProcess = isAfterMidnight ? startOfPeriod.minusDays(1) : startOfPeriod;
+      var dateToProcess = afterMidnight ? startOfPeriod.minusDays(1) : startOfPeriod;
       int i = 0;
       while (i < daysInPeriod) {
         if (months.contains(dateToProcess.getMonth())) {
@@ -266,12 +270,35 @@ public class OHCalendarBuilder {
     /**
      * Sets the days that are true in the given {@link BitSet} to be off.
      * If the builder is set be for times after midnight, the days are not shifted in this case.
-     * TODO timeshifting is probably actually needed
      */
     public OpeningHoursBuilder off(BitSet daysOff, String offDescription) {
       if (openingDays.intersects(daysOff)) {
         openingDays.andNot(daysOff);
         appendDescription(" except " + offDescription);
+      }
+      return this;
+    }
+
+    /**
+     * Sets the days that are true in the given {@link BitSet} to be off.
+     * If the builder is set be for times after midnight, we check if the previous day is set
+     * in the provided bitset.
+     */
+    public OpeningHoursBuilder offWithTimeShift(BitSet daysOff, String offDescription) {
+      if (afterMidnight) {
+        boolean intersects = false;
+        // Java doesn't seem to have operations for shifting bits
+        for (int i = 1; i < daysInPeriod; i++) {
+          if (openingDays.get(i) && daysOff.get(i - 1)) {
+            intersects = true;
+            openingDays.clear(i);
+          }
+          if (intersects) {
+            appendDescription(" except " + offDescription);
+          }
+        }
+      } else {
+        off(daysOff, offDescription);
       }
       return this;
     }

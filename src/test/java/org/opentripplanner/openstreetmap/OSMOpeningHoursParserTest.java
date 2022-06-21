@@ -59,6 +59,11 @@ public class OSMOpeningHoursParserTest {
       List.of("2022-10-25T05:30:00Z")
     ),
     Arguments.of(
+      "Mo-Fr 16:00-02:00; We 10:00-13:00",
+      List.of("2022-10-25T23:30:00Z", "2022-10-26T10:30:00Z", "2022-10-27T23:30:00Z"),
+      List.of("2022-10-25T10:30:00Z", "2022-10-26T23:30:00Z")
+    ),
+    Arguments.of(
       "Mo - Sa 10:00-18:00; Tu off",
       List.of("2022-10-24T15:30:00Z"),
       List.of("2022-10-24T05:30:00Z", "2022-10-25T10:30:00Z")
