@@ -7,6 +7,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.WheelchairTraversalInformation;
@@ -61,7 +62,7 @@ public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements Iti
   }
 
   private float compute(StreetLeg leg) {
-    var edges = leg.getWalkSteps().stream().map(s -> s.edges).toList();
+    var edges = leg.getWalkSteps().stream().map(WalkStep::getEdges).toList();
     var streetEdges = edges
       .stream()
       .filter(StreetEdge.class::isInstance)
@@ -108,7 +109,8 @@ public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements Iti
   }
 
   private Itinerary addAccessibilityScore(Itinerary i) {
-    var scoredLegs = i.legs
+    var scoredLegs = i
+      .getLegs()
       .stream()
       .map(leg -> {
         if (leg instanceof ScheduledTransitLeg transitLeg) {
@@ -121,8 +123,8 @@ public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements Iti
       })
       .toList();
 
-    i.legs = scoredLegs;
-    i.accessibilityScore = compute(scoredLegs);
+    i.setLegs(scoredLegs);
+    i.setAccessibilityScore(compute(scoredLegs));
     return i;
   }
 }

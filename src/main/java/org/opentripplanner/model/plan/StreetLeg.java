@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
@@ -40,6 +41,8 @@ public class StreetLeg implements Leg {
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
 
+  private Float accessibilityScore;
+
   public StreetLeg(
     TraverseMode mode,
     ZonedDateTime startTime,
@@ -50,7 +53,8 @@ public class StreetLeg implements Leg {
     int generalizedCost,
     LineString geometry,
     List<P2<Double>> elevation,
-    List<WalkStep> walkSteps
+    List<WalkStep> walkSteps,
+    Float accessibilityScore
   ) {
     if (mode.isTransit()) {
       throw new IllegalArgumentException(
@@ -70,6 +74,8 @@ public class StreetLeg implements Leg {
 
     this.elevationGained = calculateElevationGained(legElevation);
     this.elevationLost = calculateElevationLost(legElevation);
+
+    this.accessibilityScore = accessibilityScore;
   }
 
   @Override
@@ -204,7 +210,8 @@ public class StreetLeg implements Leg {
       generalizedCost,
       legGeometry,
       legElevation,
-      walkSteps
+      walkSteps,
+      accessibilityScore
     );
 
     copy.setPathwayId(pathwayId);
@@ -213,6 +220,12 @@ public class StreetLeg implements Leg {
     copy.setVehicleRentalNetwork(vehicleRentalNetwork);
 
     return copy;
+  }
+
+  @Override
+  @Nullable
+  public Float accessibilityScore() {
+    return accessibilityScore;
   }
 
   /**
@@ -240,6 +253,27 @@ public class StreetLeg implements Leg {
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
       .toString();
+  }
+
+  public StreetLeg withAccessibilityScore(float accessibilityScore) {
+    var copy = new StreetLeg(
+      mode,
+      startTime,
+      endTime,
+      from,
+      to,
+      distanceMeters,
+      generalizedCost,
+      legGeometry,
+      legElevation,
+      walkSteps,
+      accessibilityScore
+    );
+    copy.setPathwayId(pathwayId);
+    copy.setWalkingBike(walkingBike);
+    copy.setRentedVehicle(rentedVehicle);
+    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
+    return copy;
   }
 
   private static Double calculateElevationGained(List<P2<Double>> legElevation) {
