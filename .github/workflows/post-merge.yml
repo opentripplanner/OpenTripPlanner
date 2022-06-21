@@ -16,7 +16,7 @@ jobs:
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
 
-      - name: Configure Git User for changelog
+      - name: Configure git user
         run: |
           git config --global user.name 'OTP Changelog Bot'
           git config --global user.email 'changelog-bot@opentripplanner.org'
@@ -44,14 +44,22 @@ jobs:
           NUMBER: ${{ github.event.pull_request.number }}
           URL: ${{ github.event.pull_request.html_url }}
 
-      - name: Configure Git User for serialization version
-        if: contains(github.event.pull_request.labels.*.name, 'bump serialization version')
+  serialization-version:
+    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && contains(github.event.pull_request.labels.*.name, 'bump serialization version')
+    runs-on: ubuntu-latest
+    needs: [changelog-entry]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.CHANGELOG_TOKEN }}
+
+      - name: Configure git user
         run: |
           git config --global user.name 'OTP Serialization Version Bot'
           git config --global user.email 'serialization-version-bot@opentripplanner.org'
 
-      - name: Bump serialization version if PR has label
-        if: contains(github.event.pull_request.labels.*.name, 'bump serialization version')
+      - name: Bump serialization version
         run: |
           version=`xmllint --xpath "//*[local-name()='otp.serialization.version.id']/text()" pom.xml`
           bumped=$((version+1))
