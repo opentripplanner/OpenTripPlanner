@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.I18NString;

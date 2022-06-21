@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Objects;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.util.I18NString;
 
 class VertexAndName {

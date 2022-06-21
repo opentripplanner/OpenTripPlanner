@@ -3,10 +3,8 @@ package org.opentripplanner.routing.vertextype;
 import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

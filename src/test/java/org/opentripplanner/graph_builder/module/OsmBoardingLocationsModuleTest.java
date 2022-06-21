@@ -34,6 +34,14 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 class OsmBoardingLocationsModuleTest {
 
+  File file = new File(ConstantsForTests.HERRENBERG_OSM);
+  Stop platform = TransitModelForTest
+    .stop("de:08115:4512:4:101")
+    .withCoordinate(48.59328, 8.86128)
+    .build();
+  Stop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
+  Stop floatingBusStop = TransitModelForTest.stopForTest("floating-bus-stop", 48.59417, 8.86464);
+
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(
       true,
@@ -49,13 +57,6 @@ class OsmBoardingLocationsModuleTest {
     ),
     Arguments.of(false, Set.of("osm:node:768590748"))
   );
-  File file = new File(ConstantsForTests.HERRENBERG_OSM);
-  Stop platform = TransitModelForTest
-    .stop("de:08115:4512:4:101")
-    .withCoordinate(48.59328, 8.86128)
-    .build();
-  Stop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
-  Stop floatingBusStop = TransitModelForTest.stopForTest("floating-bus-stop", 48.59417, 8.86464);
 
   @ParameterizedTest(
     name = "add boarding locations and link them to platform edges when skipVisibility={0}"
