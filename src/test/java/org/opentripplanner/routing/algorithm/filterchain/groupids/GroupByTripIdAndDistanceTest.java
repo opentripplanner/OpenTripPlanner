@@ -25,9 +25,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
       .bus(31, T11_05, T11_07, D)
       .build();
 
-    Leg l1 = i.legs.get(0);
-    Leg l2 = i.legs.get(1);
-    Leg l3 = i.legs.get(2);
+    Leg l1 = i.getLegs().get(0);
+    Leg l2 = i.getLegs().get(1);
+    Leg l3 = i.getLegs().get(2);
 
     // 3 minutes on a bus
     double expectedDistanceRidingABus = BUS_SPEED * 3 * 60;
@@ -52,9 +52,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
       .bus(31, T11_20, T11_23, D)
       .build();
 
-    Leg l1 = i.legs.get(0);
-    Leg l2 = i.legs.get(1);
-    Leg l3 = i.legs.get(2);
+    Leg l1 = i.getLegs().get(0);
+    Leg l2 = i.getLegs().get(1);
+    Leg l3 = i.getLegs().get(2);
 
     double d1 = l1.getDistanceMeters();
     double d3 = l3.getDistanceMeters();

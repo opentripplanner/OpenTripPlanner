@@ -1,14 +1,13 @@
 package org.opentripplanner.common.geometry;
 
-import static org.apache.commons.math3.util.FastMath.abs;
-import static org.apache.commons.math3.util.FastMath.atan2;
-import static org.apache.commons.math3.util.FastMath.cos;
-import static org.apache.commons.math3.util.FastMath.sin;
-import static org.apache.commons.math3.util.FastMath.sqrt;
-import static org.apache.commons.math3.util.FastMath.toDegrees;
-import static org.apache.commons.math3.util.FastMath.toRadians;
+import static java.lang.Math.abs;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.toDegrees;
+import static java.lang.Math.toRadians;
 
-import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -52,9 +51,9 @@ public abstract class SphericalDistanceLibrary {
   public static double fastDistance(Coordinate point, LineString lineString) {
     // Transform in equirectangular projection on sphere of radius 1,
     // centered at point
-    double lat = Math.toRadians(point.y);
-    double cosLat = FastMath.cos(lat);
-    double lon = Math.toRadians(point.x) * cosLat;
+    double lat = toRadians(point.y);
+    double cosLat = cos(lat);
+    double lon = toRadians(point.x) * cosLat;
     Point point2 = GeometryUtils.getGeometryFactory().createPoint(new Coordinate(lon, lat));
     LineString lineString2 = equirectangularProject(lineString, cosLat);
     return lineString2.distance(point2) * RADIUS_OF_EARTH_IN_M;
@@ -87,7 +86,7 @@ public abstract class SphericalDistanceLibrary {
     // for degenerated geometry (same first/last point).
     Coordinate[] coordinates = lineString.getCoordinates();
     double middleY = (coordinates[0].y + coordinates[coordinates.length - 1].y) / 2.0;
-    double cosLat = FastMath.cos(Math.toRadians(middleY));
+    double cosLat = cos(toRadians(middleY));
     return equirectangularProject(lineString, cosLat).getLength() * RADIUS_OF_EARTH_IN_M;
   }
 
@@ -184,9 +183,9 @@ public abstract class SphericalDistanceLibrary {
      */
     double minCosLat;
     if (latDeg > 0) {
-      minCosLat = FastMath.cos(FastMath.toRadians(latDeg + dLatDeg));
+      minCosLat = cos(toRadians(latDeg + dLatDeg));
     } else {
-      minCosLat = FastMath.cos(FastMath.toRadians(latDeg - dLatDeg));
+      minCosLat = cos(toRadians(latDeg - dLatDeg));
     }
     return dLatDeg / minCosLat;
   }
@@ -221,8 +220,7 @@ public abstract class SphericalDistanceLibrary {
     Coordinate[] coords = lineString.getCoordinates();
     Coordinate[] coords2 = new Coordinate[coords.length];
     for (int i = 0; i < coords.length; i++) {
-      coords2[i] =
-        new Coordinate(Math.toRadians(coords[i].x) * cosLat, Math.toRadians(coords[i].y));
+      coords2[i] = new Coordinate(toRadians(coords[i].x) * cosLat, toRadians(coords[i].y));
     }
     return GeometryUtils.getGeometryFactory().createLineString(coords2);
   }

@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.traveltime;
 
-import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.traveltime.geometry.AccumulativeGridSampler;
@@ -28,7 +27,7 @@ public class SampleGridRenderer {
     long t1 = System.currentTimeMillis();
     Coordinate coordinateOrigin = spt.getAllStates().iterator().next().getVertex().getCoordinate();
     final double gridSizeMeters = traveltimeRequest.precisionMeters;
-    final double cosLat = FastMath.cos(FastMath.toRadians(coordinateOrigin.y));
+    final double cosLat = Math.cos(Math.toRadians(coordinateOrigin.y));
     double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
     double dX = dY / cosLat;
 

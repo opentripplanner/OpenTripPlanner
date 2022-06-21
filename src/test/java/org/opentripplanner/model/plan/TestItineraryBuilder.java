@@ -191,7 +191,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   public Itinerary build() {
     Itinerary itinerary = new Itinerary(legs);
-    itinerary.generalizedCost = cost;
+    itinerary.setGeneralizedCost(cost);
     return itinerary;
   }
 

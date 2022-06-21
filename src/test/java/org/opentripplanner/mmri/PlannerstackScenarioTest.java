@@ -31,7 +31,7 @@ public class PlannerstackScenarioTest extends GtfsTest {
       2
     );
 
-    Leg[] legs = itinerary.legs.toArray(new Leg[2]);
+    Leg[] legs = itinerary.getLegs().toArray(new Leg[2]);
 
     validateLeg(legs[0], 1388531220000L, 1388531340000L, "plannerstack_scenario3", null, null);
     validateLeg(
