@@ -72,6 +72,8 @@ jobs:
  
           git add pom.xml
           git commit -m "Bumping serialization version id for #${NUMBER}"
+          # just for safety as the git repo can be eventually consistent and this push competes with the changelog entry
+          git pull
           git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
         env:
           # Use environment variables to prevent injection attack
