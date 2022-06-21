@@ -94,7 +94,7 @@ public class ItineraryFilterParameters {
   public boolean filterItinerariesWithSameFirstOrLastTrip;
 
   /**
-   * Whether to compute the experimental accessibility score currently being tested at IBI.
+   * Whether to compute the sandbox accessibility score currently being tested at IBI.
    * <p>
    * {@link AccessibilityScoreFilter}
    */
