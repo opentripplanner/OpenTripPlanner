@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.I18NString;
@@ -136,11 +134,6 @@ public class VehicleParking implements Serializable {
   @Nullable
   public I18NString getName() {
     return name;
-  }
-
-  @Nonnull
-  public Coordinate getCoordinate() {
-    return new Coordinate(x, y);
   }
 
   public double getX() {

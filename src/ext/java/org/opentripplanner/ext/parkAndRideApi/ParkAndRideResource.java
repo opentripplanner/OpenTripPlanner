@@ -11,6 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -70,7 +71,7 @@ public class ParkAndRideResource {
 
     var prs = vehicleParkingService
       .getCarParks()
-      .filter(lot -> envelope.contains(lot.getCoordinate()))
+      .filter(lot -> envelope.contains(new Coordinate(lot.getX(), lot.getY())))
       .filter(lot -> hasTransitStopsNearby(maxTransitDistance, lot))
       .map(ParkAndRideInfo::ofVehicleParking)
       .toList();
@@ -83,7 +84,7 @@ public class ParkAndRideResource {
       return true;
     } else {
       List<TransitStopVertex> stops = streetIndex.getNearbyTransitStops(
-        lot.getCoordinate(),
+        new Coordinate(lot.getX(), lot.getY()),
         maxTransitDistance
       );
       return !stops.isEmpty();
