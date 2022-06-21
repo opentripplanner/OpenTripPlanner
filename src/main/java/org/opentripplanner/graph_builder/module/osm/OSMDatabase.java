@@ -290,7 +290,8 @@ public class OSMDatabase {
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
         way.isTag("amenity", "bicycle_parking") ||
-        (way.isBoardingLocation() && isClosed(way)) // not all platforms are areas!
+        // not all boarding locations are areas, so make sure geometry is closed polygon
+        (way.isBoardingLocation() && isClosed(way))
       ) &&
       way.getNodeRefs().size() > 2
     ) {
