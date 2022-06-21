@@ -255,8 +255,6 @@ public class OSMOpeningHoursParser {
         return rule
           .getTimes()
           .stream()
-          // TODO We filter out timespans that have events like "sunrise-sunset" but maybe they could be implemented
-          .filter(timeSpan -> timeSpan.getStart() >= 0)
           .flatMap(timeSpan ->
             createOHCalendarBuildersForTimeSpan(calendarBuilder, description, timeSpan)
               .stream()
@@ -302,6 +300,10 @@ public class OSMOpeningHoursParser {
     String description,
     TimeSpan timeSpan
   ) {
+    if (timeSpan.getStart() < 0) {
+      // TODO We filter out timespans that have events like "sunrise-sunset" but maybe they could be implemented
+      return List.of();
+    }
     if (timeSpan.getEnd() > 1440) {
       return List.of(
         calendarBuilder.openingHours(

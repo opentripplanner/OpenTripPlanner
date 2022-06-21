@@ -162,7 +162,7 @@ public class OHCalendarBuilder {
     }
 
     /**
-     * Sets every weekday in the range be open on every instance they exist within the defined period.
+     * Sets every weekday in the range to be open on every instance they exist within the defined period.
      * The range is inclusive in both ends.
      * If the builder is set be for times after midnight, the weekdays are shifted one day forward.
      */
@@ -186,7 +186,7 @@ public class OHCalendarBuilder {
     }
 
     /**
-     * Sets every weekday in the range be open on every instance they exist within the defined period
+     * Sets every weekday in the range to be open on every instance they exist within the defined period
      * on the defined month range. Both ranges are inclusive in both ends.
      * If the builder is set be for times after midnight, the days are shifted one day forward
      * so that first day of the first month is never on but the first day after the last month can be.
