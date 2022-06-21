@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
-import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 
@@ -39,17 +38,17 @@ class IndexedLineSegment {
 
   // in radians
   static double bearing(Coordinate c1, Coordinate c2) {
-    double deltaLon = (c2.x - c1.x) * FastMath.PI / 180;
-    double lat1Radians = c1.y * FastMath.PI / 180;
-    double lat2Radians = c2.y * FastMath.PI / 180;
-    double y = FastMath.sin(deltaLon) * FastMath.cos(lat2Radians);
+    double deltaLon = (c2.x - c1.x) * Math.PI / 180;
+    double lat1Radians = c1.y * Math.PI / 180;
+    double lat2Radians = c2.y * Math.PI / 180;
+    double y = Math.sin(deltaLon) * Math.cos(lat2Radians);
     double x =
-      FastMath.cos(lat1Radians) *
-      FastMath.sin(lat2Radians) -
-      FastMath.sin(lat1Radians) *
-      FastMath.cos(lat2Radians) *
-      FastMath.cos(deltaLon);
-    return FastMath.atan2(y, x);
+      Math.cos(lat1Radians) *
+      Math.sin(lat2Radians) -
+      Math.sin(lat1Radians) *
+      Math.cos(lat2Radians) *
+      Math.cos(deltaLon);
+    return Math.atan2(y, x);
   }
 
   double crossTrackError(Coordinate coord) {
@@ -57,9 +56,7 @@ class IndexedLineSegment {
     double bearingToCoord = bearing(start, coord);
     double bearingToEnd = bearing(start, end);
     return (
-      FastMath.asin(
-        FastMath.sin(distanceFromStart / RADIUS) * FastMath.sin(bearingToCoord - bearingToEnd)
-      ) *
+      Math.asin(Math.sin(distanceFromStart / RADIUS) * Math.sin(bearingToCoord - bearingToEnd)) *
       RADIUS
     );
   }
@@ -95,9 +92,7 @@ class IndexedLineSegment {
   private double inverseAlongTrackDistance(Coordinate coord, double inverseCrossTrackError) {
     double distanceFromEnd = SphericalDistanceLibrary.fastDistance(end, coord);
     return (
-      FastMath.acos(
-        FastMath.cos(distanceFromEnd / RADIUS) / FastMath.cos(inverseCrossTrackError / RADIUS)
-      ) *
+      Math.acos(Math.cos(distanceFromEnd / RADIUS) / Math.cos(inverseCrossTrackError / RADIUS)) *
       RADIUS
     );
   }
@@ -105,10 +100,7 @@ class IndexedLineSegment {
   private double alongTrackDistance(Coordinate coord, double crossTrackError) {
     double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
     return (
-      FastMath.acos(
-        FastMath.cos(distanceFromStart / RADIUS) / FastMath.cos(crossTrackError / RADIUS)
-      ) *
-      RADIUS
+      Math.acos(Math.cos(distanceFromStart / RADIUS) / Math.cos(crossTrackError / RADIUS)) * RADIUS
     );
   }
 }

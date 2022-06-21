@@ -86,7 +86,7 @@ public class GraphPathToItineraryMapper {
     List<Itinerary> itineraries = new LinkedList<>();
     for (GraphPath path : paths) {
       Itinerary itinerary = generateItinerary(path);
-      if (itinerary.legs.isEmpty()) {
+      if (itinerary.getLegs().isEmpty()) {
         continue;
       }
       itineraries.add(itinerary);
@@ -127,8 +127,8 @@ public class GraphPathToItineraryMapper {
     calculateElevations(itinerary, path.edges);
 
     State lastState = path.states.getLast();
-    itinerary.generalizedCost = (int) lastState.weight;
-    itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isRentingVehicleFromStation();
+    itinerary.setGeneralizedCost((int) lastState.weight);
+    itinerary.setArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
 
     return itinerary;
   }
@@ -242,9 +242,9 @@ public class GraphPathToItineraryMapper {
         double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
 
         if (change > 0) {
-          itinerary.elevationGained += change;
+          itinerary.setElevationGained(itinerary.getElevationGained() + change);
         } else if (change < 0) {
-          itinerary.elevationLost -= change;
+          itinerary.setElevationLost(itinerary.getElevationLost() - change);
         }
       }
     }

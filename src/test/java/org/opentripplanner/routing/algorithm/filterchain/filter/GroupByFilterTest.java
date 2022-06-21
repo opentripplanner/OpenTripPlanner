@@ -38,7 +38,7 @@ public class GroupByFilterTest implements PlanTestConstants {
     assertTrue(i2b.isFlaggedForDeletion());
 
     // Remove notice after asserting
-    i2b.systemNotices.remove(0);
+    i2b.getSystemNotices().remove(0);
 
     // With min Limit = 2, we get two from each group
     createFilter(2).filter(all);
@@ -80,9 +80,9 @@ public class GroupByFilterTest implements PlanTestConstants {
 
       // Remove notices after asserting
       assertTrue(i11.isFlaggedForDeletion());
-      i11.systemNotices.remove(0);
+      i11.getSystemNotices().remove(0);
       assertTrue(i12.isFlaggedForDeletion());
-      i12.systemNotices.remove(0);
+      i12.getSystemNotices().remove(0);
     }
   }
 

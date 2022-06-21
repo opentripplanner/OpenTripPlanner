@@ -25,9 +25,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
       .bus(31, T11_05, T11_07, D)
       .build();
 
-    Leg l1 = i.legs.get(0);
-    Leg l2 = i.legs.get(1);
-    Leg l3 = i.legs.get(2);
+    Leg l1 = i.getLegs().get(0);
+    Leg l2 = i.getLegs().get(1);
+    Leg l3 = i.getLegs().get(2);
 
     // 3 minutes on a bus
     double expectedDistanceRidingABus = BUS_SPEED * 3 * 60;
@@ -52,9 +52,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
       .bus(31, T11_20, T11_23, D)
       .build();
 
-    Leg l1 = i.legs.get(0);
-    Leg l2 = i.legs.get(1);
-    Leg l3 = i.legs.get(2);
+    Leg l1 = i.getLegs().get(0);
+    Leg l2 = i.getLegs().get(1);
+    Leg l3 = i.getLegs().get(2);
 
     double d1 = l1.getDistanceMeters();
     double d3 = l3.getDistanceMeters();
@@ -172,6 +172,24 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
     assertFalse(g_21.match(g_11));
     assertFalse(g_11_21.match(g_31_11));
     assertFalse(g_31_11.match(g_11_21));
+  }
+
+  @Test
+  public void notMatchFrequencyTripsWithDifferentStartTime() {
+    GroupByTripIdAndDistance g_11_00 = new GroupByTripIdAndDistance(
+      newItinerary(A).frequencyBus(11, T11_00, T11_05, B).build(),
+      0.9
+    );
+    GroupByTripIdAndDistance g_11_10 = new GroupByTripIdAndDistance(
+      newItinerary(A).frequencyBus(11, T11_10, T11_15, B).build(),
+      0.9
+    );
+
+    // Match itself
+    assertTrue(g_11_00.match(g_11_00));
+    // Match other with suffix leg
+    assertFalse(g_11_00.match(g_11_10));
+    assertFalse(g_11_10.match(g_11_00));
   }
 
   @Test

@@ -20,7 +20,7 @@ public class ServiceAlertTest extends GtfsTest {
   public void test3i1() {
     Itinerary itinerary = plan(+1388530860L, "3i1", "3i2", null, false, false, null, "", "", 1);
 
-    Leg leg = itinerary.legs.toArray(new Leg[1])[0];
+    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
 
     validateLeg(leg, 1388530860000L, 1388530920000L, "3i2", "3i1", "Unknown effect");
 

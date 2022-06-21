@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.alerts;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -18,11 +18,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -31,15 +29,13 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.util.TranslatedString;
 
-@RunWith(MockitoJUnitRunner.class)
 public class AlertsUpdateHandlerTest {
 
   private AlertsUpdateHandler handler;
 
-  @Spy
-  private FakeTransitAlertService service;
+  private final FakeTransitAlertService service = Mockito.spy(FakeTransitAlertService.class);
 
-  @Before
+  @BeforeEach
   public void setUp() {
     handler = new AlertsUpdateHandler();
     handler.setFeedId("1");

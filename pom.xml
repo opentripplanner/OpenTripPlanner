@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>26</otp.serialization.version.id>
+        <otp.serialization.version.id>28</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>26.4</geotools.version>
         <jackson.version>2.13.2</jackson.version>
@@ -626,12 +626,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
             <version>0.23.1</version>
@@ -775,11 +769,6 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.82</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>

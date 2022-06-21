@@ -30,6 +30,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -93,7 +94,8 @@ public class ScheduledTransitLeg implements Leg {
       alightStopIndexInPattern
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
-    this.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
+
+    setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
   }
 
   public TripTimes getTripTimes() {
@@ -202,7 +204,7 @@ public class ScheduledTransitLeg implements Leg {
 
   /** Only for testing purposes */
   protected void setDistanceMeters(double distanceMeters) {
-    this.distanceMeters = distanceMeters;
+    this.distanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
   }
 
   @Override
