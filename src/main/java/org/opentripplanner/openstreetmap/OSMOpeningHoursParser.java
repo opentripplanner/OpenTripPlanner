@@ -175,12 +175,16 @@ public class OSMOpeningHoursParser {
       .getDates()
       .stream()
       .flatMap(dateRange -> {
-        String description = dateRange.toString();
         if (rule.getDays() != null) {
           return rule
             .getDays()
             .stream()
             .flatMap(weekDayRange -> {
+              String description = String.format(
+                "%s %s",
+                dateRange.toString(),
+                weekDayRange.toString()
+              );
               if (rule.getTimes() != null) {
                 return rule
                   .getTimes()
