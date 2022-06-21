@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetEdge
   extends Edge
-  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairEdge {
+  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
   private static final long serialVersionUID = 1L;

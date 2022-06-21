@@ -9,7 +9,7 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.WheelchairEdge;
+import org.opentripplanner.routing.edgetype.WheelchairTraversalInformation;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 /**
@@ -97,9 +97,9 @@ public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements Iti
 
     boolean allEdgesAreAccessible = edges
       .stream()
-      .filter(WheelchairEdge.class::isInstance)
-      .map(WheelchairEdge.class::cast)
-      .allMatch(WheelchairEdge::isWheelchairAccessible);
+      .filter(WheelchairTraversalInformation.class::isInstance)
+      .map(WheelchairTraversalInformation.class::cast)
+      .allMatch(WheelchairTraversalInformation::isWheelchairAccessible);
     if (allEdgesAreAccessible) {
       score += 0.5f;
     }
