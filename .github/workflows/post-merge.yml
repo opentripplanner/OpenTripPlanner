@@ -1,4 +1,4 @@
-name: Automatic changelog entry
+name: Post-merge
 on:
   pull_request_target:
     branches:
@@ -53,6 +53,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
+
+      - name: Install xmllint
+        run: |
+          sudo apt-get install -y libxml2-utils
 
       - name: Configure git user
         run: |
