@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api.view;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;

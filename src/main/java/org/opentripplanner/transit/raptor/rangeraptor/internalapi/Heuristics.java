@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api.view;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 /**
  * The heuristics are used in the multi-criteria search and can be generated using the standard

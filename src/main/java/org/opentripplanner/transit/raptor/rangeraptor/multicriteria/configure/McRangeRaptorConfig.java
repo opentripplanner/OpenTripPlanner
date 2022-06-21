@@ -2,9 +2,9 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.api.view.Worker;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McStopArrivals;
