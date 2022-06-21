@@ -128,7 +128,7 @@ public class FaresTest {
 
     var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
     var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
-    var leg = peakItinerary.legs.get(0);
+    var leg = peakItinerary.getLegs().get(0);
     assertTrue(leg.getStartTime().toLocalTime().isAfter(LocalTime.parse("08:00")));
     var startTime = leg.getStartTime().toLocalTime();
     assertTrue(
@@ -136,7 +136,7 @@ public class FaresTest {
       "Leg's start should be before 09:00 but is " + startTime
     );
 
-    assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
+    assertEquals(new Money(USD, 275), peakItinerary.getFare().getFare(FareType.regular));
   }
 
   @Test
@@ -256,7 +256,7 @@ public class FaresTest {
     Router router
   ) {
     Itinerary itinerary = getItineraries(from, to, time, router).get(0);
-    return itinerary.fare;
+    return itinerary.getFare();
   }
 
   private static List<Itinerary> getItineraries(
@@ -283,7 +283,7 @@ public class FaresTest {
     return result
       .getItineraries()
       .stream()
-      .sorted(Comparator.comparingInt(x -> x.generalizedCost))
+      .sorted(Comparator.comparingInt(x -> x.getGeneralizedCost()))
       .toList();
   }
 }

@@ -20,6 +20,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -99,7 +100,7 @@ public class FlexibleTransitLeg implements Leg {
 
   @Override
   public double getDistanceMeters() {
-    return edge.getDistanceMeters();
+    return DoubleUtils.roundTo2Decimals(edge.getDistanceMeters());
   }
 
   @Override

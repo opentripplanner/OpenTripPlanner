@@ -24,7 +24,8 @@ public class RideMapper {
    * fares. Adapted from from previously used method DefaultFareServiceImpl.createRides().
    */
   public static List<Ride> ridesForItinerary(Itinerary itinerary) {
-    return itinerary.legs
+    return itinerary
+      .getLegs()
       .stream()
       .filter(leg -> leg.isTransitLeg() || leg.isFlexibleTrip())
       .map(RideMapper::rideForTransitPathLeg)

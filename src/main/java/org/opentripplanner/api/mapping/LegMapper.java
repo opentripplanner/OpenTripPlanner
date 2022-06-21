@@ -83,7 +83,7 @@ public class LegMapper {
     api.realTime = domain.getRealTime();
     api.isNonExactFrequency = domain.getNonExactFrequency();
     api.headway = domain.getHeadway();
-    api.distance = domain.getDistanceMeters();
+    api.distance = round3Decimals(domain.getDistanceMeters());
     api.generalizedCost = domain.getGeneralizedCost();
     api.pathway = domain.getPathwayId() != null;
     api.mode = TraverseModeMapper.mapToApi(domain.getMode());
@@ -144,6 +144,10 @@ public class LegMapper {
     api.accessibilityScore = domain.accessibilityScore();
 
     return api;
+  }
+
+  private Double round3Decimals(double value) {
+    return Math.round(value * 1000d) / 1000d;
   }
 
   private static String getBoardAlightMessage(PickDrop boardAlightType) {

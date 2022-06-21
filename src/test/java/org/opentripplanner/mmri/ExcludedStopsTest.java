@@ -20,7 +20,7 @@ public class ExcludedStopsTest extends GtfsTest {
   public void test3f1() {
     Itinerary itinerary = plan(+1388530860L, "3f1", "3f3", null, false, false, null, "", "3f2", 1);
 
-    Leg leg = itinerary.legs.toArray(new Leg[1])[0];
+    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
 
     validateLeg(leg, 1388530860000L, 1388531040000L, "3f3", "3f1", null);
 
