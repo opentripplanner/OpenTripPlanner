@@ -74,7 +74,7 @@ public class OSMOpeningHoursParser {
     ZoneId zoneId
   ) {
     this.openingHoursCalendarService = openingHoursCalendarService;
-    // TODO, zoneDd should depend on the coordinates of the object
+    // TODO, zoneId should depend on the coordinates of the object
     this.zoneId = zoneId;
   }
 

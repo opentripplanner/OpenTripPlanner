@@ -148,8 +148,9 @@ public class OHCalendarBuilder {
     public OpeningHoursBuilder on(DayOfWeek dayOfWeek) {
       var shiftedDayOfWeek = dayOfWeek.plus(afterMidnight ? 1 : 0);
       // This counts how many days there are in between the startOfPeriod and
-      // when the specified dayOfWeek occurs for the first time. Maybe there is a cleaner way to do this.
-      int rawWeekDayDifference = shiftedDayOfWeek.compareTo(startOfPeriod.getDayOfWeek());
+      // when the specified dayOfWeek occurs for the first time.
+      int rawWeekDayDifference =
+        shiftedDayOfWeek.getValue() - startOfPeriod.getDayOfWeek().getValue();
       int firstOccurrenceDaysFromStart = rawWeekDayDifference >= 0
         ? rawWeekDayDifference
         : 7 - Math.abs(rawWeekDayDifference);
