@@ -117,7 +117,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
     }
   }
 
-  /** Used internally in this class to cash a destination arrival */
+  /** Used internally in this class to cache a destination arrival */
   private static class DestinationArrivalEvent {
 
     final int round;

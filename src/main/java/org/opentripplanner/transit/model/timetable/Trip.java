@@ -16,6 +16,7 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.lang.StringUtils;
@@ -27,7 +28,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
   private final FeedScopedId serviceId;
   private final String shortName;
   private final TransitMode mode;
-  private final String netexSubmode;
+  private final SubMode netexSubmode;
   private final String headsign;
 
   // TODO RT - Fix this after the Transmodel is refactored
@@ -52,6 +53,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
     // Route is done first, it is used as a fallback for some fields
     this.route = requireNonNull(builder.getRoute());
     this.mode = requireNonNullElse(builder.getMode(), route.getMode());
+    this.netexSubmode = SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode());
     this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
     this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
     this.wheelchairBoarding =
@@ -63,7 +65,6 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
     this.operator = ifNotNull(builder.getOperator(), route.getOperator());
     this.serviceId = builder.getServiceId();
     this.shortName = builder.getShortName();
-    this.netexSubmode = ifNotNull(builder.getNetexSubmode(), route.getNetexSubmode());
     this.headsign = builder.getHeadsign();
     this.shapeId = builder.getShapeId();
     this.gtfsBlockId = builder.getGtfsBlockId();
@@ -113,8 +114,8 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
     return mode;
   }
 
-  @Nullable
-  public String getNetexSubmode() {
+  @Nonnull
+  public SubMode getNetexSubMode() {
     return netexSubmode;
   }
 

@@ -44,7 +44,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     this.mode = original.getMode();
     this.gtfsType = original.getGtfsType();
     this.gtfsSortOrder = original.getGtfsSortOrder();
-    this.netexSubmode = original.getNetexSubmode();
+    this.netexSubmode = original.getNetexSubmode().name();
     this.flexibleLineType = original.getFlexibleLineType();
     this.description = original.getDescription();
     this.url = original.getUrl();

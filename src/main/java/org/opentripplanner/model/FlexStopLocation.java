@@ -62,9 +62,6 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     return zoneId;
   }
 
-  /**
-   * Returns the centroid of this location.
-   */
   @Override
   @Nonnull
   public WgsCoordinate getCoordinate() {

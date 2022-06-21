@@ -62,10 +62,6 @@ public class TripPatternWithRaptorStopIndexes {
     return pattern.getMode();
   }
 
-  public String getNetexSubmode() {
-    return pattern.getNetexSubmode();
-  }
-
   public int[] getStopIndexes() {
     return stopIndexes;
   }

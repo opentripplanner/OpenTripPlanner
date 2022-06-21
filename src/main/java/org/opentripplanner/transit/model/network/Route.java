@@ -27,7 +27,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   // TODO: consolidate gtfsType and netexSubmode
   private final Integer gtfsType;
   private final Integer gtfsSortOrder;
-  private final String netexSubmode;
+  private final SubMode netexSubmode;
   private final String flexibleLineType;
   private final String description;
   private final String url;
@@ -52,7 +52,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
     this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
     this.gtfsType = builder.getGtfsType();
     this.gtfsSortOrder = builder.getGtfsSortOrder();
-    this.netexSubmode = builder.getNetexSubmode();
+    this.netexSubmode = SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode());
     this.flexibleLineType = builder.getFlexibleLineType();
     this.description = builder.getDescription();
     this.url = builder.getUrl();
@@ -149,8 +149,8 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
     return gtfsSortOrder;
   }
 
-  @Nullable
-  public String getNetexSubmode() {
+  @Nonnull
+  public SubMode getNetexSubmode() {
     return netexSubmode;
   }
 

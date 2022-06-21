@@ -110,10 +110,11 @@ public class LineType {
           .newFieldDefinition()
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
-          .dataFetcher(environment -> {
-            final String netexSubMode = ((Route) environment.getSource()).getNetexSubmode();
-            return netexSubMode != null ? TransmodelTransportSubmode.fromValue(netexSubMode) : null;
-          })
+          .dataFetcher(environment ->
+            TransmodelTransportSubmode.fromValue(
+              ((Route) environment.getSource()).getNetexSubmode()
+            )
+          )
           .build()
       )
       .field(

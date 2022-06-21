@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * All files are loaded from the same base directory.
  * <p>
  * Configuration is loaded lazy at startup form different configuration JSON files. Comments
- * and unquoted keys are allowed in the these configuration files. The configuration is cashed,
+ * and unquoted keys are allowed in the these configuration files. The configuration is cached,
  * and not reloaded even if it is changed on the filesystem. Changing some parameters would
  * require a new graph build - which is complicated. So, instead we try to keep the system
  * simple.
