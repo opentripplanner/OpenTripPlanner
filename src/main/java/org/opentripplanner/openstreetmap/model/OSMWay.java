@@ -38,6 +38,13 @@ public class OSMWay extends OSMWithTags {
   }
 
   /**
+   * Returns true if way is both boarding location and closed polygon
+   */
+  public boolean isBoardingArea() {
+    return isBoardingLocation() && isClosed();
+  }
+
+  /**
    * Returns true if bicycle dismounts are forced.
    */
   public boolean isBicycleDismountForced() {

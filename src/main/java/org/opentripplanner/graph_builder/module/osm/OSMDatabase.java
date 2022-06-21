@@ -247,18 +247,6 @@ public class OSMDatabase {
     }
   }
 
-  public boolean isClosed(OSMWay way) {
-    TLongList nodeRefs = way.getNodeRefs();
-    int size = nodeRefs.size();
-
-    if (size > 2) {
-      long a = nodeRefs.get(0);
-      long b = nodeRefs.get(size - 1);
-      return a == b;
-    }
-    return false;
-  }
-
   public void addWay(OSMWay way) {
     /* only add ways once */
     long wayId = way.getId();
@@ -290,8 +278,7 @@ public class OSMDatabase {
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
         way.isTag("amenity", "bicycle_parking") ||
-        // not all boarding locations are areas, so make sure geometry is closed polygon
-        (way.isBoardingLocation() && isClosed(way))
+        way.isBoardingArea()
       ) &&
       way.getNodeRefs().size() > 2
     ) {
