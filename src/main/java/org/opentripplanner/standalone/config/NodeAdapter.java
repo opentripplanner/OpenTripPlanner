@@ -303,6 +303,21 @@ public class NodeAdapter {
     return FeedScopedId.parseId(asText(paramName));
   }
 
+  public List<FeedScopedId> asFeedScopedIds(String paramName, List<FeedScopedId> defaultValues) {
+    JsonNode array = param(paramName);
+
+    if (array.isMissingNode()) {
+      return defaultValues;
+    }
+    assertIsArray(paramName, array);
+
+    List<FeedScopedId> ids = new ArrayList<>();
+    for (JsonNode it : array) {
+      ids.add(FeedScopedId.parseId(it.asText()));
+    }
+    return ids;
+  }
+
   public Locale asLocale(String paramName, Locale defaultValue) {
     if (!exist(paramName)) {
       return defaultValue;

@@ -149,6 +149,8 @@ public class RoutingRequestMapper {
 
     request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
 
+    mapUnpreferred(request, c.path("unpreferred"), dft);
+
     return request;
   }
 
@@ -159,5 +161,13 @@ public class RoutingRequestMapper {
     p.backTravelWaitTimeFactor = c.asDouble("backTravelWaitTimeFactor", p.backTravelWaitTimeFactor);
     p.extraStopBoardAlightCostsFactor =
       c.asDouble("extraStopBoardAlightCostsFactor", p.extraStopBoardAlightCostsFactor);
+  }
+
+  private static void mapUnpreferred(
+    RoutingRequest r,
+    NodeAdapter c,
+    RoutingRequest defaultValues
+  ) {
+    r.unpreferredRoutes = c.asFeedScopedIds("routes", defaultValues.unpreferredRoutes);
   }
 }

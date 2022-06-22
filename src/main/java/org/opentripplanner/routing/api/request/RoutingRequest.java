@@ -455,12 +455,12 @@ public class RoutingRequest implements Cloneable, Serializable {
   private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
   /**
-   * Set of preferred routes by user.
+   * Set of preferred routes by user and configuration.
    *
    * @deprecated TODO OTP2 Needs to be implemented
    */
   @Deprecated
-  private RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
+  public List<FeedScopedId> preferredRoutes = List.of();
 
   /**
    * Penalty added for using every route that is not preferred if user set any route as preferred.
@@ -472,20 +472,14 @@ public class RoutingRequest implements Cloneable, Serializable {
   public int otherThanPreferredRoutesPenalty = 300;
 
   /**
-   * Set of unpreferred routes for given user.
-   *
-   * @deprecated TODO OTP2: Needs to be implemented
+   * Set of unpreferred routes for given user and configuration.
    */
-  @Deprecated
-  private RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
+  public List<FeedScopedId> unpreferredRoutes = List.of();
 
   /**
    * Penalty added for using every unpreferred route. We return number of seconds that we are
    * willing to wait for preferred route.
-   *
-   * @deprecated TODO OTP2: Needs to be implemented
    */
-  @Deprecated
   public int useUnpreferredRoutesPenalty = 300;
 
   /**
@@ -818,27 +812,27 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.otherThanPreferredRoutesPenalty = penalty;
   }
 
-  public void setPreferredRoutes(List<FeedScopedId> routeIds) {
-    preferredRoutes = RouteMatcher.idMatcher(routeIds);
+  public void setPreferredRoutes(Collection<FeedScopedId> routeIds) {
+    preferredRoutes = routeIds.stream().toList();
   }
 
   public void setPreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      preferredRoutes = RouteMatcher.parse(s);
+      preferredRoutes = FeedScopedId.parseListOfIds(s);
     } else {
-      preferredRoutes = RouteMatcher.emptyMatcher();
+      preferredRoutes = List.of();
     }
   }
 
-  public void setUnpreferredRoutes(List<FeedScopedId> routeIds) {
-    unpreferredRoutes = RouteMatcher.idMatcher(routeIds);
+  public void setUnpreferredRoutes(Collection<FeedScopedId> routeIds) {
+    unpreferredRoutes = routeIds.stream().toList();
   }
 
   public void setUnpreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      unpreferredRoutes = RouteMatcher.parse(s);
+      unpreferredRoutes = FeedScopedId.parseListOfIds(s);
     } else {
-      unpreferredRoutes = RouteMatcher.emptyMatcher();
+      unpreferredRoutes = List.of();
     }
   }
 
@@ -1120,8 +1114,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
       clone.bannedRoutes = bannedRoutes.clone();
       clone.whiteListedRoutes = whiteListedRoutes.clone();
-      clone.preferredRoutes = preferredRoutes.clone();
-      clone.unpreferredRoutes = unpreferredRoutes.clone();
+      clone.preferredRoutes = List.copyOf(preferredRoutes);
+      clone.unpreferredRoutes = List.copyOf(unpreferredRoutes);
 
       clone.bannedTrips = Set.copyOf(bannedTrips);
 
@@ -1249,15 +1243,16 @@ public class RoutingRequest implements Cloneable, Serializable {
   public long preferencesPenaltyForRoute(Route route) {
     long preferences_penalty = 0;
     FeedScopedId agencyID = route.getAgency().getId();
-    if (!preferredRoutes.equals(RouteMatcher.emptyMatcher()) || !preferredAgencies.isEmpty()) {
-      boolean isPreferedRoute = preferredRoutes.matches(route);
+    FeedScopedId routeID = route.getId();
+    if (!preferredRoutes.isEmpty() || !preferredAgencies.isEmpty()) {
+      boolean isPreferedRoute = preferredRoutes.contains(routeID);
       boolean isPreferedAgency = preferredAgencies.contains(agencyID);
 
       if (!isPreferedRoute && !isPreferedAgency) {
         preferences_penalty += otherThanPreferredRoutesPenalty;
       }
     }
-    boolean isUnpreferedRoute = unpreferredRoutes.matches(route);
+    boolean isUnpreferedRoute = unpreferredRoutes.contains(routeID);
     boolean isUnpreferedAgency = unpreferredAgencies.contains(agencyID);
     if (isUnpreferedRoute || isUnpreferedAgency) {
       preferences_penalty += useUnpreferredRoutesPenalty;
