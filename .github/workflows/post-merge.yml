@@ -71,8 +71,8 @@ jobs:
           sed -Ei "s/<otp\.serialization\.version\.id>.*<\/otp\.serialization\.version\.id>/<otp\.serialization\.version\.id>${bumped}<\/otp\.serialization\.version\.id>/" pom.xml 
  
           git add pom.xml
-          git commit -m "Bumping serialization version id for #${NUMBER}"
-          # just for safety as the git repo can be eventually consistent and this push competes with the changelog entry
+          git commit -m "Bump serialization version id for #${NUMBER}"
+          # just for safety as the Github repo is eventually consistent, therefore this push competes with the changelog entry one
           git pull --rebase origin dev-2.x
           git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
         env:
