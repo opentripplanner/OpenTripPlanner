@@ -785,8 +785,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         } catch (OpeningHoursParseException e) {
           issueStore.add(
             "OSMOpeningHoursUnparsed",
-            "OSM object with id '%s' has an invalid opening_hours value, it will always be open",
-            entity.getId()
+            "OSM object with id '%s' (%s) has an invalid opening_hours value, it will always be open",
+            entity.getId(),
+            entity.getOpenStreetMapLink()
           );
         }
       }
