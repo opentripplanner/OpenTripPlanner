@@ -195,8 +195,7 @@ public class StreetLegBuilder {
   }
 
   public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
-    streetNotes = new HashSet<>();
-    streetNotes.addAll(notes);
+    streetNotes = Set.copyOf(notes);
     return this;
   }
 }
