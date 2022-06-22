@@ -273,7 +273,7 @@ public class OSMDatabase {
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
         way.isTag("amenity", "bicycle_parking") ||
-        way.isBoardingLocation()
+        way.isBoardingArea()
       ) &&
       way.getNodeRefs().size() > 2
     ) {
