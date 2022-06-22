@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 
 /**
  * Tracks the state necessary to construct paths at the end of each iteration.

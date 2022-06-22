@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.service;
+package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;

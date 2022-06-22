@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.ToStringBuilder;
 

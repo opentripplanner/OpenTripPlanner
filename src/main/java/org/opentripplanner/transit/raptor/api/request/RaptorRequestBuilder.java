@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 
 /**
  * This is a Request builder to help construct valid requests. Se the request classes for

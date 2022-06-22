@@ -11,7 +11,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * The path builder is a utility to build paths. The path builder is responsible for reconstructing

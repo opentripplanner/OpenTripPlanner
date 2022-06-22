@@ -1,4 +1,4 @@
-package org.opentripplanner.util.logging;
+package org.opentripplanner.standalone.server;
 
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
@@ -18,8 +18,6 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for

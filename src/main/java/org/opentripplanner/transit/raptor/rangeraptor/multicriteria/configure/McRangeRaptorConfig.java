@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
@@ -12,7 +13,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.MultiCriteri
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 
 /**
  * Configure and create multicriteria worker, state and child classes.

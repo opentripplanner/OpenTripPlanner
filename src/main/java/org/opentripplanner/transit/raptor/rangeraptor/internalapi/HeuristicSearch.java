@@ -1,11 +1,9 @@
-package org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics;
+package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
 
 /**
  * Combine Heuristics and Worker into one class to be able to retrieve the heuristics after the

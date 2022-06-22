@@ -1,9 +1,9 @@
-package org.opentripplanner.util;
+package org.opentripplanner.util.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

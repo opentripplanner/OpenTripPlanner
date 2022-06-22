@@ -32,7 +32,7 @@ public class RoundTracker implements RoundProvider {
    */
   private int roundMaxLimit;
 
-  RoundTracker(int nRounds, int numberOfAdditionalTransfers, WorkerLifeCycle lifeCycle) {
+  public RoundTracker(int nRounds, int numberOfAdditionalTransfers, WorkerLifeCycle lifeCycle) {
     // The 'roundMaxLimit' is inclusive, while the 'nRounds' is exclusive; Hence subtract 1.
     this.roundMaxLimit = nRounds;
     this.numberOfAdditionalTransfers = numberOfAdditionalTransfers;

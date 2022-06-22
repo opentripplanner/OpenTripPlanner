@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.service;
+package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

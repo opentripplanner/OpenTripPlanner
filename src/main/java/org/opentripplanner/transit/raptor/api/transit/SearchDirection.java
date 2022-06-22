@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api.request;
+package org.opentripplanner.transit.raptor.api.transit;
 
 /**
  * This enum describe the direction which a search is performed.

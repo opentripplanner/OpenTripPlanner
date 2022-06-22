@@ -1,9 +1,9 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.transit.raptor.rangeraptor.context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext.accessOrEgressPaths;
+import static org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext.accessOrEgressPaths;
 
 import java.util.Collection;
 import java.util.Comparator;

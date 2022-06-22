@@ -8,15 +8,15 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
+import org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
-import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 
 /**
  * This class is responsible for creating a new search and holding application scoped Raptor state.

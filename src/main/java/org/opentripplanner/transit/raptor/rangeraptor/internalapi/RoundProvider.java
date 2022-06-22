@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
+import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
+
 /**
  * Keep track of current Raptor round. The provider is injected where needed instead of passing the
  * current round down the call stack. This is faster than passing the round on the stack because the
@@ -7,7 +9,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
  * tests indicate this.
  * <p/>
  *
- * @see org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker
+ * @see RoundTracker
  */
 public interface RoundProvider {
   /**

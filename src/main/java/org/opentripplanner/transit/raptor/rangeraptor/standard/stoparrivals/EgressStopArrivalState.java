@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

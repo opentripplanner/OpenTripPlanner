@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.standard;
+package org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi;
 
 /**
  * The responsibility of this interface is to allow the caller to check if the destination is

@@ -4,8 +4,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 
 /**

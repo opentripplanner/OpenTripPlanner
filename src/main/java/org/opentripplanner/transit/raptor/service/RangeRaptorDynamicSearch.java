@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.service;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+import static org.opentripplanner.transit.raptor.api.transit.SearchDirection.FORWARD;
+import static org.opentripplanner.transit.raptor.api.transit.SearchDirection.REVERSE;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 import java.util.Collections;
@@ -20,7 +20,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,7 +175,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
         throw new DestinationNotReachedException();
       }
       LOG.error(e.getMessage() + ". Request: " + originalRequest, e);
-      throw new OtpAppException(
+      throw new IllegalStateException(
         "Failed to run FORWARD/REVERSE heuristic search in parallel. Details: " + e.getMessage()
       );
     }

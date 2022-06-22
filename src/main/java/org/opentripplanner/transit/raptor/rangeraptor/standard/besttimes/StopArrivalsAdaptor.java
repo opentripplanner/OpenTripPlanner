@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 
 public class StopArrivalsAdaptor implements StopArrivals {
 

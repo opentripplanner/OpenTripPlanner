@@ -137,20 +137,20 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     }
 
     final int costTransit = costCalculator.transitArrivalCost(
-      ride.boardCost,
+      ride.boardCost(),
       alightSlack,
-      alightTime - ride.boardTime,
-      ride.trip,
+      alightTime - ride.boardTime(),
+      ride.trip(),
       alightStop
     );
 
     arrivalsCache.add(
       new TransitStopArrival<>(
-        ride.prevArrival,
+        ride.prevArrival(),
         alightStop,
         stopArrivalTime,
         costTransit,
-        ride.trip
+        ride.trip()
       )
     );
   }

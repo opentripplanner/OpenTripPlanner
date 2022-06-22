@@ -11,7 +11,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It Private inner class which help

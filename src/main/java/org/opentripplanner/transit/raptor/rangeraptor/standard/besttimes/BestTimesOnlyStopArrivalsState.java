@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 
 /**
  * The responsibility of this class is to calculate the best arrival times at every stop. This class

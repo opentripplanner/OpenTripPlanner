@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.transit.raptor.rangeraptor.context;
 
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.forwardSlackProvider;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
@@ -16,21 +16,25 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
-import org.opentripplanner.transit.raptor.rangeraptor.path.ForwardPathMapper;
-import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
-import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.AccessPaths;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.ForwardTransitCalculator;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.ReverseTransitCalculator;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 /**
  * The search context is used to hold search scoped instances and to pass these to who ever need
@@ -54,7 +58,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final CostCalculator<T> costCalculator;
   private final RaptorTuningParameters tuningParameters;
   private final RoundTracker roundTracker;
-  private final PathMapper<T> pathMapper;
   private final DebugHandlerFactory<T> debugFactory;
   private final EgressPaths egressPaths;
   private final AccessPaths accessPaths;
@@ -84,14 +87,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
         request.searchParams().numberOfAdditionalTransfers(),
         lifeCycle()
       );
-    this.pathMapper =
-      createPathMapper(
-        this.transit.transferConstraintsSearch(),
-        this.costCalculator,
-        transit.stopNameResolver(),
-        request,
-        lifeCycle()
-      );
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
   }
 
@@ -115,6 +110,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return request.profile();
   }
 
+  public SearchDirection searchDirection() {
+    return request.searchDirection();
+  }
+
   public RaptorTransitDataProvider<T> transit() {
     return transit;
   }
@@ -131,6 +130,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return createSlackProvider(request, lifeCycle());
   }
 
+  public RaptorSlackProvider raptorSlackProvider() {
+    return request.slackProvider();
+  }
+
   /**
    * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding the
    * given trip pattern. THIS DO NOT INCLUDE THE transfer-slack, and should only be used to
@@ -140,10 +143,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
    */
   public ToIntFunction<RaptorTripPattern> boardSlackProvider() {
     return createBoardSlackProvider(request);
-  }
-
-  public PathMapper<T> pathMapper() {
-    return pathMapper;
   }
 
   @Nullable
@@ -265,32 +264,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return request.searchDirection().isForward()
       ? p -> request.slackProvider().boardSlack(p.slackIndex())
       : p -> request.slackProvider().alightSlack(p.slackIndex());
-  }
-
-  private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
-    CostCalculator<S> costCalculator,
-    RaptorStopNameResolver stopNameResolver,
-    RaptorRequest<S> request,
-    WorkerLifeCycle lifeCycle
-  ) {
-    return request.searchDirection().isForward()
-      ? new ForwardPathMapper<>(
-        txConstraintsSearch,
-        request.slackProvider(),
-        costCalculator,
-        stopNameResolver,
-        lifeCycle,
-        request.profile().useApproximateTripSearch()
-      )
-      : new ReversePathMapper<>(
-        txConstraintsSearch,
-        request.slackProvider(),
-        costCalculator,
-        stopNameResolver,
-        lifeCycle,
-        request.profile().useApproximateTripSearch()
-      );
   }
 
   private static AccessPaths accessPaths(RaptorRequest<?> request) {

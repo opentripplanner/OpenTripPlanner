@@ -63,7 +63,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   @Override
   public void alight(final int stopIndex, final int stopPos, int alightSlack) {
     for (PatternRide<T> ride : patternRides) {
-      state.transitToStop(ride, stopIndex, ride.trip.arrival(stopPos), alightSlack);
+      state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }
 
@@ -101,7 +101,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
     patternRides.add(
-      new PatternRide<>(
+      new PatternRide<T>(
         prevArrival,
         stopIndex,
         boarding.getStopPositionInPattern(),

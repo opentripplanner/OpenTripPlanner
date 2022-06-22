@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.standard;
+package org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi;
 
 import java.util.Collection;
 import java.util.List;

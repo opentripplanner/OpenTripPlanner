@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.standard;
+package org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi;
 
 /**
  * This interface is part of calculating heuristics for transfers.

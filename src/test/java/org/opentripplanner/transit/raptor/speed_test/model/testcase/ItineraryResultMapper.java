@@ -15,7 +15,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of

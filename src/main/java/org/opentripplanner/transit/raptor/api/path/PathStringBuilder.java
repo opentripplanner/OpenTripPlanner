@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.util;
+package org.opentripplanner.transit.raptor.api.path;
 
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;

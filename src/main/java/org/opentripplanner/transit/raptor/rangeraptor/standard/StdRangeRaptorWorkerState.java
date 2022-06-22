@@ -10,6 +10,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.StopArrivalsAdaptor;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 

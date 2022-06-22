@@ -7,7 +7,7 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+import static org.opentripplanner.transit.raptor.api.transit.SearchDirection.REVERSE;
 
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
