@@ -2,9 +2,11 @@ package org.opentripplanner.ext.transmodelapi.model.network;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
 public class GroupOfLinesType {
@@ -60,6 +62,17 @@ public class GroupOfLinesType {
           .description("Description of group of lines")
           .type(Scalars.GraphQLString)
           .dataFetcher(env -> ((GroupOfRoutes) env.getSource()).getDescription())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("lines")
+          .description("All lines part of this group of lines")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(LineType.REF))))
+          .dataFetcher(env ->
+            GqlUtil.getTransitService(env).getRoutesForGroupOfRoutes(env.getSource())
+          )
           .build()
       )
       .build();

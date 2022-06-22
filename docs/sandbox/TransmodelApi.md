@@ -49,6 +49,8 @@
   [#4161](https://github.com/opentripplanner/OpenTripPlanner/pull/4161)
 - Add possibility to filter dated service journeys by replacementFor
   [#4198](https://github.com/opentripplanner/OpenTripPlanner/pull/4198)
+- Add support for groupOfLines in top level query
+  [#4232](https://github.com/opentripplanner/OpenTripPlanner/pull/4232)
 
 ## Documentation
 

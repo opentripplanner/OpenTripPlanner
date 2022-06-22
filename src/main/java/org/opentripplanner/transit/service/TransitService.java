@@ -27,6 +27,7 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -137,6 +138,12 @@ public interface TransitService {
   );
 
   Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates);
+
+  Collection<GroupOfRoutes> getGroupsOfRoutes();
+
+  Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes);
+
+  GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id);
 
   Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate);
 
