@@ -1,9 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -22,6 +24,7 @@ public class McCostParams {
   private final double[] transitReluctanceFactors;
   private final double waitReluctanceFactor;
   private final WheelchairAccessibilityRequest accessibilityRequest;
+  private final Map<FeedScopedId, Integer> routePenalties;
 
   /**
    * Default constructor defines default values. These defaults are overridden by defaults in the
@@ -33,6 +36,7 @@ public class McCostParams {
     this.transitReluctanceFactors = null;
     this.waitReluctanceFactor = 1.0;
     this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULT;
+    this.routePenalties = Map.of();
   }
 
   McCostParams(McCostParamsBuilder builder) {
@@ -41,6 +45,7 @@ public class McCostParams {
     this.transitReluctanceFactors = builder.transitReluctanceFactors();
     this.waitReluctanceFactor = builder.waitReluctanceFactor();
     this.accessibilityRequest = builder.wheelchairAccessibility();
+    this.routePenalties = builder.routePenalties();
   }
 
   public int boardCost() {
@@ -75,6 +80,10 @@ public class McCostParams {
     return accessibilityRequest;
   }
 
+  public Map<FeedScopedId, Integer> routePenaltyMap() {
+    return routePenalties;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(boardCost, transferCost, waitReluctanceFactor);
@@ -104,6 +113,7 @@ public class McCostParams {
       .addNum("transferCost", transferCost, 0)
       .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
       .addDoubles("transitReluctanceFactors", transitReluctanceFactors, 1.0)
+      .addNum("routePenaltiesSize", routePenalties.size(), 0)
       .toString();
   }
 }

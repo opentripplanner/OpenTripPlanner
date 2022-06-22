@@ -15,6 +15,11 @@ public class CostCalculatorFactory {
         new WheelchairCostCalculator<>(calculator, mcCostParams.accessibilityRequirements());
     }
 
+    // append RouteCostCalculator to calculator stack if (un)preferred routes exist
+    if (mcCostParams.routePenaltyMap().size() > 0) {
+      calculator = new RouteCostCalculator(calculator, mcCostParams.routePenaltyMap());
+    }
+
     return calculator;
   }
 }
