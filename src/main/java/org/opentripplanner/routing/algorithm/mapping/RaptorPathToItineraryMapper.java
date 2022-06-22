@@ -74,7 +74,11 @@ public class RaptorPathToItineraryMapper {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.request = request;
-    this.alertToLegMapper = new AlertToLegMapper(graph.getTransitAlertService());
+    this.alertToLegMapper =
+      new AlertToLegMapper(
+        graph.getTransitAlertService(),
+        graph.index.getMultiModalStationForStations()::get
+      );
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         graph.getTimeZone(),

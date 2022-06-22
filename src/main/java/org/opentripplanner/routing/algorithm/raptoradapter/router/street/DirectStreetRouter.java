@@ -15,8 +15,6 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.server.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DirectStreetRouter {
 
@@ -44,7 +42,10 @@ public class DirectStreetRouter {
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
         router.graph.getTimeZone(),
-        new AlertToLegMapper(router.graph.getTransitAlertService()),
+        new AlertToLegMapper(
+          router.graph.getTransitAlertService(),
+          router.graph.index.getMultiModalStationForStations()::get
+        ),
         router.graph.streetNotesService,
         router.graph.ellipsoidToGeoidDifference
       );

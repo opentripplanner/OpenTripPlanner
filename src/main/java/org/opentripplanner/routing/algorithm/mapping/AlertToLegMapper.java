@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -12,6 +14,7 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -19,8 +22,14 @@ public class AlertToLegMapper {
 
   private final TransitAlertService transitAlertService;
 
-  public AlertToLegMapper(TransitAlertService transitAlertService) {
+  private final Function<Station, MultiModalStation> getMultiModalStation;
+
+  public AlertToLegMapper(
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
+  ) {
     this.transitAlertService = transitAlertService;
+    this.getMultiModalStation = getMultiModalStation;
   }
 
   public void addTransitAlertPatchesToLeg(Leg leg, boolean isFirstLeg) {
@@ -164,8 +173,9 @@ public class AlertToLegMapper {
 
       if (stop.isPartOfStation()) {
         //Also check parent
+        final Station parentStation = stop.getParentStation();
         Collection<TransitAlert> alerts = transitAlertService.getStopAndRouteAlerts(
-          stop.getParentStation().getId(),
+          parentStation.getId(),
           routeId
         );
         if (alerts != null) {
@@ -173,10 +183,10 @@ public class AlertToLegMapper {
         }
 
         // ...and siblings - platform may have been changed
-        for (var siblingStop : stop.getParentStation().getChildStops()) {
+        for (var siblingStop : parentStation.getChildStops()) {
           if (!stop.getId().equals(siblingStop.getId())) {
             Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAndRouteAlerts(
-              stop.getParentStation().getId(),
+              parentStation.getId(),
               routeId
             );
             if (siblingAlerts != null) {
@@ -184,17 +194,19 @@ public class AlertToLegMapper {
             }
           }
         }
+
+        // Also check multimodal parent
+        MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+        if (multiModalStation != null) {
+          Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAndRouteAlerts(
+            multiModalStation.getId(),
+            routeId
+          );
+          if (multimodalStopAlerts != null) {
+            alertsForStopAndRoute.addAll(multimodalStopAlerts);
+          }
+        }
       }
-      // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
-      //            if (stop.getMultiModalStation() != null) {
-      //                //Also check multimodal parent
-      //
-      //                FeedScopedId multimodalStopId = new FeedScopedId(stopId.getAgencyId(), stop.getMultiModalStation());
-      //                Collection<AlertPatch> multimodalStopAlerts = graph.index.getAlertsForStopAndRoute(multimodalStopId, routeId);
-      //                if (multimodalStopAlerts != null) {
-      //                    alertsForStopAndRoute.addAll(multimodalStopAlerts);
-      //                }
-      //            }
     }
     return alertsForStopAndRoute;
   }
@@ -239,8 +251,9 @@ public class AlertToLegMapper {
       }
       if (stop.isPartOfStation()) {
         // Also check parent
+        final Station parentStation = stop.getParentStation();
         Collection<TransitAlert> alerts = transitAlertService.getStopAndTripAlerts(
-          stop.getParentStation().getId(),
+          parentStation.getId(),
           tripId,
           serviceDate
         );
@@ -249,10 +262,10 @@ public class AlertToLegMapper {
         }
 
         // ...and siblings - platform may have been changed
-        for (var siblingStop : stop.getParentStation().getChildStops()) {
+        for (var siblingStop : parentStation.getChildStops()) {
           if (!stop.getId().equals(siblingStop.getId())) {
             Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAndTripAlerts(
-              stop.getParentStation().getId(),
+              parentStation.getId(),
               tripId,
               serviceDate
             );
@@ -261,16 +274,20 @@ public class AlertToLegMapper {
             }
           }
         }
+
+        // Also check multimodal parent
+        MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+        if (multiModalStation != null) {
+          Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAndTripAlerts(
+            multiModalStation.getId(),
+            tripId,
+            serviceDate
+          );
+          if (multimodalStopAlerts != null) {
+            alertsForStopAndTrip.addAll(multimodalStopAlerts);
+          }
+        }
       }
-      // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
-      //            if (stop.getMultiModalStation() != null) {
-      //                //Also check multimodal parent
-      //                FeedScopedId multimodalStopId = new FeedScopedId(stopId.getAgencyId(), stop.getMultiModalStation());
-      //                Collection<AlertPatch> multimodalStopAlerts = graph.index.getAlertsForStopAndTrip(multimodalStopId, tripId);
-      //                if (multimodalStopAlerts != null) {
-      //                    alertsForStopAndTrip.addAll(multimodalStopAlerts);
-      //                }
-      //            }
     }
     return alertsForStopAndTrip;
   }
@@ -292,35 +309,37 @@ public class AlertToLegMapper {
 
       if (stop.isPartOfStation()) {
         // Also check parent
+        final Station parentStation = stop.getParentStation();
         Collection<TransitAlert> parentStopAlerts = transitAlertService.getStopAlerts(
-          stop.getParentStation().getId()
+          parentStation.getId()
         );
         if (parentStopAlerts != null) {
           alertsForStop.addAll(parentStopAlerts);
         }
 
         // ...and siblings - platform may have been changed
-        for (var siblingStop : stop.getParentStation().getChildStops()) {
+        for (var siblingStop : parentStation.getChildStops()) {
           if (!stop.getId().equals(siblingStop.getId())) {
             Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAlerts(
-              stop.getParentStation().getId()
+              parentStation.getId()
             );
             if (siblingAlerts != null) {
               alertsForStop.addAll(siblingAlerts);
             }
           }
         }
-      }
-      // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
-      //            if (stop.getMultiModalStation() != null) {
-      //                //Also check multimodal parent
-      //                FeedScopedId multimodalStopId = new FeedScopedId(stopId.getAgencyId(), stop.getMultiModalStation());
-      //                Collection<AlertPatch> multimodalStopAlerts = graph.index.getAlertsForStopId(multimodalStopId);
-      //                if (multimodalStopAlerts != null) {
-      //                    alertsForStop.addAll(multimodalStopAlerts);
-      //                }
-      //            }
 
+        // Also check multimodal parent
+        MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+        if (multiModalStation != null) {
+          Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAlerts(
+            multiModalStation.getId()
+          );
+          if (multimodalStopAlerts != null) {
+            alertsForStop.addAll(multimodalStopAlerts);
+          }
+        }
+      }
     }
     return alertsForStop;
   }

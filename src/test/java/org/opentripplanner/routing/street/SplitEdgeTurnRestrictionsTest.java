@@ -156,7 +156,7 @@ public class SplitEdgeTurnRestrictionsTest {
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       graph.getTimeZone(),
-      new AlertToLegMapper(graph.getTransitAlertService()),
+      new AlertToLegMapper(graph.getTransitAlertService(), ignore -> null),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );
