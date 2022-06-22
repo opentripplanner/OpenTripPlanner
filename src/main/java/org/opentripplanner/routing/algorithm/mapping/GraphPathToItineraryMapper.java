@@ -21,6 +21,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.StreetLegBuilder;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -212,13 +213,13 @@ public class GraphPathToItineraryMapper {
   /**
    * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
    */
-  private static void setPathwayInfo(StreetLeg leg, List<State> legStates) {
+  private static StreetLegBuilder setPathwayInfo(StreetLegBuilder leg, List<State> legStates) {
     for (State legsState : legStates) {
       if (legsState.getBackEdge() instanceof PathwayEdge pe) {
         leg.setPathwayId(pe.getId());
-        return;
       }
     }
+    return leg;
   }
 
   /**
@@ -408,24 +409,21 @@ public class GraphPathToItineraryMapper {
 
     State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
-    StreetLeg leg = new StreetLeg(
-      resolveMode(states),
-      startTimeState.getTime().atZone(timeZone),
-      lastState.getTime().atZone(timeZone),
-      makePlace(firstState),
-      makePlace(lastState),
-      distanceMeters,
-      (int) (lastState.getWeight() - firstState.getWeight()),
-      geometry,
-      makeElevation(edges, firstState.getOptions().geoidElevation),
-      walkSteps,
-      null
-    );
+    StreetLegBuilder leg = new StreetLegBuilder()
+      .setMode(resolveMode(states))
+      .setStartTime(startTimeState.getTime().atZone(timeZone))
+      .setEndTime(lastState.getTime().atZone(timeZone))
+      .setFrom(makePlace(firstState))
+      .setTo(makePlace(lastState))
+      .setDistanceMeters(distanceMeters)
+      .setGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
+      .setGeometry(geometry)
+      .setElevation(makeElevation(edges, firstState.getOptions().geoidElevation))
+      .setWalkSteps(walkSteps)
+      .setRentedVehicle(firstState.isRentingVehicle())
+      .setWalkingBike(false);
 
-    leg.setRentedVehicle(firstState.isRentingVehicle());
-    leg.setWalkingBike(false);
-
-    if (leg.getRentedVehicle()) {
+    if (firstState.isRentingVehicle()) {
       String vehicleRentalNetwork = firstState.getVehicleRentalNetwork();
       if (vehicleRentalNetwork != null) {
         leg.setVehicleRentalNetwork(vehicleRentalNetwork);
@@ -436,7 +434,7 @@ public class GraphPathToItineraryMapper {
 
     setPathwayInfo(leg, states);
 
-    return leg;
+    return leg.build();
   }
 
   /**
@@ -445,16 +443,17 @@ public class GraphPathToItineraryMapper {
    * @param leg    The leg to add the mode and alerts to
    * @param states The states that go with the leg
    */
-  private void addStreetNotes(StreetLeg leg, List<State> states) {
+  private StreetLegBuilder addStreetNotes(StreetLegBuilder leg, List<State> states) {
     for (State state : states) {
       Set<StreetNote> streetNotes = streetNotesService.getNotes(state);
 
       if (streetNotes != null) {
         for (StreetNote streetNote : streetNotes) {
-          leg.addStretNote(streetNote);
+          leg.addStreetNote(streetNote);
         }
       }
     }
+    return leg;
   }
 
   private List<P2<Double>> makeElevation(List<Edge> edges, boolean geoidElevation) {

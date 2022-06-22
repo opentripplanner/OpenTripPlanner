@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.StreetLegBuilder;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
@@ -260,19 +260,17 @@ public class RaptorPathToItineraryMapper {
     List<Edge> edges = transfer.getEdges();
     if (edges == null || edges.isEmpty()) {
       return List.of(
-        new StreetLeg(
-          transferMode,
-          createZonedDateTime(pathLeg.fromTime()),
-          createZonedDateTime(pathLeg.toTime()),
-          from,
-          to,
-          transfer.getDistanceMeters(),
-          toOtpDomainCost(pathLeg.generalizedCost()),
-          GeometryUtils.makeLineString(transfer.getCoordinates()),
-          null,
-          List.of(),
-          null
-        )
+        new StreetLegBuilder()
+          .setMode(transferMode)
+          .setStartTime(createZonedDateTime(pathLeg.fromTime()))
+          .setEndTime(createZonedDateTime(pathLeg.toTime()))
+          .setFrom(from)
+          .setTo(to)
+          .setDistanceMeters(transfer.getDistanceMeters())
+          .setGeneralizedCost(toOtpDomainCost(pathLeg.generalizedCost()))
+          .setGeometry(GeometryUtils.makeLineString(transfer.getCoordinates()))
+          .setWalkSteps(List.of())
+          .build()
       );
     } else {
       // A RoutingRequest with a RoutingContext must be constructed so that the edges

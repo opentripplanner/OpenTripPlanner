@@ -2,7 +2,6 @@ package org.opentripplanner.model.plan;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -33,13 +32,13 @@ public class StreetLeg implements Leg {
 
   private final LineString legGeometry;
   private final List<WalkStep> walkSteps;
-  private final Set<StreetNote> streetNotes = new HashSet<>();
+  private final Set<StreetNote> streetNotes;
   private final List<P2<Double>> legElevation;
 
-  private FeedScopedId pathwayId;
-  private Boolean walkingBike;
-  private Boolean rentedVehicle;
-  private String vehicleRentalNetwork;
+  private final FeedScopedId pathwayId;
+  private final Boolean walkingBike;
+  private final Boolean rentedVehicle;
+  private final String vehicleRentalNetwork;
 
   private final Float accessibilityScore;
 
@@ -54,6 +53,11 @@ public class StreetLeg implements Leg {
     LineString geometry,
     List<P2<Double>> elevation,
     List<WalkStep> walkSteps,
+    Set<StreetNote> streetNotes,
+    FeedScopedId pathwayId,
+    Boolean walkingBike,
+    Boolean rentedVehicle,
+    String vehicleRentalNetwork,
     Float accessibilityScore
   ) {
     if (mode.isTransit()) {
@@ -75,6 +79,11 @@ public class StreetLeg implements Leg {
     this.elevationGained = calculateElevationGained(legElevation);
     this.elevationLost = calculateElevationLost(legElevation);
 
+    this.streetNotes = Set.copyOf(streetNotes);
+    this.pathwayId = pathwayId;
+    this.walkingBike = walkingBike;
+    this.rentedVehicle = rentedVehicle;
+    this.vehicleRentalNetwork = vehicleRentalNetwork;
     this.accessibilityScore = accessibilityScore;
   }
 
@@ -116,10 +125,6 @@ public class StreetLeg implements Leg {
   @Override
   public FeedScopedId getPathwayId() {
     return pathwayId;
-  }
-
-  public void setPathwayId(FeedScopedId pathwayId) {
-    this.pathwayId = pathwayId;
   }
 
   @Override
@@ -167,8 +172,10 @@ public class StreetLeg implements Leg {
     return walkingBike;
   }
 
-  public void setWalkingBike(Boolean walkingBike) {
-    this.walkingBike = walkingBike;
+  @Override
+  @Nullable
+  public Float accessibilityScore() {
+    return accessibilityScore;
   }
 
   @Override
@@ -176,17 +183,9 @@ public class StreetLeg implements Leg {
     return rentedVehicle;
   }
 
-  public void setRentedVehicle(Boolean rentedVehicle) {
-    this.rentedVehicle = rentedVehicle;
-  }
-
   @Override
   public String getVehicleRentalNetwork() {
     return vehicleRentalNetwork;
-  }
-
-  public void setVehicleRentalNetwork(String network) {
-    vehicleRentalNetwork = network;
   }
 
   @Override
@@ -194,59 +193,17 @@ public class StreetLeg implements Leg {
     return generalizedCost;
   }
 
-  public void addStretNote(StreetNote streetNote) {
-    streetNotes.add(streetNote);
-  }
-
   @Override
   public Leg withTimeShift(Duration duration) {
-    StreetLeg copy = new StreetLeg(
-      mode,
-      startTime.plus(duration),
-      endTime.plus(duration),
-      from,
-      to,
-      distanceMeters,
-      generalizedCost,
-      legGeometry,
-      legElevation,
-      walkSteps,
-      accessibilityScore
-    );
-
-    copy.setPathwayId(pathwayId);
-    copy.setWalkingBike(walkingBike);
-    copy.setRentedVehicle(rentedVehicle);
-    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
-
-    return copy;
+    return StreetLegBuilder
+      .of(this)
+      .setStartTime(startTime.plus(duration))
+      .setEndTime(endTime.plus(duration))
+      .build();
   }
 
   public StreetLeg withAccessibilityScore(float accessibilityScore) {
-    var copy = new StreetLeg(
-      mode,
-      startTime,
-      endTime,
-      from,
-      to,
-      distanceMeters,
-      generalizedCost,
-      legGeometry,
-      legElevation,
-      walkSteps,
-      accessibilityScore
-    );
-    copy.setPathwayId(pathwayId);
-    copy.setWalkingBike(walkingBike);
-    copy.setRentedVehicle(rentedVehicle);
-    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
-    return copy;
-  }
-
-  @Override
-  @Nullable
-  public Float accessibilityScore() {
-    return accessibilityScore;
+    return StreetLegBuilder.of(this).setAccessibilityScore(accessibilityScore).build();
   }
 
   /**
