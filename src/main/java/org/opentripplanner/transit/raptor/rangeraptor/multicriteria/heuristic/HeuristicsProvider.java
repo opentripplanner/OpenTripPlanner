@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.Abs
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 
 /**
- * A wrapper around {@link Heuristics} to cash elements to avoid recalculation of heuristic
+ * A wrapper around {@link Heuristics} to cache elements to avoid recalculation of heuristic
  * properties.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

@@ -239,12 +239,7 @@ public class OSMDatabase {
     if (nodesById.containsKey(node.getId())) {
       return;
     }
-
     nodesById.put(node.getId(), node);
-
-    if (nodesById.size() % 100000 == 0) {
-      LOG.debug("nodes=" + nodesById.size());
-    }
   }
 
   public void addWay(OSMWay way) {
@@ -278,7 +273,7 @@ public class OSMDatabase {
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
         way.isTag("amenity", "bicycle_parking") ||
-        way.isBoardingLocation()
+        way.isBoardingArea()
       ) &&
       way.getNodeRefs().size() > 2
     ) {

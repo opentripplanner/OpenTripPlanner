@@ -38,7 +38,7 @@ import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
@@ -48,6 +48,8 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.model.network.MainAndSubMode;
+import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.TestUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -234,17 +236,20 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  private static List<ApiRequestMode> mapModes(Collection<AllowedTransitMode> reqModes) {
+  private static List<ApiRequestMode> mapModes(Collection<MainAndSubMode> reqModes) {
+    Set<TransitMode> transitModes = reqModes
+      .stream()
+      .map(MainAndSubMode::mainMode)
+      .collect(Collectors.toSet());
     List<ApiRequestMode> result = new ArrayList<>();
 
-    if (ApiRequestMode.TRANSIT.getTransitModes().equals(reqModes)) {
+    if (ApiRequestMode.TRANSIT.getTransitModes().equals(transitModes)) {
       return List.of(ApiRequestMode.TRANSIT);
     }
 
-    for (AllowedTransitMode allowedTransitMode : reqModes) {
-      Collection<AllowedTransitMode> allowedTransitModes = Set.of(allowedTransitMode);
+    for (TransitMode it : transitModes) {
       for (ApiRequestMode apiCandidate : ApiRequestMode.values()) {
-        if (allowedTransitModes.equals(apiCandidate.getTransitModes())) {
+        if (apiCandidate.getTransitModes().contains(it)) {
           result.add(apiCandidate);
         }
       }

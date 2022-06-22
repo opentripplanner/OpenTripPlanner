@@ -35,8 +35,8 @@ public class NetexMapperIndexes {
       this.stationsByMultiModalStationRfs = ArrayListMultimap.create();
       this.stopTimesByNetexId = new HashMap<>();
     } else {
-      // Cashed by level(shared files, shared group files and group files). If any entries exist at the current
-      // level, then they will hide entries at a higher level.
+      // Cached by level(shared files, shared group files and group files). If any entries exist at
+      // the current level, then they will hide entries at a higher level.
       this.datedServiceJourneysBySjId =
         index.getDatedServiceJourneys().localKeys().isEmpty()
           ? parent.datedServiceJourneysBySjId
@@ -66,7 +66,7 @@ public class NetexMapperIndexes {
 
   /**
    * This is needed to assign a notice to a stop time. It is not part of the target
-   * OTPTransitService, so we need to temporally cash this here.
+   * OTPTransitService, so we need to temporally cache this here.
    */
   public Map<String, StopTime> getStopTimesByNetexId() {
     return stopTimesByNetexId;

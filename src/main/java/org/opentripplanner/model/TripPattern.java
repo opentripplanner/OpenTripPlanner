@@ -32,6 +32,7 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -282,10 +283,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
    */
   public TransitMode getMode() {
     return route.getMode();
-  }
-
-  public String getNetexSubmode() {
-    return route.getNetexSubmode();
   }
 
   public LineString getHopGeometry(int stopPosInPattern) {
@@ -664,11 +661,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return tripTimes.getHeadsign(stopIndex);
   }
 
-  public boolean matchesModeOrSubMode(TransitMode mode, String transportSubmode) {
-    return (
-      getMode().equals(mode) ||
-      (getNetexSubmode() != null && getNetexSubmode().equals(transportSubmode))
-    );
+  public boolean matchesModeOrSubMode(TransitMode mode, SubMode transportSubmode) {
+    return getMode().equals(mode) || route.getNetexSubmode().equals(transportSubmode);
   }
 
   /**
