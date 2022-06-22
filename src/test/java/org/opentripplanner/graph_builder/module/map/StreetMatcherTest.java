@@ -130,7 +130,6 @@ public class StreetMatcherTest {
       );
     match = matcher.match(geometry);
     assertNotNull(match);
-    System.out.println(match);
     assertEquals(4, match.size());
     assertEquals("ballard_20th", match.get(3).getToVertex().getLabel());
   }

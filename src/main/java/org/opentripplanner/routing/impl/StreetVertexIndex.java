@@ -173,10 +173,13 @@ public class StreetVertexIndex {
     List<Edge> edges = edgeTree.query(envelope);
     for (Iterator<Edge> ie = edges.iterator(); ie.hasNext();) {
       Edge e = ie.next();
-      Envelope eenv = edgeGeometryOrStraightLine(e).getEnvelopeInternal();
-      //Envelope eenv = e.getEnvelope();
-      if (!envelope.intersects(eenv)) {
+      if (e.getToVertex() == null || e.getFromVertex() == null) {
         ie.remove();
+      } else {
+        Envelope eenv = edgeGeometryOrStraightLine(e).getEnvelopeInternal();
+        if (!envelope.intersects(eenv)) {
+          ie.remove();
+        }
       }
     }
     return edges;

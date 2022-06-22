@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -48,7 +48,8 @@ public class LinkStopToPlatformTest {
     vertices.add(new IntersectionVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
 
     AreaEdgeList areaEdgeList = new AreaEdgeList(
-      GeometryUtils.getGeometryFactory().createPolygon()
+      GeometryUtils.getGeometryFactory().createPolygon(),
+      Set.of()
     );
 
     ArrayList<AreaEdge> edges = new ArrayList<>();
@@ -114,7 +115,6 @@ public class LinkStopToPlatformTest {
     LineString line = geometryFactory.createLineString(
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
-    double length = SphericalDistanceLibrary.distance(v1.getCoordinate(), v2.getCoordinate());
     I18NString name = new LocalizedString(nameString, new OSMWithTags());
 
     return new AreaEdge(
