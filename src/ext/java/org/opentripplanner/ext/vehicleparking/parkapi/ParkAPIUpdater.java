@@ -20,11 +20,15 @@ import org.opentripplanner.updater.GenericJsonDataSource;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Vehicle parking updater class for https://github.com/offenesdresden/ParkAPI format APIs.
  */
 abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ParkAPIUpdater.class);
 
   private static final String JSON_PARSE_PATH = "lots";
 
@@ -97,7 +101,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       .state(state)
       .x(x)
       .y(y)
-      .openingHoursCalendar(parseOpeningHours(jsonNode.path("opening_hours")))
+      .openingHoursCalendar(parseOpeningHours(jsonNode.path("opening_hours"), vehicleParkId))
       // TODO
       // .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))
       .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
@@ -151,7 +155,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     return spaces != null && spaces > 0;
   }
 
-  private OHCalendar parseOpeningHours(JsonNode jsonNode) {
+  private OHCalendar parseOpeningHours(JsonNode jsonNode, FeedScopedId id) {
     if (jsonNode == null || jsonNode.asText().isBlank()) {
       return null;
     }
@@ -159,6 +163,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     try {
       return osmOpeningHoursParser.parseOpeningHours(jsonNode.asText());
     } catch (OpeningHoursParseException e) {
+      LOG.info("Parsing of opening hours failed for park {}, it is now always open:\n{}", id, e);
       return null;
     }
   }
