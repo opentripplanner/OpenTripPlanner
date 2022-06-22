@@ -5,11 +5,13 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -19,24 +21,19 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class StreetLeg implements Leg {
 
   private final TraverseMode mode;
-
   private final ZonedDateTime startTime;
-
   private final ZonedDateTime endTime;
-
   private final double distanceMeters;
-
   private final Place from;
-
   private final Place to;
+  private final int generalizedCost;
+  private final Double elevationLost;
+  private final Double elevationGained;
 
   private final LineString legGeometry;
   private final List<WalkStep> walkSteps;
   private final Set<StreetNote> streetNotes = new HashSet<>();
-  private final int generalizedCost;
   private final List<P2<Double>> legElevation;
-  private Double elevationLost = null;
-  private Double elevationGained = null;
 
   private FeedScopedId pathwayId;
   private Boolean walkingBike;
@@ -63,15 +60,16 @@ public class StreetLeg implements Leg {
     this.mode = mode;
     this.startTime = startTime;
     this.endTime = endTime;
-    this.distanceMeters = distanceMeters;
+    this.distanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
     this.from = from;
     this.to = to;
     this.generalizedCost = generalizedCost;
-    this.legElevation = elevation;
+    this.legElevation = normalizeElevation(elevation);
     this.legGeometry = geometry;
     this.walkSteps = walkSteps;
 
-    updateElevationChanges();
+    this.elevationGained = calculateElevationGained(legElevation);
+    this.elevationLost = calculateElevationLost(legElevation);
   }
 
   @Override
@@ -244,27 +242,46 @@ public class StreetLeg implements Leg {
       .toString();
   }
 
-  private void updateElevationChanges() {
-    if (legElevation != null) {
-      double elevationGained = 0.0;
-      double elevationLost = 0.0;
+  private static Double calculateElevationGained(List<P2<Double>> legElevation) {
+    return calculateElevationChange(legElevation, v -> v > 0.0);
+  }
 
-      Double lastElevation = null;
-      for (final P2<Double> p2 : legElevation) {
-        double elevation = p2.second;
-        if (lastElevation != null) {
-          double change = elevation - lastElevation;
-          if (change > 0) {
-            elevationGained += change;
-          } else if (change < 0) {
-            elevationLost -= change;
-          }
-        }
-        lastElevation = elevation;
-      }
+  private static Double calculateElevationLost(List<P2<Double>> legElevation) {
+    return calculateElevationChange(legElevation, v -> v < 0.0);
+  }
 
-      this.elevationGained = elevationGained;
-      this.elevationLost = elevationLost;
+  private static Double calculateElevationChange(
+    List<P2<Double>> legElevation,
+    Predicate<Double> elevationFilter
+  ) {
+    if (legElevation == null) {
+      return null;
     }
+    double sum = 0.0;
+    Double lastElevation = null;
+
+    for (final P2<Double> p2 : legElevation) {
+      double elevation = p2.second;
+      if (lastElevation != null) {
+        double change = elevation - lastElevation;
+        if (elevationFilter.test(change)) {
+          sum += Math.abs(change);
+        }
+      }
+      lastElevation = elevation;
+    }
+
+    return DoubleUtils.roundTo2Decimals(sum);
+  }
+
+  static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
+    return elevation == null
+      ? null
+      : elevation
+        .stream()
+        .map(it ->
+          new P2<>(DoubleUtils.roundTo2Decimals(it.first), DoubleUtils.roundTo2Decimals(it.second))
+        )
+        .toList();
   }
 }

@@ -157,7 +157,7 @@ public class TransitRouter {
 
       // Decorate the Itineraries with fare information.
       if (fareService != null) {
-        itinerary.fare = fareService.getCost(itinerary);
+        itinerary.setFare(fareService.getCost(itinerary));
       }
 
       itineraries.add(itinerary);

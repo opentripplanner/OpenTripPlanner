@@ -74,7 +74,7 @@ class ItineraryResultMapper {
   public static String details(Itinerary itin) {
     PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
 
-    for (Leg leg : itin.legs) {
+    for (Leg leg : itin.getLegs()) {
       Optional
         .ofNullable(leg.getFrom().stop)
         .map(ItineraryResultMapper::formatStop)
@@ -116,7 +116,7 @@ class ItineraryResultMapper {
     Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
     List<String> stops = new ArrayList<>();
 
-    for (Leg it : itinerary.legs) {
+    for (Leg it : itinerary.getLegs()) {
       if (it.isTransitLeg()) {
         agencies.add(agencyShortName(it.getAgency()));
         routes.add(it.getRoute().getName());
@@ -129,10 +129,11 @@ class ItineraryResultMapper {
 
     return new Result(
       testCaseId,
-      itinerary.nTransfers,
-      itinerary.durationSeconds,
-      itinerary.generalizedCost,
-      itinerary.legs
+      itinerary.getNumberOfTransfers(),
+      itinerary.getDurationSeconds(),
+      itinerary.getGeneralizedCost(),
+      itinerary
+        .getLegs()
         .stream()
         .filter(Leg::isWalkingLeg)
         .mapToInt(l -> (int) Math.round(l.getDistanceMeters()))

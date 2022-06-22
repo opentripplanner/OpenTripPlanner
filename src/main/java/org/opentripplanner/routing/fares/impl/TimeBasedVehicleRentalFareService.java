@@ -34,7 +34,8 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
 
   @Override
   public Fare getCost(Itinerary itinerary) {
-    var totalCost = itinerary.legs
+    var totalCost = itinerary
+      .getLegs()
       .stream()
       .filter(l -> l.getRentedVehicle())
       .mapToInt(this::getLegCost)

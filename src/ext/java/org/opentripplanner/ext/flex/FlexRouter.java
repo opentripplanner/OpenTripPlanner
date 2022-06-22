@@ -136,7 +136,7 @@ public class FlexRouter {
           if (itinerary != null) {
             var fareService = graph.getService(FareService.class);
             if (fareService != null) {
-              itinerary.fare = fareService.getCost(itinerary);
+              itinerary.setFare(fareService.getCost(itinerary));
             }
             itineraries.add(itinerary);
           }

@@ -31,17 +31,17 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
   public void filterAwayLongTravelTimeWithoutWaitTime() {
     // Given: a walk itinerary with high cost - do not have any effect on filtering
     Itinerary walk = newItinerary(A, 6).walk(1, E).build();
-    walk.generalizedCost = 300;
+    walk.setGeneralizedCost(300);
 
     // Given: a bicycle itinerary with low cost - transit with higher cost is removed
     Itinerary bicycle = newItinerary(A).bicycle(6, 8, E).build();
-    bicycle.generalizedCost = 200;
+    bicycle.setGeneralizedCost(200);
 
     Itinerary i1 = newItinerary(A).bus(21, 6, 8, E).build();
-    i1.generalizedCost = 199;
+    i1.setGeneralizedCost(199);
 
     Itinerary i2 = newItinerary(A).bus(31, 6, 8, E).build();
-    i2.generalizedCost = 200;
+    i2.setGeneralizedCost(200);
 
     // When:
     List<Itinerary> result = DeletionFlaggerTestHelper.process(

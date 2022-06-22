@@ -24,9 +24,9 @@ public class SortOnGeneralizedCostTest implements PlanTestConstants {
     Itinerary rail = newItinerary(A).rail(110, 0, 20, E).build();
 
     // Add some cost - we prioritize walking
-    walk.generalizedCost = 600;
-    bus.generalizedCost = 600 + 2;
-    rail.generalizedCost = 600 + 1;
+    walk.setGeneralizedCost(600);
+    bus.setGeneralizedCost(600 + 2);
+    rail.setGeneralizedCost(600 + 1);
 
     // When: sorting
     result =
@@ -50,9 +50,9 @@ public class SortOnGeneralizedCostTest implements PlanTestConstants {
       .build();
 
     // Add some cost - we prioritize bus with the lowest cost
-    walk.generalizedCost = 300;
-    bus1.generalizedCost = 300;
-    bus2.generalizedCost = 300;
+    walk.setGeneralizedCost(300);
+    bus1.setGeneralizedCost(300);
+    bus2.setGeneralizedCost(300);
 
     // When: sorting
     result =
