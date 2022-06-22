@@ -27,131 +27,174 @@ public class StreetLegBuilder {
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
   private Float accessibilityScore;
-
   private Set<StreetNote> streetNotes = new HashSet<>();
+
+  protected StreetLegBuilder() {}
 
   public static StreetLegBuilder of(StreetLeg leg) {
     return new StreetLegBuilder()
-      .setMode(leg.getMode())
-      .setStartTime(leg.getStartTime())
-      .setEndTime(leg.getEndTime())
-      .setFrom(leg.getFrom())
-      .setTo(leg.getTo())
-      .setDistanceMeters(leg.getDistanceMeters())
-      .setGeneralizedCost(leg.getGeneralizedCost())
-      .setGeometry(leg.getLegGeometry())
-      .setElevation(leg.getLegElevation())
-      .setWalkSteps(leg.getWalkSteps())
-      .setPathwayId(leg.getPathwayId())
-      .setWalkingBike(leg.getWalkingBike())
-      .setRentedVehicle(leg.getRentedVehicle())
-      .setVehicleRentalNetwork(leg.getVehicleRentalNetwork())
-      .setAccessibilityScore(leg.accessibilityScore())
-      .setStreetNotes(leg.getStreetNotes());
+      .withMode(leg.getMode())
+      .withStartTime(leg.getStartTime())
+      .withEndTime(leg.getEndTime())
+      .withFrom(leg.getFrom())
+      .withTo(leg.getTo())
+      .withDistanceMeters(leg.getDistanceMeters())
+      .withGeneralizedCost(leg.getGeneralizedCost())
+      .withGeometry(leg.getLegGeometry())
+      .withElevation(leg.getLegElevation())
+      .withWalkSteps(leg.getWalkSteps())
+      .withPathwayId(leg.getPathwayId())
+      .withWalkingBike(leg.getWalkingBike())
+      .withRentedVehicle(leg.getRentedVehicle())
+      .withVehicleRentalNetwork(leg.getVehicleRentalNetwork())
+      .withAccessibilityScore(leg.accessibilityScore())
+      .withStreetNotes(leg.getStreetNotes());
   }
 
   public StreetLeg build() {
-    return new StreetLeg(
-      mode,
-      startTime,
-      endTime,
-      from,
-      to,
-      distanceMeters,
-      generalizedCost,
-      geometry,
-      elevation,
-      walkSteps,
-      streetNotes,
-      pathwayId,
-      walkingBike,
-      rentedVehicle,
-      vehicleRentalNetwork,
-      accessibilityScore
-    );
+    return new StreetLeg(this);
   }
 
-  public StreetLegBuilder setMode(TraverseMode mode) {
+  public TraverseMode getMode() {
+    return mode;
+  }
+
+  public ZonedDateTime getStartTime() {
+    return startTime;
+  }
+
+  public ZonedDateTime getEndTime() {
+    return endTime;
+  }
+
+  public Place getFrom() {
+    return from;
+  }
+
+  public Place getTo() {
+    return to;
+  }
+
+  public double getDistanceMeters() {
+    return distanceMeters;
+  }
+
+  public int getGeneralizedCost() {
+    return generalizedCost;
+  }
+
+  public LineString getGeometry() {
+    return geometry;
+  }
+
+  public List<P2<Double>> getElevation() {
+    return elevation;
+  }
+
+  public List<WalkStep> getWalkSteps() {
+    return walkSteps;
+  }
+
+  public FeedScopedId getPathwayId() {
+    return pathwayId;
+  }
+
+  public Boolean getWalkingBike() {
+    return walkingBike;
+  }
+
+  public Boolean getRentedVehicle() {
+    return rentedVehicle;
+  }
+
+  public String getVehicleRentalNetwork() {
+    return vehicleRentalNetwork;
+  }
+
+  public Float getAccessibilityScore() {
+    return accessibilityScore;
+  }
+
+  public Set<StreetNote> getStreetNotes() {
+    return streetNotes;
+  }
+
+  public StreetLegBuilder withMode(TraverseMode mode) {
     this.mode = mode;
     return this;
   }
 
-  public StreetLegBuilder setStartTime(ZonedDateTime startTime) {
+  public StreetLegBuilder withStartTime(ZonedDateTime startTime) {
     this.startTime = startTime;
     return this;
   }
 
-  public StreetLegBuilder setEndTime(ZonedDateTime endTime) {
+  public StreetLegBuilder withEndTime(ZonedDateTime endTime) {
     this.endTime = endTime;
     return this;
   }
 
-  public StreetLegBuilder setFrom(Place from) {
+  public StreetLegBuilder withFrom(Place from) {
     this.from = from;
     return this;
   }
 
-  public StreetLegBuilder setTo(Place to) {
+  public StreetLegBuilder withTo(Place to) {
     this.to = to;
     return this;
   }
 
-  public StreetLegBuilder setDistanceMeters(double distanceMeters) {
+  public StreetLegBuilder withDistanceMeters(double distanceMeters) {
     this.distanceMeters = distanceMeters;
     return this;
   }
 
-  public StreetLegBuilder setGeneralizedCost(int generalizedCost) {
+  public StreetLegBuilder withGeneralizedCost(int generalizedCost) {
     this.generalizedCost = generalizedCost;
     return this;
   }
 
-  public StreetLegBuilder setGeometry(LineString geometry) {
+  public StreetLegBuilder withGeometry(LineString geometry) {
     this.geometry = geometry;
     return this;
   }
 
-  public StreetLegBuilder setElevation(List<P2<Double>> elevation) {
+  public StreetLegBuilder withElevation(List<P2<Double>> elevation) {
     this.elevation = elevation;
     return this;
   }
 
-  public StreetLegBuilder setWalkSteps(List<WalkStep> walkSteps) {
+  public StreetLegBuilder withWalkSteps(List<WalkStep> walkSteps) {
     this.walkSteps = walkSteps;
     return this;
   }
 
-  public StreetLegBuilder setPathwayId(FeedScopedId pathwayId) {
+  public StreetLegBuilder withPathwayId(FeedScopedId pathwayId) {
     this.pathwayId = pathwayId;
     return this;
   }
 
-  public StreetLegBuilder setWalkingBike(Boolean walkingBike) {
+  public StreetLegBuilder withWalkingBike(Boolean walkingBike) {
     this.walkingBike = walkingBike;
     return this;
   }
 
-  public StreetLegBuilder setRentedVehicle(Boolean rentedVehicle) {
+  public StreetLegBuilder withRentedVehicle(Boolean rentedVehicle) {
     this.rentedVehicle = rentedVehicle;
     return this;
   }
 
-  public StreetLegBuilder setVehicleRentalNetwork(String vehicleRentalNetwork) {
+  public StreetLegBuilder withVehicleRentalNetwork(String vehicleRentalNetwork) {
     this.vehicleRentalNetwork = vehicleRentalNetwork;
     return this;
   }
 
-  public StreetLegBuilder setAccessibilityScore(Float accessibilityScore) {
+  public StreetLegBuilder withAccessibilityScore(Float accessibilityScore) {
     this.accessibilityScore = accessibilityScore;
     return this;
   }
 
-  public StreetLegBuilder addStreetNote(StreetNote note) {
-    this.streetNotes.add(note);
-    return this;
-  }
-
-  public StreetLegBuilder setStreetNotes(Set<StreetNote> notes) {
+  public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
     streetNotes = new HashSet<>();
     streetNotes.addAll(notes);
     return this;

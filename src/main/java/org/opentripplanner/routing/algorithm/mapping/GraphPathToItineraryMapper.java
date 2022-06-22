@@ -45,8 +45,8 @@ import org.opentripplanner.util.OTPFeature;
 /**
  * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
  * OTP APIs. This only produces itineraries for non-transit searches, as well as the non-transit
- * parts of itineraries containing transit, while the whole transit itinerary is produced by {@link
- * RaptorPathToItineraryMapper}.
+ * parts of itineraries containing transit, while the whole transit itinerary is produced by
+ * {@link RaptorPathToItineraryMapper}.
  */
 public class GraphPathToItineraryMapper {
 
@@ -216,7 +216,7 @@ public class GraphPathToItineraryMapper {
   private static StreetLegBuilder setPathwayInfo(StreetLegBuilder leg, List<State> legStates) {
     for (State legsState : legStates) {
       if (legsState.getBackEdge() instanceof PathwayEdge pe) {
-        leg.setPathwayId(pe.getId());
+        leg.withPathwayId(pe.getId());
       }
     }
     return leg;
@@ -409,24 +409,25 @@ public class GraphPathToItineraryMapper {
 
     State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
-    StreetLegBuilder leg = new StreetLegBuilder()
-      .setMode(resolveMode(states))
-      .setStartTime(startTimeState.getTime().atZone(timeZone))
-      .setEndTime(lastState.getTime().atZone(timeZone))
-      .setFrom(makePlace(firstState))
-      .setTo(makePlace(lastState))
-      .setDistanceMeters(distanceMeters)
-      .setGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
-      .setGeometry(geometry)
-      .setElevation(makeElevation(edges, firstState.getOptions().geoidElevation))
-      .setWalkSteps(walkSteps)
-      .setRentedVehicle(firstState.isRentingVehicle())
-      .setWalkingBike(false);
+    StreetLegBuilder leg = StreetLeg
+      .create()
+      .withMode(resolveMode(states))
+      .withStartTime(startTimeState.getTime().atZone(timeZone))
+      .withEndTime(lastState.getTime().atZone(timeZone))
+      .withFrom(makePlace(firstState))
+      .withTo(makePlace(lastState))
+      .withDistanceMeters(distanceMeters)
+      .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
+      .withGeometry(geometry)
+      .withElevation(makeElevation(edges, firstState.getOptions().geoidElevation))
+      .withWalkSteps(walkSteps)
+      .withRentedVehicle(firstState.isRentingVehicle())
+      .withWalkingBike(false);
 
     if (firstState.isRentingVehicle()) {
       String vehicleRentalNetwork = firstState.getVehicleRentalNetwork();
       if (vehicleRentalNetwork != null) {
-        leg.setVehicleRentalNetwork(vehicleRentalNetwork);
+        leg.withVehicleRentalNetwork(vehicleRentalNetwork);
       }
     }
 
@@ -448,9 +449,7 @@ public class GraphPathToItineraryMapper {
       Set<StreetNote> streetNotes = streetNotesService.getNotes(state);
 
       if (streetNotes != null) {
-        for (StreetNote streetNote : streetNotes) {
-          leg.addStreetNote(streetNote);
-        }
+        leg.withStreetNotes(streetNotes);
       }
     }
     return leg;

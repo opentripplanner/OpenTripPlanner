@@ -117,7 +117,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost);
     var leg = ((StreetLeg) this.legs.get(0));
-    var updatedLeg = StreetLegBuilder.of(leg).setRentedVehicle(true).build();
+    var updatedLeg = StreetLegBuilder.of(leg).withRentedVehicle(true).build();
     this.legs.add(0, updatedLeg);
     return this;
   }
@@ -318,15 +318,16 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
-    StreetLeg leg = new StreetLegBuilder()
-      .setMode(mode)
-      .setStartTime(newTime(startTime))
-      .setEndTime(newTime(endTime))
-      .setFrom(stop(lastPlace))
-      .setTo(stop(to))
-      .setDistanceMeters(speed(mode) * (endTime - startTime))
-      .setGeneralizedCost(legCost)
-      .setWalkSteps(List.of())
+    StreetLeg leg = StreetLeg
+      .create()
+      .withMode(mode)
+      .withStartTime(newTime(startTime))
+      .withEndTime(newTime(endTime))
+      .withFrom(stop(lastPlace))
+      .withTo(stop(to))
+      .withDistanceMeters(speed(mode) * (endTime - startTime))
+      .withGeneralizedCost(legCost)
+      .withWalkSteps(List.of())
       .build();
 
     legs.add(leg);

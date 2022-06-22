@@ -42,49 +42,34 @@ public class StreetLeg implements Leg {
 
   private final Float accessibilityScore;
 
-  public StreetLeg(
-    TraverseMode mode,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime,
-    Place from,
-    Place to,
-    double distanceMeters,
-    int generalizedCost,
-    LineString geometry,
-    List<P2<Double>> elevation,
-    List<WalkStep> walkSteps,
-    Set<StreetNote> streetNotes,
-    FeedScopedId pathwayId,
-    Boolean walkingBike,
-    Boolean rentedVehicle,
-    String vehicleRentalNetwork,
-    Float accessibilityScore
-  ) {
-    if (mode.isTransit()) {
+  public StreetLeg(StreetLegBuilder builder) {
+    if (builder.getMode().isTransit()) {
       throw new IllegalArgumentException(
         "To create a transit leg use the other classes implementing Leg."
       );
     }
-    this.mode = mode;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.distanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
-    this.from = from;
-    this.to = to;
-    this.generalizedCost = generalizedCost;
-    this.legElevation = normalizeElevation(elevation);
-    this.legGeometry = geometry;
-    this.walkSteps = walkSteps;
-
+    this.mode = builder.getMode();
+    this.startTime = builder.getStartTime();
+    this.endTime = builder.getEndTime();
+    this.distanceMeters = DoubleUtils.roundTo2Decimals(builder.getDistanceMeters());
+    this.from = builder.getFrom();
+    this.to = builder.getTo();
+    this.generalizedCost = builder.getGeneralizedCost();
+    this.legElevation = normalizeElevation(builder.getElevation());
+    this.legGeometry = builder.getGeometry();
+    this.walkSteps = builder.getWalkSteps();
     this.elevationGained = calculateElevationGained(legElevation);
     this.elevationLost = calculateElevationLost(legElevation);
+    this.streetNotes = Set.copyOf(builder.getStreetNotes());
+    this.pathwayId = builder.getPathwayId();
+    this.walkingBike = builder.getWalkingBike();
+    this.rentedVehicle = builder.getRentedVehicle();
+    this.vehicleRentalNetwork = builder.getVehicleRentalNetwork();
+    this.accessibilityScore = builder.getAccessibilityScore();
+  }
 
-    this.streetNotes = Set.copyOf(streetNotes);
-    this.pathwayId = pathwayId;
-    this.walkingBike = walkingBike;
-    this.rentedVehicle = rentedVehicle;
-    this.vehicleRentalNetwork = vehicleRentalNetwork;
-    this.accessibilityScore = accessibilityScore;
+  public static StreetLegBuilder create() {
+    return new StreetLegBuilder();
   }
 
   @Override
@@ -197,13 +182,13 @@ public class StreetLeg implements Leg {
   public Leg withTimeShift(Duration duration) {
     return StreetLegBuilder
       .of(this)
-      .setStartTime(startTime.plus(duration))
-      .setEndTime(endTime.plus(duration))
+      .withStartTime(startTime.plus(duration))
+      .withEndTime(endTime.plus(duration))
       .build();
   }
 
   public StreetLeg withAccessibilityScore(float accessibilityScore) {
-    return StreetLegBuilder.of(this).setAccessibilityScore(accessibilityScore).build();
+    return StreetLegBuilder.of(this).withAccessibilityScore(accessibilityScore).build();
   }
 
   /**
@@ -231,6 +216,17 @@ public class StreetLeg implements Leg {
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
       .toString();
+  }
+
+  static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
+    return elevation == null
+      ? null
+      : elevation
+        .stream()
+        .map(it ->
+          new P2<>(DoubleUtils.roundTo2Decimals(it.first), DoubleUtils.roundTo2Decimals(it.second))
+        )
+        .toList();
   }
 
   private static Double calculateElevationGained(List<P2<Double>> legElevation) {
@@ -263,16 +259,5 @@ public class StreetLeg implements Leg {
     }
 
     return DoubleUtils.roundTo2Decimals(sum);
-  }
-
-  static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
-    return elevation == null
-      ? null
-      : elevation
-        .stream()
-        .map(it ->
-          new P2<>(DoubleUtils.roundTo2Decimals(it.first), DoubleUtils.roundTo2Decimals(it.second))
-        )
-        .toList();
   }
 }
