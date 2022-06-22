@@ -24,7 +24,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
-public class TestStreetMatcher {
+public class StreetMatcherTest {
 
   static GeometryFactory gf = new GeometryFactory();
 
@@ -130,7 +130,6 @@ public class TestStreetMatcher {
       );
     match = matcher.match(geometry);
     assertNotNull(match);
-    System.out.println(match);
     assertEquals(4, match.size());
     assertEquals("ballard_20th", match.get(3).getToVertex().getLabel());
   }
