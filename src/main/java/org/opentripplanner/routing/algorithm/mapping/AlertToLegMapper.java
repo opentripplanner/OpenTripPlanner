@@ -151,14 +151,6 @@ public class AlertToLegMapper {
   }
 
   private Collection<TransitAlert> getAlertsForStopAndRoute(Stop stop, FeedScopedId routeId) {
-    return getAlertsForStopAndRoute(stop, routeId, true);
-  }
-
-  private Collection<TransitAlert> getAlertsForStopAndRoute(
-    Stop stop,
-    FeedScopedId routeId,
-    boolean checkParentStop
-  ) {
     if (stop == null) {
       return new ArrayList<>();
     }
@@ -166,45 +158,43 @@ public class AlertToLegMapper {
       stop.getId(),
       routeId
     );
-    if (checkParentStop) {
-      if (alertsForStopAndRoute == null) {
-        alertsForStopAndRoute = new HashSet<>();
+    if (alertsForStopAndRoute == null) {
+      alertsForStopAndRoute = new HashSet<>();
+    }
+
+    if (stop.isPartOfStation()) {
+      //Also check parent
+      final Station parentStation = stop.getParentStation();
+      Collection<TransitAlert> alerts = transitAlertService.getStopAndRouteAlerts(
+        parentStation.getId(),
+        routeId
+      );
+      if (alerts != null) {
+        alertsForStopAndRoute.addAll(alerts);
       }
 
-      if (stop.isPartOfStation()) {
-        //Also check parent
-        final Station parentStation = stop.getParentStation();
-        Collection<TransitAlert> alerts = transitAlertService.getStopAndRouteAlerts(
-          parentStation.getId(),
-          routeId
-        );
-        if (alerts != null) {
-          alertsForStopAndRoute.addAll(alerts);
-        }
-
-        // ...and siblings - platform may have been changed
-        for (var siblingStop : parentStation.getChildStops()) {
-          if (!stop.getId().equals(siblingStop.getId())) {
-            Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAndRouteAlerts(
-              parentStation.getId(),
-              routeId
-            );
-            if (siblingAlerts != null) {
-              alertsForStopAndRoute.addAll(siblingAlerts);
-            }
-          }
-        }
-
-        // Also check multimodal parent
-        MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
-        if (multiModalStation != null) {
-          Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAndRouteAlerts(
-            multiModalStation.getId(),
+      // ...and siblings - platform may have been changed
+      for (var siblingStop : parentStation.getChildStops()) {
+        if (!stop.getId().equals(siblingStop.getId())) {
+          Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAndRouteAlerts(
+            parentStation.getId(),
             routeId
           );
-          if (multimodalStopAlerts != null) {
-            alertsForStopAndRoute.addAll(multimodalStopAlerts);
+          if (siblingAlerts != null) {
+            alertsForStopAndRoute.addAll(siblingAlerts);
           }
+        }
+      }
+
+      // Also check multimodal parent
+      MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+      if (multiModalStation != null) {
+        Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAndRouteAlerts(
+          multiModalStation.getId(),
+          routeId
+        );
+        if (multimodalStopAlerts != null) {
+          alertsForStopAndRoute.addAll(multimodalStopAlerts);
         }
       }
     }
@@ -217,23 +207,17 @@ public class AlertToLegMapper {
     ServiceDate serviceDate
   ) {
     // Finding alerts for ServiceDate
-    final Collection<TransitAlert> alerts = getAlertsForStopAndTrip(
-      stop,
-      tripId,
-      true,
-      serviceDate
-    );
+    final Collection<TransitAlert> alerts = getAlertsForStopTripAndDate(stop, tripId, serviceDate);
 
     // Finding alerts for any date
-    alerts.addAll(getAlertsForStopAndTrip(stop, tripId, true, null));
+    alerts.addAll(getAlertsForStopTripAndDate(stop, tripId, null));
 
     return alerts;
   }
 
-  private Collection<TransitAlert> getAlertsForStopAndTrip(
+  private Collection<TransitAlert> getAlertsForStopTripAndDate(
     Stop stop,
     FeedScopedId tripId,
-    boolean checkParentStop,
     ServiceDate serviceDate
   ) {
     if (stop == null) {
@@ -245,99 +229,91 @@ public class AlertToLegMapper {
       tripId,
       serviceDate
     );
-    if (checkParentStop) {
-      if (alertsForStopAndTrip == null) {
-        alertsForStopAndTrip = new HashSet<>();
+    if (alertsForStopAndTrip == null) {
+      alertsForStopAndTrip = new HashSet<>();
+    }
+    if (stop.isPartOfStation()) {
+      // Also check parent
+      final Station parentStation = stop.getParentStation();
+      Collection<TransitAlert> alerts = transitAlertService.getStopAndTripAlerts(
+        parentStation.getId(),
+        tripId,
+        serviceDate
+      );
+      if (alerts != null) {
+        alertsForStopAndTrip.addAll(alerts);
       }
-      if (stop.isPartOfStation()) {
-        // Also check parent
-        final Station parentStation = stop.getParentStation();
-        Collection<TransitAlert> alerts = transitAlertService.getStopAndTripAlerts(
-          parentStation.getId(),
-          tripId,
-          serviceDate
-        );
-        if (alerts != null) {
-          alertsForStopAndTrip.addAll(alerts);
-        }
 
-        // ...and siblings - platform may have been changed
-        for (var siblingStop : parentStation.getChildStops()) {
-          if (!stop.getId().equals(siblingStop.getId())) {
-            Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAndTripAlerts(
-              parentStation.getId(),
-              tripId,
-              serviceDate
-            );
-            if (siblingAlerts != null) {
-              alertsForStopAndTrip.addAll(siblingAlerts);
-            }
-          }
-        }
-
-        // Also check multimodal parent
-        MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
-        if (multiModalStation != null) {
-          Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAndTripAlerts(
-            multiModalStation.getId(),
+      // ...and siblings - platform may have been changed
+      for (var siblingStop : parentStation.getChildStops()) {
+        if (!stop.getId().equals(siblingStop.getId())) {
+          Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAndTripAlerts(
+            parentStation.getId(),
             tripId,
             serviceDate
           );
-          if (multimodalStopAlerts != null) {
-            alertsForStopAndTrip.addAll(multimodalStopAlerts);
+          if (siblingAlerts != null) {
+            alertsForStopAndTrip.addAll(siblingAlerts);
           }
+        }
+      }
+
+      // Also check multimodal parent
+      MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+      if (multiModalStation != null) {
+        Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAndTripAlerts(
+          multiModalStation.getId(),
+          tripId,
+          serviceDate
+        );
+        if (multimodalStopAlerts != null) {
+          alertsForStopAndTrip.addAll(multimodalStopAlerts);
         }
       }
     }
     return alertsForStopAndTrip;
   }
 
-  private Collection<TransitAlert> getAlertsForStop(Stop stopId) {
-    return getAlertsForStop(stopId, true);
-  }
-
-  private Collection<TransitAlert> getAlertsForStop(Stop stop, boolean checkParentStop) {
+  private Collection<TransitAlert> getAlertsForStop(Stop stop) {
     if (stop == null) {
       return new ArrayList<>();
     }
 
     Collection<TransitAlert> alertsForStop = transitAlertService.getStopAlerts(stop.getId());
-    if (checkParentStop) {
-      if (alertsForStop == null) {
-        alertsForStop = new HashSet<>();
+    if (alertsForStop == null) {
+      alertsForStop = new HashSet<>();
+    }
+
+    if (stop.isPartOfStation()) {
+      // Also check parent
+      final Station parentStation = stop.getParentStation();
+      Collection<TransitAlert> parentStopAlerts = transitAlertService.getStopAlerts(
+        parentStation.getId()
+      );
+      if (parentStopAlerts != null) {
+        alertsForStop.addAll(parentStopAlerts);
       }
 
-      if (stop.isPartOfStation()) {
-        // Also check parent
-        final Station parentStation = stop.getParentStation();
-        Collection<TransitAlert> parentStopAlerts = transitAlertService.getStopAlerts(
-          parentStation.getId()
-        );
-        if (parentStopAlerts != null) {
-          alertsForStop.addAll(parentStopAlerts);
-        }
-
-        // ...and siblings - platform may have been changed
-        for (var siblingStop : parentStation.getChildStops()) {
-          if (!stop.getId().equals(siblingStop.getId())) {
-            Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAlerts(
-              parentStation.getId()
-            );
-            if (siblingAlerts != null) {
-              alertsForStop.addAll(siblingAlerts);
-            }
-          }
-        }
-
-        // Also check multimodal parent
-        MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
-        if (multiModalStation != null) {
-          Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAlerts(
-            multiModalStation.getId()
+      // ...and siblings - platform may have been changed
+      for (var siblingStop : parentStation.getChildStops()) {
+        if (!stop.getId().equals(siblingStop.getId())) {
+          Collection<TransitAlert> siblingAlerts = transitAlertService.getStopAlerts(
+            parentStation.getId()
           );
-          if (multimodalStopAlerts != null) {
-            alertsForStop.addAll(multimodalStopAlerts);
+          if (siblingAlerts != null) {
+            alertsForStop.addAll(siblingAlerts);
           }
+        }
+      }
+
+      // Also check multimodal parent
+      MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+      if (multiModalStation != null) {
+        Collection<TransitAlert> multimodalStopAlerts = transitAlertService.getStopAlerts(
+          multiModalStation.getId()
+        );
+        if (multimodalStopAlerts != null) {
+          alertsForStop.addAll(multimodalStopAlerts);
         }
       }
     }
