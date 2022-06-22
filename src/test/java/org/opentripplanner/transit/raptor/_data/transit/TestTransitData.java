@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
@@ -87,7 +88,10 @@ public class TestTransitData
 
   @Override
   public CostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
-    return new DefaultCostCalculator<>(costParamsBuilder.build(), stopBoarAlightCost());
+    return CostCalculatorFactory.createCostCalculator(
+      costParamsBuilder.build(),
+      stopBoarAlightCost()
+    );
   }
 
   @Override
