@@ -27,7 +27,7 @@ public class ParkAPIUpdaterTest {
     var updater = new CarParkAPIUpdater(
       parameters,
       openingHoursCalendarService,
-      ZoneId.of("Europe/Paris")
+      ZoneId.of("Europe/Berlin")
     );
 
     assertTrue(updater.update());
@@ -38,7 +38,7 @@ public class ParkAPIUpdaterTest {
     var first = parkingLots.get(0);
     assertEquals("Parkplatz Alenberghalle", first.getName().toString());
     assertEquals(
-      "OHCalendar{zoneId: Europe/Paris, openingHours: [Mo-Su 00:00-23:59]}",
+      "OHCalendar{zoneId: Europe/Berlin, openingHours: [Mo-Su 00:00-23:59]}",
       first.getOpeningHours().toString()
     );
     assertTrue(first.hasAnyCarPlaces());
