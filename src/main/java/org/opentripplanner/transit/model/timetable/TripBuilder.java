@@ -38,7 +38,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     this.operator = original.getOperator();
     this.serviceId = original.getServiceId();
     this.mode = original.getMode();
-    this.netexSubmode = original.getNetexSubmode();
+    this.netexSubmode = original.getNetexSubMode().name();
     this.netexAlteration = original.getNetexAlteration();
     this.shortName = original.getShortName();
     this.headsign = original.getHeadsign();

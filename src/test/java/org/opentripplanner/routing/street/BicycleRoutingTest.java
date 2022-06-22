@@ -86,9 +86,9 @@ public class BicycleRoutingTest {
 
     // make sure that we only get BICYLE legs
     itineraries.forEach(i ->
-      i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.BICYCLE))
+      i.getLegs().forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.BICYCLE))
     );
-    Geometry legGeometry = itineraries.get(0).legs.get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
     return PolylineEncoder.encodeGeometry(legGeometry).points();
   }
 }

@@ -32,6 +32,7 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -284,10 +285,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return route.getMode();
   }
 
-  public String getNetexSubmode() {
-    return route.getNetexSubmode();
-  }
-
   public LineString getHopGeometry(int stopPosInPattern) {
     if (hopGeometries != null) {
       return CompactLineString.uncompactLineString(hopGeometries[stopPosInPattern], false);
@@ -415,9 +412,9 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
   /**
    * Find the first stop position in pattern matching the given {@code stop}. The search start at
-   * position {@code 0}. Return a negative number if not found. Use {@link
-   * #findAlightStopPositionInPattern(StopLocation)} or {@link #findBoardingStopPositionInPattern(StopLocation)}
-   * if possible.
+   * position {@code 0}. Return a negative number if not found. Use
+   * {@link #findAlightStopPositionInPattern(StopLocation)} or
+   * {@link #findBoardingStopPositionInPattern(StopLocation)} if possible.
    */
   public int findStopPosition(StopLocation stop) {
     return stopPattern.findStopPosition(stop);
@@ -571,7 +568,12 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
    * trips/TripIds in the Timetable rather than the enclosing TripPattern.
    */
   public Stream<Trip> scheduledTripsAsStream() {
-    return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).distinct();
+    var trips = scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip);
+    var freqTrips = scheduledTimetable
+      .getFrequencyEntries()
+      .stream()
+      .map(e -> e.tripTimes.getTrip());
+    return Stream.concat(trips, freqTrips).distinct();
   }
 
   /**
@@ -659,11 +661,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return tripTimes.getHeadsign(stopIndex);
   }
 
-  public boolean matchesModeOrSubMode(TransitMode mode, String transportSubmode) {
-    return (
-      getMode().equals(mode) ||
-      (getNetexSubmode() != null && getNetexSubmode().equals(transportSubmode))
-    );
+  public boolean matchesModeOrSubMode(TransitMode mode, SubMode transportSubmode) {
+    return getMode().equals(mode) || route.getNetexSubmode().equals(transportSubmode);
   }
 
   /**

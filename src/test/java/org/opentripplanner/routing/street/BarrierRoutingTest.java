@@ -20,6 +20,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -68,16 +69,17 @@ public class BarrierRoutingTest {
           .stream()
           .flatMap(i ->
             Stream.of(
-              () -> assertEquals(1, i.legs.size()),
-              () -> assertEquals(BICYCLE, i.legs.get(0).getMode()),
+              () -> assertEquals(1, i.getLegs().size()),
+              () -> assertEquals(BICYCLE, i.getLegs().get(0).getMode()),
               () ->
                 assertEquals(
                   List.of(false, true, false, true, false),
-                  i.legs
+                  i
+                    .getLegs()
                     .get(0)
                     .getWalkSteps()
                     .stream()
-                    .map(step -> step.walkingBike)
+                    .map(WalkStep::isWalkingBike)
                     .collect(Collectors.toList())
                 )
             )
@@ -134,7 +136,7 @@ public class BarrierRoutingTest {
       itineraries ->
         itineraries
           .stream()
-          .flatMap(i -> i.legs.stream())
+          .flatMap(i -> i.getLegs().stream())
           .map(l ->
             () -> assertEquals(traverseMode, l.getMode(), "Allow only " + traverseMode + " legs")
           )
@@ -174,7 +176,7 @@ public class BarrierRoutingTest {
 
     assertAll(assertions.apply(itineraries));
 
-    Geometry legGeometry = itineraries.get(0).legs.get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
     temporaryVertices.close();
 
     return PolylineEncoder.encodeGeometry(legGeometry).points();

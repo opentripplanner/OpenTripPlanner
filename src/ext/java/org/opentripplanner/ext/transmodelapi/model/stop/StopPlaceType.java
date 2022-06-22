@@ -33,6 +33,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopCollection;
@@ -162,7 +163,7 @@ public class StopPlaceType {
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
               .map(StopLocation::getNetexVehicleSubmode)
-              .filter(Objects::nonNull)
+              .filter(it -> it != SubMode.UNKNOWN)
               .map(TransmodelTransportSubmode::fromValue)
               .collect(Collectors.toList())
           )

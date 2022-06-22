@@ -39,7 +39,7 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
     this.url = original.getUrl();
     this.timeZone = original.getTimeZone();
     this.gtfsVehicleType = original.getGtfsVehicleType();
-    this.netexVehicleSubmode = original.getNetexVehicleSubmode();
+    this.netexVehicleSubmode = original.getNetexVehicleSubmode().name();
   }
 
   public String platformCode() {
@@ -69,12 +69,12 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
     return this;
   }
 
-  public String netexSubmode() {
+  public String netexVehicleSubmode() {
     return netexVehicleSubmode;
   }
 
-  public StopBuilder withNetexSubmode(String netexSubmode) {
-    this.netexVehicleSubmode = netexSubmode;
+  public StopBuilder withNetexVehicleSubmode(String netexVehicleSubmode) {
+    this.netexVehicleSubmode = netexVehicleSubmode;
     return this;
   }
 

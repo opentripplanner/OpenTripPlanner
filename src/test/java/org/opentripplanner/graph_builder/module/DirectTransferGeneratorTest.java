@@ -47,7 +47,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   public void testDirectTransfersWithoutPatterns() {
     var generator = new DirectTransferGenerator(
       MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(new RequestModes(null, StreetMode.WALK, null, null, null)))
+      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
     );
 
     var graph = graph(false);
@@ -63,7 +63,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   public void testDirectTransfersWithPatterns() {
     var generator = new DirectTransferGenerator(
       MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(new RequestModes(null, StreetMode.WALK, null, null, null)))
+      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
     );
 
     var graph = graph(true);
@@ -86,7 +86,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   public void testSingleRequestWithoutPatterns() {
     var generator = new DirectTransferGenerator(
       MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(new RequestModes(null, StreetMode.WALK, null, null, null)))
+      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
     );
 
     var graph = graph(false);
@@ -101,7 +101,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   public void testSingleRequestWithPatterns() {
     var generator = new DirectTransferGenerator(
       MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(new RequestModes(null, StreetMode.WALK, null, null, null)))
+      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
     );
 
     var graph = graph(true);
@@ -122,8 +122,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var generator = new DirectTransferGenerator(
       MAX_TRANSFER_DURATION,
       List.of(
-        new RoutingRequest(new RequestModes(null, StreetMode.WALK, null, null, null)),
-        new RoutingRequest(new RequestModes(null, StreetMode.BIKE, null, null, null))
+        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()),
+        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.BIKE).build())
       )
     );
 
@@ -140,8 +140,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var generator = new DirectTransferGenerator(
       MAX_TRANSFER_DURATION,
       List.of(
-        new RoutingRequest(new RequestModes(null, StreetMode.WALK, null, null, null)),
-        new RoutingRequest(new RequestModes(null, StreetMode.BIKE, null, null, null))
+        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()),
+        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.BIKE).build())
       )
     );
 

@@ -68,6 +68,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Update developers guide [#4203](https://github.com/opentripplanner/OpenTripPlanner/pull/4203)
 - Cost-based accessibility routing for streets [#4163](https://github.com/opentripplanner/OpenTripPlanner/pull/4163)
 - Expose SIRI ET PredictionInaccurate in Transmodel-API [#4217](https://github.com/opentripplanner/OpenTripPlanner/pull/4217)
+- Do not apply walkable area processing to open platform geometries [#4225](https://github.com/opentripplanner/OpenTripPlanner/pull/4225)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
