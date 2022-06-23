@@ -42,7 +42,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author novalis
  */
-public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, CarPickupableEdge {
+public class StreetEdge
+  extends Edge
+  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
   private static final long serialVersionUID = 1L;
@@ -507,6 +509,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
   }
 
+  @Override
   public boolean isWheelchairAccessible() {
     return BitSetUtils.get(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX);
   }

@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.api.request;
 
 import java.util.function.DoubleFunction;
+import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.filter.AccessibilityScoreFilter;
 
 /**
  * Group by Similarity filter parameters
@@ -94,7 +94,7 @@ public class ItineraryFilterParameters {
   public boolean filterItinerariesWithSameFirstOrLastTrip;
 
   /**
-   * Whether to compute the experimental accessibility score currently being tested at IBI.
+   * Whether to compute the sandbox accessibility score currently being tested at IBI.
    * <p>
    * {@link AccessibilityScoreFilter}
    */
