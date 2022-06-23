@@ -7,8 +7,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 /**
  * This smoke test expects an OTP installation running at localhost:8080
@@ -20,7 +20,7 @@ import org.junit.experimental.categories.Category;
  * The assertions are intentionally vague as more precise ones would probably cause false positives
  * when there are slight changes in the schedule.
  */
-@Category(SmokeTest.class)
+@Tag("smoke-test")
 public class AtlantaSmokeTest {
 
   String nearGeorgiaStateStation = "33.74139944890028,-84.38607215881348";
