@@ -38,7 +38,7 @@ jobs:
           key: osm
 
       - name: Build jar file
-        run: mvn clean package -Dmaven.test.skip -P prettierSkip
+        run: mvn --batch-mode clean package -Dmaven.test.skip -P prettierSkip
 
       - name: Build Atlanta graph and start OTP in background
         run: |
