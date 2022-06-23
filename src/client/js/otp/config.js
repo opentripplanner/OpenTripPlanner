@@ -101,7 +101,8 @@ otp.config = {
         {
             name: 'OSM Standard Tiles',
             tileUrl: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            attribution : 'Map data and tiles © OpenStreetMap contributors'
+            attribution : 'Map data and tiles © OpenStreetMap contributors',
+            isDefault: true
         }
     ],
     
@@ -153,7 +154,6 @@ otp.config = {
         {
             id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
-            defaultBaseLayer : 'OSM Standard Tiles',
             isDefault: true
         }
     ],
