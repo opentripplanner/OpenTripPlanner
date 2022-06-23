@@ -1,8 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
+import static org.opentripplanner.transit.raptor.api.request.Optimization.PARALLEL;
+
+import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -21,14 +25,17 @@ public class RaptorRequestMapper {
   private final Collection<? extends RaptorTransfer> accessPaths;
   private final Collection<? extends RaptorTransfer> egressPaths;
   private final long transitSearchTimeZeroEpocSecond;
+  private final boolean isMultiThreadedEnbled;
 
   private RaptorRequestMapper(
     RoutingRequest request,
+    boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
     Collection<? extends RaptorTransfer> egressPaths,
     long transitSearchTimeZeroEpocSecond
   ) {
     this.request = request;
+    this.isMultiThreadedEnbled = isMultiThreaded;
     this.accessPaths = accessPaths;
     this.egressPaths = egressPaths;
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
@@ -37,11 +44,13 @@ public class RaptorRequestMapper {
   public static RaptorRequest<TripSchedule> mapRequest(
     RoutingRequest request,
     ZonedDateTime transitSearchTimeZero,
+    boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
     Collection<? extends RaptorTransfer> egressPaths
   ) {
     return new RaptorRequestMapper(
       request,
+      isMultiThreaded,
       accessPaths,
       egressPaths,
       transitSearchTimeZero.toEpochSecond()
@@ -82,7 +91,16 @@ public class RaptorRequestMapper {
       searchParams.maxNumberOfTransfers(request.maxTransfers);
     }
 
-    request.raptorOptions.getOptimizations().forEach(builder::enableOptimization);
+    for (Optimization optimization : request.raptorOptions.getOptimizations()) {
+      if (optimization.is(PARALLEL)) {
+        if (isMultiThreadedEnbled) {
+          builder.enableOptimization(optimization);
+        }
+      } else {
+        builder.enableOptimization(optimization);
+      }
+    }
+
     builder.profile(request.raptorOptions.getProfile());
     builder.searchDirection(request.raptorOptions.getSearchDirection());
 
@@ -120,11 +138,14 @@ public class RaptorRequestMapper {
         .logger(debugLogger);
     }
 
-    builder.addTags(request.tags);
-
     if (!request.timetableView && request.arriveBy) {
       builder.searchParams().preferLateArrival(true);
     }
+
+    // Add this last, it depends on generating an alias from the set values
+    builder.performanceTimers(
+      new PerformanceTimersForRaptor(builder.generateAlias(), request.tags, Metrics.globalRegistry)
+    );
 
     return builder.build();
   }

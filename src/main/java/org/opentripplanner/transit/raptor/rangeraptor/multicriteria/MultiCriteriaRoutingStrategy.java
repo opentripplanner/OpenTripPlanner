@@ -8,9 +8,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
@@ -63,7 +63,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   @Override
   public void alight(final int stopIndex, final int stopPos, int alightSlack) {
     for (PatternRide<T> ride : patternRides) {
-      state.transitToStop(ride, stopIndex, ride.trip.arrival(stopPos), alightSlack);
+      state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }
 
@@ -101,7 +101,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
     patternRides.add(
-      new PatternRide<>(
+      new PatternRide<T>(
         prevArrival,
         stopIndex,
         boarding.getStopPositionInPattern(),

@@ -5,12 +5,12 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicSearch;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +42,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     RaptorConfig<T> config,
     RaptorTransitDataProvider<T> transitData
   ) {
-    this(
-      request.searchDirection(),
-      RequestAlias.alias(request, config.isMultiThreaded()),
-      config,
-      transitData
-    );
+    this(request.searchDirection(), request.alias(), config, transitData);
     this.originalRequest = request;
   }
 
@@ -77,10 +72,6 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
   public SearchDirection getDirection() {
     return direction;
-  }
-
-  public HeuristicSearch<T> search() {
-    return search;
   }
 
   @Nullable

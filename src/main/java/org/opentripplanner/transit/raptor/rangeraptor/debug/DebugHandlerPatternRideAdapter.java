@@ -3,23 +3,23 @@ package org.opentripplanner.transit.raptor.rangeraptor.debug;
 import java.util.LinkedList;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
+import org.opentripplanner.transit.raptor.api.view.PatternRideView;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
-final class DebugHandlerPatternRideAdapter extends AbstractDebugHandlerAdapter<PatternRide<?>> {
+final class DebugHandlerPatternRideAdapter extends AbstractDebugHandlerAdapter<PatternRideView<?>> {
 
   DebugHandlerPatternRideAdapter(DebugRequest debug, WorkerLifeCycle lifeCycle) {
     super(debug, debug.patternRideDebugListener(), lifeCycle);
   }
 
   @Override
-  protected int stop(PatternRide<?> ride) {
-    return ride.boardStopIndex;
+  protected int stop(PatternRideView<?> ride) {
+    return ride.boardStopIndex();
   }
 
   @Override
-  protected Iterable<Integer> stopsVisited(PatternRide<?> ride) {
-    return listStopsForDebugging(ride.prevArrival);
+  protected Iterable<Integer> stopsVisited(PatternRideView<?> ride) {
+    return listStopsForDebugging(ride.prevArrival());
   }
 
   /**

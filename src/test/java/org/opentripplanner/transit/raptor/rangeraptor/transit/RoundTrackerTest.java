@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 public class RoundTrackerTest {
 

@@ -19,13 +19,16 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
   private final Collection<Path<T>> paths;
   private final RaptorRequest<T> requestOriginal;
   private final RaptorRequest<T> requestUsed;
+  private final StopArrivals arrivals;
 
   public RaptorResponse(
     Collection<Path<T>> paths,
+    StopArrivals arrivals,
     RaptorRequest<T> requestOriginal,
     RaptorRequest<T> requestUsed
   ) {
     this.paths = paths;
+    this.arrivals = arrivals;
     this.requestOriginal = requestOriginal;
     this.requestUsed = requestUsed;
   }
@@ -35,6 +38,14 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
    */
   public Collection<Path<T>> paths() {
     return paths;
+  }
+
+  /**
+   * The end state of the search, with arrival times and lowest number of transfers. If multiple
+   * routing workers are called, the main worker result is returned.
+   */
+  public StopArrivals getArrivals() {
+    return arrivals;
   }
 
   /**

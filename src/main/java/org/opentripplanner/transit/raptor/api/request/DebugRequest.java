@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
+import org.opentripplanner.transit.raptor.api.view.PatternRideView;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -47,7 +47,7 @@ public record DebugRequest(
    */
   int debugPathFromStopIndex,
   Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener,
-  Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener,
+  Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener,
   Consumer<DebugEvent<Path<?>>> pathFilteringListener,
   DebugLogger logger
 ) {

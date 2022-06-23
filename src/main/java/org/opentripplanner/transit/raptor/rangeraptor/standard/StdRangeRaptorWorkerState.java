@@ -3,11 +3,15 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard;
 import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.StopArrivalsAdaptor;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
@@ -78,7 +82,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   @Override
   public BitSetIterator stopsTouchedByTransitCurrentRound() {
-    return bestTimes.onBoardStopArrivalsReachedCurrentRound();
+    return bestTimes.reachedByTransitCurrentRound();
   }
 
   @Override
@@ -100,7 +104,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     }
 
     boolean reachedOnBoard =
-      accessPath.stopReachedOnBoard() && newOnBoardBestTime(stop, arrivalTime);
+      accessPath.stopReachedOnBoard() && newBestTransitArrivalTime(stop, arrivalTime);
     boolean bestTime = newOverallBestTime(stop, arrivalTime);
 
     if (reachedOnBoard || bestTime) {
@@ -115,7 +119,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
    */
   @Override
   public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-    int arrivalTimeTransit = bestTimes.onBoardTime(fromStop);
+    int arrivalTimeTransit = bestTimes.transitArrivalTime(fromStop);
     while (transfers.hasNext()) {
       transferToStop(arrivalTimeTransit, fromStop, transfers.next());
     }
@@ -162,7 +166,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
       return;
     }
 
-    if (newOnBoardBestTime(stop, arrivalTime)) {
+    if (newBestTransitArrivalTime(stop, arrivalTime)) {
       // transitTimes upper bounds bestTimes
       final boolean newOverallBestTime = newOverallBestTime(stop, arrivalTime);
       stopArrivalsState.setNewBestTransitTime(
@@ -181,6 +185,11 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   @Override
   public TransitArrival<T> previousTransit(int boardStopIndex) {
     return stopArrivalsState.previousTransit(boardStopIndex);
+  }
+
+  @Override
+  public StopArrivals extractStopArrivals() {
+    return new StopArrivalsAdaptor(bestTimes, stopArrivalsState);
   }
 
   private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
@@ -210,8 +219,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return bestTimes.updateNewBestTime(stop, alightTime);
   }
 
-  private boolean newOnBoardBestTime(int stop, int alightTime) {
-    return bestTimes.updateOnBoardBestTime(stop, alightTime);
+  private boolean newBestTransitArrivalTime(int stop, int alightTime) {
+    return bestTimes.updateBestTransitArrivalTime(stop, alightTime);
   }
 
   private boolean exceedsTimeLimit(int time) {

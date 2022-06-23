@@ -111,6 +111,7 @@ public class TransitRouter {
     var raptorRequest = RaptorRequestMapper.mapRequest(
       request,
       transitSearchTimeZero,
+      router.raptorConfig.isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses()
     );

@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

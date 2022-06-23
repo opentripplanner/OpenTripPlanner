@@ -6,8 +6,8 @@ import static org.opentripplanner.transit.raptor.api.debug.DebugTopic.HEURISTICS
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.util.CompareIntArrays;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 

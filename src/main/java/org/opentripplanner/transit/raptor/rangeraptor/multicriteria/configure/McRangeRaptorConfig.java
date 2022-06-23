@@ -2,17 +2,17 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.api.view.Worker;
-import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
+import org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.StopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 
 /**
  * Configure and create multicriteria worker, state and child classes.
@@ -64,8 +64,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  private StopArrivals<T> createStopArrivals() {
-    return new StopArrivals<>(
+  private McStopArrivals<T> createStopArrivals() {
+    return new McStopArrivals<>(
       context.nStops(),
       context.egressPaths(),
       createDestinationArrivalPaths(),
