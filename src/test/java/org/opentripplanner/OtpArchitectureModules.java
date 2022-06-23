@@ -6,7 +6,7 @@ import org.opentripplanner._support.arch.Package;
 public interface OtpArchitectureModules {
   /* Third party libs*/
 
-  Package GNU_TOVE = Package.of("gnu.trove.(*)..");
+  Package GNU_TROVE = Package.of("gnu.trove.(*)..");
 
   /* OTP Modules */
 

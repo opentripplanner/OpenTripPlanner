@@ -40,6 +40,11 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   // Algorithm
   private RaptorProfile profile;
 
+  /**
+   * A flag used to prevent fields part of the alias to be modified after the alias is generated.
+   */
+  private boolean freezeAliasFields = false;
+
   public RaptorRequestBuilder() {
     this(RaptorRequest.defaults());
   }
@@ -69,6 +74,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   }
 
   public RaptorRequestBuilder<T> profile(RaptorProfile profile) {
+    verifyAliasNotGeneratedYet();
     this.profile = profile;
     return this;
   }
@@ -78,6 +84,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   }
 
   public RaptorRequestBuilder<T> searchDirection(SearchDirection searchDirection) {
+    verifyAliasNotGeneratedYet();
     this.searchDirection = searchDirection;
     return this;
   }
@@ -95,6 +102,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   }
 
   public RaptorRequestBuilder<T> enableOptimization(Optimization optimization) {
+    verifyAliasNotGeneratedYet();
     this.optimizations.add(optimization);
     return this;
   }
@@ -131,9 +139,10 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
    * and/or performance monitoring.
    * <p>
    * Note! The {@code profile}, {@code searchDirection}, {@code optimizations} is used to
-   * make a unique alias - so set them before calling the method.
+   * make a unique alias - so set them before calling this method, if not an exception is thrown.
    */
   public String generateAlias() {
+    this.freezeAliasFields = true;
     return generateRequestAlias(profile, searchDirection, optimizations);
   }
 
@@ -156,5 +165,13 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
       name += "-DP";
     }
     return name;
+  }
+
+  private void verifyAliasNotGeneratedYet() {
+    if (freezeAliasFields) {
+      throw new IllegalStateException(
+        "The alias is generated before one of the fileds it relay on is set."
+      );
+    }
   }
 }
