@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
- * The worker perform the travel search. There are multiple implementation, even some who do not
+ * The worker performs the travel search. There are multiple implementations, even some that do not
  * return paths.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -19,7 +19,7 @@ public interface Worker<T extends RaptorTripSchedule> {
   void route();
 
   /**
-   * Return all paths found. Am empty set is returned if no paths are found or the algorithm do
+   * Return all paths found. An empty set is returned if no paths are found or the algorithm does
    * not collect paths.
    */
   Collection<Path<T>> paths();
