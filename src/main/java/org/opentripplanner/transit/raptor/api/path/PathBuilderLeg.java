@@ -14,8 +14,8 @@ import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
- * This is the leg implementation for the {@link PathBuilder}. It Private inner class which help
- * cashing and calculating values before constructing a path.
+ * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
+ * helps to cache and calculate values before constructing a path.
  */
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
@@ -178,7 +178,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * <p>
    * This method is safe to use event as long as the next leg is set.
    */
-  public int generalizedCost(CostCalculator costCalculator, RaptorSlackProvider slackProvider) {
+  public int generalizedCost(CostCalculator<T> costCalculator, RaptorSlackProvider slackProvider) {
     if (costCalculator == null) {
       return ZERO_COST;
     }
@@ -313,7 +313,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   }
 
   AccessPathLeg<T> createAccessPathLeg(
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider
   ) {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
@@ -324,7 +324,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   /* Build helper methods, package local */
 
-  private static int cost(CostCalculator costCalculator, RaptorTransfer streetPath) {
+  private static int cost(CostCalculator<?> costCalculator, RaptorTransfer streetPath) {
     return costCalculator != null ? streetPath.generalizedCost() : ZERO_COST;
   }
 
@@ -357,7 +357,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   }
 
   private PathLeg<T> createPathLeg(
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider
   ) {
     if (isAccess()) {
@@ -376,7 +376,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   }
 
   private TransferPathLeg<T> createTransferPathLeg(
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider
   ) {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
@@ -388,7 +388,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /* private methods */
 
   private TransitPathLeg<T> createTransitPathLeg(
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider
   ) {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
@@ -404,7 +404,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   }
 
   private EgressPathLeg<T> createEgressPathLeg(
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider
   ) {
     int cost = egressCost(costCalculator, slackProvider);
@@ -493,7 +493,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     setTime(newFromTime, newFromTime + egressPath.durationInSeconds());
   }
 
-  private int transitCost(CostCalculator costCalculator, RaptorSlackProvider slackProvider) {
+  private int transitCost(CostCalculator<T> costCalculator, RaptorSlackProvider slackProvider) {
     if (costCalculator == null) {
       return ZERO_COST;
     }
@@ -531,12 +531,12 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       boardCost,
       slackProvider.alightSlack(leg.trip.pattern().slackIndex()),
       durationInSec(),
-      leg.trip.transitReluctanceFactorIndex(),
+      leg.trip,
       toStop()
     );
   }
 
-  private int egressCost(CostCalculator costCalculator, RaptorSlackProvider slackProvider) {
+  private int egressCost(CostCalculator<T> costCalculator, RaptorSlackProvider slackProvider) {
     if (costCalculator == null) {
       return ZERO_COST;
     }

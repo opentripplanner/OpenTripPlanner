@@ -3,11 +3,11 @@ package org.opentripplanner.gtfs.mapping;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.StopLevel;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StationElement;
+import org.opentripplanner.transit.model.site.StopLevel;
 
 /**
  * Wrap GTFS Stop to provide a common base mapping for all {@link StationElement}s.
@@ -49,5 +49,11 @@ class StopMappingWrapper {
       return null;
     }
     return new StopLevel(stop.getLevel().getName(), stop.getLevel().getIndex());
+  }
+
+  public FeedScopedId getParentStationId() {
+    return stop.getParentStation() == null
+      ? null
+      : new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation());
   }
 }

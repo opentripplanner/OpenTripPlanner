@@ -19,7 +19,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
@@ -163,19 +163,6 @@ public abstract class RoutingResource {
   @Deprecated
   @QueryParam("wheelchair")
   protected Boolean wheelchair;
-
-  /**
-   * The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.
-   * <p>
-   * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
-   *
-   * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-   * old functionality the same way, but we will try to map this parameter
-   * so it does work similar as before.
-   */
-  @Deprecated
-  @QueryParam("maxWalkDistance")
-  protected Double maxWalkDistance;
 
   /**
    * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride

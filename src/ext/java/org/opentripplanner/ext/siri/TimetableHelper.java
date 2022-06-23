@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.xml.datatype.Duration;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -25,8 +24,8 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
@@ -148,13 +147,7 @@ public class TimetableHelper {
             if (departureDate == null) {
               departureDate = recordedCall.getAimedArrivalTime();
             }
-            if (oldTimes.getDepartureTime(0) > 86400) {
-              // The "departure-date" for this trip is set to "yesterday" (or before) even though it actually departs "today"
-
-              int dayOffsetCount = oldTimes.getDepartureTime(0) / 86400; // calculate number of offset-days
-
-              departureDate = departureDate.minusDays(dayOffsetCount);
-            }
+            departureDate = departureDate.minusDays(calculateDayOffset(oldTimes));
           }
 
           ZonedDateTime startOfService = DateMapper.asStartOfService(
@@ -254,6 +247,7 @@ public class TimetableHelper {
               if (departureDate == null) {
                 departureDate = estimatedCall.getAimedArrivalTime();
               }
+              departureDate = departureDate.minusDays(calculateDayOffset(oldTimes));
             }
 
             boolean isCallPredictionInaccurate =
@@ -393,6 +387,16 @@ public class TimetableHelper {
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
     return newTimes;
+  }
+
+  private static int calculateDayOffset(TripTimes oldTimes) {
+    if (oldTimes.getDepartureTime(0) > 86400) {
+      // The "departure-date" for this trip is set to "yesterday" (or before) even though it actually departs "today"
+
+      return oldTimes.getDepartureTime(0) / 86400; // calculate number of offset-days
+    } else {
+      return 0;
+    }
   }
 
   /**

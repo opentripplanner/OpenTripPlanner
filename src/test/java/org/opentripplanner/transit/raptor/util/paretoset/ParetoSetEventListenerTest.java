@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ParetoSetEventListenerTest {
 
@@ -22,7 +22,7 @@ public class ParetoSetEventListenerTest {
     eventListener()
   );
 
-  @Before
+  @BeforeEach
   public void setup() {
     subject.clear();
     clearResult();

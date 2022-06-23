@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.util.HashMap;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -30,7 +30,7 @@ public class ElevationModuleTest {
    * .../src/test/resources/org/opentripplanner/graph_builder/module/ned/
    */
   @Test
-  @Ignore
+  @Disabled
   public void testSetElevationOnEdgesUsingS3BucketTiles() {
     // create a graph with a StreetWithElevationEdge
     Graph graph = new Graph();

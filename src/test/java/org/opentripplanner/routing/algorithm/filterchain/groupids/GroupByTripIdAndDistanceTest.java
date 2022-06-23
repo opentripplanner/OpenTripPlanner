@@ -1,15 +1,16 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.calculateTotalDistance;
 import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.getKeySetOfLegsByLimit;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -24,9 +25,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
       .bus(31, T11_05, T11_07, D)
       .build();
 
-    Leg l1 = i.legs.get(0);
-    Leg l2 = i.legs.get(1);
-    Leg l3 = i.legs.get(2);
+    Leg l1 = i.getLegs().get(0);
+    Leg l2 = i.getLegs().get(1);
+    Leg l3 = i.getLegs().get(2);
 
     // 3 minutes on a bus
     double expectedDistanceRidingABus = BUS_SPEED * 3 * 60;
@@ -51,9 +52,9 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
       .bus(31, T11_20, T11_23, D)
       .build();
 
-    Leg l1 = i.legs.get(0);
-    Leg l2 = i.legs.get(1);
-    Leg l3 = i.legs.get(2);
+    Leg l1 = i.getLegs().get(0);
+    Leg l2 = i.getLegs().get(1);
+    Leg l3 = i.getLegs().get(2);
 
     double d1 = l1.getDistanceMeters();
     double d3 = l3.getDistanceMeters();
@@ -173,13 +174,37 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
     assertFalse(g_31_11.match(g_11_21));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void illegalRangeForPUpperBound() {
-    new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991);
+  @Test
+  public void notMatchFrequencyTripsWithDifferentStartTime() {
+    GroupByTripIdAndDistance g_11_00 = new GroupByTripIdAndDistance(
+      newItinerary(A).frequencyBus(11, T11_00, T11_05, B).build(),
+      0.9
+    );
+    GroupByTripIdAndDistance g_11_10 = new GroupByTripIdAndDistance(
+      newItinerary(A).frequencyBus(11, T11_10, T11_15, B).build(),
+      0.9
+    );
+
+    // Match itself
+    assertTrue(g_11_00.match(g_11_00));
+    // Match other with suffix leg
+    assertFalse(g_11_00.match(g_11_10));
+    assertFalse(g_11_10.match(g_11_00));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
+  public void illegalRangeForPUpperBound() {
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
+    );
+  }
+
+  @Test
   public void illegalRangeForPLowerBound() {
-    new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
+    );
   }
 }

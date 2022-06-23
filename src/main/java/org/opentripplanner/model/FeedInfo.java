@@ -91,6 +91,6 @@ public final class FeedInfo implements Serializable {
 
   @Override
   public String toString() {
-    return "<FeedInfo " + getId() + ">";
+    return "FeedInfo{" + getId() + '}';
   }
 }

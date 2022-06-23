@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
@@ -21,7 +22,6 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveP
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
@@ -53,6 +53,7 @@ public class ItineraryListFilterChainBuilder {
   private Instant latestDepartureTimeLimit = null;
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
+  private double wheelchairMaxSlope;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -220,8 +221,16 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withAccessibilityScore(boolean enable) {
+  /**
+   * Enable the IBI feature for calculating a very simple numeric accessibility score between 0 and
+   * 1 for each leg in the itinerary.
+   */
+  public ItineraryListFilterChainBuilder withAccessibilityScore(
+    boolean enable,
+    double wheelchairMaxSlope
+  ) {
     this.accessibilityScore = enable;
+    this.wheelchairMaxSlope = wheelchairMaxSlope;
     return this;
   }
 
@@ -237,7 +246,7 @@ public class ItineraryListFilterChainBuilder {
     }
 
     if (accessibilityScore) {
-      filters.add(new AccessibilityScoreFilter());
+      filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
     }
 
     // Filter transit itineraries on generalized-cost
@@ -332,7 +341,7 @@ public class ItineraryListFilterChainBuilder {
     List<GroupBySimilarity> groupBy = groupBySimilarity
       .stream()
       .sorted(Comparator.comparingDouble(o -> o.groupByP))
-      .collect(Collectors.toList());
+      .toList();
 
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 

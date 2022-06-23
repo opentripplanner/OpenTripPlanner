@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class PlaceTest {
@@ -36,8 +35,8 @@ public class PlaceTest {
 
   @Test
   public void sameLocationBasedOnStopId() {
-    var s1 = stop("1", 1.0, 1.0);
-    var s2 = stop("2", 1.0, 2.0);
+    var s1 = TransitModelForTest.stop("1").withCoordinate(1.0, 1.0).build();
+    var s2 = TransitModelForTest.stop("2").withCoordinate(1.0, 2.0).build();
 
     Place aPlace = place(s1);
     Place samePlace = place(s1);
@@ -53,24 +52,6 @@ public class PlaceTest {
   public void acceptsNullCoordinates() {
     var p = Place.normal(null, null, new NonLocalizedString("Test"));
     assertNull(p.coordinate);
-  }
-
-  private static Stop stop(String stopId, double lat, double lon) {
-    return new Stop(
-      new FeedScopedId("S", stopId),
-      new NonLocalizedString(stopId),
-      null,
-      null,
-      WgsCoordinate.creatOptionalCoordinate(lat, lon),
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
   }
 
   private static Place place(Stop stop) {

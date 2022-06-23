@@ -15,7 +15,7 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -352,7 +352,7 @@ public interface Leg {
   }
 
   /**
-   * An experimental feature for calculating a numeric score between 0 and 1 which indicates
+   * A sandbox feature for calculating a numeric score between 0 and 1 which indicates
    * how accessible the itinerary is as a whole. This is not a very scientific method but just
    * a rough guidance that expresses certainty or uncertainty about the accessibility.
    *

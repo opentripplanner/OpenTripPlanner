@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -11,6 +12,7 @@ import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A relatively high cost edge for boarding an elevator.
@@ -25,19 +27,19 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
    * The polyline geometry of this edge. It's generally a polyline with two coincident points, but
    * some elevators have horizontal dimension, e.g. the ones on the Eiffel Tower.
    */
-  private final LineString the_geom;
+  private final LineString geometry;
 
   public ElevatorBoardEdge(ElevatorOffboardVertex from, ElevatorOnboardVertex to) {
     super(from, to);
-    // set up the geometry
-    Coordinate[] coords = new Coordinate[2];
-    coords[0] = new Coordinate(from.getX(), from.getY());
-    coords[1] = new Coordinate(to.getX(), to.getY());
-    the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+    geometry =
+      GeometryUtils.makeLineString(
+        List.of(new Coordinate(from.getX(), from.getY()), new Coordinate(to.getX(), to.getY()))
+      );
   }
 
+  @Override
   public String toString() {
-    return "ElevatorBoardEdge(" + fromv + " -> " + tov + ")";
+    return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }
 
   @Override
@@ -62,7 +64,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
 
   /**
    * Since board edges always are called Elevator, the name is utterly and completely bogus but is
-   * never included in plans..
+   * never included in plans.
    */
   @Override
   public boolean hasBogusName() {
@@ -71,7 +73,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
 
   @Override
   public LineString getGeometry() {
-    return the_geom;
+    return geometry;
   }
 
   @Override

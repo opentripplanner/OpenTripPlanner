@@ -9,17 +9,11 @@ class DirectionMapper {
     if (direction == null) {
       return Direction.UNKNOWN;
     }
-    switch (direction) {
-      case INBOUND:
-        return Direction.INBOUND;
-      case OUTBOUND:
-        return Direction.OUTBOUND;
-      case CLOCKWISE:
-        return Direction.CLOCKWISE;
-      case ANTICLOCKWISE:
-        return Direction.ANTICLOCKWISE;
-      default:
-        return Direction.UNKNOWN;
-    }
+    return switch (direction) {
+      case INBOUND -> Direction.INBOUND;
+      case OUTBOUND -> Direction.OUTBOUND;
+      case CLOCKWISE -> Direction.CLOCKWISE;
+      case ANTICLOCKWISE -> Direction.ANTICLOCKWISE;
+    };
   }
 }

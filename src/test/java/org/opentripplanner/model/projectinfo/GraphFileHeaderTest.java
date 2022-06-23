@@ -1,10 +1,11 @@
 package org.opentripplanner.model.projectinfo;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.model.projectinfo.GraphFileHeader.CHARSET;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.OtpAppException;
 
 public class GraphFileHeaderTest {
@@ -23,21 +24,21 @@ public class GraphFileHeaderTest {
     assertEquals(SUBJECT, GraphFileHeader.parse(HEADER_BYTES));
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void parseToShort() {
-    GraphFileHeader.parse(new byte[10]);
+    assertThrows(OtpAppException.class, () -> GraphFileHeader.parse(new byte[10]));
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void parseIllegalId() {
     String illegalVersionId = "€€€€€€";
     byte[] header = ("OpenTripPlannerGraph;" + illegalVersionId + ";").getBytes(CHARSET);
-    GraphFileHeader.parse(header);
+    assertThrows(OtpAppException.class, () -> GraphFileHeader.parse(header));
   }
 
   @Test
   public void header() {
-    assertArrayEquals(HEADER_BYTES, SUBJECT.header());
+    Assertions.assertArrayEquals(HEADER_BYTES, SUBJECT.header());
   }
 
   @Test
@@ -77,8 +78,8 @@ public class GraphFileHeaderTest {
 
   @Test
   public void dump() {
-    assertEquals("<empty>", GraphFileHeader.prettyBytesToString(null));
-    assertEquals("<empty>", GraphFileHeader.prettyBytesToString(new byte[0]));
+    assertEquals("[empty]", GraphFileHeader.prettyBytesToString(null));
+    assertEquals("[empty]", GraphFileHeader.prettyBytesToString(new byte[0]));
     assertEquals(
       "41 6C 66 61 2D 31  \"Alfa-1\"",
       GraphFileHeader.prettyBytesToString(new byte[] { 'A', 'l', 'f', 'a', '-', '1' })

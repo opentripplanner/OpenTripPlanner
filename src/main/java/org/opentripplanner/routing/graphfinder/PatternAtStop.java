@@ -4,12 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -35,7 +35,7 @@ public class PatternAtStop {
    *
    * @see PatternAtStop#toId(StopLocation, TripPattern)
    */
-  public static PatternAtStop fromId(RoutingService routingService, String id) {
+  public static PatternAtStop fromId(TransitService transitService, String id) {
     String[] parts = id.split(";", 2);
     Base64.Decoder decoder = Base64.getDecoder();
     FeedScopedId stopId = FeedScopedId.parseId(
@@ -45,8 +45,8 @@ public class PatternAtStop {
       new String(decoder.decode(parts[1]), StandardCharsets.UTF_8)
     );
     return new PatternAtStop(
-      routingService.getStopForId(stopId),
-      routingService.getTripPatternForId(patternId)
+      transitService.getStopForId(stopId),
+      transitService.getTripPatternForId(patternId)
     );
   }
 
@@ -62,13 +62,13 @@ public class PatternAtStop {
    * @return A list of stop times
    */
   public List<TripTimeOnDate> getStoptimes(
-    RoutingService routingService,
+    TransitService transitService,
     long startTime,
     int timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
-    return routingService.stopTimesForPatternAtStop(
+    return transitService.stopTimesForPatternAtStop(
       stop,
       pattern,
       startTime,

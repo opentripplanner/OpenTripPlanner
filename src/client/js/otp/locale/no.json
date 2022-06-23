@@ -70,6 +70,8 @@
     "Total Walk": "Gangeavstand",
     "Total Bike": "Sykkel distanse",
     "Total drive": "Bil distanse",
+    "Elevation Gained": "",
+    "Elevation Lost": "",
     "Transfers": "Bytter",
     "Fare": "Pris",
     "Valid": "Gyldig",

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.model.StationElement;
+import org.opentripplanner.transit.model.site.StationElement;
 
 public class ParentStationNotFound implements DataImportIssue {
 

@@ -4,11 +4,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.stream.Collectors;
-import org.opentripplanner.model.FareZone;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.FareZone;
 import org.rutebanken.netex.model.TariffZone;
 import org.rutebanken.netex.model.TariffZoneRef;
 
@@ -37,7 +36,7 @@ class TariffZoneMapper {
       .localListCurrentVersionEntities(startOfPeriod)
       .stream()
       .map(this::mapTariffZone)
-      .collect(Collectors.toUnmodifiableList());
+      .toList();
   }
 
   /**
@@ -58,14 +57,14 @@ class TariffZoneMapper {
 
     FeedScopedId id = idFactory.createId(tariffZone.getId());
     String name = tariffZone.getName().getValue();
-    return deduplicate(new FareZone(id, name));
+    return deduplicate(FareZone.of(id).withName(name).build());
   }
 
   private FareZone deduplicate(FareZone candidate) {
     var existing = deduplicateCache
       .get(candidate.getId())
       .stream()
-      .filter(candidate::sameValueAs)
+      .filter(candidate::sameAs)
       .findFirst();
 
     if (existing.isPresent()) {

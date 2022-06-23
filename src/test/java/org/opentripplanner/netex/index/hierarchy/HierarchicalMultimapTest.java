@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.netex.index.hierarchy.E.EASTWOOD;
 import static org.opentripplanner.netex.index.hierarchy.E.REAGAN;
 import static org.opentripplanner.netex.index.hierarchy.E.SCHWARZENEGGER;
@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * We uses a simplified version of the data structure used in the {@link HierarchicalMapTest}:
@@ -38,7 +38,7 @@ public class HierarchicalMultimapTest {
   private final HierarchicalMultimap<String, E> country = new HierarchicalMultimap<>();
   private final HierarchicalMultimap<String, E> state = new HierarchicalMultimap<>(country);
 
-  @Before
+  @BeforeEach
   public void setup() {
     country.add(PRESIDENT, REAGAN);
     state.add(GOVERNOR, SCHWARZENEGGER);

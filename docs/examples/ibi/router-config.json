@@ -11,14 +11,14 @@
       // add IBI accessibility score between 0 and 1
       "accessibilityScore": true
     },
-    // use stops and trips with unknown wheelchair accessibility during routing
+    // use stop and trip with unknown wheelchair accessibility during routing
     "wheelchairAccessibility": {
-      "trips": {
+      "trip": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600
       },
-      "stops": {
+      "stop": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,
         "inaccessibleCost": 3600

@@ -80,7 +80,8 @@ public class RoutingWorker {
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
 
-    request.modes.directMode = emptyDirectModeHandler.resolveDirectMode();
+    request.modes =
+      request.modes.copy().withDirectMode(emptyDirectModeHandler.resolveDirectMode()).build();
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -121,7 +122,8 @@ public class RoutingWorker {
       emptyDirectModeHandler.removeWalkAllTheWayResults(),
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
-      request.wheelchairAccessibility.enabled()
+      request.wheelchairAccessibility.enabled(),
+      request.wheelchairAccessibility.maxSlope()
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
@@ -139,7 +141,8 @@ public class RoutingWorker {
     this.debugTimingAggregator.finishedFiltering();
 
     // Restore original directMode.
-    request.modes.directMode = emptyDirectModeHandler.originalDirectMode();
+    request.modes =
+      request.modes.copy().withDirectMode(emptyDirectModeHandler.originalDirectMode()).build();
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).

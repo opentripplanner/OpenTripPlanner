@@ -9,12 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collection;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
-import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class TripMapperTest {
@@ -39,21 +38,14 @@ public class TripMapperTest {
   );
 
   static {
-    Agency agency = new Agency();
-    agency.setId("A1");
-    agency.setName("Agency");
-    agency.setTimezone("Europa/Oslo");
-
-    ROUTE.setAgency(agency);
-    ROUTE.setId(AGENCY_AND_ID);
-    ROUTE.setShortName("R10");
+    GtfsTestData data = new GtfsTestData();
 
     TRIP.setId(AGENCY_AND_ID);
     TRIP.setBikesAllowed(BIKES_ALLOWED);
     TRIP.setBlockId(BLOCK_ID);
     TRIP.setDirectionId(Integer.toString(DIRECTION_ID));
     TRIP.setFareId(FARE_ID);
-    TRIP.setRoute(ROUTE);
+    TRIP.setRoute(data.route);
     TRIP.setServiceId(AGENCY_AND_ID);
     TRIP.setShapeId(AGENCY_AND_ID);
     TRIP.setTripHeadsign(TRIP_HEADSIGN);
@@ -89,7 +81,7 @@ public class TripMapperTest {
   public void testMapWithNulls() throws Exception {
     Trip input = new Trip();
     input.setId(AGENCY_AND_ID);
-    input.setRoute(ROUTE);
+    input.setRoute(new GtfsTestData().route);
 
     org.opentripplanner.transit.model.timetable.Trip result = subject.map(input);
 

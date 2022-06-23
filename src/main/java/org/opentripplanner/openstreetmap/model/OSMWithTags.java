@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
@@ -93,6 +94,19 @@ public class OSMWithTags {
     }
 
     return isFalse(getTag(tag));
+  }
+
+  /**
+   * Returns the level of wheelchair access of the element.
+   */
+  public WheelchairAccessibility getWheelchairAccessibility() {
+    if (isTagTrue("wheelchair")) {
+      return WheelchairAccessibility.POSSIBLE;
+    } else if (isTagFalse("wheelchair")) {
+      return WheelchairAccessibility.NOT_POSSIBLE;
+    } else {
+      return WheelchairAccessibility.NO_INFORMATION;
+    }
   }
 
   /**
@@ -352,7 +366,7 @@ public class OSMWithTags {
 
   /**
    * Returns all non-empty values of the tags passed in as input values.
-   *
+   * <p>
    * Values are split by semicolons.
    */
   public Set<String> getMultiTagValues(Set<String> refTags) {

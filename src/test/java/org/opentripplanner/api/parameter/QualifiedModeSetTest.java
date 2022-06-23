@@ -10,7 +10,7 @@ import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 
 import java.util.Set;
 import javax.ws.rs.BadRequestException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
 
 public class QualifiedModeSetTest {
@@ -24,21 +24,37 @@ public class QualifiedModeSetTest {
   public void singleWalk() {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK");
     assertEquals(Set.of(new QualifiedMode("WALK")), modeSet.qModes);
-    assertEquals(new RequestModes(WALK, WALK, WALK, WALK, Set.of()), modeSet.getRequestModes());
+    assertEquals(
+      RequestModes
+        .of()
+        .withAccessMode(WALK)
+        .withEgressMode(WALK)
+        .withDirectMode(WALK)
+        .withTransferMode(WALK)
+        .clearTransitModes()
+        .build(),
+      modeSet.getRequestModes()
+    );
   }
 
   @Test
   public void multipleWalks() {
     QualifiedModeSet modeSet = new QualifiedModeSet(new String[] { "WALK", "WALK", "WALK" });
     assertEquals(Set.of(new QualifiedMode("WALK")), modeSet.qModes);
-    assertEquals(new RequestModes(WALK, WALK, WALK, WALK, Set.of()), modeSet.getRequestModes());
+    assertEquals(
+      RequestModes.of().withAllStreetModes(WALK).clearTransitModes().build(),
+      modeSet.getRequestModes()
+    );
   }
 
   @Test
   public void singleWalkAndBicycle() {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK,BICYCLE");
     assertEquals(Set.of(new QualifiedMode("WALK"), new QualifiedMode("BICYCLE")), modeSet.qModes);
-    assertEquals(new RequestModes(BIKE, BIKE, BIKE, BIKE, Set.of()), modeSet.getRequestModes());
+    assertEquals(
+      RequestModes.of().withAllStreetModes(BIKE).clearTransitModes().build(),
+      modeSet.getRequestModes()
+    );
   }
 
   @Test
@@ -49,7 +65,7 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      new RequestModes(BIKE_RENTAL, WALK, BIKE_RENTAL, BIKE_RENTAL, Set.of()),
+      RequestModes.of().withAllStreetModes(BIKE_RENTAL).clearTransitModes().build(),
       modeSet.getRequestModes()
     );
   }
@@ -62,7 +78,14 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      new RequestModes(BIKE_TO_PARK, WALK, WALK, BIKE_TO_PARK, Set.of()),
+      RequestModes
+        .of()
+        .withAccessMode(BIKE_TO_PARK)
+        .withEgressMode(WALK)
+        .withDirectMode(BIKE_TO_PARK)
+        .withTransferMode(WALK)
+        .clearTransitModes()
+        .build(),
       modeSet.getRequestModes()
     );
   }
@@ -71,7 +94,17 @@ public class QualifiedModeSetTest {
   public void multipleWalksAndBicycle() {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK,BICYCLE,WALK");
     assertEquals(Set.of(new QualifiedMode("WALK"), new QualifiedMode("BICYCLE")), modeSet.qModes);
-    assertEquals(new RequestModes(BIKE, BIKE, BIKE, BIKE, Set.of()), modeSet.getRequestModes());
+    assertEquals(
+      RequestModes
+        .of()
+        .withAccessMode(BIKE)
+        .withEgressMode(BIKE)
+        .withDirectMode(BIKE)
+        .withTransferMode(BIKE)
+        .clearTransitModes()
+        .build(),
+      modeSet.getRequestModes()
+    );
   }
 
   @Test
@@ -94,7 +127,14 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      new RequestModes(FLEXIBLE, WALK, FLEXIBLE, FLEXIBLE, Set.of()),
+      RequestModes
+        .of()
+        .withAccessMode(FLEXIBLE)
+        .withEgressMode(FLEXIBLE)
+        .withDirectMode(FLEXIBLE)
+        .withTransferMode(WALK)
+        .clearTransitModes()
+        .build(),
       modeSet.getRequestModes()
     );
   }
@@ -107,7 +147,14 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      new RequestModes(BIKE_TO_PARK, WALK, FLEXIBLE, BIKE_TO_PARK, Set.of()),
+      RequestModes
+        .of()
+        .withAccessMode(BIKE_TO_PARK)
+        .withEgressMode(FLEXIBLE)
+        .withDirectMode(BIKE_TO_PARK)
+        .withTransferMode(WALK)
+        .clearTransitModes()
+        .build(),
       modeSet.getRequestModes()
     );
   }

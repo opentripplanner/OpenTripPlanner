@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Class to use as key in HashMap containing feed id, trip id and service date

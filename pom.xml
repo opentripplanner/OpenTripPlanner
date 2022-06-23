@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>26</otp.serialization.version.id>
+        <otp.serialization.version.id>29</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>26.4</geotools.version>
         <jackson.version>2.13.2</jackson.version>
@@ -32,6 +32,7 @@
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <lucene.version>9.1.0</lucene.version>
+        <graphql.version>18.1</graphql.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -630,12 +631,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
             <version>0.23.1</version>
@@ -787,19 +782,14 @@
             <version>1.82</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>17.3</version>
+            <version>${graphql.version}</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>17.0</version>
+            <version>${graphql.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

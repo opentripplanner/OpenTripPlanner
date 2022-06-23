@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -32,17 +34,21 @@ class OperatorTest {
     copy = subject.copy().withName("v2").build();
 
     // The two objects are not he same instance, but is equal(sae id)
-    assertNotSame(copy, subject);
-    assertEquals(copy, subject);
+    assertNotSame(subject, copy);
+    assertEquals(subject, copy);
 
-    assertEquals(copy.getId().getId(), ID);
+    assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getName());
-    assertEquals(copy.getUrl(), URL);
-    assertEquals(copy.getPhone(), PHONE);
+    assertEquals(URL, copy.getUrl());
+    assertEquals(PHONE, copy.getPhone());
   }
 
   @Test
-  void testToString() {
-    assertEquals(subject.toString(), "<Operator F:1>");
+  void sameAs() {
+    assertTrue(subject.sameAs(subject.copy().build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));
   }
 }

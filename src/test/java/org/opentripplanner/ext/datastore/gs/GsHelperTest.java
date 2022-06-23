@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.datastore.gs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.cloud.storage.BlobId;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class GsHelperTest {
 
@@ -22,14 +22,12 @@ public class GsHelperTest {
   public void toBlobIdWithInvalidURL() throws URISyntaxException {
     // given:
     String illegalBucketName = "gs://n/puh";
-    try {
-      // when:
-      GsHelper.toBlobId(new URI(illegalBucketName));
-
-      fail("An exception is expected");
-    } catch (IllegalArgumentException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains(illegalBucketName));
-    }
+    // when:
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> GsHelper.toBlobId(new URI(illegalBucketName)),
+      ""
+    );
   }
 
   @Test

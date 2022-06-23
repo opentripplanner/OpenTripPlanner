@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
 import java.util.function.IntFunction;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**

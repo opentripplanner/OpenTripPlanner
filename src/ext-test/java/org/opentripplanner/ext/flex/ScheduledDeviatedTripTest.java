@@ -37,7 +37,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
@@ -140,11 +140,11 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itineraries = router.createFlexOnlyItineraries();
 
     var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.fare.fare.isEmpty());
+    assertFalse(itinerary.getFare().fare.isEmpty());
 
     assertEquals(
       new Money(new WrappedCurrency("USD"), 250),
-      itinerary.fare.getFare(FareType.regular)
+      itinerary.getFare().getFare(FareType.regular)
     );
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
@@ -176,7 +176,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertEquals(2, itineraries.size());
 
     var itin = itineraries.get(0);
-    var leg = itin.legs.get(0);
+    var leg = itin.getLegs().get(0);
 
     assertEquals("cujv", leg.getFrom().stop.getId().getId());
     assertEquals("yz85", leg.getTo().stop.getId().getId());

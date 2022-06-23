@@ -5,7 +5,7 @@ package org.opentripplanner.transit.raptor.api.transit;
  * <p/>
  * The implementation should be immutable and thread safe.
  */
-public interface CostCalculator {
+public interface CostCalculator<T extends RaptorTripSchedule> {
   /**
    * The cost is zero(0) it it is not calculated or if the cost "element" have no cost associated
    * with it.
@@ -23,7 +23,7 @@ public interface CostCalculator {
     int prevArrivalTime,
     int boardStop,
     int boardTime,
-    RaptorTripSchedule trip,
+    T trip,
     RaptorTransferConstraint transferConstraints
   );
 
@@ -32,24 +32,13 @@ public interface CostCalculator {
    * transfer cost, and the penalty for the board stop visit. This cost should NOT include the
    * previous stop arrival cost, but the incremental cost to be added to the previous stop arrival
    * cost.
-   *
-   * @param boardTime          The time of boarding
-   * @param transitFactorIndex The index used to look up the transit reluctance/factor
    */
-  int onTripRelativeRidingCost(int boardTime, int transitFactorIndex);
+  int onTripRelativeRidingCost(int boardTime, T tripScheduledBoarded);
 
   /**
    * Calculate the value when arriving by transit.
-   *
-   * @param transitFactorIndex The index used to look up the transit reluctance/factor
    */
-  int transitArrivalCost(
-    int boardCost,
-    int alightSlack,
-    int transitTime,
-    int transitFactorIndex,
-    int toStop
-  );
+  int transitArrivalCost(int boardCost, int alightSlack, int transitTime, T trip, int toStop);
 
   /**
    * Calculate the value, when waiting between the last transit and egress paths

@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -87,8 +86,8 @@ public class TestTransitData
   }
 
   @Override
-  public CostCalculator multiCriteriaCostCalculator() {
-    return new DefaultCostCalculator(costParamsBuilder.build(), stopBoarAlightCost());
+  public CostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
+    return new DefaultCostCalculator<>(costParamsBuilder.build(), stopBoarAlightCost());
   }
 
   @Override
@@ -109,7 +108,7 @@ public class TestTransitData
           .filter(tx -> tx.getSourceStopPos() == fromStopPosition)
           .filter(tx -> tx.getTrip().equals(toTrip))
           .filter(tx -> tx.getStopPositionInPattern() == toStopPosition)
-          .collect(Collectors.toList());
+          .toList();
 
         if (list.isEmpty()) {
           return null;
@@ -133,7 +132,7 @@ public class TestTransitData
     return this.routes.stream()
       .mapToInt(route -> route.timetable().getTripSchedule(0).departure(0))
       .min()
-      .getAsInt();
+      .orElseThrow();
   }
 
   @Override
@@ -147,7 +146,7 @@ public class TestTransitData
           .departure(pattern.numberOfStopsInPattern() - 1);
       })
       .max()
-      .getAsInt();
+      .orElseThrow();
   }
 
   public TestRoute getRoute(int index) {

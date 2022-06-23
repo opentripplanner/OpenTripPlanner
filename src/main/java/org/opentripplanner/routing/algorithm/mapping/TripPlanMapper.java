@@ -25,7 +25,7 @@ public class TripPlanMapper {
       from = placeFromGeoLocation(request.from, new LocalizedString("origin"));
       to = placeFromGeoLocation(request.to, new LocalizedString("destination"));
     } else {
-      List<Leg> legs = itineraries.get(0).legs;
+      List<Leg> legs = itineraries.get(0).getLegs();
       from = legs.get(0).getFrom();
       to = legs.get(legs.size() - 1).getTo();
     }

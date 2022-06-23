@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.filterchain.groupids;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StationElement;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * This creates a group identifier based on all origin and destination stations, or stops if there
@@ -23,7 +23,8 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
 
   public GroupByAllSameStations(Itinerary itinerary) {
     keySet =
-      itinerary.legs
+      itinerary
+        .getLegs()
         .stream()
         .filter(Leg::isTransitLeg)
         .map(leg ->

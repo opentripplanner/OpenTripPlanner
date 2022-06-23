@@ -17,7 +17,6 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -58,19 +57,19 @@ public class FlexIntegrationTest {
 
     var itin = getItinerary(from, to, 2);
 
-    assertEquals(4, itin.legs.size());
+    assertEquals(4, itin.getLegs().size());
 
-    var walkToBus = itin.legs.get(0);
+    var walkToBus = itin.getLegs().get(0);
     assertEquals(TraverseMode.WALK, walkToBus.getMode());
 
-    var bus = itin.legs.get(1);
+    var bus = itin.getLegs().get(1);
     assertEquals(BUS, bus.getMode());
     assertEquals("30", bus.getRoute().getShortName());
 
-    var transfer = itin.legs.get(2);
+    var transfer = itin.getLegs().get(2);
     assertEquals(TraverseMode.WALK, transfer.getMode());
 
-    var flex = itin.legs.get(3);
+    var flex = itin.getLegs().get(3);
     assertEquals(BUS, flex.getMode());
     assertEquals("Zone 2", flex.getRoute().getShortName());
     assertTrue(flex.isFlexibleTrip());
@@ -83,23 +82,23 @@ public class FlexIntegrationTest {
 
     var itin = getItinerary(from, to, 1);
 
-    assertEquals(5, itin.legs.size());
+    assertEquals(5, itin.getLegs().size());
 
-    var firstBus = itin.legs.get(0);
+    var firstBus = itin.getLegs().get(0);
     assertEquals(BUS, firstBus.getMode());
     assertEquals("856", firstBus.getRoute().getShortName());
 
-    var transferToSecondBus = itin.legs.get(1);
+    var transferToSecondBus = itin.getLegs().get(1);
     assertEquals(WALK, transferToSecondBus.getMode());
 
-    var secondBus = itin.legs.get(2);
+    var secondBus = itin.getLegs().get(2);
     assertEquals(BUS, secondBus.getMode());
     assertEquals("30", secondBus.getRoute().getShortName());
 
-    var transferToFlex = itin.legs.get(3);
+    var transferToFlex = itin.getLegs().get(3);
     assertEquals(WALK, transferToFlex.getMode());
 
-    var finalFlex = itin.legs.get(4);
+    var finalFlex = itin.getLegs().get(4);
     assertEquals(BUS, finalFlex.getMode());
     assertEquals("Zone 2", finalFlex.getRoute().getShortName());
     assertTrue(finalFlex.isFlexibleTrip());
@@ -115,14 +114,14 @@ public class FlexIntegrationTest {
     var itin = getItinerary(from, to, 1, true);
 
     // walk, flex
-    assertEquals(2, itin.legs.size());
+    assertEquals(2, itin.getLegs().size());
     assertEquals("2021-12-02T12:53:12-05:00[America/New_York]", itin.startTime().toString());
-    assertEquals(3173, itin.generalizedCost);
+    assertEquals(3173, itin.getGeneralizedCost());
 
-    var walkToFlex = itin.legs.get(0);
+    var walkToFlex = itin.getLegs().get(0);
     assertEquals(TraverseMode.WALK, walkToFlex.getMode());
 
-    var flex = itin.legs.get(1);
+    var flex = itin.getLegs().get(1);
     assertEquals(BUS, flex.getMode());
     assertEquals("Zone 2", flex.getRoute().getShortName());
     assertTrue(flex.isFlexibleTrip());
@@ -204,11 +203,15 @@ public class FlexIntegrationTest {
     request.to = to;
     request.numItineraries = 10;
     request.searchWindow = Duration.ofHours(2);
-    request.modes.egressMode = FLEXIBLE;
+
+    var modes = request.modes.copy();
+    modes.withEgressMode(FLEXIBLE);
+
     if (onlyDirect) {
-      request.modes.directMode = FLEXIBLE;
-      request.modes.transitModes = Set.of();
+      modes.withDirectMode(FLEXIBLE);
+      modes.clearTransitModes();
     }
+    request.modes = modes.build();
 
     var result = service.route(request, router);
     var itineraries = result.getTripPlan().itineraries;

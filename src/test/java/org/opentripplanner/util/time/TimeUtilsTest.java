@@ -1,7 +1,7 @@
 package org.opentripplanner.util.time;
 
 import static java.time.ZoneOffset.UTC;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -9,7 +9,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TimeUtilsTest {
 

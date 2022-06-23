@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class FrequencyEntryTest {
@@ -26,7 +26,7 @@ public class FrequencyEntryTest {
     for (int i = 0; i < STOP_NUM; ++i) {
       FeedScopedId id = TransitModelForTest.id(i + "");
 
-      Stop stop = Stop.stopForTest(id.getId(), 0.0, 0.0);
+      Stop stop = TransitModelForTest.stopForTest(id.getId(), 0.0, 0.0);
 
       StopTime stopTime = new StopTime();
       stopTime.setStop(stop);

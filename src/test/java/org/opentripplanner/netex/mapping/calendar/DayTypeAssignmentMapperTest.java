@@ -2,7 +2,7 @@ package org.opentripplanner.netex.mapping.calendar;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithOpDay;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;

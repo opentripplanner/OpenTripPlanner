@@ -112,7 +112,7 @@ filter debugging.
 | `bikeRentalDistanceRatio`                   | For routes that consist only of bike rental and walking what is the minimum fraction of _distance_ of the bike rental leg. This filters out results that consist of a long walk plus a relatively short bike rental leg. A value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order for the result to be included.                                                                                                                                                                                                                                      | double          | `0.0`           |
 | `parkAndRideDurationRatio`                  | For P+R routes that consist only of driving and walking what is the minimum fraction of _time_ of the driving leg. This filters out results that consist of driving plus a very long walk leg at the end. A value of `0.3` means that a minimum of 30% of the total time must be spent in the car in order for the result to be included. However, if there is only a single result, it is never filtered.                                                                                                                                                                                         | double          | `0.0`           |
 | `filterItinerariesWithSameFirstOrLastTrip`  | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains. Trips are considered equal if they have same id and same service day. Non-transit legs are skipped during comparison. Before filtering, trips are sorted by their generalized cost. Algorithm loops through list from top to bottom. If itinerary matches from any other itinerary from above, it is removed from list.                                                                                                                                                    | boolean         | `false`         |
-| `accessibilityScore`                        | A experimental feature contributed by IBI which adds an accessibility "score" between 0 and 1 for each leg and itinerary. This can be used by by frontend developers to implement a simple traffic light UI.                                                                                                                                                                                                                                                                                                                                                                                       | boolean         | `false`         | 
+| `accessibilityScore`                        | A experimental feature contributed by IBI which adds an sandbox accessibility "score" between 0 and 1 for each leg and itinerary. This can be used by by frontend developers to implement a simple traffic light UI.                                                                                                                                                                                                                                                                                                                                                                               | boolean         | `false`         | 
 
 #### Group by similarity filters
 
@@ -416,6 +416,15 @@ Common to all updater entries that connect to a network resource is the `url` fi
             "frequencySec": 60,
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             "sourceType": "gtfs-http",
+            // Optional parameter for defining behaviour for propagating delays to previous stops.
+            // Default value is "REQUIRED_NO_DATA" which only propagates delays backwards when it is required
+            // to ensure that the times are increasing and it sets the NO_DATA flag on the stops so these
+            // automatically updated times are not exposed through APIs and the stops at the beginning
+            // that have not received any updates, will not be shown as realtime updated.
+            // Other options are "REQUIRED" (same as default, but NO_DATA flag is not set) and
+            // "ALWAYS" (propagates delays backwards on stops with no estimates
+            // regardless if it's required or not, and NO_DATA flag is not set).
+            "backwardsDelayPropagationType": "REQUIRED_NO_DATA",
             "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
             "feedId": "TriMet"
         },

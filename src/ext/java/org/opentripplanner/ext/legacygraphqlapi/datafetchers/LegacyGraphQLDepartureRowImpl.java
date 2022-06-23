@@ -8,9 +8,9 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLDepartureRowImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLDepartureRow {
@@ -48,7 +48,7 @@ public class LegacyGraphQLDepartureRowImpl
       );
       return getSource(environment)
         .getStoptimes(
-          getRoutingService(environment),
+          getTransitService(environment),
           args.getLegacyGraphQLStartTime(),
           args.getLegacyGraphQLTimeRange(),
           args.getLegacyGraphQLNumberOfDepartures(),
@@ -59,8 +59,8 @@ public class LegacyGraphQLDepartureRowImpl
     };
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
   private PatternAtStop getSource(DataFetchingEnvironment environment) {

@@ -134,6 +134,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         }*/
         if (tripPlan.itineraries.length > 0) {
             this.drawItinerary(tripPlan.itineraries[0]);
+            if(restoring) {
+                this.zoomToBounds(tripPlan.itineraries[0]);
+            }
         }
     },
 

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
 import java.util.function.IntFunction;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
@@ -13,6 +12,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Optim
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
@@ -113,7 +113,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     TransferGenerator<T> transferGenerator,
     MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
     TransferWaitTimeCostCalculator transferWaitTimeCostCalculator,
-    CostCalculator costCalculator
+    CostCalculator<T> costCalculator
   ) {
     return new OptimizePathDomainService<>(
       transferGenerator,
