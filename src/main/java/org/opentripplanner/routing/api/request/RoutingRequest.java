@@ -783,6 +783,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
   }
 
+  public void setUseUnpreferredRoutesPenalty(int penalty) {
+    useUnpreferredRoutesPenalty = penalty;
+  }
+
   public void setBannedAgencies(Collection<FeedScopedId> ids) {
     if (ids != null) {
       bannedAgencies = Set.copyOf(ids);

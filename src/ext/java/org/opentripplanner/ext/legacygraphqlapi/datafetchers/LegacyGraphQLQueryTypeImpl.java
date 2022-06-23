@@ -661,7 +661,10 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("preferred.agencies", request::setPreferredAgenciesFromString);
       callWith.argument("unpreferred.routes", request::setUnpreferredRoutesFromString);
       callWith.argument("unpreferred.agencies", request::setUnpreferredAgenciesFromString);
-      // callWith.argument("unpreferred.useUnpreferredRoutesPenalty", request::setUseUnpreferredRoutesPenalty);
+      callWith.argument(
+        "unpreferred.useUnpreferredRoutesPenalty",
+        request::setUseUnpreferredRoutesPenalty
+      );
       callWith.argument("walkBoardCost", request::setWalkBoardCost);
       callWith.argument("bikeBoardCost", request::setBikeBoardCost);
       callWith.argument("banned.routes", request::setBannedRoutesFromString);
