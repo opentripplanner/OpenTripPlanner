@@ -31,7 +31,8 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
    */
   public GroupByTripIdAndDistance(Itinerary itinerary, double p) {
     assertPIsValid(p);
-    List<Leg> transitLegs = itinerary.legs
+    List<Leg> transitLegs = itinerary
+      .getLegs()
       .stream()
       .filter(Leg::isTransitLeg)
       .collect(Collectors.toList());
@@ -39,7 +40,7 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
     if (transitLegs.isEmpty()) {
       keySet = List.of();
     } else {
-      double limit = p * calculateTotalDistance(itinerary.legs);
+      double limit = p * calculateTotalDistance(itinerary.getLegs());
       keySet = getKeySetOfLegsByLimit(transitLegs, limit);
     }
   }

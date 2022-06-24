@@ -110,10 +110,11 @@ public class LineType {
           .newFieldDefinition()
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
-          .dataFetcher(environment -> {
-            final String netexSubMode = ((Route) environment.getSource()).getNetexSubmode();
-            return netexSubMode != null ? TransmodelTransportSubmode.fromValue(netexSubMode) : null;
-          })
+          .dataFetcher(environment ->
+            TransmodelTransportSubmode.fromValue(
+              ((Route) environment.getSource()).getNetexSubmode()
+            )
+          )
           .build()
       )
       .field(
@@ -121,7 +122,7 @@ public class LineType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getDesc())
+          .dataFetcher(environment -> ((Route) environment.getSource()).getDescription())
           .build()
       )
       .field(
@@ -149,7 +150,7 @@ public class LineType {
           .type(new GraphQLList(journeyPatternType))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForRoute()
               .get(environment.getSource());
           })
@@ -162,7 +163,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
           .dataFetcher(environment -> {
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForRoute()
               .get(environment.getSource())
               .stream()
@@ -180,7 +181,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment -> {
             List<Trip> result = GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getPatternsForRoute()
               .get(environment.getSource())
               .stream()
@@ -212,7 +213,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
             Route route = environment.getSource();
-            return GqlUtil.getRoutingService(environment).getNoticesByEntity(route);
+            return GqlUtil.getTransitService(environment).getNoticesByEntity(route);
           })
           .build()
       )

@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Comparator;
@@ -8,8 +10,7 @@ import java.util.stream.Collectors;
 import javax.xml.bind.JAXBElement;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LineStringType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
@@ -97,16 +98,16 @@ public class ServiceLinkMapperTest {
     List<ShapePoint> shapePointList = shapePoints
       .stream()
       .sorted(Comparator.comparing(ShapePoint::getSequence))
-      .collect(Collectors.toList());
+      .toList();
 
-    Assert.assertEquals(COORDINATES[0], shapePointList.get(0).getLat(), 0.0001);
-    Assert.assertEquals(COORDINATES[1], shapePointList.get(0).getLon(), 0.0001);
-    Assert.assertEquals(COORDINATES[2], shapePointList.get(1).getLat(), 0.0001);
-    Assert.assertEquals(COORDINATES[3], shapePointList.get(1).getLon(), 0.0001);
-    Assert.assertEquals(COORDINATES[2], shapePointList.get(2).getLat(), 0.0001);
-    Assert.assertEquals(COORDINATES[3], shapePointList.get(2).getLon(), 0.0001);
-    Assert.assertEquals(COORDINATES[4], shapePointList.get(3).getLat(), 0.0001);
-    Assert.assertEquals(COORDINATES[5], shapePointList.get(3).getLon(), 0.0001);
+    assertEquals(COORDINATES[0], shapePointList.get(0).getLat(), 0.0001);
+    assertEquals(COORDINATES[1], shapePointList.get(0).getLon(), 0.0001);
+    assertEquals(COORDINATES[2], shapePointList.get(1).getLat(), 0.0001);
+    assertEquals(COORDINATES[3], shapePointList.get(1).getLon(), 0.0001);
+    assertEquals(COORDINATES[2], shapePointList.get(2).getLat(), 0.0001);
+    assertEquals(COORDINATES[3], shapePointList.get(2).getLon(), 0.0001);
+    assertEquals(COORDINATES[4], shapePointList.get(3).getLat(), 0.0001);
+    assertEquals(COORDINATES[5], shapePointList.get(3).getLon(), 0.0001);
   }
 
   private ServiceLink createServiceLink(String id, double distance, Double[] coordinates) {

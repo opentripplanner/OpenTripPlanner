@@ -19,7 +19,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
   private final RaptorSlackProvider slackProvider;
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
   private final BoardAndAlightTimeSearch tripSearch;
   private final RaptorStopNameResolver stopNameResolver;
 
@@ -28,7 +28,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
   public ForwardPathMapper(
     RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
     RaptorSlackProvider slackProvider,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorStopNameResolver stopNameResolver,
     WorkerLifeCycle lifeCycle,
     boolean useApproximateTripTimesSearch

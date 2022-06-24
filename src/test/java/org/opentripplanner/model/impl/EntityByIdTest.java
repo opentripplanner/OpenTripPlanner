@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 public class EntityByIdTest {
 
@@ -64,11 +64,6 @@ public class EntityByIdTest {
 
     E(FeedScopedId id) {
       super(id);
-    }
-
-    @Override
-    public String toString() {
-      return "E-" + getId();
     }
   }
 }

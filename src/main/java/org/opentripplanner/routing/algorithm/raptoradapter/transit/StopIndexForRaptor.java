@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 /**
  * This index is temporary to help creating a fixed list of stops (by index), a reverse map of

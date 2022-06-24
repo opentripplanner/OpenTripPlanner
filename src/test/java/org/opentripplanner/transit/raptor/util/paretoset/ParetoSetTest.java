@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ParetoSetTest {
 
@@ -46,8 +47,8 @@ public class ParetoSetTest {
     // Given a empty set
     ParetoSet<Vector> set = new ParetoSet<>(LESS_THEN);
 
-    assertEquals("The initial set should be empty.", "{}", set.toString());
-    assertTrue("The initial set should be empty.", set.isEmpty());
+    assertEquals("{}", set.toString(), "The initial set should be empty.");
+    assertTrue(set.isEmpty(), "The initial set should be empty.");
   }
 
   @Test
@@ -68,7 +69,7 @@ public class ParetoSetTest {
     assertEquals("V0[5, 5, 5]", set.get(0).toString());
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void removeAVectorIsNotAllowed() {
     // Given a set with a vector
     ParetoSet<Vector> set = new ParetoSet<>(LESS_THEN);
@@ -76,7 +77,7 @@ public class ParetoSetTest {
     addOk(set, vector);
 
     // When vector is removed, expect an exception
-    set.remove(vector);
+    assertThrows(UnsupportedOperationException.class, () -> set.remove(vector));
   }
 
   @Test
@@ -454,7 +455,7 @@ public class ParetoSetTest {
       // Copy vector to avoid any identity pitfalls
       Vector vector = new Vector(v);
       boolean qualify = set.qualify(vector);
-      assertEquals("Qualify and add should return the same value.", qualify, set.add(vector));
+      assertEquals(qualify, set.add(vector), "Qualify and add should return the same value.");
     }
     assertEquals(expected, names(set));
   }
@@ -483,15 +484,15 @@ public class ParetoSetTest {
       boolean qualify = set.qualify(v1);
       boolean added = set.add(v1);
       assertEquals(
+        qualify,
+        added,
         description +
         " - qualify() and add() should return the same value. v0: " +
         v0 +
         ", v1: " +
-        v1,
-        qualify,
-        added
+        v1
       );
-      assertEquals(description, expected, set.toString());
+      assertEquals(expected, set.toString(), description);
     }
   }
 }

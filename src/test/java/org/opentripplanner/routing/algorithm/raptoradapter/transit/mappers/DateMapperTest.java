@@ -3,11 +3,13 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper.asStartOfService;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 
 public class DateMapperTest {
@@ -99,5 +101,19 @@ public class DateMapperTest {
     // Test the Instant version of this method too
     Instant instant = D2019_04_01.atStartOfDay(ZONE_ID).toInstant();
     assertEquals((23 + 24) * 3600, DateMapper.secondsSinceStartOfTime(Z0, instant));
+  }
+
+  @Test
+  public void secondsSinceStartOfTimeWithZoneId() {
+    var dateTime = ZonedDateTime.parse("2022-05-12T00:43:00+02:00");
+    var operatingDayDate = dateTime.minusDays(1).withZoneSameInstant(ZoneId.of("UTC"));
+    var zoneId = ZoneId.of("CET");
+    var startOfService = ZonedDateTime.of(2022, 5, 11, 0, 0, 0, 0, zoneId);
+
+    var desiredDuration = Duration.between(startOfService, dateTime).toSeconds();
+    assertEquals(
+      desiredDuration,
+      DateMapper.secondsSinceStartOfService(operatingDayDate, dateTime, zoneId)
+    );
   }
 }

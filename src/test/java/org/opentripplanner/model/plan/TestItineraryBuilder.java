@@ -74,8 +74,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /**
    * The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
-   * library; Hence this method is already changed. To convert into the legacy Calendar use {@link
-   * GregorianCalendar#from(ZonedDateTime)} method.
+   * library; Hence this method is already changed. To convert into the legacy Calendar use
+   * {@link GregorianCalendar#from(ZonedDateTime)} method.
    */
   public static ZonedDateTime newTime(int seconds) {
     return TimeUtils.zonedDateTime(SERVICE_DAY, seconds, UTC);
@@ -116,7 +116,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost);
-    ((StreetLeg) this.legs.get(0)).setRentedVehicle(true);
+    var leg = ((StreetLeg) this.legs.get(0));
+    var updatedLeg = StreetLegBuilder.of(leg).withRentedVehicle(true).build();
+    this.legs.add(0, updatedLeg);
     return this;
   }
 
@@ -140,7 +142,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
       fromStopIndex,
       toStopIndex,
       to,
-      serviceDate
+      serviceDate,
+      null
     );
   }
 
@@ -178,6 +181,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       TRIP_FROM_STOP_INDEX,
       TRIP_TO_STOP_INDEX,
       to,
+      null,
       null
     );
   }
@@ -189,8 +193,22 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   public Itinerary build() {
     Itinerary itinerary = new Itinerary(legs);
-    itinerary.generalizedCost = cost;
+    itinerary.setGeneralizedCost(cost);
     return itinerary;
+  }
+
+  public TestItineraryBuilder frequencyBus(int tripId, int startTime, int endTime, Place to) {
+    return transit(
+      RAIL_ROUTE,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      600
+    );
   }
 
   /* private methods */
@@ -212,7 +230,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int fromStopIndex,
     int toStopIndex,
     Place to,
-    LocalDate serviceDate
+    LocalDate serviceDate,
+    Integer headwaySecs
   ) {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");
@@ -249,20 +268,42 @@ public class TestItineraryBuilder implements PlanTestConstants {
     final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
-    ScheduledTransitLeg leg = new ScheduledTransitLeg(
-      tripTimes,
-      tripPattern,
-      fromStopIndex,
-      toStopIndex,
-      newTime(start),
-      newTime(end),
-      serviceDate != null ? serviceDate : SERVICE_DAY,
-      UTC,
-      null,
-      null,
-      legCost,
-      null
-    );
+    ScheduledTransitLeg leg;
+
+    if (headwaySecs != null) {
+      leg =
+        new FrequencyTransitLeg(
+          tripTimes,
+          tripPattern,
+          fromStopIndex,
+          toStopIndex,
+          newTime(start),
+          newTime(end),
+          serviceDate != null ? serviceDate : SERVICE_DAY,
+          UTC,
+          null,
+          null,
+          legCost,
+          headwaySecs,
+          null
+        );
+    } else {
+      leg =
+        new ScheduledTransitLeg(
+          tripTimes,
+          tripPattern,
+          fromStopIndex,
+          toStopIndex,
+          newTime(start),
+          newTime(end),
+          serviceDate != null ? serviceDate : SERVICE_DAY,
+          UTC,
+          null,
+          null,
+          legCost,
+          null
+        );
+    }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
 
@@ -277,18 +318,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
-    StreetLeg leg = new StreetLeg(
-      mode,
-      newTime(startTime),
-      newTime(endTime),
-      stop(lastPlace),
-      stop(to),
-      speed(mode) * (endTime - startTime),
-      legCost,
-      null,
-      null,
-      List.of()
-    );
+    StreetLeg leg = StreetLeg
+      .create()
+      .withMode(mode)
+      .withStartTime(newTime(startTime))
+      .withEndTime(newTime(endTime))
+      .withFrom(stop(lastPlace))
+      .withTo(stop(to))
+      .withDistanceMeters(speed(mode) * (endTime - startTime))
+      .withGeneralizedCost(legCost)
+      .withWalkSteps(List.of())
+      .build();
 
     legs.add(leg);
     cost += legCost;

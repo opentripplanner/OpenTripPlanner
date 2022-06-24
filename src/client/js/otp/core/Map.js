@@ -25,17 +25,14 @@ otp.core.Map = otp.Class({
     contextMenuModuleItems  : null,
     contextMenuLatLng       : null,
     
-    baseLayers  : {},
+    baseLayers          : {},
+    currentBaseLayer    : null,
     
     initialize : function(webapp) {
         var this_ = this;
         this.webapp = webapp;
-        
-        
-                
-        //var baseLayers = {};
-        var defaultBaseLayer = null;
-        
+
+
         for(var i=0; i<otp.config.baseLayers.length; i++) { //otp.config.baseLayers.length-1; i >= 0; i--) {
             var layerConfig = otp.config.baseLayers[i];
 
@@ -46,16 +43,18 @@ otp.core.Map = otp.Class({
             var layer = new L.TileLayer(layerConfig.tileUrl, layerProps);
 
 	        this.baseLayers[layerConfig.name] = layer;
-            if(i == 0) defaultBaseLayer = layer;            
-	        
+
 	        if(typeof layerConfig.getTileUrl != 'undefined') {
         	    layer.getTileUrl = otp.config.getTileUrl;
             }
         }
-        
+        const selectedLayer = otp.config.baseLayers.find(l => l.name === this.webapp.urlParams.baseLayer) || otp.config.baseLayers.find(m => m.isDefault);
+        this.currentBaseLayer = selectedLayer.name;
+
+        const baseLayer = this.baseLayers[this.currentBaseLayer];
 
         var mapProps = { 
-            layers  : [ defaultBaseLayer ],
+            layers  : [ baseLayer ],
             center : (otp.config.initLatLng || new L.LatLng(0,0)),
             zoom : (otp.config.initZoom || 2),
             zoomControl : false
@@ -132,7 +131,9 @@ otp.core.Map = otp.Class({
         this.lmap.on('dragend', function(event) {
             webapp.mapBoundsChanged(event);        
         });
-        
+
+        this.lmap.on('baselayerchange', (e) => { this.currentBaseLayer = e.name; });
+
         // setup context menu
         var this_ = this;
         
@@ -190,7 +191,11 @@ otp.core.Map = otp.Class({
     $ : function() {
         return $("#map");
     },
-    
+
+    getActiveBaseLayerName() {
+        return this.currentBaseLayer;
+    },
+
     CLASS_NAME : "otp.core.Map"
 });
 

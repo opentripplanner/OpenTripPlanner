@@ -4,8 +4,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.linked.TDoubleLinkedList;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,7 +29,6 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -54,15 +51,10 @@ import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopCollection;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -83,13 +75,19 @@ import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopCollection;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.MedianCalcForDoubles;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -781,24 +779,17 @@ public class Graph implements Serializable {
    */
   public void calculateTransitCenter() {
     if (hasTransit) {
-      TDoubleList latitudes = new TDoubleLinkedList();
-      TDoubleList longitudes = new TDoubleLinkedList();
-      Median median = new Median();
+      var vertices = getVerticesOfType(TransitStopVertex.class);
+      var medianCalculator = new MedianCalcForDoubles(vertices.size());
 
-      getVerticesOfType(TransitStopVertex.class)
-        .stream()
-        .forEach(v -> {
-          latitudes.add(v.getLat());
-          longitudes.add(v.getLon());
-        });
+      vertices.forEach(v -> medianCalculator.add(v.getLon()));
+      double lon = medianCalculator.median();
 
-      median.setData(latitudes.toArray());
-      double medianLatitude = median.evaluate();
-      median = new Median();
-      median.setData(longitudes.toArray());
-      double medianLongitude = median.evaluate();
+      medianCalculator.reset();
+      vertices.forEach(v -> medianCalculator.add(v.getLat()));
+      double lat = medianCalculator.median();
 
-      this.center = new Coordinate(medianLongitude, medianLatitude);
+      this.center = new Coordinate(lon, lat);
     }
   }
 

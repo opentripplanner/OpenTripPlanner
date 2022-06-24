@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This class creates a group identifier for an itinerary based on first or last trip. Two itineraries
@@ -17,7 +17,7 @@ public class GroupBySameFirstOrLastTrip implements GroupId<GroupBySameFirstOrLas
   private final List<Leg> keySet;
 
   public GroupBySameFirstOrLastTrip(Itinerary itinerary) {
-    keySet = itinerary.legs.stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+    keySet = itinerary.getLegs().stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
   }
 
   @Override

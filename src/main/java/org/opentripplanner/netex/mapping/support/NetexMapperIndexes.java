@@ -4,10 +4,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.DatedServiceJourney;
 
 /**
@@ -35,8 +35,8 @@ public class NetexMapperIndexes {
       this.stationsByMultiModalStationRfs = ArrayListMultimap.create();
       this.stopTimesByNetexId = new HashMap<>();
     } else {
-      // Cashed by level(shared files, shared group files and group files). If any entries exist at the current
-      // level, then they will hide entries at a higher level.
+      // Cached by level(shared files, shared group files and group files). If any entries exist at
+      // the current level, then they will hide entries at a higher level.
       this.datedServiceJourneysBySjId =
         index.getDatedServiceJourneys().localKeys().isEmpty()
           ? parent.datedServiceJourneysBySjId
@@ -66,7 +66,7 @@ public class NetexMapperIndexes {
 
   /**
    * This is needed to assign a notice to a stop time. It is not part of the target
-   * OTPTransitService, so we need to temporally cash this here.
+   * OTPTransitService, so we need to temporally cache this here.
    */
   public Map<String, StopTime> getStopTimesByNetexId() {
     return stopTimesByNetexId;

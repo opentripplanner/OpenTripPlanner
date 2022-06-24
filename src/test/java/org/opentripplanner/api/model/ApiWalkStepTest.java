@@ -1,9 +1,10 @@
 package org.opentripplanner.api.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ApiWalkStepTest {
 
@@ -13,7 +14,7 @@ public class ApiWalkStepTest {
 
   private ApiWalkStep step;
 
-  @Before
+  @BeforeEach
   public void init() {
     step = new ApiWalkStep();
   }

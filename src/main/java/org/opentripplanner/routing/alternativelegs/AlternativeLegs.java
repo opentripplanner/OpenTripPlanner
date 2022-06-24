@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
@@ -28,6 +26,9 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A helper class to fetch previous/next alternative legs for a scheduled transit leg.
@@ -44,6 +45,7 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     RoutingService routingService,
+    TransitService transitService,
     boolean searchBackward,
     AlternativeLegsFilter filter
   ) {
@@ -61,7 +63,7 @@ public class AlternativeLegs {
       ? List.of(toStop)
       : toStation.getChildStops();
 
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
 
     Comparator<ScheduledTransitLeg> legComparator = Comparator.comparing(
       ScheduledTransitLeg::getStartTime
@@ -75,13 +77,14 @@ public class AlternativeLegs {
 
     return origins
       .stream()
-      .flatMap(stop -> routingService.getPatternsForStop(stop, timetableSnapshot).stream())
+      .flatMap(stop -> transitService.getPatternsForStop(stop, timetableSnapshot).stream())
       .filter(tripPattern -> tripPattern.getStops().stream().anyMatch(destinations::contains))
       .filter(tripPatternPredicate)
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
       .flatMap(t ->
         generateLegs(
           routingService,
+          transitService,
           timetableSnapshot,
           t,
           leg.getStartTime(),
@@ -102,6 +105,7 @@ public class AlternativeLegs {
   @Nonnull
   private static Stream<ScheduledTransitLeg> generateLegs(
     RoutingService routingService,
+    TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
@@ -132,9 +136,9 @@ public class AlternativeLegs {
 
     for (ServiceDate serviceDate : serviceDates) {
       ServiceDay sd = new ServiceDay(
-        routingService.getServiceCodes(),
+        transitService.getServiceCodes(),
         serviceDate,
-        routingService.getCalendarService(),
+        transitService.getCalendarService(),
         pattern.getRoute().getAgency().getId()
       );
 

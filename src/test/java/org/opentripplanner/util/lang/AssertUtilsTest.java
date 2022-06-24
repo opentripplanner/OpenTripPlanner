@@ -1,8 +1,8 @@
 package org.opentripplanner.util.lang;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AssertUtilsTest {
 
@@ -15,10 +15,7 @@ public class AssertUtilsTest {
     var illegalValues = new String[] { null, "", " ", "\t", " \n\r\t\f" };
 
     for (var it : illegalValues) {
-      try {
-        AssertUtils.assertHasValue(it);
-        fail("Assertion is expected to throw an exception for value: " + it);
-      } catch (IllegalArgumentException expected) {}
+      assertThrows(IllegalArgumentException.class, () -> AssertUtils.assertHasValue(it));
     }
   }
 }

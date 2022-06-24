@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
@@ -19,21 +20,24 @@ public class ItinerariesHelper {
         // was by removing a slope limit.
         OptionalDouble maxSlope = getMaxSlope(it);
         if (maxSlope.isPresent()) {
-          it.tooSloped = maxSlope.getAsDouble() > routingRequest.maxWheelchairSlope;
-          it.maxSlope = maxSlope.getAsDouble();
+          it.setTooSloped(
+            maxSlope.getAsDouble() > routingRequest.wheelchairAccessibility.maxSlope()
+          );
+          it.setMaxSlope(maxSlope.getAsDouble());
         }
       }
     }
   }
 
   private static OptionalDouble getMaxSlope(Itinerary it) {
-    return it.legs
+    return it
+      .getLegs()
       .stream()
       .filter(StreetLeg.class::isInstance)
       .map(StreetLeg.class::cast)
       .map(StreetLeg::getWalkSteps)
       .flatMap(List::stream)
-      .map(step -> step.edges)
+      .map(WalkStep::getEdges)
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .mapToDouble(StreetEdge::getMaxSlope)

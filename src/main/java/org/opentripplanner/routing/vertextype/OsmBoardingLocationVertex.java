@@ -4,19 +4,20 @@ import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A vertex for an OSM node that represents a transit stop and has a tag to cross-reference this to
  * a stop. OTP will treat this as an authoritative statement on where the transit stop is located
  * within the street network.
- *
- * The source of this location can be an OSM node (point) in which case the precise location is used.
- *
+ * <p>
+ * The source of this location can be an OSM node (point) in which case the precise location is
+ * used.
+ * <p>
  * If the source is an area (way) then the centroid is computed and used.
  */
-public class OsmBoardingLocationVertex extends OsmVertex {
+public class OsmBoardingLocationVertex extends IntersectionVertex {
 
   public final Set<String> references;
 
@@ -25,20 +26,19 @@ public class OsmBoardingLocationVertex extends OsmVertex {
     String label,
     double x,
     double y,
-    long nodeId,
-    @Nullable String name,
+    @Nullable I18NString name,
     Collection<String> references
   ) {
-    super(g, label, x, y, nodeId, NonLocalizedString.ofNullable(name));
+    super(g, label, x, y, name);
     this.references = Set.copyOf(references);
-  }
-
-  public boolean isConnectedToStreetNetwork() {
-    return (getOutgoing().size() + getIncoming().size()) > 0;
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(getClass()).addCol("references", references).toString();
+  }
+
+  public boolean isConnectedToStreetNetwork() {
+    return (getOutgoing().size() + getIncoming().size()) > 0;
   }
 }

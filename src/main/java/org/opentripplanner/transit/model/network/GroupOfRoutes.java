@@ -1,61 +1,64 @@
 package org.opentripplanner.transit.model.network;
 
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
-import org.opentripplanner.transit.model.basic.TransitEntity2;
-import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.util.lang.AssertUtils;
 
 /**
  * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize
  * lines based on their particular purposes such as fare harmonization or public presentation. For
  * example divide lines into commercial and non-commercial groups.
  */
-public class GroupOfRoutes extends TransitEntity2<GroupOfRoutes, GroupOfRoutesBuilder> {
+public class GroupOfRoutes
+  extends TransitEntity2<GroupOfRoutes, GroupOfRoutesBuilder>
+  implements LogInfo {
 
+  private final String name;
   private final String privateCode;
   private final String shortName;
-  private final String name;
   private final String description;
 
-  public GroupOfRoutes(GroupOfRoutesBuilder builder) {
+  GroupOfRoutes(GroupOfRoutesBuilder builder) {
     super(builder.getId());
+    // required fields
+    this.name = AssertUtils.assertHasValue(builder.getName());
+
+    // Optional fields
     this.privateCode = builder.getPrivateCode();
     this.shortName = builder.getShortName();
-    this.name = builder.getName();
     this.description = builder.getDescription();
-    // TODO - Either validate these and handle the exception in the mapping
-    //      - fix the annotations as well
-    // AssertUtils.assertHasValue(privateCode);
-    // AssertUtils.assertHasValue(shortName);
-    // AssertUtils.assertHasValue(name);
   }
 
   public static GroupOfRoutesBuilder of(FeedScopedId id) {
     return new GroupOfRoutesBuilder(id);
   }
 
-  //@NotNull
-  @Nullable
-  public String getPrivateCode() {
-    return privateCode;
+  @Nonnull
+  public String getName() {
+    return logName();
   }
 
-  //@NotNull
+  @Override
+  @Nonnull
+  public String logName() {
+    return name;
+  }
+
   @Nullable
   public String getShortName() {
     return shortName;
   }
 
-  //@NotNull
   @Nullable
-  public String getName() {
-    return name;
+  public String getPrivateCode() {
+    return privateCode;
   }
 
+  @Nullable
   public String getDescription() {
     return description;
   }
@@ -66,26 +69,13 @@ public class GroupOfRoutes extends TransitEntity2<GroupOfRoutes, GroupOfRoutesBu
   }
 
   @Override
-  public boolean sameValue(GroupOfRoutes other) {
+  public boolean sameAs(@Nonnull GroupOfRoutes other) {
     return (
-      other != null &&
       getId().equals(other.getId()) &&
-      Objects.equals(privateCode, other.privateCode) &&
-      Objects.equals(shortName, other.shortName) &&
       Objects.equals(name, other.name) &&
+      Objects.equals(shortName, other.shortName) &&
+      Objects.equals(privateCode, other.privateCode) &&
       Objects.equals(description, other.description)
     );
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
-      .addObj("id", this.getId())
-      .addStr("privateCode", this.getPrivateCode())
-      .addStr("shortName", this.getShortName())
-      .addStr("name", this.getName())
-      .addStr("description", this.getDescription())
-      .toString();
   }
 }

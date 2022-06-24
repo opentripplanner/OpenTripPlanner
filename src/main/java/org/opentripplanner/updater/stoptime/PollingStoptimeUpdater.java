@@ -4,6 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -41,6 +42,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   private final String feedId;
   private final boolean fuzzyTripMatching;
   /**
+   * Defines when delays are propagated to previous stops and if these stops are given
+   * the NO_DATA flag.
+   */
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
+  /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
@@ -74,6 +80,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.fuzzyTripMatching = parameters.fuzzyTripMatching();
+    this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
@@ -90,7 +97,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   @Override
   public void setup(Graph graph) {
     if (fuzzyTripMatching) {
-      this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+      this.fuzzyTripMatcher =
+        new GtfsRealtimeFuzzyTripMatcher(
+          new RoutingService(graph),
+          new DefaultTransitService(graph)
+        );
     }
 
     // Only create a realtime data snapshot source if none exists already
@@ -110,6 +121,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
     if (fuzzyTripMatcher != null) {
       snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
+    }
+    if (backwardsDelayPropagationType != null) {
+      snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;
     }
   }
 

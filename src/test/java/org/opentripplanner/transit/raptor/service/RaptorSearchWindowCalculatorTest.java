@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -158,9 +159,9 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(3_000, subject.getSearchWindowSeconds());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void calculateNotDefinedIfMinTravelTimeNotSet() {
-    subject.calculate();
+    assertThrows(IllegalArgumentException.class, subject::calculate);
   }
 
   @Test
@@ -171,9 +172,9 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(120, subject.roundUpToNearestMinute(61));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void roundUpToNearestMinuteNotDefinedForNegativeNumbers() {
-    subject.roundUpToNearestMinute(-1);
+    assertThrows(IllegalArgumentException.class, () -> subject.roundUpToNearestMinute(-1));
   }
 
   @Test

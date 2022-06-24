@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -17,7 +16,9 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRoute {
 
@@ -147,7 +148,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> desc() {
-    return environment -> getSource(environment).getDesc();
+    return environment -> getSource(environment).getDescription();
   }
 
   @Override
@@ -174,7 +175,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
     return environment ->
-      getRoutingService(environment).getPatternsForRoute().get(getSource(environment));
+      getTransitService(environment).getPatternsForRoute().get(getSource(environment));
   }
 
   @Override
@@ -208,7 +209,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   private Iterable<Object> getStops(DataFetchingEnvironment environment) {
-    return getRoutingService(environment)
+    return getTransitService(environment)
       .getPatternsForRoute()
       .get(getSource(environment))
       .stream()
@@ -218,7 +219,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   private Iterable<Trip> getTrips(DataFetchingEnvironment environment) {
-    return getRoutingService(environment)
+    return getTransitService(environment)
       .getPatternsForRoute()
       .get(getSource(environment))
       .stream()
@@ -232,6 +233,10 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  }
+
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
   private Route getSource(DataFetchingEnvironment environment) {

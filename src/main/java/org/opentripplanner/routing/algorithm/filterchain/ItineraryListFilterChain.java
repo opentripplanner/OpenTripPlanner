@@ -46,11 +46,13 @@ public class ItineraryListFilterChain {
     // Add errors, if there were any itineraries, but they were all filtered away
     if (hasTransitItineraries && allTransitItinerariesDeleted) {
       Predicate<Itinerary> isWorseThanStreet = it ->
-        it.systemNotices
+        it
+          .getSystemNotices()
           .stream()
           .anyMatch(notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
       Predicate<Itinerary> isOutsideSearchWindow = it ->
-        it.systemNotices
+        it
+          .getSystemNotices()
           .stream()
           .anyMatch(notice -> notice.tag.equals(LatestDepartureTimeFilter.TAG));
       if (result.stream().allMatch(isOnStreetAllTheWay.or(isWorseThanStreet))) {

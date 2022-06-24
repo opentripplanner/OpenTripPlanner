@@ -2301,7 +2301,7 @@ type QueryType {
 
         DEPRECATED - Use walkReluctance instead
         """
-        maxWalkDistance: Float
+        maxWalkDistance: Float @deprecated(reason: "Does nothing. Use walkReluctance instead.")
 
         """
         The maximum time (in seconds) of pre-transit travel when using

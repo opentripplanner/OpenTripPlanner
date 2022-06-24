@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
+public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> {
 
   private String name;
   private String timezone;
@@ -19,8 +18,15 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
     super(id);
   }
 
-  AgencyBuilder(@Nullable Agency agency) {
-    super(agency);
+  AgencyBuilder(@Nonnull Agency original) {
+    super(original);
+    this.name = original.getName();
+    this.timezone = original.getTimezone();
+    this.url = original.getUrl();
+    this.lang = original.getLang();
+    this.phone = original.getPhone();
+    this.fareUrl = original.getFareUrl();
+    this.brandingUrl = original.getBrandingUrl();
   }
 
   public String getName() {
@@ -89,16 +95,5 @@ public class AgencyBuilder extends TransitEntityBuilder<Agency, AgencyBuilder> {
   @Override
   protected Agency buildFromValues() {
     return new Agency(this);
-  }
-
-  @Override
-  protected void updateLocal(@Nonnull Agency original) {
-    this.name = original.getName();
-    this.timezone = original.getTimezone();
-    this.url = original.getUrl();
-    this.lang = original.getLang();
-    this.phone = original.getPhone();
-    this.fareUrl = original.getFareUrl();
-    this.brandingUrl = original.getBrandingUrl();
   }
 }

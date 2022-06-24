@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
 import java.util.ArrayList;
@@ -12,13 +12,11 @@ import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -102,8 +100,8 @@ public class FlexStopLocationMapperTest {
 
   @Test
   public void mapFlexStopLocationGroup() {
-    Stop stop1 = getStop("1", 59.6505778, 6.3608759);
-    Stop stop2 = getStop("2", 59.6630333, 6.3697245);
+    Stop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    Stop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(
       ID_FACTORY,
@@ -153,23 +151,5 @@ public class FlexStopLocationMapperTest {
               )
           )
       );
-  }
-
-  private Stop getStop(String id, double latitude, double longitude) {
-    return new Stop(
-      ID_FACTORY.createId(id),
-      new NonLocalizedString(id),
-      id,
-      null,
-      WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
-      WheelchairAccessibility.NO_INFORMATION,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    );
   }
 }

@@ -12,7 +12,8 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.util.TranslationHelper;
 
 public class PathwayNodeMapperTest {
@@ -45,7 +46,10 @@ public class PathwayNodeMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
-  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
+  private final PathwayNodeMapper subject = new PathwayNodeMapper(
+    new TranslationHelper(),
+    stationId -> null
+  );
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_NODE);
@@ -72,7 +76,7 @@ public class PathwayNodeMapperTest {
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.PathwayNode result = subject.map(STOP);
+    PathwayNode result = subject.map(STOP);
 
     assertEquals("A:N1", result.getId().toString());
     assertEquals(CODE, result.getCode());
@@ -88,13 +92,16 @@ public class PathwayNodeMapperTest {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_NODE);
     input.setId(AGENCY_AND_ID);
+    input.setLat(LAT);
+    input.setLon(LON);
 
-    org.opentripplanner.model.PathwayNode result = subject.map(input);
+    PathwayNode result = subject.map(input);
 
     assertNotNull(result.getId());
+    assertNotNull(result.getName());
+    assertNotNull(result.getCoordinate());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertEquals(PathwayNodeMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
     assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
@@ -106,16 +113,14 @@ public class PathwayNodeMapperTest {
     input.setLocationType(Stop.LOCATION_TYPE_NODE);
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.PathwayNode result = subject.map(input);
-
-    assertThrows(IllegalStateException.class, () -> result.getCoordinate().latitude());
+    assertThrows(IllegalStateException.class, () -> subject.map(input));
   }
 
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() {
-    org.opentripplanner.model.PathwayNode result1 = subject.map(STOP);
-    org.opentripplanner.model.PathwayNode result2 = subject.map(STOP);
+    PathwayNode result1 = subject.map(STOP);
+    PathwayNode result2 = subject.map(STOP);
 
     assertSame(result1, result2);
   }

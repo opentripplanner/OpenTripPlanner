@@ -22,9 +22,6 @@ otp.modules.planner.defaultQueryParams = {
     arriveBy                        : false,
     wheelchair                      : false,
     mode                            : "TRANSIT,WALK",
-    maxWalkDistance                 : 4828.032, // 3 mi.
-    metricDefaultMaxWalkDistance    : 5000, // meters
-    imperialDefaultMaxWalkDistance  : 4828.032, // 3 mile
     preferredRoutes                 : null,
     otherThanPreferredRoutesPenalty : 300,
     bannedTrips                     : null,
@@ -69,7 +66,6 @@ otp.modules.planner.PlannerModule =
     date                    : null,
     arriveBy                : false,
     mode                    : "TRANSIT,WALK",
-    maxWalkDistance         : null,
     preferredRoutes         : null,
     bannedTrips             : null,
     optimize                : null,
@@ -133,12 +129,6 @@ otp.modules.planner.PlannerModule =
         this.planTripFunction = this.planTrip;
 
         this.defaultQueryParams = _.clone(otp.modules.planner.defaultQueryParams);
-
-        if (otp.config.metric) {
-            this.defaultQueryParams.maxWalkDistance = this.defaultQueryParams.metricDefaultMaxWalkDistance;
-        } else {
-            this.defaultQueryParams.maxWalkDistance = this.defaultQueryParams.imperialDefaultMaxWalkDistance;
-        }
 
         _.extend(this.defaultQueryParams, this.getExtendedQueryParams());
 
@@ -345,7 +335,6 @@ otp.modules.planner.PlannerModule =
                 date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format(otp.config.apiDateFormat) : moment().format(otp.config.apiDateFormat),
                 mode: this.mode
             };
-            if(this.mode !== "CAR") _.extend(queryParams, { maxWalkDistance: this.maxWalkDistance} );
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
             if(this.preferredRoutes !== null) {
@@ -495,8 +484,16 @@ otp.modules.planner.PlannerModule =
 
     constructLink : function(queryParams, additionalParams) {
         additionalParams = additionalParams ||  { };
+        additionalParams.baseLayer = this.webapp.map.getActiveBaseLayerName();
         return otp.config.siteUrl + '?module=' + this.id + "&" +
             otp.util.Text.constructUrlParamString(_.extend(_.clone(queryParams), additionalParams));
+    },
+
+    zoomToBounds: function(itin) {
+        const geometries = itin.itinData.legs.map(l => otp.util.Geo.decodePolyline(l.legGeometry.points)).flat();
+        const bounds = L.latLngBounds(geometries).pad(0.1);
+        this.webapp.map.setBounds(bounds);
+        console.log(`Zooming map to bounds ${bounds.toBBoxString()}`);
     },
 
     drawItinerary : function(itin) {
@@ -507,7 +504,6 @@ otp.modules.planner.PlannerModule =
 
         var queryParams = itin.tripPlan.queryParams;
 
-        console.log(itin.itinData);
         for(var i=0; i < itin.itinData.legs.length; i++) {
             var leg = itin.itinData.legs[i];
 

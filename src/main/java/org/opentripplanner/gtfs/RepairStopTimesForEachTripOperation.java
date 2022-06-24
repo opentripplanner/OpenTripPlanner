@@ -16,9 +16,9 @@ import org.opentripplanner.graph_builder.issues.HopZeroTime;
 import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.issues.RepeatedStops;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -73,11 +73,10 @@ public class RepairStopTimesForEachTripOperation {
       }
       if (!filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
+      } else {
+        interpolateStopTimes(stopTimes);
+        stopTimesByTrip.replace(trip, stopTimes);
       }
-
-      interpolateStopTimes(stopTimes);
-
-      stopTimesByTrip.replace(trip, stopTimes);
     }
   }
 

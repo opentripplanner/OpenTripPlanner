@@ -32,7 +32,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -101,7 +101,7 @@ public abstract class GtfsTest {
     // Stored in instance field for use in individual tests
     Itinerary itinerary = itineraries.get(0);
 
-    assertEquals(legCount, itinerary.legs.size());
+    assertEquals(legCount, itinerary.getLegs().size());
 
     return itinerary;
   }

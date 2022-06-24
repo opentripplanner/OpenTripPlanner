@@ -24,7 +24,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
   private final SlackProvider slackProvider;
   private final ParetoSet<PatternRide<T>> patternRides;
 
@@ -33,7 +33,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
     SlackProvider slackProvider,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.state = state;
@@ -98,8 +98,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
     final int boardCost = calculateCostAtBoardTime(prevArrival, boarding);
 
-    final int relativeBoardCost =
-      boardCost + calculateOnTripRelativeCost(trip.transitReluctanceFactorIndex(), boardTime);
+    final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
     patternRides.add(
       new PatternRide<>(
@@ -146,7 +145,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
    * point in place or time - as long as it can be used to compare to paths that started at the
    * origin in the same iteration, having used the same number-of-rounds to board the same trip.
    */
-  private int calculateOnTripRelativeCost(int transitReluctanceIndex, int boardTime) {
-    return costCalculator.onTripRelativeRidingCost(boardTime, transitReluctanceIndex);
+  private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
+    return costCalculator.onTripRelativeRidingCost(boardTime, tripSchedule);
   }
 }

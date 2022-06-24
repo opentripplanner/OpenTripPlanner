@@ -18,7 +18,7 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.LINE_21;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.LINE_31;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRIP_1;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_DURATION;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
@@ -26,7 +26,6 @@ import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 
 /**
@@ -59,7 +58,7 @@ public class TestPathBuilderTest implements RaptorTestConstants {
       boardCost,
       ALIGHT_SLACK,
       transitDuration,
-      TRANSIT_RELUCTANCE_INDEX,
+      TRIP_1,
       STOP_B
     );
 
