@@ -23,7 +23,7 @@ public class BelgiumWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    props.setProperties("access:destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    props.setProperties("access=destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
   }
