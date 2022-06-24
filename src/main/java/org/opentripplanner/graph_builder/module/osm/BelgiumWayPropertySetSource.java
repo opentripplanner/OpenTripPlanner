@@ -7,7 +7,11 @@ import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTra
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * OSM way properties for Belgium roads. WIP.
+ * OSM way properties for Belgium roads
+ *
+ * Changes:
+ * - Allow Bicycle & Pedestrian crossing of ways marked as access:destination
+ *   See : https://forum.openstreetmap.org/viewtopic.php?id=75840
  *
  * @author thomashermine
  * @see WayPropertySetSource
@@ -20,10 +24,6 @@ public class BelgiumWayPropertySetSource implements WayPropertySetSource {
   @Override
   public void populateProperties(WayPropertySet props) {
   
-   /* 
-   * Allow Bicycle & Pedestrian crossing of ways marked as access:destination
-   * See : https://forum.openstreetmap.org/viewtopic.php?id=75840
-   */
     props.setProperties(
     "access:destination",
     StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
