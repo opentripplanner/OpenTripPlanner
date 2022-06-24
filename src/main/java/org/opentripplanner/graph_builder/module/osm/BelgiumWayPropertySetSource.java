@@ -11,7 +11,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  *
  * Changes:
  * - Allow Bicycle & Pedestrian crossing of ways marked as access:destination
- *   See : https://forum.openstreetmap.org/viewtopic.php?id=75840
+ * See : https://forum.openstreetmap.org/viewtopic.php?id=75840
  *
  * @author thomashermine
  * @see WayPropertySetSource
@@ -23,7 +23,7 @@ public class BelgiumWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-  
+
     props.setProperties("access:destination", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
