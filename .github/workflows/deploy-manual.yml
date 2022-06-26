@@ -1,0 +1,17 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        type: environment # will be prod, dev or dev-green
+        required: true
+        default: dev-green
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/use-deploy-ecs.yml
+    with:
+      deployment-env: ${{ github.event.inputs.environment }}
+    secrets: inherit

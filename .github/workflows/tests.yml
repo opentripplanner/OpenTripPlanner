@@ -41,11 +41,14 @@ jobs:
   deploy-prod:
     if: ${{ github.ref == 'refs/heads/master' }}
     needs: tests
-    runs-on: ubuntu-latest
-    name: Deploy to Production
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/workflows/deploy.yml
-        with:
-          environment: prod
+    uses: ./.github/workflows/use-deploy-ecs.yml
+    with:
+      deployment-env: prod
+    secrets: inherit
+  deploy-local:
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: tests
+    uses: ./.github/workflows/use-deploy-ecs.yml
+    with:
+      deployment-env: local
+    secrets: inherit

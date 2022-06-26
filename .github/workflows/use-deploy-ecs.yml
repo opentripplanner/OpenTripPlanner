@@ -1,15 +1,23 @@
-# Deploy to otp-local on merge or push into master
-name: "Update otp-local"
+# Invoke deploy to ECS
+name: Reusable deploy workflow
 
 on:
-  push:
-    branches: [master]
+  workflow_call:
+    inputs:
+      deployment-env:
+        type: string
+        required: true
+        description: "Environment to deploy to: prod, dev, dev-green, or local"
+    # should inherit secrets from caller workflow
+
+concurrency:
+  group: deploy-${{ inputs.deployment-env }}
+  cancel-in-progress: true
 
 jobs:
-  auto:
-    name: Deploy ${{ github.ref }} to otp-local
+  deploy:
     runs-on: ubuntu-latest
-
+    if: contains(fromJson('["prod", "dev", "dev-green", "local"]'), inputs.deployment-env)
     steps:
       - uses: actions/checkout@v3
 
@@ -25,7 +33,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           ecs-cluster: open-trip-planner
-          ecs-service: open-trip-planner-local
+          ecs-service: ${{ format('open-trip-planner-{0}', inputs.deployment-env) }}
           docker-tag: ${{ steps.build-push.outputs.docker-tag }}
           requires-secrets: 'false'
       
@@ -34,3 +42,5 @@ jobs:
         with:
           webhook-url: ${{ secrets.SLACK_WEBHOOK }}
           job-status: ${{ job.status }}
+          custom-message: |
+            `${{ github.ref }}` deployed to open-trip-planner-${{ inputs.deployment-env }}
