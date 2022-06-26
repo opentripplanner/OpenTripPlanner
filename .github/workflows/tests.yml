@@ -39,16 +39,10 @@ jobs:
         working-directory: ${{ github.workspace }}/OTP
   
   deploy-prod:
+    name: Deploy master branch to OTP-prod
     if: ${{ github.ref == 'refs/heads/master' }}
     needs: tests
     uses: ./.github/workflows/use-deploy-ecs.yml
     with:
       deployment-env: prod
-    secrets: inherit
-  deploy-local:
-    if: ${{ github.ref == 'refs/heads/master' }}
-    needs: tests
-    uses: ./.github/workflows/use-deploy-ecs.yml
-    with:
-      deployment-env: local
     secrets: inherit

@@ -11,6 +11,7 @@ on:
 
 jobs:
   deploy:
+    name: Deploy ${{ github.ref_name }} to OTP-${{ github.event.inputs.environment }}
     uses: ./.github/workflows/use-deploy-ecs.yml
     with:
       deployment-env: ${{ github.event.inputs.environment }}
