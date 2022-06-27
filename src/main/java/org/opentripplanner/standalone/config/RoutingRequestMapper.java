@@ -6,7 +6,6 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.slf4j.Logger;
@@ -16,7 +15,7 @@ public class RoutingRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
-  public static RoutingRequest mapRoutingRequest(NodeAdapter c, FareService fareService) {
+  public static RoutingRequest mapRoutingRequest(NodeAdapter c) {
     RoutingRequest dft = new RoutingRequest();
 
     if (c.isEmpty()) {
@@ -83,7 +82,7 @@ public class RoutingRequestMapper {
     request.carPickupTime = c.asInt("carPickupTime", dft.carPickupTime);
     request.carReluctance = c.asDouble("carReluctance", dft.carReluctance);
     request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
-    request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"), fareService);
+    request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
     request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
     request.elevatorBoardCost = c.asInt("elevatorBoardCost", dft.elevatorBoardCost);
     request.elevatorBoardTime = c.asInt("elevatorBoardTime", dft.elevatorBoardTime);

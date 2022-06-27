@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
@@ -256,9 +257,7 @@ public class ItineraryListFilterChainBuilder {
       filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
     }
 
-    if (faresService != null) {
-      filters.add(new FaresFilter(faresService));
-    }
+    Optional.ofNullable(faresService).map(service -> filters.add(new FaresFilter(faresService)));
 
     // Filter transit itineraries on generalized-cost
     if (transitGeneralizedCostLimit != null) {

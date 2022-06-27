@@ -40,7 +40,7 @@ class RoutingRequestMapperTest {
       """
     );
 
-    var subject = RoutingRequestMapper.mapRoutingRequest(nodeAdapter, null);
+    var subject = RoutingRequestMapper.mapRoutingRequest(nodeAdapter);
 
     var accessibility = subject.wheelchairAccessibility;
     assertTrue(accessibility.enabled());

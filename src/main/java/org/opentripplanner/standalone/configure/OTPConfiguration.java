@@ -59,8 +59,7 @@ public class OTPConfiguration {
     this.cli = cli;
     this.otpConfig = configLoader.loadOtpConfig();
     this.buildConfig = configLoader.loadBuildConfig();
-    this.routerConfig =
-      configLoader.loadRouterConfig(buildConfig.fareServiceFactory.makeFareService());
+    this.routerConfig = configLoader.loadRouterConfig();
   }
 
   /**

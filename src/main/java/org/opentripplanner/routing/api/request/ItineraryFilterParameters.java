@@ -100,7 +100,6 @@ public class ItineraryFilterParameters {
    * {@link AccessibilityScoreFilter}
    */
   public boolean accessibilityScore;
-  public final FareService fareService;
 
   private ItineraryFilterParameters() {
     this.debug = false;
@@ -113,7 +112,6 @@ public class ItineraryFilterParameters {
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
-    this.fareService = null;
   }
 
   public ItineraryFilterParameters(ItineraryFilterParameters i) {
@@ -127,8 +125,7 @@ public class ItineraryFilterParameters {
       i.bikeRentalDistanceRatio,
       i.parkAndRideDurationRatio,
       i.filterItinerariesWithSameFirstOrLastTrip,
-      i.accessibilityScore,
-      i.fareService
+      i.accessibilityScore
     );
   }
 
@@ -142,8 +139,7 @@ public class ItineraryFilterParameters {
     double bikeRentalDistanceRatio,
     double parkAndRideDurationRatio,
     boolean filterItinerariesWithSameFirstOrLastTrip,
-    boolean accessibilityScore,
-    FareService fareService
+    boolean accessibilityScore
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -155,7 +151,6 @@ public class ItineraryFilterParameters {
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
     this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = accessibilityScore;
-    this.fareService = fareService;
   }
 
   public static ItineraryFilterParameters createDefault() {

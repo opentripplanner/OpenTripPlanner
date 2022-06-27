@@ -1,11 +1,10 @@
 package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
-import org.opentripplanner.routing.fares.FareService;
 
 public class ItineraryFiltersMapper {
 
-  public static ItineraryFilterParameters map(NodeAdapter c, FareService faresService) {
+  public static ItineraryFilterParameters map(NodeAdapter c) {
     ItineraryFilterParameters dft = ItineraryFilterParameters.createDefault();
 
     if (c.isEmpty()) {
@@ -28,8 +27,7 @@ public class ItineraryFiltersMapper {
         "filterItinerariesWithSameFirstOrLastTrip",
         dft.filterItinerariesWithSameFirstOrLastTrip
       ),
-      c.asBoolean("accessibilityScore", dft.accessibilityScore),
-      faresService
+      c.asBoolean("accessibilityScore", dft.accessibilityScore)
     );
   }
 }

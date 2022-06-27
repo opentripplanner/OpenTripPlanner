@@ -16,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,12 +140,12 @@ public class ConfigLoader {
    *
    * @see #loadJsonFile for more details.
    */
-  public RouterConfig loadRouterConfig(FareService fareService) {
+  public RouterConfig loadRouterConfig() {
     JsonNode node = loadJsonByFilename(ROUTER_CONFIG_FILENAME);
     if (node.isMissingNode()) {
       return RouterConfig.DEFAULT;
     }
-    return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true, fareService);
+    return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
   }
 
   /**

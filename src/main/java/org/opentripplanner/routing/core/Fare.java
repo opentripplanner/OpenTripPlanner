@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -87,5 +88,18 @@ public class Fare {
     tram,
     special,
     youth,
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Fare fare1 = (Fare) o;
+    return Objects.equals(fare, fare1.fare) && Objects.equals(details, fare1.details);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(fare, details);
   }
 }

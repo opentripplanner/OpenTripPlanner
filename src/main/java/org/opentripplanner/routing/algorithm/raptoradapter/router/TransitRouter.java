@@ -28,7 +28,6 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
@@ -149,17 +148,10 @@ public class TransitRouter {
       transitSearchTimeZero,
       request
     );
-    FareService fareService = router.graph.getService(FareService.class);
 
     for (Path<TripSchedule> path : paths) {
       // Convert the Raptor/Astar paths to OTP API Itineraries
       Itinerary itinerary = itineraryMapper.createItinerary(path);
-
-      // Decorate the Itineraries with fare information.
-      if (fareService != null) {
-        itinerary.setFare(fareService.getCost(itinerary));
-      }
-
       itineraries.add(itinerary);
     }
 

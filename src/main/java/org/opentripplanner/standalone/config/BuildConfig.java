@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
@@ -389,7 +388,7 @@ public class BuildConfig {
           .path("transferRequests")
           .asList()
           .stream()
-          .map(c1 -> RoutingRequestMapper.mapRoutingRequest(c1, null))
+          .map(RoutingRequestMapper::mapRoutingRequest)
           .toList();
     } else {
       transferRequests = List.of(new RoutingRequest());
