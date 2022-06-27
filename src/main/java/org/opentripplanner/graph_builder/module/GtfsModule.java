@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
@@ -25,6 +26,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -38,6 +40,7 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -70,7 +73,8 @@ public class GtfsModule implements GraphBuilderModule {
   ) {
     this.gtfsBundles = bundles;
     this.transitPeriodLimit = transitPeriodLimit;
-    this.fareServiceFactory = fareServiceFactory;
+    this.fareServiceFactory =
+      Objects.requireNonNullElse(fareServiceFactory, new DefaultFareServiceFactory());
     this.discardMinTransferTimes = discardMinTransferTimes;
   }
 
@@ -129,14 +133,17 @@ public class GtfsModule implements GraphBuilderModule {
         // NB! The calls below have side effects - the builder state is updated!
         createTripPatterns(graph, builder, calendarServiceData.getServiceIds());
 
-        OtpTransitService transitModel = builder.build();
+        OtpTransitService transitService = builder.build();
 
         // if this or previously processed gtfs bundle has transit that has not been filtered out
-        hasTransit = hasTransit || transitModel.hasActiveTransit();
+        hasTransit = hasTransit || transitService.hasActiveTransit();
 
-        addTransitModelToGraph(graph, gtfsBundle, transitModel);
+        addTransitModelToGraph(graph, gtfsBundle, transitService);
 
-        createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph, issueStore);
+        createGeometryAndBlockProcessor(gtfsBundle, transitService).run(graph, issueStore);
+
+        fareServiceFactory.processGtfs(transitService);
+        graph.putService(FareService.class, fareServiceFactory.makeFareService());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -213,7 +220,6 @@ public class GtfsModule implements GraphBuilderModule {
   ) {
     return new GeometryAndBlockProcessor(
       transitService,
-      fareServiceFactory,
       gtfsBundle.getMaxStopToShapeSnapDistance(),
       gtfsBundle.maxInterlineDistance
     );
