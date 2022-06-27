@@ -10,7 +10,7 @@ import java.util.Set;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -376,7 +376,7 @@ public class BuildConfig {
     discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
 
     // List of complex parameters
-    fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));
+    fareServiceFactory = FaresConfiguration.fromConfig(c.asRawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
     netex = new NetexConfig(c.path("netex"));
     storage = new StorageConfig(c.path("storage"));
