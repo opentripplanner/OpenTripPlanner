@@ -73,13 +73,12 @@ public class GtfsModule implements GraphBuilderModule {
   ) {
     this.gtfsBundles = bundles;
     this.transitPeriodLimit = transitPeriodLimit;
-    this.fareServiceFactory =
-      Objects.requireNonNullElse(fareServiceFactory, new DefaultFareServiceFactory());
+    this.fareServiceFactory = fareServiceFactory;
     this.discardMinTransferTimes = discardMinTransferTimes;
   }
 
   public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
-    this(bundles, transitPeriodLimit, null, false);
+    this(bundles, transitPeriodLimit, new DefaultFareServiceFactory(), false);
   }
 
   public List<String> provides() {
