@@ -24,7 +24,7 @@ import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.TestUtils;
 
-public class FaresTest {
+public class FaresIntegrationTest {
 
   public static final Fare ZERO_FARE = new Fare();
   private final WrappedCurrency USD = new WrappedCurrency("USD");
