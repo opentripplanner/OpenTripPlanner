@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-import java.util.function.IntUnaryOperator;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
-
 /**
  * A TimeTable is a list of trips in service for the given search date and a limited time before and
  * after. This can be a subset of all trips available to speed up the trip search - that is left to

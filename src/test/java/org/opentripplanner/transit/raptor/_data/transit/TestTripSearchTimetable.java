@@ -3,8 +3,8 @@ package org.opentripplanner.transit.raptor._data.transit;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripSearchTimetable;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 
 public class TestTripSearchTimetable implements TripSearchTimetable<TestTripSchedule> {
 
