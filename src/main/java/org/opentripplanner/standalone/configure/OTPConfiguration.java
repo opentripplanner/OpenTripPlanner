@@ -7,6 +7,7 @@ import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,8 @@ public class OTPConfiguration {
     this.otpConfig = configLoader.loadOtpConfig();
     this.buildConfig = configLoader.loadBuildConfig();
     this.routerConfig = configLoader.loadRouterConfig();
+
+    initializeOtpFeatures(otpConfig);
   }
 
   /**
@@ -134,5 +137,10 @@ public class OTPConfiguration {
    */
   public OtpDataStoreConfig createDataStoreConfig() {
     return new OtpDataStoreConfigAdapter(cli.getBaseDirectory(), buildConfig().storage);
+  }
+
+  private void initializeOtpFeatures(OtpConfig otpConfig) {
+    OTPFeature.enableFeatures(otpConfig.otpFeatures);
+    OTPFeature.logFeatureSetup();
   }
 }

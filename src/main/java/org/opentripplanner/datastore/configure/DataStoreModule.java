@@ -1,8 +1,11 @@
 package org.opentripplanner.datastore.configure;
 
+import dagger.Module;
+import dagger.Provides;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Singleton;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.OtpDataStore;
@@ -28,20 +31,10 @@ import org.slf4j.LoggerFactory;
  * Implementation details. This class should contain minimal amount of business logic, delegating
  * all tasks to the underlying implementations.
  */
-public class DataStoreFactory {
+@Module
+public abstract class DataStoreModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DataStoreFactory.class);
-
-  private final OtpDataStoreConfig config;
-
-  /**
-   * @param config is used to create and configure the store.
-   */
-  public DataStoreFactory(OtpDataStoreConfig config) {
-    this.config = config;
-  }
-
-  /* static factory methods, mostly used by tests */
+  private static final Logger LOG = LoggerFactory.getLogger(DataStoreModule.class);
 
   /**
    * For test only.
@@ -55,7 +48,9 @@ public class DataStoreFactory {
   /**
    * Connect to data source and prepare to retrieve data.
    */
-  public OtpDataStore open() {
+  @Singleton
+  @Provides
+  public static OtpDataStore provideDataStore(OtpDataStoreConfig config) {
     List<DataSourceRepository> repositories = new ArrayList<>();
 
     // Adding Google Cloud Storage, if the config file contains URIs with prefix "gs:"
@@ -76,9 +71,6 @@ public class DataStoreFactory {
       )
     );
 
-    OtpDataStore store = new OtpDataStore(config, repositories);
-
-    store.open();
-    return store;
+    return new OtpDataStore(config, repositories);
   }
 }

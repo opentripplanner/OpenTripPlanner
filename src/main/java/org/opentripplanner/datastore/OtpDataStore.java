@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
-import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 
 /**
@@ -38,7 +38,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
  * into cloud storage after building it. Depending on the source this might also offer enhanced
  * performance.
  * <p>
- * Use the {@link DataStoreFactory} to obtain a new instance of this class.
+ * Use the {@link DataStoreModule} to obtain a new instance of this class.
  */
 public class OtpDataStore {
 
@@ -58,12 +58,12 @@ public class OtpDataStore {
   private CompositeDataSource buildReportDir;
 
   /**
-   * Use the {@link DataStoreFactory} to create a new instance of this class.
+   * Use the {@link DataStoreModule} to create a new instance of this class.
    */
   public OtpDataStore(OtpDataStoreConfig config, List<DataSourceRepository> repositories) {
     this.config = config;
     this.repositoryDescriptions.addAll(
-        repositories.stream().map(DataSourceRepository::description).collect(Collectors.toList())
+        repositories.stream().map(DataSourceRepository::description).toList()
       );
     this.allRepositories = repositories;
     this.localRepository = getLocalDataSourceRepo(repositories);
@@ -158,7 +158,7 @@ public class OtpDataStore {
       .stream()
       .filter(it -> it instanceof LocalDataSourceRepository)
       .map(it -> (LocalDataSourceRepository) it)
-      .collect(Collectors.toList());
+      .toList();
     if (localRepos.size() != 1) {
       throw new IllegalStateException("Only one LocalDataSourceRepository is supported.");
     }

@@ -109,6 +109,9 @@ public class OTPMain {
     Graph graph = null;
     TransitModel transitModel = null;
     OTPAppConstruction app = new OTPAppConstruction(params);
+    var factory = app.getFactory();
+    var config = factory.config();
+    var datastore = factory.datastore();
 
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
@@ -117,17 +120,12 @@ public class OTPMain {
     /* Load graph from disk if one is not present from build. */
     if (params.doLoadGraph() || params.doLoadStreetGraph()) {
       DataSource inputGraph = params.doLoadGraph()
-        ? app.store().getGraph()
-        : app.store().getStreetGraph();
-      SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(inputGraph);
-      graph = serializedGraphObject.graph;
-      transitModel = serializedGraphObject.transitModel;
-      app
-        .config()
-        .updateConfigFromSerializedGraph(
-          serializedGraphObject.buildConfig,
-          serializedGraphObject.routerConfig
-        );
+        ? datastore.getGraph()
+        : datastore.getStreetGraph();
+      SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
+      graph = obj.graph;
+      transitModel = obj.transitModel;
+      factory.config().updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
     }
 
     /* Start graph builder if requested. */
@@ -148,12 +146,7 @@ public class OTPMain {
       }
       // Store graph and config used to build it, also store router-config for easy deployment
       // with using the embedded router config.
-      new SerializedGraphObject(
-        graph,
-        transitModel,
-        app.config().buildConfig(),
-        app.config().routerConfig()
-      )
+      new SerializedGraphObject(graph, transitModel, config.buildConfig(), config.routerConfig())
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
       LOG.info("Memory optimized {}", graph.deduplicator.toString());
@@ -176,12 +169,7 @@ public class OTPMain {
     // publishing the config version info make it available to the APIs
     app.setOtpConfigVersionsOnServerInfo();
 
-    Router router = new Router(
-      graph,
-      transitModel,
-      app.config().routerConfig(),
-      Metrics.globalRegistry
-    );
+    Router router = new Router(graph, transitModel, config.routerConfig(), Metrics.globalRegistry);
     router.startup();
 
     /* Start visualizer if requested. */

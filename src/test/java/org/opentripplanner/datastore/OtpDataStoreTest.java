@@ -29,7 +29,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.OTPConfiguration;
 
@@ -66,7 +66,8 @@ public class OtpDataStoreTest {
 
   @Test
   public void readEmptyDir() {
-    OtpDataStore store = new DataStoreFactory(config()).open();
+    OtpDataStore store = DataStoreModule.provideDataStore(config());
+    store.open();
     assertNoneExistingFile(store.getGraph(), GRAPH_FILENAME, GRAPH);
     assertNoneExistingFile(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     assertNoneExistingFile(store.getBuildReportDir(), REPORT_FILENAME, REPORT);
@@ -93,7 +94,8 @@ public class OtpDataStoreTest {
     write(baseDir, GRAPH_FILENAME, "Data");
     writeToDir(baseDir, REPORT_FILENAME, "index.json");
 
-    OtpDataStore store = new DataStoreFactory(config()).open();
+    OtpDataStore store = DataStoreModule.provideDataStore(config());
+    store.open();
     assertExistingSource(store.getGraph(), GRAPH_FILENAME, GRAPH);
     assertExistingSource(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     assertReportExist(store.getBuildReportDir());
@@ -160,10 +162,10 @@ public class OtpDataStoreTest {
     write(tempDataDir, "unknown-2.txt", "Data");
 
     // Open data store using the base-dir
-    OtpDataStore store = new DataStoreFactory(
+    OtpDataStore store = DataStoreModule.provideDataStore(
       new OTPConfiguration(createCliForTest(baseDir)).createDataStoreConfig()
-    )
-      .open();
+    );
+    store.open();
 
     // Collect result and prepare it for assertion
     List<String> filenames = listFilesByRelativeName(store, baseDir, tempDataDir);

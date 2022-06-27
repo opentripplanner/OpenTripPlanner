@@ -6,7 +6,7 @@ import java.io.InputStream;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.FileType;
-import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class GtfsBundle {
 
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
-    this(DataStoreFactory.compositeSource(gtfsFile, FileType.GTFS));
+    this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
   }
 
   public GtfsBundle(CompositeDataSource dataSource) {
