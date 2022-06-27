@@ -67,7 +67,7 @@ public class ConfigLoaderTest {
     FileUtils.write(file, "{requestLogFile : \"aFile.txt\"}", UTF_8);
 
     // when:
-    RouterConfig params = new ConfigLoader(tempDir).loadRouterConfig();
+    RouterConfig params = new ConfigLoader(tempDir).loadRouterConfig(null);
 
     // then:
     assertEquals("aFile.txt", params.requestLogFile());
@@ -76,7 +76,7 @@ public class ConfigLoaderTest {
   @Test
   public void whenFileDoNotExistExpectMissingNode() {
     // when: ruter-config.json do not exist
-    RouterConfig res = new ConfigLoader(tempDir).loadRouterConfig();
+    RouterConfig res = new ConfigLoader(tempDir).loadRouterConfig(null);
 
     // then: expect missing node
     assertNull(res.requestLogFile(), "Expect deafult value(null)");

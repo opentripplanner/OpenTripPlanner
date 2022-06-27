@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -27,7 +28,8 @@ public class RouterConfig implements Serializable {
   public static final RouterConfig DEFAULT = new RouterConfig(
     MissingNode.getInstance(),
     "DEFAULT",
-    false
+    false,
+    null
   );
 
   /**
@@ -44,7 +46,12 @@ public class RouterConfig implements Serializable {
   private final VectorTileConfig vectorTileLayers;
   private final FlexConfig flexConfig;
 
-  public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
+  public RouterConfig(
+    JsonNode node,
+    String source,
+    boolean logUnusedParams,
+    FareService fareService
+  ) {
     NodeAdapter adapter = new NodeAdapter(node, source);
     this.rawJson = node;
     this.configVersion = adapter.asText("configVersion", null);
@@ -53,7 +60,7 @@ public class RouterConfig implements Serializable {
     this.streetRoutingTimeoutSeconds =
       adapter.asDouble("streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT);
     this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
-    this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
+    this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"), fareService);
     this.updatersParameters = new UpdatersConfig(adapter);
     this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
     this.flexConfig = new FlexConfig(adapter.path("flex"));

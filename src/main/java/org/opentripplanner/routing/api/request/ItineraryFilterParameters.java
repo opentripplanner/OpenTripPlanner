@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.fares.FareService;
 
 /**
  * Group by Similarity filter parameters
@@ -99,6 +100,7 @@ public class ItineraryFilterParameters {
    * {@link AccessibilityScoreFilter}
    */
   public boolean accessibilityScore;
+  public final FareService fareService;
 
   private ItineraryFilterParameters() {
     this.debug = false;
@@ -111,6 +113,7 @@ public class ItineraryFilterParameters {
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
+    this.fareService = null;
   }
 
   public ItineraryFilterParameters(ItineraryFilterParameters i) {
@@ -124,7 +127,8 @@ public class ItineraryFilterParameters {
       i.bikeRentalDistanceRatio,
       i.parkAndRideDurationRatio,
       i.filterItinerariesWithSameFirstOrLastTrip,
-      i.accessibilityScore
+      i.accessibilityScore,
+      i.fareService
     );
   }
 
@@ -138,7 +142,8 @@ public class ItineraryFilterParameters {
     double bikeRentalDistanceRatio,
     double parkAndRideDurationRatio,
     boolean filterItinerariesWithSameFirstOrLastTrip,
-    boolean accessibilityScore
+    boolean accessibilityScore,
+    FareService fareService
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -150,6 +155,7 @@ public class ItineraryFilterParameters {
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
     this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = accessibilityScore;
+    this.fareService = fareService;
   }
 
   public static ItineraryFilterParameters createDefault() {

@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -389,8 +389,8 @@ public class BuildConfig {
           .path("transferRequests")
           .asList()
           .stream()
-          .map(RoutingRequestMapper::mapRoutingRequest)
-          .collect(Collectors.toUnmodifiableList());
+          .map(c1 -> RoutingRequestMapper.mapRoutingRequest(c1, null))
+          .toList();
     } else {
       transferRequests = List.of(new RoutingRequest());
     }

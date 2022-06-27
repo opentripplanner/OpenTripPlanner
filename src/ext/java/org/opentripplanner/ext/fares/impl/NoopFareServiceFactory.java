@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.fares.impl;
+package org.opentripplanner.ext.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.OtpTransitService;
