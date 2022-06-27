@@ -30,7 +30,7 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
     T trip,
     RaptorTransferConstraint transferConstraints
   ) {
-    return delegate.boardingCost(
+    int defaultCost = delegate.boardingCost(
       firstBoarding,
       prevArrivalTime,
       boardStop,
@@ -38,6 +38,9 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
       trip,
       transferConstraints
     );
+
+    int routeReluctanceCost = routePenalties.getOrDefault(trip.routeId(), ZERO_COST);
+    return defaultCost + routeReluctanceCost;
   }
 
   @Override
@@ -53,15 +56,7 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
     T trip,
     int toStop
   ) {
-    int defaultCost = delegate.transitArrivalCost(
-      boardCost,
-      alightSlack,
-      transitTime,
-      trip,
-      toStop
-    );
-    int routeReluctanceCost = routePenalties.getOrDefault(trip.routeId(), ZERO_COST);
-    return defaultCost + routeReluctanceCost;
+    return delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStop);
   }
 
   @Override
