@@ -60,7 +60,7 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
       trip,
       toStop
     );
-    int routeReluctanceCost = routePenalties.getOrDefault(trip.routeId(), 0);
+    int routeReluctanceCost = routePenalties.getOrDefault(trip.routeId(), ZERO_COST);
     return defaultCost + routeReluctanceCost;
   }
 
