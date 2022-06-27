@@ -27,7 +27,7 @@ public class McCostParamsBuilder {
     this.transitReluctanceFactors = other.transitReluctanceFactors();
     this.waitReluctanceFactor = other.waitReluctanceFactor();
     this.accessibilityRequest = other.accessibilityRequirements();
-    this.routePenalties = other.routePenaltyMap();
+    this.routePenalties = other.routePenalties();
   }
 
   public int boardCost() {

@@ -80,7 +80,7 @@ public class McCostParams {
     return accessibilityRequest;
   }
 
-  public Map<FeedScopedId, Integer> routePenaltyMap() {
+  public Map<FeedScopedId, Integer> routePenalties() {
     return routePenalties;
   }
 

@@ -72,7 +72,7 @@ public class RouteCostCalculatorTest {
 
     McCostParams costParams = McCostParamsMapper.map(routingRequest);
 
-    var map = costParams.routePenaltyMap();
+    var map = costParams.routePenalties();
 
     Integer penaltyUnprefer = map.getOrDefault(UNPREFERRED_ROUTE_ID, 0);
     Integer penaltyNone = map.getOrDefault(DEFAULT_ROUTE_ID, 0);

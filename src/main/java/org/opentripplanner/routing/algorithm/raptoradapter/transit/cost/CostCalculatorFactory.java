@@ -16,8 +16,8 @@ public class CostCalculatorFactory {
     }
 
     // append RouteCostCalculator to calculator stack if (un)preferred routes exist
-    if (mcCostParams.routePenaltyMap().size() > 0) {
-      calculator = new RouteCostCalculator(calculator, mcCostParams.routePenaltyMap());
+    if (mcCostParams.routePenalties().size() > 0) {
+      calculator = new RouteCostCalculator(calculator, mcCostParams.routePenalties());
     }
 
     return calculator;

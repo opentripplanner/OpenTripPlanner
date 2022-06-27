@@ -29,7 +29,7 @@ public class McCostParamsMapper {
     builder.wheelchairAccessibility(request.wheelchairAccessibility);
 
     builder.routePenalties(
-      buildRoutePenaltyMap(request.unpreferredRoutes, request.useUnpreferredRoutesPenalty)
+      buildRoutePenalties(request.unpreferredRoutes, request.useUnpreferredRoutesPenalty)
     );
 
     return builder.build();
@@ -60,7 +60,7 @@ public class McCostParamsMapper {
    * @param penalty
    * @return lookup table of penalties by routeId
    */
-  private static Map<FeedScopedId, Integer> buildRoutePenaltyMap(
+  private static Map<FeedScopedId, Integer> buildRoutePenalties(
     List<FeedScopedId> routeIds,
     Integer penalty
   ) {
