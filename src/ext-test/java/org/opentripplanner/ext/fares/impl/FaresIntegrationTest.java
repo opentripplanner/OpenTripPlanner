@@ -26,7 +26,6 @@ import org.opentripplanner.util.TestUtils;
 
 public class FaresIntegrationTest {
 
-  public static final Fare ZERO_FARE = new Fare();
   private final WrappedCurrency USD = new WrappedCurrency("USD");
 
   @Test
@@ -165,7 +164,7 @@ public class FaresIntegrationTest {
     from = GenericLocation.fromStopId("Origin", feedId, "D");
     to = GenericLocation.fromStopId("Destination", feedId, "E");
     fare = getFare(from, to, dateTime, router);
-    assertEquals(ZERO_FARE, fare);
+    assertEquals(Fare.empty(), fare);
 
     // A -> C, 2 components in a path
 
