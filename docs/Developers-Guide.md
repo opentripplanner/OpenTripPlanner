@@ -4,7 +4,7 @@
 
 _A Quick guide to setting up the OpenTripPlanner project._
 
-You need Git, Maven and Java 17 and an IDE installed on your computer. Your IDE might have JDK and
+You need Git, Maven and Java(JDK) and an IDE installed on your computer. Your IDE might have JDK and
 Maven embedded, if so you may skip step 3.
 
 1. Clone OpenTripPlanner from GitHub.
