@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 
 /**
  * The responsibility of this class is to calculate the best arrival times at every stop. This class
@@ -13,7 +13,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState
  * round by using the overall best time (any round including the current round).
  * <p/>
  * This class is used to calculate heuristic information like the best possible arrival times and
- * the minimum number for transfers. The results are an optimistic "guess", since we uses the
+ * the minimum number for transfers. The results are an optimistic "guess", since we use the
  * overall best time instead of best time previous round we might skip hops.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -80,5 +80,10 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
       "configuration. For example the BestTimesOnlyStopArrivalsState can not be used " +
       "with constrained transfers."
     );
+  }
+
+  @Override
+  public int calculateMinNumberOfTransfers(int stopIndex) {
+    return bestNumberOfTransfers.calculateMinNumberOfTransfers(stopIndex);
   }
 }

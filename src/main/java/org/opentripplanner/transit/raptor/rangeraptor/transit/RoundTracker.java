@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 /**
  * Round tracker to keep track of round index and when to stop exploring new rounds.
@@ -32,7 +32,7 @@ public class RoundTracker implements RoundProvider {
    */
   private int roundMaxLimit;
 
-  RoundTracker(int nRounds, int numberOfAdditionalTransfers, WorkerLifeCycle lifeCycle) {
+  public RoundTracker(int nRounds, int numberOfAdditionalTransfers, WorkerLifeCycle lifeCycle) {
     // The 'roundMaxLimit' is inclusive, while the 'nRounds' is exclusive; Hence subtract 1.
     this.roundMaxLimit = nRounds;
     this.numberOfAdditionalTransfers = numberOfAdditionalTransfers;

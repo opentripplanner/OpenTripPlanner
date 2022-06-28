@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.debug;
 import java.util.List;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 final class DebugHandlerPathAdapter extends AbstractDebugHandlerAdapter<Path<?>> {
 

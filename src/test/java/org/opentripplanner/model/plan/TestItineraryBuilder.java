@@ -74,8 +74,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /**
    * The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
-   * library; Hence this method is already changed. To convert into the legacy Calendar use {@link
-   * GregorianCalendar#from(ZonedDateTime)} method.
+   * library; Hence this method is already changed. To convert into the legacy Calendar use
+   * {@link GregorianCalendar#from(ZonedDateTime)} method.
    */
   public static ZonedDateTime newTime(int seconds) {
     return TimeUtils.zonedDateTime(SERVICE_DAY, seconds, UTC);
@@ -116,7 +116,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost);
-    ((StreetLeg) this.legs.get(0)).setRentedVehicle(true);
+    var leg = ((StreetLeg) this.legs.get(0));
+    var updatedLeg = StreetLegBuilder.of(leg).withRentedVehicle(true).build();
+    this.legs.add(0, updatedLeg);
     return this;
   }
 
@@ -316,18 +318,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
-    StreetLeg leg = new StreetLeg(
-      mode,
-      newTime(startTime),
-      newTime(endTime),
-      stop(lastPlace),
-      stop(to),
-      speed(mode) * (endTime - startTime),
-      legCost,
-      null,
-      null,
-      List.of()
-    );
+    StreetLeg leg = StreetLeg
+      .create()
+      .withMode(mode)
+      .withStartTime(newTime(startTime))
+      .withEndTime(newTime(endTime))
+      .withFrom(stop(lastPlace))
+      .withTo(stop(to))
+      .withDistanceMeters(speed(mode) * (endTime - startTime))
+      .withGeneralizedCost(legCost)
+      .withWalkSteps(List.of())
+      .build();
 
     legs.add(leg);
     cost += legCost;

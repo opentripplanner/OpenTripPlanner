@@ -343,7 +343,7 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   public ScheduledTransitLeg withAccessibilityScore(Float score) {
-    var copy = new ScheduledTransitLeg(
+    return new ScheduledTransitLeg(
       tripTimes,
       tripPattern,
       boardStopPosInPattern,
@@ -357,8 +357,6 @@ public class ScheduledTransitLeg implements Leg {
       generalizedCost,
       score
     );
-
-    return copy;
   }
 
   /**

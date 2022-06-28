@@ -8,7 +8,7 @@ Atlanta.
 
 ![Buckhead station](images/buckhead-station.png)
 
-There the coordinates of the stop in GTFS are located on Peachtree Road so OTP would instruct 
+There the coordinates of the stop in GTFS are located near Peachtree Road so OTP would instruct 
 passengers to wait on the street rather than walking down the stairs to the platform.
 
 ## OSM tagging

@@ -141,9 +141,9 @@ but there is no implementation for this.
 The debugger instrument the existing code for the given stops determined by the
 [`DebugRequest`](api/request/DebugRequest.java). If no debug listeners exist, then no debugging code
 is injected or run; hence the performance overhead under normal execution is minimal. The main
-Raptor logic will post events to the [DebugHandler](rangeraptor/view/DebugHandler.java)
+Raptor logic will post events to the [DebugHandler](rangeraptor/internalapi/DebugHandler.java)
 interface. There are one handler implementation for each event type(stop arrival, pattern ride, and
-path), all created by the [DebugHandlerFactory](rangeraptor/debug/DebugHandlerFactory.java). The
+path), all created by the [DebugHandlerFactory](rangeraptor/model/debug/DebugHandlerFactory.java). The
 handler implementations are called _Adapters_ because they take the internal Raptor event and
 convert it and passes it to the listeners passed in using the Raptor debug request.
 

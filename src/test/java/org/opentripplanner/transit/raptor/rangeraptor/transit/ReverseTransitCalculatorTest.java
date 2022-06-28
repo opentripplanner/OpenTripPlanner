@@ -16,8 +16,6 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 public class ReverseTransitCalculatorTest {
 
-  private static final int TRIP_SEARCH_BINARY_SEARCH_THRESHOLD = 7;
-
   private int latestArrivalTime = hm2time(8, 0);
   private int searchWindowSizeInSeconds = 2 * 60 * 60;
   private int earliestAcceptableDepartureTime = hm2time(16, 0);
@@ -95,7 +93,6 @@ public class ReverseTransitCalculatorTest {
 
   private TransitCalculator<TestTripSchedule> create() {
     return new ReverseTransitCalculator<>(
-      TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
       latestArrivalTime,
       searchWindowSizeInSeconds,
       earliestAcceptableDepartureTime,

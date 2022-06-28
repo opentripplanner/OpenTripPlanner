@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.PatternRideView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -50,18 +51,18 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class PatternRide<T extends RaptorTripSchedule> {
-
-  public final AbstractStopArrival<T> prevArrival;
-  public final int boardStopIndex;
-  public final int boardPos;
-  public final int boardTime;
-  public final T trip;
-
+public record PatternRide<T extends RaptorTripSchedule>(
+  AbstractStopArrival<T> prevArrival,
+  int boardStopIndex,
+  int boardPos,
+  int boardTime,
+  int boardCost,
+  int relativeCost,
+  int tripSortIndex,
+  T trip
+)
+  implements PatternRideView<T> {
   // Pareto vector: [relativeCost, tripSortIndex]
-  public final int relativeCost;
-  public final int boardCost;
-  private final int tripSortIndex;
 
   public PatternRide(
     AbstractStopArrival<T> prevArrival,
@@ -72,14 +73,16 @@ public final class PatternRide<T extends RaptorTripSchedule> {
     int relativeCost,
     T trip
   ) {
-    this.prevArrival = prevArrival;
-    this.boardStopIndex = boardStopIndex;
-    this.boardPos = boardPos;
-    this.boardTime = boardTime;
-    this.trip = trip;
-    this.boardCost = boardCost;
-    this.relativeCost = relativeCost;
-    this.tripSortIndex = trip.tripSortIndex();
+    this(
+      prevArrival,
+      boardStopIndex,
+      boardPos,
+      boardTime,
+      boardCost,
+      relativeCost,
+      trip.tripSortIndex(),
+      trip
+    );
   }
 
   /**
@@ -120,10 +123,10 @@ public final class PatternRide<T extends RaptorTripSchedule> {
       .addNum("boardStop", boardStopIndex)
       .addNum("boardPos", boardPos)
       .addServiceTime("boardTime", boardTime)
-      .addObj("trip", trip)
       .addNum("boardCost", boardCost)
       .addNum("relativeCost", relativeCost)
       .addNum("tripSortIndex", tripSortIndex)
+      .addObj("trip", trip)
       .toString();
   }
 }

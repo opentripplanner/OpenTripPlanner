@@ -4,13 +4,15 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 import com.tngtech.archunit.lang.ArchRule;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("UnusedReturnValue")
 public class Package implements ArchComponent {
 
   private final String packageIdentifier;
-  private final ArrayList<Package> allowedPackages = new ArrayList<>();
+  private final Set<Package> allowedPackages = new HashSet<>();
 
   private Package(String packageIdentifier) {
     this.packageIdentifier = packageIdentifier;
@@ -40,7 +42,7 @@ public class Package implements ArchComponent {
     return Set.of(this);
   }
 
-  public void verify() {
+  public Package verify() {
     ArchRule rule = classes()
       .that()
       .resideInAPackage(packageIdentifier)
@@ -49,6 +51,7 @@ public class Package implements ArchComponent {
       .resideInAnyPackage(allAllowedPackages());
 
     rule.check(OTP_CLASSES);
+    return this;
   }
 
   /**

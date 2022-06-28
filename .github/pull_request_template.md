@@ -50,12 +50,6 @@ Write a few words on how the new code is tested.
   pass [the continuous integration service](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Developers-Guide.md#continuous-integration)
   ?
 
-### Code style
-
-Have you followed
-the [suggested code style](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Codestyle.md)
-?
-
 ### Documentation
 
 - Have you added documentation in code covering design and rationale behind the code?
@@ -68,4 +62,10 @@ the [suggested code style](https://github.com/opentripplanner/OpenTripPlanner/bl
 
 The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md)
 is generated from the pull-request title, make sure the title describe the feature or issue fixed.
-To exclude the PR from the changelog add `[changelog skip]` in the title.
+To exclude the PR from the changelog add the label `skip changelog` to the PR.
+
+### Bumping the serialization version id
+
+If you have made changes to the way the routing graph is serialized, for example by renaming a field
+in one of the edges, then you must add the label `bump serialization id` to the PR. With this label
+Github Actions will increase the field `otp.serialization.version.id` in `pom.xml`.

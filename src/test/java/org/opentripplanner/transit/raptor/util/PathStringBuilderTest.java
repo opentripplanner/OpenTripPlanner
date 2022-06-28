@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
 public class PathStringBuilderTest {

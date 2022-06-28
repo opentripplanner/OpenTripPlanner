@@ -260,18 +260,18 @@ public class RaptorPathToItineraryMapper {
     List<Edge> edges = transfer.getEdges();
     if (edges == null || edges.isEmpty()) {
       return List.of(
-        new StreetLeg(
-          transferMode,
-          createZonedDateTime(pathLeg.fromTime()),
-          createZonedDateTime(pathLeg.toTime()),
-          from,
-          to,
-          transfer.getDistanceMeters(),
-          toOtpDomainCost(pathLeg.generalizedCost()),
-          GeometryUtils.makeLineString(transfer.getCoordinates()),
-          null,
-          List.of()
-        )
+        StreetLeg
+          .create()
+          .withMode(transferMode)
+          .withStartTime(createZonedDateTime(pathLeg.fromTime()))
+          .withEndTime(createZonedDateTime(pathLeg.toTime()))
+          .withFrom(from)
+          .withTo(to)
+          .withDistanceMeters(transfer.getDistanceMeters())
+          .withGeneralizedCost(toOtpDomainCost(pathLeg.generalizedCost()))
+          .withGeometry(GeometryUtils.makeLineString(transfer.getCoordinates()))
+          .withWalkSteps(List.of())
+          .build()
       );
     } else {
       // A RoutingRequest with a RoutingContext must be constructed so that the edges

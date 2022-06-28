@@ -4,12 +4,12 @@
 
 _A Quick guide to setting up the OpenTripPlanner project._
 
-You need Git, Maven and Java(JDK) and an IDE installed on your computer. You IDE might have JDK and
+You need Git, Maven and Java(JDK) and an IDE installed on your computer. Your IDE might have JDK and
 Maven embedded, if so you may skip step 3.
 
 1. Clone OpenTripPlanner from GitHub.
 2. Checkout the desired branch `git checkout dev-2.x`
-3. Run `maven package`- this will download all dependencies, build the project and run tests.
+3. Run `mvn package`- this will download all dependencies, build the project and run tests.
 4. Open the project in your IDE.
 
 ## Working on OTP in an IDE
@@ -215,7 +215,7 @@ is generated from the pull-request(PR) _title_ using the
 [changelog workflow](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/automatic-changelog.yml)
 . The workflow runs after the PR is merged, and it changes, commits and pushes the _Changelog.md_. A
 secret _personal access token_ is used to bypass the "Require PR with 2 approvals" rule. To exclude
-a PR from the changelog add `[changelog skip]` in the PR title.
+a PR from the changelog add the label `skip changelog` to the PR.
 
 #### How-to update the CHANGELOG_TOKEN
 
