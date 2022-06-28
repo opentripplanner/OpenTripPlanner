@@ -60,15 +60,17 @@ public class PlaceTest {
 
   static Stream<Arguments> flexStopCases = Stream.of(
     Arguments.of(null, "an intersection name"),
-    Arguments.of(new NonLocalizedString("1:stop_id"), "an intersection name"),
-    Arguments.of(new NonLocalizedString("Flex Zone 123"), "Flex Zone 123")
+    Arguments.of(new NonLocalizedString("1:stop_id"), "an intersection name (part of 1:stop_id)"),
+    Arguments.of(
+      new NonLocalizedString("Flex Zone 123"),
+      "an intersection name (part of Flex Zone 123)"
+    )
   );
 
   @ParameterizedTest(name = "Flex stop name of {0} should lead to a place name of {1}")
   @VariableSource("flexStopCases")
   public void flexStop(I18NString stopName, String expectedPlaceName) {
-    var stop = new FlexStopLocation(new FeedScopedId("1", "stop_id"));
-    stop.setName(stopName);
+    var stop = new FlexStopLocation(new FeedScopedId("1", "stop_id"), stopName);
 
     var vertex = new SimpleVertex(new Graph(), "corner", 1, 1) {
       @Override

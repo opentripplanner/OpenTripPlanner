@@ -36,7 +36,7 @@ public class ResourceBundleAdaptor {
       return ResourceBundle.getBundle(name, l);
     } catch (MissingResourceException e) {
       LOG.error(
-        "Uh oh...no .properties file could be found, so things are most definately not going to turn out well!!!",
+        "Uh oh...no .properties file could be found, so things are most definitely not going to turn out well!!!",
         e
       );
       throw e;
