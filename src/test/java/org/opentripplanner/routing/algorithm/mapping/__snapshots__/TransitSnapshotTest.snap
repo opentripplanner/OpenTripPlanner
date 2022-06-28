@@ -245,7 +245,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -261,7 +264,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -709,7 +715,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -725,7 +734,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -1238,7 +1250,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -1254,7 +1269,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -1702,7 +1720,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -1718,7 +1739,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -2231,7 +2255,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -2251,7 +2278,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -2943,7 +2973,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -2959,7 +2992,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -3410,7 +3446,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -3426,7 +3465,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -3877,7 +3919,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -3893,7 +3938,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -4344,7 +4392,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -4364,7 +4415,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -4835,7 +4889,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -4851,7 +4908,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
