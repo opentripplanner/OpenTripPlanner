@@ -257,7 +257,9 @@ public class ItineraryListFilterChainBuilder {
       filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
     }
 
-    Optional.ofNullable(faresService).map(service -> filters.add(new FaresFilter(faresService)));
+    if (faresService != null) {
+      filters.add(new FaresFilter(faresService));
+    }
 
     // Filter transit itineraries on generalized-cost
     if (transitGeneralizedCostLimit != null) {

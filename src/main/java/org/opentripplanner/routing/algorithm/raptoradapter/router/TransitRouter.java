@@ -104,8 +104,6 @@ public class TransitRouter {
       accessEgresses.getEgresses().size()
     );
 
-    var itineraries = new ArrayList<Itinerary>();
-
     // Prepare transit search
     var raptorRequest = RaptorRequestMapper.mapRequest(
       request,
@@ -149,11 +147,7 @@ public class TransitRouter {
       request
     );
 
-    for (Path<TripSchedule> path : paths) {
-      // Convert the Raptor/Astar paths to OTP API Itineraries
-      Itinerary itinerary = itineraryMapper.createItinerary(path);
-      itineraries.add(itinerary);
-    }
+    var itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();
 
     debugTimingAggregator.finishedItineraryCreation();
 
