@@ -7,7 +7,7 @@ on:
 
 jobs:
   changelog-entry:
-    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner'
+    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && !contains(github.event.pull_request.labels.*.name, 'skip changelog')
     runs-on: ubuntu-latest
     steps:
 
@@ -23,21 +23,15 @@ jobs:
 
       - name: Generate changelog entry from PR information
         run: |
-          # if the title contains "changelog skip" we don't generate an entry
-          TITLE_LOWER_CASE=`echo $TITLE | awk '{print tolower($0)}'`
-          if  [[ "${TITLE_LOWER_CASE}" =~ "changelog skip" ]]; then
-            echo "Skipping changelog entry generation"
-          else
-            # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
-            ITEM="${TITLE} [#${NUMBER}](${URL})"
-            TEMP_FILE=docs/Changelog.generated.md
-            FILE=docs/Changelog.md
-            awk "/CHANGELOG_PLACEHOLDER/{print \"- $ITEM\"}1" $FILE > $TEMP_FILE
-            mv $TEMP_FILE $FILE
-            git add $FILE
-            git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
-            git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
-          fi
+          # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
+          ITEM="${TITLE} [#${NUMBER}](${URL})"
+          TEMP_FILE=docs/Changelog.generated.md
+          FILE=docs/Changelog.md
+          awk "/CHANGELOG_PLACEHOLDER/{print \"- $ITEM\"}1" $FILE > $TEMP_FILE
+          mv $TEMP_FILE $FILE
+          git add $FILE
+          git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
+          git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
         env:
           # Use environment variables to prevent injection attack
           TITLE: ${{ github.event.pull_request.title }}
