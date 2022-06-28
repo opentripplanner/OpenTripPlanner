@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -39,8 +38,8 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
       transferConstraints
     );
 
-    int routeReluctanceCost = routePenalties.getOrDefault(trip.routeId(), ZERO_COST);
-    return defaultCost + routeReluctanceCost;
+    int unpreferenceCost = routePenalties.getOrDefault(trip.routeId(), ZERO_COST);
+    return defaultCost + unpreferenceCost;
   }
 
   @Override
