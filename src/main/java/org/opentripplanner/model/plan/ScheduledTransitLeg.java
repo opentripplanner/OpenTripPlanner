@@ -37,7 +37,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle.
  */
-public class ScheduledTransitLeg implements Leg {
+public class ScheduledTransitLeg implements FareLeg {
 
   protected final TripTimes tripTimes;
   protected final TripPattern tripPattern;

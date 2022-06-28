@@ -10,6 +10,7 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.plan.FareLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
@@ -27,7 +28,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and stops.
  */
-public class FlexibleTransitLeg implements Leg {
+public class FlexibleTransitLeg implements FareLeg {
 
   private final FlexTripEdge edge;
 
