@@ -14,7 +14,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -313,7 +312,7 @@ public class NycFareServiceImpl implements FareService {
     Fare fare = new Fare();
     fare.addFare(
       FareType.regular,
-      new WrappedCurrency(currency),
+      currency,
       (int) Math.round(totalFare * Math.pow(10, currency.getDefaultFractionDigits()))
     );
     return fare;
