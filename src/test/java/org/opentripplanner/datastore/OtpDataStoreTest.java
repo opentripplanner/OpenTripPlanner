@@ -70,7 +70,7 @@ public class OtpDataStoreTest {
 
   @Test
   public void readEmptyDir() {
-    OtpDataStore store = DataStoreModule.provideDataStore(config());
+    OtpDataStore store = DataStoreModule.provideDataStore(config(), null);
     store.open();
     assertNoneExistingFile(store.getGraph(), GRAPH_FILENAME, GRAPH);
     assertNoneExistingFile(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
@@ -98,7 +98,7 @@ public class OtpDataStoreTest {
     write(baseDir, GRAPH_FILENAME, "Data");
     writeToDir(baseDir, REPORT_FILENAME, "index.json");
 
-    OtpDataStore store = DataStoreModule.provideDataStore(config());
+    OtpDataStore store = DataStoreModule.provideDataStore(config(), null);
     store.open();
     assertExistingSource(store.getGraph(), GRAPH_FILENAME, GRAPH);
     assertExistingSource(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
@@ -167,7 +167,8 @@ public class OtpDataStoreTest {
 
     // Open data store using the base-dir
     OtpDataStore store = DataStoreModule.provideDataStore(
-      new OTPConfiguration(createCliForTest(baseDir)).createDataStoreConfig()
+      new OTPConfiguration(createCliForTest(baseDir)).createDataStoreConfig(),
+      null
     );
     store.open();
 

@@ -5,6 +5,7 @@ import dagger.Component;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.server.OTPServer;
 
@@ -29,7 +30,9 @@ import org.opentripplanner.standalone.server.OTPServer;
  */
 
 @Singleton
-@Component(modules = { OTPApplicationModule.class, DataStoreModule.class })
+@Component(
+  modules = { OTPApplicationModule.class, DataStoreModule.class, GsDataSourceModule.class }
+)
 public interface OTPApplicationFactory {
   OTPConfiguration config();
 
