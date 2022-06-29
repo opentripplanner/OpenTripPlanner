@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FlexLocationGroup;
@@ -95,6 +96,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
   private final Collection<Trip> trips;
 
   private final Collection<FlexTrip> flexTrips;
+  private Collection<FareLegRule> fareLegRules;
 
   /**
    * Create a read only version of the {@link OtpTransitService}.
@@ -103,6 +105,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.agencies = immutableList(builder.getAgenciesById().values());
     this.fareAttributes = immutableList(builder.getFareAttributes());
     this.fareRules = immutableList(builder.getFareRules());
+    this.fareLegRules = immutableList(builder.getFareLegRules());
     this.feedInfos = immutableList(builder.getFeedInfos());
     this.groupsOfStations = builder.getGroupsOfStationsById().values();
     this.multiModalStations = builder.getMultiModalStationsById().values();
@@ -143,6 +146,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<FareRule> getAllFareRules() {
     return fareRules;
+  }
+
+  @Override
+  public Collection<FareLegRule> getAllFareLegRules() {
+    return fareLegRules;
   }
 
   @Override

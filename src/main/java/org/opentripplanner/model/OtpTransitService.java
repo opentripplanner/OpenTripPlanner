@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -34,6 +35,8 @@ public interface OtpTransitService {
   Collection<FareAttribute> getAllFareAttributes();
 
   Collection<FareRule> getAllFareRules();
+
+  Collection<FareLegRule> getAllFareLegRules();
 
   Collection<FeedInfo> getAllFeedInfos();
 

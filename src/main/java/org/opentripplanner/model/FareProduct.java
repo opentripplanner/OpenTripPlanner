@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
 import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public record FareProduct(String id, String name, Money amount) {}
+public record FareProduct(FeedScopedId id, String name, Money amount) {}

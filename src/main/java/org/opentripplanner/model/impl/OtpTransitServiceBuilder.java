@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FlexLocationGroup;
@@ -67,6 +69,8 @@ public class OtpTransitServiceBuilder {
   private final List<FareAttribute> fareAttributes = new ArrayList<>();
 
   private final List<FareRule> fareRules = new ArrayList<>();
+
+  private final List<FareLegRule> fareLegRules = new ArrayList<>();
 
   private final List<FeedInfo> feedInfos = new ArrayList<>();
 
@@ -303,6 +307,10 @@ public class OtpTransitServiceBuilder {
     }
     removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
+  }
+
+  public Collection<FareLegRule> getFareLegRules() {
+    return fareLegRules;
   }
 
   /**

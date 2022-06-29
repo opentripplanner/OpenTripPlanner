@@ -1,8 +1,10 @@
 package org.opentripplanner.model;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public record FareLegRule(
-  String feedId,
-  String groupId,
-  String networkId,
-  FareProduct fareProduct
+  @Nonnull String feedId,
+  @Nullable String networkId,
+  @Nonnull FareProduct fareProduct
 ) {}

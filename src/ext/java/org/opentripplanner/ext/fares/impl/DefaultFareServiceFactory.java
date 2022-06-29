@@ -3,8 +3,12 @@ package org.opentripplanner.ext.fares.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -27,6 +31,8 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
+  private Set<FareLegRule> fareLegRules = Set.of();
+
   @Override
   public FareService makeFareService() {
     DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
@@ -41,6 +47,8 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
       transitService.getAllFareRules(),
       regularFareRules
     );
+
+    fareLegRules = new HashSet<>(transitService.getAllFareLegRules());
   }
 
   public void configure(JsonNode config) {
