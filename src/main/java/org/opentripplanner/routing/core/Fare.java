@@ -106,7 +106,7 @@ public class Fare {
   }
 
   public void addProducts(Set<FareProduct> products) {
-    this.products.addAll(products);
+    products.forEach(this::addProduct);
   }
 
   public enum FareType implements Serializable {

@@ -1,8 +1,8 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.util.Currency;
 import org.opentripplanner.model.FareProduct;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.WrappedCurrency;
 
 public class FareProductMapper {
 
@@ -11,7 +11,7 @@ public class FareProductMapper {
       AgencyAndIdMapper.mapAgencyAndId(fareProduct.getId()),
       fareProduct.getName(),
       new Money(
-        new WrappedCurrency(fareProduct.getCurrency()),
+        Currency.getInstance(fareProduct.getCurrency()),
         (int) (fareProduct.getAmount() * 100)
       )
     );
