@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import org.opentripplanner.model.FareProduct;
 
 /**
  * <p>
@@ -26,6 +29,8 @@ public class Fare {
    * https://stackoverflow.com/a/1119241/778449
    */
   public HashMap<FareType, FareComponent[]> details;
+
+  private Set<FareProduct> products = new HashSet<>();
 
   public Fare() {
     fare = new HashMap<>();
@@ -51,6 +56,10 @@ public class Fare {
 
   public void addFare(FareType fareType, Money money) {
     fare.put(fareType, money);
+  }
+
+  public void addProduct(FareProduct fareProduct) {
+    products.add(fareProduct);
   }
 
   public void addFareDetails(FareType fareType, List<FareComponent> newDetails) {
@@ -90,6 +99,14 @@ public class Fare {
     }
     buffer.append(")");
     return buffer.toString();
+  }
+
+  public Set<FareProduct> getProducts() {
+    return Set.copyOf(products);
+  }
+
+  public void addProducts(Set<FareProduct> products) {
+    this.products.addAll(products);
   }
 
   public enum FareType implements Serializable {

@@ -479,4 +479,12 @@ public class Itinerary {
   public void setFare(Fare fare) {
     this.fare = fare;
   }
+
+  public List<ScheduledTransitLeg> getTransitLegs() {
+    return getLegs()
+      .stream()
+      .filter(ScheduledTransitLeg.class::isInstance)
+      .map(ScheduledTransitLeg.class::cast)
+      .toList();
+  }
 }
