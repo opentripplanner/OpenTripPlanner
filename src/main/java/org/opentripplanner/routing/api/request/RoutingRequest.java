@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.DoubleFunction;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -477,10 +479,13 @@ public class RoutingRequest implements Cloneable, Serializable {
   public List<FeedScopedId> unpreferredRoutes = List.of();
 
   /**
-   * Penalty added for using every unpreferred route. We return number of seconds that we are
-   * willing to wait for preferred route.
+   * A cost function used to calculate penalty for an unpreferred route. Function should return
+   * number of seconds that we are willing to wait for preferred route.
    */
-  public int useUnpreferredRoutesPenalty = 300;
+  public DoubleFunction<Double> unpreferredRouteCost = RequestFunctions.createLinearFunction(
+    0.0,
+    DEFAULT_ROUTE_RELUCTANCE
+  );
 
   /**
    * Do not use certain trips
@@ -783,8 +788,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
   }
 
-  public void setUseUnpreferredRoutesPenalty(int penalty) {
-    useUnpreferredRoutesPenalty = penalty;
+  public void setUnpreferredRouteCost(String constFunction) {
+    unpreferredRouteCost = RequestFunctions.parse(constFunction);
   }
 
   public void setBannedAgencies(Collection<FeedScopedId> ids) {
@@ -1259,7 +1264,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     boolean isUnpreferedRoute = unpreferredRoutes.contains(routeID);
     boolean isUnpreferedAgency = unpreferredAgencies.contains(agencyID);
     if (isUnpreferedRoute || isUnpreferedAgency) {
-      preferences_penalty += useUnpreferredRoutesPenalty;
+      preferences_penalty += unpreferredRouteCost.apply(0);
     }
     return preferences_penalty;
   }

@@ -1,23 +1,32 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import java.util.Map;
+import java.util.Set;
+import java.util.function.DoubleFunction;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
 
+  public static final double DEFAULT_ROUTE_RELUCTANCE = 1.0;
+  public static final double UNPREFERRED_ROUTE_RELUCTANCE = 2.0;
+
   private final CostCalculator delegate;
-  private final Map<FeedScopedId, Integer> routePenalties;
+  private final Set<FeedScopedId> unpreferredRoutes;
+  private final DoubleFunction<Double> unpreferredRouteCost;
 
   public RouteCostCalculator(
     @Nonnull CostCalculator<T> delegate,
-    @Nonnull Map<FeedScopedId, Integer> routePenalties
+    @Nonnull Set<FeedScopedId> routePenalties,
+    @Nonnull DoubleFunction<Double> unpreferredRouteCost
   ) {
-    this.routePenalties = routePenalties;
+    this.unpreferredRoutes = routePenalties;
     this.delegate = delegate;
+    this.unpreferredRouteCost = unpreferredRouteCost;
   }
 
   @Override
@@ -29,7 +38,7 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
     T trip,
     RaptorTransferConstraint transferConstraints
   ) {
-    int defaultCost = delegate.boardingCost(
+    return delegate.boardingCost(
       firstBoarding,
       prevArrivalTime,
       boardStop,
@@ -37,9 +46,6 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
       trip,
       transferConstraints
     );
-
-    int unpreferenceCost = routePenalties.getOrDefault(trip.routeId(), ZERO_COST);
-    return defaultCost + unpreferenceCost;
   }
 
   @Override
@@ -55,7 +61,19 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
     T trip,
     int toStop
   ) {
-    return delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStop);
+    int unpreferCost = 0;
+    if (unpreferredRoutes.contains(trip.routeId())) {
+      // calculate cost with linear function: fixed + reluctance * transitTime
+      unpreferCost += RaptorCostConverter.toRaptorCost(unpreferredRouteCost.apply(transitTime));
+    }
+    int defaultCost = delegate.transitArrivalCost(
+      boardCost,
+      alightSlack,
+      transitTime,
+      trip,
+      toStop
+    );
+    return defaultCost + unpreferCost;
   }
 
   @Override

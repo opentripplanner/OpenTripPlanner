@@ -1,8 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.DoubleFunction;
 import javax.annotation.Nullable;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -24,7 +26,8 @@ public class McCostParams {
   private final double[] transitReluctanceFactors;
   private final double waitReluctanceFactor;
   private final WheelchairAccessibilityRequest accessibilityRequest;
-  private final Map<FeedScopedId, Integer> routePenalties;
+  private final Set<FeedScopedId> unpreferredRoutes;
+  private final DoubleFunction<Double> unpreferredCost;
 
   /**
    * Default constructor defines default values. These defaults are overridden by defaults in the
@@ -36,7 +39,8 @@ public class McCostParams {
     this.transitReluctanceFactors = null;
     this.waitReluctanceFactor = 1.0;
     this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULT;
-    this.routePenalties = Map.of();
+    this.unpreferredRoutes = Set.of();
+    this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
   }
 
   McCostParams(McCostParamsBuilder builder) {
@@ -45,7 +49,8 @@ public class McCostParams {
     this.transitReluctanceFactors = builder.transitReluctanceFactors();
     this.waitReluctanceFactor = builder.waitReluctanceFactor();
     this.accessibilityRequest = builder.wheelchairAccessibility();
-    this.routePenalties = builder.routePenalties();
+    this.unpreferredRoutes = builder.unpreferredRoutes();
+    this.unpreferredCost = builder.unpreferredCost();
   }
 
   public int boardCost() {
@@ -80,8 +85,12 @@ public class McCostParams {
     return accessibilityRequest;
   }
 
-  public Map<FeedScopedId, Integer> routePenalties() {
-    return routePenalties;
+  public Set<FeedScopedId> unpreferredRoutes() {
+    return unpreferredRoutes;
+  }
+
+  public DoubleFunction<Double> unnpreferredCost() {
+    return unpreferredCost;
   }
 
   @Override
@@ -113,7 +122,7 @@ public class McCostParams {
       .addNum("transferCost", transferCost, 0)
       .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
       .addDoubles("transitReluctanceFactors", transitReluctanceFactors, 1.0)
-      .addNum("routePenaltiesSize", routePenalties.size(), 0)
+      .addNum("routePenaltiesSize", unpreferredRoutes.size(), 0)
       .toString();
   }
 }

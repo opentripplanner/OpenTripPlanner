@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
@@ -8,8 +9,11 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.p
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -32,7 +36,10 @@ public class F02_UnpreferredRouteTest implements RaptorTestConstants {
     "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
   private static final FeedScopedId ROUTE_ID_1 = TransitModelForTest.id("1");
   private static final FeedScopedId ROUTE_ID_2 = TransitModelForTest.id("2");
-  private static final int UNPREFER_COST = 30000;
+  private static final DoubleFunction<Double> UNPREFER_COST = RequestFunctions.createLinearFunction(
+    30000,
+    DEFAULT_ROUTE_RELUCTANCE
+  );
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -86,8 +93,8 @@ public class F02_UnpreferredRouteTest implements RaptorTestConstants {
   }
 
   private void unpreferRoute(FeedScopedId routeId) {
-    var routePenalties = Map.of(routeId, UNPREFER_COST);
-    data.mcCostParamsBuilder().routePenalties(routePenalties);
+    data.mcCostParamsBuilder().unpreferredRoutes(Set.of(routeId));
+    data.mcCostParamsBuilder().unpreferredCost(UNPREFER_COST);
   }
 
   private static String expected(String route, int cost) {

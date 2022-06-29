@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.DoubleFunction;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -28,9 +29,8 @@ public class McCostParamsMapper {
 
     builder.wheelchairAccessibility(request.wheelchairAccessibility);
 
-    builder.routePenalties(
-      buildRoutePenalties(request.unpreferredRoutes, request.useUnpreferredRoutesPenalty)
-    );
+    builder.unpreferredRoutes(request.unpreferredRoutes.stream().collect(Collectors.toSet()));
+    builder.unpreferredCost(request.unpreferredRouteCost);
 
     return builder.build();
   }
@@ -52,22 +52,5 @@ public class McCostParamsMapper {
       transitReluctance[mode.ordinal()] = map.get(mode);
     }
     return transitReluctance;
-  }
-
-  /**
-   * Build a lookup table of routes that should be penalized in search by unpreference cost.
-   * @param routeIds
-   * @param penalty
-   * @return lookup table of penalties by routeId
-   */
-  private static Map<FeedScopedId, Integer> buildRoutePenalties(
-    List<FeedScopedId> routeIds,
-    Integer penalty
-  ) {
-    var map = new HashMap<FeedScopedId, Integer>();
-    for (FeedScopedId routeId : routeIds) {
-      map.put(routeId, RaptorCostConverter.toRaptorCost(penalty));
-    }
-    return map;
   }
 }
