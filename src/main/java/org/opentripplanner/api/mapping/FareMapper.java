@@ -2,7 +2,6 @@ package org.opentripplanner.api.mapping;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,14 +31,7 @@ public class FareMapper {
       })
       .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
-    var withProducts = new HashMap<>(apiFare);
-    fare
-      .getProducts()
-      .forEach(p -> {
-        withProducts.put(p.id().getId(), toApiMoney(p.amount()));
-      });
-
-    return new ApiFare(withProducts, apiComponent);
+    return new ApiFare(apiFare, apiComponent);
   }
 
   private static Map<String, ApiMoney> combineFaresAndProducts(Fare fare) {
