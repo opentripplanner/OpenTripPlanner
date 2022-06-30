@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Currency;
 
 /**
  * <strong>Fare support is very, very preliminary.</strong>
  */
-public class Money implements Comparable<Money> {
+public class Money implements Comparable<Money>, Serializable {
 
   /**
    * The currency of the money.

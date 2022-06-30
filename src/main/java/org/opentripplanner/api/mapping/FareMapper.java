@@ -2,9 +2,12 @@ package org.opentripplanner.api.mapping;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.api.model.ApiCurrency;
 import org.opentripplanner.api.model.ApiFare;
 import org.opentripplanner.api.model.ApiFareComponent;
@@ -17,30 +20,49 @@ import org.opentripplanner.routing.core.Money;
 public class FareMapper {
 
   public static ApiFare mapFare(Fare fare) {
-    Map<ApiFareType, ApiMoney> apiFare = fare.fare
-      .entrySet()
-      .stream()
-      .map(e -> {
-        var type = toApiFare(e.getKey());
-        var money = toApiMoney(e.getValue());
-        return new SimpleEntry<>(type, money);
-      })
-      .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
+    Map<String, ApiMoney> apiFare = combineFaresAndProducts(fare);
 
     Map<ApiFareType, List<ApiFareComponent>> apiComponent = fare.details
       .entrySet()
       .stream()
       .map(e -> {
-        var type = toApiFare(e.getKey());
+        var type = toApiFareType(e.getKey());
         var money = Arrays.stream(e.getValue()).map(FareMapper::toApiFareComponent).toList();
         return new SimpleEntry<>(type, money);
       })
-      .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
+      .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
-    return new ApiFare(apiFare, apiComponent);
+    var withProducts = new HashMap<>(apiFare);
+    fare
+      .getProducts()
+      .forEach(p -> {
+        withProducts.put(p.id().getId(), toApiMoney(p.amount()));
+      });
+
+    return new ApiFare(withProducts, apiComponent);
   }
 
-  private static ApiFareType toApiFare(Fare.FareType t) {
+  private static Map<String, ApiMoney> combineFaresAndProducts(Fare fare) {
+    // fares v1
+    var fares = fare.fare
+      .entrySet()
+      .stream()
+      .map(e -> {
+        var type = e.getKey().name();
+        var money = toApiMoney(e.getValue());
+        return new SimpleEntry<>(type, money);
+      });
+
+    // fares v2
+    var products = fare
+      .getProducts()
+      .stream()
+      .map(p -> new SimpleEntry<>(p.id().toString(), toApiMoney(p.amount())));
+
+    return Stream.concat(fares, products).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+  }
+
+  private static ApiFareType toApiFareType(Fare.FareType t) {
     return switch (t) {
       case regular -> ApiFareType.regular;
       case student -> ApiFareType.student;

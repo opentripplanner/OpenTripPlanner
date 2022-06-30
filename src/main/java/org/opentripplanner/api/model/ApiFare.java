@@ -4,6 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 public record ApiFare(
-  Map<ApiFareType, ApiMoney> fare,
+  Map<String, ApiMoney> fare,
   Map<ApiFareType, List<ApiFareComponent>> details
 ) {}
