@@ -29,7 +29,6 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -40,6 +39,7 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
@@ -115,10 +115,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   protected ServiceDate lastPurgeDate = null;
   protected long lastSnapshotTime = -1;
 
-  public SiriTimetableSnapshotSource(final Graph graph) {
-    timeZone = graph.getTimeZone();
-    transitService = new DefaultTransitService(graph);
-    transitLayerUpdater = graph.transitLayerUpdater;
+  public SiriTimetableSnapshotSource(final TransitModel transitModel) {
+    timeZone = transitModel.getTimeZone();
+    transitService = new DefaultTransitService(transitModel);
+    transitLayerUpdater = transitModel.transitLayerUpdater;
     siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(transitService);
   }
 
@@ -151,13 +151,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   * @param graph       graph to update (needed for adding/changing stop patterns)
+   * @param transitModel       transitModel to update (needed for adding/changing stop patterns)
    * @param fullDataset true iff the list with updates represent all updates that are active right
    *                    now, i.e. all previous updates should be disregarded
    * @param updates     SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyVehicleMonitoring(
-    final Graph graph,
+    final TransitModel transitModel,
     final String feedId,
     final boolean fullDataset,
     final List<VehicleMonitoringDeliveryStructure> updates
@@ -186,7 +186,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           int handledCounter = 0;
           int skippedCounter = 0;
           for (VehicleActivityStructure activity : activities) {
-            boolean handled = handleModifiedTrip(graph, activity, serviceDate);
+            boolean handled = handleModifiedTrip(transitModel, activity, serviceDate);
             if (handled) {
               handledCounter++;
             } else {
@@ -230,13 +230,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   * @param graph       graph to update (needed for adding/changing stop patterns)
+   * @param transitModel       transitModel to update (needed for adding/changing stop patterns)
    * @param fullDataset true iff the list with updates represent all updates that are active right
    *                    now, i.e. all previous updates should be disregarded
    * @param updates     SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyEstimatedTimetable(
-    final Graph graph,
+    final TransitModel transitModel,
     final String feedId,
     final boolean fullDataset,
     final List<EstimatedTimetableDeliveryStructure> updates
@@ -270,7 +270,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               if (journey.isExtraJourney() != null && journey.isExtraJourney()) {
                 // Added trip
                 try {
-                  if (handleAddedTrip(graph, feedId, journey)) {
+                  if (handleAddedTrip(transitModel, feedId, journey)) {
                     addedCounter++;
                   } else {
                     skippedCounter++;
@@ -286,7 +286,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 }
               } else {
                 // Updated trip
-                if (handleModifiedTrip(graph, feedId, journey)) {
+                if (handleModifiedTrip(transitModel, feedId, journey)) {
                   handledCounter++;
                 } else {
                   if (journey.isMonitored() != null && !journey.isMonitored()) {
@@ -343,7 +343,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean handleModifiedTrip(
-    Graph graph,
+    TransitModel transitModel,
     VehicleActivityStructure activity,
     ServiceDate serviceDate
   ) {
@@ -418,7 +418,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
     boolean success = false;
     for (TripPattern pattern : patterns) {
-      if (handleTripPatternUpdate(graph, pattern, activity, trip, serviceDate)) {
+      if (handleTripPatternUpdate(transitModel, pattern, activity, trip, serviceDate)) {
         success = true;
       }
     }
@@ -430,7 +430,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean handleTripPatternUpdate(
-    Graph graph,
+    TransitModel transitModel,
     TripPattern pattern,
     VehicleActivityStructure activity,
     Trip trip,
@@ -442,7 +442,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       currentTimetable,
       activity,
       trip.getId(),
-      graph::getStopLocationById
+      transitModel::getStopLocationById
     );
     if (updatedTripTimes == null) {
       return false;
@@ -466,7 +466,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean handleAddedTrip(
-    Graph graph,
+    TransitModel transitModel,
     String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
@@ -503,18 +503,20 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       externalLineRef = lineRef;
     }
 
-    Operator operator = graph.index.getOperatorForId().get(new FeedScopedId(feedId, operatorRef));
+    Operator operator = transitModel.index
+      .getOperatorForId()
+      .get(new FeedScopedId(feedId, operatorRef));
     //        Preconditions.checkNotNull(operator, "Operator " + operatorRef + " is unknown");
 
     FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
 
     Route replacedRoute = null;
     if (externalLineRef != null) {
-      replacedRoute = graph.index.getRouteForId(new FeedScopedId(feedId, externalLineRef));
+      replacedRoute = transitModel.index.getRouteForId(new FeedScopedId(feedId, externalLineRef));
     }
 
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
-    Route route = graph.index.getRouteForId(routeId);
+    Route route = transitModel.index.getRouteForId(routeId);
 
     if (route == null) { // Route is unknown - create new
       var routeBuilder = Route.of(routeId);
@@ -528,7 +530,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       // TODO - SIRI: Is there a better way to find authority/Agency?
       // Finding first Route with same Operator, and using same Authority
-      Agency agency = graph.index
+      Agency agency = transitModel.index
         .getAllRoutes()
         .stream()
         .filter(route1 ->
@@ -548,8 +550,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         );
       }
       route = routeBuilder.build();
-      LOG.info("Adding route {} to graph.", routeId);
-      graph.index.addRoutes(route);
+      LOG.info("Adding route {} to transitModel.", routeId);
+      transitModel.index.addRoutes(route);
     }
 
     var tripBuilder = Trip.of(tripId);
@@ -561,7 +563,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    FeedScopedId calServiceId = graph.getOrCreateServiceIdForDate(serviceDate);
+    FeedScopedId calServiceId = transitModel.getOrCreateServiceIdForDate(serviceDate);
 
     if (calServiceId == null) {
       return false;
@@ -678,7 +680,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     TripPattern pattern = new TripPattern(id, tripBuilder.getRoute(), stopPattern);
 
-    TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, graph.deduplicator);
+    TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, transitModel.deduplicator);
 
     boolean isJourneyPredictionInaccurate =
       (
@@ -724,8 +726,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Adding trip to index necessary to include values in graphql-queries
     // TODO - SIRI: should more data be added to index?
-    graph.index.getTripForId().put(tripId, trip);
-    graph.index.getPatternForTrip().put(trip, pattern);
+    transitModel.index.getTripForId().put(tripId, trip);
+    transitModel.index.getPatternForTrip().put(trip, pattern);
 
     if (
       estimatedVehicleJourney.isCancellation() != null && estimatedVehicleJourney.isCancellation()
@@ -735,7 +737,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       tripTimes.setRealTimeState(RealTimeState.ADDED);
     }
 
-    tripTimes.setServiceCode(graph.getServiceCodes().get(calServiceId));
+    tripTimes.setServiceCode(transitModel.getServiceCodes().get(calServiceId));
 
     pattern.add(tripTimes);
 
@@ -746,7 +748,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     return addTripToGraphAndBuffer(
       feedId,
-      graph,
+      transitModel,
       trip,
       aimedStopTimes,
       addedStops,
@@ -795,7 +797,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean handleModifiedTrip(
-    Graph graph,
+    TransitModel transitModel,
     String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
@@ -854,9 +856,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           currentTimetable,
           estimatedVehicleJourney,
           tripMatchedByServiceJourneyId.getId(),
-          graph::getStopLocationById,
+          transitModel::getStopLocationById,
           timeZone.toZoneId(),
-          graph.deduplicator
+          transitModel.deduplicator
         );
         if (exactUpdatedTripTimes != null) {
           times.add(exactUpdatedTripTimes);
@@ -908,9 +910,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             currentTimetable,
             estimatedVehicleJourney,
             matchingTrip.getId(),
-            graph::getStopLocationById,
+            transitModel::getStopLocationById,
             timeZone.toZoneId(),
-            graph.deduplicator
+            transitModel.deduplicator
           );
           if (updatedTripTimes != null) {
             patterns.add(pattern);
@@ -956,13 +958,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             var modifiedStops = createModifiedStops(
               pattern,
               estimatedVehicleJourney,
-              graph::getStopLocationById
+              transitModel::getStopLocationById
             );
             List<StopTime> modifiedStopTimes = createModifiedStopTimes(
               pattern,
               tripTimes,
               estimatedVehicleJourney,
-              graph::getStopLocationById
+              transitModel::getStopLocationById
             );
 
             if (modifiedStops != null && modifiedStops.isEmpty()) {
@@ -973,7 +975,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 result |
                 addTripToGraphAndBuffer(
                   feedId,
-                  graph,
+                  transitModel,
                   trip,
                   modifiedStopTimes,
                   modifiedStops,
@@ -1042,13 +1044,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Add a (new) trip to the graph and the buffer
+   * Add a (new) trip to the transitModel and the buffer
    *
    * @return true if successful
    */
   private boolean addTripToGraphAndBuffer(
     final String feedId,
-    final Graph graph,
+    final TransitModel transitModel,
     final Trip trip,
     final List<StopTime> stopTimes,
     final List<StopLocation> stops,
@@ -1070,12 +1072,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
       trip,
-      graph,
+      transitModel,
       serviceDate
     );
 
     // Add service code to bitset of pattern if needed (using copy on write)
-    final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
+    final int serviceCode = transitModel.getServiceCodes().get(trip.getServiceId());
     pattern.setServiceCode(serviceCode);
 
     /*

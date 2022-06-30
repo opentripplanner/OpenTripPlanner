@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
 
 /**
  * The responsibility of this class is to provide access to all data sources OTP uses like the
@@ -77,7 +78,7 @@ public class OtpDataStore {
    *
    * @param path the location where the graph file must exist.
    * @return The graph file - the graph is not loaded, you can use the {@link
-   * org.opentripplanner.routing.graph.SerializedGraphObject#load(File)} to load the graph.
+   * SerializedGraphObject#load(File)} to load the graph.
    */
   public static File graphFile(File path) {
     return new File(path, GRAPH_FILENAME);

@@ -45,6 +45,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,8 +99,8 @@ public class GeometryAndBlockProcessor {
 
   // TODO OTP2 - Instead of exposing the graph (the entire world) to this class, this class should
   //           - Create a datastructure and return it, then that should be injected into the graph.
-  public void run(Graph graph) {
-    run(graph, new DataImportIssueStore(false));
+  public void run(Graph graph, TransitModel transitModel) {
+    run(graph, transitModel, new DataImportIssueStore(false));
   }
 
   /**
@@ -110,7 +111,7 @@ public class GeometryAndBlockProcessor {
    * the graph, the OtpTransitService and others are not.
    */
   @SuppressWarnings("Convert2MethodRef")
-  public void run(Graph graph, DataImportIssueStore issueStore) {
+  public void run(Graph graph, TransitModel transitModel, DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
 
     fareServiceFactory.processGtfs(transitService);
@@ -118,7 +119,7 @@ public class GeometryAndBlockProcessor {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
     for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
       // TODO: FIX Service code collision for multiple feeds.
-      graph.getServiceCodes().put(serviceId, graph.getServiceCodes().size());
+      transitModel.getServiceCodes().put(serviceId, transitModel.getServiceCodes().size());
     }
 
     LOG.info("Processing geometries and blocks on graph...");
@@ -176,10 +177,10 @@ public class GeometryAndBlockProcessor {
         // Make a single unified geometry, and also store the per-hop split geometries.
         tripPattern.setHopGeometries(hopGeometries);
       }
-      tripPattern.setServiceCodes(graph.getServiceCodes()); // TODO this could be more elegant
+      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-      graph.tripPatternForId.put(tripPattern.getId(), tripPattern);
+      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
     }
 
     /* Identify interlined trips and create the necessary edges. */
@@ -191,7 +192,7 @@ public class GeometryAndBlockProcessor {
       tableTripPattern.getScheduledTimetable().finish();
     }
 
-    graph.putService(FareService.class, fareServiceFactory.makeFareService());
+    transitModel.putService(FareService.class, fareServiceFactory.makeFareService());
   }
 
   public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {

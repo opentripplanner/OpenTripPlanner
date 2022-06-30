@@ -193,7 +193,7 @@ public class LineType {
               // Workaround since flex trips are not part of patterns yet
               result.addAll(
                 GqlUtil
-                  .getRoutingService(environment)
+                  .getTransitService(environment)
                   .getFlexIndex()
                   .tripById.values()
                   .stream()
@@ -225,7 +225,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTransitAlertService()
               .getRouteAlerts(((Route) environment.getSource()).getId())
           )

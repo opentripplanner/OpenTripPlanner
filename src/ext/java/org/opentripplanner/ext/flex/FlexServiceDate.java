@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex;
 import gnu.trove.set.TIntSet;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This class contains information used in a flex router, and depends on the date the search was
@@ -29,10 +29,12 @@ public class FlexServiceDate {
     this.servicesRunning = servicesRunning;
   }
 
-  boolean isFlexTripRunning(FlexTrip flexTrip, Graph graph) {
+  boolean isFlexTripRunning(FlexTrip flexTrip, TransitModel transitModel) {
     return (
       servicesRunning != null &&
-      servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()))
+      servicesRunning.contains(
+        transitModel.getServiceCodes().get(flexTrip.getTrip().getServiceId())
+      )
     );
   }
 }

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.WalkStep;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class BarrierRoutingTest {
@@ -40,9 +42,15 @@ public class BarrierRoutingTest {
 
   private static Graph graph;
 
+  private static TransitModel transitModel;
+
   @BeforeAll
   public static void createGraph() {
-    graph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_BARRIER_GATES_OSM);
+    OtpModel otpModel = ConstantsForTests.buildOsmGraph(
+      ConstantsForTests.HERRENBERG_BARRIER_GATES_OSM
+    );
+    graph = otpModel.graph;
+    transitModel = otpModel.transitModel;
   }
 
   /**
@@ -54,12 +62,13 @@ public class BarrierRoutingTest {
     var to = new GenericLocation(48.59370, 8.87079);
 
     // This takes a detour to avoid walking with the bike
-    var polyline1 = computePolyline(graph, from, to, BICYCLE);
+    var polyline1 = computePolyline(graph, transitModel, from, to, BICYCLE);
     assertThatPolylinesAreEqual(polyline1, "o~qgH_ccu@DGFENQZ]NOLOHMFKFILB`BOGo@AeD]U}BaA]Q??");
 
     // The reluctance for walking with the bike is reduced, so a detour is not taken
     var polyline2 = computePolyline(
       graph,
+      transitModel,
       from,
       to,
       BICYCLE,
@@ -97,7 +106,7 @@ public class BarrierRoutingTest {
     var to = new GenericLocation(48.59262, 8.86879);
 
     // This takes a detour to avoid walking with the bike
-    var polyline1 = computePolyline(graph, from, to, CAR);
+    var polyline1 = computePolyline(graph, transitModel, from, to, CAR);
     assertThatPolylinesAreEqual(polyline1, "sxqgHyncu@ZTnAFRdEyAFPpA");
   }
 
@@ -107,7 +116,7 @@ public class BarrierRoutingTest {
     var to = new GenericLocation(48.59276, 8.86963);
 
     // This takes a detour to avoid walking with the bike
-    var polyline1 = computePolyline(graph, from, to, CAR);
+    var polyline1 = computePolyline(graph, transitModel, from, to, CAR);
     assertThatPolylinesAreEqual(polyline1, "sxqgHyncu@ZT?~B");
   }
 
@@ -117,18 +126,20 @@ public class BarrierRoutingTest {
     var to = new GenericLocation(48.59291, 8.87037);
 
     // This takes a detour to avoid walking with the bike
-    var polyline1 = computePolyline(graph, from, to, CAR);
+    var polyline1 = computePolyline(graph, transitModel, from, to, CAR);
     assertThatPolylinesAreEqual(polyline1, "qwqgHchcu@BTxAGSeEoAG[U");
   }
 
   private static String computePolyline(
     Graph graph,
+    TransitModel transitModel,
     GenericLocation from,
     GenericLocation to,
     TraverseMode traverseMode
   ) {
     return computePolyline(
       graph,
+      transitModel,
       from,
       to,
       traverseMode,
@@ -145,6 +156,7 @@ public class BarrierRoutingTest {
 
   private static String computePolyline(
     Graph graph,
+    TransitModel transitModel,
     GenericLocation from,
     GenericLocation to,
     TraverseMode traverseMode,
@@ -162,12 +174,14 @@ public class BarrierRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
-    var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry));
+    var gpf = new GraphPathFinder(
+      new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry)
+    );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      graph.getTimeZone(),
-      new AlertToLegMapper(graph.getTransitAlertService()),
+      transitModel.getTimeZone(),
+      new AlertToLegMapper(transitModel.getTransitAlertService()),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

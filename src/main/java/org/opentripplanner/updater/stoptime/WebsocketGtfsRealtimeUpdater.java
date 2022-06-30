@@ -16,6 +16,7 @@ import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
 import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -71,9 +72,9 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) {
+  public void setup(Graph graph, TransitModel transitModel) {
     // Only create a realtime data snapshot source if none exists already
-    graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::ofGraph);
+    transitModel.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::ofGraph);
   }
 
   @Override

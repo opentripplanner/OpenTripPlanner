@@ -11,6 +11,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,11 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    if (graph.locationsById.isEmpty()) {
+    if (transitModel.getStopModel().locationsById.isEmpty()) {
       return;
     }
 
@@ -34,12 +36,12 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
-      graph.locationsById.size()
+      transitModel.getStopModel().locationsById.size()
     );
 
     LOG.info(progress.startMessage());
     // TODO: Make this into a parallel stream, first calculate vertices per location and then add them.
-    for (FlexStopLocation flexStopLocation : graph.locationsById.values()) {
+    for (FlexStopLocation flexStopLocation : transitModel.getStopModel().locationsById.values()) {
       for (Vertex vertx : streetIndex.getVerticesForEnvelope(
         flexStopLocation.getGeometry().getEnvelopeInternal()
       )) {

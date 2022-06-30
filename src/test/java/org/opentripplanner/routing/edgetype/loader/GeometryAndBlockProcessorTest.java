@@ -41,8 +41,11 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
 
 /**
@@ -52,14 +55,18 @@ import org.opentripplanner.util.TestUtils;
 public class GeometryAndBlockProcessorTest {
 
   private Graph graph;
+  private TransitModel transitModel;
+
   private GtfsContext context;
   private String feedId;
   private DataImportIssueStore issueStore;
 
   @BeforeEach
   public void setUp() throws Exception {
-    graph = new Graph();
-
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(stopModel, deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
     this.issueStore = new DataImportIssueStore(true);
 
     context =
@@ -67,8 +74,8 @@ public class GeometryAndBlockProcessorTest {
 
     feedId = context.getFeedId().getId();
     GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-    factory.run(graph, issueStore);
-    graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
+    factory.run(graph, transitModel, issueStore);
+    transitModel.putService(CalendarServiceData.class, context.getCalendarServiceData());
 
     String[] stops = {
       feedId + ":A",
@@ -128,8 +135,8 @@ public class GeometryAndBlockProcessorTest {
     StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    graph.hasTransit = true;
-    ttsnm.buildGraph(graph, new HashMap<>());
+    transitModel.hasTransit = true;
+    ttsnm.buildGraph(graph, transitModel, new HashMap<>());
   }
 
   @Test

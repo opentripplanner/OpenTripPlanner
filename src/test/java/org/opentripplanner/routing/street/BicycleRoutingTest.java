@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -21,12 +22,20 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class BicycleRoutingTest {
 
   static final Instant dateTime = Instant.now();
-  Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+  Graph herrenbergGraph;
+  TransitModel herrenbergTransitModel;
+
+  {
+    OtpModel otpModel = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    herrenbergGraph = otpModel.graph;
+    herrenbergTransitModel = otpModel.transitModel;
+  }
 
   /**
    * https://www.openstreetmap.org/way/22392895 is access=destination which means that both bicycles
@@ -37,10 +46,20 @@ public class BicycleRoutingTest {
     var mozartStr = new GenericLocation(48.59713, 8.86107);
     var fritzLeharStr = new GenericLocation(48.59696, 8.85806);
 
-    var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
+    var polyline1 = computePolyline(
+      herrenbergGraph,
+      herrenbergTransitModel,
+      mozartStr,
+      fritzLeharStr
+    );
     assertThatPolylinesAreEqual(polyline1, "_srgHutau@h@B|@Jf@BdAG?\\JT@jA?DSp@_@fFsAT{@DBpC");
 
-    var polyline2 = computePolyline(herrenbergGraph, fritzLeharStr, mozartStr);
+    var polyline2 = computePolyline(
+      herrenbergGraph,
+      herrenbergTransitModel,
+      fritzLeharStr,
+      mozartStr
+    );
     assertThatPolylinesAreEqual(polyline2, "{qrgH{aau@CqCz@ErAU^gFRq@?EAkAKUeACg@A_AM_AEDQF@H?");
   }
 
@@ -53,14 +72,29 @@ public class BicycleRoutingTest {
     var schiessmauer = new GenericLocation(48.59737, 8.86350);
     var zeppelinStr = new GenericLocation(48.59972, 8.86239);
 
-    var polyline1 = computePolyline(herrenbergGraph, schiessmauer, zeppelinStr);
+    var polyline1 = computePolyline(
+      herrenbergGraph,
+      herrenbergTransitModel,
+      schiessmauer,
+      zeppelinStr
+    );
     assertThatPolylinesAreEqual(polyline1, "otrgH{cbu@S_AU_AmAdAyApAGDs@h@_@\\_ClBe@^?S");
 
-    var polyline2 = computePolyline(herrenbergGraph, zeppelinStr, schiessmauer);
+    var polyline2 = computePolyline(
+      herrenbergGraph,
+      herrenbergTransitModel,
+      zeppelinStr,
+      schiessmauer
+    );
     assertThatPolylinesAreEqual(polyline2, "ccsgH{|au@?Rd@_@~BmB^]r@i@FExAqAlAeAT~@R~@");
   }
 
-  private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
+  private static String computePolyline(
+    Graph graph,
+    TransitModel transitModel,
+    GenericLocation from,
+    GenericLocation to
+  ) {
     RoutingRequest request = new RoutingRequest();
     request.setDateTime(dateTime);
     request.from = from;
@@ -71,12 +105,14 @@ public class BicycleRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
-    var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry));
+    var gpf = new GraphPathFinder(
+      new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry)
+    );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      graph.getTimeZone(),
-      new AlertToLegMapper(graph.getTransitAlertService()),
+      transitModel.getTimeZone(),
+      new AlertToLegMapper(transitModel.getTransitAlertService()),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

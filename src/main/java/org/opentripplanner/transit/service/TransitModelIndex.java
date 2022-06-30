@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.transit.service;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -13,83 +13,67 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GraphIndex {
+/**
+ * Indexed access to Transit entities.
+ * For performance reasons these indexes are not part of the serialized state of the graph.
+ * They are rebuilt at runtime after graph deserialization.
+ */
+public class TransitModelIndex {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitModelIndex.class);
 
   // TODO: consistently key on model object or id string
   private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
   private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
-  private final Map<FeedScopedId, StopLocation> stopForId = Maps.newHashMap();
+
   private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
   private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
-  private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
+
   private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
   private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
-  private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
-  private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
+
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
+
   private final Multimap<GroupOfRoutes, Route> routesForGroupOfRoutes = ArrayListMultimap.create();
+
   private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
   private FlexIndex flexIndex = null;
 
-  public GraphIndex(Graph graph) {
-    LOG.info("GraphIndex init...");
-    CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
+  public TransitModelIndex(TransitModel transitModel) {
+    LOG.info("Transit model index init...");
 
-    for (Agency agency : graph.getAgencies()) {
+    for (Agency agency : transitModel.getAgencies()) {
       this.agencyForId.put(agency.getId(), agency);
     }
 
-    for (Operator operator : graph.getOperators()) {
+    for (Operator operator : transitModel.getOperators()) {
       this.operatorForId.put(operator.getId(), operator);
     }
 
-    /* We will keep a separate set of all vertices in case some have the same label.
-     * Maybe we should just guarantee unique labels. */
-    for (Vertex vertex : graph.getVertices()) {
-      if (vertex instanceof TransitStopVertex) {
-        TransitStopVertex stopVertex = (TransitStopVertex) vertex;
-        Stop stop = stopVertex.getStop();
-        stopForId.put(stop.getId(), stop);
-        stopVertexForStop.put(stop, stopVertex);
-      }
-    }
-    for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
-      Envelope envelope = new Envelope(stopVertex.getCoordinate());
-      stopSpatialIndex.insert(envelope, stopVertex);
-    }
-    for (TripPattern pattern : graph.tripPatternForId.values()) {
+    for (TripPattern pattern : transitModel.tripPatternForId.values()) {
       patternsForFeedId.put(pattern.getFeedId(), pattern);
       patternsForRoute.put(pattern.getRoute(), pattern);
       pattern
@@ -111,13 +95,8 @@ public class GraphIndex {
     for (GroupOfRoutes groupOfRoutes : routesForGroupOfRoutes.keySet()) {
       groupOfRoutesForId.put(groupOfRoutes.getId(), groupOfRoutes);
     }
-    for (MultiModalStation multiModalStation : graph.multiModalStationById.values()) {
-      for (Station childStation : multiModalStation.getChildStations()) {
-        multiModalStationForStations.put(childStation, multiModalStation);
-      }
-    }
 
-    for (TripOnServiceDate tripOnServiceDate : graph.tripOnServiceDates.values()) {
+    for (TripOnServiceDate tripOnServiceDate : transitModel.tripOnServiceDates.values()) {
       tripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
@@ -128,28 +107,27 @@ public class GraphIndex {
       );
     }
 
-    initalizeServiceCodesForDate(graph);
+    initalizeServiceCodesForDate(transitModel);
 
     if (OTPFeature.FlexRouting.isOn()) {
-      flexIndex = new FlexIndex(graph);
+      flexIndex = new FlexIndex(transitModel);
       for (Route route : flexIndex.routeById.values()) {
         routeForId.put(route.getId(), route);
       }
       for (FlexTrip flexTrip : flexIndex.tripById.values()) {
         tripForId.put(flexTrip.getId(), flexTrip.getTrip());
-        flexTrip.getStops().stream().forEach(stop -> stopForId.put(stop.getId(), stop));
+        flexTrip
+          .getStops()
+          .stream()
+          .forEach(stop -> transitModel.getStopModel().getStopModelIndex().addStop(stop));
       }
     }
 
-    LOG.info("GraphIndex init complete.");
+    LOG.info("Transit Model index init complete.");
   }
 
   public Agency getAgencyForId(FeedScopedId id) {
     return agencyForId.get(id);
-  }
-
-  public StopLocation getStopForId(FeedScopedId id) {
-    return stopForId.get(id);
   }
 
   public Route getRouteForId(FeedScopedId id) {
@@ -187,7 +165,7 @@ public class GraphIndex {
   /**
    * Returns all the patterns for a specific stop. If timetableSnapshot is included, new patterns
    * added by realtime updates are added to the collection. A set is used here because trip patterns
-   * that were updated by realtime data is both part of the GraphIndex and the TimetableSnapshot.
+   * that were updated by realtime data is both part of the TransitModelIndex and the TimetableSnapshot.
    */
   public Collection<TripPattern> getPatternsForStop(
     StopLocation stop,
@@ -213,10 +191,6 @@ public class GraphIndex {
     return operatorForId;
   }
 
-  public Collection<StopLocation> getAllStops() {
-    return stopForId.values();
-  }
-
   public Map<FeedScopedId, Trip> getTripForId() {
     return tripForId;
   }
@@ -233,10 +207,6 @@ public class GraphIndex {
     return routeForId.values();
   }
 
-  public Map<Stop, TransitStopVertex> getStopVertexForStop() {
-    return stopVertexForStop;
-  }
-
   public Map<Trip, TripPattern> getPatternForTrip() {
     return patternForTrip;
   }
@@ -249,22 +219,6 @@ public class GraphIndex {
     return patternsForRoute;
   }
 
-  public Map<Station, MultiModalStation> getMultiModalStationForStations() {
-    return multiModalStationForStations;
-  }
-
-  public Multimap<GroupOfRoutes, Route> getRoutesForGroupOfRoutes() {
-    return routesForGroupOfRoutes;
-  }
-
-  public Map<FeedScopedId, GroupOfRoutes> getGroupOfRoutesForId() {
-    return groupOfRoutesForId;
-  }
-
-  public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
-    return stopSpatialIndex;
-  }
-
   public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
     return serviceCodesRunningForDate;
   }
@@ -273,8 +227,8 @@ public class GraphIndex {
     return flexIndex;
   }
 
-  private void initalizeServiceCodesForDate(Graph graph) {
-    CalendarService calendarService = graph.getCalendarService();
+  private void initalizeServiceCodesForDate(TransitModel transitModel) {
+    CalendarService calendarService = transitModel.getCalendarService();
 
     if (calendarService == null) {
       return;
@@ -304,9 +258,17 @@ public class GraphIndex {
     for (ServiceDate serviceDate : serviceIdsForServiceDate.keySet()) {
       TIntSet serviceCodesRunning = new TIntHashSet();
       for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
-        serviceCodesRunning.add(graph.getServiceCodes().get(serviceId));
+        serviceCodesRunning.add(transitModel.getServiceCodes().get(serviceId));
       }
       serviceCodesRunningForDate.put(serviceDate, serviceCodesRunning);
     }
+  }
+
+  public Multimap<GroupOfRoutes, Route> getRoutesForGroupOfRoutes() {
+    return routesForGroupOfRoutes;
+  }
+
+  public Map<FeedScopedId, GroupOfRoutes> getGroupOfRoutesForId() {
+    return groupOfRoutesForId;
   }
 }

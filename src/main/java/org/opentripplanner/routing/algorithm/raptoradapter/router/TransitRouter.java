@@ -30,12 +30,12 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
+import org.opentripplanner.transit.service.TransitModelIndex;
 import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {
@@ -84,15 +84,15 @@ public class TransitRouter {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!router.graph.transitFeedCovers(request.getDateTime())) {
+    if (!router.transitModel.transitFeedCovers(request.getDateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );
     }
 
     var transitLayer = request.ignoreRealtimeUpdates
-      ? router.graph.getTransitLayer()
-      : router.graph.getRealtimeTransitLayer();
+      ? router.transitModel.getTransitLayer()
+      : router.transitModel.getRealtimeTransitLayer();
 
     var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
 
@@ -132,7 +132,7 @@ public class TransitRouter {
           .createOptimizeTransferService(
             transitLayer::getStopByIndex,
             requestTransitDataProvider.stopNameResolver(),
-            router.graph.getTransferService(),
+            router.transitModel.getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopIndex().stopBoardAlightCosts,
             raptorRequest,
@@ -145,11 +145,12 @@ public class TransitRouter {
 
     RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
       router.graph,
+      router.transitModel,
       transitLayer,
       transitSearchTimeZero,
       request
     );
-    FareService fareService = router.graph.getService(FareService.class);
+    FareService fareService = router.transitModel.getService(FareService.class);
 
     for (Path<TripSchedule> path : paths) {
       // Convert the Raptor/Astar paths to OTP API Itineraries
@@ -222,7 +223,12 @@ public class TransitRouter {
         accessRequest.allowKeepingRentedVehicleAtDestination = false;
       }
 
-      var nearbyStops = AccessEgressRouter.streetSearch(routingContext, mode, isEgress);
+      var nearbyStops = AccessEgressRouter.streetSearch(
+        routingContext,
+        router.transitModel,
+        mode,
+        isEgress
+      );
 
       results.addAll(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
 
@@ -230,6 +236,7 @@ public class TransitRouter {
       if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
         var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
           routingContext,
+          router.transitModel,
           additionalSearchDays,
           router.routerConfig.flexParameters(request),
           isEgress
@@ -246,22 +253,25 @@ public class TransitRouter {
     TransitLayer transitLayer
   ) {
     var graph = router.graph;
+    var transitModel = router.transitModel;
 
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
     return new RaptorRoutingRequestTransitData(
-      graph.getTransferService(),
+      transitModel.getTransferService(),
       transitLayer,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
-      createRequestTransitDataProviderFilter(graph.index),
+      createRequestTransitDataProviderFilter(transitModel.index),
       new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
     );
   }
 
-  private TransitDataProviderFilter createRequestTransitDataProviderFilter(GraphIndex graphIndex) {
-    return new RoutingRequestTransitDataProviderFilter(request, graphIndex);
+  private TransitDataProviderFilter createRequestTransitDataProviderFilter(
+    TransitModelIndex transitModelIndex
+  ) {
+    return new RoutingRequestTransitDataProviderFilter(request, transitModelIndex);
   }
 
   private void verifyAccessEgress(Collection<?> access, Collection<?> egress) {

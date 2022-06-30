@@ -13,20 +13,20 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.ext.reportapi.model.BicyleSafetyReport;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.transit.service.TransitModelIndex;
 
 @Path("/report")
 @Produces(MediaType.TEXT_PLAIN)
 public class ReportResource {
 
   private final TransferService transferService;
-  private final GraphIndex index;
+  private final TransitModelIndex index;
 
   @SuppressWarnings("unused")
   public ReportResource(@Context OTPServer server) {
-    this.transferService = server.getRouter().graph.getTransferService();
-    this.index = server.getRouter().graph.index;
+    this.transferService = server.getRouter().transitModel.getTransferService();
+    this.index = server.getRouter().transitModel.index;
   }
 
   @GET

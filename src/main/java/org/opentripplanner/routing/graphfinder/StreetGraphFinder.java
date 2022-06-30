@@ -53,7 +53,6 @@ public class StreetGraphFinder implements GraphFinder {
     TransitService transitService
   ) {
     PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(
-      routingService,
       transitService,
       filterByModes,
       filterByPlaceTypes,

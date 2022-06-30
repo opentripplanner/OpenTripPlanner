@@ -33,19 +33,18 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.api.mapping.ItineraryMapper;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.network.MainAndSubMode;
@@ -82,16 +81,21 @@ public abstract class SnapshotTestBase {
 
   protected Router getRouter() {
     if (router == null) {
-      Graph graph = getGraph();
-
-      router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+      OtpModel otpModel = getGraph();
+      router =
+        new Router(
+          otpModel.graph,
+          otpModel.transitModel,
+          RouterConfig.DEFAULT,
+          Metrics.globalRegistry
+        );
       router.startup();
     }
 
     return router;
   }
 
-  protected Graph getGraph() {
+  protected OtpModel getGraph() {
     return ConstantsForTests.getInstance().getCachedPortlandGraph();
   }
 
@@ -108,7 +112,7 @@ public abstract class SnapshotTestBase {
     RoutingRequest request = router.copyDefaultRoutingRequest();
     request.setDateTime(
       TestUtils.dateInstant(
-        router.graph.getTimeZone().getID(),
+        router.transitModel.getTimeZone().getID(),
         year,
         month,
         day,
@@ -263,7 +267,7 @@ public abstract class SnapshotTestBase {
 
   private List<Itinerary> retrieveItineraries(RoutingRequest request, Router router) {
     long startMillis = System.currentTimeMillis();
-    RoutingService routingService = new RoutingService(router.graph);
+    RoutingService routingService = new RoutingService(router.graph, router.transitModel);
     RoutingResponse response = routingService.route(request, router);
 
     List<Itinerary> itineraries = response.getTripPlan().itineraries;
@@ -273,7 +277,7 @@ public abstract class SnapshotTestBase {
         itineraries,
         startMillis,
         System.currentTimeMillis(),
-        router.graph.getTimeZone()
+        router.transitModel.getTimeZone()
       );
     }
     return itineraries;
@@ -282,7 +286,7 @@ public abstract class SnapshotTestBase {
   private String createDebugUrlForRequest(RoutingRequest request) {
     var dateTime = Instant
       .ofEpochSecond(request.getDateTime().getEpochSecond())
-      .atZone(getRouter().graph.getTimeZone().toZoneId())
+      .atZone(getRouter().transitModel.getTimeZone().toZoneId())
       .toLocalDateTime();
 
     var transitModes = mapModes(request.modes.transitModes);

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
@@ -185,7 +186,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
   }
 
   private Graph graph() {
-    return graphOf(
+    OtpModel otpModel = graphOf(
       new Builder() {
         @Override
         public void build() {
@@ -199,6 +200,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
         }
       }
     );
+    return otpModel.graph;
   }
 
   private void assertOriginalRestrictionExists() {
