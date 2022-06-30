@@ -1,6 +1,5 @@
 package org.opentripplanner.api.mapping;
 
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;

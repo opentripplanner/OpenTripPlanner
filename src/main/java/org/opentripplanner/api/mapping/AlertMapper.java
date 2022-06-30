@@ -1,7 +1,7 @@
 package org.opentripplanner.api.mapping;
 
-import java.sql.Date;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;

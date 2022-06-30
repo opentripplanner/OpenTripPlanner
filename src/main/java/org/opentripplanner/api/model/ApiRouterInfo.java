@@ -1,7 +1,6 @@
 package org.opentripplanner.api.model;
 
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
