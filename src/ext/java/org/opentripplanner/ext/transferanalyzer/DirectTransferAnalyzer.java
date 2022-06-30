@@ -54,8 +54,9 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    /* Initialize graph index which is needed by the nearby stop finder. */
+    /* Initialize transit index which is needed by the nearby stop finder. */
     transitModel.index = new TransitModelIndex(transitModel);
+    transitModel.getStopModel().index();
 
     LOG.info("Analyzing transfers (this can be time consuming)...");
 
