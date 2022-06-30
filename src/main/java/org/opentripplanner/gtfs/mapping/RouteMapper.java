@@ -64,6 +64,7 @@ class RouteMapper {
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
     lhs.withBranding(brandingMapper.map(rhs));
+    lhs.withNetworkId(rhs.getNetworkId());
 
     return lhs.build();
   }

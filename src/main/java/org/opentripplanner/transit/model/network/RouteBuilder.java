@@ -28,6 +28,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   private String color;
   private String textColor;
   private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
+  private String networkId;
 
   public RouteBuilder(FeedScopedId id) {
     super(id);
@@ -51,6 +52,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     this.color = original.getColor();
     this.textColor = original.getTextColor();
     this.bikesAllowed = original.getBikesAllowed();
+    this.networkId = original.getNetworkId();
   }
 
   public Agency getAgency() {
@@ -197,6 +199,15 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
       groupsOfRoutes = new ArrayList<>();
     }
     return groupsOfRoutes;
+  }
+
+  public String getNetworkId() {
+    return networkId;
+  }
+
+  public RouteBuilder withNetworkId(String network) {
+    this.networkId = network;
+    return this;
   }
 
   @Override

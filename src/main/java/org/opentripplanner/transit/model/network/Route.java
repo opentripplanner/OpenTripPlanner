@@ -35,6 +35,9 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   private final String textColor;
   private final BikeAccess bikesAllowed;
 
+  // the GTFS Fares V2 network property
+  private final String networkId;
+
   public Route(RouteBuilder builder) {
     super(builder.getId());
     // Required fields
@@ -58,6 +61,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
     this.url = builder.getUrl();
     this.color = builder.getColor();
     this.textColor = builder.getTextColor();
+    this.networkId = builder.getNetworkId();
   }
 
   public static RouteBuilder of(@Nonnull FeedScopedId id) {
@@ -191,5 +195,9 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   @Override
   public String logName() {
     return getName();
+  }
+
+  public String getNetworkId() {
+    return networkId;
   }
 }
