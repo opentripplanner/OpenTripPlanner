@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,13 +32,15 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
-  private Set<FareLegRule> fareLegRules = Set.of();
+  private List<FareLegRule> fareLegRules = List.of();
 
   @Override
   public FareService makeFareService() {
     DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
-    return fareService;
+
+    var faresV2Service = new GtfsFaresV2Service(fareLegRules.stream().toList());
+    return new GtfsFaresService(fareService, faresV2Service);
   }
 
   @Override
@@ -48,7 +51,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
       regularFareRules
     );
 
-    fareLegRules = new HashSet<>(transitService.getAllFareLegRules());
+    fareLegRules = List.copyOf(transitService.getAllFareLegRules());
   }
 
   public void configure(JsonNode config) {

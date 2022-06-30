@@ -13,6 +13,7 @@ import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Route;
@@ -312,6 +313,9 @@ public class GtfsModule implements GraphBuilderModule {
     }
     for (FareAttribute fareAttribute : store.getAllEntitiesForType(FareAttribute.class)) {
       fareAttribute.getId().setAgencyId(reader.getDefaultAgencyId());
+    }
+    for (var fareProduct : store.getAllEntitiesForType(FareProduct.class)) {
+      fareProduct.getId().setAgencyId(reader.getDefaultAgencyId());
     }
     for (Pathway pathway : store.getAllEntitiesForType(Pathway.class)) {
       pathway.getId().setAgencyId(reader.getDefaultAgencyId());

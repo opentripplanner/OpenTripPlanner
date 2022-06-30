@@ -44,10 +44,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       )
     );
 
-    var fare = service.getCost(i1);
-    assertEquals(1, fare.getProducts().size());
+    var fare = service.getProducts(i1);
+    assertEquals(1, fare.size());
 
-    var product = fare.getProducts().stream().toList().get(0);
+    var product = fare.stream().toList().get(0);
     assertEquals("day_pass", product.id().getId());
     assertEquals(Money.euros(500), product.amount());
   }

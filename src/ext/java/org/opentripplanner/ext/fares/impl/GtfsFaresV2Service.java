@@ -1,26 +1,21 @@
 package org.opentripplanner.ext.fares.impl;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.fares.FareService;
 
-public record GtfsFaresV2Service(List<FareLegRule> legRules) implements FareService {
-  @Override
-  public Fare getCost(Itinerary itinerary) {
-    var fare = new Fare();
-    var products = itinerary
+public record GtfsFaresV2Service(List<FareLegRule> legRules) {
+  public Set<FareProduct> getProducts(Itinerary itinerary) {
+    return itinerary
       .getTransitLegs()
       .stream()
       .flatMap(this::getLegProducts)
       .collect(Collectors.toSet());
-    fare.addProducts(products);
-    return fare;
   }
 
   private Stream<FareProduct> getLegProducts(ScheduledTransitLeg leg) {
