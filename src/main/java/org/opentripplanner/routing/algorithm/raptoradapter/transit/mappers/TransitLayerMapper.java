@@ -104,7 +104,7 @@ public class TransitLayerMapper {
       transferByStopIndex,
       graph.getTransferService(),
       stopIndex,
-      graph.getTimeZone().toZoneId(),
+      graph.getTimeZone(),
       transferCache,
       tripPatternMapper,
       transferIndexGenerator

@@ -176,7 +176,10 @@ public class StopTimesHelper {
     if (startTime == 0) {
       startTime = System.currentTimeMillis() / 1000;
     }
-    Date date = new Date(startTime * 1000);
+    LocalDate date = Instant
+      .ofEpochSecond(startTime)
+      .atZone(transitService.getTimeZone())
+      .toLocalDate();
     ServiceDate[] serviceDates = {
       new ServiceDate(date).previous(),
       new ServiceDate(date),

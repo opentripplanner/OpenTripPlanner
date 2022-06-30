@@ -1,6 +1,7 @@
 package org.opentripplanner.api.model;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -43,7 +44,7 @@ public class ApiRouterInfo {
 
     this.routerId = routerId;
     this.polygon = graph.getConvexHull();
-    this.buildTime = graph.buildTime;
+    this.buildTime = Date.from(graph.buildTime);
     this.transitServiceStarts = graph.getTransitServiceStarts();
     this.transitServiceEnds = graph.getTransitServiceEnds();
     this.transitModes = TraverseModeMapper.mapToApi(graph.getTransitModes());

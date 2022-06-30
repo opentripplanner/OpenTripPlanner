@@ -216,10 +216,10 @@ public class PtSituationElementType {
           .dataFetcher(environment -> {
             TransitAlert alert = environment.getSource();
             Long startTime = alert.getEffectiveStartDate() != null
-              ? alert.getEffectiveStartDate().getTime()
+              ? alert.getEffectiveStartDate().toEpochMilli()
               : null;
             Long endTime = alert.getEffectiveEndDate() != null
-              ? alert.getEffectiveEndDate().getTime()
+              ? alert.getEffectiveEndDate().toEpochMilli()
               : null;
             return Pair.of(startTime, endTime);
           })

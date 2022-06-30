@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
@@ -38,7 +37,6 @@ import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
@@ -108,7 +106,7 @@ public abstract class SnapshotTestBase {
     RoutingRequest request = router.copyDefaultRoutingRequest();
     request.setDateTime(
       TestUtils.dateInstant(
-        router.graph.getTimeZone().getID(),
+        router.graph.getTimeZone().getId(),
         year,
         month,
         day,
@@ -128,9 +126,8 @@ public abstract class SnapshotTestBase {
     List<Itinerary> itineraries,
     long startMillis,
     long endMillis,
-    TimeZone timeZone
+    ZoneId timeZone
   ) {
-    ZoneId zoneId = timeZone.toZoneId();
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     System.out.println("\n");
@@ -155,9 +152,9 @@ public abstract class SnapshotTestBase {
           " - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n",
           j,
           leg.getFrom().toStringShort(),
-          dtf.format(leg.getStartTime().toInstant().atZone(zoneId)),
+          dtf.format(leg.getStartTime().toInstant().atZone(timeZone)),
           mode,
-          dtf.format(leg.getEndTime().toInstant().atZone(zoneId)),
+          dtf.format(leg.getEndTime().toInstant().atZone(timeZone)),
           leg.getTo().toStringShort()
         );
       }
@@ -282,7 +279,7 @@ public abstract class SnapshotTestBase {
   private String createDebugUrlForRequest(RoutingRequest request) {
     var dateTime = Instant
       .ofEpochSecond(request.getDateTime().getEpochSecond())
-      .atZone(getRouter().graph.getTimeZone().toZoneId())
+      .atZone(getRouter().graph.getTimeZone())
       .toLocalDateTime();
 
     var transitModes = mapModes(request.modes.transitModes);

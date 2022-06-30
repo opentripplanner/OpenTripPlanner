@@ -44,9 +44,7 @@ public class GbfsFreeVehicleStatusMapper {
       rentalVehicle.isDisabled = vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false;
       rentalVehicle.lastReported =
         vehicle.getLastReported() != null
-          ? Instant
-            .ofEpochSecond((long) (double) vehicle.getLastReported())
-            .atZone(system.timezone.toZoneId())
+          ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported()).atZone(system.timezone)
           : null;
       rentalVehicle.currentRangeMeters = vehicle.getCurrentRangeMeters();
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();

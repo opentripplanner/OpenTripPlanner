@@ -235,7 +235,7 @@ public class SpeedTest {
   }
 
   private ZoneId getTimeZoneId() {
-    return graph.getTimeZone().toZoneId();
+    return graph.getTimeZone();
   }
 
   private void forceGCToAvoidGCLater() {

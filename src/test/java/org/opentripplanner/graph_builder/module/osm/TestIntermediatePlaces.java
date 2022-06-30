@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.TimeZone;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ public class TestIntermediatePlaces {
    */
   public static final double DELTA = 0.005;
 
-  private static TimeZone timeZone;
+  private static ZoneId timeZone;
 
   private static GraphPathFinder graphPathFinder;
 

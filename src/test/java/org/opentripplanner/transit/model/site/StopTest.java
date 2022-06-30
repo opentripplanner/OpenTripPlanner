@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.TimeZone;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
@@ -31,7 +31,7 @@ class StopTest {
   private static final String NETEX_SUBMODE_NAME = "submode";
   private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
   private static final TransitMode VEHICLE_TYPE = TransitMode.BUS;
-  public static final TimeZone TIME_ZONE = TimeZone.getTimeZone(TransitModelForTest.TIME_ZONE_ID);
+  public static final ZoneId TIME_ZONE = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   private static final String PLATFORM_CODE = "platformCode";
 
   private static final Stop subject = Stop
@@ -95,10 +95,7 @@ class StopTest {
     assertFalse(subject.sameAs(subject.copy().withVehicleType(TransitMode.TRAM).build()));
     assertFalse(
       subject.sameAs(
-        subject
-          .copy()
-          .withTimeZone(TimeZone.getTimeZone(TransitModelForTest.OTHER_TIME_ZONE_ID))
-          .build()
+        subject.copy().withTimeZone(ZoneId.of(TransitModelForTest.OTHER_TIME_ZONE_ID)).build()
       )
     );
     assertFalse(subject.sameAs(subject.copy().withPlatformCode("X").build()));

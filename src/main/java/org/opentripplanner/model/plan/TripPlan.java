@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class TripPlan {
 
   /** The time and date of travel */
-  public final Date date;
+  public final Instant date;
 
   /** The origin */
   public final Place from;
@@ -21,7 +22,7 @@ public class TripPlan {
 
   public final List<Itinerary> itineraries;
 
-  public TripPlan(Place from, Place to, Date date, Collection<Itinerary> itineraries) {
+  public TripPlan(Place from, Place to, Instant date, Collection<Itinerary> itineraries) {
     this.from = from;
     this.to = to;
     this.date = date;

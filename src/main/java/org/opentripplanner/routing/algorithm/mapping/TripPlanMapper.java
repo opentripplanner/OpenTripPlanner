@@ -29,7 +29,7 @@ public class TripPlanMapper {
       from = legs.get(0).getFrom();
       to = legs.get(legs.size() - 1).getTo();
     }
-    return new TripPlan(from, to, Date.from(request.getDateTime()), itineraries);
+    return new TripPlan(from, to, request.getDateTime(), itineraries);
   }
 
   private static Place placeFromGeoLocation(GenericLocation location, I18NString defaultName) {

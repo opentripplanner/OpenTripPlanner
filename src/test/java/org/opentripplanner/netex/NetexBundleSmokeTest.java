@@ -240,7 +240,7 @@ public class NetexBundleSmokeTest {
     assertEquals("[RB:RUT:Authority:RUT]", cal.getAgencyIds().toString());
     assertEquals(
       "Europe/Oslo",
-      cal.getTimeZoneForAgencyId(new FeedScopedId("RB", "RUT:Authority:RUT")).toZoneId().toString()
+      cal.getTimeZoneForAgencyId(new FeedScopedId("RB", "RUT:Authority:RUT")).toString()
     );
 
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());

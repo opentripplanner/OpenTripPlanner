@@ -108,7 +108,7 @@ public class FaresTest {
       new SeattleFareServiceFactory()
     );
 
-    assertEquals("America/Los_Angeles", graph.getTimeZone().getID());
+    assertEquals("America/Los_Angeles", graph.getTimeZone().getId());
 
     assertEquals(1, graph.getFeedIds().size());
 

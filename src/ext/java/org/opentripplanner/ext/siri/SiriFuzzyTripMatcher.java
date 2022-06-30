@@ -398,12 +398,12 @@ public class SiriFuzzyTripMatcher {
     int secondsSinceMidnight = DateMapper.secondsSinceStartOfService(
       arrivalTime,
       arrivalTime,
-      transitService.getTimeZone().toZoneId()
+      transitService.getTimeZone()
     );
     int secondsSinceMidnightYesterday = DateMapper.secondsSinceStartOfService(
       arrivalTime.minusDays(1),
       arrivalTime,
-      transitService.getTimeZone().toZoneId()
+      transitService.getTimeZone()
     );
 
     Set<Trip> trips = start_stop_tripCache.get(

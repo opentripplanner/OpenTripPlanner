@@ -1,5 +1,6 @@
 package org.opentripplanner.api.mapping;
 
+import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -39,8 +40,8 @@ public class AlertMapper {
       api.alertUrl = domain.alertUrl.toString(locale);
     }
 
-    api.effectiveStartDate = domain.getEffectiveStartDate();
-    api.effectiveEndDate = domain.getEffectiveEndDate();
+    api.effectiveStartDate = Date.from(domain.getEffectiveStartDate());
+    api.effectiveEndDate = Date.from(domain.getEffectiveEndDate());
 
     return api;
   }

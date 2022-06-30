@@ -8,6 +8,7 @@ import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
 import com.google.common.base.Preconditions;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import org.opentripplanner.common.model.T2;
@@ -92,7 +92,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private final SiriTripPatternCache tripPatternCache = new SiriTripPatternCache(
     tripPatternIdGenerator
   );
-  private final TimeZone timeZone;
+  private final ZoneId timeZone;
 
   private final TransitService transitService;
   private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
@@ -177,7 +177,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (VehicleMonitoringDeliveryStructure vmDelivery : updates) {
-        ServiceDate serviceDate = new ServiceDate();
+        ServiceDate serviceDate = new ServiceDate(graph.getTimeZone());
 
         List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
         if (activities != null) {
@@ -855,7 +855,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           estimatedVehicleJourney,
           tripMatchedByServiceJourneyId.getId(),
           graph::getStopLocationById,
-          timeZone.toZoneId(),
+          timeZone,
           graph.deduplicator
         );
         if (exactUpdatedTripTimes != null) {
@@ -909,7 +909,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             estimatedVehicleJourney,
             matchingTrip.getId(),
             graph::getStopLocationById,
-            timeZone.toZoneId(),
+            timeZone,
             graph.deduplicator
           );
           if (updatedTripTimes != null) {
@@ -1026,18 +1026,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
-    return DateMapper.secondsSinceStartOfService(
-      dateTime,
-      dateTime,
-      transitService.getTimeZone().toZoneId()
-    );
+    return DateMapper.secondsSinceStartOfService(dateTime, dateTime, transitService.getTimeZone());
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
     return DateMapper.secondsSinceStartOfService(
       startOfService,
       dateTime,
-      transitService.getTimeZone().toZoneId()
+      transitService.getTimeZone()
     );
   }
 
@@ -1180,7 +1176,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean purgeExpiredData() {
-    final ServiceDate today = new ServiceDate();
+    final ServiceDate today = new ServiceDate(timeZone);
     final ServiceDate previously = today.previous().previous(); // Just to be safe...
 
     if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {
@@ -1298,11 +1294,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     if (recordedCalls != null && !recordedCalls.isEmpty()) {
       RecordedCall recordedCall = recordedCalls.get(0);
       journeyFirstStopId = recordedCall.getStopPointRef().getValue();
-      journeyDate = new ServiceDate(Date.from(recordedCall.getAimedDepartureTime().toInstant()));
+      journeyDate = new ServiceDate(recordedCall.getAimedDepartureTime().toLocalDate());
     } else if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
       EstimatedCall estimatedCall = estimatedCalls.get(0);
       journeyFirstStopId = estimatedCall.getStopPointRef().getValue();
-      journeyDate = new ServiceDate(Date.from(estimatedCall.getAimedDepartureTime().toInstant()));
+      journeyDate = new ServiceDate(estimatedCall.getAimedDepartureTime().toLocalDate());
     } else {
       return null;
     }

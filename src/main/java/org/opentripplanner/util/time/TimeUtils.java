@@ -5,7 +5,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -145,9 +144,6 @@ public class TimeUtils {
    * of the service day (effectively midnight except for days on which daylight savings time changes
    * occur." See https://developers.google.com/transit/gtfs/reference#field_types
    * <p>
-   * Note! The itinerary uses the old Java Calendar, but we would like to migrate to the new
-   * java.time library; Hence this method is already changed. To convert into the legacy Calendar
-   * use {@link GregorianCalendar#from(ZonedDateTime)} method.
    *
    * @param date    the "service" date
    * @param seconds number of seconds since noon minus 12 hours (midnight).

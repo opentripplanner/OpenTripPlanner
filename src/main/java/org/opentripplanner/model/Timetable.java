@@ -6,12 +6,12 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.io.Serializable;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TimeZone;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -212,7 +212,7 @@ public class Timetable implements Serializable {
    */
   public TripTimesPatch createUpdatedTripTimes(
     TripUpdate tripUpdate,
-    TimeZone timeZone,
+    ZoneId timeZone,
     ServiceDate updateServiceDate,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
@@ -258,7 +258,7 @@ public class Timetable implements Serializable {
     Integer delay = null;
     Integer firstUpdatedIndex = null;
 
-    final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
+    final long today = updateServiceDate.toZonedDateTime(timeZone, 0).toEpochSecond();
 
     for (int i = 0; i < numStops; i++) {
       boolean match = false;

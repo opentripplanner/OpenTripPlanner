@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -73,9 +72,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   /**
-   * The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
-   * library; Hence this method is already changed. To convert into the legacy Calendar use
-   * {@link GregorianCalendar#from(ZonedDateTime)} method.
+   * Convert a seconds since midnight to a ZonedDateTime
    */
   public static ZonedDateTime newTime(int seconds) {
     return TimeUtils.zonedDateTime(SERVICE_DAY, seconds, UTC);

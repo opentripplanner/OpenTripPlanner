@@ -3,13 +3,13 @@ package org.opentripplanner.routing;
 import gnu.trove.set.TIntSet;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -68,8 +68,7 @@ public class RoutingService {
 
   // TODO We should probably not have the Router as a parameter here
   public RoutingResponse route(RoutingRequest request, Router router) {
-    var zoneId = graph.getTimeZone().toZoneId();
-    RoutingWorker worker = new RoutingWorker(router, request, zoneId);
+    RoutingWorker worker = new RoutingWorker(router, request, graph.getTimeZone());
     return worker.route();
   }
 
@@ -237,7 +236,7 @@ public class RoutingService {
   }
 
   /** {@link Graph#getTimeZone()} */
-  public TimeZone getTimeZone() {
+  public ZoneId getTimeZone() {
     return this.graph.getTimeZone();
   }
 

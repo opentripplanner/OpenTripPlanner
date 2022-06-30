@@ -9,11 +9,11 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -453,20 +453,20 @@ public class GeometryAndBlockProcessorTest {
 
     // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
     // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
-    GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
-    time.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-    options.setDateTime(time.toInstant());
+    LocalDateTime ldt = LocalDateTime.of(2009, 7, 18, 0, 0, 0);
+    ZonedDateTime zdt = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
+    options.setDateTime(zdt.toInstant());
     spt =
       AStarBuilder
         .oneToOne()
         .setContext(new RoutingContext(options, graph, near_a, split_d))
         .getShortestPathTree();
 
-    time.add(Calendar.HOUR, 1);
-    time.add(Calendar.SECOND, 1); //for the StreetTransitLink
+    ZonedDateTime endTime = zdt.plusHours(1).plusSeconds(1);
+    // 1 sec for the StreetTransitLink
     path = spt.getPath(split_d);
     assertNotNull(path);
-    assertEquals(TestUtils.toSeconds(time), path.getEndTime());
+    assertEquals(endTime.toEpochSecond(), path.getEndTime());
   }
 
   @Test
@@ -480,8 +480,8 @@ public class GeometryAndBlockProcessorTest {
     RoutingRequest options = new RoutingRequest();
     // test is designed such that transfers must be instantaneous
     options.transferSlack = 0;
-    GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
-    startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+    LocalDateTime ldt = LocalDateTime.of(2009, 10, 2, 8, 30, 0);
+    ZonedDateTime startTime = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
     options.setDateTime(startTime.toInstant());
     Vertex q = graph.getVertex(feedId + ":Q");
     ShortestPathTree spt = AStarBuilder
@@ -491,9 +491,7 @@ public class GeometryAndBlockProcessorTest {
     GraphPath path = spt.getPath(destination);
 
     long endTime = path.getEndTime();
-    Calendar c = new GregorianCalendar();
-    c.setTimeInMillis(endTime * 1000L);
-    assertTrue(endTime - TestUtils.toSeconds(startTime) < 7200);
+    assertTrue(endTime - startTime.toEpochSecond() < 7200);
   }
 
   @Test

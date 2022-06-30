@@ -36,13 +36,10 @@ public interface DateConstants {
   String ISO_DATETIME_TIME_ZONE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";
 
   // milli second times
-  Long ONE_DAY_MILLI = 86400000L;
   Long ONE_MINUTE_MILLI = 60000L;
   Long THIRTY_MINUTES_MILLI = ONE_MINUTE_MILLI * 30;
   Long FORTY_5_MINUTES_MILLI = ONE_MINUTE_MILLI * 45;
   Integer ONE_DAY_SECONDS = 24 * 60 * 60;
-
-  Date NOW = new Date();
 
   String SIMPLE_TIME_FORMAT = "h:mm a";
   String TIME_FORMAT = "hh:mm:ss a";

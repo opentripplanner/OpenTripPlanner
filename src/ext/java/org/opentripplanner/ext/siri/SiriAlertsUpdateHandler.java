@@ -403,7 +403,7 @@ public class SiriAlertsUpdateHandler {
               if (dataFrameRef != null && dataFrameRef.getValue() != null) {
                 ZonedDateTime startOfService = DateMapper.asStartOfService(
                   LocalDate.parse(dataFrameRef.getValue()),
-                  graph.getTimeZone().toZoneId()
+                  graph.getTimeZone()
                 );
 
                 serviceDate =

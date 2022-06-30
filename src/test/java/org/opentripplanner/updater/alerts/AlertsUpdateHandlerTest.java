@@ -12,6 +12,7 @@ import com.google.transit.realtime.GtfsRealtime.Alert.Effect;
 import com.google.transit.realtime.GtfsRealtime.Alert.SeverityLevel;
 import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -51,8 +52,8 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(new Date(5 * 1000), transitAlert.getEffectiveStartDate());
-    assertEquals(new Date(20 * 1000), transitAlert.getEffectiveEndDate());
+    assertEquals(Instant.ofEpochSecond(5), transitAlert.getEffectiveStartDate());
+    assertEquals(Instant.ofEpochSecond(20), transitAlert.getEffectiveEndDate());
   }
 
   @Test
@@ -63,7 +64,7 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(new Date(5 * 1000), transitAlert.getEffectiveStartDate());
+    assertEquals(Instant.ofEpochSecond(5), transitAlert.getEffectiveStartDate());
     assertNull(transitAlert.getEffectiveEndDate());
   }
 
@@ -76,7 +77,7 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
     assertNull(transitAlert.getEffectiveStartDate());
-    assertEquals(new Date(20 * 1000), transitAlert.getEffectiveEndDate());
+    assertEquals(Instant.ofEpochSecond(20), transitAlert.getEffectiveEndDate());
   }
 
   @Test

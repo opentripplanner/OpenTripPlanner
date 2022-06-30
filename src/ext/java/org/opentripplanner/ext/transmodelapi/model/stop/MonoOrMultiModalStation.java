@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.TimeZone;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.Station;
@@ -32,7 +32,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
    */
   private final I18NString url;
 
-  private final TimeZone timezone;
+  private final ZoneId timezone;
 
   private final Collection<StopLocation> childStops;
 
@@ -88,7 +88,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return url;
   }
 
-  public TimeZone getTimezone() {
+  public ZoneId getTimezone() {
     return timezone;
   }
 
