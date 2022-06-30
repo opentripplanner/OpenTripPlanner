@@ -145,8 +145,10 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         (stopCode != null && edgeList.references.contains(stopCode)) ||
         edgeList.references.contains(stopId)
       ) {
-        var name = Optional
-          .ofNullable(edgeList.getAreas().get(0))
+        var name = edgeList
+          .getAreas()
+          .stream()
+          .findFirst()
           .map(NamedArea::getName)
           .orElse(new LocalizedString("name.platform"));
         var label = "platform-centroid/%s".formatted(ts.getStop().getId().toString());
