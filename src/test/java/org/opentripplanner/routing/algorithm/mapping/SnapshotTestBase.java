@@ -146,7 +146,7 @@ public abstract class SnapshotTestBase {
         TimeUtils.timeToStrCompact(itinerary.effectiveDurationSeconds()),
         itinerary.effectiveDurationSeconds(),
         itinerary.getWaitingTimeSeconds(),
-        itinerary.getTransitTimeSeconds()
+        itinerary.getTransitDuration()
       );
 
       for (int j = 0; j < itinerary.getLegs().size(); j++) {

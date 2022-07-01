@@ -21,7 +21,7 @@ public class Itinerary {
 
   /* final primitive properties */
   private final int durationSeconds;
-  private final int transitTimeSeconds;
+  private final Duration transitTime;
   private final int numberOfTransfers;
   private final int waitingTimeSeconds;
   private final double nonTransitDistanceMeters;
@@ -56,7 +56,7 @@ public class Itinerary {
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
     this.durationSeconds = totals.totalDurationSeconds;
     this.numberOfTransfers = totals.transfers();
-    this.transitTimeSeconds = totals.transitTimeSeconds;
+    this.transitTime = Duration.ofSeconds(totals.transitTimeSeconds);
     this.nonTransitTimeSeconds = totals.nonTransitTimeSeconds;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
     this.waitingTimeSeconds = totals.waitingTimeSeconds;
@@ -110,7 +110,7 @@ public class Itinerary {
    * This is the amount of time used to travel. {@code waitingTime} is NOT included.
    */
   public int effectiveDurationSeconds() {
-    return getTransitTimeSeconds() + getNonTransitTimeSeconds();
+    return (int) (getTransitDuration().toSeconds() + getNonTransitTimeSeconds());
   }
 
   /**
@@ -136,7 +136,7 @@ public class Itinerary {
 
   /** TRUE if alt least one leg is a transit leg. */
   public boolean hasTransit() {
-    return getTransitTimeSeconds() > 0;
+    return getTransitDuration().toSeconds() > 0;
   }
 
   public Leg firstLeg() {
@@ -208,7 +208,7 @@ public class Itinerary {
       .addDurationSec("duration", durationSeconds)
       .addNum("generalizedCost", generalizedCost)
       .addDurationSec("nonTransitTime", nonTransitTimeSeconds)
-      .addDurationSec("transitTime", transitTimeSeconds)
+      .addDuration("transitTime", transitTime)
       .addDurationSec("waitingTime", waitingTimeSeconds)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
@@ -269,8 +269,8 @@ public class Itinerary {
   /**
    * How much time is spent on transit, in seconds.
    */
-  public int getTransitTimeSeconds() {
-    return transitTimeSeconds;
+  public Duration getTransitDuration() {
+    return transitTime;
   }
 
   /**

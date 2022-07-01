@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,7 +106,7 @@ public class Fare {
     return Set.copyOf(products);
   }
 
-  public void addProducts(Set<FareProduct> products) {
+  public void addProducts(Collection<FareProduct> products) {
     products.forEach(this::addProduct);
   }
 

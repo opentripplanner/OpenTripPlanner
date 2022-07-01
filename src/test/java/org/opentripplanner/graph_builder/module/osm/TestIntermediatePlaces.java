@@ -271,7 +271,7 @@ public class TestIntermediatePlaces {
         validateLegsTemporally(request, itinerary);
         validateLegsSpatially(plan, itinerary);
         if (modes.contains(TraverseMode.TRANSIT)) {
-          assertTrue(itinerary.getTransitTimeSeconds() > 0);
+          assertTrue(itinerary.getTransitDuration().toSeconds() > 0);
         }
       }
     }

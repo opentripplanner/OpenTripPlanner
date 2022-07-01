@@ -33,7 +33,7 @@ public class ItineraryMapper {
     api.startTime = GregorianCalendar.from(domain.startTime());
     api.endTime = GregorianCalendar.from(domain.endTime());
     api.walkTime = domain.getNonTransitTimeSeconds();
-    api.transitTime = domain.getTransitTimeSeconds();
+    api.transitTime = domain.getTransitDuration().toSeconds();
     api.waitingTime = domain.getWaitingTimeSeconds();
     api.walkDistance = domain.getNonTransitDistanceMeters();
     api.generalizedCost = domain.getGeneralizedCost();
