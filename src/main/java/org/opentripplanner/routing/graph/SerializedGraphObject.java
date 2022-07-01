@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
@@ -151,6 +152,9 @@ public class SerializedGraphObject implements Serializable {
       Kryo kryo = KryoBuilder.create();
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
       SubMode.deserializeSubModeCache(serObj.allTransitSubModes);
+      CompactElevationProfile.setDistanceBetweenSamplesM(
+        serObj.graph.getDistanceBetweenElevationSamples()
+      );
       Graph graph = serObj.graph;
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();

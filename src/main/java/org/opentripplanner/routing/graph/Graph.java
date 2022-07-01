@@ -343,8 +343,6 @@ public class Graph implements Serializable {
    */
   public void index() {
     LOG.info("Index street model...");
-    //TODO refactoring transit model - logic changed
-    CompactElevationProfile.setDistanceBetweenSamplesM(getDistanceBetweenElevationSamples());
     streetIndex = new StreetVertexIndex(this, stopModel);
     LOG.info("Index street model complete.");
   }
