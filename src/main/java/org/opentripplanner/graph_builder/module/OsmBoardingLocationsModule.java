@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -13,13 +14,13 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
+import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -127,7 +128,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       }
     }
 
-    // if the boarding location is a OSM way (an area) then we are generating the vertex here and
+    // if the boarding location is an OSM way (an area) then we are generating the vertex here and
     // use the AreaEdgeList to link it to the correct vertices of the platform edge
     var nearbyEdgeLists = index
       .getEdgesForEnvelope(envelope)
@@ -144,14 +145,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         (stopCode != null && edgeList.references.contains(stopCode)) ||
         edgeList.references.contains(stopId)
       ) {
-        var name = edgeList.getAreas().get(0).getName();
-        var label =
-          "platform-centroid/%s".formatted(
-              edgeList.visibilityVertices
-                .stream()
-                .map(IntersectionVertex::getLabel)
-                .collect(Collectors.joining("/"))
-            );
+        var name = edgeList
+          .getAreas()
+          .stream()
+          .findFirst()
+          .map(NamedArea::getName)
+          .orElse(new LocalizedString("name.platform"));
+        var label = "platform-centroid/%s".formatted(ts.getStop().getId().toString());
         var centroid = edgeList.getGeometry().getCentroid();
         var boardingLocation = new OsmBoardingLocationVertex(
           graph,
