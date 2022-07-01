@@ -176,6 +176,10 @@ public class TripPatternForDate {
       return null;
     }
 
+    if (hasFrequencies() && filteredTripTimes.isEmpty() && filteredFrequencies.isEmpty()) {
+      return null;
+    }
+
     if (tripTimes.size() == filteredTripTimes.size()) {
       return this;
     }
