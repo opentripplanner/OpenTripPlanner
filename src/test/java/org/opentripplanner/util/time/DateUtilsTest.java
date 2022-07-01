@@ -6,7 +6,6 @@ import static org.opentripplanner.util.time.DateUtils.secToHHMM;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import org.junit.jupiter.api.Test;
 
 public class DateUtilsTest {

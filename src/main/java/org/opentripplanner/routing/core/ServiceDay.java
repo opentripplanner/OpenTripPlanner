@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Date;
 import java.util.Map;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
