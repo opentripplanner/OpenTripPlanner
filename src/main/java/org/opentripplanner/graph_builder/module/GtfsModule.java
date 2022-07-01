@@ -13,7 +13,9 @@ import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareProduct;
+import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Route;
@@ -51,6 +53,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GtfsModule implements GraphBuilderModule {
+
+  public static final List<Class<?>> faresV2Entities = List.of(
+    FareProduct.class,
+    FareLegRule.class,
+    FareTransferRule.class
+  );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
   private final EntityHandler counter = new EntityCounter();
@@ -256,7 +264,8 @@ public class GtfsModule implements GraphBuilderModule {
 
     if (LOG.isDebugEnabled()) reader.addEntityHandler(counter);
 
-    for (Class<?> entityClass : reader.getEntityClasses()) {
+    var filteredEntities = getEntitiesToRead(reader);
+    for (Class<?> entityClass : filteredEntities) {
       LOG.info("reading entities: " + entityClass.getName());
       reader.readEntities(entityClass);
       store.flush();
@@ -323,6 +332,19 @@ public class GtfsModule implements GraphBuilderModule {
 
     store.close();
     return store.dao;
+  }
+
+  /**
+   * Since GTFS Fares V2 is a very new, constantly evolving standard there might be a lot of errors
+   * in the data. We only want to try to parse them when the feature flag is explicitly enabled as
+   * it can easily lead to graph build failures.
+   */
+  private List<Class<?>> getEntitiesToRead(GtfsReader reader) {
+    if (OTPFeature.FaresV2.isOn()) {
+      return reader.getEntityClasses();
+    } else {
+      return reader.getEntityClasses().stream().filter(c -> !faresV2Entities.contains(c)).toList();
+    }
   }
 
   /**

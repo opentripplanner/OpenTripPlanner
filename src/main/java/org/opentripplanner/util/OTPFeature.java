@@ -43,7 +43,8 @@ public enum OTPFeature {
   SandboxAPITravelTime(false),
   SandboxAPIParkAndRideApi(false),
   TransferAnalyzer(false),
-  VehicleToStopHeuristics(false);
+  VehicleToStopHeuristics(false),
+  FaresV2(false);
 
   private static final Object TEST_SEMAPHORE = new Object();
 
