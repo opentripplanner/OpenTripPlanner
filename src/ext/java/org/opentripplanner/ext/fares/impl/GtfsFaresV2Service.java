@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.fares.impl;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,6 +31,7 @@ public record GtfsFaresV2Service(List<FareLegRule> legRules) {
         Objects.isNull(product.networkId()) ||
         product.networkId().equals(leg.getRoute().getNetworkId())
       )
-      .map(FareLegRule::fareProduct);
+      .map(FareLegRule::fareProduct)
+      .filter(product -> Optional.ofNullable(product.duration()).map(duration -> Duration.ofSeconds(leg.getDuration()).))
   }
 }

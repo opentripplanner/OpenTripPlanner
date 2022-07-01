@@ -20,12 +20,14 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct dayPass = new FareProduct(
     new FeedScopedId(FEED_ID, "day_pass"),
     "Day Pass",
-    Money.euros(500)
+    Money.euros(500),
+    null
   );
   FareProduct monthlyPass = new FareProduct(
     new FeedScopedId("another", "monthly_pass"),
     "Monthly Pass",
-    Money.euros(3000)
+    Money.euros(3000),
+    null
   );
 
   @Test
