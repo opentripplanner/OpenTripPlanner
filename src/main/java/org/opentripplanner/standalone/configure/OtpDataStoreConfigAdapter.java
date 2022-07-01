@@ -4,7 +4,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.opentripplanner.datastore.OtpDataStoreConfig;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.standalone.config.StorageConfig;
 
 /**

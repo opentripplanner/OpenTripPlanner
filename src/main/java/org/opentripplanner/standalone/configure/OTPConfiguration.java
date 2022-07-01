@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
-import org.opentripplanner.datastore.OtpDataStoreConfig;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;

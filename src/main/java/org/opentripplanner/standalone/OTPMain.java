@@ -5,7 +5,7 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import io.micrometer.core.instrument.Metrics;
-import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;

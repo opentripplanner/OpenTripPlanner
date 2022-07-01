@@ -4,7 +4,7 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
-import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;

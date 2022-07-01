@@ -1,10 +1,11 @@
-package org.opentripplanner.datastore;
+package org.opentripplanner.datastore.api;
 
 import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opentripplanner.datastore.OtpDataStore;
 
 /**
  * The {@link OtpDataStore} config, needed to create a store. This should be provided by the OTP

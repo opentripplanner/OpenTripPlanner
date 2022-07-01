@@ -1,9 +1,9 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_DEM_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_GTFS_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_NETEX_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_OSM_PATTERN;
+import static org.opentripplanner.datastore.api.OtpDataStoreConfig.DEFAULT_DEM_PATTERN;
+import static org.opentripplanner.datastore.api.OtpDataStoreConfig.DEFAULT_GTFS_PATTERN;
+import static org.opentripplanner.datastore.api.OtpDataStoreConfig.DEFAULT_NETEX_PATTERN;
+import static org.opentripplanner.datastore.api.OtpDataStoreConfig.DEFAULT_OSM_PATTERN;
 
 import java.net.URI;
 import java.util.ArrayList;
