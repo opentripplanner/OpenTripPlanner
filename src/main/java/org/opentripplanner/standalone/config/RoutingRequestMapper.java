@@ -152,8 +152,6 @@ public class RoutingRequestMapper {
     request.unpreferredRoutes =
       c.path("unpreferred").asFeedScopedIds("routes", dft.unpreferredRoutes);
 
-    LOG.info(String.format("unpreferredRouteCost: %s", request.unpreferredRouteCost.toString()));
-
     return request;
   }
 
