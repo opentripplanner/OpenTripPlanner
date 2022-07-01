@@ -60,6 +60,7 @@ public class OtpDataStore {
   private DataSource streetGraph;
   private DataSource graph;
   private CompositeDataSource buildReportDir;
+  private boolean opened = false;
 
   /**
    * Use the {@link DataStoreModule} to create a new instance of this class.
@@ -89,6 +90,9 @@ public class OtpDataStore {
   }
 
   public void open() {
+    if (opened) {
+      throw new IllegalStateException("Do not open DataSource twice.");
+    }
     allRepositories.forEach(DataSourceRepository::open);
     addAll(localRepository.listExistingSources(CONFIG));
     addAll(findMultipleSources(config.osmFiles(), OSM));
@@ -105,6 +109,7 @@ public class OtpDataStore {
     // Also read in unknown sources in case the data input source is miss-spelled,
     // We look for files on the local-file-system, other repositories ignore this call.
     addAll(findMultipleSources(Collections.emptyList(), UNKNOWN));
+    this.opened = true;
   }
 
   /**
@@ -125,26 +130,29 @@ public class OtpDataStore {
    */
   @Nonnull
   public Collection<DataSource> listExistingSourcesFor(FileType type) {
+    assertDataStoreIsOpened();
     return sources.get(type).stream().filter(DataSource::exists).collect(Collectors.toList());
   }
 
   @Nonnull
   public DataSource getStreetGraph() {
+    assertDataStoreIsOpened();
     return streetGraph;
   }
 
   @Nonnull
   public DataSource getGraph() {
+    assertDataStoreIsOpened();
     return graph;
   }
 
   @Nonnull
   public CompositeDataSource getBuildReportDir() {
+    assertDataStoreIsOpened();
     return buildReportDir;
   }
 
   /* private methods */
-
   private void add(DataSource source) {
     if (source != null) {
       sources.put(source.type(), source);
@@ -235,5 +243,11 @@ public class OtpDataStore {
       }
     }
     return null;
+  }
+
+  private void assertDataStoreIsOpened() {
+    if (!opened) {
+      throw new IllegalStateException("Open data store before using it.");
+    }
   }
 }
