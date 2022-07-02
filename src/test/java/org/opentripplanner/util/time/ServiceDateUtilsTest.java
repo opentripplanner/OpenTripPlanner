@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
+package org.opentripplanner.util.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper.asStartOfService;
+import static org.opentripplanner.util.time.ServiceDateUtils.asStartOfService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -10,8 +10,9 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
-public class DateMapperTest {
+public class ServiceDateUtilsTest {
 
   private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");
   private static final LocalTime TIME = LocalTime.of(10, 26);
@@ -93,13 +94,13 @@ public class DateMapperTest {
 
   @Test
   public void secondsSinceStartOfTime() {
-    assertEquals(0, DateMapper.secondsSinceStartOfTime(Z0, D2019_03_30));
-    assertEquals(23 * 3600, DateMapper.secondsSinceStartOfTime(Z0, D2019_03_31));
-    assertEquals((23 + 24) * 3600, DateMapper.secondsSinceStartOfTime(Z0, D2019_04_01));
+    assertEquals(0, ServiceDateUtils.secondsSinceStartOfTime(Z0, D2019_03_30));
+    assertEquals(23 * 3600, ServiceDateUtils.secondsSinceStartOfTime(Z0, D2019_03_31));
+    assertEquals((23 + 24) * 3600, ServiceDateUtils.secondsSinceStartOfTime(Z0, D2019_04_01));
 
     // Test the Instant version of this method too
     Instant instant = D2019_04_01.atStartOfDay(ZONE_ID).toInstant();
-    assertEquals((23 + 24) * 3600, DateMapper.secondsSinceStartOfTime(Z0, instant));
+    assertEquals((23 + 24) * 3600, ServiceDateUtils.secondsSinceStartOfTime(Z0, instant));
   }
 
   @Test
@@ -112,7 +113,7 @@ public class DateMapperTest {
     var desiredDuration = Duration.between(startOfService, dateTime).toSeconds();
     assertEquals(
       desiredDuration,
-      DateMapper.secondsSinceStartOfService(operatingDayDate, dateTime, zoneId)
+      ServiceDateUtils.secondsSinceStartOfService(operatingDayDate, dateTime, zoneId)
     );
   }
 }

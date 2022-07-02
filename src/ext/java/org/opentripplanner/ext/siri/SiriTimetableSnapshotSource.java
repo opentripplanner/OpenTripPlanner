@@ -26,7 +26,6 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -40,6 +39,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -1027,11 +1027,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
-    return DateMapper.secondsSinceStartOfService(dateTime, dateTime, transitService.getTimeZone());
+    return ServiceDateUtils.secondsSinceStartOfService(
+      dateTime,
+      dateTime,
+      transitService.getTimeZone()
+    );
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
-    return DateMapper.secondsSinceStartOfService(
+    return ServiceDateUtils.secondsSinceStartOfService(
       startOfService,
       dateTime,
       transitService.getTimeZone()

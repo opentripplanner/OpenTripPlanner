@@ -53,7 +53,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -76,6 +75,7 @@ import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 @Path("/traveltime")
 public class TravelTimeResource {
@@ -288,8 +288,8 @@ public class TravelTimeResource {
     final RaptorRequest<TripSchedule> request = new RaptorRequestBuilder<TripSchedule>()
       .profile(RaptorProfile.BEST_TIME)
       .searchParams()
-      .earliestDepartureTime(DateMapper.secondsSinceStartOfTime(startOfTime, startTime))
-      .latestArrivalTime(DateMapper.secondsSinceStartOfTime(startOfTime, endTime))
+      .earliestDepartureTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, startTime))
+      .latestArrivalTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, endTime))
       .addAccessPaths(accessList)
       .searchOneIterationOnly()
       .timetableEnabled(false)

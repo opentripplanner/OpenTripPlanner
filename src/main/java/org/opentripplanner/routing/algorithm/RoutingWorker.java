@@ -21,7 +21,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -33,6 +32,7 @@ import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class RoutingWorker {
     this.request = request;
     this.router = router;
     this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.tags);
-    this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
+    this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.getDateTime(), zoneId);
     this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
     this.additionalSearchDays =
       createAdditionalSearchDays(router.routerConfig.raptorTuningParameters(), zoneId, request);

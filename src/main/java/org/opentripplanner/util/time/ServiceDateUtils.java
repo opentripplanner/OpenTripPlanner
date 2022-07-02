@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
+package org.opentripplanner.util.time;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -8,9 +8,8 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.function.Supplier;
 
-public class DateMapper {
+public class ServiceDateUtils {
 
   public static ZonedDateTime asStartOfService(ZonedDateTime date) {
     return date.truncatedTo(ChronoUnit.HOURS).withHour(12).minusHours(12);
@@ -18,7 +17,7 @@ public class DateMapper {
 
   public static ZonedDateTime asStartOfService(Instant time, ZoneId zoneId) {
     LocalDate date = LocalDate.ofInstant(time, zoneId);
-    return DateMapper.asStartOfService(date, zoneId);
+    return ServiceDateUtils.asStartOfService(date, zoneId);
   }
 
   public static ZonedDateTime asStartOfService(LocalDate localDate, ZoneId zoneId) {

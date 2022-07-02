@@ -10,7 +10,6 @@ import java.util.Set;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -19,6 +18,7 @@ import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedCall;
@@ -395,12 +395,12 @@ public class SiriFuzzyTripMatcher {
     String lastStopPoint,
     ZonedDateTime arrivalTime
   ) {
-    int secondsSinceMidnight = DateMapper.secondsSinceStartOfService(
+    int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime,
       arrivalTime,
       transitService.getTimeZone()
     );
-    int secondsSinceMidnightYesterday = DateMapper.secondsSinceStartOfService(
+    int secondsSinceMidnightYesterday = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime.minusDays(1),
       arrivalTime,
       transitService.getTimeZone()
