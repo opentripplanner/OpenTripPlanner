@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.BitSet;
 import java.util.Collection;
@@ -405,6 +406,11 @@ public class DefaultTransitService implements TransitEditorService {
       : tripPattern.getScheduledTimetable();
   }
 
+  @Override
+  public Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate) {
+    return getTimetableForTripPattern(tripPattern, new ServiceDate(serviceDate));
+  }
+
   /**
    * Lazy-initialization of TimetableSnapshot
    *
@@ -420,7 +426,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
     FeedScopedId tripId,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     return DatedServiceJourneyHelper.getTripOnServiceDate(this, tripId, serviceDate);
   }

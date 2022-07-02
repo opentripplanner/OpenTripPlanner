@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.BitSet;
 import java.util.Collection;
@@ -141,7 +142,9 @@ public interface TransitService {
 
   Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate);
 
-  TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, ServiceDate serviceDate);
+  Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
+
+  TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, LocalDate serviceDate);
 
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);
 

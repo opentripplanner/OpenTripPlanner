@@ -1562,10 +1562,7 @@ public class TransmodelGraphQLSchema {
             if (ref == null) {
               return null;
             }
-            return ref.getLeg(
-              GqlUtil.getRoutingService(environment),
-              GqlUtil.getTransitService(environment)
-            );
+            return ref.getLeg(GqlUtil.getTransitService(environment));
           })
           .build()
       )

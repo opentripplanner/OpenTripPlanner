@@ -1,10 +1,10 @@
 package org.opentripplanner.model;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -24,7 +24,7 @@ public class TripTimeOnDate {
   private final int stopIndex;
   // This is only needed because TripTimes has no reference to TripPattern
   private final TripPattern tripPattern;
-  private final ServiceDate serviceDate;
+  private final LocalDate serviceDate;
   private final long midnight;
 
   public TripTimeOnDate(
@@ -36,7 +36,7 @@ public class TripTimeOnDate {
     this.tripTimes = tripTimes;
     this.stopIndex = stopIndex;
     this.tripPattern = tripPattern;
-    this.serviceDate = serviceDay != null ? serviceDay.getServiceDate() : null;
+    this.serviceDate = serviceDay != null ? serviceDay.getServiceDate().toLocalDate() : null;
     this.midnight = serviceDay != null ? serviceDay.time(0) : UNDEFINED;
   }
 
@@ -44,7 +44,7 @@ public class TripTimeOnDate {
     TripTimes tripTimes,
     int stopIndex,
     TripPattern tripPattern,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     Instant midnight
   ) {
     this.tripTimes = tripTimes;
@@ -194,7 +194,7 @@ public class TripTimeOnDate {
     return midnight;
   }
 
-  public ServiceDate getServiceDay() {
+  public LocalDate getServiceDay() {
     return serviceDate;
   }
 

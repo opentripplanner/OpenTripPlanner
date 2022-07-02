@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.time.LocalDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 
@@ -11,6 +12,13 @@ class ServiceDateMapper {
     return orginal == null
       ? null
       : new ServiceDate(orginal.getYear(), orginal.getMonth(), orginal.getDay());
+  }
+
+  /** Map from GTFS ServiceDate to a {@link java.time.LocalDate}, {@code null} safe. */
+  static LocalDate mapLocalDate(org.onebusaway.gtfs.model.calendar.ServiceDate orginal) {
+    return orginal == null
+      ? null
+      : LocalDate.of(orginal.getYear(), orginal.getMonth(), orginal.getDay());
   }
 
   static ServiceDateInterval mapServiceDateInterval(

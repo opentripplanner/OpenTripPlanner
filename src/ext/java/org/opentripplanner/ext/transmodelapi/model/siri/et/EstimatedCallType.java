@@ -286,7 +286,6 @@ public class EstimatedCallType {
               .of(environment.getSource())
               .map(TripTimeOnDate.class::cast)
               .map(TripTimeOnDate::getServiceDay)
-              .map(ServiceDate::toLocalDate)
               .orElse(null)
           )
           .build()
@@ -386,7 +385,7 @@ public class EstimatedCallType {
 
     TransitAlertService alertPatchService = transitService.getTransitAlertService();
 
-    final ServiceDate serviceDate = tripTimeOnDate.getServiceDay();
+    final ServiceDate serviceDate = new ServiceDate(tripTimeOnDate.getServiceDay());
 
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));

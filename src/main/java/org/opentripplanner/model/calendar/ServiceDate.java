@@ -134,7 +134,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
    * saving time.
    */
   public ZonedDateTime toZonedDateTime(ZoneId zoneId, int secondsOffset) {
-    return getStartOfService(zoneId).plusSeconds(secondsOffset);
+    return ServiceDateUtils.toZonedDateTime(toLocalDate(), zoneId, secondsOffset);
   }
 
   public ZonedDateTime getStartOfService(ZoneId zoneId) {

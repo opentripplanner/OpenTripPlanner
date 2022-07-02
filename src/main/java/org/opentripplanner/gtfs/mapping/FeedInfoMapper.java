@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapServiceDate;
+import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapLocalDate;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,8 +34,8 @@ class FeedInfoMapper {
       rhs.getPublisherName(),
       rhs.getPublisherUrl(),
       rhs.getLang(),
-      mapServiceDate(rhs.getStartDate()),
-      mapServiceDate(rhs.getEndDate()),
+      mapLocalDate(rhs.getStartDate()),
+      mapLocalDate(rhs.getEndDate()),
       rhs.getVersion()
     );
   }

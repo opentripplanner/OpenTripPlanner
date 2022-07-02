@@ -24,6 +24,20 @@ public class ServiceDateUtils {
     return ZonedDateTime.of(localDate, LocalTime.NOON, zoneId).minusHours(12);
   }
 
+  /**
+   * Create a ZonedDateTime based on the service date, time zone and seconds-offset. This
+   * method add the offset seconds to the service date start time, which is defined to be NOON - 12
+   * hours. This is midnight for most days, except days where the time is adjusted for daylight
+   * saving time.
+   */
+  public static ZonedDateTime toZonedDateTime(
+    LocalDate localDate,
+    ZoneId zoneId,
+    int secondsOffset
+  ) {
+    return asStartOfService(localDate, zoneId).plusSeconds(secondsOffset);
+  }
+
   public static int secondsSinceStartOfTime(ZonedDateTime timeZero, LocalDate localDate) {
     ZonedDateTime startOfDay = asStartOfService(localDate, timeZero.getZone());
     return (int) Duration.between(timeZero, startOfDay).getSeconds();
@@ -57,5 +71,13 @@ public class ServiceDateUtils {
     ZonedDateTime dateTime
   ) {
     return (int) Duration.between(startOfService, dateTime).toSeconds();
+  }
+
+  /**
+   * The service date is either the minimum or maximum allowed value. In practice this means
+   * unbounded.
+   */
+  public static boolean isMinMax(LocalDate date) {
+    return LocalDate.MIN.equals(date) || LocalDate.MAX.equals(date);
   }
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.alternativelegs;
 
 import static org.opentripplanner.routing.stoptimes.StopTimesHelper.skipByTripCancellation;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -23,12 +24,12 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * A helper class to fetch previous/next alternative legs for a scheduled transit leg.
@@ -44,7 +45,6 @@ public class AlternativeLegs {
   public static List<ScheduledTransitLeg> getAlternativeLegs(
     Leg leg,
     Integer numberLegs,
-    RoutingService routingService,
     TransitService transitService,
     boolean searchBackward,
     AlternativeLegsFilter filter
@@ -83,12 +83,11 @@ public class AlternativeLegs {
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
       .flatMap(t ->
         generateLegs(
-          routingService,
           transitService,
           timetableSnapshot,
           t,
           leg.getStartTime(),
-          leg.getServiceDate(),
+          new ServiceDate(leg.getServiceDate()),
           searchBackward
         )
       )
@@ -104,7 +103,6 @@ public class AlternativeLegs {
    */
   @Nonnull
   private static Stream<ScheduledTransitLeg> generateLegs(
-    RoutingService routingService,
     TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     TripPatternBetweenStops tripPatternBetweenStops,
@@ -186,14 +184,16 @@ public class AlternativeLegs {
     int alightingPosition,
     TripTimeOnDate tripTimeOnDate
   ) {
-    ServiceDate serviceDay = tripTimeOnDate.getServiceDay();
-
+    LocalDate serviceDay = tripTimeOnDate.getServiceDay();
     TripTimes tripTimes = tripTimeOnDate.getTripTimes();
-    ZonedDateTime boardingTime = serviceDay.toZonedDateTime(
+
+    ZonedDateTime boardingTime = ServiceDateUtils.toZonedDateTime(
+      serviceDay,
       timeZone,
       tripTimeOnDate.getRealtimeDeparture()
     );
-    ZonedDateTime alightingTime = serviceDay.toZonedDateTime(
+    ZonedDateTime alightingTime = ServiceDateUtils.toZonedDateTime(
+      serviceDay,
       timeZone,
       tripTimes.getArrivalTime(alightingPosition)
     );
@@ -205,7 +205,7 @@ public class AlternativeLegs {
       alightingPosition,
       boardingTime,
       alightingTime,
-      serviceDay.toLocalDate(),
+      serviceDay,
       timeZone,
       null,
       null,

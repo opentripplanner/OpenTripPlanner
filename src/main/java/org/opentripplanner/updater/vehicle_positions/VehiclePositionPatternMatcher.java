@@ -31,6 +31,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,8 +139,8 @@ public class VehiclePositionPatternMatcher {
     return Stream
       .of(yesterday, today, tomorrow)
       .flatMap(day -> {
-        var startTime = day.atStartOfDay(zoneId).plusSeconds(start).toInstant();
-        var endTime = day.atStartOfDay(zoneId).plusSeconds(end).toInstant();
+        var startTime = ServiceDateUtils.toZonedDateTime(day, zoneId, start).toInstant();
+        var endTime = ServiceDateUtils.toZonedDateTime(day, zoneId, end).toInstant();
 
         return Stream
           .of(Duration.between(startTime, now), Duration.between(endTime, now))

@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
@@ -155,6 +156,10 @@ public class TimetableSnapshot {
   public TripPattern getLastAddedTripPattern(FeedScopedId tripId, ServiceDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return lastAddedTripPattern.get(tripIdAndServiceDate);
+  }
+
+  public TripPattern getLastAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+    return getLastAddedTripPattern(tripId, new ServiceDate(serviceDate));
   }
 
   /**

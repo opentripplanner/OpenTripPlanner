@@ -58,15 +58,19 @@ public class AlertToLegMapper {
 
     FeedScopedId routeId = leg.getRoute().getId();
     FeedScopedId tripId = leg.getTrip().getId();
+    ServiceDate serviceDate = leg.getServiceDate() != null
+      ? new ServiceDate(leg.getServiceDate())
+      : null;
+
     if (fromStop instanceof Stop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, leg.getServiceDate()));
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
       addTransitAlertsToLeg(leg, departingStopConditions, alerts, legStartTime, legEndTime);
     }
     if (toStop instanceof Stop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, leg.getServiceDate()));
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
       addTransitAlertsToLeg(leg, StopCondition.ARRIVING, alerts, legStartTime, legEndTime);
     }
@@ -75,7 +79,7 @@ public class AlertToLegMapper {
       for (StopArrival visit : leg.getIntermediateStops()) {
         if (visit.place.stop instanceof Stop stop) {
           Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, leg.getServiceDate()));
+          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
           alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
 
           ZonedDateTime stopArrival = visit.arrival;
@@ -89,7 +93,7 @@ public class AlertToLegMapper {
     Collection<TransitAlert> alerts;
 
     // trips - alerts tagged on ServiceDate
-    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), leg.getServiceDate());
+    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
     addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
 
     // trips - alerts tagged on any date
