@@ -669,7 +669,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
-    final long midnightSecondsSinceEpoch = serviceDate.toZonedDateTime(timeZone, 0).toEpochSecond();
+    final long midnightSecondsSinceEpoch = serviceDate.getStartOfService(timeZone).toEpochSecond();
 
     // Create StopTimes
     final List<StopTime> stopTimes = new ArrayList<>(tripUpdate.getStopTimeUpdateCount());

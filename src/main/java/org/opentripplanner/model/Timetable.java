@@ -258,7 +258,7 @@ public class Timetable implements Serializable {
     Integer delay = null;
     Integer firstUpdatedIndex = null;
 
-    final long today = updateServiceDate.toZonedDateTime(timeZone, 0).toEpochSecond();
+    final long today = updateServiceDate.getStartOfService(timeZone).toEpochSecond();
 
     for (int i = 0; i < numStops; i++) {
       boolean match = false;

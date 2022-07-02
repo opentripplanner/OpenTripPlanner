@@ -149,6 +149,22 @@ public class ServiceDateTest {
   }
 
   @Test
+  public void getStartOfService() {
+    var zone = ZoneId.of("Europe/Oslo");
+    ServiceDate d = new ServiceDate(2020, 8, 25);
+
+    assertEquals("2020-08-25T00:00+02:00[Europe/Oslo]", d.getStartOfService(zone).toString());
+
+    // Time is adjusted 1 hour back in Norway on this date
+    d = new ServiceDate(2020, 10, 25);
+    assertEquals("2020-10-25T01:00+02:00[Europe/Oslo]", d.getStartOfService(zone).toString());
+
+    // Time is adjusted 1 hour forward in Norway on this date
+    d = new ServiceDate(2020, 3, 29);
+    assertEquals("2020-03-28T23:00+01:00[Europe/Oslo]", d.getStartOfService(zone).toString());
+  }
+
+  @Test
   public void toZonedDateTime() {
     var zone = ZoneId.of("Europe/Oslo");
     ServiceDate d;

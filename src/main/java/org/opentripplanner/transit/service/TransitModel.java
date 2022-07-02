@@ -269,7 +269,7 @@ public class TransitModel implements Serializable {
       agencies.add(sid.getFeedId());
       for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
         // Adjust for timezone, assuming there is only one per graph.
-        long t = sd.toZonedDateTime(getTimeZone(), 0).toEpochSecond();
+        long t = sd.getStartOfService(getTimeZone()).toEpochSecond();
         if (t > now) {
           agenciesWithFutureDates.add(sid.getFeedId());
         }
@@ -345,7 +345,7 @@ public class TransitModel implements Serializable {
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
     // Start of day
-    long time = serviceDate.toZonedDateTime(getTimeZone(), 0).toEpochSecond();
+    long time = serviceDate.getStartOfService(getTimeZone()).toEpochSecond();
 
     if (time < transitServiceStarts || time >= transitServiceEnds) {
       return null;

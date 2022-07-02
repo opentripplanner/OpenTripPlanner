@@ -94,7 +94,7 @@ public class ServiceDay implements Serializable {
   }
 
   private void init(Map<FeedScopedId, Integer> serviceCodes, CalendarService cs, ZoneId timeZone) {
-    this.midnight = serviceDate.toZonedDateTime(timeZone, 0).toEpochSecond();
+    this.midnight = serviceDate.getStartOfService(timeZone).toEpochSecond();
     serviceIdsRunning = new BitSet(cs.getServiceIds().size());
 
     for (FeedScopedId serviceId : cs.getServiceIdsOnDate(serviceDate)) {

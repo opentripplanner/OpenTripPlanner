@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * A general representation of a year-month-day triple not tied to any locale and used by the GTFS
@@ -133,8 +134,11 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
    * saving time.
    */
   public ZonedDateTime toZonedDateTime(ZoneId zoneId, int secondsOffset) {
-    var d = ZonedDateTime.of(year, month, day, 12, 0, 0, 0, zoneId);
-    return d.minusHours(12).plusSeconds(secondsOffset);
+    return getStartOfService(zoneId).plusSeconds(secondsOffset);
+  }
+
+  public ZonedDateTime getStartOfService(ZoneId zoneId) {
+    return ServiceDateUtils.asStartOfService(toLocalDate(), zoneId);
   }
 
   /**

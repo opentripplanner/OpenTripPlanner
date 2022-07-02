@@ -200,7 +200,7 @@ public class TimetableSnapshotSourceTest {
       tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
       final long midnightSecondsSinceEpoch = serviceDate
-        .toZonedDateTime(transitModel.getTimeZone(), 0)
+        .getStartOfService(transitModel.getTimeZone())
         .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
@@ -323,7 +323,7 @@ public class TimetableSnapshotSourceTest {
       tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
       final long midnightSecondsSinceEpoch = serviceDate
-        .toZonedDateTime(transitModel.getTimeZone(), 0)
+        .getStartOfService(transitModel.getTimeZone())
         .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();

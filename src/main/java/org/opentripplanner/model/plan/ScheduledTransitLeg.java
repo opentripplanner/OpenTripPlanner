@@ -107,7 +107,7 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   public Instant getServiceDateMidnight() {
-    return serviceDate.toZonedDateTime(zoneId, 0).toInstant();
+    return serviceDate.getStartOfService(zoneId).toInstant();
   }
 
   @Override
