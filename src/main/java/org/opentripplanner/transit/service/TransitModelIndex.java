@@ -101,7 +101,7 @@ public class TransitModelIndex {
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
           tripOnServiceDate.getTrip().getId(),
-          tripOnServiceDate.getServiceDate()
+          new ServiceDate(tripOnServiceDate.getServiceDate())
         ),
         tripOnServiceDate
       );

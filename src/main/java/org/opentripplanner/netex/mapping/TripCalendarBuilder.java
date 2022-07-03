@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.Multimap;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
@@ -34,8 +34,8 @@ public class TripCalendarBuilder {
   private final DataImportIssueStore issueStore;
 
   /** ServiceDates by dayType id */
-  private HierarchicalMap<String, Set<ServiceDate>> dayTypeCalendars = new HierarchicalMap<>();
-  private HierarchicalMap<String, Set<ServiceDate>> dsjBySJId = new HierarchicalMap<>();
+  private HierarchicalMap<String, Set<LocalDate>> dayTypeCalendars = new HierarchicalMap<>();
+  private HierarchicalMap<String, Set<LocalDate>> dsjBySJId = new HierarchicalMap<>();
 
   public TripCalendarBuilder(
     CalendarServiceBuilder calendarServiceBuilder,
@@ -100,7 +100,7 @@ public class TripCalendarBuilder {
     Map<String, FeedScopedId> serviceIdsBySJId = new HashMap<>();
 
     for (ServiceJourney sj : serviceJourneys) {
-      Set<ServiceDate> serviceDates;
+      Set<LocalDate> serviceDates;
 
       // Add scheduled dayTypes
       serviceDates = new HashSet<>(getServiceDatesForDayType(sj));
@@ -118,18 +118,18 @@ public class TripCalendarBuilder {
     return serviceIdsBySJId;
   }
 
-  private Collection<ServiceDate> getServiceDatesForDayType(ServiceJourney sj) {
+  private Collection<LocalDate> getServiceDatesForDayType(ServiceJourney sj) {
     DayTypeRefs_RelStructure dayTypes = sj.getDayTypes();
 
     if (dayTypes == null) {
       return List.of();
     }
 
-    List<ServiceDate> result = new ArrayList<>();
+    List<LocalDate> result = new ArrayList<>();
 
     for (JAXBElement<? extends DayTypeRefStructure> dt : dayTypes.getDayTypeRef()) {
       String dayTypeRef = dt.getValue().getRef();
-      Set<ServiceDate> dates = dayTypeCalendars.lookup(dayTypeRef);
+      Set<LocalDate> dates = dayTypeCalendars.lookup(dayTypeRef);
       if (dates != null) {
         result.addAll(dates);
       } else {
@@ -139,7 +139,7 @@ public class TripCalendarBuilder {
     return result;
   }
 
-  private Collection<ServiceDate> getDatesForDSJs(String sjId) {
+  private Collection<LocalDate> getDatesForDSJs(String sjId) {
     return dsjBySJId.containsKey(sjId) ? dsjBySJId.lookup(sjId) : List.of();
   }
 

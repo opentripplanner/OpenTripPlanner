@@ -1108,7 +1108,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       var tripOnServiceDate = new TripOnServiceDate(
         datedServiceJourneyId,
         trip,
-        serviceDate,
+        serviceDate.toLocalDate(),
         null,
         List.of() // TODO: Is there a reference to the old DSJ?
       );
