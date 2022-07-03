@@ -55,9 +55,6 @@ public class TripPatternCache {
       // Create an empty bitset for service codes (because the new pattern does not contain any trips)
       tripPattern.setServiceCodes(serviceCodes);
 
-      // Finish scheduled time table
-      tripPattern.getScheduledTimetable().finish();
-
       tripPattern.setCreatedByRealtimeUpdater();
 
       // Copy information from the TripPattern this is replacing

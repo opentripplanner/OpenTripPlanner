@@ -1085,7 +1085,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      */
     pattern.getScheduledTimetable().getTripTimes().clear();
     pattern.getScheduledTimetable().addTripTimes(updatedTripTimes);
-    pattern.getScheduledTimetable().finish();
 
     // Remove trip times to avoid real time trip times being visible for ignoreRealtimeInformation queries
     pattern.getScheduledTimetable().getTripTimes().clear();

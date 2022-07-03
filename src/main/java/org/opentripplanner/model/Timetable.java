@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
 public class Timetable implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
-  private static final long serialVersionUID = 1L;
 
   private final TripPattern pattern;
 
@@ -44,12 +42,6 @@ public class Timetable implements Serializable {
   private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
 
   private final ServiceDate serviceDate;
-
-  /**
-   * Helps determine whether a particular pattern is worth searching for departures at a given
-   * time.
-   */
-  private transient int minTime, maxTime;
 
   /** Construct an empty Timetable. */
   public Timetable(TripPattern pattern) {
@@ -65,65 +57,6 @@ public class Timetable implements Serializable {
     tripTimes.addAll(tt.tripTimes);
     this.serviceDate = serviceDate;
     this.pattern = tt.pattern;
-  }
-
-  /**
-   * Before performing the relatively expensive iteration over all the trips in this pattern, check
-   * whether it's even possible to board any of them given the time at which we are searching, and
-   * whether it's possible that any of them could improve on the best known time. This is only an
-   * optimization, but a significant one. When we search for departures, we look at three separate
-   * days: yesterday, today, and tomorrow. Many patterns do not have service at all hours of the day
-   * or past midnight. This optimization can cut the search time for each pattern by 66 to 100
-   * percent.
-   *
-   * @param bestWait -1 means there is not yet any best known time.
-   */
-  public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
-    // Check whether any services are running at all on this pattern.
-    if (!sd.anyServiceRunning(this.pattern.getServices())) {
-      return false;
-    }
-    // Make the search time relative to the given service day.
-    searchTime = sd.secondsSinceMidnight(searchTime);
-    // Check whether any trip can be boarded at all, given the search time
-    if (boarding ? (searchTime > this.maxTime) : (searchTime < this.minTime)) {
-      return false;
-    }
-    // Check whether any trip can improve on the best time yet found
-    if (bestWait >= 0) {
-      long bestTime = boarding ? (searchTime + bestWait) : (searchTime - bestWait);
-      if (boarding ? (bestTime < this.minTime) : (bestTime > this.maxTime)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Finish off a Timetable once all TripTimes have been added to it. This involves caching lower
-   * bounds on the running times and dwell times at each stop, and may perform other actions to
-   * compact the data structure such as trimming and deduplicating arrays.
-   */
-  public void finish() {
-    int nStops = pattern.numberOfStops();
-
-    // Concatenate raw TripTimes and those referenced from FrequencyEntries
-    List<TripTimes> allTripTimes = Lists.newArrayList(tripTimes);
-    for (FrequencyEntry freq : frequencyEntries) allTripTimes.add(freq.tripTimes);
-
-    /* Find the time range over which this timetable is active. Allows departure search optimizations. */
-    minTime = Integer.MAX_VALUE;
-    maxTime = Integer.MIN_VALUE;
-    for (TripTimes tt : tripTimes) {
-      minTime = Math.min(minTime, tt.getDepartureTime(0));
-      maxTime = Math.max(maxTime, tt.getArrivalTime(nStops - 1));
-    }
-    // Slightly repetitive code.
-    // Again it seems reasonable to have a shared interface between FrequencyEntries and normal TripTimes.
-    for (FrequencyEntry freq : frequencyEntries) {
-      minTime = Math.min(minTime, freq.getMinDeparture());
-      maxTime = Math.max(maxTime, freq.getMaxArrival());
-    }
   }
 
   /** @return the index of TripTimes for this trip ID in this particular Timetable */

@@ -173,12 +173,6 @@ public class GeometryAndBlockProcessor {
 
     /* Identify interlined trips and create the necessary edges. */
     interline(tripPatterns);
-
-    /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
-    // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
-    for (TripPattern tableTripPattern : tripPatterns) {
-      tableTripPattern.getScheduledTimetable().finish();
-    }
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {

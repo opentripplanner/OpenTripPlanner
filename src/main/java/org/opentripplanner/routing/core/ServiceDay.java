@@ -40,11 +40,6 @@ public class ServiceDay implements Serializable {
     return this.serviceIdsRunning.get(serviceCode);
   }
 
-  /** Do any of the services for this set of service codes run on this ServiceDay? */
-  public boolean anyServiceRunning(BitSet serviceCodes) {
-    return this.serviceIdsRunning.intersects(serviceCodes);
-  }
-
   /**
    * Return the ServiceDate for this ServiceDay.
    */

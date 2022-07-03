@@ -67,9 +67,6 @@ public class SiriTripPatternCache {
       // Create an empty bitset for service codes (because the new pattern does not contain any trips)
       tripPattern.setServiceCodes(transitModel.getServiceCodes());
 
-      // Finish scheduled time table
-      tripPattern.getScheduledTimetable().finish();
-
       // Create vertices and edges for new TripPattern
       // TODO: purge these vertices and edges once in a while?
       //            tripPattern.makePatternVerticesAndEdges(transitModel, transitModel.index.stopVertexForStop);

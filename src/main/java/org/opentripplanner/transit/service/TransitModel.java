@@ -165,10 +165,6 @@ public class TransitModel implements Serializable {
    */
   public void index() {
     LOG.info("Index transit model...");
-    for (TripPattern tp : tripPatternForId.values()) {
-      // Skip frequency-based patterns which have no timetable (null)
-      if (tp != null) tp.getScheduledTimetable().finish();
-    }
     this.getStopModel().index();
     // the transit model indexing updates the stop model index (flex stops added to the stop index)
     this.index = new TransitModelIndex(this);

@@ -251,9 +251,6 @@ public class TimetableSnapshot {
     if (!force && !this.isDirty()) {
       return null;
     }
-    for (Timetable tt : dirtyTimetables) {
-      tt.finish(); // summarize, index, etc. the new timetables
-    }
     ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
     ret.lastAddedTripPattern =
       (HashMap<TripIdAndServiceDate, TripPattern>) this.lastAddedTripPattern.clone();

@@ -125,32 +125,6 @@ public class FrequencyEntry implements Serializable {
     return tripTimes.timeShift(stop, time, depart);
   }
 
-  /** @return the maximum number of trips this frequency entry could represent, given its headway. */
-  public int numTrips() {
-    return (endTime - startTime) / headway;
-  }
-
-  /**
-   * @return the minimum time in seconds since midnight at which a trip may depart on this frequency
-   * definition.
-   */
-  public int getMinDeparture() {
-    // this is simple: the earliest this trip could depart is the time at which it starts plus the dwell at the first stop
-    return tripTimes.getDepartureTime(0) - tripTimes.getArrivalTime(0) + startTime;
-  }
-
-  /**
-   * @return the maximum time in seconds since midnight at which a trip may arrive on this frequency
-   * definition.
-   */
-  public int getMaxArrival() {
-    // The latest this trip could arrive is its last arrival time minus its first arrival time (the length of the trip),
-    // plus the end time (the latest it could have arrived at the initial stop)
-    return (
-      tripTimes.getArrivalTime(tripTimes.getNumStops() - 1) - tripTimes.getArrivalTime(0) + endTime
-    );
-  }
-
   /** Used in debugging / dumping times. */
   private static String formatSeconds(int s) {
     int m = s / 60;
