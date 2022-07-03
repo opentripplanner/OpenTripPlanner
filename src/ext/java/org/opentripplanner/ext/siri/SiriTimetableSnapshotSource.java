@@ -1072,7 +1072,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       stopPattern,
       trip,
       transitModel,
-      serviceDate
+      serviceDate.toLocalDate()
     );
 
     // Add service code to bitset of pattern if needed (using copy on write)
