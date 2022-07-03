@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -247,7 +249,7 @@ public class SiriFuzzyTripMatcher {
    */
   public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDateAndMode(
     String internalPlanningCode,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     TransitMode mode,
     SubMode transportSubmode
   ) {
@@ -261,9 +263,12 @@ public class SiriFuzzyTripMatcher {
     for (Trip trip : cachedTripsBySiriId) {
       final TripPattern tripPattern = transitService.getPatternForTrip().get(trip);
       if (tripPattern.matchesModeOrSubMode(mode, transportSubmode)) {
-        Set<ServiceDate> serviceDates = transitService
+        Set<LocalDate> serviceDates = transitService
           .getCalendarService()
-          .getServiceDatesForServiceId(trip.getServiceId());
+          .getServiceDatesForServiceId(trip.getServiceId())
+          .stream()
+          .map(ServiceDate::toLocalDate)
+          .collect(Collectors.toSet());
         if (
           serviceDates.contains(serviceDate) &&
           trip.getNetexInternalPlanningCode() != null &&

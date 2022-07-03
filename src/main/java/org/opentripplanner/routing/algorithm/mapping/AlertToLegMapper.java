@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -58,9 +58,7 @@ public class AlertToLegMapper {
 
     FeedScopedId routeId = leg.getRoute().getId();
     FeedScopedId tripId = leg.getTrip().getId();
-    ServiceDate serviceDate = leg.getServiceDate() != null
-      ? new ServiceDate(leg.getServiceDate())
-      : null;
+    LocalDate serviceDate = leg.getServiceDate();
 
     if (fromStop instanceof Stop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
@@ -172,7 +170,7 @@ public class AlertToLegMapper {
   private Collection<TransitAlert> getAlertsForStopAndTrip(
     Stop stop,
     FeedScopedId tripId,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     // Finding alerts for ServiceDate
     final Collection<TransitAlert> alerts = getAlertsForRelatedStops(

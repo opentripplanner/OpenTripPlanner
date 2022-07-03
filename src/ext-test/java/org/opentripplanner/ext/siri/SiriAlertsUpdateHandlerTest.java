@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
@@ -295,7 +295,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-    ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
+    LocalDate serviceDate = LocalDate.of(2014, 1, 1);
     final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
       tripId,
       serviceDate
@@ -347,7 +347,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
     // Verify that requesting specific date does not include alert for all dates
-    ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
+    LocalDate serviceDate = LocalDate.of(2014, 1, 1);
     Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
 
     assertNotNull(tripPatches);
@@ -407,7 +407,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-    ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
+    LocalDate serviceDate = LocalDate.of(2014, 1, 1);
     final Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(
       tripId,
       serviceDate
@@ -447,7 +447,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-    final ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
+    final LocalDate serviceDate = LocalDate.of(2014, 1, 1);
 
     Collection<TransitAlert> tripPatches = transitAlertService.getStopAndTripAlerts(
       stopId0,
@@ -599,7 +599,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
      * Trip and stop-alerts should result in several TransitAlertes. One for each tripId/stop combination
      */
 
-    final ServiceDate serviceDate = new ServiceDate(2014, 1, 1);
+    final LocalDate serviceDate = LocalDate.of(2014, 1, 1);
     Collection<TransitAlert> tripPatches = transitAlertService.getStopAndTripAlerts(
       stopId0,
       tripId,
@@ -1012,7 +1012,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     TransitAlert transitAlert,
     FeedScopedId stopId,
     FeedScopedId routeOrTripId,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     boolean foundMatch = false;
     for (EntitySelector entity : transitAlert.getEntities()) {

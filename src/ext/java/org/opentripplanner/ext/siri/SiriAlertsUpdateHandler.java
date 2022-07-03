@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -357,7 +356,7 @@ public class SiriAlertsUpdateHandler {
                 originAimedDepartureTime
               );
 
-              ServiceDate serviceDate = new ServiceDate(startOfService.toLocalDate());
+              LocalDate serviceDate = startOfService.toLocalDate();
 
               if (tripIdFromVehicleJourney != null) {
                 tripIds.add(tripIdFromVehicleJourney);
@@ -401,19 +400,9 @@ public class SiriAlertsUpdateHandler {
             FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef, feedId);
 
             if (tripId != null) {
-              ServiceDate serviceDate = null;
+              LocalDate serviceDate = null;
               if (dataFrameRef != null && dataFrameRef.getValue() != null) {
-                ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-                  LocalDate.parse(dataFrameRef.getValue()),
-                  transitModel.getTimeZone()
-                );
-
-                serviceDate =
-                  new ServiceDate(
-                    startOfService.getYear(),
-                    startOfService.getMonthValue(),
-                    startOfService.getDayOfMonth()
-                  );
+                serviceDate = LocalDate.parse(dataFrameRef.getValue());
               }
 
               if (!affectedStops.isEmpty()) {

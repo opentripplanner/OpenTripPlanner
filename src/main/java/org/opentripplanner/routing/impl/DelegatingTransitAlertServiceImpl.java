@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -70,7 +70,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, ServiceDate serviceDate) {
+  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate) {
     return transitAlertServices
       .stream()
       .map(transitAlertService -> transitAlertService.getTripAlerts(trip, serviceDate))
@@ -100,7 +100,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   public Collection<TransitAlert> getStopAndTripAlerts(
     FeedScopedId stop,
     FeedScopedId trip,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     return transitAlertServices
       .stream()

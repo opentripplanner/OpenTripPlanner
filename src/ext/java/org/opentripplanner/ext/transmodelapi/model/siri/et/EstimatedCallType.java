@@ -12,6 +12,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,7 +21,6 @@ import java.util.Optional;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -385,7 +385,7 @@ public class EstimatedCallType {
 
     TransitAlertService alertPatchService = transitService.getTransitAlertService();
 
-    final ServiceDate serviceDate = new ServiceDate(tripTimeOnDate.getServiceDay());
+    final LocalDate serviceDate = tripTimeOnDate.getServiceDay();
 
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
