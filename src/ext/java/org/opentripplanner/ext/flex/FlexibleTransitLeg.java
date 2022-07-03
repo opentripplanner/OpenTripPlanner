@@ -115,7 +115,7 @@ public class FlexibleTransitLeg implements Leg {
 
   @Override
   public LocalDate getServiceDate() {
-    return edge.flexTemplate.serviceDate.toLocalDate();
+    return edge.flexTemplate.serviceDate;
   }
 
   @Override

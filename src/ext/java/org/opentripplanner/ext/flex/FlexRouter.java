@@ -110,7 +110,7 @@ public class FlexRouter {
       ServiceDate serviceDate = new ServiceDate(date);
       dates[index] =
         new FlexServiceDate(
-          serviceDate,
+          date,
           ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
           transitModel.index.getServiceCodesRunningForDate().get(serviceDate)
         );

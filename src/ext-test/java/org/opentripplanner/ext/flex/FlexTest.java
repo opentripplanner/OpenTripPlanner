@@ -33,7 +33,7 @@ public abstract class FlexTest {
   static final String COBB_OSM = "/flex/cobb-county.filtered.osm.pbf";
 
   static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();
-  static final ServiceDate serviceDate = new ServiceDate(2021, 4, 11);
+  static final LocalDate serviceDate = LocalDate.of(2021, 4, 11);
   static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
   static final FlexServiceDate flexDate = new FlexServiceDate(
     serviceDate,
