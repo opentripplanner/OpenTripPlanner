@@ -209,22 +209,6 @@ public class ServiceDateTest {
   }
 
   @Test
-  public void minMax() throws ParseException {
-    ServiceDate d1 = ServiceDate.parseString("2020-12-30");
-    ServiceDate d2 = ServiceDate.parseString("2020-12-31");
-
-    assertSame(d1, d1.min(d2));
-    assertSame(d1, d2.min(d1));
-    assertSame(d2, d1.max(d2));
-    assertSame(d2, d2.max(d1));
-
-    // Test isMinMax
-    assertFalse(d1.isMinMax());
-    assertTrue(ServiceDate.MIN_DATE.isMinMax());
-    assertTrue(ServiceDate.MAX_DATE.isMinMax());
-  }
-
-  @Test
   public void shift() {
     ServiceDate subject = new ServiceDate(2020, 3, 12);
     assertEquals("2020-03-11", subject.previous().asISO8601());

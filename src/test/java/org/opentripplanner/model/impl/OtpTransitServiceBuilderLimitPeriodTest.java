@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,10 +69,14 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject = new OtpTransitServiceBuilder();
 
     // Add a service calendar that overlap with the period limit
-    subject.getCalendars().add(createServiceCalendar(SERVICE_C_IN, D1, D3));
+    subject
+      .getCalendars()
+      .add(createServiceCalendar(SERVICE_C_IN, D1.toLocalDate(), D3.toLocalDate()));
 
     // Add a service calendar that is outside the period limit, expected deleted later
-    subject.getCalendars().add(createServiceCalendar(SERVICE_C_OUT, D0, D1));
+    subject
+      .getCalendars()
+      .add(createServiceCalendar(SERVICE_C_OUT, D0.toLocalDate(), D1.toLocalDate()));
 
     // Add a service calendar date that is within the period limit
     subject.getCalendarDates().add(new ServiceCalendarDate(SERVICE_D_IN, D2, 1));
@@ -114,7 +119,10 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
     // Limit service to last half of month
-    subject.limitServiceDays(new ServiceDateInterval(D2, D3), new DataImportIssueStore(false));
+    subject.limitServiceDays(
+      new ServiceDateInterval(D2.toLocalDate(), D3.toLocalDate()),
+      new DataImportIssueStore(false)
+    );
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();
@@ -155,8 +163,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
   private static ServiceCalendar createServiceCalendar(
     FeedScopedId serviceId,
-    ServiceDate start,
-    ServiceDate end
+    LocalDate start,
+    LocalDate end
   ) {
     ServiceCalendar calendar = new ServiceCalendar();
     calendar.setPeriod(new ServiceDateInterval(start, end));

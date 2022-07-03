@@ -1,8 +1,12 @@
 package org.opentripplanner.util.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.util.time.ServiceDateUtils.asStartOfService;
 
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -10,6 +14,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class ServiceDateUtilsTest {
@@ -115,5 +120,28 @@ public class ServiceDateUtilsTest {
       desiredDuration,
       ServiceDateUtils.secondsSinceStartOfService(operatingDayDate, dateTime, zoneId)
     );
+  }
+
+  @Test
+  public void minMax() throws ParseException {
+    LocalDate d1 = LocalDate.parse("2020-12-30");
+    LocalDate d2 = LocalDate.parse("2020-12-31");
+
+    assertSame(d1, ServiceDateUtils.min(d1, d2));
+    assertSame(d1, ServiceDateUtils.min(d2, d1));
+    assertSame(d2, ServiceDateUtils.max(d1, d2));
+    assertSame(d2, ServiceDateUtils.max(d2, d1));
+
+    // Test isMinMax
+    assertFalse(ServiceDateUtils.isMinMax(d1));
+    assertTrue(ServiceDateUtils.isMinMax(LocalDate.MIN));
+    assertTrue(ServiceDateUtils.isMinMax(LocalDate.MAX));
+  }
+
+  @Test
+  public void testToString() {
+    assertEquals("MAX", ServiceDateUtils.toString(LocalDate.MAX));
+    assertEquals("MIN", ServiceDateUtils.toString(LocalDate.MIN));
+    assertEquals("2020-03-12", ServiceDateUtils.toString(LocalDate.of(2020, 3, 12)));
   }
 }

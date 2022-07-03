@@ -411,10 +411,7 @@ public class BuildConfig {
   }
 
   public ServiceDateInterval getTransitServicePeriod() {
-    return new ServiceDateInterval(
-      new ServiceDate(transitServiceStart),
-      new ServiceDate(transitServiceEnd)
-    );
+    return new ServiceDateInterval(transitServiceStart, transitServiceEnd);
   }
 
   public int getSubwayAccessTimeSeconds() {

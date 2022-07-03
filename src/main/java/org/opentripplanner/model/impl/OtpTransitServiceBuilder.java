@@ -279,7 +279,7 @@ public class OtpTransitServiceBuilder {
     LOG.warn("Limiting transit service days to time period: {}", periodLimit);
 
     int orgSize = calendarDates.size();
-    calendarDates.removeIf(c -> !periodLimit.include(c.getDate()));
+    calendarDates.removeIf(c -> !periodLimit.include(c.getDate().toLocalDate()));
     logRemove("ServiceCalendarDate", orgSize, calendarDates.size(), "Outside time period.");
 
     List<ServiceCalendar> keepCal = new ArrayList<>();

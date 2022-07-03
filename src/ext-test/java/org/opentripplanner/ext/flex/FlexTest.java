@@ -5,6 +5,7 @@ import static graphql.Assert.assertFalse;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public abstract class FlexTest {
     GtfsBundle gtfsBundle = new GtfsBundle(file);
     GtfsModule module = new GtfsModule(
       List.of(gtfsBundle),
-      new ServiceDateInterval(new ServiceDate(2021, 1, 1), new ServiceDate(2022, 1, 1))
+      new ServiceDateInterval(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     module.buildGraph(graph, transitModel, new HashMap<>());

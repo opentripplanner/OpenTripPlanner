@@ -25,6 +25,6 @@ class ServiceDateMapper {
     org.onebusaway.gtfs.model.calendar.ServiceDate start,
     org.onebusaway.gtfs.model.calendar.ServiceDate end
   ) {
-    return new ServiceDateInterval(mapServiceDate(start), mapServiceDate(end));
+    return new ServiceDateInterval(mapLocalDate(start), mapLocalDate(end));
   }
 }

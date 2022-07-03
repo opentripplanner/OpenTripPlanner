@@ -194,14 +194,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     return new ServiceDate(toLocalDate().plusDays(numberOfDays));
   }
 
-  /**
-   * The service date is either the minimum or maximum allowed value. In practice this means
-   * unbounded.
-   */
-  public boolean isMinMax() {
-    return equals(MIN_DATE) || equals(MAX_DATE);
-  }
-
   public boolean isBefore(ServiceDate other) {
     return sequenceNumber < other.sequenceNumber;
   }
@@ -216,14 +208,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
   public boolean isAfterOrEq(ServiceDate other) {
     return sequenceNumber >= other.sequenceNumber;
-  }
-
-  public ServiceDate min(ServiceDate other) {
-    return isBefore(other) ? this : other;
-  }
-
-  public ServiceDate max(ServiceDate other) {
-    return isAfter(other) ? this : other;
   }
 
   @Override

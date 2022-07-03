@@ -11,6 +11,9 @@ import java.time.temporal.ChronoUnit;
 
 public class ServiceDateUtils {
 
+  private static final String MAX_TEXT = "MAX";
+  private static final String MIN_TEXT = "MIN";
+
   public static ZonedDateTime asStartOfService(ZonedDateTime date) {
     return date.truncatedTo(ChronoUnit.HOURS).withHour(12).minusHours(12);
   }
@@ -79,5 +82,23 @@ public class ServiceDateUtils {
    */
   public static boolean isMinMax(LocalDate date) {
     return LocalDate.MIN.equals(date) || LocalDate.MAX.equals(date);
+  }
+
+  public static LocalDate max(LocalDate a, LocalDate b) {
+    return a.isAfter(b) ? a : b;
+  }
+
+  public static LocalDate min(LocalDate a, LocalDate b) {
+    return a.isBefore(b) ? a : b;
+  }
+
+  public static String toString(LocalDate date) {
+    if (LocalDate.MAX.equals(date)) {
+      return MAX_TEXT;
+    }
+    if (LocalDate.MIN.equals(date)) {
+      return MIN_TEXT;
+    }
+    return date.toString();
   }
 }
