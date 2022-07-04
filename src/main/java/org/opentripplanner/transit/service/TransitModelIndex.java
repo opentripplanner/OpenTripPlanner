@@ -21,7 +21,6 @@ import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -102,7 +101,7 @@ public class TransitModelIndex {
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
           tripOnServiceDate.getTrip().getId(),
-          new ServiceDate(tripOnServiceDate.getServiceDate())
+          tripOnServiceDate.getServiceDate()
         ),
         tripOnServiceDate
       );
@@ -249,11 +248,11 @@ public class TransitModelIndex {
     Multimap<LocalDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
 
     for (FeedScopedId serviceId : calendarService.getServiceIds()) {
-      Set<ServiceDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(
+      Set<LocalDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(
         serviceId
       );
-      for (ServiceDate serviceDate : serviceDatesForService) {
-        serviceIdsForServiceDate.put(serviceDate.toLocalDate(), serviceId);
+      for (LocalDate serviceDate : serviceDatesForService) {
+        serviceIdsForServiceDate.put(serviceDate, serviceId);
       }
     }
     for (LocalDate serviceDate : serviceIdsForServiceDate.keySet()) {

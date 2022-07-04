@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
 
 public class LegTest implements PlanTestConstants {
 
@@ -54,8 +54,8 @@ public class LegTest implements PlanTestConstants {
     final int toStopIndex = 12;
     final int tripId0 = 33;
     final int tripIdOther = 44;
-    final ServiceDate day1 = new ServiceDate(2020, 9, 17);
-    final ServiceDate day2 = new ServiceDate(2020, 9, 18);
+    final LocalDate day1 = LocalDate.of(2020, 9, 17);
+    final LocalDate day2 = LocalDate.of(2020, 9, 18);
 
     Leg t0 = createLegIgnoreTime(tripId0, fromStopIndex, toStopIndex, day1);
     Leg t1;
@@ -92,11 +92,11 @@ public class LegTest implements PlanTestConstants {
     int tripId,
     int fromStopIndex,
     int toStopIndex,
-    ServiceDate service
+    LocalDate service
   ) {
     return TestItineraryBuilder
       .newItinerary(A, 99)
-      .bus(tripId, 99, 99, fromStopIndex, toStopIndex, B, service.toLocalDate())
+      .bus(tripId, 99, 99, fromStopIndex, toStopIndex, B, service)
       .build()
       .firstLeg();
   }

@@ -6,18 +6,19 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class Timetable implements Serializable {
 
   private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
 
-  private final ServiceDate serviceDate;
+  private final LocalDate serviceDate;
 
   /** Construct an empty Timetable. */
   public Timetable(TripPattern pattern) {
@@ -53,7 +54,7 @@ public class Timetable implements Serializable {
    * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified
    * timetable.
    */
-  Timetable(Timetable tt, ServiceDate serviceDate) {
+  Timetable(Timetable tt, LocalDate serviceDate) {
     tripTimes.addAll(tt.tripTimes);
     this.serviceDate = serviceDate;
     this.pattern = tt.pattern;
@@ -146,7 +147,7 @@ public class Timetable implements Serializable {
   public TripTimesPatch createUpdatedTripTimes(
     TripUpdate tripUpdate,
     ZoneId timeZone,
-    ServiceDate updateServiceDate,
+    LocalDate updateServiceDate,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     if (tripUpdate == null) {
@@ -191,7 +192,9 @@ public class Timetable implements Serializable {
     Integer delay = null;
     Integer firstUpdatedIndex = null;
 
-    final long today = updateServiceDate.getStartOfService(timeZone).toEpochSecond();
+    final long today = ServiceDateUtils
+      .asStartOfService(updateServiceDate, timeZone)
+      .toEpochSecond();
 
     for (int i = 0; i < numStops; i++) {
       boolean match = false;
@@ -340,7 +343,7 @@ public class Timetable implements Serializable {
     frequencyEntries.add(freq);
   }
 
-  public boolean isValidFor(ServiceDate serviceDate) {
+  public boolean isValidFor(LocalDate serviceDate) {
     return this.serviceDate == null || this.serviceDate.equals(serviceDate);
   }
 
@@ -383,7 +386,7 @@ public class Timetable implements Serializable {
    * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all
    * dates.
    */
-  public ServiceDate getServiceDate() {
+  public LocalDate getServiceDate() {
     return serviceDate;
   }
 

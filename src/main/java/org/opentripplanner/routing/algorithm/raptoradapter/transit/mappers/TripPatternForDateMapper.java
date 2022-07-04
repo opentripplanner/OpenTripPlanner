@@ -98,10 +98,7 @@ public class TripPatternForDateMapper {
       .collect(Collectors.toList());
 
     if (times.isEmpty() && frequencies.isEmpty()) {
-      if (
-        timetable.getServiceDate() != null &&
-        timetable.getServiceDate().toLocalDate().equals(serviceDate)
-      ) {
+      if (timetable.getServiceDate() != null && timetable.getServiceDate().equals(serviceDate)) {
         LOG.debug(
           "Tried to update TripPattern {}, but no service codes are valid for date {}",
           timetable.getPattern().getId(),

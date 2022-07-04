@@ -55,7 +55,7 @@ public class RoutingWorker {
    * The transit service time-zero normalized for the current search. All transit times are relative
    * to a "time-zero". This enables us to use an integer(small memory footprint). The times are
    * number for seconds past the {@code transitSearchTimeZero}. In the internal model all times are
-   * stored relative to the {@link org.opentripplanner.model.calendar.ServiceDate}, but to be able
+   * stored relative to the {@link java.time.LocalDate}, but to be able
    * to compare trip times for different service days we normalize all times by calculating an
    * offset. Now all times for the selected trip patterns become relative to the {@code
    * transitSearchTimeZero}.

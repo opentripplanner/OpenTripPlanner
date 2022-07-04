@@ -17,7 +17,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -38,10 +37,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public class OtpTransitServiceBuilderLimitPeriodTest {
 
-  private static final ServiceDate D0 = new ServiceDate(2020, 1, 1);
-  private static final ServiceDate D1 = new ServiceDate(2020, 1, 8);
-  private static final ServiceDate D2 = new ServiceDate(2020, 1, 15);
-  private static final ServiceDate D3 = new ServiceDate(2020, 1, 31);
+  private static final LocalDate D0 = LocalDate.of(2020, 1, 1);
+  private static final LocalDate D1 = LocalDate.of(2020, 1, 8);
+  private static final LocalDate D2 = LocalDate.of(2020, 1, 15);
+  private static final LocalDate D3 = LocalDate.of(2020, 1, 31);
   private static final FeedScopedId SERVICE_C_IN = TransitModelForTest.id("CalSrvIn");
   private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
   private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
@@ -69,14 +68,10 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject = new OtpTransitServiceBuilder();
 
     // Add a service calendar that overlap with the period limit
-    subject
-      .getCalendars()
-      .add(createServiceCalendar(SERVICE_C_IN, D1.toLocalDate(), D3.toLocalDate()));
+    subject.getCalendars().add(createServiceCalendar(SERVICE_C_IN, D1, D3));
 
     // Add a service calendar that is outside the period limit, expected deleted later
-    subject
-      .getCalendars()
-      .add(createServiceCalendar(SERVICE_C_OUT, D0.toLocalDate(), D1.toLocalDate()));
+    subject.getCalendars().add(createServiceCalendar(SERVICE_C_OUT, D0, D1));
 
     // Add a service calendar date that is within the period limit
     subject.getCalendarDates().add(new ServiceCalendarDate(SERVICE_D_IN, D2, 1));
@@ -119,10 +114,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
     // Limit service to last half of month
-    subject.limitServiceDays(
-      new ServiceDateInterval(D2.toLocalDate(), D3.toLocalDate()),
-      new DataImportIssueStore(false)
-    );
+    subject.limitServiceDays(new ServiceDateInterval(D2, D3), new DataImportIssueStore(false));
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();

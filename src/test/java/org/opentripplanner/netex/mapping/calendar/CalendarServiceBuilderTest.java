@@ -74,7 +74,7 @@ public class CalendarServiceBuilderTest {
     LocalDate serviceDate
   ) {
     for (ServiceCalendarDate it : list) {
-      if (serviceId.equals(it.getServiceId()) && serviceDate.equals(it.getDate().toLocalDate())) {
+      if (serviceId.equals(it.getServiceId()) && serviceDate.equals(it.getDate())) {
         return;
       }
     }

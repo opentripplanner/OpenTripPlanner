@@ -26,7 +26,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -399,16 +398,11 @@ public class DefaultTransitService implements TransitEditorService {
    * without making a fake routing request.
    */
   @Override
-  public Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
+  public Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate) {
     TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
     return timetableSnapshot != null
       ? timetableSnapshot.resolve(tripPattern, serviceDate)
       : tripPattern.getScheduledTimetable();
-  }
-
-  @Override
-  public Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate) {
-    return getTimetableForTripPattern(tripPattern, new ServiceDate(serviceDate));
   }
 
   /**

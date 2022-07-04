@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,6 +101,14 @@ public class ServiceDateUtils {
     int month = Integer.parseInt(matcher.group(2));
     int day = Integer.parseInt(matcher.group(3));
     return LocalDate.of(year, month, day);
+  }
+
+  public static Optional<LocalDate> parseStringToOptional(String value) {
+    try {
+      return Optional.of(parseString(value));
+    } catch (ParseException e) {
+      return Optional.empty();
+    }
   }
 
   /**

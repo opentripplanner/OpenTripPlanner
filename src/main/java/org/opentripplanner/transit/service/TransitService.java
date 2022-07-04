@@ -24,7 +24,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -139,8 +138,6 @@ public interface TransitService {
   Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes);
 
   GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id);
-
-  Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate);
 
   Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 

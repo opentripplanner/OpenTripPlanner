@@ -20,7 +20,6 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -118,7 +117,7 @@ public class StopTimesHelper {
       Timetable tt;
       TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
       if (timetableSnapshot != null) {
-        tt = timetableSnapshot.resolve(pattern, new ServiceDate(serviceDate));
+        tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
         tt = pattern.getScheduledTimetable();
       }
@@ -246,7 +245,7 @@ public class StopTimesHelper {
     for (LocalDate serviceDate : serviceDates) {
       Timetable timetable;
       if (timetableSnapshot != null) {
-        timetable = timetableSnapshot.resolve(pattern, new ServiceDate(serviceDate));
+        timetable = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
         timetable = pattern.getScheduledTimetable();
       }

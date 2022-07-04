@@ -50,7 +50,6 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -455,7 +454,7 @@ public class IndexAPI {
     // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
     Timetable table = transitService.getTimetableForTripPattern(
       pattern,
-      new ServiceDate(transitService.getTimeZone())
+      LocalDate.now(transitService.getTimeZone())
     );
     var tripTimesOnDate = TripTimeOnDate.fromTripTimes(table, trip);
     return TripTimeMapper.mapToApi(tripTimesOnDate);

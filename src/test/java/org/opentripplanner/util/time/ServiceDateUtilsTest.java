@@ -16,7 +16,6 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
 
 public class ServiceDateUtilsTest {
 
@@ -95,6 +94,31 @@ public class ServiceDateUtilsTest {
     assertEquals(
       "2019-03-30T00:00+01:00[Europe/Paris]",
       asStartOfService(time, ZONE_ID).toString()
+    );
+  }
+
+  @Test
+  public void getStartOfService() {
+    var zone = ZoneId.of("Europe/Oslo");
+    LocalDate d = LocalDate.of(2020, 8, 25);
+
+    assertEquals(
+      "2020-08-25T00:00+02:00[Europe/Oslo]",
+      ServiceDateUtils.asStartOfService(d, zone).toString()
+    );
+
+    // Time is adjusted 1 hour back in Norway on this date
+    d = LocalDate.of(2020, 10, 25);
+    assertEquals(
+      "2020-10-25T01:00+02:00[Europe/Oslo]",
+      ServiceDateUtils.asStartOfService(d, zone).toString()
+    );
+
+    // Time is adjusted 1 hour forward in Norway on this date
+    d = LocalDate.of(2020, 3, 29);
+    assertEquals(
+      "2020-03-28T23:00+01:00[Europe/Oslo]",
+      ServiceDateUtils.asStartOfService(d, zone).toString()
     );
   }
 

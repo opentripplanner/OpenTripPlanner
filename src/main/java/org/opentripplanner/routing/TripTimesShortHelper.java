@@ -1,13 +1,13 @@
 package org.opentripplanner.routing;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
@@ -18,7 +18,7 @@ public class TripTimesShortHelper {
   public static List<TripTimeOnDate> getTripTimesShort(
     TransitService transitService,
     Trip trip,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     Timetable timetable = null;
     TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
@@ -43,17 +43,13 @@ public class TripTimesShortHelper {
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
-    if (
-      !transitService
-        .getServicesRunningForDate(serviceDate.toLocalDate())
-        .contains(times.getServiceCode())
-    ) {
+    if (!transitService.getServicesRunningForDate(serviceDate).contains(times.getServiceCode())) {
       return new ArrayList<>();
     } else {
       Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate.toLocalDate(), transitService.getTimeZone())
+        .asStartOfService(serviceDate, transitService.getTimeZone())
         .toInstant();
-      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate.toLocalDate(), midnight);
+      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight);
     }
   }
 }

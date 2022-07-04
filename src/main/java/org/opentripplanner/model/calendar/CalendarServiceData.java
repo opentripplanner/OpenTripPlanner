@@ -2,6 +2,7 @@
 package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -24,9 +24,9 @@ public class CalendarServiceData implements Serializable {
 
   private final Map<FeedScopedId, ZoneId> timeZonesByAgencyId = new HashMap<>();
 
-  private final Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
+  private final Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId = new HashMap<>();
 
-  private final Map<ServiceDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
+  private final Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
 
   /**
    * @return the time zone for the specified agencyId, or null if the agency was not found
@@ -47,11 +47,11 @@ public class CalendarServiceData implements Serializable {
     return Collections.unmodifiableSet(serviceDatesByServiceId.keySet());
   }
 
-  public List<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
+  public List<LocalDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
     return serviceDatesByServiceId.get(serviceId);
   }
 
-  public Set<FeedScopedId> getServiceIdsForDate(ServiceDate date) {
+  public Set<FeedScopedId> getServiceIdsForDate(LocalDate date) {
     Set<FeedScopedId> serviceIds = serviceIdsByDate.get(date);
     if (serviceIds == null) {
       serviceIds = new HashSet<>();
@@ -59,8 +59,8 @@ public class CalendarServiceData implements Serializable {
     return serviceIds;
   }
 
-  public void putServiceDatesForServiceId(FeedScopedId serviceId, List<ServiceDate> dates) {
-    List<ServiceDate> serviceDates = sortedImmutableList(dates);
+  public void putServiceDatesForServiceId(FeedScopedId serviceId, List<LocalDate> dates) {
+    List<LocalDate> serviceDates = sortedImmutableList(dates);
     serviceDatesByServiceId.put(serviceId, serviceDates);
     addDatesToServiceIdsByDate(serviceId, serviceDates);
   }
@@ -69,10 +69,10 @@ public class CalendarServiceData implements Serializable {
    * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
    *           - this when doing the issue #3030.
    */
-  public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     FeedScopedId serviceId = new FeedScopedId(
       CAL_SERVICE_FEED_ID,
-      ServiceDateUtils.asCompactString(serviceDate.toLocalDate())
+      ServiceDateUtils.asCompactString(serviceDate)
     );
     if (serviceDatesByServiceId.containsKey(serviceId)) {
       return serviceId;
@@ -97,11 +97,11 @@ public class CalendarServiceData implements Serializable {
   /* private methods */
 
   private static <T> List<T> sortedImmutableList(Collection<T> c) {
-    return c.stream().sorted().collect(Collectors.toUnmodifiableList());
+    return c.stream().sorted().toList();
   }
 
-  private void addDatesToServiceIdsByDate(FeedScopedId serviceId, List<ServiceDate> serviceDates) {
-    for (ServiceDate serviceDate : serviceDates) {
+  private void addDatesToServiceIdsByDate(FeedScopedId serviceId, List<LocalDate> serviceDates) {
+    for (LocalDate serviceDate : serviceDates) {
       Set<FeedScopedId> serviceIds = serviceIdsByDate.computeIfAbsent(
         serviceDate,
         k -> new HashSet<>()

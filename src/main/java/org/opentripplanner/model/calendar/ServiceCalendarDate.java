@@ -31,11 +31,11 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
 
   private final FeedScopedId serviceId;
 
-  private final ServiceDate date;
+  private final LocalDate date;
 
   private final int exceptionType;
 
-  public ServiceCalendarDate(FeedScopedId serviceId, ServiceDate date, int exceptionType) {
+  public ServiceCalendarDate(FeedScopedId serviceId, LocalDate date, int exceptionType) {
     this.serviceId = serviceId;
     this.date = date;
     this.exceptionType = exceptionType;
@@ -46,14 +46,14 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
    * to 'EXCEPTION_TYPE_ADD'.
    */
   public static ServiceCalendarDate create(FeedScopedId serviceId, LocalDate date) {
-    return new ServiceCalendarDate(serviceId, new ServiceDate(date), EXCEPTION_TYPE_ADD);
+    return new ServiceCalendarDate(serviceId, date, EXCEPTION_TYPE_ADD);
   }
 
   public FeedScopedId getServiceId() {
     return serviceId;
   }
 
-  public ServiceDate getDate() {
+  public LocalDate getDate() {
     return date;
   }
 

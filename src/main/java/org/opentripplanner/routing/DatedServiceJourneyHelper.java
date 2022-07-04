@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -19,7 +18,7 @@ public class DatedServiceJourneyHelper {
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {
-    var tuple = new TripIdAndServiceDate(tripId, new ServiceDate(serviceDate));
+    var tuple = new TripIdAndServiceDate(tripId, serviceDate);
     if (transitService.getTimetableSnapshot() != null) {
       if (
         transitService

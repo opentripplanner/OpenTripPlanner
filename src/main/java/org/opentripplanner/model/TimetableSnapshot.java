@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -61,7 +60,7 @@ public class TimetableSnapshot {
   /**
    * <p>
    * Map containing the last <b>added</b> trip pattern given a trip id (without agency) and a
-   * service date as a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)} with
+   * service date as a result of a call to {@link #update(TripPattern, TripTimes, LocalDate)} with
    * trip times of a trip that didn't exist yet in the trip pattern.
    * </p>
    * <p>
@@ -97,7 +96,7 @@ public class TimetableSnapshot {
    * Returns an updated timetable for the specified pattern if one is available in this snapshot, or
    * the originally scheduled timetable if there are no updates in this snapshot.
    */
-  public Timetable resolve(TripPattern pattern, ServiceDate serviceDate) {
+  public Timetable resolve(TripPattern pattern, LocalDate serviceDate) {
     SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
 
     if (sortedTimetables != null && serviceDate != null) {
@@ -114,7 +113,7 @@ public class TimetableSnapshot {
   public void removeRealtimeUpdatedTripTimes(
     TripPattern tripPattern,
     FeedScopedId tripId,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     SortedSet<Timetable> sortedTimetables = this.timetables.get(tripPattern);
     if (sortedTimetables != null) {
@@ -145,7 +144,7 @@ public class TimetableSnapshot {
 
   /**
    * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as a
-   * result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)} with trip times of a
+   * result of a call to {@link #update(TripPattern, TripTimes, LocalDate)} with trip times of a
    * trip that didn't exist yet in the trip pattern.
    * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
    *
@@ -153,13 +152,9 @@ public class TimetableSnapshot {
    * @param serviceDate service date
    * @return last added trip pattern; null if trip never was added to a trip pattern
    */
-  public TripPattern getLastAddedTripPattern(FeedScopedId tripId, ServiceDate serviceDate) {
+  public TripPattern getLastAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return lastAddedTripPattern.get(tripIdAndServiceDate);
-  }
-
-  public TripPattern getLastAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
-    return getLastAddedTripPattern(tripId, new ServiceDate(serviceDate));
   }
 
   /**
@@ -171,7 +166,7 @@ public class TimetableSnapshot {
    * @param serviceDate      service day for which this update is valid
    * @return whether or not the update was actually applied
    */
-  public boolean update(TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
+  public boolean update(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
     // Preconditions
     Preconditions.checkNotNull(pattern);
     Preconditions.checkNotNull(serviceDate);
@@ -295,14 +290,14 @@ public class TimetableSnapshot {
    * Removes the latest added trip pattern from the cache. This should be done when removing the
    * trip times from the timetable the trip has been added to.
    */
-  public void removeLastAddedTripPattern(FeedScopedId feedScopedTripId, ServiceDate serviceDate) {
+  public void removeLastAddedTripPattern(FeedScopedId feedScopedTripId, LocalDate serviceDate) {
     lastAddedTripPattern.remove(new TripIdAndServiceDate(feedScopedTripId, serviceDate));
   }
 
   /**
    * Removes all Timetables which are valid for a ServiceDate on-or-before the one supplied.
    */
-  public boolean purgeExpiredData(ServiceDate serviceDate) {
+  public boolean purgeExpiredData(LocalDate serviceDate) {
     if (readOnly) {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
     }
@@ -366,7 +361,7 @@ public class TimetableSnapshot {
 
   public void addLastAddedTripOnServiceDate(
     Trip trip,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     FeedScopedId datedServiceJourneyId,
     TripOnServiceDate tripOnServiceDate
   ) {

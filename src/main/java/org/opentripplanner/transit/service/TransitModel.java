@@ -9,9 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -37,7 +37,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -56,6 +55,7 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +97,7 @@ public class TransitModel implements Serializable {
 
   private StopModel stopModel;
   // transit feed validity information in seconds since epoch
+  // TODO: Convert to instants
   private long transitServiceStarts = Long.MAX_VALUE;
   private long transitServiceEnds = 0;
 
@@ -263,9 +264,9 @@ public class TransitModel implements Serializable {
     HashSet<String> agencies = new HashSet<>();
     for (FeedScopedId sid : data.getServiceIds()) {
       agencies.add(sid.getFeedId());
-      for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
+      for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
         // Adjust for timezone, assuming there is only one per graph.
-        long t = sd.getStartOfService(getTimeZone()).toEpochSecond();
+        long t = ServiceDateUtils.asStartOfService(sd, getTimeZone()).toEpochSecond();
         if (t > now) {
           agenciesWithFutureDates.add(sid.getFeedId());
         }
@@ -339,9 +340,9 @@ public class TransitModel implements Serializable {
    * service period {@code null} is returned.
    */
   @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     // Start of day
-    long time = serviceDate.getStartOfService(getTimeZone()).toEpochSecond();
+    long time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toEpochSecond();
 
     if (time < transitServiceStarts || time >= transitServiceEnds) {
       return null;
@@ -360,7 +361,7 @@ public class TransitModel implements Serializable {
 
       index
         .getServiceCodesRunningForDate()
-        .computeIfAbsent(serviceDate.toLocalDate(), ignored -> new TIntHashSet())
+        .computeIfAbsent(serviceDate, ignored -> new TIntHashSet())
         .add(serviceCode);
     }
     return serviceId;

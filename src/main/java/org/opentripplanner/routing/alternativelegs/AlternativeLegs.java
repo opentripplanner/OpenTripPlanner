@@ -21,7 +21,6 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -86,7 +85,7 @@ public class AlternativeLegs {
           timetableSnapshot,
           t,
           leg.getStartTime(),
-          new ServiceDate(leg.getServiceDate()),
+          leg.getServiceDate(),
           searchBackward
         )
       )
@@ -106,7 +105,7 @@ public class AlternativeLegs {
     TimetableSnapshot timetableSnapshot,
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
-    ServiceDate originalDate,
+    LocalDate originalDate,
     boolean searchBackward
   ) {
     TripPattern pattern = tripPatternBetweenStops.tripPattern;
@@ -127,9 +126,9 @@ public class AlternativeLegs {
     Queue<TripTimeOnDate> pq = new PriorityQueue<>(comparator);
 
     // Loop through all possible days
-    ServiceDate[] serviceDates = { originalDate.previous(), originalDate, originalDate.next() };
+    var serviceDates = List.of(originalDate.minusDays(1), originalDate, originalDate.plusDays(1));
 
-    for (ServiceDate serviceDate : serviceDates) {
+    for (LocalDate serviceDate : serviceDates) {
       Timetable timetable;
       if (timetableSnapshot != null) {
         timetable = timetableSnapshot.resolve(pattern, serviceDate);
@@ -138,7 +137,7 @@ public class AlternativeLegs {
       }
 
       ZonedDateTime midnight = ServiceDateUtils.asStartOfService(
-        serviceDate.toLocalDate(),
+        serviceDate,
         transitService.getTimeZone()
       );
       int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
@@ -146,7 +145,7 @@ public class AlternativeLegs {
         departureTime
       );
 
-      var servicesRunning = transitService.getServicesRunningForDate(serviceDate.toLocalDate());
+      var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
 
       for (TripTimes tripTimes : timetable.getTripTimes()) {
         if (!servicesRunning.contains(tripTimes.getServiceCode())) {
@@ -166,7 +165,7 @@ public class AlternativeLegs {
               tripTimes,
               boardingPosition,
               pattern,
-              serviceDate.toLocalDate(),
+              serviceDate,
               midnight.toInstant()
             )
           );

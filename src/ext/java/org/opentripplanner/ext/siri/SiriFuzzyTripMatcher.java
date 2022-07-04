@@ -8,10 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -265,10 +263,7 @@ public class SiriFuzzyTripMatcher {
       if (tripPattern.matchesModeOrSubMode(mode, transportSubmode)) {
         Set<LocalDate> serviceDates = transitService
           .getCalendarService()
-          .getServiceDatesForServiceId(trip.getServiceId())
-          .stream()
-          .map(ServiceDate::toLocalDate)
-          .collect(Collectors.toSet());
+          .getServiceDatesForServiceId(trip.getServiceId());
         if (
           serviceDates.contains(serviceDate) &&
           trip.getNetexInternalPlanningCode() != null &&

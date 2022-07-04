@@ -44,10 +44,7 @@ public class ServiceCalendarDateMapperTest {
   public void testMap() {
     org.opentripplanner.model.calendar.ServiceCalendarDate result = subject.map(SERVICE_DATE);
 
-    assertEquals(
-      DATE.getAsString(),
-      ServiceDateUtils.asCompactString(result.getDate().toLocalDate())
-    );
+    assertEquals(DATE.getAsString(), ServiceDateUtils.asCompactString(result.getDate()));
 
     assertEquals(EXCEPTION_TYPE, result.getExceptionType());
     assertEquals("A:1", result.getServiceId().toString());

@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
@@ -49,7 +48,7 @@ public class VehiclePositionPatternMatcher {
 
   private final Function<FeedScopedId, Trip> getTripForId;
   private final Function<Trip, TripPattern> getStaticPattern;
-  private final BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern;
+  private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
 
   private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
@@ -57,7 +56,7 @@ public class VehiclePositionPatternMatcher {
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
     Function<Trip, TripPattern> getStaticPattern,
-    BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern,
+    BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
     RealtimeVehiclePositionService service,
     ZoneId timeZoneId
   ) {
@@ -110,9 +109,9 @@ public class VehiclePositionPatternMatcher {
     }
   }
 
-  private ServiceDate inferServiceDate(Trip trip) {
+  private LocalDate inferServiceDate(Trip trip) {
     var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
-    return new ServiceDate(inferServiceDate(staticTripTimes, timeZoneId, Instant.now()));
+    return inferServiceDate(staticTripTimes, timeZoneId, Instant.now());
   }
 
   /**
@@ -264,7 +263,7 @@ public class VehiclePositionPatternMatcher {
     var serviceDate = Optional
       .of(vehiclePosition.getTrip().getStartDate())
       .map(Strings::emptyToNull)
-      .flatMap(ServiceDate::parseStringToOptional)
+      .flatMap(ServiceDateUtils::parseStringToOptional)
       .orElseGet(() -> inferServiceDate(trip));
 
     var pattern = getRealtimePattern.apply(trip, serviceDate);

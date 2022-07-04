@@ -25,7 +25,6 @@ import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -37,7 +36,7 @@ public class TimetableSnapshotSourceTest {
 
   static TransitModel transitModel;
   private static final boolean fullDataset = false;
-  private static ServiceDate serviceDate;
+  private static LocalDate serviceDate;
   private static byte[] cancellation;
   private static String feedId;
 
@@ -50,7 +49,7 @@ public class TimetableSnapshotSourceTest {
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();
 
-    serviceDate = new ServiceDate(transitModel.getTimeZone());
+    serviceDate = LocalDate.now(transitModel.getTimeZone());
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -288,7 +287,7 @@ public class TimetableSnapshotSourceTest {
     assertEquals(1, patternsAtA.size());
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    final Timetable forToday = snapshot.resolve(tripPattern, new ServiceDate(serviceDate));
+    final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
     final Timetable schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);
@@ -430,7 +429,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        new ServiceDate(serviceDate)
+        serviceDate
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -475,10 +474,7 @@ public class TimetableSnapshotSourceTest {
       );
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      final Timetable newTimetableForToday = snapshot.resolve(
-        newTripPattern,
-        new ServiceDate(serviceDate)
-      );
+      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -589,10 +585,7 @@ public class TimetableSnapshotSourceTest {
     final Trip trip = transitModel.index.getTripForId().get(tripId);
     final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
 
-    final Timetable originalTimetableForToday = snapshot.resolve(
-      originalTripPattern,
-      new ServiceDate(serviceDate)
-    );
+    final Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
     final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
@@ -689,7 +682,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        new ServiceDate(serviceDate)
+        serviceDate
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -729,10 +722,7 @@ public class TimetableSnapshotSourceTest {
       );
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      final Timetable newTimetableForToday = snapshot.resolve(
-        newTripPattern,
-        new ServiceDate(serviceDate)
-      );
+      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -849,7 +839,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        new ServiceDate(serviceDate)
+        serviceDate
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -870,10 +860,7 @@ public class TimetableSnapshotSourceTest {
         serviceDate
       );
 
-      final Timetable newTimetableForToday = snapshot.resolve(
-        newTripPattern,
-        new ServiceDate(serviceDate)
-      );
+      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -942,9 +929,6 @@ public class TimetableSnapshotSourceTest {
     assertSame(snapshotA.resolve(pattern, null), snapshotB.resolve(pattern, null));
     assertSame(snapshotA.resolve(pattern, serviceDate), snapshotB.resolve(pattern, serviceDate));
     assertNotSame(snapshotA.resolve(pattern, null), snapshotA.resolve(pattern, serviceDate));
-    assertSame(
-      snapshotB.resolve(pattern, null),
-      snapshotB.resolve(pattern, new ServiceDate(previously))
-    );
+    assertSame(snapshotB.resolve(pattern, null), snapshotB.resolve(pattern, previously));
   }
 }
