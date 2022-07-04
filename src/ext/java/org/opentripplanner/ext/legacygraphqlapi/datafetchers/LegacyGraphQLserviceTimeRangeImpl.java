@@ -11,12 +11,12 @@ public class LegacyGraphQLserviceTimeRangeImpl
 
   @Override
   public DataFetcher<Long> end() {
-    return environment -> getTransitService(environment).getTransitServiceEnds();
+    return environment -> getTransitService(environment).getTransitServiceEnds().toEpochSecond();
   }
 
   @Override
   public DataFetcher<Long> start() {
-    return environment -> getTransitService(environment).getTransitServiceStarts();
+    return environment -> getTransitService(environment).getTransitServiceStarts().toEpochSecond();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

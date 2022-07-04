@@ -11,10 +11,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -97,9 +97,8 @@ public class TransitModel implements Serializable {
 
   private StopModel stopModel;
   // transit feed validity information in seconds since epoch
-  // TODO: Convert to instants
-  private long transitServiceStarts = Long.MAX_VALUE;
-  private long transitServiceEnds = 0;
+  private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
+  private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
   private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
@@ -258,24 +257,23 @@ public class TransitModel implements Serializable {
 
   // Infer the time period covered by the transit feed
   public void updateTransitFeedValidity(CalendarServiceData data, DataImportIssueStore issueStore) {
-    long now = Instant.now().getEpochSecond();
-    final long SEC_IN_DAY = 24 * 60 * 60;
+    Instant now = Instant.now();
     HashSet<String> agenciesWithFutureDates = new HashSet<>();
     HashSet<String> agencies = new HashSet<>();
     for (FeedScopedId sid : data.getServiceIds()) {
       agencies.add(sid.getFeedId());
       for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
         // Adjust for timezone, assuming there is only one per graph.
-        long t = ServiceDateUtils.asStartOfService(sd, getTimeZone()).toEpochSecond();
-        if (t > now) {
+        ZonedDateTime t = ServiceDateUtils.asStartOfService(sd, getTimeZone());
+        if (t.toInstant().isAfter(now)) {
           agenciesWithFutureDates.add(sid.getFeedId());
         }
         // assume feed is unreliable after midnight on last service day
-        long u = t + SEC_IN_DAY;
-        if (t < this.transitServiceStarts) {
+        ZonedDateTime u = t.plusDays(1);
+        if (t.isBefore(this.transitServiceStarts)) {
           this.transitServiceStarts = t;
         }
-        if (u > this.transitServiceEnds) {
+        if (u.isAfter(this.transitServiceEnds)) {
           this.transitServiceEnds = u;
         }
       }
@@ -289,8 +287,10 @@ public class TransitModel implements Serializable {
 
   // Check to see if we have transit information for a given date
   public boolean transitFeedCovers(Instant time) {
-    long t = time.getEpochSecond();
-    return t >= this.transitServiceStarts && t < this.transitServiceEnds;
+    return (
+      !time.isBefore(this.transitServiceStarts.toInstant()) &&
+      time.isBefore(this.transitServiceEnds.toInstant())
+    );
   }
 
   /**
@@ -342,9 +342,9 @@ public class TransitModel implements Serializable {
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     // Start of day
-    long time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toEpochSecond();
+    ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
 
-    if (time < transitServiceStarts || time >= transitServiceEnds) {
+    if (!transitFeedCovers(time.toInstant())) {
       return null;
     }
 
@@ -429,11 +429,11 @@ public class TransitModel implements Serializable {
     this.timeZone = null;
   }
 
-  public long getTransitServiceStarts() {
+  public ZonedDateTime getTransitServiceStarts() {
     return transitServiceStarts;
   }
 
-  public long getTransitServiceEnds() {
+  public ZonedDateTime getTransitServiceEnds() {
     return transitServiceEnds;
   }
 
