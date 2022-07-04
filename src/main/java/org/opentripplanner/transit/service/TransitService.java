@@ -119,7 +119,7 @@ public interface TransitService {
 
   List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture
   );
 

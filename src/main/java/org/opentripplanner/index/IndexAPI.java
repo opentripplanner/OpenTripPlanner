@@ -1,6 +1,7 @@
 package org.opentripplanner.index;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -62,6 +63,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolyline;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -295,7 +297,7 @@ public class IndexAPI {
   ) {
     TransitService transitService = createTransitService();
     var stop = getStop(transitService, stopId);
-    ServiceDate serviceDate = parseServiceDate("date", date);
+    LocalDate serviceDate = parseServiceDate("date", date);
     List<StopTimesInPattern> stopTimes = transitService.getStopTimesForStop(
       stop,
       serviceDate,
@@ -569,9 +571,9 @@ public class IndexAPI {
   }
 
   @SuppressWarnings("SameParameterValue")
-  private static ServiceDate parseServiceDate(String label, String date) {
+  private static LocalDate parseServiceDate(String label, String date) {
     try {
-      return ServiceDate.parseString(date);
+      return ServiceDateUtils.parseString(date);
     } catch (ParseException e) {
       throw new BadRequestException(
         "Unable to parse date, not on format: YYYY-MM-DD. " + label + ": '" + date + "'"

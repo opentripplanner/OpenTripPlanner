@@ -4,6 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -37,6 +38,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
 
@@ -312,9 +314,9 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForServiceDateArgs(
         environment.getArguments()
       );
-      ServiceDate date;
+      LocalDate date;
       try {
-        date = ServiceDate.parseString(args.getLegacyGraphQLDate());
+        date = ServiceDateUtils.parseString(args.getLegacyGraphQLDate());
       } catch (ParseException e) {
         return null;
       }

@@ -321,7 +321,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture
   ) {
     return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);

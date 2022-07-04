@@ -49,8 +49,8 @@ public class StopTimesHelper {
     TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
-    long startTime,
-    int timeRange,
+    long startTime, // TODO: Migrate to instant
+    int timeRange, // TODO: Migrate to duration
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
@@ -66,14 +66,12 @@ public class StopTimesHelper {
     // Number of days requested + the following day
     int numberOfDays = timeRange / ONE_DAY_SECONDS + 1;
 
-    List<ServiceDate> dates = new ArrayList<>();
+    List<LocalDate> dates = new ArrayList<>();
 
     // Yesterday, today, number of requested days, following day
     for (int i = -1; i <= numberOfDays; i++) {
-      dates.add(new ServiceDate(date).shift(i));
+      dates.add(date.plusDays(i));
     }
-
-    ServiceDate[] serviceDates = dates.toArray(new ServiceDate[0]);
 
     // Fetch all patterns, including those from realtime sources
     Collection<TripPattern> patterns = transitService.getPatternsForStop(stop, timetableSnapshot);
@@ -90,7 +88,7 @@ public class StopTimesHelper {
         arrivalDeparture,
         includeCancelledTrips,
         false,
-        serviceDates
+        dates
       );
 
       result.addAll(getStopTimesInPattern(pattern, pq));
@@ -109,7 +107,7 @@ public class StopTimesHelper {
   public static List<StopTimesInPattern> stopTimesForStop(
     TransitService transitService,
     StopLocation stop,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture
   ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
@@ -120,13 +118,13 @@ public class StopTimesHelper {
       Timetable tt;
       TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
       if (timetableSnapshot != null) {
-        tt = timetableSnapshot.resolve(pattern, serviceDate);
+        tt = timetableSnapshot.resolve(pattern, new ServiceDate(serviceDate));
       } else {
         tt = pattern.getScheduledTimetable();
       }
-      var servicesRunning = transitService.getServicesRunningForDate(serviceDate.toLocalDate());
+      var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
       Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate.toLocalDate(), transitService.getTimeZone())
+        .asStartOfService(serviceDate, transitService.getTimeZone())
         .toInstant();
       int sidx = 0;
       for (var currStop : pattern.getStops()) {
@@ -136,9 +134,7 @@ public class StopTimesHelper {
             if (!servicesRunning.contains(t.getServiceCode())) {
               continue;
             }
-            stopTimes.times.add(
-              new TripTimeOnDate(t, sidx, pattern, serviceDate.toLocalDate(), midnight)
-            );
+            stopTimes.times.add(new TripTimeOnDate(t, sidx, pattern, serviceDate, midnight));
           }
         }
         sidx++;
@@ -168,8 +164,8 @@ public class StopTimesHelper {
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
-    long startTime,
-    int timeRange,
+    long startTime, // TODO: Migrate to instant
+    int timeRange, // TODO: Migrate to duration
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
@@ -180,11 +176,8 @@ public class StopTimesHelper {
       .ofEpochSecond(startTime)
       .atZone(transitService.getTimeZone())
       .toLocalDate();
-    ServiceDate[] serviceDates = {
-      new ServiceDate(date).previous(),
-      new ServiceDate(date),
-      new ServiceDate(date).next(),
-    };
+    List<LocalDate> serviceDates = List.of(date.minusDays(1), date, date.plusDays(1));
+
     Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
       transitService,
       timetableSnapshot,
@@ -207,9 +200,9 @@ public class StopTimesHelper {
     Queue<TripTimeOnDate> pq
   ) {
     List<StopTimesInPattern> result = new ArrayList<>();
-    if (pq.size() != 0) {
+    if (!pq.isEmpty()) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-      while (pq.size() != 0) {
+      while (!pq.isEmpty()) {
         stopTimes.times.add(0, pq.poll());
       }
       result.add(stopTimes);
@@ -222,13 +215,13 @@ public class StopTimesHelper {
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
-    long startTime, //TODO: Change to ZonedDateTime
-    int timeRange,
+    long startTime, //TODO: Change to Instant
+    int timeRange, // TODO: Migrate to duration
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations,
     boolean includeReplaced,
-    ServiceDate[] serviceDates
+    Collection<LocalDate> serviceDates
   ) {
     // The bounded priority Q is used to keep a sorted short list of trip times. We can not
     // relay on the trip times to be in order because of real-time updates. This code can
@@ -250,23 +243,23 @@ public class StopTimesHelper {
       .create();
 
     // Loop through all possible days
-    for (ServiceDate serviceDate : serviceDates) {
+    for (LocalDate serviceDate : serviceDates) {
       Timetable timetable;
       if (timetableSnapshot != null) {
-        timetable = timetableSnapshot.resolve(pattern, serviceDate);
+        timetable = timetableSnapshot.resolve(pattern, new ServiceDate(serviceDate));
       } else {
         timetable = pattern.getScheduledTimetable();
       }
 
       ZonedDateTime midnight = ServiceDateUtils.asStartOfService(
-        serviceDate.toLocalDate(),
+        serviceDate,
         transitService.getTimeZone()
       );
       int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
         midnight,
         ZonedDateTime.ofInstant(Instant.ofEpochSecond(startTime), transitService.getTimeZone())
       );
-      var servicesRunning = transitService.getServicesRunningForDate(serviceDate.toLocalDate());
+      var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
 
       int stopIndex = 0;
       for (var currStop : pattern.getStops()) {
@@ -313,13 +306,7 @@ public class StopTimesHelper {
               (arrivalDeparture != DEPARTURES && arrivalTimeInRange)
             ) {
               pq.add(
-                new TripTimeOnDate(
-                  tripTimes,
-                  stopIndex,
-                  pattern,
-                  serviceDate.toLocalDate(),
-                  midnight.toInstant()
-                )
+                new TripTimeOnDate(tripTimes, stopIndex, pattern, serviceDate, midnight.toInstant())
               );
             }
           }
@@ -333,7 +320,7 @@ public class StopTimesHelper {
 
   private static boolean isReplacedByAnotherPattern(
     Trip trip,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     TripPattern pattern,
     TimetableSnapshot snapshot
   ) {
