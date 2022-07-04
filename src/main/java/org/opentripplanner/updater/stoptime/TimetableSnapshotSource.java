@@ -36,6 +36,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -757,6 +758,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Make sure that updated trip times have the correct real time state
     newTripTimes.setRealTimeState(realTimeState);
+
+    if (tripUpdate.hasVehicle()) {
+      var vehicleDescriptor = tripUpdate.getVehicle();
+      if (vehicleDescriptor.hasWheelchairAccessible()) {
+        GtfsRealtimeMapper
+          .mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
+          .ifPresent(newTripTimes::updateWheelchairAccessibility);
+      }
+    }
 
     // Add new trip times to the buffer
     return buffer.update(pattern, newTripTimes, serviceDate);
