@@ -17,7 +17,6 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -162,10 +161,7 @@ public class FlexIntegrationTest {
     var extra = new HashMap<Class<?>, Object>();
 
     // GTFS
-    var gtfsBundles = gtfsFiles
-      .stream()
-      .map(f -> new GtfsBundle(new File(f)))
-      .collect(Collectors.toList());
+    var gtfsBundles = gtfsFiles.stream().map(f -> new GtfsBundle(new File(f))).toList();
     GtfsModule gtfsModule = new GtfsModule(gtfsBundles, ServiceDateInterval.unbounded());
     gtfsModule.buildGraph(graph, extra);
 

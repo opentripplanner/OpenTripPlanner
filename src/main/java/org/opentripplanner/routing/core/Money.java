@@ -11,20 +11,19 @@ public class Money implements Comparable<Money> {
   /**
    * The currency of the money.
    */
-  private WrappedCurrency currency = null;
+  private WrappedCurrency currency;
   /**
    * The actual currency value in decimal fixed-point, with the default number of fraction digits
    * from currency after the decimal point.
    */
-  private int cents;
-
-  public Money() {}
+  private final int cents;
 
   public Money(WrappedCurrency currency, int cents) {
     this.currency = currency;
     this.cents = cents;
   }
 
+  @Override
   public int compareTo(Money m) {
     if (m.currency != currency) {
       throw new RuntimeException("Can't compare " + m.currency + " to " + currency);
@@ -36,20 +35,13 @@ public class Money implements Comparable<Money> {
     return currency;
   }
 
+  @Deprecated
   public void setCurrency(Currency currency) {
     this.currency = new WrappedCurrency(currency);
   }
 
-  public void setCurrency(WrappedCurrency currency) {
-    this.currency = currency;
-  }
-
   public int getCents() {
     return cents;
-  }
-
-  public void setCents(int cents) {
-    this.cents = cents;
   }
 
   @Override

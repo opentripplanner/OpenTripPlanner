@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.fares.impl;
+package org.opentripplanner.ext.fares.impl;
 
 import org.opentripplanner.routing.fares.FareService;
 

@@ -37,9 +37,6 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -51,8 +48,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract
- * and prepare geometries. It also does some other postprocessing involving fares and interlined
- * blocks.
+ * and prepare geometries. It also does some other postprocessing involving interlined blocks.
  *
  * <p>
  * THREAD SAFETY The computation runs in parallel so be careful about threadsafety when modifying
@@ -72,25 +68,19 @@ public class GeometryAndBlockProcessor {
   private final double maxStopToShapeSnapDistance;
   private final int maxInterlineDistance;
   private DataImportIssueStore issueStore;
-  private FareServiceFactory fareServiceFactory;
 
   public GeometryAndBlockProcessor(GtfsContext context) {
-    this(context.getTransitService(), null, -1, -1);
+    this(context.getTransitService(), -1, -1);
   }
 
   public GeometryAndBlockProcessor(
     // TODO OTP2 - Operate on the builder, not the transit service and move the executon of
     //           - this to where the builder is in context.
     OtpTransitService transitService,
-    // TODO OTP2 - This does not belong here - Do geometry and blocks have anything with
-    //           - a FareService.
-    FareServiceFactory fareServiceFactory,
     double maxStopToShapeSnapDistance,
     int maxInterlineDistance
   ) {
     this.transitService = transitService;
-    this.fareServiceFactory =
-      fareServiceFactory != null ? fareServiceFactory : new DefaultFareServiceFactory();
     this.maxStopToShapeSnapDistance =
       maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
@@ -112,8 +102,6 @@ public class GeometryAndBlockProcessor {
   @SuppressWarnings("Convert2MethodRef")
   public void run(Graph graph, DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
-
-    fareServiceFactory.processGtfs(transitService);
 
     /* Assign 0-based numeric codes to all GTFS service IDs. */
     for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
@@ -190,12 +178,6 @@ public class GeometryAndBlockProcessor {
     for (TripPattern tableTripPattern : tripPatterns) {
       tableTripPattern.getScheduledTimetable().finish();
     }
-
-    graph.putService(FareService.class, fareServiceFactory.makeFareService());
-  }
-
-  public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
-    this.fareServiceFactory = fareServiceFactory;
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {

@@ -1,35 +1,30 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.fares.impl.SeattleFareServiceFactory;
-import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.TestUtils;
 
-public class FaresTest {
+public class FaresIntegrationTest {
 
   private final WrappedCurrency USD = new WrappedCurrency("USD");
 
@@ -169,7 +164,7 @@ public class FaresTest {
     from = GenericLocation.fromStopId("Origin", feedId, "D");
     to = GenericLocation.fromStopId("Destination", feedId, "E");
     fare = getFare(from, to, dateTime, router);
-    assertNull(fare);
+    assertEquals(Fare.empty(), fare);
 
     // A -> C, 2 components in a path
 
@@ -269,21 +264,15 @@ public class FaresTest {
     request.setDateTime(time);
     request.from = from;
     request.to = to;
+    request.itineraryFilters.debug = true;
 
-    var zonedDateTime = time.atZone(ZoneId.of("America/Los_Angeles"));
-    var additionalSearchDays = AdditionalSearchDays.defaults(zonedDateTime);
+    var routingWorker = new RoutingWorker(router, request, router.graph.getTimeZone().toZoneId());
+    var result = routingWorker.route();
 
-    var result = TransitRouter.route(
-      request,
-      router,
-      zonedDateTime,
-      additionalSearchDays,
-      new DebugTimingAggregator()
-    );
     return result
-      .getItineraries()
-      .stream()
-      .sorted(Comparator.comparingInt(x -> x.getGeneralizedCost()))
+      .getTripPlan()
+      .itineraries.stream()
+      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCost))
       .toList();
   }
 }
