@@ -358,7 +358,7 @@ public class LegacyGraphQLQueryTypeImpl
           transitService.getRouteForId(FeedScopedId.parseId(args.getLegacyGraphQLRoute())),
           args.getLegacyGraphQLDirection(),
           args.getLegacyGraphQLTime(),
-          ServiceDate.parseString(args.getLegacyGraphQLDate())
+          ServiceDate.parseString(args.getLegacyGraphQLDate()).toLocalDate()
         );
     };
   }

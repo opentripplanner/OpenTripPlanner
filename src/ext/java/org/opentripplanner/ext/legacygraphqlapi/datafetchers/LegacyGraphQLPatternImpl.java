@@ -1,12 +1,12 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import gnu.trove.set.TIntSet;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +23,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -206,14 +207,14 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         .getLegacyGraphQLServiceDate();
 
       try {
-        BitSet services = getTransitService(environment)
-          .getServicesRunningForDate(ServiceDate.parseString(servicaDate));
+        TIntSet services = getTransitService(environment)
+          .getServicesRunningForDate(ServiceDate.parseString(servicaDate).toLocalDate());
         return getSource(environment)
           .getScheduledTimetable()
           .getTripTimes()
           .stream()
-          .filter(times -> services.get(times.getServiceCode()))
-          .map(times -> times.getTrip())
+          .filter(times -> services.contains(times.getServiceCode()))
+          .map(TripTimes::getTrip)
           .collect(Collectors.toList());
       } catch (ParseException e) {
         return null; // Invalid date format

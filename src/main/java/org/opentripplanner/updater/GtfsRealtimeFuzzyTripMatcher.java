@@ -1,7 +1,9 @@
 package org.opentripplanner.updater;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import gnu.trove.set.TIntSet;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.BitSet;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -22,8 +24,6 @@ import org.opentripplanner.util.time.TimeUtils;
 public class GtfsRealtimeFuzzyTripMatcher {
 
   private final TransitService transitService;
-  private BitSet servicesRunningForDate;
-  private ServiceDate date;
 
   public GtfsRealtimeFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;
@@ -44,9 +44,9 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
     FeedScopedId routeId = new FeedScopedId(feedId, trip.getRouteId());
     int time = TimeUtils.time(trip.getStartTime());
-    ServiceDate date;
+    LocalDate date;
     try {
-      date = ServiceDate.parseString(trip.getStartDate());
+      date = ServiceDate.parseString(trip.getStartDate()).toLocalDate();
     } catch (ParseException e) {
       return trip;
     }
@@ -60,7 +60,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
     if (matchedTrip == null) {
       // Check if the trip is carried over from previous day
-      date = date.previous();
+      date = date.minusDays(1);
       time += 24 * 60 * 60;
       matchedTrip = getTrip(route, direction, time, date);
     }
@@ -73,18 +73,14 @@ public class GtfsRealtimeFuzzyTripMatcher {
     return trip.toBuilder().setTripId(matchedTrip.getId().getId()).build();
   }
 
-  public synchronized Trip getTrip(Route route, int direction, int startTime, ServiceDate date) {
-    if (!date.equals(this.date)) {
-      this.date = date;
-      // TODO: This is slow, we should either precalculate or cache these for all dates in graph
-      this.servicesRunningForDate = transitService.getServicesRunningForDate(date);
-    }
+  public synchronized Trip getTrip(Route route, int direction, int startTime, LocalDate date) {
+    TIntSet servicesRunningForDate = transitService.getServicesRunningForDate(date);
     for (TripPattern pattern : transitService.getPatternsForRoute().get(route)) {
       if (pattern.getDirection().gtfsCode != direction) continue;
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {
         if (
           times.getScheduledDepartureTime(0) == startTime &&
-          servicesRunningForDate.get(times.getServiceCode())
+          servicesRunningForDate.contains(times.getServiceCode())
         ) {
           return times.getTrip();
         }

@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.network;
 
+import gnu.trove.set.TIntSet;
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -85,19 +86,18 @@ public class JourneyPatternType {
           .argument(GraphQLArgument.newArgument().name("date").type(gqlUtil.dateScalar).build())
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
           .dataFetcher(environment -> {
-            BitSet services = GqlUtil
+            TIntSet services = GqlUtil
               .getTransitService(environment)
               .getServicesRunningForDate(
                 Optional
                   .ofNullable((LocalDate) environment.getArgument("date"))
-                  .map(ServiceDate::new)
-                  .orElse(new ServiceDate(LocalDate.now()))
+                  .orElse(LocalDate.now())
               );
 
             return ((TripPattern) environment.getSource()).getScheduledTimetable()
               .getTripTimes()
               .stream()
-              .filter(times -> services.get(times.getServiceCode()))
+              .filter(times -> services.contains(times.getServiceCode()))
               .map(TripTimes::getTrip)
               .collect(Collectors.toList());
           })

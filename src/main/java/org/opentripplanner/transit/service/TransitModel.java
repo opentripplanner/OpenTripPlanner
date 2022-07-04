@@ -451,19 +451,6 @@ public class TransitModel implements Serializable {
     return transitAlertService;
   }
 
-  /** An OBA Service Date is a local date without timezone, only year month and day. */
-  public BitSet getServicesRunningForDate(ServiceDate date) {
-    BitSet services = new BitSet(calendarService.getServiceIds().size());
-    for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
-      int n = serviceCodes.get(serviceId);
-      if (n < 0) {
-        continue;
-      }
-      services.set(n);
-    }
-    return services;
-  }
-
   public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
     Collection<Notice> res = getNoticesByElement().get(entity);
     return res == null ? Collections.emptyList() : res;

@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import gnu.trove.set.TIntSet;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -168,7 +168,7 @@ public interface TransitService {
 
   FlexIndex getFlexIndex();
 
-  BitSet getServicesRunningForDate(ServiceDate parseString);
+  TIntSet getServicesRunningForDate(LocalDate parseString);
 
   Long getTransitServiceEnds();
 
