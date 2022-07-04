@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,7 +54,7 @@ public class TransitModelIndex {
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
 
-  private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
+  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
 
@@ -219,7 +220,7 @@ public class TransitModelIndex {
     return patternsForRoute;
   }
 
-  public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
+  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
     return serviceCodesRunningForDate;
   }
 
@@ -245,17 +246,17 @@ public class TransitModelIndex {
 
     // Reconstruct set of all dates where service is defined, keeping track of which services
     // run on which days.
-    Multimap<ServiceDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
+    Multimap<LocalDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
 
     for (FeedScopedId serviceId : calendarService.getServiceIds()) {
       Set<ServiceDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(
         serviceId
       );
       for (ServiceDate serviceDate : serviceDatesForService) {
-        serviceIdsForServiceDate.put(serviceDate, serviceId);
+        serviceIdsForServiceDate.put(serviceDate.toLocalDate(), serviceId);
       }
     }
-    for (ServiceDate serviceDate : serviceIdsForServiceDate.keySet()) {
+    for (LocalDate serviceDate : serviceIdsForServiceDate.keySet()) {
       TIntSet serviceCodesRunning = new TIntHashSet();
       for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
         serviceCodesRunning.add(transitModel.getServiceCodes().get(serviceId));

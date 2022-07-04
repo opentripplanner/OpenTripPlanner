@@ -107,12 +107,11 @@ public class FlexRouter {
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
       int index = d + additionalPastSearchDays;
-      ServiceDate serviceDate = new ServiceDate(date);
       dates[index] =
         new FlexServiceDate(
           date,
           ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
-          transitModel.index.getServiceCodesRunningForDate().get(serviceDate)
+          transitModel.index.getServiceCodesRunningForDate().get(date)
         );
     }
   }

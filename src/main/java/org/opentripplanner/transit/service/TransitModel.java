@@ -360,7 +360,7 @@ public class TransitModel implements Serializable {
 
       index
         .getServiceCodesRunningForDate()
-        .computeIfAbsent(serviceDate, ignored -> new TIntHashSet())
+        .computeIfAbsent(serviceDate.toLocalDate(), ignored -> new TIntHashSet())
         .add(serviceCode);
     }
     return serviceId;

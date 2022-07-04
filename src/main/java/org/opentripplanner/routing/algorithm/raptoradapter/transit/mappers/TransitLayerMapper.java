@@ -133,7 +133,7 @@ public class TransitLayerMapper {
       newTripPatternForOld
     );
 
-    Set<ServiceDate> allServiceDates = transitModel.index.getServiceCodesRunningForDate().keySet();
+    Set<LocalDate> allServiceDates = transitModel.index.getServiceCodesRunningForDate().keySet();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 

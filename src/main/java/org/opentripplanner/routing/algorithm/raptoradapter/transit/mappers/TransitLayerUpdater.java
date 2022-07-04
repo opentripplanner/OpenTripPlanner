@@ -36,7 +36,7 @@ public class TransitLayerUpdater {
 
   private final TransitModel transitModel;
 
-  private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
+  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
 
   /**
    * Cache the TripPatternForDates indexed on the original TripPatterns in order to avoid this
@@ -54,7 +54,7 @@ public class TransitLayerUpdater {
 
   public TransitLayerUpdater(
     TransitModel transitModel,
-    Map<ServiceDate, TIntSet> serviceCodesRunningForDate
+    Map<LocalDate, TIntSet> serviceCodesRunningForDate
   ) {
     this.transitModel = transitModel;
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
@@ -99,8 +99,7 @@ public class TransitLayerUpdater {
     Set<TripPatternForDate> previouslyUsedPatterns = new HashSet<>();
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
     for (Timetable timetable : updatedTimetables) {
-      @SuppressWarnings("ConstantConditions")
-      LocalDate date = ServiceCalendarMapper.localDateFromServiceDate(timetable.getServiceDate());
+      LocalDate date = timetable.getServiceDate().toLocalDate();
 
       if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
@@ -124,7 +123,7 @@ public class TransitLayerUpdater {
 
       TripPatternForDate newTripPatternForDate = tripPatternForDateMapper.map(
         timetable,
-        timetable.getServiceDate()
+        timetable.getServiceDate().toLocalDate()
       );
 
       if (newTripPatternForDate != null) {
