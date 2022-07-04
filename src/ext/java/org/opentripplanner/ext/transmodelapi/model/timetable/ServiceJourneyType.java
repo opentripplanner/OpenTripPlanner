@@ -270,7 +270,6 @@ public class ServiceJourneyType {
               .map(ServiceDate::new)
               .orElse(new ServiceDate(GqlUtil.getTransitService(environment).getTimeZone()));
             return TripTimesShortHelper.getTripTimesShort(
-              GqlUtil.getRoutingService(environment),
               GqlUtil.getTransitService(environment),
               trip(environment),
               serviceDate

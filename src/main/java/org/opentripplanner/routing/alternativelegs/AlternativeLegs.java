@@ -24,7 +24,6 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -127,19 +126,10 @@ public class AlternativeLegs {
 
     Queue<TripTimeOnDate> pq = new PriorityQueue<>(comparator);
 
-    long startTime = departureTime.toEpochSecond();
-
     // Loop through all possible days
     ServiceDate[] serviceDates = { originalDate.previous(), originalDate, originalDate.next() };
 
     for (ServiceDate serviceDate : serviceDates) {
-      ServiceDay sd = new ServiceDay(
-        transitService.getServiceCodes(),
-        serviceDate,
-        transitService.getCalendarService(),
-        pattern.getRoute().getAgency().getId()
-      );
-
       Timetable timetable;
       if (timetableSnapshot != null) {
         timetable = timetableSnapshot.resolve(pattern, serviceDate);
@@ -147,9 +137,19 @@ public class AlternativeLegs {
         timetable = pattern.getScheduledTimetable();
       }
 
-      int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
+      ZonedDateTime midnight = ServiceDateUtils.asStartOfService(
+        serviceDate.toLocalDate(),
+        transitService.getTimeZone()
+      );
+      int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
+        midnight,
+        departureTime
+      );
+
+      var servicesRunning = transitService.getServicesRunningForDate(serviceDate.toLocalDate());
+
       for (TripTimes tripTimes : timetable.getTripTimes()) {
-        if (!sd.serviceRunning(tripTimes.getServiceCode())) {
+        if (!servicesRunning.contains(tripTimes.getServiceCode())) {
           continue;
         }
         if (skipByTripCancellation(tripTimes, false)) {
@@ -161,7 +161,15 @@ public class AlternativeLegs {
           : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
 
         if (departureTimeInRange) {
-          pq.add(new TripTimeOnDate(tripTimes, boardingPosition, pattern, sd));
+          pq.add(
+            new TripTimeOnDate(
+              tripTimes,
+              boardingPosition,
+              pattern,
+              serviceDate.toLocalDate(),
+              midnight.toInstant()
+            )
+          );
         }
       }
     }

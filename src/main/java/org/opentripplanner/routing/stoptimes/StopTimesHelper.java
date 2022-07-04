@@ -8,6 +8,7 @@ import com.google.common.collect.MinMaxPriorityQueue;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -20,11 +21,11 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class StopTimesHelper {
 
@@ -123,21 +124,21 @@ public class StopTimesHelper {
       } else {
         tt = pattern.getScheduledTimetable();
       }
-      ServiceDay sd = new ServiceDay(
-        transitService.getServiceCodes(),
-        serviceDate,
-        transitService.getCalendarService(),
-        pattern.getRoute().getAgency().getId()
-      );
+      var servicesRunning = transitService.getServicesRunningForDate(serviceDate.toLocalDate());
+      Instant midnight = ServiceDateUtils
+        .asStartOfService(serviceDate.toLocalDate(), transitService.getTimeZone())
+        .toInstant();
       int sidx = 0;
       for (var currStop : pattern.getStops()) {
         if (currStop == stop) {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, sidx)) continue;
           for (TripTimes t : tt.getTripTimes()) {
-            if (!sd.serviceRunning(t.getServiceCode())) {
+            if (!servicesRunning.contains(t.getServiceCode())) {
               continue;
             }
-            stopTimes.times.add(new TripTimeOnDate(t, sidx, pattern, sd));
+            stopTimes.times.add(
+              new TripTimeOnDate(t, sidx, pattern, serviceDate.toLocalDate(), midnight)
+            );
           }
         }
         sidx++;
@@ -221,7 +222,7 @@ public class StopTimesHelper {
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
-    long startTime,
+    long startTime, //TODO: Change to ZonedDateTime
     int timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
@@ -250,12 +251,6 @@ public class StopTimesHelper {
 
     // Loop through all possible days
     for (ServiceDate serviceDate : serviceDates) {
-      ServiceDay sd = new ServiceDay(
-        transitService.getServiceCodes(),
-        serviceDate,
-        transitService.getCalendarService(),
-        pattern.getRoute().getAgency().getId()
-      );
       Timetable timetable;
       if (timetableSnapshot != null) {
         timetable = timetableSnapshot.resolve(pattern, serviceDate);
@@ -263,7 +258,16 @@ public class StopTimesHelper {
         timetable = pattern.getScheduledTimetable();
       }
 
-      int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
+      ZonedDateTime midnight = ServiceDateUtils.asStartOfService(
+        serviceDate.toLocalDate(),
+        transitService.getTimeZone()
+      );
+      int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
+        midnight,
+        ZonedDateTime.ofInstant(Instant.ofEpochSecond(startTime), transitService.getTimeZone())
+      );
+      var servicesRunning = transitService.getServicesRunningForDate(serviceDate.toLocalDate());
+
       int stopIndex = 0;
       for (var currStop : pattern.getStops()) {
         if (currStop == stop) {
@@ -275,7 +279,7 @@ public class StopTimesHelper {
           }
 
           for (TripTimes tripTimes : timetable.getTripTimes()) {
-            if (!sd.serviceRunning(tripTimes.getServiceCode())) {
+            if (!servicesRunning.contains(tripTimes.getServiceCode())) {
               continue;
             }
             if (skipByTripCancellation(tripTimes, includeCancellations)) {
@@ -308,7 +312,15 @@ public class StopTimesHelper {
               (arrivalDeparture != ARRIVALS && departureTimeInRange) ||
               (arrivalDeparture != DEPARTURES && arrivalTimeInRange)
             ) {
-              pq.add(new TripTimeOnDate(tripTimes, stopIndex, pattern, sd));
+              pq.add(
+                new TripTimeOnDate(
+                  tripTimes,
+                  stopIndex,
+                  pattern,
+                  serviceDate.toLocalDate(),
+                  midnight.toInstant()
+                )
+              );
             }
           }
           // TODO Add back support for frequency entries
