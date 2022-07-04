@@ -34,6 +34,6 @@ class LocationMapperTest {
     var mapper = new LocationMapper();
     var flexLocation = mapper.map(gtfsLocation);
 
-    assertEquals(isBogusName, flexLocation.hasBogusName());
+    assertEquals(isBogusName, flexLocation.hasFallbackName());
   }
 }

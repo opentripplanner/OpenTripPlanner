@@ -19,7 +19,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private final I18NString name;
 
-  private final boolean hasBogusName;
+  private final boolean hasFallbackName;
 
   private I18NString description;
 
@@ -37,10 +37,10 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     // as the bogus name. *shrug*
     if (name == null) {
       this.name = new NonLocalizedString(id.toString());
-      hasBogusName = true;
+      hasFallbackName = true;
     } else {
       this.name = name;
-      hasBogusName = false;
+      hasFallbackName = false;
     }
   }
 
@@ -115,7 +115,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    * Names for GTFS flex locations are optional therefore we set the id as the name. When this is
    * the case then this method returns true.
    */
-  public boolean hasBogusName() {
-    return hasBogusName;
+  public boolean hasFallbackName() {
+    return hasFallbackName;
   }
 }

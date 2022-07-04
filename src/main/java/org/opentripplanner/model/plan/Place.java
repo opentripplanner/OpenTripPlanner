@@ -1,11 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import java.util.Optional;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
@@ -98,7 +96,7 @@ public class Place {
     var name = stop.getName();
 
     if (stop instanceof FlexStopLocation flexArea && vertex instanceof StreetVertex s) {
-      if (flexArea.hasBogusName()) {
+      if (flexArea.hasFallbackName()) {
         name = s.getIntersectionName();
       } else {
         name = new LocalizedString("partOf", s.getIntersectionName(), flexArea.getName());
