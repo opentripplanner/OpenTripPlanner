@@ -95,16 +95,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
    * @throws ParseException on parse error
    */
   public static ServiceDate parseString(String value) throws ParseException {
-    Matcher matcher = PATTERN.matcher(value);
-
-    if (!matcher.matches()) {
-      throw new ParseException("error parsing date: " + value, 0);
-    }
-
-    int year = Integer.parseInt(matcher.group(1));
-    int month = Integer.parseInt(matcher.group(2));
-    int day = Integer.parseInt(matcher.group(3));
-    return new ServiceDate(year, month, day);
+    return new ServiceDate(ServiceDateUtils.parseString(value));
   }
 
   public static Optional<ServiceDate> parseStringToOptional(String value) {

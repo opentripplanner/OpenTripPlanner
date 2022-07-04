@@ -1,5 +1,6 @@
 package org.opentripplanner.util.time;
 
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -8,11 +9,15 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 public class ServiceDateUtils {
 
   private static final String MAX_TEXT = "MAX";
   private static final String MIN_TEXT = "MIN";
+  private static final Pattern PATTERN = Pattern.compile("^(\\d{4})-?(\\d{2})-?(\\d{2})$");
 
   public static ZonedDateTime asStartOfService(ZonedDateTime date) {
     return date.truncatedTo(ChronoUnit.HOURS).withHour(12).minusHours(12);
@@ -74,6 +79,24 @@ public class ServiceDateUtils {
     ZonedDateTime dateTime
   ) {
     return (int) Duration.between(startOfService, dateTime).toSeconds();
+  }
+
+  /**
+   * Parse given input string in the "YYYYMMDD" or "YYYY-MM-DD" format.
+   *
+   * @throws ParseException on parse error
+   */
+  public static LocalDate parseString(String value) throws ParseException {
+    Matcher matcher = PATTERN.matcher(value);
+
+    if (!matcher.matches()) {
+      throw new ParseException("error parsing date: " + value, 0);
+    }
+
+    int year = Integer.parseInt(matcher.group(1));
+    int month = Integer.parseInt(matcher.group(2));
+    int day = Integer.parseInt(matcher.group(3));
+    return LocalDate.of(year, month, day);
   }
 
   /**

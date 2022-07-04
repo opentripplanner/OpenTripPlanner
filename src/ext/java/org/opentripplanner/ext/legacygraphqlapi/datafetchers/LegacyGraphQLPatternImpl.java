@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPattern {
 
@@ -208,7 +209,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
       try {
         TIntSet services = getTransitService(environment)
-          .getServicesRunningForDate(ServiceDate.parseString(servicaDate).toLocalDate());
+          .getServicesRunningForDate(ServiceDateUtils.parseString(servicaDate));
         return getSource(environment)
           .getScheduledTimetable()
           .getTripTimes()

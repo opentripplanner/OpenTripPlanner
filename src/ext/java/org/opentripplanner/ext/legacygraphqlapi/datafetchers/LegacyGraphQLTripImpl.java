@@ -149,7 +149,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
           environment.getArguments()
         );
         if (args.getLegacyGraphQLServiceDate() != null) {
-          serviceDate = ServiceDate.parseString(args.getLegacyGraphQLServiceDate()).toLocalDate();
+          serviceDate = ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate());
           midnight =
             ServiceDateUtils
               .asStartOfService(serviceDate, transitService.getTimeZone())
@@ -210,7 +210,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
           environment.getArguments()
         );
         if (args.getLegacyGraphQLServiceDate() != null) {
-          serviceDate = ServiceDate.parseString(args.getLegacyGraphQLServiceDate()).toLocalDate();
+          serviceDate = ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate());
           midnight =
             ServiceDateUtils
               .asStartOfService(serviceDate, transitService.getTimeZone())
@@ -331,7 +331,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
         ZoneId timeZone = transitService.getTimeZone();
         LocalDate serviceDate = args.getLegacyGraphQLServiceDate() != null
-          ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()).toLocalDate()
+          ? ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate())
           : LocalDate.now(timeZone);
 
         TripPattern tripPattern = null;

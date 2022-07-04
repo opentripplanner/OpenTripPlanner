@@ -3,6 +3,7 @@ package org.opentripplanner.util.time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.util.time.ServiceDateUtils.asStartOfService;
 
@@ -11,11 +12,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class ServiceDateUtilsTest {
 
@@ -119,6 +119,29 @@ public class ServiceDateUtilsTest {
     assertEquals(
       desiredDuration,
       ServiceDateUtils.secondsSinceStartOfService(operatingDayDate, dateTime, zoneId)
+    );
+  }
+
+  @Test
+  public void parse() throws ParseException {
+    LocalDate subject;
+
+    subject = ServiceDateUtils.parseString("20201231");
+    assertEquals(2020, subject.getYear());
+    assertEquals(Month.DECEMBER, subject.getMonth());
+    assertEquals(31, subject.getDayOfMonth());
+
+    subject = ServiceDateUtils.parseString("2020-03-12");
+    assertEquals(2020, subject.getYear());
+    assertEquals(Month.MARCH, subject.getMonth());
+    assertEquals(12, subject.getDayOfMonth());
+
+    // Even though this is a valid date, we only support parsing of dates with
+    // 4 digits in the year
+    assertThrows(
+      ParseException.class,
+      () -> ServiceDateUtils.parseString("0-03-12"),
+      "error parsing date: 0-03-12"
     );
   }
 
