@@ -145,16 +145,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     return LocalDate.of(year, month, day);
   }
 
-  /**
-   * @return a string in "YYYYMMDD" format
-   */
-  public String asCompactString() {
-    String year = YEAR_FORMAT.format(this.year);
-    String month = MONTH_AND_DAY_FORMAT.format(this.month);
-    String day = MONTH_AND_DAY_FORMAT.format(this.day);
-    return year + month + day;
-  }
-
   public String asISO8601() {
     return String.format("%d-%02d-%02d", year, month, day);
   }

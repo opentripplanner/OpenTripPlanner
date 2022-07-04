@@ -46,7 +46,8 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         .getCalendarService()
         .getServiceDatesForServiceId(getSource(environment).getServiceId())
         .stream()
-        .map(ServiceDate::asCompactString)
+        .map(ServiceDate::toLocalDate)
+        .map(ServiceDateUtils::asCompactString)
         .collect(Collectors.toList());
   }
 

@@ -33,6 +33,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (08.11.2017)
@@ -184,6 +185,11 @@ public class CalendarServiceDataFactoryImplTest {
   }
 
   private static List<String> sevenFirstDays(List<ServiceDate> dates) {
-    return dates.stream().limit(7).map(ServiceDate::asCompactString).collect(toList());
+    return dates
+      .stream()
+      .limit(7)
+      .map(ServiceDate::toLocalDate)
+      .map(ServiceDateUtils::asCompactString)
+      .collect(toList());
   }
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,10 @@ public class CalendarServiceData implements Serializable {
    *           - this when doing the issue #3030.
    */
   public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
-    FeedScopedId serviceId = new FeedScopedId(CAL_SERVICE_FEED_ID, serviceDate.asCompactString());
+    FeedScopedId serviceId = new FeedScopedId(
+      CAL_SERVICE_FEED_ID,
+      ServiceDateUtils.asCompactString(serviceDate.toLocalDate())
+    );
     if (serviceDatesByServiceId.containsKey(serviceId)) {
       return serviceId;
     }

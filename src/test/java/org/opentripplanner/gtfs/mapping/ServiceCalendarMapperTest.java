@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class ServiceCalendarMapperTest {
 
@@ -42,8 +43,6 @@ public class ServiceCalendarMapperTest {
 
   private static final ServiceCalendar CALENDAR = new ServiceCalendar();
   private final ServiceCalendarMapper subject = new ServiceCalendarMapper();
-
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
   static {
     CALENDAR.setId(ID);
@@ -78,8 +77,14 @@ public class ServiceCalendarMapperTest {
     assertEquals(FRIDAY, result.getFriday());
     assertEquals(SATURDAY, result.getSaturday());
     assertEquals(SUNDAY, result.getSunday());
-    assertEquals(START_DATE.getAsString(), result.getPeriod().getStart().format(FORMATTER));
-    assertEquals(END_DATE.getAsString(), result.getPeriod().getEnd().format(FORMATTER));
+    assertEquals(
+      START_DATE.getAsString(),
+      ServiceDateUtils.asCompactString(result.getPeriod().getStart())
+    );
+    assertEquals(
+      END_DATE.getAsString(),
+      ServiceDateUtils.asCompactString(result.getPeriod().getEnd())
+    );
   }
 
   @Test

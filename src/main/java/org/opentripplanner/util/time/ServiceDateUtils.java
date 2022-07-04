@@ -8,16 +8,19 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 
 public class ServiceDateUtils {
 
   private static final String MAX_TEXT = "MAX";
   private static final String MIN_TEXT = "MIN";
   private static final Pattern PATTERN = Pattern.compile("^(\\d{4})-?(\\d{2})-?(\\d{2})$");
+  private static final DateTimeFormatter COMPACT_FORMATTER = DateTimeFormatter.ofPattern(
+    "uuuuMMdd"
+  );
 
   public static ZonedDateTime asStartOfService(ZonedDateTime date) {
     return date.truncatedTo(ChronoUnit.HOURS).withHour(12).minusHours(12);
@@ -113,6 +116,13 @@ public class ServiceDateUtils {
 
   public static LocalDate min(LocalDate a, LocalDate b) {
     return a.isBefore(b) ? a : b;
+  }
+
+  /**
+   * @return a string in "YYYYMMDD" format
+   */
+  public static String asCompactString(LocalDate date) {
+    return date.format(COMPACT_FORMATTER);
   }
 
   public static String toString(LocalDate date) {

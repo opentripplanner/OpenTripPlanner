@@ -31,6 +31,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class TimetableSnapshotSourceTest {
 
@@ -187,7 +188,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    final ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
 
     final String addedTripId = "added_trip";
 
@@ -197,10 +198,10 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(addedTripId);
       tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
-      final long midnightSecondsSinceEpoch = serviceDate
-        .getStartOfService(transitModel.getTimeZone())
+      final long midnightSecondsSinceEpoch = ServiceDateUtils
+        .asStartOfService(serviceDate, transitModel.getTimeZone())
         .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
@@ -287,7 +288,7 @@ public class TimetableSnapshotSourceTest {
     assertEquals(1, patternsAtA.size());
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
+    final Timetable forToday = snapshot.resolve(tripPattern, new ServiceDate(serviceDate));
     final Timetable schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);
@@ -311,7 +312,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String modifiedTripId = "10.1";
 
     TripUpdate tripUpdate;
@@ -320,10 +321,10 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(modifiedTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.REPLACEMENT);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
-      final long midnightSecondsSinceEpoch = serviceDate
-        .getStartOfService(transitModel.getTimeZone())
+      final long midnightSecondsSinceEpoch = ServiceDateUtils
+        .asStartOfService(serviceDate, transitModel.getTimeZone())
         .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
@@ -429,7 +430,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        serviceDate
+        new ServiceDate(serviceDate)
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -474,7 +475,10 @@ public class TimetableSnapshotSourceTest {
       );
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+      final Timetable newTimetableForToday = snapshot.resolve(
+        newTripPattern,
+        new ServiceDate(serviceDate)
+      );
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -504,7 +508,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String scheduledTripId = "1.1";
 
     TripUpdate tripUpdate;
@@ -513,7 +517,7 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(scheduledTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -585,7 +589,10 @@ public class TimetableSnapshotSourceTest {
     final Trip trip = transitModel.index.getTripForId().get(tripId);
     final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
 
-    final Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
+    final Timetable originalTimetableForToday = snapshot.resolve(
+      originalTripPattern,
+      new ServiceDate(serviceDate)
+    );
     final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
@@ -626,7 +633,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String scheduledTripId = "1.1";
 
     TripUpdate tripUpdate;
@@ -635,7 +642,7 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(scheduledTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -682,7 +689,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        serviceDate
+        new ServiceDate(serviceDate)
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -722,7 +729,10 @@ public class TimetableSnapshotSourceTest {
       );
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+      final Timetable newTimetableForToday = snapshot.resolve(
+        newTripPattern,
+        new ServiceDate(serviceDate)
+      );
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -765,7 +775,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now();
     String scheduledTripId = "1.1";
 
     TripUpdate tripUpdate;
@@ -774,7 +784,7 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(scheduledTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -839,7 +849,7 @@ public class TimetableSnapshotSourceTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        serviceDate
+        new ServiceDate(serviceDate)
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -860,7 +870,10 @@ public class TimetableSnapshotSourceTest {
         serviceDate
       );
 
-      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+      final Timetable newTimetableForToday = snapshot.resolve(
+        newTripPattern,
+        new ServiceDate(serviceDate)
+      );
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -897,7 +910,7 @@ public class TimetableSnapshotSourceTest {
   @Test
   public void testPurgeExpiredData() throws InvalidProtocolBufferException {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
-    final ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
+    final LocalDate previously = LocalDate.now(transitModel.getTimeZone()).minusDays(2); // Just to be safe...
     final Trip trip = transitModel.index.getTripForId().get(tripId);
     final TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
 
@@ -913,7 +926,7 @@ public class TimetableSnapshotSourceTest {
 
     tripDescriptorBuilder.setTripId("1.1");
     tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-    tripDescriptorBuilder.setStartDate(previously.asCompactString());
+    tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(previously));
 
     final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -929,6 +942,9 @@ public class TimetableSnapshotSourceTest {
     assertSame(snapshotA.resolve(pattern, null), snapshotB.resolve(pattern, null));
     assertSame(snapshotA.resolve(pattern, serviceDate), snapshotB.resolve(pattern, serviceDate));
     assertNotSame(snapshotA.resolve(pattern, null), snapshotA.resolve(pattern, serviceDate));
-    assertSame(snapshotB.resolve(pattern, null), snapshotB.resolve(pattern, previously));
+    assertSame(
+      snapshotB.resolve(pattern, null),
+      snapshotB.resolve(pattern, new ServiceDate(previously))
+    );
   }
 }

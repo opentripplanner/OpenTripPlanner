@@ -219,13 +219,6 @@ public class ServiceDateTest {
   }
 
   @Test
-  public void asCompactString() {
-    assertEquals("99991231", ServiceDate.MAX_DATE.asCompactString());
-    assertEquals("00000101", ServiceDate.MIN_DATE.asCompactString());
-    assertEquals("20200312", new ServiceDate(2020, 3, 12).asCompactString());
-  }
-
-  @Test
   public void asISO8601() {
     assertEquals("9999-12-31", ServiceDate.MAX_DATE.asISO8601());
     assertEquals("0-01-01", ServiceDate.MIN_DATE.asISO8601());

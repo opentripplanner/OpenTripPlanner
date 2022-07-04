@@ -16,6 +16,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 public class ServiceDateUtilsTest {
 
@@ -159,6 +160,13 @@ public class ServiceDateUtilsTest {
     assertFalse(ServiceDateUtils.isMinMax(d1));
     assertTrue(ServiceDateUtils.isMinMax(LocalDate.MIN));
     assertTrue(ServiceDateUtils.isMinMax(LocalDate.MAX));
+  }
+
+  @Test
+  public void asCompactString() {
+    assertEquals("-9999999990101", ServiceDateUtils.asCompactString(LocalDate.MIN));
+    assertEquals("+9999999991231", ServiceDateUtils.asCompactString(LocalDate.MAX));
+    assertEquals("20200312", ServiceDateUtils.asCompactString(LocalDate.of(2020, 3, 12)));
   }
 
   @Test
