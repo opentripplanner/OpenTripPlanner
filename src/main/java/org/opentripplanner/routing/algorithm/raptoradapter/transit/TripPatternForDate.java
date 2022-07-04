@@ -172,11 +172,13 @@ public class TripPatternForDate {
       .filter(frequencyEntry -> filter.test(frequencyEntry.tripTimes))
       .collect(Collectors.toList());
 
-    if (filteredTripTimes.isEmpty() && !hasFrequencies()) {
+    final boolean hasFreqs = hasFrequencies();
+
+    if (filteredTripTimes.isEmpty() && !hasFreqs) {
       return null;
     }
 
-    if (hasFrequencies() && filteredTripTimes.isEmpty() && filteredFrequencies.isEmpty()) {
+    if (hasFreqs && filteredTripTimes.isEmpty() && filteredFrequencies.isEmpty()) {
       return null;
     }
 
