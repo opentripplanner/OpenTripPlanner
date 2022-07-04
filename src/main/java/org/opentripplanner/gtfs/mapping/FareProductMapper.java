@@ -18,7 +18,7 @@ public class FareProductMapper {
     );
 
     Duration duration = null;
-    if (fareProduct.getDurationUnit() == NOT_SET) {
+    if (fareProduct.getDurationUnit() != NOT_SET) {
       duration = toTemporalUnit(fareProduct.getDurationUnit(), fareProduct.getDurationAmount());
     }
     return new FareProduct(id, fareProduct.getName(), price, duration);
