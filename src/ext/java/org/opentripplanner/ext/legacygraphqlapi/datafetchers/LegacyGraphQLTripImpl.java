@@ -144,12 +144,15 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripArrivalStoptimeArgs(
           environment.getArguments()
         );
-        if (args.getLegacyGraphQLServiceDate() != null) new ServiceDay(
-          transitService.getServiceCodes(),
-          ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
-          transitService.getCalendarService(),
-          getAgency(environment).getId()
-        );
+        if (args.getLegacyGraphQLServiceDate() != null) {
+          serviceDate =
+            new ServiceDay(
+              transitService.getServiceCodes(),
+              ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
+              transitService.getCalendarService(),
+              getAgency(environment).getId()
+            );
+        }
 
         return new TripTimeOnDate(triptimes, triptimes.getNumStops() - 1, tripPattern, serviceDate);
       } catch (ParseException e) {
@@ -198,12 +201,15 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripDepartureStoptimeArgs(
           environment.getArguments()
         );
-        if (args.getLegacyGraphQLServiceDate() != null) new ServiceDay(
-          transitService.getServiceCodes(),
-          ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
-          transitService.getCalendarService(),
-          getAgency(environment).getId()
-        );
+        if (args.getLegacyGraphQLServiceDate() != null) {
+          serviceDate =
+            new ServiceDay(
+              transitService.getServiceCodes(),
+              ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
+              transitService.getCalendarService(),
+              getAgency(environment).getId()
+            );
+        }
 
         return new TripTimeOnDate(triptimes, 0, tripPattern, serviceDate);
       } catch (ParseException e) {
