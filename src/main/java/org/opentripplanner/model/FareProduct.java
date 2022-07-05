@@ -6,7 +6,14 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public record FareProduct(FeedScopedId id, String name, Money amount, Duration duration) {
+public record FareProduct(
+  FeedScopedId id,
+  String name,
+  Money amount,
+  Duration duration,
+  RiderCategory category,
+  FareContainer container
+) {
   public boolean coversItinerary(Itinerary i) {
     var transitLegs = i.getTransitLegs();
     var allLegsInProductFeed = transitLegs

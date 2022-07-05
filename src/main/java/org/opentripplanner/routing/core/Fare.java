@@ -61,6 +61,13 @@ public class Fare {
 
   public void addProduct(FareProduct fareProduct) {
     products.add(fareProduct);
+    var c = new FareComponent(
+      fareProduct.id(),
+      fareProduct.amount(),
+      fareProduct.category(),
+      fareProduct.container()
+    );
+    addFareDetails(FareType.special, List.of(c));
   }
 
   public void addFareDetails(FareType fareType, List<FareComponent> newDetails) {

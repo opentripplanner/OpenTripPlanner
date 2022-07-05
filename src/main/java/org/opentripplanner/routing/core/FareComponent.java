@@ -2,7 +2,10 @@ package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.model.FareContainer;
+import org.opentripplanner.model.RiderCategory;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * <p>
@@ -11,31 +14,40 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class FareComponent {
 
-  public FeedScopedId fareId;
-  public Money price;
-  public List<FeedScopedId> routes;
+  public final FeedScopedId fareId;
+  public final Money price;
+  public final RiderCategory category;
+  public final FareContainer container;
+  public final List<FeedScopedId> routes = new ArrayList<>();
 
   public FareComponent(FeedScopedId fareId, Money amount) {
+    this(fareId, amount, null, null);
+  }
+
+  public FareComponent(
+    FeedScopedId fareId,
+    Money amount,
+    RiderCategory category,
+    FareContainer container
+  ) {
     this.fareId = fareId;
-    price = amount;
-    routes = new ArrayList<>();
+    this.price = amount;
+    this.category = category;
+    this.container = container;
   }
 
   public void addRoute(FeedScopedId routeId) {
     routes.add(routeId);
   }
 
+  @Override
   public String toString() {
-    StringBuilder buffer = new StringBuilder("FareComponent(");
-    buffer.append(fareId.toString());
-    buffer.append(", ");
-    buffer.append(price.toString());
-    buffer.append(", ");
-    for (FeedScopedId routeId : routes) {
-      buffer.append(routeId.toString());
-      buffer.append(", ");
-    }
-    buffer.append(")");
-    return buffer.toString();
+    return ToStringBuilder
+      .of(this.getClass())
+      .addStr("id", fareId.toString())
+      .addObj("price", price)
+      .addObj("category", category)
+      .addObj("container", container)
+      .toString();
   }
 }
