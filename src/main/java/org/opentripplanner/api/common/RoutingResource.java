@@ -724,7 +724,7 @@ public abstract class RoutingResource {
           XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
           ZonedDateTime dateTime = xmlGregCal.toGregorianCalendar().toZonedDateTime();
           if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-            dateTime.withZoneSameLocal(tz);
+            dateTime = dateTime.withZoneSameLocal(tz);
           }
           request.setDateTime(dateTime.toInstant());
         } catch (DatatypeConfigurationException e) {
