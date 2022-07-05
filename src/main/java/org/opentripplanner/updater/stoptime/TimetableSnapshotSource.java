@@ -106,7 +106,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private final Deduplicator deduplicator;
   private final Map<FeedScopedId, Integer> serviceCodes;
 
-  public static TimetableSnapshotSource ofGraph(final TransitModel transitModel) {
+  public static TimetableSnapshotSource ofTransitModel(final TransitModel transitModel) {
     return new TimetableSnapshotSource(
       transitModel.getTimeZone(),
       new DefaultTransitService(transitModel),

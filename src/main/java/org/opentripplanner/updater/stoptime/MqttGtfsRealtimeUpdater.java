@@ -74,7 +74,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   public void setup(Graph graph, TransitModel transitModel) {
     // Only create a realtime data snapshot source if none exists already
     TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(
-      TimetableSnapshotSource::ofGraph
+      TimetableSnapshotSource::ofTransitModel
     );
 
     // Set properties of realtime data snapshot source

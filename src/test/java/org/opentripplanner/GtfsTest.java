@@ -169,7 +169,7 @@ public abstract class GtfsTest {
     graph.index();
     router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
-    timetableSnapshotSource = TimetableSnapshotSource.ofGraph(transitModel);
+    timetableSnapshotSource = TimetableSnapshotSource.ofTransitModel(transitModel);
     timetableSnapshotSource.purgeExpiredData = false;
     transitModel.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
     alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);

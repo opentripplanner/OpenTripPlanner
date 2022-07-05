@@ -64,7 +64,7 @@ public class TimetableSnapshotSourceTest {
 
   @BeforeEach
   public void setUp() {
-    updater = TimetableSnapshotSource.ofGraph(transitModel);
+    updater = TimetableSnapshotSource.ofTransitModel(transitModel);
   }
 
   @Test
