@@ -26,7 +26,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -134,10 +133,6 @@ public class FlexRouter {
             graphPathToItineraryMapper
           );
           if (itinerary != null) {
-            var fareService = graph.getService(FareService.class);
-            if (fareService != null) {
-              itinerary.setFare(fareService.getCost(itinerary));
-            }
             itineraries.add(itinerary);
           }
         }

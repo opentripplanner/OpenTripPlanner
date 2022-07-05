@@ -6,10 +6,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
+import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
@@ -29,6 +30,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastT
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
+import org.opentripplanner.routing.fares.FareService;
 
 /**
  * Create a filter chain based on the given config.
@@ -54,6 +56,7 @@ public class ItineraryListFilterChainBuilder {
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
   private double wheelchairMaxSlope;
+  private FareService faresService;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -234,6 +237,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withFares(FareService fareService) {
+    this.faresService = fareService;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
@@ -247,6 +255,10 @@ public class ItineraryListFilterChainBuilder {
 
     if (accessibilityScore) {
       filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
+    }
+
+    if (faresService != null) {
+      filters.add(new FaresFilter(faresService));
     }
 
     // Filter transit itineraries on generalized-cost

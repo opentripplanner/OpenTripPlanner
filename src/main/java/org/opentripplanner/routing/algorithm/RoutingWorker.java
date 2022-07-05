@@ -26,6 +26,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
@@ -123,7 +124,8 @@ public class RoutingWorker {
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
       request.wheelchairAccessibility.enabled(),
-      request.wheelchairAccessibility.maxSlope()
+      request.wheelchairAccessibility.maxSlope(),
+      router.graph.getService(FareService.class)
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
