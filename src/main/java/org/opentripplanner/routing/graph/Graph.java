@@ -117,6 +117,8 @@ public class Graph implements Serializable {
   public Double maxElevation = null;
 
   /** The distance between elevation samples used in CompactElevationProfile. */
+  // TODO refactoring transit model: remove  and instead always serialize directly from and to the
+  //  static variable in CompactElevationProfile in SerializedGraphObject
   private double distanceBetweenElevationSamples;
 
   private transient RealtimeVehiclePositionService vehiclePositionService;
