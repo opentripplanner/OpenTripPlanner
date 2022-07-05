@@ -3,11 +3,12 @@ package org.opentripplanner.routing.street;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import io.micrometer.core.instrument.Metrics;
-import java.io.IOException;
 import java.time.Instant;
+import java.util.TimeZone;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
+import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
@@ -48,13 +49,12 @@ public class SplitEdgeTurnRestrictionsTest {
   static final GenericLocation steinbeissWeg = new GenericLocation(48.68172, 9.00599);
 
   @Test
-  public void shouldTakeDeufringenTurnRestrictionsIntoAccount() throws IOException {
+  void shouldTakeDeufringenTurnRestrictionsIntoAccount() {
     OtpModel otpModel = ConstantsForTests.buildOsmAndGtfsGraph(
       ConstantsForTests.DEUFRINGEN_OSM,
       ConstantsForTests.VVS_BUS_764_ONLY
     );
     Graph graph = otpModel.graph;
-    TransitModel transitModel = otpModel.transitModel;
     // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving Hardtheimer Weg
     // you must either turn right and take the long way to Steinhaldenweg or go past the intersection with the
     // turn restriction and turn around.
@@ -62,7 +62,6 @@ public class SplitEdgeTurnRestrictionsTest {
     // even when the streets are split.
     var noRightTurnPermitted = computeCarPolyline(
       graph,
-      transitModel,
       hardtheimerWeg,
       steinhaldenWeg
     );
@@ -72,27 +71,27 @@ public class SplitEdgeTurnRestrictionsTest {
     );
 
     // when to drive in reverse direction it's fine to go this way
-    var leftTurnOk = computeCarPolyline(graph, transitModel, steinhaldenWeg, hardtheimerWeg);
+    var leftTurnOk = computeCarPolyline(graph, steinhaldenWeg, hardtheimerWeg);
     assertThatPolylinesAreEqual(leftTurnOk, "kmbhHo_du@BCLEAd@Q`Ak@~CC\\@HBFFWDOd@}Bp@Zf@T");
 
     // make sure that going straight on a straight-only turn direction also works
-    var straightAhead = computeCarPolyline(graph, transitModel, hardtheimerWeg, k1022);
+    var straightAhead = computeCarPolyline(graph, hardtheimerWeg, k1022);
     assertThatPolylinesAreEqual(straightAhead, "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAXn@Hd@");
 
-    var straightAheadBack = computeCarPolyline(graph, transitModel, k1022, hardtheimerWeg);
+    var straightAheadBack = computeCarPolyline(graph, k1022, hardtheimerWeg);
     assertThatPolylinesAreEqual(straightAheadBack, "kobhHwmcu@Ie@Yo@\\yAXyAFWDOd@}Bp@Zf@T");
 
     // make sure that turning left onto the minor road works even when the opposite direction has a straight-only
     // restriction
-    var leftTurnAllowed = computeCarPolyline(graph, transitModel, k1022, steinhaldenWeg);
+    var leftTurnAllowed = computeCarPolyline(graph, k1022, steinhaldenWeg);
     assertThatPolylinesAreEqual(leftTurnAllowed, "kobhHwmcu@Ie@Yo@\\yAXyACGAIB]j@_DPaA@e@MDCB");
 
-    var rightTurnAllowed = computeCarPolyline(graph, transitModel, steinhaldenWeg, k1022);
+    var rightTurnAllowed = computeCarPolyline(graph, steinhaldenWeg, k1022);
     assertThatPolylinesAreEqual(rightTurnAllowed, "kmbhHo_du@BCLEAd@Q`Ak@~CC\\@HBFYxA]xAXn@Hd@");
   }
 
   @Test
-  public void shouldTakeBoeblingenTurnRestrictionsIntoAccount() throws IOException {
+  void shouldTakeBoeblingenTurnRestrictionsIntoAccount() {
     // this tests that the following turn restriction is transferred correctly to the split edges
     // https://www.openstreetmap.org/relation/299171
     OtpModel otpModel = ConstantsForTests.buildOsmAndGtfsGraph(
@@ -100,10 +99,9 @@ public class SplitEdgeTurnRestrictionsTest {
       ConstantsForTests.VVS_BUS_751_ONLY
     );
     var graph = otpModel.graph;
-    var transitModel = otpModel.transitModel;
 
     // turning left from the main road onto a residential one
-    var turnLeft = computeCarPolyline(graph, transitModel, parkStrasse, paulGerhardtWegEast);
+    var turnLeft = computeCarPolyline(graph, parkStrasse, paulGerhardtWegEast);
     assertThatPolylinesAreEqual(
       turnLeft,
       "kochHsl~u@HQL]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFYj@DP^lAJX"
@@ -113,7 +111,6 @@ public class SplitEdgeTurnRestrictionsTest {
     // is a bus station along the way, splitting the edge
     var noLeftTurnPermitted = computeCarPolyline(
       graph,
-      transitModel,
       paulGerhardtWegEast,
       parkStrasse
     );
@@ -121,7 +118,7 @@ public class SplitEdgeTurnRestrictionsTest {
 
     // right hand turn out of the the residential road onto the main road, only right turn allowed plus there
     // is a bus station along the way, splitting the edge
-    var longWay = computeCarPolyline(graph, transitModel, paulGerhardtWegEast, herrenbergerStrasse);
+    var longWay = computeCarPolyline(graph, paulGerhardtWegEast, herrenbergerStrasse);
     assertThatPolylinesAreEqual(
       longWay,
       "sochHof~u@KY_@mAVi@Te@N]L]N_@v@mBDKN]KKM\\{@~BKXWj@KRKPCFa@`@_@XWPSHQDMCEAQMKKSgAa@qCMe@"
@@ -129,7 +126,6 @@ public class SplitEdgeTurnRestrictionsTest {
 
     var longWayBack = computeCarPolyline(
       graph,
-      transitModel,
       herrenbergerStrasse,
       paulGerhardtWegEast
     );
@@ -140,16 +136,15 @@ public class SplitEdgeTurnRestrictionsTest {
 
     // test that you can correctly turn right here https://www.openstreetmap.org/relation/415123 when approaching
     // from south
-    var fromSouth = computeCarPolyline(graph, transitModel, steinbeissWeg, paulGerhardtWegWest);
+    var fromSouth = computeCarPolyline(graph, steinbeissWeg, paulGerhardtWegWest);
     assertThatPolylinesAreEqual(fromSouth, "wcchHk~}u@Fd@Hj@o@\\{@b@KFyBlAWmA");
-    var toSouth = computeCarPolyline(graph, transitModel, paulGerhardtWegWest, steinbeissWeg);
+    var toSouth = computeCarPolyline(graph, paulGerhardtWegWest, steinbeissWeg);
     assertThatPolylinesAreEqual(toSouth, "okchHoy}u@VlAxBmAJGz@c@n@]Ik@Ge@");
 
     // test that you cannot turn left here https://www.openstreetmap.org/relation/415123 when approaching
     // from north
     var fromNorth = computeCarPolyline(
       graph,
-      transitModel,
       paulGerhardtWegWest,
       herrenbergerStrasse
     );
@@ -159,7 +154,7 @@ public class SplitEdgeTurnRestrictionsTest {
     );
 
     // when you approach you cannot turn left so you have to take a long way
-    var toNorth = computeCarPolyline(graph, transitModel, herrenbergerStrasse, paulGerhardtWegWest);
+    var toNorth = computeCarPolyline(graph, herrenbergerStrasse, paulGerhardtWegWest);
     assertThatPolylinesAreEqual(
       toNorth,
       "axchHwq~u@G_@Qc@@UCMAK@Q@WTUh@eA@Cb@gANg@Nu@Lq@Fe@Da@Bo@Bq@BUD[Je@Li@DWFBHJt@bAFFTZLN@@d@j@|@lA`@r@\\r@z@tBLZ]TYX]`@e@z@Yp@GJJJBDDDBBBFvAhCXv@Rp@`@lC@Ff@`D@HRpAJt@Hj@o@\\{@b@KFyBlAWmA"
@@ -168,7 +163,6 @@ public class SplitEdgeTurnRestrictionsTest {
 
   private static String computeCarPolyline(
     Graph graph,
-    TransitModel transitModel,
     GenericLocation from,
     GenericLocation to
   ) {
@@ -183,13 +177,13 @@ public class SplitEdgeTurnRestrictionsTest {
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry)
+      new Router(graph, Mockito.mock(TransitModel.class), RouterConfig.DEFAULT, Metrics.globalRegistry)
     );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      transitModel.getTimeZone(),
-      new AlertToLegMapper(transitModel.getTransitAlertService()),
+      TimeZone.getTimeZone("Europe/Berlin"),
+      Mockito.mock(AlertToLegMapper.class),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

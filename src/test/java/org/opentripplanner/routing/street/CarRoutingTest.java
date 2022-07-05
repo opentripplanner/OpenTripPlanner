@@ -4,11 +4,13 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
+import java.util.TimeZone;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
+import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
@@ -31,14 +33,11 @@ public class CarRoutingTest {
   static final Instant dateTime = Instant.now();
 
   private static Graph herrenbergGraph;
-  private static TransitModel herrenbergTransitModel;
 
   @BeforeAll
   public static void setup() {
     OtpModel otpModel = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
     herrenbergGraph = otpModel.graph;
-    herrenbergTransitModel = otpModel.transitModel;
-    herrenbergTransitModel.index();
     herrenbergGraph.index();
   }
 
@@ -63,14 +62,12 @@ public class CarRoutingTest {
       ConstantsForTests.HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM
     );
     var hindenburgStrUnderConstruction = otpModel.graph;
-    var transitModel = otpModel.transitModel;
 
     var gueltsteinerStr = new GenericLocation(48.59240, 8.87024);
     var aufDemGraben = new GenericLocation(48.59487, 8.87133);
 
     var polyline = computePolyline(
       hindenburgStrUnderConstruction,
-      transitModel,
       gueltsteinerStr,
       aufDemGraben
     );
@@ -88,7 +85,6 @@ public class CarRoutingTest {
 
     var polyline1 = computePolyline(
       herrenbergGraph,
-      herrenbergTransitModel,
       mozartStr,
       fritzLeharStr
     );
@@ -96,7 +92,6 @@ public class CarRoutingTest {
 
     var polyline2 = computePolyline(
       herrenbergGraph,
-      herrenbergTransitModel,
       fritzLeharStr,
       mozartStr
     );
@@ -114,7 +109,6 @@ public class CarRoutingTest {
 
     var polyline1 = computePolyline(
       herrenbergGraph,
-      herrenbergTransitModel,
       schiessmauer,
       zeppelinStr
     );
@@ -125,7 +119,6 @@ public class CarRoutingTest {
 
     var polyline2 = computePolyline(
       herrenbergGraph,
-      herrenbergTransitModel,
       zeppelinStr,
       schiessmauer
     );
@@ -142,7 +135,6 @@ public class CarRoutingTest {
 
     var polyline1 = computePolyline(
       herrenbergGraph,
-      herrenbergTransitModel,
       noThroughTrafficPlace,
       destination
     );
@@ -153,7 +145,6 @@ public class CarRoutingTest {
 
     var polyline2 = computePolyline(
       herrenbergGraph,
-      herrenbergTransitModel,
       destination,
       noThroughTrafficPlace
     );
@@ -165,7 +156,6 @@ public class CarRoutingTest {
 
   private static String computePolyline(
     Graph graph,
-    TransitModel transitModel,
     GenericLocation from,
     GenericLocation to
   ) {
@@ -180,13 +170,13 @@ public class CarRoutingTest {
     final RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry)
+      new Router(graph, Mockito.mock(TransitModel.class), RouterConfig.DEFAULT, Metrics.globalRegistry)
     );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      transitModel.getTimeZone(),
-      new AlertToLegMapper(transitModel.getTransitAlertService()),
+      TimeZone.getTimeZone("Europe/Berlin"),
+      Mockito.mock(AlertToLegMapper.class),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );
