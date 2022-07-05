@@ -13,16 +13,19 @@ import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.FareContainer;
 import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.Pathway;
+import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopArea;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
@@ -54,10 +57,13 @@ import org.slf4j.LoggerFactory;
 
 public class GtfsModule implements GraphBuilderModule {
 
-  public static final List<Class<?>> faresV2Entities = List.of(
+  public static final Set<Class<?>> faresV2Entities = Set.of(
     FareProduct.class,
     FareLegRule.class,
-    FareTransferRule.class
+    FareTransferRule.class,
+    RiderCategory.class,
+    FareContainer.class,
+    StopArea.class
   );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
