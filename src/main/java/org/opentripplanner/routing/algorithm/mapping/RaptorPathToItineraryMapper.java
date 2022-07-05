@@ -218,7 +218,7 @@ public class RaptorPathToItineraryMapper {
         );
     }
 
-    alertToLegMapper.addTransitAlertPatchesToLeg(leg, firstLeg);
+    alertToLegMapper.addTransitAlertsToLeg(leg, firstLeg);
 
     return leg;
   }
