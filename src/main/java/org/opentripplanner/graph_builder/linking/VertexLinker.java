@@ -430,7 +430,14 @@ public class VertexLinker {
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
     } else {
-      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y);
+      v =
+        new SplitterVertex(
+          graph,
+          uniqueSplitLabel,
+          splitPoint.x,
+          splitPoint.y,
+          originalEdge.getName()
+        );
     }
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the

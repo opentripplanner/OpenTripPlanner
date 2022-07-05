@@ -38,7 +38,8 @@ public enum ResourceBundleSingleton {
         key.equals("corner") ||
         key.equals("unnamedStreet") ||
         key.equals("origin") ||
-        key.equals("destination")
+        key.equals("destination") ||
+        key.equals("partOf")
       ) {
         resourceBundle = ResourceBundle.getBundle("internals", locale, noFallbackControl);
       } else {
