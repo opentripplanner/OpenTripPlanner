@@ -194,11 +194,13 @@ public class DefaultFareServiceImpl implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
-      FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
+
+      var routes = new ArrayList<FeedScopedId>();
       for (int i = start; i <= via; ++i) {
-        detail.addRoute(legs.get(i).getRoute().getId());
+        routes.add(legs.get(i).getRoute().getId());
       }
-      details.add(detail);
+      var component = new FareComponent(fareId, getMoney(currency, cost), routes, null, null);
+      details.add(component);
       ++count;
       start = via + 1;
     }

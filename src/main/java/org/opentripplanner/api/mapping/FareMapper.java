@@ -53,11 +53,11 @@ public class FareMapper {
 
   private static ApiFareComponent toApiFareComponent(FareComponent m) {
     return new ApiFareComponent(
-      m.fareId,
-      toApiMoney(m.price),
-      m.routes,
-      Optional.ofNullable(m.container).map(FareContainer::name).orElse(null),
-      Optional.ofNullable(m.category).map(RiderCategory::name).orElse(null)
+      m.fareId(),
+      toApiMoney(m.price()),
+      m.routes(),
+      Optional.ofNullable(m.container()).map(FareContainer::name).orElse(null),
+      Optional.ofNullable(m.category()).map(RiderCategory::name).orElse(null)
     );
   }
 }
