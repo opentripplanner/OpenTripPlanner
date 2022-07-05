@@ -24,6 +24,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alerts.TransitAlertProvider;
 import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
@@ -49,14 +50,14 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   }
 
   @Override
-  public void setup(Graph graph) throws Exception {
-    super.setup(graph);
-    this.transitAlertService = new TransitAlertServiceImpl(graph);
+  public void setup(Graph graph, TransitModel transitModel) throws Exception {
+    super.setup(graph, transitModel);
+    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
-      new DefaultTransitService(graph)
+      new DefaultTransitService(transitModel)
     );
     if (updateHandler == null) {
-      updateHandler = new SiriAlertsUpdateHandler(feedId, graph);
+      updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
     }
     updateHandler.setTransitAlertService(transitAlertService);
     updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
@@ -143,7 +144,9 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
         return;
       }
 
-      super.saveResultOnGraph.execute(graph -> updateHandler.update(siri.getServiceDelivery()));
+      super.saveResultOnGraph.execute((graph, transitModel) ->
+        updateHandler.update(siri.getServiceDelivery())
+      );
     } catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
@@ -157,7 +160,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
         return;
       }
 
-      super.saveResultOnGraph.execute(graph -> {
+      super.saveResultOnGraph.execute((graph, transitModel) -> {
         long t1 = System.currentTimeMillis();
         updateHandler.update(siri.getServiceDelivery());
 

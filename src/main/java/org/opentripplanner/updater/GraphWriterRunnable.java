@@ -1,6 +1,7 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * The graph should only be modified by a runnable implementing this interface, executed by the
@@ -15,5 +16,5 @@ public interface GraphWriterRunnable {
   /**
    * This function is executed to modify the graph.
    */
-  void run(Graph graph);
+  void run(Graph graph, TransitModel transitModel);
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -90,11 +91,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) {
+  public void setup(Graph graph, TransitModel transitModel) {
     // Only create a realtime data snapshot source if none exists already
     // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
     //           - Ideally we should inject the snapshotSource on this class.
-    snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+    snapshotSource =
+      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
 
     // Set properties of realtime data snapshot source.
     // TODO OTP2 - this is overwriting these properties if they were specified by other updaters.
@@ -131,8 +133,8 @@ public class SiriETUpdater extends PollingGraphUpdater {
         final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
-          saveResultOnGraph.execute(graph -> {
-            snapshotSource.applyEstimatedTimetable(graph, feedId, fullDataset, etds);
+          saveResultOnGraph.execute((graph, transitModel) -> {
+            snapshotSource.applyEstimatedTimetable(transitModel, feedId, fullDataset, etds);
             if (markPrimed) primed = true;
           });
         }

@@ -715,7 +715,7 @@ public abstract class RoutingResource {
 
     {
       //FIXME: move into setter method on routing request
-      ZoneId tz = router.graph.getTimeZone();
+      ZoneId tz = router.transitModel.getTimeZone();
       if (date == null && time != null) { // Time was provided but not date
         LOG.debug("parsing ISO datetime {}", time);
         try {

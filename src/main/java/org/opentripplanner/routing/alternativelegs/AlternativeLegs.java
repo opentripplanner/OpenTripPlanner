@@ -117,7 +117,7 @@ public class AlternativeLegs {
     int alightingPosition = tripPatternBetweenStops.positions.alightingPosition;
 
     // TODO: What should we have here
-    ZoneId timeZone = routingService.getTimeZone();
+    ZoneId timeZone = transitService.getTimeZone();
 
     Comparator<TripTimeOnDate> comparator = Comparator.comparing((TripTimeOnDate tts) ->
       tts.getServiceDayMidnight() + tts.getRealtimeDeparture()

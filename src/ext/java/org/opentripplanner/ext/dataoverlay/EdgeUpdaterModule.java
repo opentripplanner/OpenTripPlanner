@@ -6,6 +6,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This class allows updating the graph with the grid data from generic .nc file in accordance with
@@ -35,6 +36,7 @@ public class EdgeUpdaterModule implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {

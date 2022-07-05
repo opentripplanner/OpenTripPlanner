@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
@@ -40,6 +41,7 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
@@ -55,12 +57,13 @@ import org.opentripplanner.util.model.EncodedPolyline;
 public class ScheduledDeviatedTripTest extends FlexTest {
 
   static Graph graph;
+  static TransitModel transitModel;
 
   float delta = 0.01f;
 
   @Test
   public void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = graph.flexTripsById.values();
+    var flexTrips = transitModel.flexTripsById.values();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -126,6 +129,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     var router = new FlexRouter(
       graph,
+      transitModel,
       new FlexParameters(300),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       false,
@@ -158,9 +162,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
    */
   @Test
   public void flexTripInTransitMode() {
-    var feedId = graph.getFeedIds().iterator().next();
+    var feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
 
     // from zone 3 to zone 2
@@ -202,8 +206,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
    */
   @Test
   public void shouldNotInterpolateFlexTimes() {
-    var feedId = graph.getFeedIds().iterator().next();
-    var pattern = graph.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
+    var feedId = transitModel.getFeedIds().iterator().next();
+    var pattern = transitModel.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
 
     assertEquals(3, pattern.numberOfStops());
 
@@ -224,7 +228,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
   @BeforeAll
   static void setup() {
-    graph = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    OtpModel otpModel = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    graph = otpModel.graph;
+    transitModel = otpModel.transitModel;
   }
 
   private static List<Itinerary> getItineraries(
@@ -280,8 +286,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   }
 
   private static FlexTrip getFlexTrip() {
-    var feedId = graph.getFeedIds().iterator().next();
+    var feedId = transitModel.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return graph.flexTripsById.get(tripId);
+    return transitModel.flexTripsById.get(tripId);
   }
 }

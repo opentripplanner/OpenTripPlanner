@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.State;
@@ -27,8 +26,6 @@ import org.opentripplanner.transit.service.TransitService;
 public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
   public final List<PlaceAtDistance> placesFound = new ArrayList<>();
-  private final RoutingService routingService;
-
   private final TransitService transitService;
   private final Set<TransitMode> filterByModes;
   private final Set<FeedScopedId> filterByStops;
@@ -47,7 +44,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final double radiusMeters;
 
   /**
-   * @param routingService             A RoutingService used in finding information about the
+   * @param transitService             A TransitService used in finding information about the
    *                                   various places.
    * @param filterByModes              A list of TransitModes for which to find Stops and
    *                                   PatternAtStops. Use null to disable the filtering.
@@ -63,7 +60,6 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    * @param maxResults                 Maximum number of results to return.
    */
   public PlaceFinderTraverseVisitor(
-    RoutingService routingService,
     TransitService transitService,
     List<TransitMode> filterByModes,
     List<PlaceType> filterByPlaceTypes,
@@ -73,7 +69,6 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     int maxResults,
     double radiusMeters
   ) {
-    this.routingService = routingService;
     this.transitService = transitService;
     this.filterByModes = toSet(filterByModes);
     this.filterByStops = toSet(filterByStops);

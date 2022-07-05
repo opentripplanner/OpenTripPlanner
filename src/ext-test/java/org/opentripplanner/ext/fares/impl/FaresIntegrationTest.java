@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
@@ -22,6 +23,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
 
 public class FaresIntegrationTest {
@@ -30,11 +32,13 @@ public class FaresIntegrationTest {
 
   @Test
   public void testBasic() {
-    var graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
+    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
+    var graph = otpModel.graph;
+    var transitModel = otpModel.transitModel;
 
-    var feedId = graph.getFeedIds().iterator().next();
+    var feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
 
     var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
@@ -47,10 +51,12 @@ public class FaresIntegrationTest {
 
   @Test
   public void testPortland() {
-    Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
-    var portlandId = graph.getFeedIds().iterator().next();
+    OtpModel otpModel = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    Graph graph = otpModel.graph;
+    TransitModel transitModel = otpModel.transitModel;
+    var portlandId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
 
     // from zone 3 to zone 2
@@ -98,18 +104,20 @@ public class FaresIntegrationTest {
 
   @Test
   public void testKCM() {
-    Graph graph = ConstantsForTests.buildGtfsGraph(
+    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(
       ConstantsForTests.KCM_GTFS,
       new SeattleFareServiceFactory()
     );
+    Graph graph = otpModel.graph;
+    TransitModel transitModel = otpModel.transitModel;
 
-    assertEquals("America/Los_Angeles", graph.getTimeZone().getId());
+    assertEquals("America/Los_Angeles", transitModel.getTimeZone().getId());
 
-    assertEquals(1, graph.getFeedIds().size());
+    assertEquals(1, transitModel.getFeedIds().size());
 
-    var feedId = graph.getFeedIds().iterator().next();
+    var feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
 
     var from = GenericLocation.fromStopId("Origin", feedId, "2010");
@@ -136,10 +144,12 @@ public class FaresIntegrationTest {
 
   @Test
   public void testFareComponent() {
-    Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
-    String feedId = graph.getFeedIds().iterator().next();
+    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
+    Graph graph = otpModel.graph;
+    TransitModel transitModel = otpModel.transitModel;
+    String feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
 
     Money tenUSD = new Money(USD, 1000);
@@ -266,7 +276,7 @@ public class FaresIntegrationTest {
     request.to = to;
     request.itineraryFilters.debug = true;
 
-    var routingWorker = new RoutingWorker(router, request, router.graph.getTimeZone().toZoneId());
+    var routingWorker = new RoutingWorker(router, request, router.transitModel.getTimeZone());
     var result = routingWorker.route();
 
     return result

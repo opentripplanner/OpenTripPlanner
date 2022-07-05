@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -31,6 +32,7 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Tests for planning with intermediate places
@@ -50,24 +52,28 @@ public class TestIntermediatePlaces {
 
   private static Graph graph;
 
+  private static TransitModel transitModel;
+
   private static GraphPathToItineraryMapper graphPathToItineraryMapper;
 
   @BeforeAll
   public static void setUp() {
     try {
-      graph = FakeGraph.buildGraphNoTransit();
-      FakeGraph.addPerpendicularRoutes(graph);
-      FakeGraph.link(graph);
+      OtpModel otpModel = FakeGraph.buildGraphNoTransit();
+      graph = otpModel.graph;
+      transitModel = otpModel.transitModel;
+      FakeGraph.addPerpendicularRoutes(graph, transitModel);
+      FakeGraph.link(graph, transitModel);
       graph.index();
-      Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+      Router router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
       router.startup();
       TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
-      timeZone = graph.getTimeZone();
+      timeZone = transitModel.getTimeZone();
 
       graphPathToItineraryMapper =
         new GraphPathToItineraryMapper(
-          graph.getTimeZone(),
-          new AlertToLegMapper(graph.getTransitAlertService()),
+          transitModel.getTimeZone(),
+          new AlertToLegMapper(transitModel.getTransitAlertService()),
           graph.streetNotesService,
           graph.ellipsoidToGeoidDifference
         );

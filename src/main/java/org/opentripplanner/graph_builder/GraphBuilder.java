@@ -35,8 +35,11 @@ import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFacto
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.S3BucketConfig;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
@@ -54,10 +57,21 @@ public class GraphBuilder implements Runnable {
 
   private final Graph graph;
 
+  private final TransitModel transitModel;
+
   private boolean hasTransitData = false;
 
   private GraphBuilder(Graph baseGraph) {
-    this.graph = baseGraph == null ? new Graph() : baseGraph;
+    if (baseGraph == null) {
+      StopModel stopModel = new StopModel();
+      Deduplicator deduplicator = new Deduplicator();
+      this.graph = new Graph(stopModel, deduplicator);
+      this.transitModel = new TransitModel(stopModel, deduplicator);
+    } else {
+      this.graph = baseGraph;
+      // ensure the street model and the transit model share the same deduplicator and stop model
+      this.transitModel = new TransitModel(this.graph.getStopModel(), this.graph.deduplicator);
+    }
   }
 
   /**
@@ -240,6 +254,10 @@ public class GraphBuilder implements Runnable {
     return graph;
   }
 
+  public TransitModel getTransitModel() {
+    return transitModel;
+  }
+
   public void run() {
     // Record how long it takes to build the graph, purely for informational purposes.
     long startTime = System.currentTimeMillis();
@@ -254,7 +272,7 @@ public class GraphBuilder implements Runnable {
     HashMap<Class<?>, Object> extra = new HashMap<>();
 
     for (GraphBuilderModule load : graphBuilderModules) {
-      load.buildGraph(graph, extra, issueStore);
+      load.buildGraph(graph, transitModel, extra, issueStore);
     }
     issueStore.summarize();
     validate();
@@ -276,11 +294,11 @@ public class GraphBuilder implements Runnable {
 
   /**
    * Validates the build. Currently, only checks if the graph has transit data if any transit data
-   * sets were included in the build. If all transit data gets filtered out due to transit period configuration,
-   * for example, then this function will throw a {@link OtpAppException}.
+   * sets were included in the build. If all transit data gets filtered out due to transit period
+   * configuration, for example, then this function will throw a {@link OtpAppException}.
    */
   private void validate() {
-    if (hasTransitData() && !graph.hasTransit) {
+    if (hasTransitData() && !transitModel.hasTransit) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit " +
         "service period. See build config 'transitServiceStart' and " +

@@ -18,10 +18,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 
 public class TimetableSnapshotTest {
@@ -32,12 +33,13 @@ public class TimetableSnapshotTest {
 
   @BeforeAll
   public static void setUp() throws Exception {
-    Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    TransitModel transitModel = otpModel.transitModel;
 
-    feedId = graph.getFeedIds().iterator().next();
+    feedId = transitModel.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : graph.tripPatternForId.values()) {
+    for (TripPattern tripPattern : transitModel.tripPatternForId.values()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));

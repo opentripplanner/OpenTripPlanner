@@ -63,7 +63,7 @@ public class Routers {
   private ApiRouterInfo getRouterInfo() {
     try {
       Router router = otpServer.getRouter();
-      return new ApiRouterInfo("default", router.graph);
+      return new ApiRouterInfo("default", router.graph, router.transitModel);
     } catch (GraphNotFoundException e) {
       return null;
     }

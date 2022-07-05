@@ -20,6 +20,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Verify that OSM ways that represent proposed or as yet unbuilt roads are not used for routing.
@@ -30,17 +33,23 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
  */
 public class UnroutableTest {
 
-  private final Graph graph = new Graph();
+  private Graph graph;
+  private TransitModel transitModel;
 
   @BeforeEach
   public void setUp() throws Exception {
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(stopModel, deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
+
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
     OpenStreetMapProvider provider = new OpenStreetMapProvider(osmDataFile, true);
     OpenStreetMapModule osmBuilder = new OpenStreetMapModule(provider);
     osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     HashMap<Class<?>, Object> extra = Maps.newHashMap();
-    osmBuilder.buildGraph(graph, extra); // TODO get rid of this "extra" thing
+    osmBuilder.buildGraph(graph, transitModel, extra); // TODO get rid of this "extra" thing
   }
 
   /**

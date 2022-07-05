@@ -268,7 +268,7 @@ public class ServiceJourneyType {
               .ofNullable(environment.getArgument("date"))
               .map(LocalDate.class::cast)
               .map(ServiceDate::new)
-              .orElse(new ServiceDate(GqlUtil.getRoutingService(environment).getTimeZone()));
+              .orElse(new ServiceDate(GqlUtil.getTransitService(environment).getTimeZone()));
             return TripTimesShortHelper.getTripTimesShort(
               GqlUtil.getRoutingService(environment),
               GqlUtil.getTransitService(environment),
@@ -320,7 +320,7 @@ public class ServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTransitAlertService()
               .getTripAlerts(trip(environment).getId(), null)
           )

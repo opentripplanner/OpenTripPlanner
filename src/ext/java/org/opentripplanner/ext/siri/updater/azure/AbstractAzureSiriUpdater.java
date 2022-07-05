@@ -12,17 +12,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
@@ -80,8 +74,9 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) throws Exception {
-    snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+  public void setup(Graph graph, TransitModel transitModel) throws Exception {
+    snapshotSource =
+      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
   }
 
   @Override

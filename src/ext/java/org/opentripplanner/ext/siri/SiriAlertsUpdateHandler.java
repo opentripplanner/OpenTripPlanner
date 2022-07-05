@@ -16,11 +16,11 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
@@ -60,16 +60,16 @@ public class SiriAlertsUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
   private final String feedId;
-  private final Graph graph;
+  private final TransitModel transitModel;
   private final Set<TransitAlert> alerts = new HashSet<>();
   private TransitAlertService transitAlertService;
   /** How long before the posted start of an event it should be displayed to users */
   private long earlyStart;
   private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
-  public SiriAlertsUpdateHandler(String feedId, Graph graph) {
+  public SiriAlertsUpdateHandler(String feedId, TransitModel transitModel) {
     this.feedId = feedId;
-    this.graph = graph;
+    this.transitModel = transitModel;
   }
 
   public void update(ServiceDelivery delivery) {
@@ -403,7 +403,7 @@ public class SiriAlertsUpdateHandler {
               if (dataFrameRef != null && dataFrameRef.getValue() != null) {
                 ZonedDateTime startOfService = DateMapper.asStartOfService(
                   LocalDate.parse(dataFrameRef.getValue()),
-                  graph.getTimeZone()
+                  transitModel.getTimeZone()
                 );
 
                 serviceDate =

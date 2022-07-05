@@ -19,6 +19,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.OTPFeature;
@@ -34,7 +35,10 @@ public class Router {
 
   private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
   private final RoutingRequest defaultRoutingRequest;
+
   public final Graph graph;
+  public final TransitModel transitModel;
+
   public final RouterConfig routerConfig;
   public final MeterRegistry meterRegistry;
   public final RaptorConfig<TripSchedule> raptorConfig;
@@ -54,8 +58,14 @@ public class Router {
   /** A graphical window that is used for visualizing search progress (debugging). */
   public GraphVisualizer graphVisualizer = null;
 
-  public Router(Graph graph, RouterConfig routerConfig, MeterRegistry meterRegistry) {
+  public Router(
+    Graph graph,
+    TransitModel transitModel,
+    RouterConfig routerConfig,
+    MeterRegistry meterRegistry
+  ) {
     this.graph = graph;
+    this.transitModel = transitModel;
     this.routerConfig = routerConfig;
     this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
     this.meterRegistry = meterRegistry;
@@ -84,11 +94,13 @@ public class Router {
     /* Create transit layer for Raptor routing. Here we map the scheduled timetables. */
     /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
     LOG.info("Creating transit layer for Raptor routing.");
-    if (graph.hasTransit && graph.index != null) {
-      graph.setTransitLayer(TransitLayerMapper.map(routerConfig.transitTuningParameters(), graph));
-      graph.setRealtimeTransitLayer(new TransitLayer(graph.getTransitLayer()));
-      graph.transitLayerUpdater =
-        new TransitLayerUpdater(graph, graph.index.getServiceCodesRunningForDate());
+    if (transitModel.hasTransit && transitModel.index != null) {
+      transitModel.setTransitLayer(
+        TransitLayerMapper.map(routerConfig.transitTuningParameters(), transitModel)
+      );
+      transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
+      transitModel.transitLayerUpdater =
+        new TransitLayerUpdater(transitModel, transitModel.index.getServiceCodesRunningForDate());
     } else {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
@@ -96,7 +108,11 @@ public class Router {
     }
 
     /* Create Graph updater modules from JSON config. */
-    GraphUpdaterConfigurator.setupGraph(this.graph, routerConfig.updaterConfig());
+    GraphUpdaterConfigurator.setupGraph(
+      this.graph,
+      this.transitModel,
+      routerConfig.updaterConfig()
+    );
 
     /* Compute ellipsoidToGeoidDifference for this Graph */
     try {
@@ -117,7 +133,7 @@ public class Router {
     }
 
     if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
-      TransmodelAPI.setUp(routerConfig.transmodelApi(), graph, defaultRoutingRequest);
+      TransmodelAPI.setUp(routerConfig.transmodelApi(), transitModel, defaultRoutingRequest);
     }
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
@@ -144,7 +160,7 @@ public class Router {
 
   /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */
   public void shutdown() {
-    GraphUpdaterConfigurator.shutdownGraph(this.graph);
+    GraphUpdaterConfigurator.shutdownGraph(this.transitModel);
     raptorConfig.shutdown();
   }
 

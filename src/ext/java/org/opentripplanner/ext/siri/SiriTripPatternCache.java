@@ -11,10 +11,10 @@ import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,18 +41,18 @@ public class SiriTripPatternCache {
 
   /**
    * Get cached trip pattern or create one if it doesn't exist yet. If a trip pattern is created,
-   * vertices and edges for this trip pattern are also created in the graph.
+   * vertices and edges for this trip pattern are also created in the transitModel.
    *
    * @param stopPattern stop pattern to retrieve/create trip pattern
    * @param trip        Trip containing route of new trip pattern in case a new trip pattern will be
    *                    created
-   * @param graph       graph to add vertices and edges in case a new trip pattern will be created
+   * @param transitModel       transitModel to add vertices and edges in case a new trip pattern will be created
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
     @NotNull final StopPattern stopPattern,
     @NotNull final Trip trip,
-    @NotNull final Graph graph,
+    @NotNull final TransitModel transitModel,
     @NotNull ServiceDate serviceDate
   ) {
     // Check cache for trip pattern
@@ -65,18 +65,18 @@ public class SiriTripPatternCache {
       tripPattern = new TripPattern(id, trip.getRoute(), stopPattern);
 
       // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-      tripPattern.setServiceCodes(graph.getServiceCodes());
+      tripPattern.setServiceCodes(transitModel.getServiceCodes());
 
       // Finish scheduled time table
       tripPattern.getScheduledTimetable().finish();
 
       // Create vertices and edges for new TripPattern
       // TODO: purge these vertices and edges once in a while?
-      //            tripPattern.makePatternVerticesAndEdges(graph, graph.index.stopVertexForStop);
+      //            tripPattern.makePatternVerticesAndEdges(transitModel, transitModel.index.stopVertexForStop);
 
-      // TODO - SIRI: Add pattern to graph index?
+      // TODO - SIRI: Add pattern to transitModel index?
 
-      TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+      TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
 
       tripPattern.setCreatedByRealtimeUpdater();
 

@@ -23,16 +23,18 @@ import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.transit.service.StopModel;
 
 public class TemporaryVerticesContainerTest {
 
   private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
   // Given:
   // - a graph with 3 intersections/vertexes
-  private final Graph g = new Graph();
+  private Graph g = new Graph(new StopModel(), new Deduplicator());
   private final StreetVertex a = new IntersectionVertex(g, "A", 1.0, 1.0);
   private final StreetVertex b = new IntersectionVertex(g, "B", 0.0, 1.0);
   private final StreetVertex c = new IntersectionVertex(g, "C", 1.0, 0.0);

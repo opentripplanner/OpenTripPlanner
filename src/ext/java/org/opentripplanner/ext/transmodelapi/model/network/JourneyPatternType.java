@@ -86,7 +86,7 @@ public class JourneyPatternType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
           .dataFetcher(environment -> {
             BitSet services = GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getServicesRunningForDate(
                 Optional
                   .ofNullable((LocalDate) environment.getArgument("date"))
@@ -149,7 +149,7 @@ public class JourneyPatternType {
           .dataFetcher(environment -> {
             TripPattern tripPattern = environment.getSource();
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTransitAlertService()
               .getDirectionAndRouteAlerts(
                 tripPattern.getDirection().gtfsCode,

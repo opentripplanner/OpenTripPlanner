@@ -17,7 +17,10 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class ElevationModuleTest {
 
@@ -33,7 +36,10 @@ public class ElevationModuleTest {
   @Disabled
   public void testSetElevationOnEdgesUsingS3BucketTiles() {
     // create a graph with a StreetWithElevationEdge
-    Graph graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var graph = new Graph(stopModel, deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
     OsmVertex from = new OsmVertex(graph, "from", -122.6932051, 45.5122964, 40513757);
     OsmVertex to = new OsmVertex(graph, "to", -122.6903532, 45.5115309, 1677595882);
     LineString geometry = GeometryUtils.makeLineString(
@@ -97,7 +103,7 @@ public class ElevationModuleTest {
 
     // build to graph to execute the elevation module
     elevationModule.checkInputs();
-    elevationModule.buildGraph(graph, new HashMap<>());
+    elevationModule.buildGraph(graph, transitModel, new HashMap<>());
 
     // verify that elevation data has been set on the StreetWithElevationEdge
     assertNotNull(edge.getElevationProfile());

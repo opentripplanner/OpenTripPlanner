@@ -36,6 +36,11 @@ public class StreetLocation extends StreetVertex {
   }
 
   @Override
+  public I18NString getIntersectionName() {
+    return super.getName();
+  }
+
+  @Override
   public int hashCode() {
     return getCoordinate().hashCode();
   }

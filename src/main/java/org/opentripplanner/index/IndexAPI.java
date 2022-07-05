@@ -159,10 +159,10 @@ public class IndexAPI {
     @PathParam("feedId") String feedId,
     @PathParam("agencyId") String agencyId
   ) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = new FeedScopedId(feedId, agencyId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getAgencyAlerts(id));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getAgencyAlerts(id));
   }
 
   /** Return specific transit stop in the graph, by ID. */
@@ -202,7 +202,7 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return createTransitService()
+      return createRoutingService()
         .getStopsInRadius(new WgsCoordinate(lat, lon), radius)
         .stream()
         .map(it -> StopMapper.mapToApiShort(it.first, it.second.intValue()))
@@ -217,7 +217,7 @@ public class IndexAPI {
         .lessThan("minLat", minLat, "maxLat", maxLat)
         .lessThan("minLon", minLon, "maxLon", maxLon)
         .validate();
-      var stops = createTransitService().getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
+      var stops = createRoutingService().getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
       return StopMapper.mapToApiShort(stops);
     }
   }
@@ -327,10 +327,10 @@ public class IndexAPI {
   @GET
   @Path("/stops/{stopId}/alerts")
   public Collection<ApiAlert> getAlertsForStop(@PathParam("stopId") String stopId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = createId("stopId", stopId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getStopAlerts(id));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getStopAlerts(id));
   }
 
   /** Return a list of all routes in the graph. */
@@ -411,10 +411,10 @@ public class IndexAPI {
   @GET
   @Path("/routes/{routeId}/alerts")
   public Collection<ApiAlert> getAlertsForRoute(@PathParam("routeId") String routeId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = createId("routeId", routeId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getRouteAlerts(id));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getRouteAlerts(id));
   }
 
   // Not implemented, results would be too voluminous.
@@ -473,10 +473,10 @@ public class IndexAPI {
   @GET
   @Path("/trips/{tripId}/alerts")
   public Collection<ApiAlert> getAlertsForTrip(@PathParam("tripId") String tripId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = createId("tripId", tripId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id, null));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getTripAlerts(id, null));
   }
 
   @GET
@@ -528,11 +528,11 @@ public class IndexAPI {
   @GET
   @Path("/patterns/{patternId}/alerts")
   public Collection<ApiAlert> getAlertsForPattern(@PathParam("patternId") String patternId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     TripPattern pattern = getTripPattern(createTransitService(), patternId);
     return alertMapper.mapToApi(
-      routingService
+      transitService
         .getTransitAlertService()
         .getDirectionAndRouteAlerts(pattern.getDirection().gtfsCode, pattern.getRoute().getId())
     );

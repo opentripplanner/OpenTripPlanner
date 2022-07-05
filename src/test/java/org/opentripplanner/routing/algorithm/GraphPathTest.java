@@ -23,7 +23,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
 
 /**
@@ -33,19 +36,24 @@ import org.opentripplanner.util.TestUtils;
 public class GraphPathTest {
 
   private Graph graph;
+  private TransitModel transitModel;
 
   @BeforeEach
   public void setUp() throws Exception {
     GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
-    graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(stopModel, deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
+
     GeometryAndBlockProcessor hl = new GeometryAndBlockProcessor(context);
-    hl.run(graph);
-    graph.putService(CalendarServiceData.class, context.getCalendarServiceData());
+    hl.run(graph, transitModel);
+    transitModel.putService(CalendarServiceData.class, context.getCalendarServiceData());
   }
 
   @Test
   public void testGraphPathOptimize() {
-    String feedId = graph.getFeedIds().iterator().next();
+    String feedId = transitModel.getFeedIds().iterator().next();
 
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_c = graph.getVertex(feedId + ":C");
