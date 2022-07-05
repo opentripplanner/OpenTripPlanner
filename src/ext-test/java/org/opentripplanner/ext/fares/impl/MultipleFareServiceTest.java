@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 
 /**
@@ -21,12 +22,12 @@ public class MultipleFareServiceTest {
   @Test
   public void testAddingMultipleFareService() {
     Fare fare1 = new Fare();
-    fare1.addFare(FareType.regular, Currency.getInstance("EUR"), 100);
+    fare1.addFare(FareType.regular, Money.euros(100));
     FareService fs1 = new SimpleFareService(fare1);
 
     Fare fare2 = new Fare();
-    fare2.addFare(FareType.regular, Currency.getInstance("EUR"), 140);
-    fare2.addFare(FareType.student, Currency.getInstance("EUR"), 120);
+    fare2.addFare(FareType.regular, Money.euros(140));
+    fare2.addFare(FareType.student, Money.euros(120));
     FareService fs2 = new SimpleFareService(fare2);
 
     /*
@@ -34,7 +35,7 @@ public class MultipleFareServiceTest {
      * "regular" fare in case you want to add bike and transit fares.
      */
     Fare fare3 = new Fare();
-    fare3.addFare(FareType.student, Currency.getInstance("EUR"), 80);
+    fare3.addFare(FareType.student, Money.euros(80));
     FareService fs3 = new SimpleFareService(fare3);
 
     AddingMultipleFareService mfs = new AddingMultipleFareService(new ArrayList<>());

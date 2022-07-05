@@ -47,7 +47,7 @@ public class Itinerary {
   private final List<SystemNotice> systemNotices = new ArrayList<>();
   private List<Leg> legs;
 
-  private Fare fare = new Fare();
+  private Fare fare = Fare.empty();
 
   public Itinerary(List<Leg> legs) {
     setLegs(legs);

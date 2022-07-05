@@ -38,7 +38,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     // account for distance-derived fares.
     Fare fare = super.getCost(itinerary);
     if (fare != null) {
-      for (Money money : fare.fare.values()) {
+      for (Money money : fare.getMoneys()) {
         money.setCurrency(euros);
       }
     }

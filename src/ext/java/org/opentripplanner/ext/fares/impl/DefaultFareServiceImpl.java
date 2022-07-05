@@ -114,7 +114,7 @@ public class DefaultFareServiceImpl implements FareService {
       return null;
     }
 
-    Fare fare = new Fare();
+    Fare fare = Fare.empty();
     boolean hasFare = false;
     for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
       FareType fareType = kv.getKey();
@@ -203,8 +203,7 @@ public class DefaultFareServiceImpl implements FareService {
       start = via + 1;
     }
 
-    fare.addFare(fareType, getMoney(currency, r.resultTable[0][legs.size() - 1]));
-    fare.addFareDetails(fareType, details);
+    fare.addFare(fareType, getMoney(currency, r.resultTable[0][legs.size() - 1]), details);
     return count > 0;
   }
 

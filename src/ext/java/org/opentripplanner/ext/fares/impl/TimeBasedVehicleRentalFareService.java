@@ -8,6 +8,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 
 /**
@@ -40,8 +41,8 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
       .mapToInt(this::getLegCost)
       .sum();
 
-    Fare fare = new Fare();
-    fare.addFare(FareType.regular, currency, totalCost);
+    Fare fare = Fare.empty();
+    fare.addFare(FareType.regular, new Money(currency, totalCost));
     return fare;
   }
 

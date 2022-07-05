@@ -1,7 +1,6 @@
 package org.opentripplanner.api.mapping;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,12 +28,12 @@ public class FareMapper {
   }
 
   private static Map<String, List<ApiFareComponent>> combineComponentsAndProducts(Fare fare) {
-    var fromFares = fare.details
-      .entrySet()
+    var fromFares = fare
+      .getTypes()
       .stream()
       .map(e -> {
-        var type = e.getKey().name();
-        var money = Arrays.stream(e.getValue()).map(FareMapper::toApiFareComponent).toList();
+        var type = e.name();
+        var money = fare.getDetails(e).stream().map(FareMapper::toApiFareComponent).toList();
         return new SimpleEntry<>(type, money);
       });
 
@@ -54,12 +53,12 @@ public class FareMapper {
 
   private static Map<String, ApiMoney> combineFaresAndProducts(Fare fare) {
     // fares v1
-    var fares = fare.fare
-      .entrySet()
+    var fares = fare
+      .getTypes()
       .stream()
       .map(e -> {
-        var type = e.getKey().name();
-        var money = toApiMoney(e.getValue());
+        var type = e.name();
+        var money = toApiMoney(fare.getFare(e));
         return new SimpleEntry<>(type, money);
       });
 
