@@ -55,6 +55,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRental
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRentalVehicleTypeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRouteImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRouteTypeImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLRoutingErrorImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopGeometriesImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopOnRouteImpl;
@@ -153,6 +154,7 @@ class LegacyGraphQLIndex {
         .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnTripImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLUnknownImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteTypeImpl.class))
+        .type(IntrospectionTypeWiring.build(LegacyGraphQLRoutingErrorImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLVehiclePositionImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLStopRelationshipImpl.class))

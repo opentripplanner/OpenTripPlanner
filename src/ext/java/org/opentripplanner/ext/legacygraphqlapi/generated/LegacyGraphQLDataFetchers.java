@@ -2,14 +2,23 @@
 package org.opentripplanner.ext.legacygraphqlapi.generated;
 
 import graphql.relay.Connection;
+import graphql.relay.Connection;
+import graphql.relay.Edge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
+import java.util.Map;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripPattern;
@@ -21,17 +30,21 @@ import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.network.Route;
@@ -514,6 +527,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> previousPageCursor();
 
+    public DataFetcher<Iterable<RoutingError>> routingErrors();
+
     public DataFetcher<Long> searchWindowUsed();
 
     public DataFetcher<StopArrival> to();
@@ -679,6 +694,15 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Integer> routeType();
 
     public DataFetcher<Iterable<Route>> routes();
+  }
+
+  /** Description of the reason, why the planner did not return any results */
+  public interface LegacyGraphQLRoutingError {
+    public DataFetcher<LegacyGraphQLRoutingErrorCode> code();
+
+    public DataFetcher<String> description();
+
+    public DataFetcher<LegacyGraphQLInputField> inputField();
   }
 
   /**

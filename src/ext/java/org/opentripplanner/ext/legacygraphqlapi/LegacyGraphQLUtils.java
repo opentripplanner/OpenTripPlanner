@@ -5,7 +5,11 @@ import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFilterPlaceType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -40,6 +44,28 @@ public class LegacyGraphQLUtils {
       case NO_INFORMATION -> LegacyGraphQLWheelchairBoarding.NO_INFORMATION;
       case POSSIBLE -> LegacyGraphQLWheelchairBoarding.POSSIBLE;
       case NOT_POSSIBLE -> LegacyGraphQLWheelchairBoarding.NOT_POSSIBLE;
+    };
+  }
+
+  public static LegacyGraphQLRoutingErrorCode toGraphQL(RoutingErrorCode code) {
+    if (code == null) return null;
+    return switch (code) {
+      case LOCATION_NOT_FOUND -> LegacyGraphQLRoutingErrorCode.locationNotFound;
+      case NO_STOPS_IN_RANGE -> LegacyGraphQLRoutingErrorCode.noStopsInRange;
+      case NO_TRANSIT_CONNECTION -> LegacyGraphQLRoutingErrorCode.noTransitConnection;
+      case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW -> LegacyGraphQLRoutingErrorCode.noTransitConnectionInSearchWindow;
+      case OUTSIDE_BOUNDS -> LegacyGraphQLRoutingErrorCode.outsideBounds;
+      case OUTSIDE_SERVICE_PERIOD -> LegacyGraphQLRoutingErrorCode.outsideServicePeriod;
+      case SYSTEM_ERROR -> LegacyGraphQLRoutingErrorCode.systemError;
+      case WALKING_BETTER_THAN_TRANSIT -> LegacyGraphQLRoutingErrorCode.walkingBetterThanTransit;
+    };
+  }
+
+  public static LegacyGraphQLInputField toGraphQL(InputField inputField) {
+    return switch (inputField) {
+      case DATE_TIME -> LegacyGraphQLInputField.dateTime;
+      case FROM_PLACE -> LegacyGraphQLInputField.from;
+      case TO_PLACE, INTERMEDIATE_PLACE -> LegacyGraphQLInputField.to;
     };
   }
 

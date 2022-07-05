@@ -1120,6 +1120,50 @@ input InputUnpreferred {
     useUnpreferredRoutesPenalty: Int
 }
 
+enum RoutingErrorCode {
+    """No transit connection was found between the origin and destination withing the operating day or the next day"""
+    noTransitConnection
+
+    """Transit connection was found, but it was outside the search window, see metadata for the next search window"""
+    noTransitConnectionInSearchWindow
+
+    """The date specified is outside the range of data currently loaded into the system"""
+    outsideServicePeriod
+
+    """The coordinates are outside the bounds of the data currently loaded into the system"""
+    outsideBounds
+
+    """The specified location is not close to any streets or transit stops"""
+    locationNotFound
+
+    """No stops are reachable from the location specified. You can try searching using a different access or egress mode"""
+    noStopsInRange
+
+    """The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"""
+    walkingBetterThanTransit
+
+    """An unknown error happened during the search. The details have been logged to the server logs"""
+    systemError
+}
+
+enum InputField {
+    dateTime
+    from
+    to
+}
+
+"""Description of the reason, why the planner did not return any results"""
+type RoutingError {
+    """An enum describing the reason"""
+    code: RoutingErrorCode!
+
+    """An enum describing the field which should be changed, in order for the search to succeed"""
+    inputField: InputField
+
+    """A textual description of why the search failed. The clients are expected to have their own translations based on the code, for user visible error messages."""
+    description: String!
+}
+
 type Itinerary {
     """
     Time when the user leaves from the origin. Format: Unix timestamp in milliseconds.
@@ -1723,6 +1767,9 @@ type Plan {
 
     """A list of possible error messages in cleartext"""
     messageStrings: [String]!
+
+    """A list of routing errors, and fields which caused them"""
+    routingErrors: [RoutingError!]!
 
     """
     Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response

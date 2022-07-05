@@ -346,6 +346,12 @@ public class LegacyGraphQLTypes {
     }
   }
 
+  public enum LegacyGraphQLInputField {
+    dateTime,
+    from,
+    to,
+  }
+
   public static class LegacyGraphQLInputFiltersInput {
 
     private Iterable<String> bikeParks;
@@ -2505,6 +2511,17 @@ public class LegacyGraphQLTypes {
     STOPS_ON_ROUTE,
     STOPS_ON_TRIPS,
     TRIPS,
+  }
+
+  public enum LegacyGraphQLRoutingErrorCode {
+    locationNotFound,
+    noStopsInRange,
+    noTransitConnection,
+    noTransitConnectionInSearchWindow,
+    outsideBounds,
+    outsideServicePeriod,
+    systemError,
+    walkingBetterThanTransit,
   }
 
   public static class LegacyGraphQLStopAlertsArgs {
