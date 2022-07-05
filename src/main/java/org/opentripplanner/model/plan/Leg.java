@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
@@ -19,6 +21,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -396,5 +399,24 @@ public interface Leg {
 
   default Leg withTimeShift(Duration duration) {
     throw new UnsupportedOperationException();
+  }
+
+  default Set<FareZone> getFareZones() {
+    var intermediate = getIntermediateStops()
+      .stream()
+      .flatMap(stopArrival -> stopArrival.place.stop.getFareZones().stream());
+
+    var start = getFareZones(this.getFrom());
+    var end = getFareZones(this.getTo());
+
+    return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
+  }
+
+  private static Stream<FareZone> getFareZones(Place place) {
+    if (place.stop == null) {
+      return Stream.empty();
+    } else {
+      return place.stop.getFareZones().stream();
+    }
   }
 }

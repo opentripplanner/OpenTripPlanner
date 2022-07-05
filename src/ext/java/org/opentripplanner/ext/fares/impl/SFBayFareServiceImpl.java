@@ -7,7 +7,7 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.model.plan.FareLeg;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -40,10 +40,10 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
   @Override
   protected float getLowestCost(
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
-    List<FareLeg> bartBlock = null;
+    List<Leg> bartBlock = null;
     Long sfmtaTransferIssued = null;
     Long alightedBart = null;
     String alightedBartStop = null;
@@ -108,7 +108,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     Fare fare,
     Currency currency,
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     float lowestCost = getLowestCost(fareType, rides, fareRules);

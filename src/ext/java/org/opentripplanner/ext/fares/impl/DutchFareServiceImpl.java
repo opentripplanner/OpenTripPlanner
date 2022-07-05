@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.plan.FareLeg;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -86,7 +86,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
   @Override
   protected float getLowestCost(
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     float cost = 0f;
@@ -223,7 +223,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     Fare fare,
     Currency currency,
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     float lowestCost = getLowestCost(fareType, rides, fareRules);

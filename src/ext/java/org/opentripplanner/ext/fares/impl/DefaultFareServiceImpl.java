@@ -11,9 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.plan.FareLeg;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
@@ -94,8 +97,8 @@ public class DefaultFareServiceImpl implements FareService {
     var fareLegs = itinerary
       .getLegs()
       .stream()
-      .filter(FareLeg.class::isInstance)
-      .map(FareLeg.class::cast)
+      .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
+      .map(Leg.class::cast)
       .toList();
     // If there are no rides, there's no fare.
     if (fareLegs.isEmpty()) {
@@ -127,13 +130,13 @@ public class DefaultFareServiceImpl implements FareService {
     return new Money(new WrappedCurrency(currency), cents);
   }
 
-  protected float addFares(List<FareLeg> ride0, List<FareLeg> ride1, float cost0, float cost1) {
+  protected float addFares(List<Leg> ride0, List<Leg> ride1, float cost0, float cost1) {
     return cost0 + cost1;
   }
 
   protected float getLowestCost(
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     FareSearch r = performSearch(fareType, rides, fareRules);
@@ -160,7 +163,7 @@ public class DefaultFareServiceImpl implements FareService {
     Fare fare,
     Currency currency,
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     FareSearch r = performSearch(fareType, rides, fareRules);
@@ -198,7 +201,7 @@ public class DefaultFareServiceImpl implements FareService {
 
   protected float calculateCost(
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     return getBestFareAndId(fareType, rides, fareRules).fare;
@@ -206,7 +209,7 @@ public class DefaultFareServiceImpl implements FareService {
 
   private FareSearch performSearch(
     FareType fareType,
-    List<FareLeg> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     FareSearch r = new FareSearch(rides.size());
@@ -250,7 +253,7 @@ public class DefaultFareServiceImpl implements FareService {
 
   private FareAndId getBestFareAndId(
     FareType fareType,
-    List<FareLeg> legs,
+    List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
     Set<String> zones = new HashSet<>();
