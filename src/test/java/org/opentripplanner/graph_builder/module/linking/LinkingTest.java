@@ -29,6 +29,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class LinkingTest {
 
@@ -75,13 +76,15 @@ public class LinkingTest {
         null,
         "split",
         x + delta * splitVal,
-        y + delta * splitVal
+        y + delta * splitVal,
+        new NonLocalizedString("split")
       );
       SplitterVertex sv1 = new SplitterVertex(
         null,
         "split",
         x + delta * splitVal,
-        y + delta * splitVal
+        y + delta * splitVal,
+        new NonLocalizedString("split")
       );
 
       var graph = new Graph();
