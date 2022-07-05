@@ -51,7 +51,7 @@ public class LegacyGraphQLItineraryImpl
         .stream()
         .map(fareKey -> {
           Map<String, Object> result = new HashMap<>();
-          result.put("name", fareKey.name());
+          result.put("name", fareKey);
           result.put("fare", fare.getFare(fareKey));
           result.put("details", fare.getDetails(fareKey));
           return result;

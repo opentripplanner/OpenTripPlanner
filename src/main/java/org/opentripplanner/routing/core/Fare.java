@@ -2,9 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Currency;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,9 +18,7 @@ import org.opentripplanner.model.FareProduct;
  */
 public class Fare {
 
-  protected final Map<FareType, Container> details;
-
-  protected Set<FareProduct> products = new HashSet<>();
+  protected final Map<String, Container> details;
 
   public Fare(Fare aFare) {
     if (aFare != null) {
@@ -45,18 +41,26 @@ public class Fare {
   }
 
   public void addFare(FareType fareType, Money money, List<FareComponent> components) {
-    details.put(fareType, new Container(money, components));
+    details.put(fareType.name(), new Container(money, components));
   }
 
   public void addProduct(FareProduct fareProduct) {
-    products.add(fareProduct);
+    details.put(fareProduct.id().toString(), new Container(fareProduct.amount(), List.of()));
   }
 
   public Money getFare(FareType type) {
+    return getFare(type.name());
+  }
+
+  public Money getFare(String type) {
     return Optional.ofNullable(details.get(type)).map(Container::amount).orElse(null);
   }
 
   public List<FareComponent> getDetails(FareType type) {
+    return getDetails(type.name());
+  }
+
+  public List<FareComponent> getDetails(String type) {
     return Optional.ofNullable(details.get(type)).map(Container::components).orElse(null);
   }
 
@@ -73,15 +77,11 @@ public class Fare {
     return Objects.equals(details, fare1.details);
   }
 
-  public Set<FareProduct> getProducts() {
-    return Set.copyOf(products);
-  }
-
   public void addProducts(Collection<FareProduct> products) {
     products.forEach(this::addProduct);
   }
 
-  public Set<FareType> getTypes() {
+  public Set<String> getTypes() {
     return details.keySet();
   }
 
