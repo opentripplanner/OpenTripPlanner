@@ -77,6 +77,11 @@ public class FlexIntegrationTest {
     assertEquals(BUS, flex.getMode());
     assertEquals("Zone 2", flex.getRoute().getShortName());
     assertTrue(flex.isFlexibleTrip());
+    assertEquals(
+      "corner of Story Place Southwest and service road (part of Flex Zone 2)",
+      flex.getFrom().name.toString()
+    );
+    assertEquals("Destination (part of Flex Zone 2)", flex.getTo().name.toString());
   }
 
   @Test
@@ -129,6 +134,9 @@ public class FlexIntegrationTest {
     assertEquals(BUS, flex.getMode());
     assertEquals("Zone 2", flex.getRoute().getShortName());
     assertTrue(flex.isFlexibleTrip());
+
+    assertEquals("Transfer Point for Route 30", flex.getFrom().name.toString());
+    assertEquals("Destination (part of Flex Zone 2)", flex.getTo().name.toString());
 
     assertEquals("2021-12-02T13:00-05:00[America/New_York]", flex.getStartTime().toString());
   }

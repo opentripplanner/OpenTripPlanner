@@ -31,6 +31,7 @@ import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class LinkingTest {
 
@@ -77,13 +78,15 @@ public class LinkingTest {
         null,
         "split",
         x + delta * splitVal,
-        y + delta * splitVal
+        y + delta * splitVal,
+        new NonLocalizedString("split")
       );
       SplitterVertex sv1 = new SplitterVertex(
         null,
         "split",
         x + delta * splitVal,
-        y + delta * splitVal
+        y + delta * splitVal,
+        new NonLocalizedString("split")
       );
 
       P2<StreetEdge> sp0 = s0.splitDestructively(sv0);

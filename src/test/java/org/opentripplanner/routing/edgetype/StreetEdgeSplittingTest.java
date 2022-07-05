@@ -18,6 +18,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 class StreetEdgeSplittingTest extends GraphRoutingTest {
 
@@ -32,7 +33,13 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionFromEdgeSplit() {
-    var splitVtx = new SplitterVertex(graph, "Split_Vertex", 1.0, 0.0);
+    var splitVtx = new SplitterVertex(
+      graph,
+      "Split_Vertex",
+      1.0,
+      0.0,
+      new NonLocalizedString("a name")
+    );
 
     var splitResult = streetEdge1.splitDestructively(splitVtx);
     assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
@@ -51,7 +58,13 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionToEdgeSplit() {
-    var splitVtx = new SplitterVertex(graph, "Split_Vertex", 1.0, 1.0);
+    var splitVtx = new SplitterVertex(
+      graph,
+      "Split_Vertex",
+      1.0,
+      1.0,
+      new NonLocalizedString("a name")
+    );
 
     var splitResult = streetEdge2.splitDestructively(splitVtx);
     assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
