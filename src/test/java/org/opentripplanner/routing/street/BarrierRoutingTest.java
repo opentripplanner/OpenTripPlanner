@@ -170,7 +170,12 @@ public class BarrierRoutingTest {
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new Router(graph, Mockito.mock(TransitModel.class), RouterConfig.DEFAULT, Metrics.globalRegistry)
+      new Router(
+        graph,
+        Mockito.mock(TransitModel.class),
+        RouterConfig.DEFAULT,
+        Metrics.globalRegistry
+      )
     );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
