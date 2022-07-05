@@ -17,8 +17,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class TransitLayerUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerUpdater.class);
 
-  private final Graph graph;
+  private final TransitModel transitModel;
 
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
 
@@ -52,8 +52,11 @@ public class TransitLayerUpdater {
 
   private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache = new HashMap<>();
 
-  public TransitLayerUpdater(Graph graph, Map<ServiceDate, TIntSet> serviceCodesRunningForDate) {
-    this.graph = graph;
+  public TransitLayerUpdater(
+    TransitModel transitModel,
+    Map<ServiceDate, TIntSet> serviceCodesRunningForDate
+  ) {
+    this.transitModel = transitModel;
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
   }
 
@@ -61,7 +64,7 @@ public class TransitLayerUpdater {
     Set<Timetable> updatedTimetables,
     Map<TripPattern, SortedSet<Timetable>> timetables
   ) {
-    if (!graph.hasRealtimeTransitLayer()) {
+    if (!transitModel.hasRealtimeTransitLayer()) {
       return;
     }
 
@@ -69,7 +72,7 @@ public class TransitLayerUpdater {
 
     // Make a shallow copy of the realtime transit layer. Only the objects that are copied will be
     // changed during this update process.
-    TransitLayer realtimeTransitLayer = new TransitLayer(graph.getRealtimeTransitLayer());
+    TransitLayer realtimeTransitLayer = new TransitLayer(transitModel.getRealtimeTransitLayer());
 
     // Map TripPatterns for this update to Raptor TripPatterns
     final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = realtimeTransitLayer
@@ -229,7 +232,7 @@ public class TransitLayerUpdater {
 
     // Switch out the reference with the updated realtimeTransitLayer. This is synchronized to
     // guarantee that the reference is set after all the fields have been updated.
-    graph.setRealtimeTransitLayer(realtimeTransitLayer);
+    transitModel.setRealtimeTransitLayer(realtimeTransitLayer);
 
     LOG.debug(
       "UPDATING {} tripPatterns took {} ms",

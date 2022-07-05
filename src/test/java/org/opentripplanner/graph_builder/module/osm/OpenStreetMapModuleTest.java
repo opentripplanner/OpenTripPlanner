@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.model.P2;
@@ -33,9 +32,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -50,7 +52,10 @@ public class OpenStreetMapModuleTest {
 
   @Test
   public void testGraphBuilder() {
-    Graph gg = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var gg = new Graph(stopModel, deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
@@ -58,10 +63,10 @@ public class OpenStreetMapModuleTest {
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
 
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    loader.buildGraph(gg, extra);
+    osmModule.buildGraph(gg, transitModel, extra);
 
     // Kamiennogorska at south end of segment
     Vertex v1 = gg.getVertex("osm:node:280592578");
@@ -110,7 +115,10 @@ public class OpenStreetMapModuleTest {
    */
   @Test
   public void testBuildGraphDetailed() throws Exception {
-    Graph gg = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var gg = new Graph(stopModel, deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(
@@ -119,10 +127,10 @@ public class OpenStreetMapModuleTest {
       )
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    loader.buildGraph(gg, extra);
+    osmModule.buildGraph(gg, transitModel, extra);
 
     // These vertices are labeled in the OSM file as having traffic lights.
     IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm:node:1919595918");
@@ -287,7 +295,10 @@ public class OpenStreetMapModuleTest {
    * @param skipVisibility if true visibility calculations are skipped
    */
   private void testBuildingAreas(boolean skipVisibility) {
-    Graph graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var graph = new Graph(stopModel, deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(
@@ -301,10 +312,9 @@ public class OpenStreetMapModuleTest {
     loader.skipVisibility = skipVisibility;
     loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    loader.buildGraph(graph, extra);
-    graph.getStreetIndex();
+    loader.buildGraph(graph, transitModel, extra);
 
-    Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    Router router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
 
     RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));

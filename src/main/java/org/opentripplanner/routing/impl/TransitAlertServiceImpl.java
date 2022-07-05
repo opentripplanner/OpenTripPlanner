@@ -8,9 +8,9 @@ import java.util.Set;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions
@@ -19,12 +19,12 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class TransitAlertServiceImpl implements TransitAlertService {
 
-  private final Graph graph;
+  private final TransitModel transitModel;
 
   private Multimap<EntitySelector, TransitAlert> alerts = HashMultimap.create();
 
-  public TransitAlertServiceImpl(Graph graph) {
-    this.graph = graph;
+  public TransitAlertServiceImpl(TransitModel transitModel) {
+    this.transitModel = transitModel;
   }
 
   @Override
@@ -59,8 +59,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     Set<TransitAlert> result = new HashSet<>(alerts.get(new EntitySelector.Stop(stopId)));
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
-      if (graph != null && graph.index != null) {
-        var quay = graph.index.getStopForId(stopId);
+      if (transitModel != null && transitModel.index != null) {
+        var quay = transitModel.getStopModel().getStopModelIndex().getStopForId(stopId);
         if (quay != null) {
           // TODO - SIRI: Add alerts from parent- and multimodal-stops
           /*

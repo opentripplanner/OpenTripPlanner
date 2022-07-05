@@ -22,6 +22,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitModel;
 
 public abstract class FlexAccessEgressTemplate {
 
@@ -81,16 +82,22 @@ public abstract class FlexAccessEgressTemplate {
    * This method is very much the hot code path in the flex access/egress search so any optimization
    * here will lead to noticeable speedups.
    */
-  public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
+  public Stream<FlexAccessEgress> createFlexAccessEgressStream(
+    Graph graph,
+    TransitModel transitModel
+  ) {
     if (transferStop instanceof Stop) {
-      TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
+      TransitStopVertex flexVertex = transitModel
+        .getStopModel()
+        .getStopVertexForStop()
+        .get(transferStop);
       return Stream
         .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
         .filter(Objects::nonNull);
     }
     // transferStop is Location Area/Line
     else {
-      return getTransfersFromTransferStop(graph)
+      return getTransfersFromTransferStop(transitModel)
         .stream()
         .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= flexParams.maxTransferMeters)
         .filter(transfer -> getFinalStop(transfer) != null)
@@ -133,7 +140,9 @@ public abstract class FlexAccessEgressTemplate {
    * Get the transfers to/from stops in the scheduled transit network from the beginning/end of the
    * flex ride for the access/egress.
    */
-  protected abstract Collection<PathTransfer> getTransfersFromTransferStop(Graph graph);
+  protected abstract Collection<PathTransfer> getTransfersFromTransferStop(
+    TransitModel transitModel
+  );
 
   /**
    * Get the {@Link Vertex} where the flex ride ends/begins for the access/egress.

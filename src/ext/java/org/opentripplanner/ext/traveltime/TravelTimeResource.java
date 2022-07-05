@@ -99,7 +99,7 @@ public class TravelTimeResource {
     @QueryParam("modes") String modes
   ) {
     router = otpServer.getRouter();
-    transitLayer = router.graph.getRealtimeTransitLayer();
+    transitLayer = router.transitModel.getRealtimeTransitLayer();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
     routingRequest = router.copyDefaultRoutingRequest();
     routingRequest.from = LocationStringParser.fromOldStyleString(location);
@@ -128,12 +128,12 @@ public class TravelTimeResource {
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
-        router.graph.getTransferService(),
+        router.transitModel.getTransferService(),
         transitLayer,
         startOfTime,
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
-        new RoutingRequestTransitDataProviderFilter(routingRequest, router.graph.index),
+        new RoutingRequestTransitDataProviderFilter(routingRequest, router.transitModel.index),
         new RoutingContext(transferRoutingRequest, router.graph, (Vertex) null, null)
       );
   }
@@ -244,6 +244,7 @@ public class TravelTimeResource {
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
       new RoutingContext(accessRequest, router.graph, temporaryVertices),
+      router.transitModel,
       routingRequest.modes.accessMode,
       false
     );
@@ -268,7 +269,7 @@ public class TravelTimeResource {
         final int arrivalTime = arrivals.bestTransitArrivalTime(i);
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {
-          Vertex v = router.graph.index.getStopVertexForStop().get(stop);
+          Vertex v = router.transitModel.getStopModel().getStopVertexForStop().get(stop);
           if (v != null) {
             Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
             State s = new State(v, time, routingContext, stateData.clone());

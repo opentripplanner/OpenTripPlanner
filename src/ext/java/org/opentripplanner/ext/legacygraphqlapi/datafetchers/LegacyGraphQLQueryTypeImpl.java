@@ -95,7 +95,7 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      Collection<TransitAlert> alerts = getRoutingService(environment)
+      Collection<TransitAlert> alerts = getTransitService(environment)
         .getTransitAlertService()
         .getAllAlerts();
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(
@@ -351,10 +351,9 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      RoutingService routingService = getRoutingService(environment);
       TransitService transitService = getTransitService(environment);
 
-      return new GtfsRealtimeFuzzyTripMatcher(routingService, transitService)
+      return new GtfsRealtimeFuzzyTripMatcher(transitService)
         .getTrip(
           transitService.getRouteForId(FeedScopedId.parseId(args.getLegacyGraphQLRoute())),
           args.getLegacyGraphQLDirection(),
@@ -598,7 +597,7 @@ public class LegacyGraphQLQueryTypeImpl
       request.setDateTime(
         environment.getArgument("date"),
         environment.getArgument("time"),
-        context.getRouter().graph.getTimeZone()
+        context.getRouter().transitModel.getTimeZone()
       );
 
       callWith.argument("wheelchair", request::setWheelchairAccessible);
@@ -1013,7 +1012,7 @@ public class LegacyGraphQLQueryTypeImpl
         new Coordinate(args.getLegacyGraphQLMaxLon(), args.getLegacyGraphQLMaxLat())
       );
 
-      Stream<Stop> stopStream = getRoutingService(environment)
+      Stream<Stop> stopStream = getTransitService(environment)
         .getStopSpatialIndex()
         .query(envelope)
         .stream()

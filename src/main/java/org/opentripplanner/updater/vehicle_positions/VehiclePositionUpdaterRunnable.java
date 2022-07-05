@@ -4,6 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
 
 public record VehiclePositionUpdaterRunnable(
@@ -17,7 +18,7 @@ public record VehiclePositionUpdaterRunnable(
   }
 
   @Override
-  public void run(Graph graph) {
+  public void run(Graph graph, TransitModel transitModel) {
     // Apply new vehicle positions
     matcher.applyVehiclePositionUpdates(updates);
   }

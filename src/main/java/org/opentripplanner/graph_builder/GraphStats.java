@@ -26,6 +26,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,8 @@ public class GraphStats {
   private String outPath;
 
   private Graph graph;
+
+  private TransitModel transitModel;
 
   private CsvWriter writer;
 
@@ -92,7 +95,9 @@ public class GraphStats {
   private void run() {
     /* open input graph (same for all commands) */
     File graphFile = new File(graphPath);
-    graph = SerializedGraphObject.load(graphFile);
+    SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(graphFile);
+    graph = serializedGraphObject.graph;
+    transitModel = serializedGraphObject.transitModel;
 
     /* open output stream (same for all commands) */
     if (outPath != null) {
@@ -215,7 +220,7 @@ public class GraphStats {
             "empiricalDistTrips",
           }
         );
-        Collection<TripPattern> patterns = graph.tripPatternForId.values();
+        Collection<TripPattern> patterns = transitModel.tripPatternForId.values();
         Multiset<Integer> counts = TreeMultiset.create();
         int nPatterns = patterns.size();
         LOG.info("total number of patterns is: {}", nPatterns);

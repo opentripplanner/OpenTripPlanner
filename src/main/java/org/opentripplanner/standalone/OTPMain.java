@@ -13,6 +13,7 @@ import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.OTPAppConstruction;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.ThrowableUtils;
 import org.opentripplanner.visualizer.GraphVisualizer;
@@ -106,6 +107,7 @@ public class OTPMain {
     );
 
     Graph graph = null;
+    TransitModel transitModel = null;
     OTPAppConstruction app = new OTPAppConstruction(params);
 
     // Validate data sources, command line arguments and config before loading and
@@ -117,9 +119,15 @@ public class OTPMain {
       DataSource inputGraph = params.doLoadGraph()
         ? app.store().getGraph()
         : app.store().getStreetGraph();
-      SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
-      graph = obj.graph;
-      app.config().updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+      SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(inputGraph);
+      graph = serializedGraphObject.graph;
+      transitModel = serializedGraphObject.transitModel;
+      app
+        .config()
+        .updateConfigFromSerializedGraph(
+          serializedGraphObject.buildConfig,
+          serializedGraphObject.routerConfig
+        );
     }
 
     /* Start graph builder if requested. */
@@ -134,12 +142,18 @@ public class OTPMain {
         graphBuilder.run();
         // Hand off the graph to the server as the default graph
         graph = graphBuilder.getGraph();
+        transitModel = graphBuilder.getTransitModel();
       } else {
         throw new IllegalStateException("An error occurred while building the graph.");
       }
       // Store graph and config used to build it, also store router-config for easy deployment
       // with using the embedded router config.
-      new SerializedGraphObject(graph, app.config().buildConfig(), app.config().routerConfig())
+      new SerializedGraphObject(
+        graph,
+        transitModel,
+        app.config().buildConfig(),
+        app.config().routerConfig()
+      )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
       LOG.info("Memory optimized {}", graph.deduplicator.toString());
@@ -156,12 +170,18 @@ public class OTPMain {
     }
 
     // Index graph for travel search
+    transitModel.index();
     graph.index();
 
     // publishing the config version info make it available to the APIs
     app.setOtpConfigVersionsOnServerInfo();
 
-    Router router = new Router(graph, app.config().routerConfig(), Metrics.globalRegistry);
+    Router router = new Router(
+      graph,
+      transitModel,
+      app.config().routerConfig(),
+      Metrics.globalRegistry
+    );
     router.startup();
 
     /* Start visualizer if requested. */

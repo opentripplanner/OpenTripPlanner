@@ -335,7 +335,7 @@ public class QuayType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(env -> {
             return GqlUtil
-              .getRoutingService(env)
+              .getTransitService(env)
               .getTransitAlertService()
               .getStopAlerts(((StopLocation) env.getSource()).getId());
           })
