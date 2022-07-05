@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.OtpModel;
+import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.model.FlexStopLocation;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -95,9 +97,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip
-      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, params)
-      .collect(Collectors.toList());
+    var accesses = trip.getFlexAccessTemplates(nearbyStop, flexDate, calculator, params).toList();
 
     assertEquals(3, accesses.size());
 
@@ -110,9 +110,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   public void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip
-      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, params)
-      .collect(Collectors.toList());
+    var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
 
     assertEquals(3, egresses.size());
 
@@ -141,7 +139,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       List.of(to)
     );
 
-    var itineraries = router.createFlexOnlyItineraries();
+    var filter = new FaresFilter(graph.getService(FareService.class));
+
+    var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
 
     var itinerary = itineraries.iterator().next();
     assertFalse(itinerary.getFare().fare.isEmpty());

@@ -1,10 +1,11 @@
-package org.opentripplanner.routing.fares.impl;
+package org.opentripplanner.ext.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -52,14 +53,14 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
   public void configure(JsonNode config) {
     subFactories = new ArrayList<>();
     for (JsonNode pConfig : config.path("fares")) {
-      subFactories.add(DefaultFareServiceFactory.fromConfig(pConfig));
+      subFactories.add(FaresConfiguration.fromConfig(pConfig));
     }
     for (Iterator<Map.Entry<String, JsonNode>> i = config.fields(); i.hasNext();) {
       Map.Entry<String, JsonNode> kv = i.next();
       String key = kv.getKey();
       if (key.startsWith("fare") && !key.equals("fares")) {
         JsonNode node = kv.getValue();
-        FareServiceFactory fareFactory = DefaultFareServiceFactory.fromConfig(node);
+        FareServiceFactory fareFactory = FaresConfiguration.fromConfig(node);
         if (fareFactory != null) subFactories.add(fareFactory);
       }
     }

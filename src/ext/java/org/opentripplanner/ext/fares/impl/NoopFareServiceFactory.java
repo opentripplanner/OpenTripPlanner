@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.fares.impl;
+package org.opentripplanner.ext.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.OtpTransitService;
@@ -11,7 +11,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
  * Create a FareServiceFactory which create a noop fare service. That is a fare service that does
  * nothing.
  */
-class NoopFareServiceFactory implements FareServiceFactory {
+public class NoopFareServiceFactory implements FareServiceFactory {
 
   @Override
   public FareService makeFareService() {

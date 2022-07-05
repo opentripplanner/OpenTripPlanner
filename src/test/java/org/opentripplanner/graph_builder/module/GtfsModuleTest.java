@@ -25,7 +25,7 @@ class GtfsModuleTest {
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     var bundle = new GtfsBundle(new File(ConstantsForTests.FAKE_GTFS));
-    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded(), null, false);
+    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded());
 
     module.buildGraph(graph, transitModel, new HashMap<>());
 

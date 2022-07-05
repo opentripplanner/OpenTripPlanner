@@ -25,6 +25,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -38,6 +39,7 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -76,7 +78,7 @@ public class GtfsModule implements GraphBuilderModule {
   }
 
   public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
-    this(bundles, transitPeriodLimit, null, false);
+    this(bundles, transitPeriodLimit, new DefaultFareServiceFactory(), false);
   }
 
   public List<String> provides() {
@@ -223,7 +225,6 @@ public class GtfsModule implements GraphBuilderModule {
   ) {
     return new GeometryAndBlockProcessor(
       transitService,
-      fareServiceFactory,
       gtfsBundle.getMaxStopToShapeSnapDistance(),
       gtfsBundle.maxInterlineDistance
     );

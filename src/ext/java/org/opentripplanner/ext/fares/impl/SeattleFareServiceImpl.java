@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.fares.impl;
+package org.opentripplanner.ext.fares.impl;
 
 import com.google.common.collect.Iterables;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.fares.impl;
+package org.opentripplanner.ext.fares.impl;
 
 import static graphql.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;

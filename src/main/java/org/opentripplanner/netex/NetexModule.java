@@ -13,8 +13,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -40,8 +38,6 @@ public class NetexModule implements GraphBuilderModule {
   private final ServiceDateInterval transitPeriodLimit;
 
   private final List<NetexBundle> netexBundles;
-
-  private final FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
 
   public NetexModule(
     String netexFeedId,
@@ -114,7 +110,6 @@ public class NetexModule implements GraphBuilderModule {
 
         new GeometryAndBlockProcessor(
           otpService,
-          fareServiceFactory,
           maxStopToShapeSnapDistance,
           maxInterlineDistance
         )
