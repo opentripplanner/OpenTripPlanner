@@ -174,7 +174,9 @@ public class TripPatternForDate {
 
     if (filteredTripTimes.isEmpty()) {
       if (hasFrequencies()) {
-        if (filteredFrequencies.isEmpty()) { return null; }
+        if (filteredFrequencies.isEmpty()) {
+          return null;
+        }
       } else {
         return null;
       }

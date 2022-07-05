@@ -44,7 +44,6 @@ class TripPatternForDateTest {
       new int[0]
     );
 
-    var f = new Frequency();
     var withFrequencies = new TripPatternForDate(
       tripPattern,
       List.of(tripTimes),
