@@ -9,6 +9,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class FlexAccessEgressRouter {
 
@@ -16,20 +17,22 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RoutingContext routingContext,
+    TransitModel transitModel,
     AdditionalSearchDays searchDays,
     FlexParameters params,
     boolean isEgress
   ) {
     Collection<NearbyStop> accessStops = !isEgress
-      ? AccessEgressRouter.streetSearch(routingContext, StreetMode.WALK, false)
+      ? AccessEgressRouter.streetSearch(routingContext, transitModel, StreetMode.WALK, false)
       : List.of();
 
     Collection<NearbyStop> egressStops = isEgress
-      ? AccessEgressRouter.streetSearch(routingContext, StreetMode.WALK, true)
+      ? AccessEgressRouter.streetSearch(routingContext, transitModel, StreetMode.WALK, true)
       : List.of();
 
     FlexRouter flexRouter = new FlexRouter(
       routingContext.graph,
+      transitModel,
       params,
       routingContext.opt.getDateTime(),
       routingContext.opt.arriveBy,

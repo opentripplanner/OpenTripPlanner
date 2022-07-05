@@ -2,7 +2,6 @@ package org.opentripplanner.routing.vertextype;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -32,12 +31,12 @@ public class TransitStopVertex extends Vertex {
   private int streetToStopTime = 0;
 
   /**
-   * @param stop  The transit model stop reference. See {@link RoutingService#getStopVertexForStop()}
+   * @param stop  The transit model stop reference. See {@link org.opentripplanner.transit.service.TransitService#getStopVertexForStop()}
    *              for navigation from a Stop to this class.
    * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is
    *              used.
    */
-  public TransitStopVertex(Graph graph, Stop stop, Set<TransitMode> modes) {
+  TransitStopVertex(Graph graph, Stop stop, Set<TransitMode> modes) {
     super(graph, stop.getId().toString(), stop.getLon(), stop.getLat(), stop.getName());
     this.stop = stop;
     this.modes = modes != null ? modes : new HashSet<>();

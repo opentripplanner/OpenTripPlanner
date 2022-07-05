@@ -33,6 +33,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
@@ -108,7 +110,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     // reconnect stops that got disconnected
     if (streetLinkerModule != null) {
       LOG.info("Reconnecting stops");
-      streetLinkerModule.linkTransitStops(graph);
+      streetLinkerModule.linkTransitStops(graph, transitModel);
       int isolated = 0;
       for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
         if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {

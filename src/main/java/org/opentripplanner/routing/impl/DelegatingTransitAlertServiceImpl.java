@@ -6,18 +6,18 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alerts.TransitAlertProvider;
 
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
 
-  public DelegatingTransitAlertServiceImpl(Graph graph) {
-    if (graph.updaterManager != null) {
-      graph.updaterManager
+  public DelegatingTransitAlertServiceImpl(TransitModel transitModel) {
+    if (transitModel.updaterManager != null) {
+      transitModel.updaterManager
         .getUpdaterList()
         .stream()
         .filter(TransitAlertProvider.class::isInstance)

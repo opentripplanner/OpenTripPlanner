@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +42,11 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
   }
 
   @Override
-  public void run(Graph graph) {
+  public void run(Graph graph, TransitModel transitModel) {
     // Apply updates to graph using realtime snapshot source. The source is retrieved from the graph using the
     // setup method which return the instance, we do not need to provide any creator because the
     // TimetableSnapshotSource should already be set up
-    TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(null);
+    TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(null);
     if (snapshotSource != null) {
       snapshotSource.applyTripUpdates(fullDataset, updates, feedId);
     } else {

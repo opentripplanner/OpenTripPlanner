@@ -41,6 +41,7 @@ import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.I18NString;
 
 public class LuceneIndex implements Serializable {
@@ -53,11 +54,14 @@ public class LuceneIndex implements Serializable {
   private static final String COORDINATE = "coordinate";
 
   private final Graph graph;
+
+  private final TransitModel transitModel;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
 
-  public LuceneIndex(Graph graph) {
+  public LuceneIndex(Graph graph, TransitModel transitModel) {
     this.graph = graph;
+    this.transitModel = transitModel;
     this.analyzer =
       new PerFieldAnalyzerWrapper(
         new StandardAnalyzer(),
@@ -73,7 +77,7 @@ public class LuceneIndex implements Serializable {
           iwcWithSuggestField(analyzer, Set.of(SUGGEST))
         )
       ) {
-        graph
+        transitModel
           .getAllStopLocations()
           .forEach(stopLocation ->
             addToIndex(
@@ -87,7 +91,8 @@ public class LuceneIndex implements Serializable {
             )
           );
 
-        graph
+        transitModel
+          .getStopModel()
           .getAllStopCollections()
           .forEach(stopCollection ->
             addToIndex(
@@ -128,24 +133,27 @@ public class LuceneIndex implements Serializable {
 
   public static synchronized LuceneIndex forServer(Router router) {
     var graph = router.graph;
+    var transitModel = router.transitModel;
     var existingIndex = graph.getService(LuceneIndex.class);
     if (existingIndex != null) {
       return existingIndex;
     }
 
-    var newIndex = new LuceneIndex(graph);
+    var newIndex = new LuceneIndex(graph, transitModel);
     graph.putService(LuceneIndex.class, newIndex);
     return newIndex;
   }
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
     return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> graph.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
+      .map(document -> transitModel.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
   }
 
   public Stream<StopCollection> queryStopCollections(String query, boolean autocomplete) {
     return matchingDocuments(StopCollection.class, query, autocomplete)
-      .map(document -> graph.getStopCollectionById(FeedScopedId.parseId(document.get(ID))));
+      .map(document ->
+        transitModel.getStopModel().getStopCollectionById(FeedScopedId.parseId(document.get(ID)))
+      );
   }
 
   public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {

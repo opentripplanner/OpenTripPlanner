@@ -104,8 +104,8 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         return;
       }
 
-      super.saveResultOnGraph.execute(graph ->
-        snapshotSource.applyEstimatedTimetable(graph, feedId, false, updates)
+      super.saveResultOnGraph.execute((graph, transitModel) ->
+        snapshotSource.applyEstimatedTimetable(transitModel, feedId, false, updates)
       );
     } catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -121,9 +121,9 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         return;
       }
 
-      super.saveResultOnGraph.execute(graph -> {
+      super.saveResultOnGraph.execute((graph, transitModel) -> {
         long t1 = System.currentTimeMillis();
-        snapshotSource.applyEstimatedTimetable(graph, feedId, false, updates);
+        snapshotSource.applyEstimatedTimetable(transitModel, feedId, false, updates);
 
         setPrimed(true);
         LOG.info(

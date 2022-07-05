@@ -44,6 +44,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +90,7 @@ public class GtfsModule implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
@@ -99,9 +101,9 @@ public class GtfsModule implements GraphBuilderModule {
     // OTP doesn't currently support multiple time zones in a single graph;
     // at least this way we catch the error and log it instead of silently ignoring
     // because the time zone from the first agency is cached
-    graph.clearTimeZone();
+    transitModel.clearTimeZone();
 
-    CalendarServiceData calendarServiceData = graph.getCalendarDataService();
+    CalendarServiceData calendarServiceData = transitModel.getCalendarDataService();
 
     boolean hasTransit = false;
 
@@ -129,18 +131,19 @@ public class GtfsModule implements GraphBuilderModule {
         repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip());
 
         // NB! The calls below have side effects - the builder state is updated!
-        createTripPatterns(graph, builder, calendarServiceData.getServiceIds());
+        createTripPatterns(graph, transitModel, builder, calendarServiceData.getServiceIds());
 
-        OtpTransitService transitService = builder.build();
+        OtpTransitService otpTransitService = builder.build();
 
         // if this or previously processed gtfs bundle has transit that has not been filtered out
-        hasTransit = hasTransit || transitService.hasActiveTransit();
+        hasTransit = hasTransit || otpTransitService.hasActiveTransit();
 
-        addTransitModelToGraph(graph, gtfsBundle, transitService);
+        addTransitModelToGraph(graph, transitModel, gtfsBundle, otpTransitService);
 
-        createGeometryAndBlockProcessor(gtfsBundle, transitService).run(graph, issueStore);
+        createGeometryAndBlockProcessor(gtfsBundle, otpTransitService)
+          .run(graph, transitModel, issueStore);
 
-        fareServiceFactory.processGtfs(transitService);
+        fareServiceFactory.processGtfs(otpTransitService);
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
       }
     } catch (IOException e) {
@@ -151,17 +154,19 @@ public class GtfsModule implements GraphBuilderModule {
       gtfsBundles.forEach(GtfsBundle::close);
     }
 
-    graph.clearCachedCalenderService();
+    transitModel.clearCachedCalenderService();
     // We need to save the calendar service data so we can use it later
-    graph.putService(
+    transitModel.putService(
       org.opentripplanner.model.calendar.CalendarServiceData.class,
       calendarServiceData
     );
-    graph.updateTransitFeedValidity(calendarServiceData, issueStore);
+    transitModel.updateTransitFeedValidity(calendarServiceData, issueStore);
 
     // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    graph.hasTransit = graph.hasTransit || hasTransit;
-    graph.calculateTransitCenter();
+    transitModel.hasTransit = transitModel.hasTransit || hasTransit;
+    if (hasTransit) {
+      transitModel.calculateTransitCenter();
+    }
   }
 
   @Override
@@ -185,6 +190,7 @@ public class GtfsModule implements GraphBuilderModule {
    */
   private void createTripPatterns(
     Graph graph,
+    TransitModel transitModel,
     OtpTransitServiceBuilder builder,
     Set<FeedScopedId> calServiceIds
   ) {
@@ -195,20 +201,24 @@ public class GtfsModule implements GraphBuilderModule {
       calServiceIds
     );
     buildTPOp.run();
-    graph.hasFrequencyService = graph.hasFrequencyService || buildTPOp.hasFrequencyBasedTrips();
-    graph.hasScheduledService = graph.hasScheduledService || buildTPOp.hasScheduledTrips();
+    transitModel.hasFrequencyService =
+      transitModel.hasFrequencyService || buildTPOp.hasFrequencyBasedTrips();
+    transitModel.hasScheduledService =
+      transitModel.hasScheduledService || buildTPOp.hasScheduledTrips();
   }
 
   private void addTransitModelToGraph(
     Graph graph,
+    TransitModel transitModel,
     GtfsBundle gtfsBundle,
-    OtpTransitService transitModel
+    OtpTransitService otpTransitService
   ) {
     AddTransitModelEntitiesToGraph.addToGraph(
       gtfsBundle.getFeedId(),
-      transitModel,
+      otpTransitService,
       gtfsBundle.subwayAccessTime,
-      graph
+      graph,
+      transitModel
     );
   }
 

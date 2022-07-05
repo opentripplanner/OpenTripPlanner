@@ -6,6 +6,7 @@ import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -98,14 +99,15 @@ public class SiriVMUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) {
+  public void setup(Graph graph, TransitModel transitModel) {
     if (fuzzyTripMatching) {
-      this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(graph));
+      this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
     // Only create a realtime data snapshot source if none exists already
     // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
     //           - Ideally we should inject the snapshotSource on this class.
-    snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+    snapshotSource =
+      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
 
     // Set properties of realtime data snapshot source.
     // TODO OTP2 - this is overwriting these properties if they were specified by other updaters.
@@ -120,7 +122,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
       snapshotSource.purgeExpiredData = purgeExpiredData;
     }
     if (siriFuzzyTripMatcher != null) {
-      siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(graph));
+      siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
   }
 
@@ -146,8 +148,8 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         final boolean markPrimed = !moreData;
         List<VehicleMonitoringDeliveryStructure> vmds = serviceDelivery.getVehicleMonitoringDeliveries();
         if (vmds != null) {
-          saveResultOnGraph.execute(graph -> {
-            snapshotSource.applyVehicleMonitoring(graph, feedId, fullDataset, vmds);
+          saveResultOnGraph.execute((graph, transitModel) -> {
+            snapshotSource.applyVehicleMonitoring(transitModel, feedId, fullDataset, vmds);
             if (markPrimed) primed = true;
           });
         }

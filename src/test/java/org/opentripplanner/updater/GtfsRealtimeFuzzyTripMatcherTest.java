@@ -6,18 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 
 public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
 
   @Test
   public void testMatch() {
-    String feedId = graph.getFeedIds().iterator().next();
+    String feedId = transitModel.getFeedIds().iterator().next();
 
     GtfsRealtimeFuzzyTripMatcher matcher = new GtfsRealtimeFuzzyTripMatcher(
-      new RoutingService(graph),
-      new DefaultTransitService(graph)
+      new DefaultTransitService(transitModel)
     );
     TripDescriptor trip1 = TripDescriptor
       .newBuilder()

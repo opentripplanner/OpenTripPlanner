@@ -41,10 +41,13 @@ public class DirectStreetRouter {
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        router.graph.getTimeZone(),
+        router.transitModel.getTimeZone(),
         new AlertToLegMapper(
-          router.graph.getTransitAlertService(),
-          router.graph.index.getMultiModalStationForStations()::get
+          router.transitModel.getTransitAlertService(),
+          router.transitModel
+            .getStopModel()
+            .getStopModelIndex()
+            .getMultiModalStationForStations()::get
         ),
         router.graph.streetNotesService,
         router.graph.ellipsoidToGeoidDifference

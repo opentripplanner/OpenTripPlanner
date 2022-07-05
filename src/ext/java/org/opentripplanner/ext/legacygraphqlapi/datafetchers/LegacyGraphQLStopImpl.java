@@ -43,7 +43,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLStopAlertsArgs(environment.getArguments());
       List<LegacyGraphQLTypes.LegacyGraphQLStopAlertType> types = (List) args.getLegacyGraphQLTypes();
       FeedScopedId id = getValue(environment, stop -> stop.getId(), station -> station.getId());

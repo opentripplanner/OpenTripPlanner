@@ -8,6 +8,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
@@ -16,7 +17,9 @@ import org.opentripplanner.util.I18NString;
 
 public class FlexStopLocation extends TransitEntity implements StopLocation {
 
-  private I18NString name;
+  private final I18NString name;
+
+  private final boolean hasFallbackName;
 
   private I18NString description;
 
@@ -28,8 +31,17 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private WgsCoordinate centroid;
 
-  public FlexStopLocation(FeedScopedId id) {
+  public FlexStopLocation(@Nonnull FeedScopedId id, I18NString name) {
     super(id);
+    // according to the spec stop location names are optional for flex zones so, we set the id
+    // as the bogus name. *shrug*
+    if (name == null) {
+      this.name = new NonLocalizedString(id.toString());
+      hasFallbackName = true;
+    } else {
+      this.name = name;
+      hasFallbackName = false;
+    }
   }
 
   /**
@@ -95,11 +107,15 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     this.description = description;
   }
 
-  public void setName(I18NString name) {
-    this.name = name;
-  }
-
   public void setZoneId(String zoneId) {
     this.zoneId = zoneId;
+  }
+
+  /**
+   * Names for GTFS flex locations are optional therefore we set the id as the name. When this is
+   * the case then this method returns true.
+   */
+  public boolean hasFallbackName() {
+    return hasFallbackName;
   }
 }

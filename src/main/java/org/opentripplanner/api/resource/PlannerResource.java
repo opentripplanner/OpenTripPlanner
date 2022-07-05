@@ -71,7 +71,7 @@ public class PlannerResource extends RoutingResource {
       router = otpServer.getRouter();
 
       // Route
-      RoutingService routingService = new RoutingService(router.graph);
+      RoutingService routingService = new RoutingService(router.graph, router.transitModel);
       res = routingService.route(request, router);
 
       // Map to API

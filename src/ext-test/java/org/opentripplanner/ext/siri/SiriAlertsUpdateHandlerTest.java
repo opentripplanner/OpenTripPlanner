@@ -134,16 +134,16 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   public void init() {
     if (routingService == null) {
-      routingService = new RoutingService(graph);
-      transitService = new DefaultTransitService(graph);
-      graph.updaterManager = new GraphUpdaterManager(graph, List.of());
+      routingService = new RoutingService(graph, transitModel);
+      transitService = new DefaultTransitService(transitModel);
+      transitModel.updaterManager = new GraphUpdaterManager(graph, transitModel, List.of());
     } else {
       transitAlertService.getAllAlerts().clear();
     }
     if (alertsUpdateHandler == null) {
-      alertsUpdateHandler = new SiriAlertsUpdateHandler(FEED_ID, graph);
+      alertsUpdateHandler = new SiriAlertsUpdateHandler(FEED_ID, transitModel);
 
-      transitAlertService = new TransitAlertServiceImpl(graph);
+      transitAlertService = new TransitAlertServiceImpl(transitModel);
       alertsUpdateHandler.setTransitAlertService(transitAlertService);
 
       alertsUpdateHandler.setSiriFuzzyTripMatcher(new SiriFuzzyTripMatcher(transitService));
