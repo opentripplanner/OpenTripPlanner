@@ -17,7 +17,7 @@ import org.opentripplanner.util.NonLocalizedString;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends Edge implements BikeWalkableEdge {
+public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
   private static final long serialVersionUID = -3311099256178798982L;
@@ -161,6 +161,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
   public FeedScopedId getId() {
     return id;
+  }
+
+  @Override
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
   }
 
   private boolean isStairs() {

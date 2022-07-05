@@ -113,7 +113,6 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   }
 
   @Test
-  @Disabled("This test fails on some machines, but not others, snapshot @line 2704")
   public void test_trip_planning_with_transit() {
     RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 

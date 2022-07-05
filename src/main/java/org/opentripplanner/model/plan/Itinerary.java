@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -242,9 +242,14 @@ public class Itinerary {
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.getDuration());
       } else if (leg.isTransitLeg()) {
-        buf.transit(leg.getMode(), leg.getTrip().logName(), leg.getStartTime(), leg.getEndTime());
+        buf.transit(
+          leg.getMode().name(),
+          leg.getTrip().logName(),
+          leg.getStartTime(),
+          leg.getEndTime()
+        );
       } else {
-        buf.other(leg.getMode(), leg.getStartTime(), leg.getEndTime());
+        buf.other(leg.getMode().name(), leg.getStartTime(), leg.getEndTime());
       }
 
       buf.sep();
@@ -324,7 +329,7 @@ public class Itinerary {
   }
 
   /**
-   * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
+   * A sandbox feature for calculating a numeric score between 0 and 1 which indicates how
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
    * <p>

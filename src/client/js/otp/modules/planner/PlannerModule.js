@@ -484,8 +484,16 @@ otp.modules.planner.PlannerModule =
 
     constructLink : function(queryParams, additionalParams) {
         additionalParams = additionalParams ||  { };
+        additionalParams.baseLayer = this.webapp.map.getActiveBaseLayerName();
         return otp.config.siteUrl + '?module=' + this.id + "&" +
             otp.util.Text.constructUrlParamString(_.extend(_.clone(queryParams), additionalParams));
+    },
+
+    zoomToBounds: function(itin) {
+        const geometries = itin.itinData.legs.map(l => otp.util.Geo.decodePolyline(l.legGeometry.points)).flat();
+        const bounds = L.latLngBounds(geometries).pad(0.1);
+        this.webapp.map.setBounds(bounds);
+        console.log(`Zooming map to bounds ${bounds.toBBoxString()}`);
     },
 
     drawItinerary : function(itin) {
@@ -496,7 +504,6 @@ otp.modules.planner.PlannerModule =
 
         var queryParams = itin.tripPlan.queryParams;
 
-        console.log(itin.itinData);
         for(var i=0; i < itin.itinData.legs.length; i++) {
             var leg = itin.itinData.legs[i];
 

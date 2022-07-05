@@ -757,7 +757,7 @@ public class TransmodelGraphQLSchema {
 
             if (stops.isEmpty()) {
               return new DefaultConnection<>(
-                Collections.emptyList(),
+                emptyList(),
                 new DefaultPageInfo(null, null, false, false)
               );
             }
@@ -1181,6 +1181,35 @@ public class TransmodelGraphQLSchema {
             }
             return stream.collect(Collectors.toList());
           })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("groupOfLines")
+          .description("Get a single group of lines based on its id")
+          .type(groupOfLinesType)
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("id")
+              .type(new GraphQLNonNull(Scalars.GraphQLString))
+              .build()
+          )
+          .dataFetcher(environment ->
+            GqlUtil
+              .getTransitService(environment)
+              .getGroupOfRoutesForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("groupsOfLines")
+          .description("Get all groups of lines")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(groupOfLinesType))))
+          .dataFetcher(environment -> GqlUtil.getTransitService(environment).getGroupsOfRoutes())
           .build()
       )
       .field(

@@ -34,6 +34,7 @@ import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -391,6 +392,21 @@ public class DefaultTransitService implements TransitEditorService {
       stop,
       includeRealtimeUpdates ? lazyGetTimeTableSnapShot() : null
     );
+  }
+
+  @Override
+  public Collection<GroupOfRoutes> getGroupsOfRoutes() {
+    return graphIndex.getRoutesForGroupOfRoutes().keySet();
+  }
+
+  @Override
+  public Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes) {
+    return graphIndex.getRoutesForGroupOfRoutes().get(groupOfRoutes);
+  }
+
+  @Override
+  public GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id) {
+    return graphIndex.getGroupOfRoutesForId().get(id);
   }
 
   /**

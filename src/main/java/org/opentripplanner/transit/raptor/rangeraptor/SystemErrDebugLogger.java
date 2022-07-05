@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
 import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 import java.text.NumberFormat;
@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
+import org.opentripplanner.transit.raptor.api.view.PatternRideView;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.transit.raptor.util.IntUtils;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
-import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.lang.StringUtils;
+import org.opentripplanner.util.lang.TableFormatter;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -91,12 +91,12 @@ public class SystemErrDebugLogger implements DebugLogger {
    * This should be passed into the {@link DebugRequestBuilder#patternRideDebugListener(Consumer)}
    * using a lambda to enable debugging pattern ride events.
    */
-  public void patternRideLister(DebugEvent<PatternRide<?>> e) {
+  public void patternRideLister(DebugEvent<PatternRideView<?>> e) {
     printIterationHeader(e.iterationStartTime());
-    printRoundHeader(e.element().prevArrival.round() + 1);
+    printRoundHeader(e.element().prevArrival().round() + 1);
     print(e.element(), e.action().toString());
 
-    PatternRide<?> byElement = e.rejectedDroppedByElement();
+    PatternRideView<?> byElement = e.rejectedDroppedByElement();
     if (e.action() == DebugEvent.Action.DROP && byElement != null) {
       print(byElement, "->by");
     }
@@ -123,7 +123,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
         TimeUtils.timeToStrLong(p.egressLeg().toTime()),
         DurationUtils.durationToStr(p.durationInSeconds()),
-        numFormat.format(RaptorCostConverter.toOtpDomainCost(p.generalizedCost())),
+        OtpNumberFormat.formatCost(p.generalizedCost()),
         details(e.action().toString(), e.reason(), e.element().toString())
       )
     );
@@ -209,16 +209,16 @@ public class SystemErrDebugLogger implements DebugLogger {
     );
   }
 
-  private void print(PatternRide<?> p, String action) {
+  private void print(PatternRideView<?> p, String action) {
     System.err.println(
       arrivalTableFormatter.printRow(
         action,
         "OnRide",
-        p.prevArrival.round() + 1,
-        p.boardStopIndex,
-        TimeUtils.timeToStrLong(p.boardTime),
-        numFormat.format(p.relativeCost),
-        p.trip.pattern().debugInfo(),
+        p.prevArrival().round() + 1,
+        p.boardStopIndex(),
+        TimeUtils.timeToStrLong(p.boardTime()),
+        numFormat.format(p.relativeCost()),
+        p.trip().pattern().debugInfo(),
         p.toString()
       )
     );

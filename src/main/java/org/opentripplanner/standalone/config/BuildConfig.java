@@ -7,17 +7,16 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -377,7 +376,7 @@ public class BuildConfig {
     discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
 
     // List of complex parameters
-    fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));
+    fareServiceFactory = FaresConfiguration.fromConfig(c.asRawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
     netex = new NetexConfig(c.path("netex"));
     storage = new StorageConfig(c.path("storage"));
@@ -390,7 +389,7 @@ public class BuildConfig {
           .asList()
           .stream()
           .map(RoutingRequestMapper::mapRoutingRequest)
-          .collect(Collectors.toUnmodifiableList());
+          .toList();
     } else {
       transferRequests = List.of(new RoutingRequest());
     }

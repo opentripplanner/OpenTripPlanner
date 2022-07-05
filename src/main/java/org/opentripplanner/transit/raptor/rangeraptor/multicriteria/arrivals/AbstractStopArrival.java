@@ -137,7 +137,6 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
    * @return previous state or throw a NPE if no previousArrival exist.
    */
   final int previousStop() {
-    //noinspection ConstantConditions
     return previous.stop;
   }
 }

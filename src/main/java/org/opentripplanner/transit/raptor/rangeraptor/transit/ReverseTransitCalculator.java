@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -13,6 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -20,21 +20,19 @@ import org.opentripplanner.util.time.TimeUtils;
  * A calculator that will take you back in time not forward, this is the basic logic to implement a
  * reveres search.
  */
-final class ReverseTransitCalculator<T extends RaptorTripSchedule>
+public final class ReverseTransitCalculator<T extends RaptorTripSchedule>
   extends ReverseTimeCalculator
   implements TransitCalculator<T> {
 
-  private final int tripSearchBinarySearchThreshold;
   private final int latestArrivalTime;
   private final int searchWindowInSeconds;
   private final int earliestAcceptableDepartureTime;
   private final int iterationStep;
 
-  ReverseTransitCalculator(SearchParams s, RaptorTuningParameters t) {
+  public ReverseTransitCalculator(SearchParams s, RaptorTuningParameters t) {
     // The request is already modified to search backwards, so 'earliestDepartureTime()'
     // goes with destination and 'latestArrivalTime()' match origin.
     this(
-      t.scheduledTripBinarySearchThreshold(),
       s.latestArrivalTime(),
       s.searchWindowInSeconds(),
       s.earliestDepartureTime(),
@@ -43,13 +41,11 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule>
   }
 
   ReverseTransitCalculator(
-    int binaryTripSearchThreshold,
     int latestArrivalTime,
     int searchWindowInSeconds,
     int earliestAcceptableDepartureTime,
     int iterationStep
   ) {
-    this.tripSearchBinarySearchThreshold = binaryTripSearchThreshold;
     this.latestArrivalTime = latestArrivalTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
     this.earliestAcceptableDepartureTime =

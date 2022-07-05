@@ -12,8 +12,8 @@ public class Module implements ArchComponent {
     this.packages = packages;
   }
 
-  public static Module of(Package... packages) {
-    return new Module(Arrays.asList(packages));
+  public static Module of(ArchComponent... components) {
+    return new Module(Arrays.stream(components).flatMap(c -> c.packages().stream()).toList());
   }
 
   @Override

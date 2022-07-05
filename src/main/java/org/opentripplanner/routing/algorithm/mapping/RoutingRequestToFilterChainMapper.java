@@ -9,6 +9,7 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChai
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.opentripplanner.routing.fares.FareService;
 
 public class RoutingRequestToFilterChainMapper {
 
@@ -26,7 +27,9 @@ public class RoutingRequestToFilterChainMapper {
     boolean removeWalkAllTheWayResults,
     boolean maxNumberOfItinerariesCropHead,
     Consumer<Itinerary> maxLimitReachedSubscriber,
-    boolean wheelchairAccessible
+    boolean wheelchairAccessible,
+    double wheelchairMaxSlope,
+    FareService fareService
   ) {
     var builder = new ItineraryListFilterChainBuilder(sortOrder);
 
@@ -59,7 +62,8 @@ public class RoutingRequestToFilterChainMapper {
       .withParkAndRideDurationRatio(params.parkAndRideDurationRatio)
       .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit)
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip)
-      .withAccessibilityScore(params.accessibilityScore && wheelchairAccessible)
+      .withAccessibilityScore(params.accessibilityScore && wheelchairAccessible, wheelchairMaxSlope)
+      .withFares(fareService)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)

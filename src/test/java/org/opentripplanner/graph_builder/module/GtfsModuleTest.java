@@ -19,7 +19,7 @@ class GtfsModuleTest {
     var graph = new Graph();
 
     var bundle = new GtfsBundle(new File(ConstantsForTests.FAKE_GTFS));
-    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded(), null, false);
+    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded());
 
     module.buildGraph(graph, new HashMap<>());
 

@@ -5,9 +5,9 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 
 /**
@@ -104,5 +104,10 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule>
   @Override
   public Collection<Path<T>> extractPaths() {
     return delegate.extractPaths();
+  }
+
+  @Override
+  public int calculateMinNumberOfTransfers(int stopIndex) {
+    return delegate.calculateMinNumberOfTransfers(stopIndex);
   }
 }

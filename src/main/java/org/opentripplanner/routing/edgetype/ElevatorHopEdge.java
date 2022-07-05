@@ -16,7 +16,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  *
  * @author mattwigway
  */
-public class ElevatorHopEdge extends Edge implements ElevatorEdge {
+public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTraversalInformation {
 
   private static final long serialVersionUID = 3925814840369402222L;
 
@@ -139,6 +139,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     return 0;
   }
 
+  @Override
   public boolean isWheelchairAccessible() {
     return wheelchairAccessibility == WheelchairAccessibility.POSSIBLE;
   }
