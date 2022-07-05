@@ -142,6 +142,9 @@ public class GtfsModule implements GraphBuilderModule {
 
         createGeometryAndBlockProcessor(gtfsBundle, otpTransitService)
           .run(graph, transitModel, issueStore);
+
+        fareServiceFactory.processGtfs(otpTransitService);
+        graph.putService(FareService.class, fareServiceFactory.makeFareService());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);

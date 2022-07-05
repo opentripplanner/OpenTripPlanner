@@ -108,11 +108,7 @@ public class NetexModule implements GraphBuilderModule {
           transitModel
         );
 
-        new GeometryAndBlockProcessor(
-          otpService,
-          maxStopToShapeSnapDistance,
-          maxInterlineDistance
-        )
+        new GeometryAndBlockProcessor(otpService, maxStopToShapeSnapDistance, maxInterlineDistance)
           .run(graph, transitModel, issueStore);
       }
     } catch (Exception e) {
