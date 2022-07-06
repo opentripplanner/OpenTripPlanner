@@ -31,6 +31,8 @@ import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
+import org.opentripplanner.graph_builder.issues.MissingShapeGeometry;
+import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
@@ -300,6 +302,7 @@ public class GeometryAndBlockProcessor {
     if (shapeLineString == null) {
       // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
       // create straight line segments between stops for each hop
+      issueStore.add(new MissingShapeGeometry(stopTimes.get(0).getTrip().getId(), shapeId));
       return createStraightLineHopeGeometries(stopTimes, shapeId);
     }
 
@@ -308,6 +311,7 @@ public class GeometryAndBlockProcessor {
       // this only happens on shape which have points very far from
       // their stop sequence. So we'll fall back to trivial stop-to-stop
       // linking, even though theoretically we could do better.
+      issueStore.add(new ShapeGeometryTooFar(stopTimes.get(0).getTrip().getId(), shapeId));
       return createStraightLineHopeGeometries(stopTimes, shapeId);
     }
 
@@ -454,8 +458,6 @@ public class GeometryAndBlockProcessor {
       StopTime st1 = stopTimes.get(i + 1);
       LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
       geoms[i] = geometry;
-      //this warning is not strictly correct, but will do
-      issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
     }
     return geoms;
   }
