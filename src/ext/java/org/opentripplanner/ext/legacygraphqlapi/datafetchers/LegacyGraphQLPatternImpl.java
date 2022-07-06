@@ -201,14 +201,14 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   @Override
   public DataFetcher<Iterable<Trip>> tripsForDate() {
     return environment -> {
-      String servicaDate = new LegacyGraphQLTypes.LegacyGraphQLPatternTripsForDateArgs(
+      String serviceDate = new LegacyGraphQLTypes.LegacyGraphQLPatternTripsForDateArgs(
         environment.getArguments()
       )
         .getLegacyGraphQLServiceDate();
 
       try {
         TIntSet services = getTransitService(environment)
-          .getServicesRunningForDate(ServiceDateUtils.parseString(servicaDate));
+          .getServicesRunningForDate(ServiceDateUtils.parseString(serviceDate));
         return getSource(environment)
           .getScheduledTimetable()
           .getTripTimes()
