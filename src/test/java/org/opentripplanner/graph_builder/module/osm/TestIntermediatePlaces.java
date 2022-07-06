@@ -73,7 +73,7 @@ public class TestIntermediatePlaces {
       graphPathToItineraryMapper =
         new GraphPathToItineraryMapper(
           transitModel.getTimeZone(),
-          new AlertToLegMapper(transitModel.getTransitAlertService()),
+          new AlertToLegMapper(transitModel.getTransitAlertService(), ignore -> null),
           graph.streetNotesService,
           graph.ellipsoidToGeoidDifference
         );

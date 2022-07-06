@@ -76,7 +76,11 @@ public class RaptorPathToItineraryMapper {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.request = request;
-    this.alertToLegMapper = new AlertToLegMapper(transitModel.getTransitAlertService());
+    this.alertToLegMapper =
+      new AlertToLegMapper(
+        transitModel.getTransitAlertService(),
+        transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations()::get
+      );
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitModel.getTimeZone(),
@@ -216,7 +220,7 @@ public class RaptorPathToItineraryMapper {
         );
     }
 
-    alertToLegMapper.addTransitAlertPatchesToLeg(leg, firstLeg);
+    alertToLegMapper.addTransitAlertsToLeg(leg, firstLeg);
 
     return leg;
   }

@@ -76,7 +76,10 @@ public class FlexRouter {
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitModel.getTimeZone(),
-        new AlertToLegMapper(transitModel.getTransitAlertService()),
+        new AlertToLegMapper(
+          transitModel.getTransitAlertService(),
+          transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations()::get
+        ),
         graph.streetNotesService,
         graph.ellipsoidToGeoidDifference
       );

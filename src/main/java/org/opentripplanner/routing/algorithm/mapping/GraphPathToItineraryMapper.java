@@ -359,7 +359,7 @@ public class GraphPathToItineraryMapper {
 
     Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
 
-    alertToLegMapper.addTransitAlertPatchesToLeg(leg, true);
+    alertToLegMapper.addTransitAlertsToLeg(leg, true);
     return leg;
   }
 
