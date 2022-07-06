@@ -1,14 +1,13 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import java.time.ZoneId;
 import java.util.BitSet;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.function.Function;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -402,10 +401,7 @@ public class DefaultTransitService implements TransitEditorService {
   public Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
     TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
     return timetableSnapshot != null
-      ? timetableSnapshot.resolve(
-        tripPattern,
-        serviceDate == null ? new ServiceDate(Calendar.getInstance().getTime()) : serviceDate
-      )
+      ? timetableSnapshot.resolve(tripPattern, serviceDate)
       : tripPattern.getScheduledTimetable();
   }
 
@@ -496,7 +492,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModel#getTimeZone()} */
   @Override
-  public TimeZone getTimeZone() {
+  public ZoneId getTimeZone() {
     return this.transitModel.getTimeZone();
   }
 

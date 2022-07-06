@@ -7,13 +7,12 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -50,11 +49,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
 
   /**
-   * Number of milliseconds per second
-   */
-  private static final int MILLIS_PER_SECOND = 1000;
-
-  /**
    * Maximum time in seconds since midnight for arrivals and departures
    */
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
@@ -73,7 +67,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * messages.
    */
   private final TripPatternCache tripPatternCache = new TripPatternCache();
-  private final TimeZone timeZone;
+  private final ZoneId timeZone;
 
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
@@ -117,7 +111,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   public TimetableSnapshotSource(
-    TimeZone timeZone,
+    ZoneId timeZone,
     TransitService transitService,
     TransitLayerUpdater transitLayerUpdater,
     Deduplicator deduplicator,
@@ -211,7 +205,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         FeedScopedId tripId = new FeedScopedId(feedId, tripUpdate.getTrip().getTripId());
 
-        ServiceDate serviceDate = new ServiceDate();
+        ServiceDate serviceDate = new ServiceDate(timeZone);
         if (tripDescriptor.hasStartDate()) {
           try {
             serviceDate = ServiceDate.parseString(tripDescriptor.getStartDate());
@@ -675,8 +669,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
-    final Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
-    final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
+    final long midnightSecondsSinceEpoch = serviceDate.toZonedDateTime(timeZone, 0).toEpochSecond();
 
     // Create StopTimes
     final List<StopTime> stopTimes = new ArrayList<>(tripUpdate.getStopTimeUpdateCount());
@@ -952,7 +945,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean purgeExpiredData() {
-    final ServiceDate today = new ServiceDate();
+    final ServiceDate today = new ServiceDate(timeZone);
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
     final ServiceDate previously = today.previous().previous(); // Just to be safe...
 

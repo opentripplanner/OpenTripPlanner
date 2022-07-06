@@ -319,7 +319,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
         ServiceDate serviceDate = args.getLegacyGraphQLServiceDate() != null
           ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate())
-          : new ServiceDate();
+          : new ServiceDate(transitService.getTimeZone());
 
         TripPattern tripPattern = null;
         TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();

@@ -1,9 +1,9 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.function.Function;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
@@ -89,7 +89,7 @@ class StopMapper {
     }
 
     if (gtfsStop.getTimezone() != null) {
-      builder.withTimeZone(TimeZone.getTimeZone(gtfsStop.getTimezone()));
+      builder.withTimeZone(ZoneId.of(gtfsStop.getTimezone()));
     }
 
     if (gtfsStop.getParentStation() != null) {

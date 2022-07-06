@@ -94,7 +94,7 @@ public class FlexRouter {
       this.egressFlexPathCalculator = new DirectFlexPathCalculator();
     }
 
-    ZoneId tz = transitModel.getTimeZone().toZoneId();
+    ZoneId tz = transitModel.getTimeZone();
     LocalDate searchDate = LocalDate.ofInstant(searchInstant, tz);
     this.startOfTime = DateMapper.asStartOfService(searchDate, tz);
     this.departureTime = DateMapper.secondsSinceStartOfTime(startOfTime, searchInstant);

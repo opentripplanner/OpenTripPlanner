@@ -11,9 +11,9 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -408,14 +408,14 @@ public class EstimatedCallType {
       alertPatchService.getDirectionAndRouteAlerts(trip.getDirection().gtfsCode, routeId)
     );
 
-    long serviceDayMillis = 1000L * tripTimeOnDate.getServiceDayMidnight();
-    long arrivalMillis = 1000L * tripTimeOnDate.getRealtimeArrival();
-    long departureMillis = 1000L * tripTimeOnDate.getRealtimeDeparture();
+    long serviceDay = tripTimeOnDate.getServiceDayMidnight();
+    long arrivalTime = tripTimeOnDate.getRealtimeArrival();
+    long departureTime = tripTimeOnDate.getRealtimeDeparture();
 
     filterSituationsByDateAndStopConditions(
       allAlerts,
-      new Date(serviceDayMillis + arrivalMillis),
-      new Date(serviceDayMillis + departureMillis),
+      Instant.ofEpochSecond(serviceDay + arrivalTime),
+      Instant.ofEpochSecond(serviceDay + departureTime),
       Arrays.asList(StopCondition.STOP, StopCondition.START_POINT, StopCondition.EXCEPTIONAL_STOP)
     );
 
@@ -424,20 +424,20 @@ public class EstimatedCallType {
 
   private static void filterSituationsByDateAndStopConditions(
     Collection<TransitAlert> alertPatches,
-    Date fromTime,
-    Date toTime,
+    Instant fromTime,
+    Instant toTime,
     List<StopCondition> stopConditions
   ) {
     if (alertPatches != null) {
       // First and last period
       alertPatches.removeIf(alert ->
-        (alert.getEffectiveStartDate() != null && alert.getEffectiveStartDate().after(toTime)) ||
-        (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().before(fromTime))
+        (alert.getEffectiveStartDate() != null && alert.getEffectiveStartDate().isAfter(toTime)) ||
+        (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().isBefore(fromTime))
       );
 
       // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch ->
-        !alertPatch.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)
+        !alertPatch.displayDuring(fromTime.getEpochSecond(), toTime.getEpochSecond())
       );
 
       alertPatches.removeIf(alert ->

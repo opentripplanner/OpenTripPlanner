@@ -12,9 +12,9 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -33,7 +33,7 @@ import org.opentripplanner.util.TestUtils;
 
 public class TimetableTest {
 
-  private static final TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
+  private static final ZoneId timeZone = ZoneId.of("America/New_York");
   private static final ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
   private static Graph graph;
   private static TransitModel transitModel;

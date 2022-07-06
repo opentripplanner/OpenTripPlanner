@@ -44,7 +44,7 @@ public class ApiRouterInfo {
 
     this.routerId = routerId;
     this.polygon = graph.getConvexHull();
-    this.buildTime = graph.buildTime;
+    this.buildTime = Date.from(graph.buildTime);
     this.transitServiceStarts = transitModel.getTransitServiceStarts();
     this.transitServiceEnds = transitModel.getTransitServiceEnds();
     this.transitModes = TraverseModeMapper.mapToApi(transitModel.getTransitModes());

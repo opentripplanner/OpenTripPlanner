@@ -11,10 +11,10 @@ import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactory
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -94,7 +94,7 @@ public class CalendarServiceDataFactoryImplTest {
 
   @Test
   public void testDataGetTimeZoneForAgencyId() {
-    assertEquals("America/New_York", data.getTimeZoneForAgencyId(id(AGENCY)).getID());
+    assertEquals("America/New_York", data.getTimeZoneForAgencyId(id(AGENCY)).getId());
   }
 
   @Test
@@ -118,8 +118,8 @@ public class CalendarServiceDataFactoryImplTest {
 
   @Test
   public void testServiceGetTimeZoneForAgencyId() {
-    TimeZone result = calendarService.getTimeZoneForAgencyId(id(AGENCY));
-    assertEquals("America/New_York", result.getID());
+    ZoneId result = calendarService.getTimeZoneForAgencyId(id(AGENCY));
+    assertEquals("America/New_York", result.getId());
   }
 
   @Test

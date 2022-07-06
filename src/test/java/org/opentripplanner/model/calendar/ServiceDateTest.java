@@ -9,11 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 
 public class ServiceDateTest {
@@ -46,27 +42,6 @@ public class ServiceDateTest {
     assertTrue(Y_0.isBefore(Y_1));
     assertFalse(Y_1.isBefore(Y_0));
     assertFalse(Y_0.isBefore(Y_OTHER));
-  }
-
-  @Test
-  public void testDateConstructor() {
-    var dftTz = TimeZone.getDefault();
-    try {
-      ZoneId utc = ZoneId.of("UTC");
-      ZoneId zFi = ZoneId.of("Europe/Helsinki");
-      TimeZone.setDefault(TimeZone.getTimeZone(zFi));
-
-      var dz0 = ZonedDateTime.of(2020, 10, 20, 20, 59, 59, 999, utc);
-      var dz1 = ZonedDateTime.of(2020, 10, 20, 21, 0, 0, 0, utc);
-
-      Date d0 = new Date(dz0.toEpochSecond() * 1000L);
-      Date d1 = new Date(dz1.toEpochSecond() * 1000L);
-
-      assertEquals(new ServiceDate(2020, 10, 20), new ServiceDate(d0));
-      assertEquals(new ServiceDate(2020, 10, 21), new ServiceDate(d1));
-    } finally {
-      TimeZone.setDefault(dftTz);
-    }
   }
 
   @Test

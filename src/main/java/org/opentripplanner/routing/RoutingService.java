@@ -55,8 +55,7 @@ public class RoutingService {
 
   // TODO We should probably not have the Router as a parameter here
   public RoutingResponse route(RoutingRequest request, Router router) {
-    var zoneId = transitModel.getTimeZone().toZoneId();
-    RoutingWorker worker = new RoutingWorker(router, request, zoneId);
+    RoutingWorker worker = new RoutingWorker(router, request, transitModel.getTimeZone());
     return worker.route();
   }
 

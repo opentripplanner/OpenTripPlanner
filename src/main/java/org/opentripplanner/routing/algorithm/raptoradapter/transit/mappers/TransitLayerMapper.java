@@ -111,7 +111,7 @@ public class TransitLayerMapper {
       transferByStopIndex,
       transitModel.getTransferService(),
       stopIndex,
-      transitModel.getTimeZone().toZoneId(),
+      transitModel.getTimeZone(),
       transferCache,
       tripPatternMapper,
       transferIndexGenerator

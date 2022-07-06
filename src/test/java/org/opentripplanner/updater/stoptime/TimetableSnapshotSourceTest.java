@@ -15,7 +15,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,7 +36,7 @@ public class TimetableSnapshotSourceTest {
 
   static TransitModel transitModel;
   private static final boolean fullDataset = false;
-  private static final ServiceDate serviceDate = new ServiceDate();
+  private static ServiceDate serviceDate;
   private static byte[] cancellation;
   private static String feedId;
 
@@ -49,6 +48,8 @@ public class TimetableSnapshotSourceTest {
     transitModel = otpModel.transitModel;
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();
+
+    serviceDate = new ServiceDate(transitModel.getTimeZone());
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -198,8 +199,9 @@ public class TimetableSnapshotSourceTest {
       tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED);
       tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
-      final Calendar calendar = serviceDate.getAsCalendar(transitModel.getTimeZone());
-      final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
+      final long midnightSecondsSinceEpoch = serviceDate
+        .toZonedDateTime(transitModel.getTimeZone(), 0)
+        .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -320,8 +322,9 @@ public class TimetableSnapshotSourceTest {
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.REPLACEMENT);
       tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
-      final Calendar calendar = serviceDate.getAsCalendar(transitModel.getTimeZone());
-      final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
+      final long midnightSecondsSinceEpoch = serviceDate
+        .toZonedDateTime(transitModel.getTimeZone(), 0)
+        .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 

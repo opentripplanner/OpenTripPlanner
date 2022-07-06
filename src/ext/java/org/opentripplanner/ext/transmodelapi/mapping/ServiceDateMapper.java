@@ -1,15 +1,16 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
-import java.util.TimeZone;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 public class ServiceDateMapper {
 
-  private final TimeZone timeZone;
+  private final ZoneId timeZone;
 
-  public ServiceDateMapper(TimeZone timeZone) {
+  public ServiceDateMapper(ZoneId timeZone) {
     this.timeZone = timeZone;
   }
 
@@ -20,14 +21,14 @@ public class ServiceDateMapper {
 
     return LocalDate
       .of(serviceDate.getYear(), serviceDate.getMonth(), serviceDate.getDay())
-      .atStartOfDay(timeZone.toZoneId())
+      .atStartOfDay(timeZone)
       .toEpochSecond();
   }
 
   public ServiceDate secondsSinceEpochToServiceDate(Long secondsSinceEpoch) {
     if (secondsSinceEpoch == null) {
-      return new ServiceDate();
+      return new ServiceDate(timeZone);
     }
-    return new ServiceDate(new Date(secondsSinceEpoch * 1000));
+    return new ServiceDate(Instant.ofEpochSecond(secondsSinceEpoch).atZone(timeZone).toLocalDate());
   }
 }

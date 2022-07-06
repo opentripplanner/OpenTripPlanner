@@ -2,7 +2,7 @@ package org.opentripplanner.routing.stoptimes;
 
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
-import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
+import static org.opentripplanner.util.time.TimeUtils.ONE_DAY_SECONDS;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import java.time.Instant;
@@ -11,7 +11,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import org.opentripplanner.model.PickDrop;
@@ -176,7 +175,10 @@ public class StopTimesHelper {
     if (startTime == 0) {
       startTime = System.currentTimeMillis() / 1000;
     }
-    Date date = new Date(startTime * 1000);
+    LocalDate date = Instant
+      .ofEpochSecond(startTime)
+      .atZone(transitService.getTimeZone())
+      .toLocalDate();
     ServiceDate[] serviceDates = {
       new ServiceDate(date).previous(),
       new ServiceDate(date),

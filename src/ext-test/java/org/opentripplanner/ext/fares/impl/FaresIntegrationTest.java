@@ -111,7 +111,7 @@ public class FaresIntegrationTest {
     Graph graph = otpModel.graph;
     TransitModel transitModel = otpModel.transitModel;
 
-    assertEquals("America/Los_Angeles", transitModel.getTimeZone().getID());
+    assertEquals("America/Los_Angeles", transitModel.getTimeZone().getId());
 
     assertEquals(1, transitModel.getFeedIds().size());
 
@@ -276,11 +276,7 @@ public class FaresIntegrationTest {
     request.to = to;
     request.itineraryFilters.debug = true;
 
-    var routingWorker = new RoutingWorker(
-      router,
-      request,
-      router.transitModel.getTimeZone().toZoneId()
-    );
+    var routingWorker = new RoutingWorker(router, request, router.transitModel.getTimeZone());
     var result = routingWorker.route();
 
     return result

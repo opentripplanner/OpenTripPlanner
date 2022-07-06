@@ -451,7 +451,10 @@ public class IndexAPI {
     Trip trip = getTrip(transitService, tripId);
     TripPattern pattern = getTripPattern(transitService, trip);
     // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
-    Timetable table = transitService.getTimetableForTripPattern(pattern, null);
+    Timetable table = transitService.getTimetableForTripPattern(
+      pattern,
+      new ServiceDate(transitService.getTimeZone())
+    );
     var tripTimesOnDate = TripTimeOnDate.fromTripTimes(table, trip);
     return TripTimeMapper.mapToApi(tripTimesOnDate);
   }

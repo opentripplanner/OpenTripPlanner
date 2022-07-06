@@ -3,17 +3,16 @@ package org.opentripplanner.model.calendar.impl;
 
 import static java.util.stream.Collectors.groupingBy;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
@@ -70,12 +69,6 @@ public class CalendarServiceDataFactoryImpl {
     return newSet;
   }
 
-  private static Date getServiceDateAsNoon(ServiceDate serviceDate, TimeZone timeZone) {
-    Calendar c = serviceDate.getAsCalendar(timeZone);
-    c.add(Calendar.HOUR_OF_DAY, 12);
-    return c.getTime();
-  }
-
   private CalendarServiceData createData() {
     CalendarServiceData data = new CalendarServiceData();
 
@@ -88,20 +81,7 @@ public class CalendarServiceDataFactoryImpl {
 
       LOG.debug("serviceId=" + serviceId + " (" + index + "/" + serviceIds.size() + ")");
 
-      TimeZone serviceIdTimeZone = data.getTimeZoneForAgencyId(
-        data
-          .getAgencyIds()
-          .stream()
-          .filter(agency -> agency.getFeedId().equals(serviceId.getFeedId()))
-          .findAny()
-          .orElse(null)
-      );
-      if (serviceIdTimeZone == null) {
-        serviceIdTimeZone = TimeZone.getDefault();
-      }
-
-      Set<ServiceDate> activeDates = getServiceDatesForServiceId(serviceId, serviceIdTimeZone);
-
+      Set<ServiceDate> activeDates = getServiceDatesForServiceId(serviceId);
       List<ServiceDate> serviceDates = new ArrayList<>(activeDates);
       Collections.sort(serviceDates);
 
@@ -111,15 +91,12 @@ public class CalendarServiceDataFactoryImpl {
     return data;
   }
 
-  private Set<ServiceDate> getServiceDatesForServiceId(
-    FeedScopedId serviceId,
-    TimeZone serviceIdTimeZone
-  ) {
+  private Set<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
     Set<ServiceDate> activeDates = new HashSet<>();
     ServiceCalendar c = findCalendarForServiceId(serviceId);
 
     if (c != null) {
-      addDatesFromCalendar(c, serviceIdTimeZone, activeDates);
+      addDatesFromCalendar(c, activeDates);
     }
     List<ServiceCalendarDate> dates = calendarDatesByServiceId.get(serviceId);
     if (dates != null) {
@@ -144,64 +121,32 @@ public class CalendarServiceDataFactoryImpl {
 
   private void setTimeZonesForAgencies(CalendarServiceData data) {
     for (Agency agency : agencies) {
-      TimeZone timeZone = TimeZone.getTimeZone(agency.getTimezone());
-      if (timeZone.getID().equals("GMT") && !agency.getTimezone().toUpperCase().equals("GMT")) {
+      try {
+        data.putTimeZoneForAgencyId(agency.getId(), ZoneId.of(agency.getTimezone()));
+      } catch (DateTimeException exception) {
         throw new UnknownAgencyTimezoneException(agency.getName(), agency.getTimezone());
       }
-      data.putTimeZoneForAgencyId(agency.getId(), timeZone);
     }
   }
 
-  private void addDatesFromCalendar(
-    ServiceCalendar calendar,
-    TimeZone timeZone,
-    Set<ServiceDate> activeDates
-  ) {
-    // We calculate service dates relative to noon so as to avoid any weirdness
-    // relative to DST.
-    Date startDate = getServiceDateAsNoon(calendar.getPeriod().getStart(), timeZone);
-    Date endDate = getServiceDateAsNoon(calendar.getPeriod().getEnd(), timeZone);
+  private void addDatesFromCalendar(ServiceCalendar calendar, Set<ServiceDate> activeDates) {
+    LocalDate startDate = calendar.getPeriod().getStart().toLocalDate();
+    LocalDate endDate = calendar.getPeriod().getEnd().toLocalDate();
 
-    java.util.Calendar c = java.util.Calendar.getInstance(timeZone);
-    c.setTime(startDate);
-
-    while (true) {
-      Date date = c.getTime();
-      if (date.after(endDate)) break;
-
-      int day = c.get(java.util.Calendar.DAY_OF_WEEK);
-      boolean active = false;
-
-      switch (day) {
-        case java.util.Calendar.MONDAY:
-          active = calendar.getMonday() == 1;
-          break;
-        case java.util.Calendar.TUESDAY:
-          active = calendar.getTuesday() == 1;
-          break;
-        case java.util.Calendar.WEDNESDAY:
-          active = calendar.getWednesday() == 1;
-          break;
-        case java.util.Calendar.THURSDAY:
-          active = calendar.getThursday() == 1;
-          break;
-        case java.util.Calendar.FRIDAY:
-          active = calendar.getFriday() == 1;
-          break;
-        case java.util.Calendar.SATURDAY:
-          active = calendar.getSaturday() == 1;
-          break;
-        case java.util.Calendar.SUNDAY:
-          active = calendar.getSunday() == 1;
-          break;
+    for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+      if (
+        switch (date.getDayOfWeek()) {
+          case MONDAY -> calendar.getMonday() == 1;
+          case TUESDAY -> calendar.getTuesday() == 1;
+          case WEDNESDAY -> calendar.getWednesday() == 1;
+          case THURSDAY -> calendar.getThursday() == 1;
+          case FRIDAY -> calendar.getFriday() == 1;
+          case SATURDAY -> calendar.getSaturday() == 1;
+          case SUNDAY -> calendar.getSunday() == 1;
+        }
+      ) {
+        addServiceDate(activeDates, new ServiceDate(date));
       }
-
-      if (active) {
-        var localDate = LocalDate.ofInstant(c.toInstant(), timeZone.toZoneId());
-        addServiceDate(activeDates, new ServiceDate(localDate));
-      }
-
-      c.add(java.util.Calendar.DAY_OF_YEAR, 1);
     }
   }
 
@@ -212,15 +157,11 @@ public class CalendarServiceDataFactoryImpl {
     ServiceDate serviceDate = calendarDate.getDate();
 
     switch (calendarDate.getExceptionType()) {
-      case ServiceCalendarDate.EXCEPTION_TYPE_ADD:
-        addServiceDate(activeDates, serviceDate);
-        break;
-      case ServiceCalendarDate.EXCEPTION_TYPE_REMOVE:
-        activeDates.remove(serviceDate);
-        break;
-      default:
-        LOG.warn("unknown CalendarDate exception type: " + calendarDate.getExceptionType());
-        break;
+      case ServiceCalendarDate.EXCEPTION_TYPE_ADD -> addServiceDate(activeDates, serviceDate);
+      case ServiceCalendarDate.EXCEPTION_TYPE_REMOVE -> activeDates.remove(serviceDate);
+      default -> LOG.warn(
+        "unknown CalendarDate exception type: " + calendarDate.getExceptionType()
+      );
     }
   }
 

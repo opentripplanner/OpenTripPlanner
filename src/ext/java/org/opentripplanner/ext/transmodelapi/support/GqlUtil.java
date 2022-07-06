@@ -10,8 +10,8 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.TimeZone;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
@@ -36,7 +36,7 @@ public class GqlUtil {
   public final GraphQLDirective timingData;
 
   /** private to prevent util class from instantiation */
-  public GqlUtil(TimeZone timeZone) {
+  public GqlUtil(ZoneId timeZone) {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
     this.dateScalar = DateScalarFactory.createDateScalar();

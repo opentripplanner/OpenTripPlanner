@@ -16,7 +16,7 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Long> date() {
-    return environment -> getSource(environment).getTripPlan().date.getTime();
+    return environment -> getSource(environment).getTripPlan().date.toEpochMilli();
   }
 
   @Override

@@ -54,7 +54,7 @@ public record ScheduledTransitLegReference(
     TripTimes tripTimes = timetable.getTripTimes(trip);
 
     // TODO: What should we have here
-    ZoneId timeZone = transitService.getTimeZone().toZoneId();
+    ZoneId timeZone = transitService.getTimeZone();
 
     int boardingTime = tripTimes.getDepartureTime(fromStopPositionInPattern);
     int alightingTime = tripTimes.getArrivalTime(toStopPositionInPattern);

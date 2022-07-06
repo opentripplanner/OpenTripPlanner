@@ -32,7 +32,7 @@ public class TripType {
           .name("dateTime")
           .description("The time and date of travel")
           .type(gqlUtil.dateTimeScalar)
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.getTime())
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.toEpochMilli())
           .build()
       )
       .field(

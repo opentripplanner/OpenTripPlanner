@@ -243,7 +243,7 @@ public class SpeedTest {
   }
 
   private ZoneId getTimeZoneId() {
-    return transitModel.getTimeZone().toZoneId();
+    return transitModel.getTimeZone();
   }
 
   private void forceGCToAvoidGCLater() {

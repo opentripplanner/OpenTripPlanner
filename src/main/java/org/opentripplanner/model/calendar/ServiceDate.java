@@ -8,10 +8,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,15 +32,13 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
   private static final NumberFormat MONTH_AND_DAY_FORMAT = new DecimalFormat("00");
 
-  private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
-
   /**
    * The smallest possible ServiceDate allowed. Dates before 1 . JAN year 0 is not allowed.
    */
   public static final ServiceDate MIN_DATE = new ServiceDate(0, 1, 1);
 
   /**
-   * The greatest possible ServiceDate allowed. Dates ater 31 . DEC year 9999 is not allowed.
+   * The greatest possible ServiceDate allowed. Dates after 31 . DEC year 9999 is not allowed.
    */
   public static final ServiceDate MAX_DATE = new ServiceDate(9999, 12, 31);
 
@@ -85,25 +80,8 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     this.sequenceNumber = 10_000 * year + 100 * month + day;
   }
 
-  /**
-   * Construct a ServiceDate from the specified {@link Date} object, using the default {@link
-   * TimeZone} object for the current VM to localize the date.
-   *
-   * @deprecated This is potentially dangerous to use. The TimeZone on the graph can be different
-   * from the VM/server default.
-   */
-  @Deprecated
-  public ServiceDate(Date date) {
-    this(LocalDate.ofInstant(date.toInstant(), ZoneId.systemDefault()));
-  }
-
-  /**
-   * @deprecated This is potentially dangerous to use. The TimeZone on the graph can be different
-   * from the server default.
-   */
-  @Deprecated
-  public ServiceDate() {
-    this(new Date());
+  public ServiceDate(ZoneId timeZone) {
+    this(LocalDate.now(timeZone));
   }
 
   public ServiceDate(LocalDate date) {
@@ -173,54 +151,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
   }
 
   /**
-   * Constructs a {@link Calendar} object such that the Calendar will be at "midnight" (12:00am) at
-   * the start of the day specified by this service date and the target timezone. Note that we take
-   * the GTFS convention of calculating midnight by setting the target date to noon (12:00pm) for
-   * the service date and timezone specified and then subtracting twelve hours. Normally that would
-   * be equivalent to midnight, except on Daylight Saving Time days, in which case it can be an hour
-   * ahead or behind. This behavior ensures correct calculation of {@link
-   * org.opentripplanner.model.StopTime} arrival and departure time when the second offset is added
-   * to the localized service date.
-   *
-   * @param timeZone the target timezone to localize the service date to
-   * @return a localized date at "midnight" at the start of this service date in the specified
-   * timezone
-   * @deprecated Replace this method with a method that uses the new {@link java.time} library
-   * instead of the old {@link Calendar}.
-   */
-  @Deprecated
-  public Calendar getAsCalendar(TimeZone timeZone) {
-    Calendar c = Calendar.getInstance();
-    c.setTimeZone(timeZone);
-    c.set(Calendar.YEAR, year);
-    c.set(Calendar.MONTH, month - 1);
-    c.set(Calendar.DAY_OF_MONTH, day);
-
-    // Initial set time to noon
-    c.set(Calendar.HOUR_OF_DAY, 12);
-    c.set(Calendar.MINUTE, 0);
-    c.set(Calendar.SECOND, 0);
-    c.set(Calendar.MILLISECOND, 0);
-
-    // Subtract 12 hours. Usually takes you to midnight, except on DST days
-    c.add(Calendar.HOUR_OF_DAY, -12);
-
-    return c;
-  }
-
-  /**
-   * See {@link #getAsCalendar(TimeZone)} for more details.
-   *
-   * @param timeZone the target timezone to localize the service date to
-   * @return a localized date at "midnight" at the start of this service date in the specified
-   * timezone
-   */
-  public Date getAsDate(TimeZone timeZone) {
-    Calendar c = getAsCalendar(timeZone);
-    return c.getTime();
-  }
-
-  /**
    * @return a string in "YYYYMMDD" format
    */
   public String asCompactString() {
@@ -258,19 +188,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
       return this;
     }
     return new ServiceDate(toLocalDate().plusDays(numberOfDays));
-  }
-
-  /**
-   * @return the number of days between this service date and the specified argument service date
-   * @deprecated This method uses UTC TimeZone, should be replaced with a method that uses the graph
-   * TimeZone.
-   */
-  @Deprecated
-  public long difference(ServiceDate serviceDate) {
-    return (
-      (serviceDate.getAsDate(UTC_TIME_ZONE).getTime() - getAsDate(UTC_TIME_ZONE).getTime()) /
-      (24 * 60 * 60 * 1000)
-    );
   }
 
   /**

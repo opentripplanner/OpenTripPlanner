@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Date;
 import java.util.Map;
-import java.util.TimeZone;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -30,7 +29,7 @@ public class ServiceDay implements Serializable {
     CalendarService cs,
     FeedScopedId agencyId
   ) {
-    TimeZone timeZone = cs.getTimeZoneForAgencyId(agencyId);
+    ZoneId timeZone = cs.getTimeZoneForAgencyId(agencyId);
     this.serviceDate = serviceDate;
 
     init(serviceCodes, cs, timeZone);
@@ -94,13 +93,8 @@ public class ServiceDay implements Serializable {
     return Long.toString(this.midnight) + Arrays.asList(serviceIdsRunning);
   }
 
-  private void init(
-    Map<FeedScopedId, Integer> serviceCodes,
-    CalendarService cs,
-    TimeZone timeZone
-  ) {
-    Date d = serviceDate.getAsDate(timeZone);
-    this.midnight = d.getTime() / 1000;
+  private void init(Map<FeedScopedId, Integer> serviceCodes, CalendarService cs, ZoneId timeZone) {
+    this.midnight = serviceDate.toZonedDateTime(timeZone, 0).toEpochSecond();
     serviceIdsRunning = new BitSet(cs.getServiceIds().size());
 
     for (FeedScopedId serviceId : cs.getServiceIdsOnDate(serviceDate)) {

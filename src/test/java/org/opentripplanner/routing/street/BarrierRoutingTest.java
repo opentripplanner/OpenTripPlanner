@@ -8,6 +8,7 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.function.Consumer;
@@ -180,7 +181,7 @@ public class BarrierRoutingTest {
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      TimeZone.getTimeZone("Europe/Berlin"),
+      ZoneId.of("Europe/Berlin"),
       Mockito.mock(AlertToLegMapper.class),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference

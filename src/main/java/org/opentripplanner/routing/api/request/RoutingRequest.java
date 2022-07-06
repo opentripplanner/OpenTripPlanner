@@ -5,11 +5,12 @@ import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -906,8 +906,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.dateTime = dateTime;
   }
 
-  public void setDateTime(String date, String time, TimeZone tz) {
-    Date dateObject = DateUtils.toDate(date, time, tz);
+  public void setDateTime(String date, String time, ZoneId tz) {
+    ZonedDateTime dateObject = DateUtils.toZonedDateTime(date, time, tz);
     setDateTime(dateObject == null ? Instant.now() : dateObject.toInstant());
   }
 

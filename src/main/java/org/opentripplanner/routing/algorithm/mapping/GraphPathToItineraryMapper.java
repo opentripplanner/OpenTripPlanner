@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
@@ -56,12 +55,12 @@ public class GraphPathToItineraryMapper {
   private final double ellipsoidToGeoidDifference;
 
   public GraphPathToItineraryMapper(
-    TimeZone timeZone,
+    ZoneId timeZone,
     AlertToLegMapper alertToLegMapper,
     StreetNotesService streetNotesService,
     double ellipsoidToGeoidDifference
   ) {
-    this.timeZone = timeZone.toZoneId();
+    this.timeZone = timeZone;
     this.alertToLegMapper = alertToLegMapper;
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;

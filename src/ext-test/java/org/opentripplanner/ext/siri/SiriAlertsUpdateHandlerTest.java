@@ -312,11 +312,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
-      transitAlert.getEffectiveStartDate().toInstant(),
+      transitAlert.getEffectiveStartDate(),
       startTime.getZone()
     );
     final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(
-      transitAlert.getEffectiveEndDate().toInstant(),
+      transitAlert.getEffectiveEndDate(),
       endTime.getZone()
     );
 
@@ -373,11 +373,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
-      transitAlert.getEffectiveStartDate().toInstant(),
+      transitAlert.getEffectiveStartDate(),
       startTime.getZone()
     );
     final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(
-      transitAlert.getEffectiveEndDate().toInstant(),
+      transitAlert.getEffectiveEndDate(),
       endTime.getZone()
     );
 
@@ -506,11 +506,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     // Effective validity should be calculated based on the actual departures when Operating dat/service date is provided
     final ZonedDateTime effectiveStartDate = ZonedDateTime.ofInstant(
-      transitAlert.getEffectiveStartDate().toInstant(),
+      transitAlert.getEffectiveStartDate(),
       startTime.getZone()
     );
     final ZonedDateTime effectiveEndDate = ZonedDateTime.ofInstant(
-      transitAlert.getEffectiveEndDate().toInstant(),
+      transitAlert.getEffectiveEndDate(),
       endTime.getZone()
     );
 
@@ -722,10 +722,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertNotNull(transitAlert.getEffectiveStartDate());
 
-    assertEquals(
-      period_1.getStartTime().toEpochSecond(),
-      (transitAlert.getEffectiveStartDate().getTime() / 1000)
-    );
+    assertEquals(period_1.getStartTime().toInstant(), transitAlert.getEffectiveStartDate());
 
     assertNull(transitAlert.getEffectiveEndDate());
   }

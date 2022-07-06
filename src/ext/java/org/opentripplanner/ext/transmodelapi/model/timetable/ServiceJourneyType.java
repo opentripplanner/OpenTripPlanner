@@ -268,7 +268,7 @@ public class ServiceJourneyType {
               .ofNullable(environment.getArgument("date"))
               .map(LocalDate.class::cast)
               .map(ServiceDate::new)
-              .orElse(new ServiceDate());
+              .orElse(new ServiceDate(GqlUtil.getTransitService(environment).getTimeZone()));
             return TripTimesShortHelper.getTripTimesShort(
               GqlUtil.getRoutingService(environment),
               GqlUtil.getTransitService(environment),

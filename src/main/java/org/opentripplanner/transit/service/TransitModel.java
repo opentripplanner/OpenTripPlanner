@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -18,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -108,7 +108,7 @@ public class TransitModel implements Serializable {
 
   public transient TransitModelIndex index;
   private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
-  private transient TimeZone timeZone = null;
+  private transient ZoneId timeZone = null;
 
   /**
    * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
@@ -261,7 +261,7 @@ public class TransitModel implements Serializable {
 
   // Infer the time period covered by the transit feed
   public void updateTransitFeedValidity(CalendarServiceData data, DataImportIssueStore issueStore) {
-    long now = new Date().getTime() / 1000;
+    long now = Instant.now().getEpochSecond();
     final long SEC_IN_DAY = 24 * 60 * 60;
     HashSet<String> agenciesWithFutureDates = new HashSet<>();
     HashSet<String> agencies = new HashSet<>();
@@ -269,7 +269,7 @@ public class TransitModel implements Serializable {
       agencies.add(sid.getFeedId());
       for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
         // Adjust for timezone, assuming there is only one per graph.
-        long t = sd.getAsDate(getTimeZone()).getTime() / 1000;
+        long t = sd.toZonedDateTime(getTimeZone(), 0).toEpochSecond();
         if (t > now) {
           agenciesWithFutureDates.add(sid.getFeedId());
         }
@@ -345,7 +345,7 @@ public class TransitModel implements Serializable {
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
     // Start of day
-    long time = serviceDate.toZonedDateTime(getTimeZone().toZoneId(), 0).toEpochSecond();
+    long time = serviceDate.toZonedDateTime(getTimeZone(), 0).toEpochSecond();
 
     if (time < transitServiceStarts || time >= transitServiceEnds) {
       return null;
@@ -399,15 +399,15 @@ public class TransitModel implements Serializable {
    * may become necessary when we start making graphs with long distance train, boat, or air
    * services.
    */
-  public TimeZone getTimeZone() {
+  public ZoneId getTimeZone() {
     if (timeZone == null) {
       if (agencies.size() == 0) {
-        timeZone = TimeZone.getTimeZone("GMT");
+        timeZone = ZoneId.of("GMT");
         LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
       } else {
         CalendarService cs = this.getCalendarService();
         for (Agency agency : agencies) {
-          TimeZone tz = cs.getTimeZoneForAgencyId(agency.getId());
+          ZoneId tz = cs.getTimeZoneForAgencyId(agency.getId());
           if (timeZone == null) {
             LOG.debug("graph time zone set to {}", tz);
             timeZone = tz;

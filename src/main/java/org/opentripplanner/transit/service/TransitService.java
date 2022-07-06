@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import java.time.ZoneId;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -159,7 +159,7 @@ public interface TransitService {
 
   CalendarService getCalendarService();
 
-  TimeZone getTimeZone();
+  ZoneId getTimeZone();
 
   TransitAlertService getTransitAlertService();
 

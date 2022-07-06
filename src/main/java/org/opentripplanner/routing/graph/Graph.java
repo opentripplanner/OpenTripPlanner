@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -69,9 +69,10 @@ public class Graph implements Serializable {
 
   /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
   private final Map<String, Vertex> vertices = new ConcurrentHashMap<>();
+
   public final transient Deduplicator deduplicator;
 
-  public final Date buildTime = new Date();
+  public final Instant buildTime = Instant.now();
   private StopModel stopModel;
 
   private GraphBundle bundle;

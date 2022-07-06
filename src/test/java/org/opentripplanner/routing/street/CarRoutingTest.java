@@ -4,6 +4,7 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.TimeZone;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -148,7 +149,7 @@ public class CarRoutingTest {
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      TimeZone.getTimeZone("Europe/Berlin"),
+      ZoneId.of("Europe/Berlin"),
       Mockito.mock(AlertToLegMapper.class),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
