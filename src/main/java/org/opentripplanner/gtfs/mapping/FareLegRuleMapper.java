@@ -18,7 +18,13 @@ public record FareLegRuleMapper(
       .map(r -> {
         FareProduct productForRule = fareProductMapper.map(r.getFareProduct());
         if (productForRule != null) {
-          return new FareLegRule(productForRule.id().getFeedId(), r.getNetworkId(), productForRule);
+          return new FareLegRule(
+            productForRule.id().getFeedId(),
+            r.getNetworkId(),
+            r.getFromAreaId(),
+            r.getToAreaId(),
+            productForRule
+          );
         } else {
           issueStore.add(
             "UnknownFareProductId",

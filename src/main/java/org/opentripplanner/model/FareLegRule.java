@@ -6,5 +6,7 @@ import javax.annotation.Nullable;
 public record FareLegRule(
   @Nonnull String feedId,
   @Nullable String networkId,
+  @Nullable String fromAreaId,
+  @Nullable String toAreadId,
   @Nonnull FareProduct fareProduct
 ) {}

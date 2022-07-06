@@ -37,6 +37,14 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null,
     null
   );
+  FareProduct zoneABsingle = new FareProduct(
+    new FeedScopedId(FEED_ID, "zone_ab_single"),
+    "Day Pass",
+    Money.euros(500),
+    Duration.ofDays(1),
+    null,
+    null
+  );
   FareProduct monthlyPass = new FareProduct(
     new FeedScopedId("another", "monthly_pass"),
     "Monthly Pass",
@@ -55,12 +63,15 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null
   );
 
+  private String zoneA = "zone-a";
+  private String zoneB = "zone-b";
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      new FareLegRule(FEED_ID, null, single),
-      new FareLegRule(FEED_ID, null, dayPass),
-      new FareLegRule(FEED_ID, express, expressPass),
-      new FareLegRule("another-feed", null, monthlyPass)
+      new FareLegRule(FEED_ID, null, null, null, single),
+      new FareLegRule(FEED_ID, null, null, null, dayPass),
+      new FareLegRule(FEED_ID, null, zoneA, zoneB, dayPass),
+      new FareLegRule(FEED_ID, express, null, null, expressPass),
+      new FareLegRule("another-feed", null, null, null, monthlyPass)
     )
   );
 
