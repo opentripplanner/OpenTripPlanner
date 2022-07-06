@@ -93,7 +93,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   // these queues are filled by a search in another thread, so must be threadsafe
   private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<>();
   private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<>();
-  private final DateTimeFormatter shortDateFormat = DateTimeFormatter.ofPattern("HH:mm:ss z");
+  private static final DateTimeFormatter shortDateFormat = DateTimeFormatter.ofPattern(
+    "HH:mm:ss z"
+  );
   private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<>();
   private final boolean drawEdges = true;
   private int videoFrameNumber = 0;

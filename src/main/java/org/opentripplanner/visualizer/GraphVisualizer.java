@@ -164,7 +164,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GraphVisualizer.class);
-  private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(
+    "yyyy-MM-dd HH:mm:ss z"
+  );
+  public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss z");
   /* The router we are visualizing. */
   private final Router router;
   /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
@@ -433,9 +436,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     Instant when;
     // Year + 1900
     try {
-      when = ZonedDateTime.parse(searchDate.getText(), dateFormat).toInstant();
+      when = ZonedDateTime.parse(searchDate.getText(), DATE_FORMAT).toInstant();
     } catch (DateTimeParseException e) {
-      searchDate.setText("Format: " + dateFormat.toString());
+      searchDate.setText("Format: " + DATE_FORMAT.toString());
       return;
     }
     TraverseModeSet modeSet = new TraverseModeSet();
@@ -1284,13 +1287,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     resetSearchDateButton.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          searchDate.setText(dateFormat.format(Instant.now()));
+          searchDate.setText(DATE_FORMAT.format(Instant.now()));
         }
       }
     );
     routingPanel.add(resetSearchDateButton);
     searchDate = new JTextField();
-    searchDate.setText(dateFormat.format(Instant.now()));
+    searchDate.setText(DATE_FORMAT.format(Instant.now()));
     routingPanel.add(searchDate);
 
     // row: launch, continue, and clear path search
@@ -1353,9 +1356,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
 
     public String toString() {
-      DateTimeFormatter shortDateFormat = DateTimeFormatter.ofPattern("HH:mm:ss z");
-      String startTime = shortDateFormat.format(Instant.ofEpochSecond(gp.getStartTime()));
-      String endTime = shortDateFormat.format(Instant.ofEpochSecond(gp.getEndTime()));
+      String startTime = TIME_FORMAT.format(Instant.ofEpochSecond(gp.getStartTime()));
+      String endTime = TIME_FORMAT.format(Instant.ofEpochSecond(gp.getEndTime()));
       return (
         "Path (" +
         startTime +

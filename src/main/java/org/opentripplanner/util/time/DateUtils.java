@@ -24,6 +24,30 @@ public class DateUtils implements DateConstants {
 
   private static final int SANITY_CHECK_CUTOFF_YEAR = 1000;
 
+  // NOTE: don't change the order of these strings...the simplest should be on the
+  // bottom...you risk parsing the wrong thing (and ending up with year 0012)
+  private static final List<DateTimeFormatter> DF_LIST = List.of(
+    DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm.ss"),
+    DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm"),
+    DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm.ss.SS"),
+    DateTimeFormatter.ofPattern("M.d.yy h.mm a"),
+    DateTimeFormatter.ofPattern("M.d.yyyy h.mm a"),
+    DateTimeFormatter.ofPattern("M.d.yyyy h.mma"),
+    DateTimeFormatter.ofPattern("M.d.yyyy h.mm"),
+    DateTimeFormatter.ofPattern("M.d.yyyy k.mm"),
+    DateTimeFormatter.ofPattern("M.d.yyyy"),
+    DateTimeFormatter.ofPattern("yyyy.M.d"),
+    DateTimeFormatter.ofPattern("h.mm a")
+    // NOTE: don't change the order of these strings...the simplest should be on the
+    // bottom...you risk parsing the wrong thing (and ending up with year 0012)
+  );
+
+  private static final List<DateTimeFormatter> SMALL_DF_LIST = List.of(
+    DateTimeFormatter.ofPattern("M.d.yy"),
+    DateTimeFormatter.ofPattern("yy.M.d"),
+    DateTimeFormatter.ofPattern("h.mm a")
+  );
+
   /**
    * Returns a Date object based on input date and time parameters Defaults to today / now (when
    * date / time are null)
@@ -70,7 +94,7 @@ public class DateUtils implements DateConstants {
         .replace('-', '.')
         .replace(':', '.')
         .replace('/', '.');
-      List<String> dl = DF_LIST;
+      List<DateTimeFormatter> dateTimeFormatterList = DF_LIST;
 
       if (newString.length() <= 8) {
         if (newString.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
@@ -84,14 +108,13 @@ public class DateUtils implements DateConstants {
         } else if (!(newString.matches(".*20\\d\\d.*"))) {
           // if it looks like we have a small date format, ala 11.4.09, then use
           // another set of compares
-          dl = SMALL_DF_LIST;
+          dateTimeFormatterList = SMALL_DF_LIST;
         }
       }
 
-      for (String df : dl) {
-        DateTimeFormatter sdf = DateTimeFormatter.ofPattern(df);
+      for (DateTimeFormatter dateTimeFormatter : dateTimeFormatterList) {
         try {
-          retVal = LocalDate.parse(newString, sdf);
+          retVal = LocalDate.parse(newString, dateTimeFormatter);
           if (retVal != null) {
             int year = retVal.getYear();
             if (year >= SANITY_CHECK_CUTOFF_YEAR) {
