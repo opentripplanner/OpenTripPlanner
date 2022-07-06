@@ -66,7 +66,7 @@ public class AddingMultipleFareService implements FareService, Serializable {
             // Add new cost
             // Note: this should not happen often: only if a fare
             // did not compute a "regular" fare.
-            newFare.addFare(fareType, new Money(subCost.getCurrency(), subCost.getCents()));
+            newFare.addFare(fareType, subCost);
           }
         }
         fare = newFare;

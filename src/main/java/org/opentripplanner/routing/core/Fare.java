@@ -18,7 +18,7 @@ import org.opentripplanner.model.FareProduct;
  */
 public class Fare {
 
-  protected final Map<String, Container> details;
+  protected final Map<String, FareEntry> details;
 
   public Fare(Fare aFare) {
     if (aFare != null) {
@@ -41,11 +41,25 @@ public class Fare {
   }
 
   public void addFare(FareType fareType, Money money, List<FareComponent> components) {
-    details.put(fareType.name(), new Container(money, components));
+    details.put(fareType.name(), new FareEntry(money, components));
   }
 
-  public void addProduct(FareProduct fareProduct) {
-    details.put(fareProduct.id().toString(), new Container(fareProduct.amount(), List.of()));
+  public void addProduct(FareProduct product) {
+    details.put(
+      product.id().toString(),
+      new FareEntry(
+        product.amount(),
+        List.of(
+          new FareComponent(
+            product.id(),
+            product.amount(),
+            List.of(),
+            product.container(),
+            product.category()
+          )
+        )
+      )
+    );
   }
 
   public Money getFare(FareType type) {
@@ -53,7 +67,7 @@ public class Fare {
   }
 
   public Money getFare(String type) {
-    return Optional.ofNullable(details.get(type)).map(Container::amount).orElse(null);
+    return Optional.ofNullable(details.get(type)).map(FareEntry::amount).orElse(null);
   }
 
   public List<FareComponent> getDetails(FareType type) {
@@ -61,7 +75,7 @@ public class Fare {
   }
 
   public List<FareComponent> getDetails(String type) {
-    return Optional.ofNullable(details.get(type)).map(Container::components).orElse(null);
+    return Optional.ofNullable(details.get(type)).map(FareEntry::components).orElse(null);
   }
 
   @Override
@@ -86,7 +100,7 @@ public class Fare {
   }
 
   public Set<Money> getMoneys() {
-    return details.values().stream().map(Container::amount).collect(Collectors.toSet());
+    return details.values().stream().map(FareEntry::amount).collect(Collectors.toSet());
   }
 
   public enum FareType implements Serializable {
@@ -98,5 +112,5 @@ public class Fare {
     youth,
   }
 
-  private record Container(Money amount, List<FareComponent> components) {}
+  private record FareEntry(Money amount, List<FareComponent> components) {}
 }
