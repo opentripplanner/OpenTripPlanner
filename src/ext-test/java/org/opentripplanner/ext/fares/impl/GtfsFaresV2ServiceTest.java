@@ -112,7 +112,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   }
 
   @Test
-  void areaIds() {
+  void twoAreaIds() {
     Itinerary i1 = newItinerary(A, 0)
       .walk(20, INNER_ZONE_STOP)
       .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)

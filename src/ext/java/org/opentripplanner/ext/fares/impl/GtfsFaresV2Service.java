@@ -1,11 +1,15 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.model.FareLegRule;
@@ -13,18 +17,21 @@ import org.opentripplanner.model.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public final class GtfsFaresV2Service implements Serializable {
 
   private final List<FareLegRule> legRules;
   private final Multimap<FeedScopedId, String> stopAreas;
   private final Set<String> networksWithRules;
-  private final Set<String> stopAreasWithRules;
+  private final Set<String> fromAreasWithRules;
+  private final Set<String> toAreasWithRules;
 
   public GtfsFaresV2Service(List<FareLegRule> legRules, Multimap<FeedScopedId, String> stopAreas) {
     this.legRules = legRules;
     this.networksWithRules = findNetworksWithRules(legRules);
-    this.stopAreasWithRules = findAreasWithRules(legRules);
+    this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
+    this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreadId);
     this.stopAreas = stopAreas;
   }
 
@@ -40,11 +47,11 @@ public final class GtfsFaresV2Service implements Serializable {
     return new ProductResult(coveringItinerary);
   }
 
-  private static Set<String> findAreasWithRules(List<FareLegRule> legRules) {
-    return legRules
-      .stream()
-      .flatMap(rule -> Stream.of(rule.fromAreaId(), rule.toAreadId()).filter(Objects::nonNull))
-      .collect(Collectors.toSet());
+  private static Set<String> findAreasWithRules(
+    List<FareLegRule> legRules,
+    Function<FareLegRule, String> getArea
+  ) {
+    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
   }
 
   private static Set<String> findNetworksWithRules(Collection<FareLegRule> legRules) {
@@ -61,19 +68,19 @@ public final class GtfsFaresV2Service implements Serializable {
       // make sure that you only get rules for the correct feed
       .filter(legRule -> leg.getAgency().getId().getFeedId().equals(legRule.feedId()))
       .filter(rule -> filterByNetworkId(leg, rule))
-      // apply only those rules which have the correct area ids
-      .filter(rule -> filterByFromArea(leg, rule))
+      // apply only those fare leg rules which have the correct area ids
+      // if area id is null, the rule applies to all legs UNLESS there is another rule that
+      // covers this area
+      .filter(rule -> filterByArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules))
+      .filter(rule -> filterByArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules))
       .map(FareLegRule::fareProduct);
   }
 
-  private boolean filterByFromArea(ScheduledTransitLeg leg, FareLegRule rule) {
-    var fromStopAreas = stopAreas.get(leg.getFrom().stop.getId());
+  private boolean filterByArea(StopLocation stop, String areaId, Set<String> areasWithRules) {
+    var stopAreas = this.stopAreas.get(stop.getId());
     return (
-      (
-        Objects.isNull(rule.fromAreaId()) &&
-        fromStopAreas.stream().noneMatch(stopAreasWithRules::contains)
-      ) ||
-      (Objects.nonNull(rule.fromAreaId()) && fromStopAreas.contains(rule.fromAreaId()))
+      (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
+      (nonNull(areaId) && stopAreas.contains(areaId))
     );
   }
 
@@ -83,10 +90,7 @@ public final class GtfsFaresV2Service implements Serializable {
    */
   private boolean filterByNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
     return (
-      (
-        Objects.isNull(rule.networkId()) &&
-        !networksWithRules.contains(leg.getRoute().getNetworkId())
-      ) ||
+      (isNull(rule.networkId()) && !networksWithRules.contains(leg.getRoute().getNetworkId())) ||
       Objects.equals(rule.networkId(), leg.getRoute().getNetworkId())
     );
   }
