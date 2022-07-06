@@ -6,7 +6,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class ShapeGeometryTooFar implements DataImportIssue {
 
   public static final String FMT =
-    "Trip %s is too far from shape geometry %s" + " using straight line path instead";
+    "Trip %s is too far from shape geometry %s, using straight line path instead";
 
   final FeedScopedId shapeId;
   final FeedScopedId tripId;
