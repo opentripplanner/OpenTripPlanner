@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 
+import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareProduct;
@@ -37,11 +39,11 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null,
     null
   );
-  FareProduct zoneABsingle = new FareProduct(
+  FareProduct innerToOuterZoneSingle = new FareProduct(
     new FeedScopedId(FEED_ID, "zone_ab_single"),
     "Day Pass",
     Money.euros(500),
-    Duration.ofDays(1),
+    null,
     null,
     null
   );
@@ -63,24 +65,31 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null
   );
 
-  private String zoneA = "zone-a";
-  private String zoneB = "zone-b";
+  Place INNER_ZONE_STOP = Place.forStop(
+    TransitModelForTest.stop("inner city stop").withCoordinate(1, 1).build()
+  );
+  Place OUTER_ZONE_STOP = Place.forStop(
+    TransitModelForTest.stop("outer city stop").withCoordinate(2, 2).build()
+  );
+  String INNER_ZONE = "inner-zone";
+  String OUTER_ZONE = "outer-zone";
+
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
       new FareLegRule(FEED_ID, null, null, null, single),
       new FareLegRule(FEED_ID, null, null, null, dayPass),
-      new FareLegRule(FEED_ID, null, zoneA, zoneB, dayPass),
       new FareLegRule(FEED_ID, express, null, null, expressPass),
+      new FareLegRule(FEED_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
       new FareLegRule("another-feed", null, null, null, monthlyPass)
+    ),
+    Multimaps.forMap(
+      Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
     )
   );
 
   @Test
   void singleLeg() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, Place.forStop(TransitModelForTest.stopForTest("1:stop", 1d, 1d)))
-      .bus(ID, 0, 50, B)
-      .build();
+    Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
     var result = service.getProducts(i1);
     assertEquals(List.of(single, dayPass), result.productsCoveringItinerary().stream().toList());
@@ -88,11 +97,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   @Test
   void twoLegs() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, Place.forStop(TransitModelForTest.stopForTest("1:stop", 1d, 1d)))
-      .bus(ID, 0, 50, B)
-      .bus(ID, 55, 70, B)
-      .build();
+    Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
     var result = service.getProducts(i1);
     assertEquals(List.of(dayPass), result.productsCoveringItinerary().stream().toList());
@@ -100,12 +105,23 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   @Test
   void networkId() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, Place.forStop(TransitModelForTest.stopForTest("1:stop", 1d, 1d)))
-      .faresV2Rail(ID, 0, 50, B, express)
-      .build();
+    Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, express).build();
 
     var result = service.getProducts(i1);
     assertEquals(List.of(expressPass), result.productsCoveringItinerary().stream().toList());
+  }
+
+  @Test
+  void areaIds() {
+    Itinerary i1 = newItinerary(A, 0)
+      .walk(20, INNER_ZONE_STOP)
+      .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
+      .build();
+
+    var result = service.getProducts(i1);
+    assertEquals(
+      List.of(innerToOuterZoneSingle),
+      result.productsCoveringItinerary().stream().toList()
+    );
   }
 }

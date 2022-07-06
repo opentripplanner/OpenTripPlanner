@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareRule;
@@ -32,14 +32,16 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
-  private List<FareLegRule> fareLegRules = List.of();
+  private List<FareLegRule> fareLegRules = new ArrayList<>();
+  // mapping the stop ids to area ids. one stop can be in several areas.
+  private Multimap<FeedScopedId, String> stopAreas = Multimaps.forMap(Map.of());
 
   @Override
   public FareService makeFareService() {
     DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
 
-    var faresV2Service = new GtfsFaresV2Service(fareLegRules.stream().toList());
+    var faresV2Service = new GtfsFaresV2Service(fareLegRules.stream().toList(), stopAreas);
     return new GtfsFaresService(fareService, faresV2Service);
   }
 
@@ -51,7 +53,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
       regularFareRules
     );
 
-    fareLegRules = List.copyOf(transitService.getAllFareLegRules());
+    fareLegRules.addAll(transitService.getAllFareLegRules());
   }
 
   public void configure(JsonNode config) {
