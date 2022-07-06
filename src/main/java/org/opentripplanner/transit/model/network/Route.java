@@ -87,7 +87,8 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
       Objects.equals(this.url, other.url) &&
       Objects.equals(this.color, other.color) &&
       Objects.equals(this.textColor, other.textColor) &&
-      Objects.equals(this.bikesAllowed, other.bikesAllowed)
+      Objects.equals(this.bikesAllowed, other.bikesAllowed) &&
+      Objects.equals(this.networkId, other.networkId)
     );
   }
 

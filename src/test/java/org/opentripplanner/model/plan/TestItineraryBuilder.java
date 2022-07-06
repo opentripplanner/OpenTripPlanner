@@ -202,6 +202,26 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
   }
 
+  public TestItineraryBuilder faresV2Rail(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    String networkId
+  ) {
+    return transit(
+      RAIL_ROUTE.copy().withNetworkId(networkId).build(),
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      null
+    );
+  }
+
   public Itinerary egress(int walkDuration) {
     walk(walkDuration, null);
     return build();
