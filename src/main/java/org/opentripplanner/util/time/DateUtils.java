@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g) October 20, 2009
  */
-public class DateUtils implements DateConstants {
+public class DateUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 

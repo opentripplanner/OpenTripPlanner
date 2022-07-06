@@ -2,7 +2,7 @@ package org.opentripplanner.routing.stoptimes;
 
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
-import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
+import static org.opentripplanner.util.time.TimeUtils.ONE_DAY_SECONDS;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import java.time.Instant;

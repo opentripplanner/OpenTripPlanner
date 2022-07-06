@@ -21,6 +21,7 @@ public class TimeUtils {
   public static final int NOT_SET = -1_000_000;
 
   private static final Pattern DAYS_SUFFIX = Pattern.compile("([-+])(\\d+)d");
+  public static final Integer ONE_DAY_SECONDS = 24 * 60 * 60;
 
   /** This is a utility class. Do not instantiate this class. It should have only static methods. */
   private TimeUtils() {}
@@ -85,7 +86,7 @@ public class TimeUtils {
     }
     int mm = tokens.length > 1 ? Integer.parseInt(tokens[1]) : 0;
     int ss = tokens.length == 3 ? Integer.parseInt(tokens[2]) : 0;
-    int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * DateConstants.ONE_DAY_SECONDS;
+    int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * ONE_DAY_SECONDS;
     return negative ? -seconds : seconds;
   }
 

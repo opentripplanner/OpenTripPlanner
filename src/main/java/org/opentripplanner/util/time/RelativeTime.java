@@ -56,8 +56,8 @@ class RelativeTime {
    */
   static RelativeTime ofSeconds(int secondsPastMidnight) {
     boolean negative = secondsPastMidnight < 0;
-    int days = secondsPastMidnight / DateConstants.ONE_DAY_SECONDS;
-    int secondsOfDay = secondsPastMidnight % DateConstants.ONE_DAY_SECONDS;
+    int days = secondsPastMidnight / TimeUtils.ONE_DAY_SECONDS;
+    int secondsOfDay = secondsPastMidnight % TimeUtils.ONE_DAY_SECONDS;
 
     if (negative) {
       // The days and secondsOfDay are both negative numbers

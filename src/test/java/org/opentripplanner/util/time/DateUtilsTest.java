@@ -38,7 +38,7 @@ public class DateUtilsTest {
 
     date = DateUtils.toZonedDateTime(null, "00:00", UTC);
     assertEquals(LocalDate.now(UTC).toString(), date.toLocalDate().toString());
-    assertEquals(0, date.toEpochSecond() % DateUtils.ONE_DAY_SECONDS);
+    assertEquals(0, date.toEpochSecond() % TimeUtils.ONE_DAY_SECONDS);
   }
 
   @Test
