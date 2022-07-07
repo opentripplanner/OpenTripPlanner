@@ -21,12 +21,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - id: set-gtfs-url
+        run: |
+          set -eu
+          case "${{ inputs.deployment-env }}" in
+            'dev-green')
+              URL="${{ secrets.MBTA_GTFS_URL_DEV_GREEN }}" ;;
+            'dev')
+              URL="${{ secrets.MBTA_GTFS_URL_DEV }}" ;;
+            *)
+              URL="${{ secrets.MBTA_GTFS_URL_PROD }}" ;;
+          esac
+          echo "::set-output name=url::$URL"
+
       - uses: mbta/actions/build-push-ecr@v1
         id: build-push
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           docker-repo: ${{ secrets.DOCKER_REPO }}
+          docker-additional-args: '--build-arg MBTA_GTFS_URL=${{ steps.set-gtfs-url.outputs.url }}'
+          docker-additional-tags: ${{ inputs.deployment-env }}
 
       - uses: mbta/actions/deploy-ecs@v1
         with:

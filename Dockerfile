@@ -24,8 +24,8 @@ RUN JAVA_HOME=$JAVA_HOME_JDK_17 ./build.sh
 
 WORKDIR /build/OpenTripPlanner
 COPY . .
-
-RUN ./mbta/update_gtfs.sh
+ARG MBTA_GTFS_URL=https://mbta-gtfs-s3.s3.amazonaws.com/google_transit.zip
+RUN MBTA_GTFS_URL="$MBTA_GTFS_URL" ./mbta/update_gtfs.sh
 RUN ./mbta/update_pbf.sh
 ENV JAVA_HOME="$JAVA_HOME_JDK_8" PATH="$JAVA_HOME_JDK_8/bin:$PATH"
 RUN ./mbta/build.sh
