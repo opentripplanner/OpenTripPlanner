@@ -125,7 +125,9 @@ public class RoutingWorker {
       it -> firstRemovedItinerary = it,
       request.wheelchairAccessibility.enabled(),
       request.wheelchairAccessibility.maxSlope(),
-      router.graph.getService(FareService.class)
+      router.graph.getService(FareService.class),
+      router.transitModel.getTransitAlertService(),
+      router.transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations()::get
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
