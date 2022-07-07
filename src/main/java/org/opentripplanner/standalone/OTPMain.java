@@ -110,8 +110,8 @@ public class OTPMain {
     TransitModel transitModel = null;
     OTPAppConstruction app = new OTPAppConstruction(params);
     var factory = app.getFactory();
-    var config = factory.config();
     var datastore = factory.datastore();
+    var configModel = factory.configModel();
 
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
@@ -125,7 +125,7 @@ public class OTPMain {
       SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
       graph = obj.graph;
       transitModel = obj.transitModel;
-      factory.config().updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+      configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
     }
 
     /* Start graph builder if requested. */
@@ -146,7 +146,7 @@ public class OTPMain {
       }
       // Store graph and config used to build it, also store router-config for easy deployment
       // with using the embedded router config.
-      new SerializedGraphObject(graph, transitModel, config.buildConfig(), config.routerConfig())
+      new SerializedGraphObject(graph, transitModel, configModel.buildConfig(), configModel.routerConfig())
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
       LOG.info("Memory optimized {}", graph.deduplicator.toString());
@@ -167,9 +167,9 @@ public class OTPMain {
     graph.index();
 
     // publishing the config version info make it available to the APIs
-    app.setOtpConfigVersionsOnServerInfo();
+    factory.setOtpConfigVersionsOnServerInfo();
 
-    Router router = new Router(graph, transitModel, config.routerConfig(), Metrics.globalRegistry);
+    Router router = new Router(graph, transitModel, configModel.routerConfig(), Metrics.globalRegistry);
     router.startup();
 
     /* Start visualizer if requested. */

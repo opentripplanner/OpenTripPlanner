@@ -11,7 +11,6 @@ import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
-import static org.opentripplanner.standalone.config.CommandLineParameters.createCliForTest;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,8 +33,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.configure.OTPConfiguration;
+import org.opentripplanner.standalone.config.ConfigLoader;
 
 public class OtpDataStoreTest {
 
@@ -70,7 +68,7 @@ public class OtpDataStoreTest {
 
   @Test
   public void readEmptyDir() {
-    OtpDataStore store = DataStoreModule.provideDataStore(config(), null);
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null);
 
     assertNoneExistingFile(store.getGraph(), GRAPH_FILENAME, GRAPH);
     assertNoneExistingFile(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
@@ -98,10 +96,10 @@ public class OtpDataStoreTest {
     write(baseDir, GRAPH_FILENAME, "Data");
     writeToDir(baseDir, REPORT_FILENAME, "index.json");
 
-    OtpDataStore store = DataStoreModule.provideDataStore(config(), null);
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null);
 
-    assertExistingSource(store.getGraph(), GRAPH_FILENAME, GRAPH);
-    assertExistingSource(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
+    assertExistingGraph(store.getGraph(), GRAPH_FILENAME);
+    assertExistingGraph(store.getStreetGraph(), STREET_GRAPH_FILENAME);
     assertReportExist(store.getBuildReportDir());
 
     assertExistingSources(store.listExistingSourcesFor(OSM), OSM_FILENAME);
@@ -166,10 +164,11 @@ public class OtpDataStoreTest {
     write(tempDataDir, "unknown-2.txt", "Data");
 
     // Open data store using the base-dir
-    OtpDataStore store = DataStoreModule.provideDataStore(
-      new OTPConfiguration(createCliForTest(baseDir)).createDataStoreConfig(),
-      null
-    );
+
+    var confLoader = new ConfigLoader(baseDir);
+    var buildConfig = confLoader.loadBuildConfig();
+
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, buildConfig.storage, null);
 
     // Collect result and prepare it for assertion
     List<String> filenames = listFilesByRelativeName(store, baseDir, tempDataDir);
@@ -219,8 +218,8 @@ public class OtpDataStoreTest {
     assertFalse(source.exists());
   }
 
-  private static void assertExistingSource(DataSource source, String name, FileType type) {
-    assertEquals(type, source.type());
+  private static void assertExistingGraph(DataSource source, String name) {
+    assertEquals(GRAPH, source.type());
     assertEquals(name, source.name());
     assertTrue(source.exists());
     assertTrue(source.lastModified() > D2000_01_01, "Last modified: " + source.lastModified());
@@ -267,7 +266,8 @@ public class OtpDataStoreTest {
   }
 
   private OtpDataStoreConfig config() {
-    CommandLineParameters cli = CommandLineParameters.createCliForTest(baseDir);
-    return new OTPConfiguration(cli).createDataStoreConfig();
+    var confLoader = new ConfigLoader(baseDir);
+    var buildConfig = confLoader.loadBuildConfig();
+    return buildConfig.storage;
   }
 }

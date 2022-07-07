@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -14,8 +13,7 @@ import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.standalone.config.OtpBaseDirectory;
 
 /**
  * This is the global access point to create a data store and create datasource objects(tests). It
@@ -34,8 +32,6 @@ import org.slf4j.LoggerFactory;
 @Module
 public abstract class DataStoreModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DataStoreModule.class);
-
   /**
    * For test only.
    * <p>
@@ -48,9 +44,9 @@ public abstract class DataStoreModule {
   /**
    * Connect to data source and prepare to retrieve data.
    */
-  @Singleton
   @Provides
   public static OtpDataStore provideDataStore(
+    @OtpBaseDirectory File baseDirectory,
     OtpDataStoreConfig config,
     @Nullable @GoogleStorageDSRepository DataSourceRepository gsRepository
   ) {
@@ -62,7 +58,7 @@ public abstract class DataStoreModule {
     // The file data storage repository should be last, to allow
     // other repositories to "override" and grab files analyzing the
     // datasource uri passed in
-    repositories.add(createFileDataSourceRepository(config));
+    repositories.add(createFileDataSourceRepository(baseDirectory, config));
 
     var dataStore = new OtpDataStore(config, repositories);
 
@@ -74,10 +70,11 @@ public abstract class DataStoreModule {
   }
 
   private static FileDataSourceRepository createFileDataSourceRepository(
+    File baseDirectory,
     OtpDataStoreConfig config
   ) {
     return new FileDataSourceRepository(
-      config.baseDirectory(),
+      baseDirectory,
       config.gtfsLocalFilePattern(),
       config.netexLocalFilePattern(),
       config.osmLocalFilePattern(),

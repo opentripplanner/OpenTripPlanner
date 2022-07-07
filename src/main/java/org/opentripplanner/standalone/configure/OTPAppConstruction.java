@@ -1,7 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
@@ -18,16 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for creating the top level services like {@link OTPConfiguration} and
- * {@link OTPServer}. The purpose of this class is to wire the application, creating the necessary
- * Services and modules and putting them together. It is NOT responsible for starting or running the
- * application. The whole idea of this class is to separate application construction from running
- * it.
- *
- * <p> The top level construction class(this class) may delegate to other construction classes
+ * This class is responsible for creating the top level services like the {@link OTPServer}. The
+ * purpose of this class is to wire the application, creating the necessary Services and modules
+ * and putting them together. It is NOT responsible for starting or running the application. The
+ * whole idea of this class is to separate application construction from running it.
+ * <p>
+ * The top level construction class(this class) may delegate to other construction classes
  * to inject configuration and services into sub-modules.
- *
- * <p> THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
+ * <p>
+ * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
  * should be really fast, since the only IO operations are reading config files and logging. Loading
  * transit or map data should NOT happen during this phase.
  */
@@ -35,6 +32,7 @@ public class OTPAppConstruction {
 
   private static final Logger LOG = LoggerFactory.getLogger(OTPAppConstruction.class);
 
+  private final CommandLineParameters cli;
   private final OTPApplicationFactory factory;
   private OTPServer server = null;
   private GraphBuilderDataSources graphBuilderDataSources = null;
@@ -43,7 +41,9 @@ public class OTPAppConstruction {
    * Create a new OTP configuration instance for a given directory.
    */
   public OTPAppConstruction(CommandLineParameters commandLineParameters) {
-    this.factory = DaggerOTPApplicationFactory.builder().cli(commandLineParameters).build();
+    this.cli = commandLineParameters;
+    this.factory =
+      DaggerOTPApplicationFactory.builder().baseDirectory(this.cli.getBaseDirectory()).build();
   }
 
   public OTPApplicationFactory getFactory() {
@@ -55,7 +55,7 @@ public class OTPAppConstruction {
    * this method is called.
    */
   public GrizzlyServer createGrizzlyServer(Router router) {
-    return new GrizzlyServer(factory.config().getCli(), createApplication(router));
+    return new GrizzlyServer(cli, createApplication(router));
   }
 
   public void validateConfigAndDataSources() {
@@ -71,11 +71,11 @@ public class OTPAppConstruction {
   public GraphBuilder createGraphBuilder(Graph baseGraph) {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
-      factory.config().buildConfig(),
+      factory.buildConfig(),
       graphBuilderDataSources(),
       baseGraph,
-      factory.config().getCli().doLoadStreetGraph(),
-      factory.config().getCli().doSaveStreetGraph()
+      cli.doLoadStreetGraph(),
+      cli.doSaveStreetGraph()
     );
   }
 
@@ -90,39 +90,29 @@ public class OTPAppConstruction {
     return graphBuilderDataSources().getOutputGraph();
   }
 
-  /**
-   * Create the top-level objects that represent the OTP server. There is one server and it is
-   * created lazy at the first invocation of this method.
-   * <p>
-   * The method is {@code public} to allow test access.
-   */
-  public OTPServer server(Router router) {
-    if (server == null) {
-      server = new OTPServer(factory.config().getCli(), router);
-      new MetricsLogging(server);
-    }
-    return server;
-  }
-
-  public void setOtpConfigVersionsOnServerInfo() {
-    projectInfo().otpConfigVersion = factory.config().otpConfig().configVersion;
-    projectInfo().buildConfigVersion = factory.config().buildConfig().configVersion;
-    projectInfo().routerConfigVersion = factory.config().routerConfig().getConfigVersion();
-  }
-
   private GraphBuilderDataSources graphBuilderDataSources() {
     if (graphBuilderDataSources == null) {
       graphBuilderDataSources =
-        GraphBuilderDataSources.create(
-          factory.config().getCli(),
-          factory.config().buildConfig(),
-          factory.datastore()
-        );
+        GraphBuilderDataSources.create(cli, factory.buildConfig(), factory.datastore());
     }
     return graphBuilderDataSources;
   }
 
   private Application createApplication(Router router) {
     return new OTPApplication(server(router));
+  }
+
+  /**
+   * Create the top-level objects that represent the OTP server. There is one server and it is
+   * created lazy at the first invocation of this method.
+   * <p>
+   * The method is {@code public} to allow test access.
+   */
+  private OTPServer server(Router router) {
+    if (server == null) {
+      server = new OTPServer(cli, router);
+      new MetricsLogging(server);
+    }
+    return server;
   }
 }
