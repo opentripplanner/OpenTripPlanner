@@ -14,6 +14,12 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Utilities related to handling of service dates. In GTFS, service dates are defined to begin 12
+ * hours before noon. This requires us to do some calculations when not using timezone-aware ways to
+ * do calculations on time, as days with DST-changes make the day start either before or after
+ * midnight.
+ */
 public class ServiceDateUtils {
 
   private static final String MAX_TEXT = "MAX";
@@ -23,15 +29,26 @@ public class ServiceDateUtils {
     "uuuuMMdd"
   );
 
+  /**
+   * Calculate the start of the service day for the given {@link ZonedDateTime}
+   */
   public static ZonedDateTime asStartOfService(ZonedDateTime date) {
     return date.truncatedTo(ChronoUnit.HOURS).withHour(12).minusHours(12);
   }
 
+  /**
+   * Calculate the start of the service day for the given {@link Instant} at the given
+   * {@link ZoneId}
+   */
   public static ZonedDateTime asStartOfService(Instant time, ZoneId zoneId) {
     LocalDate date = LocalDate.ofInstant(time, zoneId);
     return ServiceDateUtils.asStartOfService(date, zoneId);
   }
 
+  /**
+   * Calculate the start of the service day for the given {@link LocalDate} at the given
+   * {@link ZoneId}
+   */
   public static ZonedDateTime asStartOfService(LocalDate localDate, ZoneId zoneId) {
     return ZonedDateTime.of(localDate, LocalTime.NOON, zoneId).minusHours(12);
   }
@@ -60,9 +77,8 @@ public class ServiceDateUtils {
   }
 
   public static LocalDateTime asDateTime(LocalDate localDate, int secondsSinceStartOfDay) {
-    // In OTP LocalDate is sometimes used to represent ServiceDate. This calculation is
-    // "safe" because calculations on LocalDate ignore TimeZone adjustments, just like the
-    // ServiceDate. So, in this case it is not necessary to: 'NOON - 12 hours + secondsSinceStartOfDay'
+    // This calculation is "safe" because calculations on LocalDate ignore TimeZone adjustments.
+    // So, in this case it is not necessary to: 'NOON - 12 hours + secondsSinceStartOfDay'
     return localDate.atStartOfDay().plusSeconds(secondsSinceStartOfDay);
   }
 
