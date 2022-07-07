@@ -50,22 +50,23 @@ public class LegacyGraphQLUtils {
   public static LegacyGraphQLRoutingErrorCode toGraphQL(RoutingErrorCode code) {
     if (code == null) return null;
     return switch (code) {
-      case LOCATION_NOT_FOUND -> LegacyGraphQLRoutingErrorCode.locationNotFound;
-      case NO_STOPS_IN_RANGE -> LegacyGraphQLRoutingErrorCode.noStopsInRange;
-      case NO_TRANSIT_CONNECTION -> LegacyGraphQLRoutingErrorCode.noTransitConnection;
-      case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW -> LegacyGraphQLRoutingErrorCode.noTransitConnectionInSearchWindow;
-      case OUTSIDE_BOUNDS -> LegacyGraphQLRoutingErrorCode.outsideBounds;
-      case OUTSIDE_SERVICE_PERIOD -> LegacyGraphQLRoutingErrorCode.outsideServicePeriod;
-      case SYSTEM_ERROR -> LegacyGraphQLRoutingErrorCode.systemError;
-      case WALKING_BETTER_THAN_TRANSIT -> LegacyGraphQLRoutingErrorCode.walkingBetterThanTransit;
+      case LOCATION_NOT_FOUND -> LegacyGraphQLRoutingErrorCode.LOCATION_NOT_FOUND;
+      case NO_STOPS_IN_RANGE -> LegacyGraphQLRoutingErrorCode.NO_STOPS_IN_RANGE;
+      case NO_TRANSIT_CONNECTION -> LegacyGraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION;
+      case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW -> LegacyGraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
+      case OUTSIDE_BOUNDS -> LegacyGraphQLRoutingErrorCode.OUTSIDE_BOUNDS;
+      case OUTSIDE_SERVICE_PERIOD -> LegacyGraphQLRoutingErrorCode.OUTSIDE_SERVICE_PERIOD;
+      case SYSTEM_ERROR -> LegacyGraphQLRoutingErrorCode.SYSTEM_ERROR;
+      case WALKING_BETTER_THAN_TRANSIT -> LegacyGraphQLRoutingErrorCode.WALKING_BETTER_THAN_TRANSIT;
     };
   }
 
   public static LegacyGraphQLInputField toGraphQL(InputField inputField) {
+    if (inputField == null) return null;
     return switch (inputField) {
-      case DATE_TIME -> LegacyGraphQLInputField.dateTime;
-      case FROM_PLACE -> LegacyGraphQLInputField.from;
-      case TO_PLACE, INTERMEDIATE_PLACE -> LegacyGraphQLInputField.to;
+      case DATE_TIME -> LegacyGraphQLInputField.DATE_TIME;
+      case FROM_PLACE -> LegacyGraphQLInputField.FROM;
+      case TO_PLACE, INTERMEDIATE_PLACE -> LegacyGraphQLInputField.TO;
     };
   }
 

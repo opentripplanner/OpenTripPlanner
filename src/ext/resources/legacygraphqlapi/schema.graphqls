@@ -1122,34 +1122,34 @@ input InputUnpreferred {
 
 enum RoutingErrorCode {
     """No transit connection was found between the origin and destination withing the operating day or the next day"""
-    noTransitConnection
+    NO_TRANSIT_CONNECTION
 
     """Transit connection was found, but it was outside the search window, see metadata for the next search window"""
-    noTransitConnectionInSearchWindow
+    NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW
 
     """The date specified is outside the range of data currently loaded into the system"""
-    outsideServicePeriod
+    OUTSIDE_SERVICE_PERIOD
 
     """The coordinates are outside the bounds of the data currently loaded into the system"""
-    outsideBounds
+    OUTSIDE_BOUNDS
 
     """The specified location is not close to any streets or transit stops"""
-    locationNotFound
+    LOCATION_NOT_FOUND
 
     """No stops are reachable from the location specified. You can try searching using a different access or egress mode"""
-    noStopsInRange
+    NO_STOPS_IN_RANGE
 
     """The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"""
-    walkingBetterThanTransit
+    WALKING_BETTER_THAN_TRANSIT
 
     """An unknown error happened during the search. The details have been logged to the server logs"""
-    systemError
+    SYSTEM_ERROR
 }
 
 enum InputField {
-    dateTime
-    from
-    to
+    DATE_TIME
+    FROM
+    TO
 }
 
 """Description of the reason, why the planner did not return any results"""

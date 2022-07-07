@@ -347,9 +347,9 @@ public class LegacyGraphQLTypes {
   }
 
   public enum LegacyGraphQLInputField {
-    dateTime,
-    from,
-    to,
+    DATE_TIME,
+    FROM,
+    TO,
   }
 
   public static class LegacyGraphQLInputFiltersInput {
@@ -2514,14 +2514,14 @@ public class LegacyGraphQLTypes {
   }
 
   public enum LegacyGraphQLRoutingErrorCode {
-    locationNotFound,
-    noStopsInRange,
-    noTransitConnection,
-    noTransitConnectionInSearchWindow,
-    outsideBounds,
-    outsideServicePeriod,
-    systemError,
-    walkingBetterThanTransit,
+    LOCATION_NOT_FOUND,
+    NO_STOPS_IN_RANGE,
+    NO_TRANSIT_CONNECTION,
+    NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
+    OUTSIDE_BOUNDS,
+    OUTSIDE_SERVICE_PERIOD,
+    SYSTEM_ERROR,
+    WALKING_BETTER_THAN_TRANSIT,
   }
 
   public static class LegacyGraphQLStopAlertsArgs {
