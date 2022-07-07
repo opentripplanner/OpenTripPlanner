@@ -9,7 +9,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * Configure paths to each individual file resource. Use URIs to specify paths. If a parameter is
@@ -108,7 +108,7 @@ public class StorageConfig {
    * <p>
    * This parameter is optional.
    */
-  @NotNull
+  @Nonnull
   public final List<URI> gtfs = new ArrayList<>();
 
   /**
@@ -119,7 +119,7 @@ public class StorageConfig {
    * <p>
    * This parameter is optional.
    */
-  @NotNull
+  @Nonnull
   public final List<URI> netex = new ArrayList<>();
 
   /**

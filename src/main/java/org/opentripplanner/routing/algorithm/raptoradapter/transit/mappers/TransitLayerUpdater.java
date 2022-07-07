@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -36,7 +35,7 @@ public class TransitLayerUpdater {
 
   private final TransitModel transitModel;
 
-  private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
+  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
 
   /**
    * Cache the TripPatternForDates indexed on the original TripPatterns in order to avoid this
@@ -54,7 +53,7 @@ public class TransitLayerUpdater {
 
   public TransitLayerUpdater(
     TransitModel transitModel,
-    Map<ServiceDate, TIntSet> serviceCodesRunningForDate
+    Map<LocalDate, TIntSet> serviceCodesRunningForDate
   ) {
     this.transitModel = transitModel;
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
@@ -99,8 +98,7 @@ public class TransitLayerUpdater {
     Set<TripPatternForDate> previouslyUsedPatterns = new HashSet<>();
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
     for (Timetable timetable : updatedTimetables) {
-      @SuppressWarnings("ConstantConditions")
-      LocalDate date = ServiceCalendarMapper.localDateFromServiceDate(timetable.getServiceDate());
+      LocalDate date = timetable.getServiceDate();
 
       if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
@@ -198,7 +196,7 @@ public class TransitLayerUpdater {
           if (oldTimeTable != null) {
             var toRemove = oldTimeTable
               .stream()
-              .filter(tt -> tt.getServiceDate().equals(new ServiceDate(date)))
+              .filter(tt -> tt.getServiceDate().equals(date))
               .findFirst()
               .map(tt -> tt.getTripTimes().isEmpty())
               .orElse(false);

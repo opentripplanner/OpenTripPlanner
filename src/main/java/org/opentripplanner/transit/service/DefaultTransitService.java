@@ -1,8 +1,11 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import gnu.trove.set.TIntSet;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.BitSet;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +28,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -320,7 +322,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture
   ) {
     return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);
@@ -398,7 +400,7 @@ public class DefaultTransitService implements TransitEditorService {
    * without making a fake routing request.
    */
   @Override
-  public Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
+  public Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate) {
     TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
     return timetableSnapshot != null
       ? timetableSnapshot.resolve(tripPattern, serviceDate)
@@ -420,7 +422,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
     FeedScopedId tripId,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     return DatedServiceJourneyHelper.getTripOnServiceDate(this, tripId, serviceDate);
   }
@@ -508,17 +510,17 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public BitSet getServicesRunningForDate(ServiceDate parseString) {
-    return transitModel.getServicesRunningForDate(parseString);
+  public TIntSet getServicesRunningForDate(LocalDate serviceDate) {
+    return transitModelIndex.getServiceCodesRunningForDate().get(serviceDate);
   }
 
   @Override
-  public Long getTransitServiceEnds() {
+  public ZonedDateTime getTransitServiceEnds() {
     return transitModel.getTransitServiceEnds();
   }
 
   @Override
-  public Long getTransitServiceStarts() {
+  public ZonedDateTime getTransitServiceStarts() {
     return transitModel.getTransitServiceStarts();
   }
 

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class ServiceCalendarDateMapperTest {
 
@@ -43,7 +44,8 @@ public class ServiceCalendarDateMapperTest {
   public void testMap() {
     org.opentripplanner.model.calendar.ServiceCalendarDate result = subject.map(SERVICE_DATE);
 
-    assertEquals(DATE.getAsString(), result.getDate().asCompactString());
+    assertEquals(DATE.getAsString(), ServiceDateUtils.asCompactString(result.getDate()));
+
     assertEquals(EXCEPTION_TYPE, result.getExceptionType());
     assertEquals("A:1", result.getServiceId().toString());
   }

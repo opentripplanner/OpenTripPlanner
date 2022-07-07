@@ -8,6 +8,7 @@ import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
 import com.google.common.base.Preconditions;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -25,8 +26,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -40,6 +39,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -111,7 +111,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private volatile TimetableSnapshot snapshot = null;
   /** Should expired realtime data be purged from the graph. */
   public boolean purgeExpiredData = true;
-  protected ServiceDate lastPurgeDate = null;
+  protected LocalDate lastPurgeDate = null;
   protected long lastSnapshotTime = -1;
 
   public SiriTimetableSnapshotSource(final TransitModel transitModel) {
@@ -176,7 +176,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (VehicleMonitoringDeliveryStructure vmDelivery : updates) {
-        ServiceDate serviceDate = new ServiceDate(transitService.getTimeZone());
+        LocalDate serviceDate = LocalDate.now(transitService.getTimeZone());
 
         List<VehicleActivityStructure> activities = vmDelivery.getVehicleActivities();
         if (activities != null) {
@@ -344,7 +344,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean handleModifiedTrip(
     TransitModel transitModel,
     VehicleActivityStructure activity,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
       //Activity has expired
@@ -433,7 +433,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TripPattern pattern,
     VehicleActivityStructure activity,
     Trip trip,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     // Apply update on the *scheduled* time table and set the updated trip times in the buffer
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
@@ -456,7 +456,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * <p>
    * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
-  private Timetable getCurrentTimetable(TripPattern tripPattern, ServiceDate serviceDate) {
+  private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
     TimetableSnapshot timetableSnapshot = getTimetableSnapshot();
     if (timetableSnapshot != null) {
       return getTimetableSnapshot().resolve(tripPattern, serviceDate);
@@ -556,7 +556,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     var tripBuilder = Trip.of(tripId);
     tripBuilder.withRoute(route);
 
-    ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
+    LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
     if (serviceDate == null) {
       return false;
@@ -827,7 +827,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           : null
       );
 
-    ServiceDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
+    LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
     if (serviceDate == null) {
       return false;
@@ -997,7 +997,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return result;
   }
 
-  private ServiceDate getServiceDateForEstimatedVehicleJourney(
+  private LocalDate getServiceDateForEstimatedVehicleJourney(
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
     ZonedDateTime date;
@@ -1023,15 +1023,19 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return null;
     }
 
-    return new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+    return date.toLocalDate();
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime dateTime) {
-    return DateMapper.secondsSinceStartOfService(dateTime, dateTime, transitService.getTimeZone());
+    return ServiceDateUtils.secondsSinceStartOfService(
+      dateTime,
+      dateTime,
+      transitService.getTimeZone()
+    );
   }
 
   private int calculateSecondsSinceMidnight(ZonedDateTime startOfService, ZonedDateTime dateTime) {
-    return DateMapper.secondsSinceStartOfService(
+    return ServiceDateUtils.secondsSinceStartOfService(
       startOfService,
       dateTime,
       transitService.getTimeZone()
@@ -1050,7 +1054,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     final List<StopTime> stopTimes,
     final List<StopLocation> stops,
     TripTimes updatedTripTimes,
-    final ServiceDate serviceDate,
+    final LocalDate serviceDate,
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
     // Preconditions
@@ -1081,7 +1085,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      */
     pattern.getScheduledTimetable().getTripTimes().clear();
     pattern.getScheduledTimetable().addTripTimes(updatedTripTimes);
-    pattern.getScheduledTimetable().finish();
 
     // Remove trip times to avoid real time trip times being visible for ignoreRealtimeInformation queries
     pattern.getScheduledTimetable().getTripTimes().clear();
@@ -1130,7 +1133,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
-  private boolean cancelScheduledTrip(Trip trip, final ServiceDate serviceDate) {
+  private boolean cancelScheduledTrip(Trip trip, final LocalDate serviceDate) {
     boolean success = false;
 
     final TripPattern pattern = transitService.getPatternForTrip().get(trip);
@@ -1159,7 +1162,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param serviceDate service date
    * @return true if a previously added trip was removed
    */
-  private boolean removePreviousRealtimeUpdate(final Trip trip, final ServiceDate serviceDate) {
+  private boolean removePreviousRealtimeUpdate(final Trip trip, final LocalDate serviceDate) {
     boolean success = false;
 
     final TripPattern pattern = buffer.getLastAddedTripPattern(trip.getId(), serviceDate);
@@ -1177,8 +1180,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean purgeExpiredData() {
-    final ServiceDate today = new ServiceDate(timeZone);
-    final ServiceDate previously = today.previous().previous(); // Just to be safe...
+    final LocalDate today = LocalDate.now(timeZone);
+    final LocalDate previously = today.minusDays(2); // Just to be safe...
 
     if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {
       return false;
@@ -1202,18 +1205,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
     if (date == null) {
       //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now();
+      date = ZonedDateTime.now(transitService.getTimeZone());
     }
-    ServiceDate realTimeReportedServiceDate = new ServiceDate(
-      date.getYear(),
-      date.getMonthValue(),
-      date.getDayOfMonth()
-    );
+    LocalDate realTimeReportedServiceDate = date.toLocalDate();
 
     Set<TripPattern> patterns = new HashSet<>();
     for (Trip currentTrip : matches) {
       TripPattern tripPattern = transitService.getPatternForTrip().get(currentTrip);
-      Set<ServiceDate> serviceDates = transitService
+      Set<LocalDate> serviceDates = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(currentTrip.getServiceId());
 
@@ -1271,7 +1270,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private TripPattern getPatternForTrip(Trip trip, EstimatedVehicleJourney journey) {
-    Set<ServiceDate> serviceDates = transitService
+    Set<LocalDate> serviceDates = transitService
       .getCalendarService()
       .getServiceDatesForServiceId(trip.getServiceId());
 
@@ -1290,16 +1289,16 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     String journeyFirstStopId;
     String journeyLastStopId;
-    ServiceDate journeyDate;
+    LocalDate journeyDate;
     //Resolve first stop - check recordedCalls, then estimatedCalls
     if (recordedCalls != null && !recordedCalls.isEmpty()) {
       RecordedCall recordedCall = recordedCalls.get(0);
       journeyFirstStopId = recordedCall.getStopPointRef().getValue();
-      journeyDate = new ServiceDate(recordedCall.getAimedDepartureTime().toLocalDate());
+      journeyDate = recordedCall.getAimedDepartureTime().toLocalDate();
     } else if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
       EstimatedCall estimatedCall = estimatedCalls.get(0);
       journeyFirstStopId = estimatedCall.getStopPointRef().getValue();
-      journeyDate = new ServiceDate(estimatedCall.getAimedDepartureTime().toLocalDate());
+      journeyDate = estimatedCall.getAimedDepartureTime().toLocalDate();
     } else {
       return null;
     }
@@ -1372,19 +1371,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       //If no date is set - assume Realtime-data is reported for 'today'.
       date = ZonedDateTime.now();
     }
-    ServiceDate serviceDate = new ServiceDate(
-      date.getYear(),
-      date.getMonthValue(),
-      date.getDayOfMonth()
-    );
+    LocalDate serviceDate = date.toLocalDate();
 
     List<Trip> results = new ArrayList<>();
     for (Trip trip : trips) {
-      Set<ServiceDate> serviceDatesForServiceId = transitService
+      Set<LocalDate> serviceDatesForServiceId = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(trip.getServiceId());
 
-      for (ServiceDate next : serviceDatesForServiceId) {
+      for (LocalDate next : serviceDatesForServiceId) {
         if (next.equals(serviceDate)) {
           results.add(trip);
         }
@@ -1452,18 +1447,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (date == null) {
       //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now();
+      date = ZonedDateTime.now(transitService.getTimeZone());
     }
-    ServiceDate serviceDate = new ServiceDate(
-      date.getYear(),
-      date.getMonthValue(),
-      date.getDayOfMonth()
-    );
+    LocalDate serviceDate = date.toLocalDate();
 
     int departureInSecondsSinceMidnight = calculateSecondsSinceMidnight(date);
     Set<Trip> result = new HashSet<>();
     for (Trip trip : trips) {
-      Set<ServiceDate> serviceDatesForServiceId = transitService
+      Set<LocalDate> serviceDatesForServiceId = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(trip.getServiceId());
       if (serviceDatesForServiceId.contains(serviceDate)) {

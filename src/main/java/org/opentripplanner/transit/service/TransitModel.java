@@ -9,12 +9,12 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,7 +37,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -56,6 +55,7 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,8 +97,8 @@ public class TransitModel implements Serializable {
 
   private StopModel stopModel;
   // transit feed validity information in seconds since epoch
-  private long transitServiceStarts = Long.MAX_VALUE;
-  private long transitServiceEnds = 0;
+  private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
+  private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
   private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
@@ -165,10 +165,6 @@ public class TransitModel implements Serializable {
    */
   public void index() {
     LOG.info("Index transit model...");
-    for (TripPattern tp : tripPatternForId.values()) {
-      // Skip frequency-based patterns which have no timetable (null)
-      if (tp != null) tp.getScheduledTimetable().finish();
-    }
     this.getStopModel().index();
     // the transit model indexing updates the stop model index (flex stops added to the stop index)
     this.index = new TransitModelIndex(this);
@@ -261,24 +257,23 @@ public class TransitModel implements Serializable {
 
   // Infer the time period covered by the transit feed
   public void updateTransitFeedValidity(CalendarServiceData data, DataImportIssueStore issueStore) {
-    long now = Instant.now().getEpochSecond();
-    final long SEC_IN_DAY = 24 * 60 * 60;
+    Instant now = Instant.now();
     HashSet<String> agenciesWithFutureDates = new HashSet<>();
     HashSet<String> agencies = new HashSet<>();
     for (FeedScopedId sid : data.getServiceIds()) {
       agencies.add(sid.getFeedId());
-      for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
+      for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
         // Adjust for timezone, assuming there is only one per graph.
-        long t = sd.toZonedDateTime(getTimeZone(), 0).toEpochSecond();
-        if (t > now) {
+        ZonedDateTime t = ServiceDateUtils.asStartOfService(sd, getTimeZone());
+        if (t.toInstant().isAfter(now)) {
           agenciesWithFutureDates.add(sid.getFeedId());
         }
         // assume feed is unreliable after midnight on last service day
-        long u = t + SEC_IN_DAY;
-        if (t < this.transitServiceStarts) {
+        ZonedDateTime u = t.plusDays(1);
+        if (t.isBefore(this.transitServiceStarts)) {
           this.transitServiceStarts = t;
         }
-        if (u > this.transitServiceEnds) {
+        if (u.isAfter(this.transitServiceEnds)) {
           this.transitServiceEnds = u;
         }
       }
@@ -292,8 +287,10 @@ public class TransitModel implements Serializable {
 
   // Check to see if we have transit information for a given date
   public boolean transitFeedCovers(Instant time) {
-    long t = time.getEpochSecond();
-    return t >= this.transitServiceStarts && t < this.transitServiceEnds;
+    return (
+      !time.isBefore(this.transitServiceStarts.toInstant()) &&
+      time.isBefore(this.transitServiceEnds.toInstant())
+    );
   }
 
   /**
@@ -343,11 +340,11 @@ public class TransitModel implements Serializable {
    * service period {@code null} is returned.
    */
   @Nullable
-  public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     // Start of day
-    long time = serviceDate.toZonedDateTime(getTimeZone(), 0).toEpochSecond();
+    ZonedDateTime time = ServiceDateUtils.asStartOfService(serviceDate, getTimeZone());
 
-    if (time < transitServiceStarts || time >= transitServiceEnds) {
+    if (!transitFeedCovers(time.toInstant())) {
       return null;
     }
 
@@ -432,11 +429,11 @@ public class TransitModel implements Serializable {
     this.timeZone = null;
   }
 
-  public long getTransitServiceStarts() {
+  public ZonedDateTime getTransitServiceStarts() {
     return transitServiceStarts;
   }
 
-  public long getTransitServiceEnds() {
+  public ZonedDateTime getTransitServiceEnds() {
     return transitServiceEnds;
   }
 
@@ -453,19 +450,6 @@ public class TransitModel implements Serializable {
       transitAlertService = new DelegatingTransitAlertServiceImpl(this);
     }
     return transitAlertService;
-  }
-
-  /** An OBA Service Date is a local date without timezone, only year month and day. */
-  public BitSet getServicesRunningForDate(ServiceDate date) {
-    BitSet services = new BitSet(calendarService.getServiceIds().size());
-    for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
-      int n = serviceCodes.get(serviceId);
-      if (n < 0) {
-        continue;
-      }
-      services.set(n);
-    }
-    return services;
   }
 
   public Collection<Notice> getNoticesByEntity(TransitEntity entity) {

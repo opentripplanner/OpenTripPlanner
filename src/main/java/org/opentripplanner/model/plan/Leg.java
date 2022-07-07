@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -10,7 +11,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -231,7 +231,7 @@ public interface Leg {
    * for a given trip may happen at service date March 25th and service time 25:00, which in local
    * time would be Mach 26th 01:00.
    */
-  default ServiceDate getServiceDate() {
+  default LocalDate getServiceDate() {
     return null;
   }
 

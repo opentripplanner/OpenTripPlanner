@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -58,15 +58,17 @@ public class AlertToLegMapper {
 
     FeedScopedId routeId = leg.getRoute().getId();
     FeedScopedId tripId = leg.getTrip().getId();
+    LocalDate serviceDate = leg.getServiceDate();
+
     if (fromStop instanceof Stop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, leg.getServiceDate()));
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
       addTransitAlertsToLeg(leg, departingStopConditions, alerts, legStartTime, legEndTime);
     }
     if (toStop instanceof Stop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, leg.getServiceDate()));
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
       addTransitAlertsToLeg(leg, StopCondition.ARRIVING, alerts, legStartTime, legEndTime);
     }
@@ -75,7 +77,7 @@ public class AlertToLegMapper {
       for (StopArrival visit : leg.getIntermediateStops()) {
         if (visit.place.stop instanceof Stop stop) {
           Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, leg.getServiceDate()));
+          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
           alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
 
           ZonedDateTime stopArrival = visit.arrival;
@@ -89,7 +91,7 @@ public class AlertToLegMapper {
     Collection<TransitAlert> alerts;
 
     // trips - alerts tagged on ServiceDate
-    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), leg.getServiceDate());
+    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
     addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
 
     // trips - alerts tagged on any date
@@ -168,7 +170,7 @@ public class AlertToLegMapper {
   private Collection<TransitAlert> getAlertsForStopAndTrip(
     Stop stop,
     FeedScopedId tripId,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     // Finding alerts for ServiceDate
     final Collection<TransitAlert> alerts = getAlertsForRelatedStops(

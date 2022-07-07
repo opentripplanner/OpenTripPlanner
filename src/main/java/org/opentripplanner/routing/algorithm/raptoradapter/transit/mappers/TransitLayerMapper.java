@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -133,7 +132,7 @@ public class TransitLayerMapper {
       newTripPatternForOld
     );
 
-    Set<ServiceDate> allServiceDates = transitModel.index.getServiceCodesRunningForDate().keySet();
+    Set<LocalDate> allServiceDates = transitModel.index.getServiceCodesRunningForDate().keySet();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 

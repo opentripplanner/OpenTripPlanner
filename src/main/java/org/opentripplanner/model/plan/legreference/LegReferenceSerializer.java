@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Base64;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,7 @@ public class LegReferenceSerializer {
     throws IOException {
     if (ref instanceof ScheduledTransitLegReference s) {
       out.writeUTF(s.tripId().toString());
-      out.writeUTF(s.serviceDate().asCompactString());
+      out.writeUTF(s.serviceDate().toString());
       out.writeInt(s.fromStopPositionInPattern());
       out.writeInt(s.toStopPositionInPattern());
     } else {
@@ -80,10 +80,10 @@ public class LegReferenceSerializer {
   }
 
   static LegReference readScheduledTransitLeg(ObjectInputStream objectInputStream)
-    throws IOException, ParseException {
+    throws IOException {
     return new ScheduledTransitLegReference(
       FeedScopedId.parseId(objectInputStream.readUTF()),
-      ServiceDate.parseString(objectInputStream.readUTF()),
+      LocalDate.parse(objectInputStream.readUTF()),
       objectInputStream.readInt(),
       objectInputStream.readInt()
     );

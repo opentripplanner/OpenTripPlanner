@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.flex;
 
 import gnu.trove.set.TIntSet;
+import java.time.LocalDate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -12,7 +12,7 @@ import org.opentripplanner.transit.service.TransitModel;
 public class FlexServiceDate {
 
   /** The local date */
-  public final ServiceDate serviceDate;
+  public final LocalDate serviceDate;
 
   /**
    * How many seconds does this date's "midnight" (12 hours before noon) differ from the "midnight"
@@ -23,7 +23,7 @@ public class FlexServiceDate {
   /** Which services are running on the date. */
   public final TIntSet servicesRunning;
 
-  FlexServiceDate(ServiceDate serviceDate, int secondsFromStartOfTime, TIntSet servicesRunning) {
+  FlexServiceDate(LocalDate serviceDate, int secondsFromStartOfTime, TIntSet servicesRunning) {
     this.serviceDate = serviceDate;
     this.secondsFromStartOfTime = secondsFromStartOfTime;
     this.servicesRunning = servicesRunning;

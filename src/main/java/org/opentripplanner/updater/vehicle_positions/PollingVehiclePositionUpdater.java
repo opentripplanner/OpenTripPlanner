@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
@@ -96,7 +96,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   private static TripPattern getPatternIncludingRealtime(
     TransitModel transitModel,
     Trip trip,
-    ServiceDate sd
+    LocalDate sd
   ) {
     return Optional
       .ofNullable(transitModel.getTimetableSnapshot())

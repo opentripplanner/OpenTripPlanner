@@ -21,15 +21,14 @@ import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class FlexRouter {
 
@@ -96,8 +95,8 @@ public class FlexRouter {
 
     ZoneId tz = transitModel.getTimeZone();
     LocalDate searchDate = LocalDate.ofInstant(searchInstant, tz);
-    this.startOfTime = DateMapper.asStartOfService(searchDate, tz);
-    this.departureTime = DateMapper.secondsSinceStartOfTime(startOfTime, searchInstant);
+    this.startOfTime = ServiceDateUtils.asStartOfService(searchDate, tz);
+    this.departureTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, searchInstant);
     this.arriveBy = arriveBy;
 
     int totalDays = additionalPastSearchDays + 1 + additionalFutureSearchDays;
@@ -107,12 +106,11 @@ public class FlexRouter {
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
       int index = d + additionalPastSearchDays;
-      ServiceDate serviceDate = new ServiceDate(date);
       dates[index] =
         new FlexServiceDate(
-          serviceDate,
-          DateMapper.secondsSinceStartOfTime(startOfTime, date),
-          transitModel.index.getServiceCodesRunningForDate().get(serviceDate)
+          date,
+          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
+          transitModel.index.getServiceCodesRunningForDate().get(date)
         );
     }
   }

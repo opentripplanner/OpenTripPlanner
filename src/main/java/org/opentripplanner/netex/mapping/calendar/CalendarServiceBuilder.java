@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping.calendar;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -8,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -23,7 +23,7 @@ public class CalendarServiceBuilder {
   static final FeedScopedId EMPTY_SERVICE_ID = new FeedScopedId("CAL-SERVICE", "EMPTY");
 
   private final FeedScopedIdFactory scopedIdFactory;
-  private final Map<Set<ServiceDate>, FeedScopedId> serviceCalendar = new ConcurrentHashMap<>();
+  private final Map<Set<LocalDate>, FeedScopedId> serviceCalendar = new ConcurrentHashMap<>();
 
   private long counter = 0L;
 
@@ -40,7 +40,7 @@ public class CalendarServiceBuilder {
    * @return serviceId associated with the given dates
    */
   @Nullable
-  public FeedScopedId registerDatesAndGetServiceId(Set<ServiceDate> dates) {
+  public FeedScopedId registerDatesAndGetServiceId(Set<LocalDate> dates) {
     if (dates.isEmpty()) {
       return EMPTY_SERVICE_ID;
     }
@@ -56,8 +56,8 @@ public class CalendarServiceBuilder {
   public Collection<ServiceCalendarDate> createServiceCalendar() {
     List<ServiceCalendarDate> dates = new ArrayList<>();
 
-    for (Map.Entry<Set<ServiceDate>, FeedScopedId> it : serviceCalendar.entrySet()) {
-      for (ServiceDate serviceDate : it.getKey()) {
+    for (Map.Entry<Set<LocalDate>, FeedScopedId> it : serviceCalendar.entrySet()) {
+      for (LocalDate serviceDate : it.getKey()) {
         dates.add(ServiceCalendarDate.create(it.getValue(), serviceDate));
       }
     }

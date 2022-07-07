@@ -4,13 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
  * This class extend the Java {@link LocalTime} and with the ability to span multiple days and be
  * negative.
  * <p>
- * The class is used to track time relative to a {@link ServiceDate}.
+ * The class is used to track time relative to a {@link LocalDate}.
  * <p>
  * The primary usage of this class is to convert "number of seconds" into a string in the given
  * context. Here is some examples:
@@ -42,9 +41,8 @@ class RelativeTime {
    * for most days are midnight, but in when time is adjusted for day-light-saving it is not.
    */
   public ZonedDateTime toZonedDateTime(LocalDate date, ZoneId zoneId) {
-    return ZonedDateTime
-      .of(date, LocalTime.NOON, zoneId)
-      .minusHours(12)
+    return ServiceDateUtils
+      .asStartOfService(date, zoneId)
       .plusDays(days)
       .plusSeconds(time.toSecondOfDay());
   }

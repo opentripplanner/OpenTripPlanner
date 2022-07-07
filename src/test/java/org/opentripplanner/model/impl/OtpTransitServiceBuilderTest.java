@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -18,7 +19,6 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -112,7 +112,7 @@ public class OtpTransitServiceBuilderTest {
   }
 
   private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {
-    return new ServiceCalendarDate(serviceId, new ServiceDate(2017, 8, 31), 2);
+    return new ServiceCalendarDate(serviceId, LocalDate.of(2017, 8, 31), 2);
   }
 
   private static <T> T first(Collection<? extends T> c) {

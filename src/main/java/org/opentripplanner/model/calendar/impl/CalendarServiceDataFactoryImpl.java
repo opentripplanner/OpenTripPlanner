@@ -16,7 +16,6 @@ import java.util.Set;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.slf4j.Logger;
@@ -81,8 +80,8 @@ public class CalendarServiceDataFactoryImpl {
 
       LOG.debug("serviceId=" + serviceId + " (" + index + "/" + serviceIds.size() + ")");
 
-      Set<ServiceDate> activeDates = getServiceDatesForServiceId(serviceId);
-      List<ServiceDate> serviceDates = new ArrayList<>(activeDates);
+      Set<LocalDate> activeDates = getServiceDatesForServiceId(serviceId);
+      List<LocalDate> serviceDates = new ArrayList<>(activeDates);
       Collections.sort(serviceDates);
 
       data.putServiceDatesForServiceId(serviceId, serviceDates);
@@ -91,8 +90,8 @@ public class CalendarServiceDataFactoryImpl {
     return data;
   }
 
-  private Set<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
-    Set<ServiceDate> activeDates = new HashSet<>();
+  private Set<LocalDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
+    Set<LocalDate> activeDates = new HashSet<>();
     ServiceCalendar c = findCalendarForServiceId(serviceId);
 
     if (c != null) {
@@ -129,9 +128,9 @@ public class CalendarServiceDataFactoryImpl {
     }
   }
 
-  private void addDatesFromCalendar(ServiceCalendar calendar, Set<ServiceDate> activeDates) {
-    LocalDate startDate = calendar.getPeriod().getStart().toLocalDate();
-    LocalDate endDate = calendar.getPeriod().getEnd().toLocalDate();
+  private void addDatesFromCalendar(ServiceCalendar calendar, Set<LocalDate> activeDates) {
+    LocalDate startDate = calendar.getPeriod().getStart();
+    LocalDate endDate = calendar.getPeriod().getEnd();
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
       if (
@@ -145,16 +144,16 @@ public class CalendarServiceDataFactoryImpl {
           case SUNDAY -> calendar.getSunday() == 1;
         }
       ) {
-        addServiceDate(activeDates, new ServiceDate(date));
+        addServiceDate(activeDates, date);
       }
     }
   }
 
   private void addAndRemoveDatesFromCalendarDate(
     ServiceCalendarDate calendarDate,
-    Set<ServiceDate> activeDates
+    Set<LocalDate> activeDates
   ) {
-    ServiceDate serviceDate = calendarDate.getDate();
+    LocalDate serviceDate = calendarDate.getDate();
 
     switch (calendarDate.getExceptionType()) {
       case ServiceCalendarDate.EXCEPTION_TYPE_ADD -> addServiceDate(activeDates, serviceDate);
@@ -165,7 +164,7 @@ public class CalendarServiceDataFactoryImpl {
     }
   }
 
-  private void addServiceDate(Set<ServiceDate> activeDates, ServiceDate serviceDate) {
+  private void addServiceDate(Set<LocalDate> activeDates, LocalDate serviceDate) {
     activeDates.add(serviceDate);
   }
 }

@@ -37,7 +37,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -67,6 +66,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLQueryTypeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLQueryType {
@@ -358,7 +358,7 @@ public class LegacyGraphQLQueryTypeImpl
           transitService.getRouteForId(FeedScopedId.parseId(args.getLegacyGraphQLRoute())),
           args.getLegacyGraphQLDirection(),
           args.getLegacyGraphQLTime(),
-          ServiceDate.parseString(args.getLegacyGraphQLDate())
+          ServiceDateUtils.parseString(args.getLegacyGraphQLDate())
         );
     };
   }

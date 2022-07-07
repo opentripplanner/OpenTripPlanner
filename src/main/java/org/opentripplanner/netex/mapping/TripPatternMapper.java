@@ -16,7 +16,6 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
@@ -265,7 +264,7 @@ class TripPatternMapper {
       return null;
     }
 
-    var serviceDate = new ServiceDate(opDay.getCalendarDate().toLocalDate());
+    var serviceDate = opDay.getCalendarDate().toLocalDate();
     var id = idFactory.createId(datedServiceJourney.getId());
     var alteration = TripServiceAlterationMapper.mapAlteration(
       datedServiceJourney.getServiceAlteration()

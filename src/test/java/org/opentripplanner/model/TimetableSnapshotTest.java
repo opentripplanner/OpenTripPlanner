@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.OtpModel;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
@@ -49,16 +49,16 @@ public class TimetableSnapshotTest {
   @Test
   public void testCompare() {
     Timetable orig = new Timetable(null);
-    Timetable a = new Timetable(orig, new ServiceDate(timeZone).previous());
-    Timetable b = new Timetable(orig, new ServiceDate(timeZone));
+    Timetable a = new Timetable(orig, LocalDate.now(timeZone).minusDays(1));
+    Timetable b = new Timetable(orig, LocalDate.now(timeZone));
     assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
   }
 
   @Test
   public void testResolve() {
-    ServiceDate today = new ServiceDate(timeZone);
-    ServiceDate yesterday = today.previous();
-    ServiceDate tomorrow = today.next();
+    LocalDate today = LocalDate.now(timeZone);
+    LocalDate yesterday = today.minusDays(1);
+    LocalDate tomorrow = today.plusDays(1);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     TimetableSnapshot resolver = new TimetableSnapshot();
 
@@ -105,8 +105,8 @@ public class TimetableSnapshotTest {
     Assertions.assertThrows(
       ConcurrentModificationException.class,
       () -> {
-        ServiceDate today = new ServiceDate(timeZone);
-        ServiceDate yesterday = today.previous();
+        LocalDate today = LocalDate.now(timeZone);
+        LocalDate yesterday = today.minusDays(1);
         TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
@@ -158,8 +158,8 @@ public class TimetableSnapshotTest {
     Assertions.assertThrows(
       ConcurrentModificationException.class,
       () -> {
-        ServiceDate today = new ServiceDate(timeZone);
-        ServiceDate yesterday = today.previous();
+        LocalDate today = LocalDate.now(timeZone);
+        LocalDate yesterday = today.minusDays(1);
         TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
         TimetableSnapshot resolver = new TimetableSnapshot();
@@ -216,8 +216,8 @@ public class TimetableSnapshotTest {
 
   @Test
   public void testPurge() {
-    ServiceDate today = new ServiceDate(timeZone);
-    ServiceDate yesterday = today.previous();
+    LocalDate today = LocalDate.now(timeZone);
+    LocalDate yesterday = today.minusDays(1);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
     TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -262,7 +262,7 @@ public class TimetableSnapshotTest {
     TimetableSnapshot resolver,
     TripPattern pattern,
     TripUpdate tripUpdate,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     TripTimesPatch tripTimesPatch = pattern
       .getScheduledTimetable()

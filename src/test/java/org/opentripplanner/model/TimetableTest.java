@@ -12,6 +12,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.OtpModel;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -34,7 +34,7 @@ import org.opentripplanner.util.TestUtils;
 public class TimetableTest {
 
   private static final ZoneId timeZone = ZoneId.of("America/New_York");
-  private static final ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
+  private static final LocalDate serviceDate = LocalDate.of(2009, 8, 7);
   private static Graph graph;
   private static TransitModel transitModel;
   private static Map<FeedScopedId, TripPattern> patternIndex;

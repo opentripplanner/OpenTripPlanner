@@ -4,19 +4,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class CalendarServiceBuilderTest {
 
-  private static final ServiceDate D1 = new ServiceDate(2020, 11, 1);
-  private static final ServiceDate D2 = new ServiceDate(2020, 11, 2);
+  private static final LocalDate D1 = LocalDate.of(2020, 11, 1);
+  private static final LocalDate D2 = LocalDate.of(2020, 11, 2);
 
   private static final FeedScopedId EXP_SID_1 = TransitModelForTest.id("S000001");
   private static final FeedScopedId EXP_SID_2 = TransitModelForTest.id("S000002");
@@ -71,7 +71,7 @@ public class CalendarServiceBuilderTest {
   private void assertServiceDateExistInList(
     Collection<ServiceCalendarDate> list,
     FeedScopedId serviceId,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     for (ServiceCalendarDate it : list) {
       if (serviceId.equals(it.getServiceId()) && serviceDate.equals(it.getDate())) {

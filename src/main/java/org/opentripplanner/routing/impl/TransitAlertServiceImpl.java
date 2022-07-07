@@ -2,10 +2,10 @@ package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -85,7 +85,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, ServiceDate serviceDate) {
+  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate) {
     return alerts.get(new EntitySelector.Trip(trip, serviceDate));
   }
 
@@ -103,7 +103,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   public Collection<TransitAlert> getStopAndTripAlerts(
     FeedScopedId stop,
     FeedScopedId trip,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     return alerts.get(new EntitySelector.StopAndTrip(stop, trip, serviceDate));
   }

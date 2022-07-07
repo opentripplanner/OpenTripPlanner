@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -9,7 +10,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
@@ -114,7 +114,7 @@ public class FlexibleTransitLeg implements Leg {
   }
 
   @Override
-  public ServiceDate getServiceDate() {
+  public LocalDate getServiceDate() {
     return edge.flexTemplate.serviceDate;
   }
 

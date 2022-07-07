@@ -13,7 +13,6 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -411,10 +410,7 @@ public class BuildConfig {
   }
 
   public ServiceDateInterval getTransitServicePeriod() {
-    return new ServiceDateInterval(
-      new ServiceDate(transitServiceStart),
-      new ServiceDate(transitServiceEnd)
-    );
+    return new ServiceDateInterval(transitServiceStart, transitServiceEnd);
   }
 
   public int getSubwayAccessTimeSeconds() {

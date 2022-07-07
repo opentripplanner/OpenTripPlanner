@@ -5,6 +5,7 @@ import static graphql.Assert.assertFalse;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,6 @@ import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -32,7 +32,7 @@ public abstract class FlexTest {
   static final String COBB_OSM = "/flex/cobb-county.filtered.osm.pbf";
 
   static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();
-  static final ServiceDate serviceDate = new ServiceDate(2021, 4, 11);
+  static final LocalDate serviceDate = LocalDate.of(2021, 4, 11);
   static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
   static final FlexServiceDate flexDate = new FlexServiceDate(
     serviceDate,
@@ -56,7 +56,7 @@ public abstract class FlexTest {
     GtfsBundle gtfsBundle = new GtfsBundle(file);
     GtfsModule module = new GtfsModule(
       List.of(gtfsBundle),
-      new ServiceDateInterval(new ServiceDate(2021, 1, 1), new ServiceDate(2022, 1, 1))
+      new ServiceDateInterval(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     module.buildGraph(graph, transitModel, new HashMap<>());

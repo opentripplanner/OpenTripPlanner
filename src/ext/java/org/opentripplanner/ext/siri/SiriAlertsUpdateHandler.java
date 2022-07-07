@@ -9,13 +9,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.SubMode;
@@ -24,6 +22,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.ifopt.siri20.StopPlaceRef;
@@ -353,9 +352,11 @@ public class SiriAlertsUpdateHandler {
                 ? affectedVehicleJourney.getOriginAimedDepartureTime()
                 : ZonedDateTime.now();
 
-              ZonedDateTime startOfService = DateMapper.asStartOfService(originAimedDepartureTime);
+              ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
+                originAimedDepartureTime
+              );
 
-              ServiceDate serviceDate = new ServiceDate(startOfService.toLocalDate());
+              LocalDate serviceDate = startOfService.toLocalDate();
 
               if (tripIdFromVehicleJourney != null) {
                 tripIds.add(tripIdFromVehicleJourney);
@@ -399,19 +400,9 @@ public class SiriAlertsUpdateHandler {
             FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef, feedId);
 
             if (tripId != null) {
-              ServiceDate serviceDate = null;
+              LocalDate serviceDate = null;
               if (dataFrameRef != null && dataFrameRef.getValue() != null) {
-                ZonedDateTime startOfService = DateMapper.asStartOfService(
-                  LocalDate.parse(dataFrameRef.getValue()),
-                  transitModel.getTimeZone()
-                );
-
-                serviceDate =
-                  new ServiceDate(
-                    startOfService.getYear(),
-                    startOfService.getMonthValue(),
-                    startOfService.getDayOfMonth()
-                  );
+                serviceDate = LocalDate.parse(dataFrameRef.getValue());
               }
 
               if (!affectedStops.isEmpty()) {

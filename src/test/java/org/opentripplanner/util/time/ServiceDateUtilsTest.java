@@ -1,17 +1,23 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
+package org.opentripplanner.util.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper.asStartOfService;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.util.time.ServiceDateUtils.asStartOfService;
 
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
-public class DateMapperTest {
+public class ServiceDateUtilsTest {
 
   private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");
   private static final LocalTime TIME = LocalTime.of(10, 26);
@@ -92,14 +98,39 @@ public class DateMapperTest {
   }
 
   @Test
+  public void getStartOfService() {
+    var zone = ZoneId.of("Europe/Oslo");
+    LocalDate d = LocalDate.of(2020, 8, 25);
+
+    assertEquals(
+      "2020-08-25T00:00+02:00[Europe/Oslo]",
+      ServiceDateUtils.asStartOfService(d, zone).toString()
+    );
+
+    // Time is adjusted 1 hour back in Norway on this date
+    d = LocalDate.of(2020, 10, 25);
+    assertEquals(
+      "2020-10-25T01:00+02:00[Europe/Oslo]",
+      ServiceDateUtils.asStartOfService(d, zone).toString()
+    );
+
+    // Time is adjusted 1 hour forward in Norway on this date
+    d = LocalDate.of(2020, 3, 29);
+    assertEquals(
+      "2020-03-28T23:00+01:00[Europe/Oslo]",
+      ServiceDateUtils.asStartOfService(d, zone).toString()
+    );
+  }
+
+  @Test
   public void secondsSinceStartOfTime() {
-    assertEquals(0, DateMapper.secondsSinceStartOfTime(Z0, D2019_03_30));
-    assertEquals(23 * 3600, DateMapper.secondsSinceStartOfTime(Z0, D2019_03_31));
-    assertEquals((23 + 24) * 3600, DateMapper.secondsSinceStartOfTime(Z0, D2019_04_01));
+    assertEquals(0, ServiceDateUtils.secondsSinceStartOfTime(Z0, D2019_03_30));
+    assertEquals(23 * 3600, ServiceDateUtils.secondsSinceStartOfTime(Z0, D2019_03_31));
+    assertEquals((23 + 24) * 3600, ServiceDateUtils.secondsSinceStartOfTime(Z0, D2019_04_01));
 
     // Test the Instant version of this method too
     Instant instant = D2019_04_01.atStartOfDay(ZONE_ID).toInstant();
-    assertEquals((23 + 24) * 3600, DateMapper.secondsSinceStartOfTime(Z0, instant));
+    assertEquals((23 + 24) * 3600, ServiceDateUtils.secondsSinceStartOfTime(Z0, instant));
   }
 
   @Test
@@ -112,7 +143,60 @@ public class DateMapperTest {
     var desiredDuration = Duration.between(startOfService, dateTime).toSeconds();
     assertEquals(
       desiredDuration,
-      DateMapper.secondsSinceStartOfService(operatingDayDate, dateTime, zoneId)
+      ServiceDateUtils.secondsSinceStartOfService(operatingDayDate, dateTime, zoneId)
     );
+  }
+
+  @Test
+  public void parse() throws ParseException {
+    LocalDate subject;
+
+    subject = ServiceDateUtils.parseString("20201231");
+    assertEquals(2020, subject.getYear());
+    assertEquals(Month.DECEMBER, subject.getMonth());
+    assertEquals(31, subject.getDayOfMonth());
+
+    subject = ServiceDateUtils.parseString("2020-03-12");
+    assertEquals(2020, subject.getYear());
+    assertEquals(Month.MARCH, subject.getMonth());
+    assertEquals(12, subject.getDayOfMonth());
+
+    // Even though this is a valid date, we only support parsing of dates with
+    // 4 digits in the year
+    assertThrows(
+      ParseException.class,
+      () -> ServiceDateUtils.parseString("0-03-12"),
+      "error parsing date: 0-03-12"
+    );
+  }
+
+  @Test
+  public void minMax() throws ParseException {
+    LocalDate d1 = LocalDate.parse("2020-12-30");
+    LocalDate d2 = LocalDate.parse("2020-12-31");
+
+    assertSame(d1, ServiceDateUtils.min(d1, d2));
+    assertSame(d1, ServiceDateUtils.min(d2, d1));
+    assertSame(d2, ServiceDateUtils.max(d1, d2));
+    assertSame(d2, ServiceDateUtils.max(d2, d1));
+
+    // Test isMinMax
+    assertFalse(ServiceDateUtils.isMinMax(d1));
+    assertTrue(ServiceDateUtils.isMinMax(LocalDate.MIN));
+    assertTrue(ServiceDateUtils.isMinMax(LocalDate.MAX));
+  }
+
+  @Test
+  public void asCompactString() {
+    assertEquals("-9999999990101", ServiceDateUtils.asCompactString(LocalDate.MIN));
+    assertEquals("+9999999991231", ServiceDateUtils.asCompactString(LocalDate.MAX));
+    assertEquals("20200312", ServiceDateUtils.asCompactString(LocalDate.of(2020, 3, 12)));
+  }
+
+  @Test
+  public void testToString() {
+    assertEquals("MAX", ServiceDateUtils.toString(LocalDate.MAX));
+    assertEquals("MIN", ServiceDateUtils.toString(LocalDate.MIN));
+    assertEquals("2020-03-12", ServiceDateUtils.toString(LocalDate.of(2020, 3, 12)));
   }
 }

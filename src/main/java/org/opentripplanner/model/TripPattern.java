@@ -723,14 +723,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return new Coordinate(s.getLon(), s.getLat());
   }
 
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    // The serialized graph contains cyclic references TripPattern <--> Timetable.
-    // The Timetable must be indexed from here (rather than in its own readObject method)
-    // to ensure that the stops field it uses in TripPattern is already deserialized.
-    scheduledTimetable.finish();
-  }
-
   /**
    * Check if given stop and next stop on this trip pattern and other are equal.
    *

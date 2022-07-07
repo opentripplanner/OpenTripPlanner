@@ -3,14 +3,14 @@ package org.opentripplanner.ext.siri;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -50,10 +50,10 @@ public class SiriTripPatternCache {
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
-    @NotNull final StopPattern stopPattern,
-    @NotNull final Trip trip,
-    @NotNull final TransitModel transitModel,
-    @NotNull ServiceDate serviceDate
+    @Nonnull final StopPattern stopPattern,
+    @Nonnull final Trip trip,
+    @Nonnull final TransitModel transitModel,
+    @Nonnull LocalDate serviceDate
   ) {
     // Check cache for trip pattern
     StopPatternServiceDateKey key = new StopPatternServiceDateKey(stopPattern, serviceDate);
@@ -66,9 +66,6 @@ public class SiriTripPatternCache {
 
       // Create an empty bitset for service codes (because the new pattern does not contain any trips)
       tripPattern.setServiceCodes(transitModel.getServiceCodes());
-
-      // Finish scheduled time table
-      tripPattern.getScheduledTimetable().finish();
 
       // Create vertices and edges for new TripPattern
       // TODO: purge these vertices and edges once in a while?
@@ -172,9 +169,9 @@ public class SiriTripPatternCache {
 class StopPatternServiceDateKey {
 
   StopPattern stopPattern;
-  ServiceDate serviceDate;
+  LocalDate serviceDate;
 
-  public StopPatternServiceDateKey(StopPattern stopPattern, ServiceDate serviceDate) {
+  public StopPatternServiceDateKey(StopPattern stopPattern, LocalDate serviceDate) {
     this.stopPattern = stopPattern;
     this.serviceDate = serviceDate;
   }
@@ -197,9 +194,9 @@ class StopPatternServiceDateKey {
 class TripServiceDateKey {
 
   Trip trip;
-  ServiceDate serviceDate;
+  LocalDate serviceDate;
 
-  public TripServiceDateKey(Trip trip, ServiceDate serviceDate) {
+  public TripServiceDateKey(Trip trip, LocalDate serviceDate) {
     this.trip = trip;
     this.serviceDate = serviceDate;
   }

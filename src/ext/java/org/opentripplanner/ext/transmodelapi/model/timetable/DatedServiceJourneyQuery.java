@@ -16,7 +16,6 @@ import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -130,7 +129,7 @@ public class DatedServiceJourneyQuery {
         }
 
         // At least one operationg day is required
-        var days = operatingDays.stream().map(ServiceDate::new).toList();
+        var days = operatingDays.stream().toList();
 
         stream =
           stream.filter(tripOnServiceDate -> days.contains(tripOnServiceDate.getServiceDate()));

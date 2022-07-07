@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
 import com.google.common.base.MoreObjects;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -32,7 +32,7 @@ public abstract class FlexAccessEgressTemplate {
   public final int toStopIndex;
   protected final StopLocation transferStop;
   protected final int secondsFromStartOfTime;
-  public final ServiceDate serviceDate;
+  public final LocalDate serviceDate;
   protected final FlexPathCalculator calculator;
   private final FlexParameters flexParams;
 

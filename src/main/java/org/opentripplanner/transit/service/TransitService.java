@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import gnu.trove.set.TIntSet;
+import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.BitSet;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +25,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -118,7 +119,7 @@ public interface TransitService {
 
   List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture
   );
 
@@ -139,9 +140,9 @@ public interface TransitService {
 
   GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id);
 
-  Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate);
+  Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 
-  TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, ServiceDate serviceDate);
+  TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, LocalDate serviceDate);
 
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);
 
@@ -165,11 +166,11 @@ public interface TransitService {
 
   FlexIndex getFlexIndex();
 
-  BitSet getServicesRunningForDate(ServiceDate parseString);
+  TIntSet getServicesRunningForDate(LocalDate parseString);
 
-  Long getTransitServiceEnds();
+  ZonedDateTime getTransitServiceEnds();
 
-  Long getTransitServiceStarts();
+  ZonedDateTime getTransitServiceStarts();
 
   Map<Stop, TransitStopVertex> getStopVertexForStop();
 

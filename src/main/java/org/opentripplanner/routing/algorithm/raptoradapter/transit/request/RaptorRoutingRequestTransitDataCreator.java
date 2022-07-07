@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper.secondsSinceStartOfTime;
+import static org.opentripplanner.util.time.ServiceDateUtils.secondsSinceStartOfTime;
 
 import gnu.trove.list.array.TIntArrayList;
 import java.time.LocalDate;
