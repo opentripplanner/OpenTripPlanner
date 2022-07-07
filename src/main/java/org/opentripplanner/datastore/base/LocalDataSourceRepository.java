@@ -1,7 +1,7 @@
 package org.opentripplanner.datastore.base;
 
 import java.util.List;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -43,7 +43,7 @@ public interface LocalDataSourceRepository extends DataSourceRepository {
    * @param type          the file type to load.
    * @return the datasource wrapper that can be used to access the data source.
    */
-  CompositeDataSource findCompositeSource(String localFilename, @NotNull FileType type);
+  CompositeDataSource findCompositeSource(String localFilename, @Nonnull FileType type);
 
   /**
    * List all existing data sources for the given type.

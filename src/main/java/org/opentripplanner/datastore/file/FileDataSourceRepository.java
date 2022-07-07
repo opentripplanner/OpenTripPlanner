@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -56,7 +56,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   /**
    * Use for unit testing
    */
-  @NotNull
+  @Nonnull
   public static CompositeDataSource compositeSource(File file, FileType type) {
     // The cast is safe
     return createCompositeSource(file, type);
@@ -73,12 +73,12 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   }
 
   @Override
-  public DataSource findSource(URI uri, FileType type) {
+  public DataSource findSource(@Nonnull URI uri, @Nonnull FileType type) {
     return new FileDataSource(openFile(uri, type), type);
   }
 
   @Override
-  public CompositeDataSource findCompositeSource(URI uri, FileType type) {
+  public CompositeDataSource findCompositeSource(@Nonnull URI uri, @Nonnull FileType type) {
     return createCompositeSource(openFile(uri, type), type);
   }
 

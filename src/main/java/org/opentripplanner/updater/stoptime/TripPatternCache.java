@@ -2,7 +2,7 @@ package org.opentripplanner.updater.stoptime;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
@@ -36,9 +36,9 @@ public class TripPatternCache {
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
-    @NotNull final StopPattern stopPattern,
-    @NotNull final Trip trip,
-    @NotNull final Map<FeedScopedId, Integer> serviceCodes,
+    @Nonnull final StopPattern stopPattern,
+    @Nonnull final Trip trip,
+    @Nonnull final Map<FeedScopedId, Integer> serviceCodes,
     final TripPattern originalTripPattern
   ) {
     Route route = trip.getRoute();

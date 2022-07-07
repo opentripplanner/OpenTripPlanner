@@ -3,7 +3,7 @@ package org.opentripplanner.ext.vehicleparking.parkapi;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
@@ -23,7 +23,7 @@ public class ParkAPIUpdaterParameters extends VehicleParkingUpdaterParameters {
     String url,
     String feedId,
     int frequencySec,
-    @NotNull Map<String, String> httpHeaders,
+    @Nonnull Map<String, String> httpHeaders,
     List<String> tags,
     DataSourceType sourceType
   ) {

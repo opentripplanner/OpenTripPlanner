@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -38,7 +39,7 @@ public class GsDataSourceRepository implements DataSourceRepository {
   }
 
   @Override
-  public DataSource findSource(URI uri, FileType type) {
+  public DataSource findSource(@Nonnull URI uri, @Nonnull FileType type) {
     if (skipUri(uri)) {
       return null;
     }
@@ -47,7 +48,7 @@ public class GsDataSourceRepository implements DataSourceRepository {
   }
 
   @Override
-  public CompositeDataSource findCompositeSource(URI uri, FileType type) {
+  public CompositeDataSource findCompositeSource(@Nonnull URI uri, @Nonnull FileType type) {
     if (skipUri(uri)) {
       return null;
     }

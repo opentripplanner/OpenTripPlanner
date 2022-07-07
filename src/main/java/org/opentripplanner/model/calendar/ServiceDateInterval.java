@@ -5,7 +5,7 @@ import static java.time.LocalDate.MIN;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
@@ -51,7 +51,7 @@ public final class ServiceDateInterval {
    * Return the interval start, inclusive. If the period start is unbounded the {@link
    * LocalDate#MIN} is returned.
    */
-  @NotNull
+  @Nonnull
   public LocalDate getStart() {
     return start;
   }
@@ -60,7 +60,7 @@ public final class ServiceDateInterval {
    * Return the interval end, inclusive. If the period start is unbounded the {@link
    * LocalDate#MAX} is returned.
    */
-  @NotNull
+  @Nonnull
   public LocalDate getEnd() {
     return end;
   }

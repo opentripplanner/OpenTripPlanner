@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.transit.model.site.Stop;
@@ -50,10 +50,10 @@ public class SiriTripPatternCache {
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
-    @NotNull final StopPattern stopPattern,
-    @NotNull final Trip trip,
-    @NotNull final TransitModel transitModel,
-    @NotNull LocalDate serviceDate
+    @Nonnull final StopPattern stopPattern,
+    @Nonnull final Trip trip,
+    @Nonnull final TransitModel transitModel,
+    @Nonnull LocalDate serviceDate
   ) {
     // Check cache for trip pattern
     StopPatternServiceDateKey key = new StopPatternServiceDateKey(stopPattern, serviceDate);
