@@ -30,7 +30,9 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
   @Override
   public Collection<T2<String, Object>> map(TransitStopVertex input) {
     Stop stop = input.getStop();
-    Collection<TripPattern> patternsForStop = transitModel.index.getPatternsForStop(stop);
+    Collection<TripPattern> patternsForStop = transitModel
+      .getTransitModelIndex()
+      .getPatternsForStop(stop);
 
     String type = patternsForStop
       .stream()

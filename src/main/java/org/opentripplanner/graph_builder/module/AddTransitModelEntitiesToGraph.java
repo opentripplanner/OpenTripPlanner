@@ -356,7 +356,7 @@ public class AddTransitModelEntitiesToGraph {
 
   private void addLocationsToGraph(TransitModel transitModel) {
     for (FlexStopLocation flexStopLocation : otpTransitService.getAllLocations()) {
-      transitModel.getStopModel().locationsById.put(flexStopLocation.getId(), flexStopLocation);
+      transitModel.getStopModel().addLocations(flexStopLocation.getId(), flexStopLocation);
     }
   }
 
@@ -364,7 +364,7 @@ public class AddTransitModelEntitiesToGraph {
     for (FlexLocationGroup flexLocationGroup : otpTransitService.getAllLocationGroups()) {
       transitModel
         .getStopModel()
-        .locationGroupsById.put(flexLocationGroup.getId(), flexLocationGroup);
+        .addFlexLocationGroup(flexLocationGroup.getId(), flexLocationGroup);
     }
   }
 
@@ -385,9 +385,8 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   private void addFlexTripsToGraph(TransitModel transitModel) {
-    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) transitModel.flexTripsById.put(
-      flexTrip.getId(),
-      flexTrip
-    );
+    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) {
+      transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
+    }
   }
 }

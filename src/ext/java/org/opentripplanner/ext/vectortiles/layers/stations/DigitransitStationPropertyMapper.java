@@ -36,7 +36,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
         "type",
         childStops
           .stream()
-          .flatMap(stop -> transitModel.index.getPatternsForStop(stop).stream())
+          .flatMap(stop -> transitModel.getTransitModelIndex().getPatternsForStop(stop).stream())
           .map(tripPattern -> tripPattern.getMode().name())
           .distinct()
           .collect(Collectors.joining(","))
@@ -56,7 +56,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
         JSONArray.toJSONString(
           childStops
             .stream()
-            .flatMap(stop -> transitModel.index.getRoutesForStop(stop).stream())
+            .flatMap(stop -> transitModel.getTransitModelIndex().getRoutesForStop(stop).stream())
             .distinct()
             .map(route ->
               route.getShortName() == null

@@ -187,7 +187,7 @@ public class TestHalfEdges {
 
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
-    transitModel.hasTransit = true;
+    transitModel.setHasTransit(true);
   }
 
   @Test

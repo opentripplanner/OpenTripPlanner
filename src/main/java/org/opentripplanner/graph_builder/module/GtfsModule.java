@@ -163,7 +163,7 @@ public class GtfsModule implements GraphBuilderModule {
     transitModel.updateTransitFeedValidity(calendarServiceData, issueStore);
 
     // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    transitModel.hasTransit = transitModel.hasTransit || hasTransit;
+    transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
     if (hasTransit) {
       transitModel.calculateTransitCenter();
     }
@@ -201,10 +201,12 @@ public class GtfsModule implements GraphBuilderModule {
       calServiceIds
     );
     buildTPOp.run();
-    transitModel.hasFrequencyService =
-      transitModel.hasFrequencyService || buildTPOp.hasFrequencyBasedTrips();
-    transitModel.hasScheduledService =
-      transitModel.hasScheduledService || buildTPOp.hasScheduledTrips();
+    transitModel.setHasFrequencyService(
+      transitModel.hasFrequencyService() || buildTPOp.hasFrequencyBasedTrips()
+    );
+    transitModel.setHasScheduledService(
+      transitModel.hasScheduledService() || buildTPOp.hasScheduledTrips()
+    );
   }
 
   private void addTransitModelToGraph(

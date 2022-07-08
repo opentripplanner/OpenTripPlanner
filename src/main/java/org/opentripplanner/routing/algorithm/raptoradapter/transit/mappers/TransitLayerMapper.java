@@ -81,14 +81,14 @@ public class TransitLayerMapper {
         tuningParameters
       );
 
-    Collection<TripPattern> allTripPatterns = transitModel.tripPatternForId.values();
+    Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
     TripPatternMapper tripPatternMapper = new TripPatternMapper();
     newTripPatternForOld =
       tripPatternMapper.mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns, newTripPatternForOld);
 
-    transferByStopIndex = mapTransfers(stopIndex, transitModel.transfersByStop);
+    transferByStopIndex = mapTransfers(stopIndex, transitModel);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
@@ -128,11 +128,14 @@ public class TransitLayerMapper {
     Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld
   ) {
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      transitModel.index.getServiceCodesRunningForDate(),
+      transitModel.getTransitModelIndex().getServiceCodesRunningForDate(),
       newTripPatternForOld
     );
 
-    Set<LocalDate> allServiceDates = transitModel.index.getServiceCodesRunningForDate().keySet();
+    Set<LocalDate> allServiceDates = transitModel
+      .getTransitModelIndex()
+      .getServiceCodesRunningForDate()
+      .keySet();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 

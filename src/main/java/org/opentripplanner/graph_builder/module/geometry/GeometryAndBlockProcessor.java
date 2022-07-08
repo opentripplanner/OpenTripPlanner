@@ -168,7 +168,7 @@ public class GeometryAndBlockProcessor {
       tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
+      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     /* Identify interlined trips and create the necessary edges. */

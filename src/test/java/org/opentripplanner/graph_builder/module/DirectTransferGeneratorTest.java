@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.google.common.collect.Multimap;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +58,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
     generator.buildGraph(graph, transitModel, null);
 
-    assertTransfers(transitModel.transfersByStop);
+    assertTransfers(transitModel.getAllPathTransfers());
   }
 
   @Test
@@ -75,7 +76,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     generator.buildGraph(graph, transitModel, null);
 
     assertTransfers(
-      transitModel.transfersByStop,
+      transitModel.getAllPathTransfers(),
       tr(S0, 556, S11),
       tr(S0, 935, S21),
       tr(S11, 751, S21),
@@ -99,7 +100,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
     generator.buildGraph(graph, transitModel, null);
 
-    assertTransfers(transitModel.transfersByStop);
+    assertTransfers(transitModel.getAllPathTransfers());
   }
 
   @Test
@@ -117,7 +118,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     generator.buildGraph(graph, transitModel, null);
 
     assertTransfers(
-      transitModel.transfersByStop,
+      transitModel.getAllPathTransfers(),
       tr(S0, 100, List.of(V0, V11), S11),
       tr(S0, 100, List.of(V0, V21), S21),
       tr(S11, 100, List.of(V11, V21), S21)
@@ -141,7 +142,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
     generator.buildGraph(graph, transitModel, null);
 
-    assertTransfers(transitModel.transfersByStop);
+    assertTransfers(transitModel.getAllPathTransfers());
   }
 
   @Test
@@ -161,7 +162,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
     generator.buildGraph(graph, transitModel, null);
     assertTransfers(
-      transitModel.transfersByStop,
+      transitModel.getAllPathTransfers(),
       tr(S0, 100, List.of(V0, V11), S11),
       tr(S0, 100, List.of(V0, V21), S21),
       tr(S11, 100, List.of(V11, V21), S21),
@@ -227,24 +228,24 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   }
 
   private void assertTransfers(
-    Multimap<StopLocation, PathTransfer> transfersByStop,
+    Collection<PathTransfer> allPathTransfers,
     TransferDescriptor... transfers
   ) {
     var matchedTransfers = new HashSet<PathTransfer>();
     var assertions = Stream.concat(
-      Arrays.stream(transfers).map(td -> td.matcher(transfersByStop, matchedTransfers)),
-      Stream.of(allTransfersMatched(transfersByStop, matchedTransfers))
+      Arrays.stream(transfers).map(td -> td.matcher(allPathTransfers, matchedTransfers)),
+      Stream.of(allTransfersMatched(allPathTransfers, matchedTransfers))
     );
 
     assertAll(assertions);
   }
 
   private Executable allTransfersMatched(
-    Multimap<StopLocation, PathTransfer> transfersByStop,
+    Collection<PathTransfer> transfersByStop,
     Set<PathTransfer> matchedTransfers
   ) {
     return () -> {
-      var missingTransfers = new HashSet<>(transfersByStop.values());
+      var missingTransfers = new HashSet<>(transfersByStop);
       missingTransfers.removeAll(matchedTransfers);
 
       assertEquals(Set.of(), missingTransfers, "All transfers matched");
@@ -324,11 +325,11 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     }
 
     private Executable matcher(
-      Multimap<StopLocation, PathTransfer> transfersByStop,
+      Collection<PathTransfer> transfersByStop,
       Set<PathTransfer> matchedTransfers
     ) {
       return () -> {
-        var matched = transfersByStop.values().stream().filter(this::matches).findFirst();
+        var matched = transfersByStop.stream().filter(this::matches).findFirst();
 
         if (matched.isPresent()) {
           assertTrue(true, "Found transfer for " + this);

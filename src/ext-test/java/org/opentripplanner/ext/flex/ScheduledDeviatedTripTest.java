@@ -63,7 +63,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
   @Test
   public void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = transitModel.flexTripsById.values();
+    var flexTrips = transitModel.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -207,7 +207,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   @Test
   public void shouldNotInterpolateFlexTimes() {
     var feedId = transitModel.getFeedIds().iterator().next();
-    var pattern = transitModel.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
+    var pattern = transitModel.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
 
     assertEquals(3, pattern.numberOfStops());
 
@@ -288,6 +288,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   private static FlexTrip getFlexTrip() {
     var feedId = transitModel.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return transitModel.flexTripsById.get(tripId);
+    return transitModel.getFlexTrip(tripId);
   }
 }

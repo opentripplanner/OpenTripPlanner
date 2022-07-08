@@ -483,7 +483,7 @@ public class IndexAPI {
   @GET
   @Path("/patterns")
   public List<ApiPatternShort> getPatterns() {
-    Collection<TripPattern> patterns = createTransitService().getTripPatterns();
+    Collection<TripPattern> patterns = createTransitService().getAllTripPatterns();
     return TripPatternMapper.mapToApiShort(patterns);
   }
 

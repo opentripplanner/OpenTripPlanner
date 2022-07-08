@@ -298,7 +298,7 @@ public class GraphBuilder implements Runnable {
    * configuration, for example, then this function will throw a {@link OtpAppException}.
    */
   private void validate() {
-    if (hasTransitData() && !transitModel.hasTransit) {
+    if (hasTransitData() && !transitModel.hasTransit()) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit " +
         "service period. See build config 'transitServiceStart' and " +
