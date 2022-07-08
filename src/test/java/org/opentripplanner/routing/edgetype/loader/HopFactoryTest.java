@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
+import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
@@ -50,8 +50,8 @@ public class HopFactoryTest {
     var stopModel = new StopModel();
     graph = new Graph(stopModel, deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
-    GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-    factory.run(graph, transitModel);
+    GeometryProcessor factory = new GeometryProcessor(context);
+    factory.run(transitModel);
     transitModel.putService(CalendarServiceData.class, context.getCalendarServiceData());
 
     feedId = context.getFeedId().getId();

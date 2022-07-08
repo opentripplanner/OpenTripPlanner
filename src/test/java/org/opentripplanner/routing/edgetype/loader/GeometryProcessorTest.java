@@ -23,7 +23,7 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
+import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
@@ -52,7 +52,7 @@ import org.opentripplanner.util.TestUtils;
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
 @Disabled
-public class GeometryAndBlockProcessorTest {
+public class GeometryProcessorTest {
 
   private Graph graph;
   private TransitModel transitModel;
@@ -73,8 +73,8 @@ public class GeometryAndBlockProcessorTest {
       contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
 
     feedId = context.getFeedId().getId();
-    GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-    factory.run(graph, transitModel, issueStore);
+    GeometryProcessor factory = new GeometryProcessor(context);
+    factory.run(transitModel);
     transitModel.putService(CalendarServiceData.class, context.getCalendarServiceData());
 
     String[] stops = {
