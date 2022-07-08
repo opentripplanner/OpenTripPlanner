@@ -10,7 +10,6 @@ import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,7 +24,6 @@ import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -182,7 +180,6 @@ public class BarrierRoutingTest {
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneId.of("Europe/Berlin"),
-      Mockito.mock(AlertToLegMapper.class),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

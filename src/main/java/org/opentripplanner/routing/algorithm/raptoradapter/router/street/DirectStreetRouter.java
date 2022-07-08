@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -42,13 +41,6 @@ public class DirectStreetRouter {
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
         router.transitModel.getTimeZone(),
-        new AlertToLegMapper(
-          router.transitModel.getTransitAlertService(),
-          router.transitModel
-            .getStopModel()
-            .getStopModelIndex()
-            .getMultiModalStationForStations()::get
-        ),
         router.graph.streetNotesService,
         router.graph.ellipsoidToGeoidDifference
       );

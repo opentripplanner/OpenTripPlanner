@@ -5,7 +5,6 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.TimeZone;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +14,6 @@ import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -150,7 +148,6 @@ public class CarRoutingTest {
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneId.of("Europe/Berlin"),
-      Mockito.mock(AlertToLegMapper.class),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

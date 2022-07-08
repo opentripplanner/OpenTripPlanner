@@ -19,7 +19,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -52,8 +51,6 @@ public class TestIntermediatePlaces {
 
   private static Graph graph;
 
-  private static TransitModel transitModel;
-
   private static GraphPathToItineraryMapper graphPathToItineraryMapper;
 
   @BeforeAll
@@ -61,7 +58,7 @@ public class TestIntermediatePlaces {
     try {
       OtpModel otpModel = FakeGraph.buildGraphNoTransit();
       graph = otpModel.graph;
-      transitModel = otpModel.transitModel;
+      TransitModel transitModel = otpModel.transitModel;
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
       graph.index();
@@ -72,8 +69,7 @@ public class TestIntermediatePlaces {
 
       graphPathToItineraryMapper =
         new GraphPathToItineraryMapper(
-          transitModel.getTimeZone(),
-          new AlertToLegMapper(transitModel.getTransitAlertService(), ignore -> null),
+          timeZone,
           graph.streetNotesService,
           graph.ellipsoidToGeoidDifference
         );

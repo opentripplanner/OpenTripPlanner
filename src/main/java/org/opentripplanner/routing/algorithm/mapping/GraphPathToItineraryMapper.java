@@ -50,18 +50,15 @@ import org.opentripplanner.util.OTPFeature;
 public class GraphPathToItineraryMapper {
 
   private final ZoneId timeZone;
-  private final AlertToLegMapper alertToLegMapper;
   private final StreetNotesService streetNotesService;
   private final double ellipsoidToGeoidDifference;
 
   public GraphPathToItineraryMapper(
     ZoneId timeZone,
-    AlertToLegMapper alertToLegMapper,
     StreetNotesService streetNotesService,
     double ellipsoidToGeoidDifference
   ) {
     this.timeZone = timeZone;
-    this.alertToLegMapper = alertToLegMapper;
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
@@ -356,10 +353,7 @@ public class GraphPathToItineraryMapper {
     ZonedDateTime endTime = toState.getTime().atZone(timeZone);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
-    Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
-
-    alertToLegMapper.addTransitAlertsToLeg(leg, true);
-    return leg;
+    return new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
   }
 
   /**

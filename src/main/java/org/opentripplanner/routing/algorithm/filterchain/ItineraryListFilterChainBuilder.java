@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
+import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
@@ -28,9 +30,12 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.Station;
 
 /**
  * Create a filter chain based on the given config.
@@ -57,6 +62,8 @@ public class ItineraryListFilterChainBuilder {
   private boolean accessibilityScore;
   private double wheelchairMaxSlope;
   private FareService faresService;
+  private TransitAlertService transitAlertService;
+  private Function<Station, MultiModalStation> getMultiModalStation;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -261,6 +268,10 @@ public class ItineraryListFilterChainBuilder {
       filters.add(new FaresFilter(faresService));
     }
 
+    if (transitAlertService != null) {
+      filters.add(new TransitAlertFilter(transitAlertService, getMultiModalStation));
+    }
+
     // Filter transit itineraries on generalized-cost
     if (transitGeneralizedCostLimit != null) {
       filters.add(
@@ -337,6 +348,16 @@ public class ItineraryListFilterChainBuilder {
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
     return new ItineraryListFilterChain(filters, debug);
+  }
+
+  public ItineraryListFilterChainBuilder withTransitAlerts(
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
+  ) {
+    this.transitAlertService = transitAlertService;
+    this.getMultiModalStation = getMultiModalStation;
+
+    return this;
   }
 
   /**

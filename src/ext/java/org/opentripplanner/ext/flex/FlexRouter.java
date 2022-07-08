@@ -22,7 +22,6 @@ import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -75,10 +74,6 @@ public class FlexRouter {
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitModel.getTimeZone(),
-        new AlertToLegMapper(
-          transitModel.getTransitAlertService(),
-          transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations()::get
-        ),
         graph.streetNotesService,
         graph.ellipsoidToGeoidDifference
       );
