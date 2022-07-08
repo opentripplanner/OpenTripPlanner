@@ -5,7 +5,7 @@ on:
     inputs:
       environment:
         description: "Environment"
-        type: environment # will be prod, dev or dev-green
+        type: environment # will be prod, dev, dev-green or dev-blue
         required: true
         default: dev-green
 

@@ -7,7 +7,7 @@ on:
       deployment-env:
         type: string
         required: true
-        description: "Environment to deploy to: prod, dev, dev-green"
+        description: "Environment to deploy to: prod, dev, dev-green, dev-blue"
     # should inherit secrets from caller workflow
 
 concurrency:
@@ -17,7 +17,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: contains(fromJson('["prod", "dev", "dev-green"]'), inputs.deployment-env)
+    if: contains(fromJson('["prod", "dev", "dev-green", "dev-blue"]'), inputs.deployment-env)
     steps:
       - uses: actions/checkout@v3
 
@@ -25,6 +25,8 @@ jobs:
         run: |
           set -eu
           case "${{ inputs.deployment-env }}" in
+            'dev-blue')
+              URL="${{ secrets.MBTA_GTFS_URL_DEV_BLUE }}" ;;
             'dev-green')
               URL="${{ secrets.MBTA_GTFS_URL_DEV_GREEN }}" ;;
             'dev')
