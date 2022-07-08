@@ -18,7 +18,7 @@ class FareProductMapperTest {
     gtfs.setName("day pass");
     gtfs.setCurrency("USD");
     gtfs.setDurationAmount(1);
-    gtfs.setDurationUnit(3);
+    gtfs.setDurationUnit(5);
 
     var mapper = new FareProductMapper();
     var internal = mapper.map(gtfs);

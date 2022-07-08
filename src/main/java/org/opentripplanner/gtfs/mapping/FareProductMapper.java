@@ -1,7 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 import org.opentripplanner.model.FareContainer;
 import org.opentripplanner.model.FareProduct;
@@ -48,18 +47,16 @@ public class FareProductMapper {
   }
 
   private static Duration toTemporalUnit(int unit, int amount) {
-    var timeUnit =
-      switch (unit) {
-        case 0 -> ChronoUnit.SECONDS;
-        case 1 -> ChronoUnit.MINUTES;
-        case 2 -> ChronoUnit.HOURS;
-        case 3 -> ChronoUnit.DAYS;
-        case 4 -> ChronoUnit.WEEKS;
-        case 5 -> ChronoUnit.MONTHS;
-        case 6 -> ChronoUnit.YEARS;
-        default -> throw new IllegalStateException("Unexpected value: " + unit);
-      };
-    return Duration.of(amount, timeUnit);
+    return switch (unit) {
+      case 0 -> Duration.ofSeconds(amount);
+      case 1 -> Duration.ofMinutes(amount);
+      case 2 -> Duration.ofHours(amount);
+      case 3 -> Duration.ofDays(amount);
+      case 4 -> Duration.ofDays(amount * 7L);
+      case 5 -> Duration.ofDays(amount * 31L); // not totally right but good enough
+      case 6 -> Duration.ofDays(amount * 365L);
+      default -> throw new IllegalStateException("Unexpected value: " + unit);
+    };
   }
 
   private static FareContainer toInternalModel(org.onebusaway.gtfs.model.FareContainer c) {
