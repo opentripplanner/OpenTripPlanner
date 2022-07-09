@@ -73,7 +73,7 @@ public class NetexModule implements GraphBuilderModule {
           graph.deduplicator,
           issueStore
         );
-        transitBuilder.limitServiceDays(transitPeriodLimit, issueStore);
+        transitBuilder.limitServiceDays(transitPeriodLimit);
         for (TripOnServiceDate tripOnServiceDate : transitBuilder
           .getTripOnServiceDates()
           .values()) {
