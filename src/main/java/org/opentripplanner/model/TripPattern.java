@@ -113,7 +113,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
    * "like [trip id]" name, which at least tells you where in the GTFS you can find a related trip.
    */
   // TODO: pass in a transit index that contains a Multimap<Route, TripPattern> and derive all TableTripPatterns
-  // TODO: use headsigns before attempting to machine-generate names
   // TODO: combine from/to and via in a single name. this could be accomplished by grouping the trips by destination,
   // then disambiguating in groups of size greater than 1.
   /*
@@ -150,6 +149,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
       for (TripPattern pattern : routeTripPatterns) {
         StopLocation start = pattern.firstStop();
         StopLocation end = pattern.lastStop();
+        String headsign = pattern.getTripHeadsign();
+        if (headsign != null) {
+          signs.put(headsign, pattern);
+        }
         starts.put(start, pattern);
         ends.put(end, pattern);
         for (StopLocation stop : pattern.getStops()) {
@@ -158,6 +161,11 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
       }
       PATTERN:for (TripPattern pattern : routeTripPatterns) {
         StringBuilder sb = new StringBuilder(routeName);
+        String headsign = pattern.getTripHeadsign();
+        if (headsign != null && signs.get(headsign).size() == 1) {
+          pattern.setName(sb.append(" ").append(headsign).toString());
+          continue;
+        }
 
         /* First try to name with destination. */
         var end = pattern.lastStop();
