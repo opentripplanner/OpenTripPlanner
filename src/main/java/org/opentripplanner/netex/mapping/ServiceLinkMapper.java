@@ -1,246 +1,286 @@
 package org.opentripplanner.netex.mapping;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
-import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.MissingProjectionInServiceLink;
-import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStructure;
 
 /**
- * Maps NeTEx ServiceLinks til OTP ShapePoints. NeTEx defines a ServiceLink as a link between an
- * ordered pair of Stop Points, while GTFS defines a list of ShapePoints for an entire Trip. GTFS
- * ShapePoints contain distance travelled per point, while a NeTEX ServiceLinks only contain a
- * distance for each link. We therefore have to divide the total distance between a pair of stops
- * equally between all the points between them.
- * <p>
- * Because NeTEx ServiceLinks are defined at the JourneyPattern level, we create ShapePoints with
- * the same ids as their corresponding JourneyPattern (only with "JourneyPattern" switched out with
- * "ServiceLink". In the TripMapper, we then use this id to look up ShapePoint ids.
- * <p>
- * Combining the ServiceLinks that are defined per hop into a single geometry for the entire pattern
- * seems counterproductive, as they are split apart in the GeometryAndBlockProcessor afterwards. A
- * better approach could be to keep the geometries as per hop throughout the import. The reason we
- * decided not to do this, is that it required a large refactoring of the complicated logic in the
- * GeometryAndBlockProcessor in order to keep the existing validation of the geometries. (2020-02-14
- * #2952)
+ * Maps NeTEx ServiceLinks to arrays of LineStrings.
  */
 class ServiceLinkMapper {
 
+  private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
   private final FeedScopedIdFactory idFactory;
+  private final ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById;
+  private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
+  private final EntityById<Stop> stopById;
   private final DataImportIssueStore issueStore;
+  private final double maxStopToShapeSnapDistance;
 
-  ServiceLinkMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
-    this.idFactory = idFactory;
-    this.issueStore = issueStore;
-  }
-
-  Collection<ShapePoint> getShapePointsByJourneyPattern(
-    JourneyPattern journeyPattern,
+  ServiceLinkMapper(
+    FeedScopedIdFactory idFactory,
     ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-    ReadOnlyHierarchicalVersionMapById<Quay> quayById
+    EntityById<Stop> stopById,
+    DataImportIssueStore issueStore,
+    double maxStopToShapeSnapDistance
   ) {
-    Collection<ShapePoint> shapePoints = new ArrayList<>();
-    if (journeyPattern.getLinksInSequence() != null) {
-      MutableInt sequenceCounter = new MutableInt(0);
-      MutableDouble distance = new MutableDouble(0);
-      for (LinkInLinkSequence_VersionedChildStructure linkInLinkSequence_versionedChildStructure : journeyPattern
-        .getLinksInSequence()
-        .getServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern()) {
-        String serviceLinkRef =
-          (
-            (ServiceLinkInJourneyPattern_VersionedChildStructure) linkInLinkSequence_versionedChildStructure
-          ).getServiceLinkRef()
-            .getRef();
-        ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
+    this.idFactory = idFactory;
+    this.serviceLinkById = serviceLinkById;
+    this.quayIdByStopPointRef = quayIdByStopPointRef;
+    this.stopById = stopById;
+    this.issueStore = issueStore;
+    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+  }
 
-        if (serviceLink != null) {
-          shapePoints.addAll(
-            mapServiceLink(
-              serviceLink,
-              journeyPattern,
-              sequenceCounter,
-              distance,
-              quayIdByStopPointRef,
-              quayById
-            )
-          );
-        } else {
-          issueStore.add(
-            "MissingServiceLink",
-            "ServiceLink not found in journey pattern %s",
-            journeyPattern.getId()
-          );
+  LineString[] getGeometriesByJourneyPattern(
+    JourneyPattern journeyPattern,
+    TripPattern tripPattern
+  ) {
+    LineString[] geometries = new LineString[tripPattern.numberOfStops() - 1];
+    if (journeyPattern.getLinksInSequence() != null) {
+      List<LinkInLinkSequence_VersionedChildStructure> linksInJourneyPattern = journeyPattern
+        .getLinksInSequence()
+        .getServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern();
+      for (int i = 0; i < linksInJourneyPattern.size(); i++) {
+        var linkInLinkSequence = linksInJourneyPattern.get(i);
+        if (
+          linkInLinkSequence instanceof ServiceLinkInJourneyPattern_VersionedChildStructure serviceLinkInJourneyPattern
+        ) {
+          String serviceLinkRef = serviceLinkInJourneyPattern.getServiceLinkRef().getRef();
+          ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
+
+          if (serviceLink != null) {
+            geometries[i] = mapServiceLink(serviceLink, tripPattern, i);
+          } else {
+            issueStore.add(
+              "MissingServiceLink",
+              "ServiceLink %s not found in journey pattern %s",
+              serviceLinkRef,
+              journeyPattern.getId()
+            );
+          }
         }
       }
     }
-    return shapePoints;
+
+    // Make sure all geometries are generated
+    for (int i = 0; i < tripPattern.numberOfStops() - 1; ++i) {
+      if (geometries[i] == null) {
+        geometries[i] = createSimpleGeometry(tripPattern.getStop(i), tripPattern.getStop(i + 1));
+      }
+    }
+    return geometries;
   }
 
-  private Collection<ShapePoint> mapServiceLink(
-    ServiceLink serviceLink,
-    JourneyPattern journeyPattern,
-    MutableInt sequenceCounter,
-    MutableDouble distanceCounter,
-    ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-    ReadOnlyHierarchicalVersionMapById<Quay> quayById
-  ) {
-    Collection<ShapePoint> shapePoints = new ArrayList<>();
-    FeedScopedId shapePointIdFromJourneyPatternId = createShapePointIdFromJourneyPatternId(
-      idFactory.createId(journeyPattern.getId())
-    );
-
+  private LineString mapServiceLink(ServiceLink serviceLink, TripPattern tripPattern, int i) {
     if (
       serviceLink.getProjections() == null ||
       serviceLink.getProjections().getProjectionRefOrProjection() == null
     ) {
-      addStraightLine(
-        serviceLink,
-        sequenceCounter,
-        distanceCounter,
-        quayIdByStopPointRef,
-        quayById,
-        shapePoints,
-        shapePointIdFromJourneyPatternId
-      );
-    } else {
-      mapCoordinates(
-        serviceLink,
-        sequenceCounter,
-        distanceCounter,
-        shapePoints,
-        shapePointIdFromJourneyPatternId
-      );
+      issueStore.add(new MissingProjectionInServiceLink(serviceLink.getId()));
+      return null;
     }
-
-    return shapePoints;
+    return mapCoordinates(serviceLink, tripPattern, i);
   }
 
-  private void mapCoordinates(
+  private LineString mapCoordinates(
     ServiceLink serviceLink,
-    MutableInt sequenceCounter,
-    MutableDouble distanceCounter,
-    Collection<ShapePoint> shapePoints,
-    FeedScopedId shapePointIdFromJourneyPatternId
+    TripPattern tripPattern,
+    int stopIndex
   ) {
+    String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
+    Stop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
+
+    String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
+    Stop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
+
+    if (fromPointStop == null || toPointStop == null) {
+      issueStore.add(
+        "ServiceLinkWithoutQuay",
+        "Service link with missing or unknown quays. Link: %s",
+        serviceLink
+      );
+    } else if (!fromPointStop.equals(tripPattern.getStop(stopIndex))) {
+      issueStore.add(
+        "ServiceLinkQuayMismatch",
+        "Service link %s with quays different from point in journey pattern. Link point: %s, journey pattern point: %s",
+        serviceLink,
+        tripPattern.getStop(stopIndex).getId().getId(),
+        fromPointQuayId
+      );
+      return null;
+    } else if (!toPointStop.equals(tripPattern.getStop(stopIndex + 1))) {
+      issueStore.add(
+        "ServiceLinkQuayMismatch",
+        "Service link %s with quays different to point in journey pattern. Link point: %s, journey pattern point: %s",
+        serviceLink,
+        tripPattern.getStop(stopIndex).getId().getId(),
+        toPointQuayId
+      );
+      return null;
+    }
+
     for (JAXBElement<?> projectionElement : serviceLink
       .getProjections()
       .getProjectionRefOrProjection()) {
       Object projectionObj = projectionElement.getValue();
-      if (projectionObj instanceof LinkSequenceProjection_VersionStructure) {
-        LinkSequenceProjection_VersionStructure linkSequenceProjection = (LinkSequenceProjection_VersionStructure) projectionObj;
-        if (linkSequenceProjection.getLineString() != null) {
-          List<Double> coordinates = linkSequenceProjection.getLineString().getPosList().getValue();
-          double distance = serviceLink.getDistance() != null
-            ? serviceLink.getDistance().doubleValue()
-            : -1;
-          for (int i = 0; i < coordinates.size(); i += 2) {
-            ShapePoint shapePoint = new ShapePoint();
-            shapePoint.setShapeId(shapePointIdFromJourneyPatternId);
-            shapePoint.setLat(coordinates.get(i));
-            shapePoint.setLon(coordinates.get(i + 1));
-            shapePoint.setSequence(sequenceCounter.toInteger());
-            if (distance != -1) {
-              shapePoint.setDistTraveled(
-                distanceCounter.doubleValue() + (distance / (coordinates.size() / 2.0) * (i / 2.0))
-              );
-            }
-            sequenceCounter.increment();
-            shapePoints.add(shapePoint);
-          }
-          distanceCounter.add(distance != -1 ? distance : 0);
-        } else {
+      if (projectionObj instanceof LinkSequenceProjection_VersionStructure linkSequenceProjection) {
+        if (linkSequenceProjection.getLineString() == null) {
           issueStore.add(
             "ServiceLinkWithoutLineString",
             "Ignore linkSequenceProjection without linestring for: %s",
             linkSequenceProjection
           );
+          return null;
         }
+        List<Double> coords = linkSequenceProjection.getLineString().getPosList().getValue();
+        if (coords.size() < 4) {
+          issueStore.add(
+            "ServiceLinkGeometryError",
+            "Ignore linkSequenceProjection with invalid linestring, " +
+            "containing fewer than two coordinates for: %s",
+            serviceLink.getId()
+          );
+          return null;
+        } else if (coords.size() % 2 != 0) {
+          issueStore.add(
+            "ServiceLinkGeometryError",
+            "Ignore linkSequenceProjection with invalid linestring, " +
+            "containing odd number of values for coordinates: %s",
+            serviceLink.getId()
+          );
+          return null;
+        }
+
+        Coordinate[] coordinates = new Coordinate[coords.size() / 2];
+        for (int i = 0; i < coords.size(); i += 2) {
+          coordinates[i / 2] = new Coordinate(coords.get(i + 1), coords.get(i));
+        }
+        final LineString geometry = geometryFactory.createLineString(coordinates);
+
+        if (
+          !isValid(
+            geometry,
+            tripPattern.getStop(stopIndex),
+            tripPattern.getStop(stopIndex + 1),
+            serviceLink.getId(),
+            issueStore
+          )
+        ) {
+          return null;
+        }
+        return geometry;
       }
     }
-  }
 
-  private void addStraightLine(
-    ServiceLink serviceLink,
-    MutableInt sequenceCounter,
-    MutableDouble distanceCounter,
-    ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-    ReadOnlyHierarchicalVersionMapById<Quay> quayById,
-    Collection<ShapePoint> shapePoints,
-    FeedScopedId shapePointIdFromJourneyPatternId
-  ) {
-    String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
-    Quay fromPointQuay = quayById.lookupLastVersionById(fromPointQuayId);
-
-    String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
-    Quay toPointQuay = quayById.lookupLastVersionById(toPointQuayId);
-
-    if (
-      fromPointQuay != null &&
-      fromPointQuay.getCentroid() != null &&
-      toPointQuay != null &&
-      toPointQuay.getCentroid() != null
-    ) {
-      issueStore.add(new MissingProjectionInServiceLink(serviceLink.getId()));
-
-      ShapePoint fromShapePoint = new ShapePoint();
-      fromShapePoint.setShapeId(shapePointIdFromJourneyPatternId);
-      fromShapePoint.setLat(fromPointQuay.getCentroid().getLocation().getLatitude().doubleValue());
-      fromShapePoint.setLon(fromPointQuay.getCentroid().getLocation().getLongitude().doubleValue());
-      fromShapePoint.setSequence(sequenceCounter.toInteger());
-      fromShapePoint.setDistTraveled(distanceCounter.getValue());
-      shapePoints.add(fromShapePoint);
-      sequenceCounter.increment();
-
-      ShapePoint toShapePoint = new ShapePoint();
-      toShapePoint.setShapeId(shapePointIdFromJourneyPatternId);
-      toShapePoint.setLat(toPointQuay.getCentroid().getLocation().getLatitude().doubleValue());
-      toShapePoint.setLon(toPointQuay.getCentroid().getLocation().getLongitude().doubleValue());
-      toShapePoint.setSequence(sequenceCounter.toInteger());
-      shapePoints.add(toShapePoint);
-      sequenceCounter.increment();
-
-      double distance;
-
-      if (serviceLink.getDistance() != null) {
-        distance = serviceLink.getDistance().doubleValue();
-      } else {
-        Coordinate fromCoord = new Coordinate(fromShapePoint.getLon(), fromShapePoint.getLat());
-        Coordinate toCoord = new Coordinate(toShapePoint.getLon(), toShapePoint.getLat());
-        distance = SphericalDistanceLibrary.distance(fromCoord, toCoord);
-      }
-      distanceCounter.add(distance);
-      toShapePoint.setDistTraveled(distanceCounter.doubleValue());
-    } else {
-      issueStore.add(
-        "ServiceLinkWithoutQuay",
-        "Ignore service link without projection and missing or unknown quays. Link: %s",
-        serviceLink
-      );
-    }
-  }
-
-  private FeedScopedId createShapePointIdFromJourneyPatternId(FeedScopedId journeyPatternId) {
-    return new FeedScopedId(
-      journeyPatternId.getFeedId(),
-      journeyPatternId.getId().replace("JourneyPattern", "ServiceLink")
+    issueStore.add(
+      "ServiceLinkWithoutProjection",
+      "Ignore ServiceLink without projection: %s",
+      serviceLink.getId()
     );
+    return null;
+  }
+
+  /** create a 2-point linestring (a straight line segment) between the two stops */
+  private LineString createSimpleGeometry(StopLocation s0, StopLocation s1) {
+    Coordinate[] coordinates = new Coordinate[] {
+      s0.getCoordinate().asJtsCoordinate(),
+      s1.getCoordinate().asJtsCoordinate(),
+    };
+    CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
+
+    return geometryFactory.createLineString(sequence);
+  }
+
+  private boolean isValid(
+    Geometry geometry,
+    StopLocation s0,
+    StopLocation s1,
+    String id,
+    DataImportIssueStore issueStore
+  ) {
+    Coordinate[] coordinates = geometry.getCoordinates();
+    if (coordinates.length < 2) {
+      issueStore.add(
+        "ServiceLinkGeometryError",
+        "Ignore linkSequenceProjection with invalid linestring, " +
+        "containing fewer than two coordinates for: %s",
+        id
+      );
+      return false;
+    }
+    if (geometry.getLength() == 0) {
+      issueStore.add(
+        "ServiceLinkGeometryError",
+        "Ignore linkSequenceProjection with invalid linestring, having distance of 0 for: %s",
+        id
+      );
+      return false;
+    }
+    for (Coordinate coordinate : coordinates) {
+      if (Double.isNaN(coordinate.x) || Double.isNaN(coordinate.y)) {
+        issueStore.add(
+          "ServiceLinkGeometryError",
+          "Ignore linkSequenceProjection with invalid linestring, " +
+          "containing coordinate with NaN for: %s",
+          id
+        );
+        return false;
+      }
+    }
+    Coordinate geometryStartCoord = coordinates[0];
+    Coordinate geometryEndCoord = coordinates[coordinates.length - 1];
+
+    Coordinate startCoord = s0.getCoordinate().asJtsCoordinate();
+    Coordinate endCoord = s1.getCoordinate().asJtsCoordinate();
+    if (
+      SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord) >
+      maxStopToShapeSnapDistance
+    ) {
+      issueStore.add(
+        "ServiceLinkGeometryTooFar",
+        "Ignore linkSequenceProjection with too long distance between stop and start of linestring, " +
+        " stop %s, distance: %s, link id: %s",
+        s0,
+        SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord),
+        id
+      );
+      return false;
+    } else if (
+      SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance
+    ) {
+      issueStore.add(
+        "ServiceLinkGeometryTooFar",
+        "Ignore linkSequenceProjection with too long distance between stop and end of linestring, " +
+        " stop %s, distance: %s, link id: %s",
+        s1,
+        SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord),
+        id
+      );
+      return false;
+    }
+    return true;
   }
 }

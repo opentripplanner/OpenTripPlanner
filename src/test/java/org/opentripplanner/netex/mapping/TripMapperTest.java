@@ -58,8 +58,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       new HierarchicalMapById<>(),
       new HierarchicalMap<>(),
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     limitation.withWheelchairAccess(wheelchairLimitation);
@@ -88,8 +87,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       new HierarchicalMapById<>(),
       new HierarchicalMap<>(),
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     ServiceJourney serviceJourney = createExampleServiceJourney();
@@ -130,8 +128,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       routeById,
       journeyPatternById,
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);

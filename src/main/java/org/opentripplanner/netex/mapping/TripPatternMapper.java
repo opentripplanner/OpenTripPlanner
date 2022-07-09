@@ -7,13 +7,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.EntityById;
@@ -34,6 +32,7 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.ServiceLink;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern
@@ -71,6 +70,8 @@ class TripPatternMapper {
 
   private final StopTimesMapper stopTimesMapper;
 
+  private final ServiceLinkMapper serviceLinkMapper;
+
   private final Deduplicator deduplicator;
 
   private TripPatternMapperResult result;
@@ -83,19 +84,20 @@ class TripPatternMapper {
     EntityById<FlexStopLocation> flexStopLocationsById,
     EntityById<FlexLocationGroup> flexLocationGroupsById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
-    Set<FeedScopedId> shapePointsIds,
     ReadOnlyHierarchicalMap<String, Route> routeById,
     ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
     ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
+    ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById,
     ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
     ReadOnlyHierarchicalMapById<DatedServiceJourney> datedServiceJourneyById,
     Multimap<String, DatedServiceJourney> datedServiceJourneysBySJId,
     Map<String, FeedScopedId> serviceIds,
-    Deduplicator deduplicator
+    Deduplicator deduplicator,
+    double maxStopToShapeSnapDistance
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
@@ -111,8 +113,7 @@ class TripPatternMapper {
         otpRouteById,
         routeById,
         journeyPatternById,
-        serviceIds,
-        shapePointsIds
+        serviceIds
       );
     this.stopTimesMapper =
       new StopTimesMapper(
@@ -126,6 +127,15 @@ class TripPatternMapper {
         flexibleStopPlaceIdByStopPointRef,
         flexibleLinesById,
         routeById
+      );
+    this.serviceLinkMapper =
+      new ServiceLinkMapper(
+        idFactory,
+        serviceLinkById,
+        quayIdByStopPointRef,
+        stopsById,
+        issueStore,
+        maxStopToShapeSnapDistance
       );
     this.deduplicator = deduplicator;
 
@@ -224,17 +234,13 @@ class TripPatternMapper {
 
     createTripTimes(trips, tripPattern);
 
+    tripPattern.setHopGeometries(
+      serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, tripPattern)
+    );
+
     result.tripPatterns.put(stopPattern, tripPattern);
 
     return result;
-  }
-
-  private static String getHeadsign(List<StopTime> stopTimes) {
-    if (stopTimes != null && stopTimes.size() > 0) {
-      return stopTimes.stream().findFirst().get().getStopHeadsign();
-    } else {
-      return "";
-    }
   }
 
   private void mapDatedServiceJourney(

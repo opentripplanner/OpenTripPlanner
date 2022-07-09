@@ -3,7 +3,6 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.ArrayListMultimap;
-import java.util.Collections;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -40,7 +39,6 @@ public class TripPatternMapperTest {
       new EntityById<>(),
       new EntityById<>(),
       sample.getOtpRouteByid(),
-      Collections.emptySet(),
       sample.getRouteById(),
       sample.getJourneyPatternById(),
       sample.getQuayIdByStopPointRef(),
@@ -50,9 +48,11 @@ public class TripPatternMapperTest {
       new HierarchicalMapById<>(),
       new HierarchicalMapById<>(),
       new HierarchicalMapById<>(),
+      new HierarchicalMapById<>(),
       ArrayListMultimap.create(),
       Map.of(NetexTestDataSample.SERVICE_JOURNEY_ID, SERVICE_ID),
-      new Deduplicator()
+      new Deduplicator(),
+      150
     );
 
     TripPatternMapperResult r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
@@ -99,7 +99,6 @@ public class TripPatternMapperTest {
       new EntityById<>(),
       new EntityById<>(),
       sample.getOtpRouteByid(),
-      Collections.emptySet(),
       sample.getRouteById(),
       sample.getJourneyPatternById(),
       sample.getQuayIdByStopPointRef(),
@@ -107,11 +106,13 @@ public class TripPatternMapperTest {
       new HierarchicalMapById<>(),
       sample.getServiceJourneyById(),
       new HierarchicalMapById<>(),
+      new HierarchicalMapById<>(),
       sample.getOperatingDaysById(),
       datedServiceJourneys,
       sample.getDatedServiceJourneyBySjId(),
       Map.of(NetexTestDataSample.SERVICE_JOURNEY_ID, SERVICE_ID),
-      new Deduplicator()
+      new Deduplicator(),
+      150
     );
 
     TripPatternMapperResult r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
