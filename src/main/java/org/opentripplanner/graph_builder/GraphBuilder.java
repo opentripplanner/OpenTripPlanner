@@ -42,6 +42,7 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -279,7 +280,8 @@ public class GraphBuilder implements Runnable {
 
     long endTime = System.currentTimeMillis();
     LOG.info(
-      String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0)
+      "Graph building took {}.",
+      DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime))
     );
     LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
   }

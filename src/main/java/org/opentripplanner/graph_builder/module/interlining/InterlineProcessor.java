@@ -13,9 +13,13 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
-import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.model.transfer.TransferPriority;
+import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -24,18 +28,23 @@ import org.slf4j.LoggerFactory;
 
 public class InterlineProcessor {
 
+  private static final Logger LOG = LoggerFactory.getLogger(InterlineProcessor.class);
+  private final TransferService transferService;
   private final int maxInterlineDistance;
   private final DataImportIssueStore issueStore;
-  private static final Logger LOG = LoggerFactory.getLogger(GeometryProcessor.class);
 
-  public InterlineProcessor(int maxInterlineDistance, DataImportIssueStore issueStore) {
+  public InterlineProcessor(
+    TransferService transferService,
+    int maxInterlineDistance,
+    DataImportIssueStore issueStore
+  ) {
+    this.transferService = transferService;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
   }
 
   /**
-   * Identify interlined trips (where a physical vehicle continues on to another logical trip) and
-   * update the TripPatterns accordingly.
+   * Identify interlined trips (where a physical vehicle continues on to another logical trip).
    */
   public Multimap<P2<TripPattern>, P2<Trip>> getInterlinedTrips(
     Collection<TripPattern> tripPatterns
@@ -106,9 +115,46 @@ public class InterlineProcessor {
       }
     }
 
-    LOG.info("Done finding interlining trips.");
-
     return interlines;
+  }
+
+  public void run(Collection<TripPattern> tripPatterns) {
+    var interlinedTrips = this.getInterlinedTrips(tripPatterns);
+    var transfers = interlinedTrips
+      .entries()
+      .stream()
+      .map(p -> {
+        var constraint = TransferConstraint.create();
+        constraint.staySeated();
+        constraint.priority(TransferPriority.ALLOWED);
+
+        var fromTrip = p.getValue().first;
+        var toTrip = p.getValue().second;
+
+        var from = new TripTransferPoint(fromTrip, p.getKey().first.numberOfStops() - 1);
+        var to = new TripTransferPoint(toTrip, 0);
+
+        LOG.debug(
+          "Creating stay-seated transfer from trip {} (route {}) to trip {} (route {})",
+          fromTrip.getId(),
+          fromTrip.getRoute().getId(),
+          toTrip.getId(),
+          toTrip.getRoute().getId()
+        );
+        // TODO: check that there is no forbidden transfer for these trips
+
+        return new ConstrainedTransfer(null, from, to, constraint.build());
+      })
+      .toList();
+
+    if (!transfers.isEmpty()) {
+      LOG.info(
+        "Found {} pairs of trips for which stay-seated (interlined) transfers were created",
+        interlinedTrips.keySet().size()
+      );
+
+      transferService.addAll(transfers);
+    }
   }
 }
 

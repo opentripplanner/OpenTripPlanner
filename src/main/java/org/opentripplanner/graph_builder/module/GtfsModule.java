@@ -144,8 +144,12 @@ public class GtfsModule implements GraphBuilderModule {
         )
           .run(transitModel);
 
-        var interlining = new InterlineProcessor(gtfsBundle.maxInterlineDistance, issueStore);
-        var interlinedTrips = interlining.getInterlinedTrips(otpTransitService.getTripPatterns());
+        new InterlineProcessor(
+          transitModel.getTransferService(),
+          gtfsBundle.maxInterlineDistance,
+          issueStore
+        )
+          .run(transitModel.getTripPatterns());
 
         fareServiceFactory.processGtfs(otpTransitService);
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
