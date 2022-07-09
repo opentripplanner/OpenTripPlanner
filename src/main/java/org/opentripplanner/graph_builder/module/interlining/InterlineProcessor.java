@@ -46,7 +46,7 @@ public class InterlineProcessor {
   /**
    * Identify interlined trips (where a physical vehicle continues on to another logical trip).
    */
-  public Multimap<P2<TripPattern>, P2<Trip>> getInterlinedTrips(
+  private Multimap<P2<TripPattern>, P2<Trip>> getInterlinedTrips(
     Collection<TripPattern> tripPatterns
   ) {
     /* Record which Pattern each interlined TripTimes belongs to. */
@@ -118,7 +118,7 @@ public class InterlineProcessor {
     return interlines;
   }
 
-  public void run(Collection<TripPattern> tripPatterns) {
+  public List<ConstrainedTransfer> run(Collection<TripPattern> tripPatterns) {
     var interlinedTrips = this.getInterlinedTrips(tripPatterns);
     var transfers = interlinedTrips
       .entries()
@@ -155,6 +155,7 @@ public class InterlineProcessor {
 
       transferService.addAll(transfers);
     }
+    return transfers;
   }
 }
 
