@@ -121,7 +121,7 @@ public class GeometryAndBlockProcessor {
     Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
     /* Generate unique human-readable names for all the TableTripPatterns. */
-    TripPattern.generateUniqueNames(tripPatterns, issueStore);
+    TripPattern.generateUniqueNames(tripPatterns);
 
     /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
     ProgressTracker progress = ProgressTracker.track(

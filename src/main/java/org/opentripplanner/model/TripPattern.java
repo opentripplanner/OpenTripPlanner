@@ -1,14 +1,10 @@
 package org.opentripplanner.model;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -24,8 +20,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -127,13 +121,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
    * combination will create unique names). from, to, via, express. Then concatenate all necessary
    * fields. Express should really be determined from number of stops and/or run time of trips.
    */
-  public static void generateUniqueNames(
-    Collection<TripPattern> tableTripPatterns,
-    DataImportIssueStore issueStore
-  ) {
+  public static void generateUniqueNames(Collection<TripPattern> tableTripPatterns) {
     LOG.info("Generating unique names for stop patterns on each route.");
-    Set<String> usedRouteNames = Sets.newHashSet();
-    Map<Route, String> uniqueRouteNames = Maps.newHashMap();
 
     /* Group TripPatterns by Route */
     Multimap<Route, TripPattern> patternsByRoute = ArrayListMultimap.create();
@@ -141,26 +130,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
       patternsByRoute.put(ttp.route, ttp);
     }
 
-    /* Ensure we have a unique name for every Route */
-    for (Route route : patternsByRoute.keySet()) {
-      String routeName = route.getName();
-      if (usedRouteNames.contains(routeName)) {
-        int i = 2;
-        String generatedRouteName;
-        do generatedRouteName = routeName + " " + (i++); while (
-          usedRouteNames.contains(generatedRouteName)
-        );
-        issueStore.add(new NonUniqueRouteName(generatedRouteName));
-        routeName = generatedRouteName;
-      }
-      usedRouteNames.add(routeName);
-      uniqueRouteNames.put(route, routeName);
-    }
-
     /* Iterate over all routes, giving the patterns within each route unique names. */
-    ROUTE:for (Route route : patternsByRoute.keySet()) {
+    for (Route route : patternsByRoute.keySet()) {
       Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
-      String routeName = uniqueRouteNames.get(route);
+      String routeName = route.getName();
 
       /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
       if (routeTripPatterns.size() == 1) {
@@ -188,18 +161,18 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
         /* First try to name with destination. */
         var end = pattern.lastStop();
-        sb.append(" to " + stopNameAndId(end));
+        sb.append(" to ").append(stopNameAndId(end));
         if (ends.get(end).size() == 1) {
           pattern.setName(sb.toString());
-          continue PATTERN; // only pattern with this last stop
+          continue; // only pattern with this last stop
         }
 
         /* Then try to name with origin. */
         var start = pattern.firstStop();
-        sb.append(" from " + stopNameAndId(start));
+        sb.append(" from ").append(stopNameAndId(start));
         if (starts.get(start).size() == 1) {
           pattern.setName((sb.toString()));
-          continue PATTERN; // only pattern with this first stop
+          continue; // only pattern with this first stop
         }
 
         /* Check whether (end, start) is unique. */
@@ -208,17 +181,16 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         remainingPatterns.retainAll(ends.get(end)); // set intersection
         if (remainingPatterns.size() == 1) {
           pattern.setName((sb.toString()));
-          continue PATTERN;
+          continue;
         }
 
         /* Still not unique; try (end, start, via) for each via. */
         for (var via : pattern.getStops()) {
           if (via.equals(start) || via.equals(end)) continue;
-          Set<TripPattern> intersection = new HashSet<>();
-          intersection.addAll(remainingPatterns);
+          Set<TripPattern> intersection = new HashSet<>(remainingPatterns);
           intersection.retainAll(vias.get(via));
           if (intersection.size() == 1) {
-            sb.append(" via " + stopNameAndId(via));
+            sb.append(" via ").append(stopNameAndId(via));
             pattern.setName((sb.toString()));
             continue PATTERN;
           }
@@ -245,21 +217,12 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
       LOG.debug("Done generating unique names for stop patterns on each route.");
       for (Route route : patternsByRoute.keySet()) {
         Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
-        LOG.debug(
-          "Named {} patterns in route {}",
-          routeTripPatterns.size(),
-          uniqueRouteNames.get(route)
-        );
+        LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), route.getName());
         for (TripPattern pattern : routeTripPatterns) {
           LOG.debug("    {} ({} stops)", pattern.name, pattern.stopPattern.getSize());
         }
       }
     }
-  }
-
-  public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {
-    Set<FeedScopedId> seen = new HashSet<>();
-    return tripPatterns.stream().map(TransitEntity::getId).allMatch(t -> t != null && seen.add(t));
   }
 
   /** The human-readable, unique name for this trip pattern. */
