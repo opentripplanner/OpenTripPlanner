@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -15,8 +14,6 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.server.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DirectStreetRouter {
 
@@ -43,8 +40,7 @@ public class DirectStreetRouter {
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        router.graph.getTimeZone(),
-        new AlertToLegMapper(router.graph.getTransitAlertService()),
+        router.transitModel.getTimeZone(),
         router.graph.streetNotesService,
         router.graph.ellipsoidToGeoidDifference
       );

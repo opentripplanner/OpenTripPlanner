@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.api.mapping.ServiceDateMapper;
+import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.BookingInfo;
@@ -164,7 +164,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<String> serviceDate() {
-    return environment -> ServiceDateMapper.mapToApi(getSource(environment).getServiceDate());
+    return environment -> LocalDateMapper.mapToApi(getSource(environment).getServiceDate());
   }
 
   @Override

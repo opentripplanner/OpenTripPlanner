@@ -24,7 +24,6 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.TripTimesShortHelper;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -73,7 +72,6 @@ public class ServiceJourneyType {
               .getCalendarService()
               .getServiceDatesForServiceId(((trip(environment)).getServiceId()))
               .stream()
-              .map(ServiceDate::toLocalDate)
               .sorted()
               .collect(Collectors.toList())
           )
@@ -267,10 +265,8 @@ public class ServiceJourneyType {
             var serviceDate = Optional
               .ofNullable(environment.getArgument("date"))
               .map(LocalDate.class::cast)
-              .map(ServiceDate::new)
-              .orElse(new ServiceDate());
+              .orElse(LocalDate.now(GqlUtil.getTransitService(environment).getTimeZone()));
             return TripTimesShortHelper.getTripTimesShort(
-              GqlUtil.getRoutingService(environment),
               GqlUtil.getTransitService(environment),
               trip(environment),
               serviceDate
@@ -320,7 +316,7 @@ public class ServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTransitAlertService()
               .getTripAlerts(trip(environment).getId(), null)
           )

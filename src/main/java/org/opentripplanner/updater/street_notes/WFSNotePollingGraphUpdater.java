@@ -28,6 +28,7 @@ import org.opentripplanner.routing.services.notes.DynamicStreetNotesSource;
 import org.opentripplanner.routing.services.notes.MatcherAndStreetNote;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -101,7 +102,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
    * Setup the WFS data source and add the DynamicStreetNotesSource to the graph
    */
   @Override
-  public void setup(Graph graph) throws IOException, FactoryException {
+  public void setup(Graph graph, TransitModel transitModel) throws IOException, FactoryException {
     this.graph = graph;
     LOG.info("Setup WFS polling updater");
     HashMap<String, Object> connectionParameters = new HashMap<>();
@@ -194,7 +195,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
    */
   private class WFSGraphWriter implements GraphWriterRunnable {
 
-    public void run(Graph graph) {
+    public void run(Graph graph, TransitModel transitModel) {
       notesSource.setNotes(notesForEdge);
     }
   }

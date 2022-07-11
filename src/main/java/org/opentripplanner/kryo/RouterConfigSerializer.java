@@ -11,7 +11,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
  * This serializer is needed because there is no default constructor on the {@link RouterConfig}.
  * The router config is created passing in a JSON node. It save this internally and this is used to
  * serialize the router config. We serialize the JsonNode as a String instead of the graph router
- * POJO it self. This make it easy to deserialize it by using the constructor.
+ * POJO itself. This make it easy to deserialize it by using the constructor.
  * <p>
  * We serialize the JsonNode, not the original JSON String, because we do not want the environment
  * variables to be resolved twice. They are resolved for the raw JSON string when it is read from

@@ -7,7 +7,6 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -102,8 +101,7 @@ public class TransmodelGraphQLPlanner {
 
     callWith.argument(
       "dateTime",
-      millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch)),
-      Date::new
+      millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
     callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
     callWith.argument("pageCursor", request::setPageCursor);

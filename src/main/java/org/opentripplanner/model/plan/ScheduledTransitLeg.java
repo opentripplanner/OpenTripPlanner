@@ -17,7 +17,6 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -32,6 +31,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -51,7 +51,7 @@ public class ScheduledTransitLeg implements Leg {
   protected final Integer boardStopPosInPattern;
   protected final Integer alightStopPosInPattern;
   private final int generalizedCost;
-  protected final ServiceDate serviceDate;
+  protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
   private double distanceMeters;
   private final Float accessibilityScore;
@@ -79,7 +79,7 @@ public class ScheduledTransitLeg implements Leg {
     this.startTime = startTime;
     this.endTime = endTime;
 
-    this.serviceDate = new ServiceDate(serviceDate);
+    this.serviceDate = serviceDate;
     this.zoneId = zoneId;
 
     this.transferFromPrevLeg = transferFromPreviousLeg;
@@ -107,7 +107,7 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   public Instant getServiceDateMidnight() {
-    return serviceDate.toZonedDateTime(zoneId, 0).toInstant();
+    return ServiceDateUtils.asStartOfService(serviceDate, zoneId).toInstant();
   }
 
   @Override
@@ -218,7 +218,7 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   @Override
-  public ServiceDate getServiceDate() {
+  public LocalDate getServiceDate() {
     return serviceDate;
   }
 
@@ -241,8 +241,8 @@ public class ScheduledTransitLeg implements Leg {
 
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        serviceDate.toZonedDateTime(zoneId, tripTimes.getArrivalTime(i)),
-        serviceDate.toZonedDateTime(zoneId, tripTimes.getDepartureTime(i)),
+        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getArrivalTime(i)),
+        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getDepartureTime(i)),
         i,
         tripTimes.getOriginalGtfsStopSequence(i)
       );
@@ -350,7 +350,7 @@ public class ScheduledTransitLeg implements Leg {
       alightStopPosInPattern,
       startTime,
       endTime,
-      serviceDate.toLocalDate(),
+      serviceDate,
       zoneId,
       transferFromPrevLeg,
       transferToNextLeg,

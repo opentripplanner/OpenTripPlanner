@@ -2,6 +2,7 @@
 package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -30,11 +31,11 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
 
   private final FeedScopedId serviceId;
 
-  private final ServiceDate date;
+  private final LocalDate date;
 
   private final int exceptionType;
 
-  public ServiceCalendarDate(FeedScopedId serviceId, ServiceDate date, int exceptionType) {
+  public ServiceCalendarDate(FeedScopedId serviceId, LocalDate date, int exceptionType) {
     this.serviceId = serviceId;
     this.date = date;
     this.exceptionType = exceptionType;
@@ -44,7 +45,7 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
    * Create a service calendar date on the given date with the given id. The 'exceptionType' is set
    * to 'EXCEPTION_TYPE_ADD'.
    */
-  public static ServiceCalendarDate create(FeedScopedId serviceId, ServiceDate date) {
+  public static ServiceCalendarDate create(FeedScopedId serviceId, LocalDate date) {
     return new ServiceCalendarDate(serviceId, date, EXCEPTION_TYPE_ADD);
   }
 
@@ -52,7 +53,7 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
     return serviceId;
   }
 
-  public ServiceDate getDate() {
+  public LocalDate getDate() {
     return date;
   }
 

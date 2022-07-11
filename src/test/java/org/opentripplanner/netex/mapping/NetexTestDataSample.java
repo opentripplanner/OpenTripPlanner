@@ -56,6 +56,7 @@ class NetexTestDataSample {
   private static final DayType EVERYDAY = new DayType()
     .withId("EVERYDAY")
     .withName(new MultilingualString().withValue("everyday"));
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final JourneyPattern journeyPattern;
   private final HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
@@ -164,11 +165,7 @@ class NetexTestDataSample {
       for (int i = 0; i < DATED_SERVICE_JOURNEY_ID.size(); i++) {
         OperatingDay operatingDay = new OperatingDay()
           .withId(OPERATING_DAYS.get(i))
-          .withCalendarDate(
-            LocalDate
-              .parse(OPERATING_DAYS.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-              .atStartOfDay()
-          );
+          .withCalendarDate(LocalDate.parse(OPERATING_DAYS.get(i), DATE_FORMATTER).atStartOfDay());
         operatingDaysById.add(operatingDay);
 
         DatedServiceJourney datedServiceJourney = new DatedServiceJourney()

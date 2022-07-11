@@ -15,28 +15,28 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class TimetableSnapshotSourceTest {
 
-  static Graph graph = new Graph();
+  static TransitModel transitModel;
   private static final boolean fullDataset = false;
-  private static final ServiceDate serviceDate = new ServiceDate();
+  private static LocalDate serviceDate;
   private static byte[] cancellation;
   private static String feedId;
 
@@ -44,9 +44,12 @@ public class TimetableSnapshotSourceTest {
 
   @BeforeAll
   public static void setUpClass() {
-    graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    transitModel = otpModel.transitModel;
 
-    feedId = graph.getFeedIds().stream().findFirst().get();
+    feedId = transitModel.getFeedIds().stream().findFirst().get();
+
+    serviceDate = LocalDate.now(transitModel.getTimeZone());
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -62,7 +65,7 @@ public class TimetableSnapshotSourceTest {
 
   @BeforeEach
   public void setUp() {
-    updater = TimetableSnapshotSource.ofGraph(graph);
+    updater = TimetableSnapshotSource.ofTransitModel(transitModel);
   }
 
   @Test
@@ -86,8 +89,8 @@ public class TimetableSnapshotSourceTest {
   public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-    final Trip trip = graph.index.getTripForId().get(tripId);
-    final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
+    final Trip trip = transitModel.index.getTripForId().get(tripId);
+    final TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
@@ -109,8 +112,8 @@ public class TimetableSnapshotSourceTest {
   public void testHandleDelayedTrip() {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-    final Trip trip = graph.index.getTripForId().get(tripId);
-    final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
+    final Trip trip = transitModel.index.getTripForId().get(tripId);
+    final TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
@@ -184,7 +187,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    final ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    final LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
 
     final String addedTripId = "added_trip";
 
@@ -194,10 +197,11 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(addedTripId);
       tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
-      final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
-      final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
+      final long midnightSecondsSinceEpoch = ServiceDateUtils
+        .asStartOfService(serviceDate, transitModel.getTimeZone())
+        .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -271,7 +275,10 @@ public class TimetableSnapshotSourceTest {
 
     // THEN
     // Find new pattern in graph starting from stop A
-    var stopA = graph.index.getStopForId(new FeedScopedId(feedId, "A"));
+    var stopA = transitModel
+      .getStopModel()
+      .getStopModelIndex()
+      .getStopForId(new FeedScopedId(feedId, "A"));
     // Get trip pattern of last (most recently added) outgoing edge
     var snapshot = updater.getTimetableSnapshot();
     var patternsAtA = snapshot.getPatternsForStop(stopA);
@@ -304,7 +311,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String modifiedTripId = "10.1";
 
     TripUpdate tripUpdate;
@@ -313,10 +320,11 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(modifiedTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.REPLACEMENT);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
-      final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
-      final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
+      final long midnightSecondsSinceEpoch = ServiceDateUtils
+        .asStartOfService(serviceDate, transitModel.getTimeZone())
+        .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -416,8 +424,8 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
-      final Trip trip = graph.index.getTripForId().get(tripId);
-      final TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+      final Trip trip = transitModel.index.getTripForId().get(tripId);
+      final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
@@ -496,7 +504,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String scheduledTripId = "1.1";
 
     TripUpdate tripUpdate;
@@ -505,7 +513,7 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(scheduledTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -574,8 +582,8 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
 
     final FeedScopedId tripId = new FeedScopedId(feedId, scheduledTripId);
-    final Trip trip = graph.index.getTripForId().get(tripId);
-    final TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+    final Trip trip = transitModel.index.getTripForId().get(tripId);
+    final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
 
     final Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
     final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -618,7 +626,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now(transitModel.getTimeZone());
     String scheduledTripId = "1.1";
 
     TripUpdate tripUpdate;
@@ -627,7 +635,7 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(scheduledTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -669,8 +677,8 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, scheduledTripId);
-      final Trip trip = graph.index.getTripForId().get(tripId);
-      final TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+      final Trip trip = transitModel.index.getTripForId().get(tripId);
+      final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
@@ -757,7 +765,7 @@ public class TimetableSnapshotSourceTest {
     // GIVEN
 
     // Get service date of today because old dates will be purged after applying updates
-    ServiceDate serviceDate = new ServiceDate(LocalDate.now());
+    LocalDate serviceDate = LocalDate.now();
     String scheduledTripId = "1.1";
 
     TripUpdate tripUpdate;
@@ -766,7 +774,7 @@ public class TimetableSnapshotSourceTest {
 
       tripDescriptorBuilder.setTripId(scheduledTripId);
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-      tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
+      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -826,8 +834,8 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, scheduledTripId);
-      final Trip trip = graph.index.getTripForId().get(tripId);
-      final TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+      final Trip trip = transitModel.index.getTripForId().get(tripId);
+      final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
@@ -889,9 +897,9 @@ public class TimetableSnapshotSourceTest {
   @Test
   public void testPurgeExpiredData() throws InvalidProtocolBufferException {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
-    final ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
-    final Trip trip = graph.index.getTripForId().get(tripId);
-    final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
+    final LocalDate previously = LocalDate.now(transitModel.getTimeZone()).minusDays(2); // Just to be safe...
+    final Trip trip = transitModel.index.getTripForId().get(tripId);
+    final TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
 
     updater.maxSnapshotFrequency = 0;
     updater.purgeExpiredData = false;
@@ -905,7 +913,7 @@ public class TimetableSnapshotSourceTest {
 
     tripDescriptorBuilder.setTripId("1.1");
     tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-    tripDescriptorBuilder.setStartDate(previously.asCompactString());
+    tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(previously));
 
     final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 

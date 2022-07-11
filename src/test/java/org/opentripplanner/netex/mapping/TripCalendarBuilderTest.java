@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
@@ -158,7 +157,7 @@ public class TripCalendarBuilderTest {
     return map;
   }
 
-  private String toStr(Map<String, Set<ServiceDate>> result, String key) {
+  private String toStr(Map<String, Set<LocalDate>> result, String key) {
     return result.get(key).stream().sorted().collect(Collectors.toList()).toString();
   }
 }

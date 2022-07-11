@@ -8,9 +8,9 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
@@ -65,7 +65,7 @@ public class TripPatternForDate {
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
     if (hasFrequencies()) {
       this.startOfRunningPeriod =
-        DateMapper.asDateTime(
+        ServiceDateUtils.asDateTime(
           localDate,
           frequencies
             .stream()
@@ -75,7 +75,7 @@ public class TripPatternForDate {
         );
 
       this.endOfRunningPeriod =
-        DateMapper.asDateTime(
+        ServiceDateUtils.asDateTime(
           localDate,
           frequencies
             .stream()
@@ -86,10 +86,10 @@ public class TripPatternForDate {
     } else {
       // These depend on the tripTimes array being sorted
       this.startOfRunningPeriod =
-        DateMapper.asDateTime(localDate, tripTimes.get(0).getDepartureTime(0));
+        ServiceDateUtils.asDateTime(localDate, tripTimes.get(0).getDepartureTime(0));
       var last = tripTimes.get(tripTimes.size() - 1);
       this.endOfRunningPeriod =
-        DateMapper.asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1));
+        ServiceDateUtils.asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1));
     }
   }
 
@@ -172,8 +172,14 @@ public class TripPatternForDate {
       .filter(frequencyEntry -> filter.test(frequencyEntry.tripTimes))
       .collect(Collectors.toList());
 
-    if (filteredTripTimes.isEmpty() && !hasFrequencies()) {
-      return null;
+    if (filteredTripTimes.isEmpty()) {
+      if (hasFrequencies()) {
+        if (filteredFrequencies.isEmpty()) {
+          return null;
+        }
+      } else {
+        return null;
+      }
     }
 
     if (tripTimes.size() == filteredTripTimes.size()) {

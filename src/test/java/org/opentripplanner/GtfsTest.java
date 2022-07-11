@@ -30,9 +30,12 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -40,6 +43,8 @@ import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 public abstract class GtfsTest {
 
   public Graph graph;
+  public TransitModel transitModel;
+
   AlertsUpdateHandler alertsUpdateHandler;
   TimetableSnapshotSource timetableSnapshotSource;
   TransitAlertServiceImpl alertPatchServiceImpl;
@@ -95,7 +100,7 @@ public abstract class GtfsTest {
     routingRequest.setWalkBoardCost(30);
     routingRequest.transferSlack = 0;
 
-    RoutingResponse res = new RoutingWorker(router, routingRequest, graph.getTimeZone().toZoneId())
+    RoutingResponse res = new RoutingWorker(router, routingRequest, transitModel.getTimeZone())
       .route();
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
     // Stored in instance field for use in individual tests
@@ -147,19 +152,23 @@ public abstract class GtfsTest {
     );
 
     alertsUpdateHandler = new AlertsUpdateHandler();
-    graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(stopModel, deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
 
-    gtfsGraphBuilderImpl.buildGraph(graph, null);
+    gtfsGraphBuilderImpl.buildGraph(graph, transitModel, null);
     // Set the agency ID to be used for tests to the first one in the feed.
-    String agencyId = graph.getAgencies().iterator().next().getId().getId();
+    String agencyId = transitModel.getAgencies().iterator().next().getId().getId();
     System.out.printf("Set the agency ID for this test to %s\n", agencyId);
+    transitModel.index();
     graph.index();
-    router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+    router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
     router.startup();
-    timetableSnapshotSource = TimetableSnapshotSource.ofGraph(graph);
+    timetableSnapshotSource = TimetableSnapshotSource.ofTransitModel(transitModel);
     timetableSnapshotSource.purgeExpiredData = false;
-    graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
-    alertPatchServiceImpl = new TransitAlertServiceImpl(graph);
+    transitModel.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
+    alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
 

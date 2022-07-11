@@ -12,6 +12,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.updater.alerts.TransitAlertProvider;
@@ -71,13 +72,13 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   }
 
   @Override
-  public void setup(Graph graph) {
-    this.transitAlertService = new TransitAlertServiceImpl(graph);
+  public void setup(Graph graph, TransitModel transitModel) {
+    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
-      new DefaultTransitService(graph)
+      new DefaultTransitService(transitModel)
     );
     if (updateHandler == null) {
-      updateHandler = new SiriAlertsUpdateHandler(feedId, graph);
+      updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
     }
     updateHandler.setEarlyStart(earlyStart);
     updateHandler.setTransitAlertService(transitAlertService);
@@ -107,7 +108,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
           moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
           final boolean markPrimed = !moreData;
           if (serviceDelivery.getSituationExchangeDeliveries() != null) {
-            saveResultOnGraph.execute(graph -> {
+            saveResultOnGraph.execute((graph, transitModel) -> {
               updateHandler.update(serviceDelivery);
               if (markPrimed) primed = true;
             });

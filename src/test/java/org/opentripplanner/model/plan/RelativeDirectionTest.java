@@ -44,7 +44,7 @@ class RelativeDirectionTest {
     tc(-181, HARD_RIGHT)
   );
 
-  @ParameterizedTest(name = "Turing {0} degrees should give a relative direction of {1}")
+  @ParameterizedTest(name = "Turning {0} degrees should give a relative direction of {1}")
   @VariableSource("testCasesNormal")
   void testCalculateForNormalIntersections(int thisAngleDegrees, RelativeDirection expected) {
     assertEquals(expected, RelativeDirection.calculate(angle(thisAngleDegrees), false));

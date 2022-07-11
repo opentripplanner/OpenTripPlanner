@@ -2,7 +2,7 @@
 package org.opentripplanner.model;
 
 import java.io.Serializable;
-import org.opentripplanner.model.calendar.ServiceDate;
+import java.time.LocalDate;
 
 public final class FeedInfo implements Serializable {
 
@@ -16,9 +16,9 @@ public final class FeedInfo implements Serializable {
 
   private final String lang;
 
-  private final ServiceDate startDate;
+  private final LocalDate startDate;
 
-  private final ServiceDate endDate;
+  private final LocalDate endDate;
 
   private final String version;
 
@@ -27,8 +27,8 @@ public final class FeedInfo implements Serializable {
     String publisherName,
     String publisherUrl,
     String lang,
-    ServiceDate startDate,
-    ServiceDate endDate,
+    LocalDate startDate,
+    LocalDate endDate,
     String version
   ) {
     this.id = id;
@@ -56,11 +56,11 @@ public final class FeedInfo implements Serializable {
     return lang;
   }
 
-  public ServiceDate getStartDate() {
+  public LocalDate getStartDate() {
     return startDate;
   }
 
-  public ServiceDate getEndDate() {
+  public LocalDate getEndDate() {
     return endDate;
   }
 

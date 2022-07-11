@@ -53,7 +53,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -76,6 +75,7 @@ import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 @Path("/traveltime")
 public class TravelTimeResource {
@@ -99,7 +99,7 @@ public class TravelTimeResource {
     @QueryParam("modes") String modes
   ) {
     router = otpServer.getRouter();
-    transitLayer = router.graph.getRealtimeTransitLayer();
+    transitLayer = router.transitModel.getRealtimeTransitLayer();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
     routingRequest = router.copyDefaultRoutingRequest();
     routingRequest.from = LocationStringParser.fromOldStyleString(location);
@@ -128,12 +128,12 @@ public class TravelTimeResource {
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
-        router.graph.getTransferService(),
+        router.transitModel.getTransferService(),
         transitLayer,
         startOfTime,
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
-        new RoutingRequestTransitDataProviderFilter(routingRequest, router.graph.index),
+        new RoutingRequestTransitDataProviderFilter(routingRequest, router.transitModel.index),
         new RoutingContext(transferRoutingRequest, router.graph, (Vertex) null, null)
       );
   }
@@ -244,6 +244,7 @@ public class TravelTimeResource {
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
       new RoutingContext(accessRequest, router.graph, temporaryVertices),
+      router.transitModel,
       routingRequest.modes.accessMode,
       false
     );
@@ -268,7 +269,7 @@ public class TravelTimeResource {
         final int arrivalTime = arrivals.bestTransitArrivalTime(i);
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {
-          Vertex v = router.graph.index.getStopVertexForStop().get(stop);
+          Vertex v = router.transitModel.getStopModel().getStopVertexForStop().get(stop);
           if (v != null) {
             Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
             State s = new State(v, time, routingContext, stateData.clone());
@@ -287,8 +288,8 @@ public class TravelTimeResource {
     final RaptorRequest<TripSchedule> request = new RaptorRequestBuilder<TripSchedule>()
       .profile(RaptorProfile.BEST_TIME)
       .searchParams()
-      .earliestDepartureTime(DateMapper.secondsSinceStartOfTime(startOfTime, startTime))
-      .latestArrivalTime(DateMapper.secondsSinceStartOfTime(startOfTime, endTime))
+      .earliestDepartureTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, startTime))
+      .latestArrivalTime(ServiceDateUtils.secondsSinceStartOfTime(startOfTime, endTime))
       .addAccessPaths(accessList)
       .searchOneIterationOnly()
       .timetableEnabled(false)

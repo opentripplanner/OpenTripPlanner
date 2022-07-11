@@ -1,6 +1,7 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Interface for graph updaters. Objects that implement this interface should always be configured
@@ -24,7 +25,7 @@ public interface GraphUpdater {
    * method won't be called). All updaters' setup methods will be run sequentially in a
    * single-threaded manner before updates begin, in order to avoid concurrent reads/writes.
    */
-  void setup(Graph graph) throws Exception;
+  void setup(Graph graph, TransitModel transitModel) throws Exception;
 
   /**
    * This method will run in its own thread. It pulls or receives updates and applies them to the

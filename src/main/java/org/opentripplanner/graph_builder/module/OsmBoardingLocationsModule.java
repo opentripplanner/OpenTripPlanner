@@ -24,6 +24,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.LocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {

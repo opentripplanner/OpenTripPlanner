@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
@@ -23,6 +24,7 @@ import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.model.network.SubMode;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -44,6 +46,7 @@ public class SerializedGraphObject implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(SerializedGraphObject.class);
 
   public final Graph graph;
+  public final TransitModel transitModel;
 
   private final Collection<Edge> edges;
 
@@ -62,9 +65,15 @@ public class SerializedGraphObject implements Serializable {
    */
   public final List<SubMode> allTransitSubModes;
 
-  public SerializedGraphObject(Graph graph, BuildConfig buildConfig, RouterConfig routerConfig) {
+  public SerializedGraphObject(
+    Graph graph,
+    TransitModel transitModel,
+    BuildConfig buildConfig,
+    RouterConfig routerConfig
+  ) {
     this.graph = graph;
     this.edges = graph.getEdges();
+    this.transitModel = transitModel;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
@@ -90,10 +99,9 @@ public class SerializedGraphObject implements Serializable {
     return load(source.asInputStream(), source.path());
   }
 
-  public static Graph load(File file) {
+  public static SerializedGraphObject load(File file) {
     try {
-      SerializedGraphObject serObj = load(new FileInputStream(file), file.getAbsolutePath());
-      return serObj == null ? null : serObj.graph;
+      return load(new FileInputStream(file), file.getAbsolutePath());
     } catch (FileNotFoundException e) {
       LOG.error("Graph file not found: " + file, e);
       throw new OtpAppException(e.getMessage());
@@ -144,6 +152,9 @@ public class SerializedGraphObject implements Serializable {
       Kryo kryo = KryoBuilder.create();
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
       SubMode.deserializeSubModeCache(serObj.allTransitSubModes);
+      CompactElevationProfile.setDistanceBetweenSamplesM(
+        serObj.graph.getDistanceBetweenElevationSamples()
+      );
       Graph graph = serObj.graph;
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();

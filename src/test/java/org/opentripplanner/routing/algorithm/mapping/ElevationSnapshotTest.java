@@ -11,13 +11,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.network.MainAndSubMode;
 
 @ExtendWith(SnapshotExtension.class)
@@ -147,7 +147,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   }
 
   @Override
-  protected Graph getGraph() {
+  protected OtpModel getGraph() {
     return ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
   }
 }

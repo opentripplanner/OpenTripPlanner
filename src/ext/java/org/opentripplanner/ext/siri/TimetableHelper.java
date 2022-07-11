@@ -19,13 +19,13 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
@@ -150,7 +150,7 @@ public class TimetableHelper {
             departureDate = departureDate.minusDays(calculateDayOffset(oldTimes));
           }
 
-          ZonedDateTime startOfService = DateMapper.asStartOfService(
+          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
             departureDate.toLocalDate(),
             zoneId
           );
@@ -275,7 +275,7 @@ public class TimetableHelper {
               modifiedStopTimes.get(callCounter).cancelPickup();
             }
 
-            ZonedDateTime startOfService = DateMapper.asStartOfService(
+            ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
               departureDate.toLocalDate(),
               zoneId
             );
@@ -792,7 +792,7 @@ public class TimetableHelper {
     for (var supplier : timeSuppliers) {
       final ZonedDateTime time = supplier.get();
       if (time != null) {
-        return DateMapper.secondsSinceStartOfService(startOfService, time);
+        return ServiceDateUtils.secondsSinceStartOfService(startOfService, time);
       }
     }
     return null;

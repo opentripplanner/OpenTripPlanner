@@ -21,14 +21,6 @@ public class DataFetcherDecorator {
     call(environment, name, consumer);
   }
 
-  public <T> void argument(String name, Consumer<T> consumer, Runnable alternativeAction) {
-    if (GqlUtil.hasArgument(environment, name)) {
-      argument(name, consumer);
-    } else {
-      alternativeAction.run();
-    }
-  }
-
   private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
     if (!name.contains(".")) {
       if (hasArgument(m, name)) {

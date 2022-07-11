@@ -1,36 +1,22 @@
 package org.opentripplanner.routing;
 
-import gnu.trove.set.TIntSet;
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.TimeZone;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.ext.flex.FlexIndex;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -38,14 +24,15 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
@@ -56,20 +43,19 @@ public class RoutingService {
 
   private final Graph graph;
 
-  private final GraphIndex graphIndex;
+  private final TransitModel transitModel;
 
   private final GraphFinder graphFinder;
 
-  public RoutingService(Graph graph) {
+  public RoutingService(Graph graph, TransitModel transitModel) {
     this.graph = graph;
-    this.graphIndex = graph.index;
+    this.transitModel = transitModel;
     this.graphFinder = GraphFinder.getInstance(graph);
   }
 
   // TODO We should probably not have the Router as a parameter here
   public RoutingResponse route(RoutingRequest request, Router router) {
-    var zoneId = graph.getTimeZone().toZoneId();
-    RoutingWorker worker = new RoutingWorker(router, request, zoneId);
+    RoutingWorker worker = new RoutingWorker(router, request, transitModel.getTimeZone());
     return worker.route();
   }
 
@@ -113,21 +99,6 @@ public class RoutingService {
     return this.graph.getStreetEdges();
   }
 
-  /** {@link Graph#getRealtimeTransitLayer()} */
-  public TransitLayer getRealtimeTransitLayer() {
-    return this.graph.getRealtimeTransitLayer();
-  }
-
-  /** {@link Graph#setRealtimeTransitLayer(TransitLayer)} */
-  public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
-    this.graph.setRealtimeTransitLayer(realtimeTransitLayer);
-  }
-
-  /** {@link Graph#hasRealtimeTransitLayer()} */
-  public boolean hasRealtimeTransitLayer() {
-    return this.graph.hasRealtimeTransitLayer();
-  }
-
   /** {@link Graph#containsVertex(Vertex)} */
   public boolean containsVertex(Vertex v) {
     return this.graph.containsVertex(v);
@@ -168,21 +139,6 @@ public class RoutingService {
     return this.graph.getExtent();
   }
 
-  /** {@link Graph#getTransferService()} */
-  public TransferService getTransferService() {
-    return this.graph.getTransferService();
-  }
-
-  /** {@link Graph#updateTransitFeedValidity(CalendarServiceData, DataImportIssueStore)} */
-  public void updateTransitFeedValidity(CalendarServiceData data, DataImportIssueStore issueStore) {
-    this.graph.updateTransitFeedValidity(data, issueStore);
-  }
-
-  /** {@link Graph#transitFeedCovers(Instant)} */
-  public boolean transitFeedCovers(Instant time) {
-    return this.graph.transitFeedCovers(time);
-  }
-
   /** {@link Graph#getBundle()} */
   public GraphBundle getBundle() {
     return this.graph.getBundle();
@@ -203,19 +159,6 @@ public class RoutingService {
     return this.graph.countEdges();
   }
 
-  // /** {@link Graph#index()} */
-  // public void index() {this.graph.index();}
-
-  /** {@link Graph#getCalendarDataService()} */
-  public CalendarServiceData getCalendarDataService() {
-    return this.graph.getCalendarDataService();
-  }
-
-  /** {@link Graph#clearCachedCalenderService()} */
-  public void clearCachedCalenderService() {
-    this.graph.clearCachedCalenderService();
-  }
-
   /** {@link Graph#getStreetIndex()} */
   public StreetVertexIndex getStreetIndex() {
     return this.graph.getStreetIndex();
@@ -226,24 +169,9 @@ public class RoutingService {
     return this.graph.getLinker();
   }
 
-  /** {@link Graph#getOrCreateServiceIdForDate(ServiceDate)} */
-  public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
-    return this.graph.getOrCreateServiceIdForDate(serviceDate);
-  }
-
   /** {@link Graph#removeEdgelessVertices()} */
   public int removeEdgelessVertices() {
     return this.graph.removeEdgelessVertices();
-  }
-
-  /** {@link Graph#getTimeZone()} */
-  public TimeZone getTimeZone() {
-    return this.graph.getTimeZone();
-  }
-
-  /** {@link Graph#clearTimeZone()} */
-  public void clearTimeZone() {
-    this.graph.clearTimeZone();
   }
 
   /** {@link Graph#calculateEnvelope()} */
@@ -271,26 +199,6 @@ public class RoutingService {
     return this.graph.getEnvelope();
   }
 
-  /** {@link Graph#calculateTransitCenter()} */
-  public void calculateTransitCenter() {
-    this.graph.calculateTransitCenter();
-  }
-
-  /** {@link Graph#getCenter()} */
-  public Optional<Coordinate> getCenter() {
-    return this.graph.getCenter();
-  }
-
-  /** {@link Graph#getTransitServiceStarts()} */
-  public long getTransitServiceStarts() {
-    return this.graph.getTransitServiceStarts();
-  }
-
-  /** {@link Graph#getTransitServiceEnds()} */
-  public long getTransitServiceEnds() {
-    return this.graph.getTransitServiceEnds();
-  }
-
   /** {@link Graph#getDistanceBetweenElevationSamples()} */
   public double getDistanceBetweenElevationSamples() {
     return this.graph.getDistanceBetweenElevationSamples();
@@ -301,23 +209,13 @@ public class RoutingService {
     this.graph.setDistanceBetweenElevationSamples(distanceBetweenElevationSamples);
   }
 
-  /** {@link Graph#getTransitAlertService()} */
-  public TransitAlertService getTransitAlertService() {
-    return this.graph.getTransitAlertService();
-  }
-
   public RealtimeVehiclePositionService getVehiclePositionService() {
     return this.graph.getVehiclePositionService();
   }
 
-  /** {@link Graph#getStopVerticesById(FeedScopedId)} */
+  /** {@link org.opentripplanner.transit.service.StopModel#getStopVerticesById(FeedScopedId)} */
   public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-    return this.graph.getStopVerticesById(id);
-  }
-
-  /** {@link Graph#getServicesRunningForDate(ServiceDate)} */
-  public BitSet getServicesRunningForDate(ServiceDate date) {
-    return this.graph.getServicesRunningForDate(date);
+    return this.transitModel.getStopModel().getStopVerticesById(id);
   }
 
   /** {@link Graph#getVehicleRentalStationService()} */
@@ -350,26 +248,6 @@ public class RoutingService {
     IntersectionTraversalCostModel intersectionTraversalCostModel
   ) {
     this.graph.setIntersectionTraversalCostModel(intersectionTraversalCostModel);
-  }
-
-  /** {@link GraphIndex#getStopVertexForStop()} */
-  public Map<Stop, TransitStopVertex> getStopVertexForStop() {
-    return this.graphIndex.getStopVertexForStop();
-  }
-
-  /** {@link GraphIndex#getStopSpatialIndex()} */
-  public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
-    return this.graphIndex.getStopSpatialIndex();
-  }
-
-  /** {@link GraphIndex#getServiceCodesRunningForDate()} */
-  public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
-    return this.graphIndex.getServiceCodesRunningForDate();
-  }
-
-  /** {@link GraphIndex#getFlexIndex()} */
-  public FlexIndex getFlexIndex() {
-    return this.graphIndex.getFlexIndex();
   }
 
   /** {@link GraphFinder#findClosestStops(double, double, double)} */
@@ -409,5 +287,20 @@ public class RoutingService {
         routingService,
         transitService
       );
+  }
+
+  /** {@link Graph#getStopsByBoundingBox(double, double, double, double)} */
+  public Collection<StopLocation> getStopsByBoundingBox(
+    double minLat,
+    double minLon,
+    double maxLat,
+    double maxLon
+  ) {
+    return this.graph.getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
+  }
+
+  /** {@link Graph#getStopsInRadius(WgsCoordinate, double)} */
+  public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
+    return this.graph.getStopsInRadius(center, radius);
   }
 }

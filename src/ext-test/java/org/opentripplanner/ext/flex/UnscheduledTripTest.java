@@ -8,11 +8,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the City of
@@ -24,11 +25,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class UnscheduledTripTest extends FlexTest {
 
-  static Graph graph;
+  static TransitModel transitModel;
 
   @Test
   public void parseAspenTaxiAsUnscheduledTrip() {
-    var flexTrips = graph.flexTripsById.values();
+    var flexTrips = transitModel.flexTripsById.values();
     assertFalse(flexTrips.isEmpty());
     assertEquals(
       Set.of("t_1289262_b_29084_tn_0", "t_1289257_b_28352_tn_0"),
@@ -74,7 +75,8 @@ public class UnscheduledTripTest extends FlexTest {
 
   @BeforeAll
   static void setup() {
-    graph = FlexTest.buildFlexGraph(ASPEN_GTFS);
+    OtpModel otpModel = FlexTest.buildFlexGraph(ASPEN_GTFS);
+    transitModel = otpModel.transitModel;
   }
 
   private static NearbyStop getNearbyStop(FlexTrip trip) {
@@ -84,7 +86,7 @@ public class UnscheduledTripTest extends FlexTest {
   }
 
   private static FlexTrip getFlexTrip() {
-    var flexTrips = graph.flexTripsById.values();
+    var flexTrips = transitModel.flexTripsById.values();
     return flexTrips.iterator().next();
   }
 }

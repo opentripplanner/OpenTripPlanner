@@ -42,11 +42,11 @@ public class OTPServer {
    * not be visible to the request.
    */
   public RoutingService createRoutingRequestService() {
-    return new RoutingService(router.graph);
+    return new RoutingService(router.graph, router.transitModel);
   }
 
   public TransitService createTransitRequestService() {
-    return new DefaultTransitService(router.graph);
+    return new DefaultTransitService(router.transitModel);
   }
 
   /**

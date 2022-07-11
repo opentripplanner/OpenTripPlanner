@@ -13,25 +13,30 @@ import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class StopsLayerBuilder extends LayerBuilder<TransitStopVertex> {
 
-  static Map<MapperType, Function<Graph, PropertyMapper<TransitStopVertex>>> mappers = Map.of(
+  static Map<MapperType, Function<TransitModel, PropertyMapper<TransitStopVertex>>> mappers = Map.of(
     MapperType.Digitransit,
     DigitransitStopPropertyMapper::create
   );
-  private final Graph graph;
+  private final TransitModel transitModel;
 
-  public StopsLayerBuilder(Graph graph, VectorTilesResource.LayerParameters layerParameters) {
+  public StopsLayerBuilder(
+    Graph graph,
+    TransitModel transitModel,
+    VectorTilesResource.LayerParameters layerParameters
+  ) {
     super(
       layerParameters.name(),
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(graph)
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitModel)
     );
-    this.graph = graph;
+    this.transitModel = transitModel;
   }
 
   protected List<Geometry> getGeometries(Envelope query) {
-    return graph.index
+    return transitModel
       .getStopSpatialIndex()
       .query(query)
       .stream()

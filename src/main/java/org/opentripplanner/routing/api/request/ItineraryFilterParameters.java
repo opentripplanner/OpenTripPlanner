@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.fares.FareService;
 
 /**
  * Group by Similarity filter parameters

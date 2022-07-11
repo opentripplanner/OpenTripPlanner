@@ -12,9 +12,9 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -71,19 +71,16 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) {
+  public void setup(Graph graph, TransitModel transitModel) {
     // Only create a realtime data snapshot source if none exists already
-    TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(
-      TimetableSnapshotSource::ofGraph
+    TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(
+      TimetableSnapshotSource::ofTransitModel
     );
 
     // Set properties of realtime data snapshot source
     if (fuzzyTripMatching) {
       snapshotSource.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(
-          new RoutingService(graph),
-          new DefaultTransitService(graph)
-        );
+        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
     if (backwardsDelayPropagationType != null) {
       snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;

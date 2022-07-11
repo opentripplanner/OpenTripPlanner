@@ -30,13 +30,9 @@ public class LocationMapper {
   }
 
   private FlexStopLocation doMap(org.onebusaway.gtfs.model.Location gtfsLocation) {
-    FlexStopLocation otpLocation = new FlexStopLocation(mapAgencyAndId(gtfsLocation.getId()));
+    var name = NonLocalizedString.ofNullable(gtfsLocation.getName());
+    FlexStopLocation otpLocation = new FlexStopLocation(mapAgencyAndId(gtfsLocation.getId()), name);
 
-    // according to the spec stop location names are optional for flex zones so, we return the id
-    // when it's null. *shrug*
-    otpLocation.setName(
-      NonLocalizedString.ofNullableOrElse(gtfsLocation.getName(), otpLocation.getId().toString())
-    );
     otpLocation.setUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()));
     otpLocation.setDescription(NonLocalizedString.ofNullable(gtfsLocation.getDescription()));
     otpLocation.setZoneId(gtfsLocation.getZoneId());

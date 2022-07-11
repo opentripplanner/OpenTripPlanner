@@ -16,12 +16,12 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
@@ -41,7 +41,10 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     LocalDate second = LocalDate.of(2019, 3, 31);
     LocalDate third = LocalDate.of(2019, 4, 1);
 
-    ZonedDateTime startOfTime = DateMapper.asStartOfService(second, ZoneId.of("Europe/London"));
+    ZonedDateTime startOfTime = ServiceDateUtils.asStartOfService(
+      second,
+      ZoneId.of("Europe/London")
+    );
 
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 

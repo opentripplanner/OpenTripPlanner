@@ -1,10 +1,10 @@
 package org.opentripplanner.api.common;
 
 import java.time.Duration;
-import java.util.GregorianCalendar;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -715,19 +715,18 @@ public abstract class RoutingResource {
 
     {
       //FIXME: move into setter method on routing request
-      TimeZone tz;
-      tz = router.graph.getTimeZone();
+      ZoneId tz = router.transitModel.getTimeZone();
       if (date == null && time != null) { // Time was provided but not date
         LOG.debug("parsing ISO datetime {}", time);
         try {
           // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
           DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
           XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(time);
-          GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
+          ZonedDateTime dateTime = xmlGregCal.toGregorianCalendar().toZonedDateTime();
           if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
-            gregCal.setTimeZone(tz);
+            dateTime = dateTime.withZoneSameLocal(tz);
           }
-          request.setDateTime(gregCal.toInstant());
+          request.setDateTime(dateTime.toInstant());
         } catch (DatatypeConfigurationException e) {
           request.setDateTime(date, time, tz);
         }

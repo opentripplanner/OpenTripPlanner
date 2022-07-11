@@ -6,15 +6,13 @@ import com.google.common.collect.Multimap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class FlexIndex {
 
@@ -22,19 +20,15 @@ public class FlexIndex {
 
   public Multimap<StopLocation, FlexTrip> flexTripsByStop = HashMultimap.create();
 
-  public Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
-
-  public HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
-
   public Map<FeedScopedId, Route> routeById = new HashMap<>();
 
   public Map<FeedScopedId, FlexTrip> tripById = new HashMap<>();
 
-  public FlexIndex(Graph graph) {
-    for (PathTransfer transfer : graph.transfersByStop.values()) {
+  public FlexIndex(TransitModel transitModel) {
+    for (PathTransfer transfer : transitModel.transfersByStop.values()) {
       transfersToStop.put(transfer.to, transfer);
     }
-    for (FlexTrip flexTrip : graph.flexTripsById.values()) {
+    for (FlexTrip flexTrip : transitModel.flexTripsById.values()) {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {
@@ -46,14 +40,6 @@ public class FlexIndex {
           flexTripsByStop.put(stop, flexTrip);
         }
       }
-    }
-    for (FlexLocationGroup flexLocationGroup : graph.locationGroupsById.values()) {
-      for (StopLocation stop : flexLocationGroup.getLocations()) {
-        locationGroupsByStop.put(stop, flexLocationGroup);
-      }
-    }
-    for (FlexStopLocation flexStopLocation : graph.locationsById.values()) {
-      locationIndex.insert(flexStopLocation.getGeometry().getEnvelopeInternal(), flexStopLocation);
     }
   }
 

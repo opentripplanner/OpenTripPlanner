@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDay;
@@ -21,9 +20,6 @@ public class DatedServiceJourneyMapperTest {
   private static final LocalDate LD1 = LocalDate.of(2020, 11, 1);
   private static final LocalDate LD2 = LocalDate.of(2020, 11, 2);
   private static final LocalDate LD3 = LocalDate.of(2020, 11, 3);
-
-  private static final ServiceDate SD1 = new ServiceDate(LD1);
-  private static final ServiceDate SD2 = new ServiceDate(LD2);
 
   private static final String OP_DAY_1 = "OD-1";
   private static final String OP_DAY_2 = "OD-2";
@@ -59,13 +55,10 @@ public class DatedServiceJourneyMapperTest {
     opDaysById.add(createOperatingDay(OP_DAY_3, LD3));
 
     // When
-    Collection<ServiceDate> result = DatedServiceJourneyMapper.mapToServiceDates(
-      dsjList,
-      opDaysById
-    );
+    Collection<LocalDate> result = DatedServiceJourneyMapper.mapToServiceDates(dsjList, opDaysById);
 
     // Then
-    assertEquals(List.of(SD1, SD2), sort(result));
+    assertEquals(List.of(LD1, LD2), sort(result));
   }
 
   private <T> List<T> sort(Collection<T> input) {

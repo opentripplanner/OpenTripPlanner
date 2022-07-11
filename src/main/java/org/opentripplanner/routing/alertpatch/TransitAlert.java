@@ -1,14 +1,13 @@
 package org.opentripplanner.routing.alertpatch;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.util.I18NString;
 
 public class TransitAlert implements Serializable {
@@ -100,13 +99,13 @@ public class TransitAlert implements Serializable {
    *
    * @return First startDate for this Alert, <code>null</code> if 0 (not set)
    */
-  public Date getEffectiveStartDate() {
+  public Instant getEffectiveStartDate() {
     return timePeriods
       .stream()
       .map(timePeriod -> timePeriod.startTime)
       .min(Comparator.naturalOrder())
       .filter(startTime -> startTime > 0) //If 0, null should be returned
-      .map(startTime -> new Date(startTime * 1000))
+      .map(Instant::ofEpochSecond)
       .orElse(null);
   }
 
@@ -116,13 +115,13 @@ public class TransitAlert implements Serializable {
    *
    * @return Last endDate for this Alert, <code>null</code> if open-ended
    */
-  public Date getEffectiveEndDate() {
+  public Instant getEffectiveEndDate() {
     return timePeriods
       .stream()
       .map(timePeriod -> timePeriod.endTime)
       .max(Comparator.naturalOrder())
       .filter(endTime -> endTime < TimePeriod.OPEN_ENDED) //If open-ended, null should be returned
-      .map(endTime -> new Date(endTime * 1000))
+      .map(Instant::ofEpochSecond)
       .orElse(null);
   }
 

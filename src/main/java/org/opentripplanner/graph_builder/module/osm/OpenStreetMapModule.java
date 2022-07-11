@@ -71,6 +71,7 @@ import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedStringFormat;
 import org.opentripplanner.util.NonLocalizedString;
@@ -158,12 +159,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
     this.issueStore = issueStore;
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
-    Handler handler = new Handler(graph, osmdb);
+    Handler handler = new Handler(graph, transitModel, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: " + provider);
       provider.readOSM(osmdb);
@@ -211,6 +213,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private final Graph graph;
 
+    private final TransitModel transitModel;
+
     private final OSMDatabase osmdb;
     // track OSM nodes which are decomposed into multiple graph vertices because they are
     // elevators. later they will be iterated over to build ElevatorEdges between them.
@@ -222,8 +226,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     private float bestBikeSafety = 1.0f;
 
-    public Handler(Graph graph, OSMDatabase osmdb) {
+    public Handler(Graph graph, TransitModel transitModel, OSMDatabase osmdb) {
       this.graph = graph;
+      this.transitModel = transitModel;
       this.osmdb = osmdb;
     }
 
@@ -532,7 +537,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       // running a request caches the timezone; we need to clear it now so that when agencies are loaded
       // the graph time zone is set to the agency time zone.
-      graph.clearTimeZone();
+      transitModel.clearTimeZone();
       if (skipVisibility) {
         LOG.info("Done building rings for walkable areas.");
       } else {

@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -26,7 +25,7 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLFeedAlertsArgs(environment.getArguments());
       Iterable<LegacyGraphQLTypes.LegacyGraphQLFeedAlertType> types = args.getLegacyGraphQLTypes();
       if (types != null) {
@@ -72,10 +71,6 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
       .stream()
       .filter(agency -> agency.getId().getFeedId().equals(id))
       .collect(Collectors.toList());
-  }
-
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

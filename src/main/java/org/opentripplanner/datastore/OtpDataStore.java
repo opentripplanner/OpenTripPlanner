@@ -20,11 +20,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
 
 /**
  * The responsibility of this class is to provide access to all data sources OTP uses like the
@@ -77,7 +78,7 @@ public class OtpDataStore {
    *
    * @param path the location where the graph file must exist.
    * @return The graph file - the graph is not loaded, you can use the {@link
-   * org.opentripplanner.routing.graph.SerializedGraphObject#load(File)} to load the graph.
+   * SerializedGraphObject#load(File)} to load the graph.
    */
   public static File graphFile(File path) {
     return new File(path, GRAPH_FILENAME);
@@ -118,22 +119,22 @@ public class OtpDataStore {
    * @return The collection may contain elements of type {@link DataSource} or {@link
    * CompositeDataSource}.
    */
-  @NotNull
+  @Nonnull
   public Collection<DataSource> listExistingSourcesFor(FileType type) {
     return sources.get(type).stream().filter(DataSource::exists).collect(Collectors.toList());
   }
 
-  @NotNull
+  @Nonnull
   public DataSource getStreetGraph() {
     return streetGraph;
   }
 
-  @NotNull
+  @Nonnull
   public DataSource getGraph() {
     return graph;
   }
 
-  @NotNull
+  @Nonnull
   public CompositeDataSource getBuildReportDir() {
     return buildReportDir;
   }
@@ -166,8 +167,8 @@ public class OtpDataStore {
 
   private DataSource findSingleSource(
     @Nullable URI uri,
-    @NotNull String filename,
-    @NotNull FileType type
+    @Nonnull String filename,
+    @Nonnull FileType type
   ) {
     if (uri != null) {
       return findSourceUsingAllRepos(it -> it.findSource(uri, type));
@@ -177,8 +178,8 @@ public class OtpDataStore {
 
   private CompositeDataSource findCompositeSource(
     @Nullable URI uri,
-    @NotNull String filename,
-    @NotNull FileType type
+    @Nonnull String filename,
+    @Nonnull FileType type
   ) {
     if (uri != null) {
       return findSourceUsingAllRepos(it -> it.findCompositeSource(uri, type));
@@ -188,8 +189,8 @@ public class OtpDataStore {
   }
 
   private List<DataSource> findMultipleSources(
-    @NotNull Collection<URI> uris,
-    @NotNull FileType type
+    @Nonnull Collection<URI> uris,
+    @Nonnull FileType type
   ) {
     if (uris == null || uris.isEmpty()) {
       return localRepository.listExistingSources(type);
@@ -203,8 +204,8 @@ public class OtpDataStore {
   }
 
   private List<CompositeDataSource> findMultipleCompositeSources(
-    @NotNull Collection<URI> uris,
-    @NotNull FileType type
+    @Nonnull Collection<URI> uris,
+    @Nonnull FileType type
   ) {
     if (uris.isEmpty()) {
       return localRepository

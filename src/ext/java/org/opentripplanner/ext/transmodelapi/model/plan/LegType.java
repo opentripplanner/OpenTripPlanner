@@ -21,13 +21,10 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegType {
@@ -328,11 +325,7 @@ public class LegType {
           )
           .type(gqlUtil.dateScalar)
           .dataFetcher(environment ->
-            Optional
-              .of((Leg) environment.getSource())
-              .map(Leg::getServiceDate)
-              .map(ServiceDate::toLocalDate)
-              .orElse(null)
+            Optional.of((Leg) environment.getSource()).map(Leg::getServiceDate).orElse(null)
           )
           .build()
       )
@@ -476,14 +469,10 @@ public class LegType {
             if (!leg.isScheduledTransitLeg()) {
               return null;
             }
-            int previous = env.getArgument("previous");
-            RoutingService routingService = GqlUtil.getRoutingService(env);
-            TransitService transitService = GqlUtil.getTransitService(env);
             return AlternativeLegs.getAlternativeLegs(
               leg,
-              previous,
-              routingService,
-              transitService,
+              env.getArgument("previous"),
+              GqlUtil.getTransitService(env),
               true,
               env.getArgument("filter")
             );
@@ -520,14 +509,10 @@ public class LegType {
             if (!leg.isScheduledTransitLeg()) {
               return null;
             }
-            int next = env.getArgument("next");
-            RoutingService routingService = GqlUtil.getRoutingService(env);
-            TransitService transitService = GqlUtil.getTransitService(env);
             return AlternativeLegs.getAlternativeLegs(
               leg,
-              next,
-              routingService,
-              transitService,
+              env.getArgument("next"),
+              GqlUtil.getTransitService(env),
               false,
               env.getArgument("filter")
             );

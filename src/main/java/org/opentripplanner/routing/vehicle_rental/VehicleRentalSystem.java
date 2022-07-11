@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import java.util.TimeZone;
+import java.time.ZoneId;
 
 /**
  * Based on https://github.com/NABSA/gbfs/blob/master/gbfs.md#system_informationjson
@@ -18,7 +18,7 @@ public class VehicleRentalSystem {
   public final String phoneNumber;
   public final String email;
   public final String feedContactEmail;
-  public final TimeZone timezone;
+  public final ZoneId timezone;
   public final String licenseUrl;
   public final VehicleRentalSystemAppInformation androidApp;
   public final VehicleRentalSystemAppInformation iosApp;
@@ -35,7 +35,7 @@ public class VehicleRentalSystem {
     String phoneNumber,
     String email,
     String feedContactEmail,
-    TimeZone timezone,
+    ZoneId timezone,
     String licenseUrl,
     VehicleRentalSystemAppInformation androidApp,
     VehicleRentalSystemAppInformation iosApp

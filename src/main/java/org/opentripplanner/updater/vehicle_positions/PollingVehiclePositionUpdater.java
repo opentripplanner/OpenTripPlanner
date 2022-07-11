@@ -1,12 +1,13 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -55,16 +56,16 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) {
-    var index = graph.index;
+  public void setup(Graph graph, TransitModel transitModel) {
+    var index = transitModel.index;
     vehiclePositionPatternMatcher =
       new VehiclePositionPatternMatcher(
         feedId,
         tripId -> index.getTripForId().get(tripId),
-        trip -> graph.index.getPatternForTrip().get(trip),
-        (trip, date) -> getPatternIncludingRealtime(graph, trip, date),
+        trip -> index.getPatternForTrip().get(trip),
+        (trip, date) -> getPatternIncludingRealtime(transitModel, trip, date),
         graph.getVehiclePositionService(),
-        graph.getTimeZone().toZoneId()
+        transitModel.getTimeZone()
       );
   }
 
@@ -92,10 +93,14 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     return "Streaming vehicle position updater with update source = " + s;
   }
 
-  private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, ServiceDate sd) {
+  private static TripPattern getPatternIncludingRealtime(
+    TransitModel transitModel,
+    Trip trip,
+    LocalDate sd
+  ) {
     return Optional
-      .ofNullable(graph.getTimetableSnapshot())
+      .ofNullable(transitModel.getTimetableSnapshot())
       .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
-      .orElseGet(() -> graph.index.getPatternForTrip().get(trip));
+      .orElseGet(() -> transitModel.index.getPatternForTrip().get(trip));
   }
 }

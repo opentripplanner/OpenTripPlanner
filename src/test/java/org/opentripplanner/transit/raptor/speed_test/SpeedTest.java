@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -28,6 +29,7 @@ import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseInpu
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 
 /**
@@ -39,6 +41,7 @@ public class SpeedTest {
   private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
   private final Graph graph;
+  private final TransitModel transitModel;
 
   private final SpeedTestTimer timer = new SpeedTestTimer();
 
@@ -54,14 +57,16 @@ public class SpeedTest {
   private SpeedTest(SpeedTestCmdLineOpts opts) {
     this.opts = opts;
     this.config = SpeedTestConfig.config(opts.rootDir());
-    this.graph = loadGraph(opts.rootDir(), config.graph);
+    OtpModel otpModel = loadGraph(opts.rootDir(), config.graph);
+    this.graph = otpModel.graph;
+    this.transitModel = otpModel.transitModel;
 
     this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
 
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
-    this.router = new Router(graph, RouterConfig.DEFAULT, timer.getRegistry());
+    this.router = new Router(graph, transitModel, RouterConfig.DEFAULT, timer.getRegistry());
     this.router.startup();
 
     timer.setUp(opts.groupResultsByCategory());
@@ -88,16 +93,19 @@ public class SpeedTest {
     }
   }
 
-  private static Graph loadGraph(File baseDir, URI path) {
+  private static OtpModel loadGraph(File baseDir, URI path) {
     File file = path == null
       ? OtpDataStore.graphFile(baseDir)
       : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
-    Graph graph = SerializedGraphObject.load(file);
+    SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(file);
+    Graph graph = serializedGraphObject.graph;
     if (graph == null) {
       throw new IllegalStateException();
     }
+    TransitModel transitModel = serializedGraphObject.transitModel;
+    transitModel.index();
     graph.index();
-    return graph;
+    return new OtpModel(graph, transitModel);
   }
 
   /**
@@ -235,7 +243,7 @@ public class SpeedTest {
   }
 
   private ZoneId getTimeZoneId() {
-    return graph.getTimeZone().toZoneId();
+    return transitModel.getTimeZone();
   }
 
   private void forceGCToAvoidGCLater() {
