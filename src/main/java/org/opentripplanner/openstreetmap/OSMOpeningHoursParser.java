@@ -27,9 +27,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OHCalendarBuilder;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for parsing OpenStreetMap format opening hours into {@link OHCalendar}.
@@ -38,9 +41,13 @@ import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarServi
  */
 public class OSMOpeningHoursParser {
 
+  private static final Logger LOG = LoggerFactory.getLogger(OSMOpeningHoursParser.class);
+
   private final OpeningHoursCalendarService openingHoursCalendarService;
 
   private final ZoneId zoneId;
+
+  private final DataImportIssueStore issueStore;
 
   private static final Set<RuleModifier.Modifier> CLOSED_MODIFIERS = Set.of(CLOSED, OFF);
   private static final Set<RuleModifier.Modifier> OPEN_MODIFIERS = Set.of(OPEN, UNKNOWN);
@@ -71,18 +78,31 @@ public class OSMOpeningHoursParser {
 
   public OSMOpeningHoursParser(
     OpeningHoursCalendarService openingHoursCalendarService,
+    ZoneId zoneId,
+    DataImportIssueStore issueStore
+  ) {
+    this.openingHoursCalendarService = openingHoursCalendarService;
+    // TODO, zoneId should depend on the coordinates of the object
+    this.zoneId = zoneId;
+    this.issueStore = issueStore;
+  }
+
+  public OSMOpeningHoursParser(
+    OpeningHoursCalendarService openingHoursCalendarService,
     ZoneId zoneId
   ) {
     this.openingHoursCalendarService = openingHoursCalendarService;
     // TODO, zoneId should depend on the coordinates of the object
     this.zoneId = zoneId;
+    this.issueStore = null;
   }
 
   /**
    * Builds a {@link OHCalendar} by parsing rules from OSM format opening hours.
    * Currently, doesn't have support for all types of rules.
    */
-  public OHCalendar parseOpeningHours(String openingHoursTag) throws OpeningHoursParseException {
+  public OHCalendar parseOpeningHours(String openingHoursTag, String id, String link)
+    throws OpeningHoursParseException {
     var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
     var parser = new OpeningHoursParser(new ByteArrayInputStream(openingHoursTag.getBytes()));
     var rules = parser.rules(false);
@@ -97,10 +117,12 @@ public class OSMOpeningHoursParser {
         openingHoursBuildersForRule.add(createOHCalendarBuilderForOpen247(calendarBuilder));
       } else if (rule.getYears() != null) {
         // TODO
+        logUnhandled(rule, openingHoursTag, id, link);
       } else if (rule.getDates() != null) {
         openingHoursBuildersForRule.addAll(createOHCalendarBuildersForDates(calendarBuilder, rule));
       } else if (rule.getWeeks() != null) {
         // TODO
+        logUnhandled(rule, openingHoursTag, id, link);
       } else if (rule.getDays() != null) {
         openingHoursBuildersForRule.addAll(
           createOHCalendarBuildersForDayRanges(calendarBuilder, rule)
@@ -529,5 +551,30 @@ public class OSMOpeningHoursParser {
         )
       )
     );
+  }
+
+  /**
+   * Logs unhandled rule either with {@link Logger} or stores it in {@link DataImportIssueStore}.
+   */
+  private void logUnhandled(Rule rule, String ohTag, String id, String link) {
+    var message = link != null
+      ? String.format(
+        "Rule %s is unhandled in the opening hours definition %s for %s (%s)",
+        rule,
+        ohTag,
+        id,
+        link
+      )
+      : String.format(
+        "Rule %s is unhandled in the opening hours definition %s for %s",
+        rule,
+        ohTag,
+        id
+      );
+    if (issueStore != null) {
+      issueStore.add("UnhandledOHRule", message);
+    } else {
+      LOG.info(message);
+    }
   }
 }

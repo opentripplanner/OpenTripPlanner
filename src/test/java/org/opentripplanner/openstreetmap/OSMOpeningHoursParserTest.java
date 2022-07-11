@@ -162,7 +162,7 @@ public class OSMOpeningHoursParserTest {
     List<String> closedTimes
   ) {
     try {
-      var ohCalendar = osmOpeningHoursParser.parseOpeningHours(openingHours);
+      var ohCalendar = osmOpeningHoursParser.parseOpeningHours(openingHours, "test", null);
       openTimes.forEach(openTime -> {
         Instant openDateTime = Instant.parse(openTime);
         assertTrue(ohCalendar.isOpen(openDateTime.getEpochSecond()));

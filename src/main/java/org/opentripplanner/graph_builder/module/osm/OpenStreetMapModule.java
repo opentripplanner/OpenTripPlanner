@@ -175,7 +175,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.osmOpeningHoursParser =
       new OSMOpeningHoursParser(
         graph.getOpeningHoursCalendarService(),
-        graph.getTimeZone().toZoneId()
+        graph.getTimeZone().toZoneId(),
+        issueStore
       );
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
@@ -779,15 +780,17 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private OHCalendar parseOpeningHours(OSMWithTags entity) {
       final var openingHoursTag = entity.getTag("opening_hours");
+      final var id = entity.getId();
+      final var link = entity.getOpenStreetMapLink();
       if (openingHoursTag != null) {
         try {
-          return osmOpeningHoursParser.parseOpeningHours(openingHoursTag);
+          return osmOpeningHoursParser.parseOpeningHours(openingHoursTag, String.valueOf(id), link);
         } catch (OpeningHoursParseException e) {
           issueStore.add(
             "OSMOpeningHoursUnparsed",
             "OSM object with id '%s' (%s) has an invalid opening_hours value, it will always be open",
-            entity.getId(),
-            entity.getOpenStreetMapLink()
+            id,
+            link
           );
         }
       }
