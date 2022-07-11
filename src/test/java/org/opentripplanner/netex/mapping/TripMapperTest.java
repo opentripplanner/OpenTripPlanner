@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
-import java.util.Collections;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.junit.jupiter.api.Test;
