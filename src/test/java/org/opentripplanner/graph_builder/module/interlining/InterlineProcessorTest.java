@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.impl.StaySeatedNotAllowed;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -17,6 +18,12 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class InterlineProcessorTest implements PlanTestConstants {
+
+  List<TripPattern> patterns = List.of(
+    tripPattern("trip-1", "block-1"),
+    tripPattern("trip-2", "block-1"),
+    tripPattern("trip-2", "block-3")
+  );
 
   @Test
   void run() {
@@ -28,18 +35,34 @@ class InterlineProcessorTest implements PlanTestConstants {
       DataImportIssueStore.noop()
     );
 
-    var patterns = List.of(
-      tripPattern("trip-1", "block-1"),
-      tripPattern("trip-2", "block-1"),
-      tripPattern("trip-2", "block-3")
-    );
-
     var createdTransfers = processor.run(patterns);
     assertEquals(1, createdTransfers.size());
 
     assertEquals(transferService.listAll(), createdTransfers);
 
     createdTransfers.forEach(t -> assertTrue(t.getTransferConstraint().isStaySeated()));
+  }
+
+  @Test
+  void staySeatedNotAllowed() {
+    var transferService = new TransferService();
+
+    var fromTrip = patterns.get(0).getTrip(0);
+    var toTrip = patterns.get(1).getTrip(0);
+
+    var notAllowed = new StaySeatedNotAllowed(fromTrip, toTrip);
+
+    var processor = new InterlineProcessor(
+      transferService,
+      List.of(notAllowed),
+      100,
+      DataImportIssueStore.noop()
+    );
+
+    var createdTransfers = processor.run(patterns);
+    assertEquals(0, createdTransfers.size());
+
+    assertEquals(transferService.listAll(), createdTransfers);
   }
 
   private static TripPattern tripPattern(String tripId, String blockId) {
