@@ -140,11 +140,6 @@ public class TimeUtils {
     return RelativeTime.from(time).toLongStr();
   }
 
-  /** Format string on format HH:MM */
-  public static String timeToStrShort(int time) {
-    return RelativeTime.ofSeconds(time).toShortStr();
-  }
-
   public static String timeToStrLong(LocalTime time) {
     return time.toString();
   }

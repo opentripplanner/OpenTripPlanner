@@ -74,9 +74,9 @@ public class HslParkUpdaterTest {
     assertEquals(
       "OHCalendar{" +
       "zoneId: Europe/Helsinki, " +
-      "openingHours: [Business days 00:00-23:59, " +
-      "Saturday 00:00-23:59, " +
-      "Sunday 00:00-23:59]" +
+      "openingHours: [Business days 0:00-23:59, " +
+      "Saturday 0:00-23:59, " +
+      "Sunday 0:00-23:59]" +
       "}",
       first.getOpeningHours().toString()
     );
@@ -98,7 +98,7 @@ public class HslParkUpdaterTest {
     assertEquals(
       "OHCalendar{" +
       "zoneId: Europe/Helsinki, " +
-      "openingHours: [Business days 06:00-17:30]" +
+      "openingHours: [Business days 6:00-17:30]" +
       "}",
       second.getOpeningHours().toString()
     );
@@ -121,8 +121,8 @@ public class HslParkUpdaterTest {
     assertEquals(
       "OHCalendar{" +
       "zoneId: Europe/Helsinki, " +
-      "openingHours: [Saturday 07:00-18:00, " +
-      "Business days 07:00-21:00, " +
+      "openingHours: [Saturday 7:00-18:00, " +
+      "Business days 7:00-21:00, " +
       "Sunday 12:00-21:00]" +
       "}",
       fourth.getOpeningHours().toString()

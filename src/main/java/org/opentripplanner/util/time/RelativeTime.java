@@ -75,10 +75,6 @@ class RelativeTime {
     return appendDays(timeStrLong());
   }
 
-  String toShortStr() {
-    return appendDays(timeStrShort());
-  }
-
   String toCompactStr() {
     return appendDays(timeStrCompact());
   }
@@ -87,10 +83,6 @@ class RelativeTime {
     return time.getSecond() == 0
       ? String.format("%d:%02d", time.getHour(), time.getMinute())
       : String.format("%d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
-  }
-
-  private String timeStrShort() {
-    return String.format("%02d:%02d", time.getHour(), time.getMinute());
   }
 
   private String timeStrLong() {
