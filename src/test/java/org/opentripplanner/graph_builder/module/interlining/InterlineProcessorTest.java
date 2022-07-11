@@ -21,7 +21,12 @@ class InterlineProcessorTest implements PlanTestConstants {
   @Test
   void run() {
     var transferService = new TransferService();
-    var processor = new InterlineProcessor(transferService, 100, DataImportIssueStore.noop());
+    var processor = new InterlineProcessor(
+      transferService,
+      List.of(),
+      100,
+      DataImportIssueStore.noop()
+    );
 
     var patterns = List.of(
       tripPattern("trip-1", "block-1"),

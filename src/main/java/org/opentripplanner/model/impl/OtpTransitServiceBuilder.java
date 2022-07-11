@@ -105,6 +105,8 @@ public class OtpTransitServiceBuilder {
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
 
+  private final List<StaySeatedNotAllowed> staySeatedNotAllowed = new ArrayList<>();
+
   private final EntityById<Trip> tripsById = new EntityById<>();
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
@@ -221,6 +223,10 @@ public class OtpTransitServiceBuilder {
 
   public List<ConstrainedTransfer> getTransfers() {
     return transfers;
+  }
+
+  public List<StaySeatedNotAllowed> getStaySeatedNotAllowed() {
+    return staySeatedNotAllowed;
   }
 
   public EntityById<Trip> getTripsById() {

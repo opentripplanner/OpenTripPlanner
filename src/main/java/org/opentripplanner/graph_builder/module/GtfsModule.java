@@ -146,6 +146,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         new InterlineProcessor(
           transitModel.getTransferService(),
+          builder.getStaySeatedNotAllowed(),
           gtfsBundle.maxInterlineDistance,
           issueStore
         )

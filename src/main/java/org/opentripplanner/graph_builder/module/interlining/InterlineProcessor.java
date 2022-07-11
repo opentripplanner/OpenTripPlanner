@@ -15,6 +15,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.impl.StaySeatedNotAllowed;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
@@ -32,15 +33,68 @@ public class InterlineProcessor {
   private final TransferService transferService;
   private final int maxInterlineDistance;
   private final DataImportIssueStore issueStore;
+  private List<StaySeatedNotAllowed> staySeatedNotAllowed;
 
   public InterlineProcessor(
     TransferService transferService,
+    List<StaySeatedNotAllowed> staySeatedNotAllowed,
     int maxInterlineDistance,
     DataImportIssueStore issueStore
   ) {
     this.transferService = transferService;
+    this.staySeatedNotAllowed = staySeatedNotAllowed;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
+  }
+
+  public List<ConstrainedTransfer> run(Collection<TripPattern> tripPatterns) {
+    var interlinedTrips = this.getInterlinedTrips(tripPatterns);
+    var transfers = interlinedTrips
+      .entries()
+      .stream()
+      .filter(this::staySeatedNotForbidden)
+      .map(p -> {
+        var constraint = TransferConstraint.create();
+        constraint.staySeated();
+        constraint.priority(TransferPriority.ALLOWED);
+
+        var fromTrip = p.getValue().first;
+        var toTrip = p.getValue().second;
+
+        var from = new TripTransferPoint(fromTrip, p.getKey().first.numberOfStops() - 1);
+        var to = new TripTransferPoint(toTrip, 0);
+
+        LOG.debug(
+          "Creating stay-seated transfer from trip {} (route {}) to trip {} (route {})",
+          fromTrip.getId(),
+          fromTrip.getRoute().getId(),
+          toTrip.getId(),
+          toTrip.getRoute().getId()
+        );
+
+        return new ConstrainedTransfer(null, from, to, constraint.build());
+      })
+      .toList();
+
+    if (!transfers.isEmpty()) {
+      LOG.info(
+        "Found {} pairs of trips for which stay-seated (interlined) transfers were created",
+        interlinedTrips.keySet().size()
+      );
+
+      transferService.addAll(transfers);
+    }
+    return transfers;
+  }
+
+  private boolean staySeatedNotForbidden(Map.Entry<P2<TripPattern>, P2<Trip>> p) {
+    var fromTrip = p.getValue().first;
+    var toTrip = p.getValue().second;
+    return staySeatedNotAllowed
+      .stream()
+      .noneMatch(t ->
+        t.fromTrip().getId().equals(fromTrip.getId()) && t.toTrip().getId().equals(toTrip.getId())
+      );
   }
 
   /**
@@ -116,46 +170,6 @@ public class InterlineProcessor {
     }
 
     return interlines;
-  }
-
-  public List<ConstrainedTransfer> run(Collection<TripPattern> tripPatterns) {
-    var interlinedTrips = this.getInterlinedTrips(tripPatterns);
-    var transfers = interlinedTrips
-      .entries()
-      .stream()
-      .map(p -> {
-        var constraint = TransferConstraint.create();
-        constraint.staySeated();
-        constraint.priority(TransferPriority.ALLOWED);
-
-        var fromTrip = p.getValue().first;
-        var toTrip = p.getValue().second;
-
-        var from = new TripTransferPoint(fromTrip, p.getKey().first.numberOfStops() - 1);
-        var to = new TripTransferPoint(toTrip, 0);
-
-        LOG.debug(
-          "Creating stay-seated transfer from trip {} (route {}) to trip {} (route {})",
-          fromTrip.getId(),
-          fromTrip.getRoute().getId(),
-          toTrip.getId(),
-          toTrip.getRoute().getId()
-        );
-        // TODO: check that there is no forbidden transfer for these trips
-
-        return new ConstrainedTransfer(null, from, to, constraint.build());
-      })
-      .toList();
-
-    if (!transfers.isEmpty()) {
-      LOG.info(
-        "Found {} pairs of trips for which stay-seated (interlined) transfers were created",
-        interlinedTrips.keySet().size()
-      );
-
-      transferService.addAll(transfers);
-    }
-    return transfers;
   }
 }
 
