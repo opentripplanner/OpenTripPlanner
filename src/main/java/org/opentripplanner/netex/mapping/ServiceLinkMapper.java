@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.List;
 import javax.xml.bind.JAXBElement;
+import net.opengis.gml._3.LineStringType;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
@@ -94,51 +95,18 @@ class ServiceLinkMapper {
     return geometries;
   }
 
-  private LineString mapServiceLink(ServiceLink serviceLink, TripPattern tripPattern, int i) {
+  private LineString mapServiceLink(
+    ServiceLink serviceLink,
+    TripPattern tripPattern,
+    int stopIndex
+  ) {
     if (
       serviceLink.getProjections() == null ||
       serviceLink.getProjections().getProjectionRefOrProjection() == null
     ) {
       issueStore.add(new MissingProjectionInServiceLink(serviceLink.getId()));
       return null;
-    }
-    return mapCoordinates(serviceLink, tripPattern, i);
-  }
-
-  private LineString mapCoordinates(
-    ServiceLink serviceLink,
-    TripPattern tripPattern,
-    int stopIndex
-  ) {
-    String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
-    Stop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
-
-    String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
-    Stop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
-
-    if (fromPointStop == null || toPointStop == null) {
-      issueStore.add(
-        "ServiceLinkWithoutQuay",
-        "Service link with missing or unknown quays. Link: %s",
-        serviceLink
-      );
-    } else if (!fromPointStop.equals(tripPattern.getStop(stopIndex))) {
-      issueStore.add(
-        "ServiceLinkQuayMismatch",
-        "Service link %s with quays different from point in journey pattern. Link point: %s, journey pattern point: %s",
-        serviceLink,
-        tripPattern.getStop(stopIndex).getId().getId(),
-        fromPointQuayId
-      );
-      return null;
-    } else if (!toPointStop.equals(tripPattern.getStop(stopIndex + 1))) {
-      issueStore.add(
-        "ServiceLinkQuayMismatch",
-        "Service link %s with quays different to point in journey pattern. Link point: %s, journey pattern point: %s",
-        serviceLink,
-        tripPattern.getStop(stopIndex).getId().getId(),
-        toPointQuayId
-      );
+    } else if (!isFromToPointRefsValid(serviceLink, tripPattern, stopIndex)) {
       return null;
     }
 
@@ -147,46 +115,25 @@ class ServiceLinkMapper {
       .getProjectionRefOrProjection()) {
       Object projectionObj = projectionElement.getValue();
       if (projectionObj instanceof LinkSequenceProjection_VersionStructure linkSequenceProjection) {
-        if (linkSequenceProjection.getLineString() == null) {
-          issueStore.add(
-            "ServiceLinkWithoutLineString",
-            "Ignore linkSequenceProjection without linestring for: %s",
-            linkSequenceProjection
-          );
-          return null;
-        }
-        List<Double> coords = linkSequenceProjection.getLineString().getPosList().getValue();
-        if (coords.size() < 4) {
-          issueStore.add(
-            "ServiceLinkGeometryError",
-            "Ignore linkSequenceProjection with invalid linestring, " +
-            "containing fewer than two coordinates for: %s",
-            serviceLink.getId()
-          );
-          return null;
-        } else if (coords.size() % 2 != 0) {
-          issueStore.add(
-            "ServiceLinkGeometryError",
-            "Ignore linkSequenceProjection with invalid linestring, " +
-            "containing odd number of values for coordinates: %s",
-            serviceLink.getId()
-          );
+        LineStringType lineString = linkSequenceProjection.getLineString();
+        if (!isProjectionValid(lineString, serviceLink.getId())) {
           return null;
         }
 
-        Coordinate[] coordinates = new Coordinate[coords.size() / 2];
-        for (int i = 0; i < coords.size(); i += 2) {
-          coordinates[i / 2] = new Coordinate(coords.get(i + 1), coords.get(i));
+        List<Double> positionList = lineString.getPosList().getValue();
+        Coordinate[] coordinates = new Coordinate[positionList.size() / 2];
+        for (int i = 0; i < positionList.size(); i += 2) {
+          coordinates[i / 2] = new Coordinate(positionList.get(i + 1), positionList.get(i));
         }
         final LineString geometry = geometryFactory.createLineString(coordinates);
 
         if (
-          !isValid(
+          !isGeometryValid(geometry, serviceLink.getId()) ||
+          !areEndpointsWithinTolerance(
             geometry,
             tripPattern.getStop(stopIndex),
             tripPattern.getStop(stopIndex + 1),
-            serviceLink.getId(),
-            issueStore
+            serviceLink.getId()
           )
         ) {
           return null;
@@ -214,13 +161,77 @@ class ServiceLinkMapper {
     return geometryFactory.createLineString(sequence);
   }
 
-  private boolean isValid(
-    Geometry geometry,
-    StopLocation s0,
-    StopLocation s1,
-    String id,
-    DataImportIssueStore issueStore
+  private boolean isFromToPointRefsValid(
+    ServiceLink serviceLink,
+    TripPattern tripPattern,
+    int stopIndex
   ) {
+    String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
+    Stop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
+
+    String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
+    Stop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
+
+    if (fromPointStop == null || toPointStop == null) {
+      issueStore.add(
+        "ServiceLinkWithoutQuay",
+        "Service link with missing or unknown quays. Link: %s",
+        serviceLink
+      );
+      return false;
+    } else if (!fromPointStop.equals(tripPattern.getStop(stopIndex))) {
+      issueStore.add(
+        "ServiceLinkQuayMismatch",
+        "Service link %s with quays different from point in journey pattern. Link point: %s, journey pattern point: %s",
+        serviceLink,
+        tripPattern.getStop(stopIndex).getId().getId(),
+        fromPointQuayId
+      );
+      return false;
+    } else if (!toPointStop.equals(tripPattern.getStop(stopIndex + 1))) {
+      issueStore.add(
+        "ServiceLinkQuayMismatch",
+        "Service link %s with quays different to point in journey pattern. Link point: %s, journey pattern point: %s",
+        serviceLink,
+        tripPattern.getStop(stopIndex).getId().getId(),
+        toPointQuayId
+      );
+      return false;
+    }
+    return true;
+  }
+
+  private boolean isProjectionValid(LineStringType lineString, String id) {
+    if (lineString == null) {
+      issueStore.add(
+        "ServiceLinkWithoutLineString",
+        "Ignore linkSequenceProjection without linestring for: %s",
+        id
+      );
+      return false;
+    }
+    List<Double> coordinates = lineString.getPosList().getValue();
+    if (coordinates.size() < 4) {
+      issueStore.add(
+        "ServiceLinkGeometryError",
+        "Ignore linkSequenceProjection with invalid linestring, " +
+        "containing fewer than two coordinates for: %s",
+        id
+      );
+      return false;
+    } else if (coordinates.size() % 2 != 0) {
+      issueStore.add(
+        "ServiceLinkGeometryError",
+        "Ignore linkSequenceProjection with invalid linestring, " +
+        "containing odd number of values for coordinates: %s",
+        id
+      );
+      return false;
+    }
+    return true;
+  }
+
+  private boolean isGeometryValid(Geometry geometry, String id) {
     Coordinate[] coordinates = geometry.getCoordinates();
     if (coordinates.length < 2) {
       issueStore.add(
@@ -250,33 +261,44 @@ class ServiceLinkMapper {
         return false;
       }
     }
-    Coordinate geometryStartCoord = coordinates[0];
-    Coordinate geometryEndCoord = coordinates[coordinates.length - 1];
+    return true;
+  }
 
-    Coordinate startCoord = s0.getCoordinate().asJtsCoordinate();
-    Coordinate endCoord = s1.getCoordinate().asJtsCoordinate();
+  private boolean areEndpointsWithinTolerance(
+    Geometry geometry,
+    StopLocation fromStop,
+    StopLocation toStop,
+    String id
+  ) {
+    Coordinate[] coordinates = geometry.getCoordinates();
+    Coordinate geometryStartCoordinate = coordinates[0];
+    Coordinate geometryEndCoordinate = coordinates[coordinates.length - 1];
+
+    Coordinate startCoordinate = fromStop.getCoordinate().asJtsCoordinate();
+    Coordinate endCoordinate = toStop.getCoordinate().asJtsCoordinate();
     if (
-      SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord) >
+      SphericalDistanceLibrary.fastDistance(startCoordinate, geometryStartCoordinate) >
       maxStopToShapeSnapDistance
     ) {
       issueStore.add(
         "ServiceLinkGeometryTooFar",
         "Ignore linkSequenceProjection with too long distance between stop and start of linestring, " +
         " stop %s, distance: %s, link id: %s",
-        s0,
-        SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord),
+        fromStop,
+        SphericalDistanceLibrary.fastDistance(startCoordinate, geometryStartCoordinate),
         id
       );
       return false;
     } else if (
-      SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance
+      SphericalDistanceLibrary.fastDistance(endCoordinate, geometryEndCoordinate) >
+      maxStopToShapeSnapDistance
     ) {
       issueStore.add(
         "ServiceLinkGeometryTooFar",
         "Ignore linkSequenceProjection with too long distance between stop and end of linestring, " +
         " stop %s, distance: %s, link id: %s",
-        s1,
-        SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord),
+        toStop,
+        SphericalDistanceLibrary.fastDistance(endCoordinate, geometryEndCoordinate),
         id
       );
       return false;
