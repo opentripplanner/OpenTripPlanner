@@ -148,7 +148,7 @@ public class Graph implements Serializable {
   private long transitServiceEnds = 0;
   private GraphBundle bundle;
   private transient CalendarService calendarService;
-  private transient OpeningHoursCalendarService openingHoursCalendarService;
+  private OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
   public transient GraphIndex index;
   private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
