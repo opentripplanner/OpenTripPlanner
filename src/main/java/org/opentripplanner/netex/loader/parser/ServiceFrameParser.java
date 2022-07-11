@@ -88,7 +88,6 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     parseServiceLinks(frame.getServiceLinks());
 
     // Keep list sorted alphabetically
-    warnOnMissingMapping(LOG, frame.getAdditionalNetworks());
     warnOnMissingMapping(LOG, frame.getCommonSections());
     warnOnMissingMapping(LOG, frame.getConnections());
     warnOnMissingMapping(LOG, frame.getDirections());
@@ -96,7 +95,6 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     warnOnMissingMapping(LOG, frame.getFlexibleLinkProperties());
     warnOnMissingMapping(LOG, frame.getFlexiblePointProperties());
     warnOnMissingMapping(LOG, frame.getGeneralSections());
-    warnOnMissingMapping(LOG, frame.getGroupsOfLines());
     warnOnMissingMapping(LOG, frame.getGroupsOfLinks());
     warnOnMissingMapping(LOG, frame.getGroupsOfPoints());
     warnOnMissingMapping(LOG, frame.getLineNetworks());
