@@ -12,10 +12,6 @@ public class WrappedCurrency {
 
   private final Currency value;
 
-  public WrappedCurrency() {
-    value = null;
-  }
-
   public WrappedCurrency(Currency value) {
     this.value = value;
   }

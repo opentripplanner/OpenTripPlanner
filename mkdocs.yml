@@ -66,3 +66,4 @@ pages:
     - Geocoder API: 'sandbox/GeocoderAPI.md'
     - Travel time isochrones: 'sandbox/TravelTime.md'
     - IBI accessibility score: 'sandbox/IBIAccessibilityScore.md'
+    - Fares: 'sandbox/Fares.md'

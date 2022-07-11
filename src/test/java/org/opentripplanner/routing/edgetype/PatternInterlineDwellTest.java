@@ -2,9 +2,9 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
@@ -22,9 +22,9 @@ public class PatternInterlineDwellTest extends GtfsTest {
 
   @Test
   public void testInterlining() {
-    Calendar calendar = new GregorianCalendar(2014, Calendar.JANUARY, 01, 00, 05, 00);
-    calendar.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-    long time = calendar.getTime().getTime() / 1000;
+    LocalDateTime ldt = LocalDateTime.of(2014, 1, 1, 0, 5, 0);
+    ZonedDateTime zdt = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
+    long time = zdt.toEpochSecond();
     // We should arrive at the destination using two legs, both of which are on
     // the same route and with zero transfers.
     Itinerary itinerary = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);

@@ -7,21 +7,21 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
-  private final Graph graph;
+  private final TransitModel transitModel;
 
-  private DigitransitStationPropertyMapper(Graph graph) {
-    this.graph = graph;
+  private DigitransitStationPropertyMapper(TransitModel transitModel) {
+    this.transitModel = transitModel;
   }
 
-  public static DigitransitStationPropertyMapper create(Graph graph) {
-    return new DigitransitStationPropertyMapper(graph);
+  public static DigitransitStationPropertyMapper create(TransitModel transitModel) {
+    return new DigitransitStationPropertyMapper(transitModel);
   }
 
   @Override
@@ -36,7 +36,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
         "type",
         childStops
           .stream()
-          .flatMap(stop -> graph.index.getPatternsForStop(stop).stream())
+          .flatMap(stop -> transitModel.index.getPatternsForStop(stop).stream())
           .map(tripPattern -> tripPattern.getMode().name())
           .distinct()
           .collect(Collectors.joining(","))
@@ -56,7 +56,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
         JSONArray.toJSONString(
           childStops
             .stream()
-            .flatMap(stop -> graph.index.getRoutesForStop(stop).stream())
+            .flatMap(stop -> transitModel.index.getRoutesForStop(stop).stream())
             .distinct()
             .map(route ->
               route.getShortName() == null

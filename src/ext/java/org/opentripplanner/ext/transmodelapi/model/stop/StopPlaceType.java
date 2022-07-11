@@ -460,7 +460,7 @@ public class StopPlaceType {
     final RoutingService routingService = GqlUtil.getRoutingService(environment);
     final TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Stream<Station> stations = transitService
+    Stream<Station> stations = routingService
       .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
       .stream()
       .map(StopLocation::getParentStation)

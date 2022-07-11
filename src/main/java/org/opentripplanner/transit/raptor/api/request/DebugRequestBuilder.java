@@ -13,7 +13,7 @@ import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
+import org.opentripplanner.transit.raptor.api.view.PatternRideView;
 
 /**
  * Mutable version of {@link DebugRequest}.
@@ -24,7 +24,7 @@ public class DebugRequestBuilder {
   private List<Integer> path = new ArrayList<>();
   private int debugPathFromStopIndex;
   private Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener;
-  private Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener;
+  private Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener;
   private Consumer<DebugEvent<Path<?>>> pathFilteringListener;
   private DebugLogger logger;
 
@@ -91,12 +91,12 @@ public class DebugRequestBuilder {
     return this;
   }
 
-  public Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener() {
+  public Consumer<DebugEvent<PatternRideView<?>>> patternRideDebugListener() {
     return patternRideDebugListener;
   }
 
   public DebugRequestBuilder patternRideDebugListener(
-    Consumer<DebugEvent<PatternRide<?>>> listener
+    Consumer<DebugEvent<PatternRideView<?>>> listener
   ) {
     this.patternRideDebugListener = listener;
     return this;

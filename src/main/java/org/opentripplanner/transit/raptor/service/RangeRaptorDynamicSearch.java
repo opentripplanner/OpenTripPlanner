@@ -1,28 +1,26 @@
 package org.opentripplanner.transit.raptor.service;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+import static org.opentripplanner.transit.raptor.api.transit.SearchDirection.FORWARD;
+import static org.opentripplanner.transit.raptor.api.transit.SearchDirection.REVERSE;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.api.view.Worker;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +76,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     } catch (DestinationNotReachedException e) {
       return new RaptorResponse<>(
         Collections.emptyList(),
+        null,
         originalRequest,
         // If a trip exist(forward heuristics succeed), but is outside the calculated
         // search-window, then set the search-window params as if the request was
@@ -139,10 +138,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     }
 
     // Route
-    Collection<Path<T>> paths = worker.route();
+    worker.route();
 
     // create and return response
-    return new RaptorResponse<>(paths, originalRequest, request);
+    return new RaptorResponse<>(worker.paths(), worker.stopArrivals(), originalRequest, request);
   }
 
   private boolean isItPossibleToRunHeuristicsInParallel() {
@@ -176,7 +175,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
         throw new DestinationNotReachedException();
       }
       LOG.error(e.getMessage() + ". Request: " + originalRequest, e);
-      throw new OtpAppException(
+      throw new IllegalStateException(
         "Failed to run FORWARD/REVERSE heuristic search in parallel. Details: " + e.getMessage()
       );
     }

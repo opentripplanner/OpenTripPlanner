@@ -85,8 +85,11 @@ class FlexStopLocationMapper {
    * Allows pickup / drop off along any eligible street inside the area
    */
   FlexStopLocation mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
-    FlexStopLocation result = new FlexStopLocation(idFactory.createId(flexibleStopPlace.getId()));
-    result.setName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
+    var name = new NonLocalizedString(flexibleStopPlace.getName().getValue());
+    FlexStopLocation result = new FlexStopLocation(
+      idFactory.createId(flexibleStopPlace.getId()),
+      name
+    );
     result.setGeometry(OpenGisMapper.mapGeometry(area.getPolygon()));
     return result;
   }

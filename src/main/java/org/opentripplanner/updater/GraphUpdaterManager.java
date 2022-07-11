@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,14 +59,16 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
    * The Graph that will be updated.
    */
   private final Graph graph;
+  private final TransitModel transitModel;
 
   /**
    * Constructor.
    *
-   * @param graph is the Graph that will be updated.
+   * @param transitModel is the Graph that will be updated.
    */
-  public GraphUpdaterManager(Graph graph, List<GraphUpdater> updaters) {
+  public GraphUpdaterManager(Graph graph, TransitModel transitModel, List<GraphUpdater> updaters) {
     this.graph = graph;
+    this.transitModel = transitModel;
     // Thread factory used to create new threads, giving them more human-readable names.
     var threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-%d").build();
     this.scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
@@ -133,7 +136,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
   public Future<?> execute(GraphWriterRunnable runnable) {
     return scheduler.submit(() -> {
       try {
-        runnable.run(graph);
+        runnable.run(graph, transitModel);
       } catch (Exception e) {
         LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
       }

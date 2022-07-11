@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
-import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
 
 public class SimpleArrivedAtDestinationCheck implements ArrivedAtDestinationCheck {
 

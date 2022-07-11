@@ -4,12 +4,14 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
+import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -21,12 +23,18 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class BicycleRoutingTest {
 
   static final Instant dateTime = Instant.now();
-  Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+  private final Graph herrenbergGraph;
+
+  {
+    OtpModel otpModel = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    herrenbergGraph = otpModel.graph;
+  }
 
   /**
    * https://www.openstreetmap.org/way/22392895 is access=destination which means that both bicycles
@@ -71,12 +79,18 @@ public class BicycleRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
-    var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry));
+    var gpf = new GraphPathFinder(
+      new Router(
+        graph,
+        Mockito.mock(TransitModel.class),
+        RouterConfig.DEFAULT,
+        Metrics.globalRegistry
+      )
+    );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      graph.getTimeZone(),
-      new AlertToLegMapper(graph.getTransitAlertService()),
+      ZoneId.of("Europe/Berlin"),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

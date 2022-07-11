@@ -15,9 +15,7 @@ import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.DayType;
@@ -68,7 +66,7 @@ public class DayTypeAssignmentMapperTest {
     }
 
     // WHEN - create calendar
-    Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
       dayTypes,
       assignments,
       EMPTY_OPERATING_DAYS,
@@ -100,7 +98,7 @@ public class DayTypeAssignmentMapperTest {
     assignments.add(DAY_TYPE_1, createDayTypeAssignment(DAY_TYPE_1, D2020_11_03, NOT_AVAILABLE));
 
     // WHEN - create calendar
-    Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
       dayTypes,
       assignments,
       EMPTY_OPERATING_DAYS,
@@ -125,7 +123,7 @@ public class DayTypeAssignmentMapperTest {
     assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithOpDay(DAY_TYPE_1, OP_DAY_1, AVAILABLE));
 
     // WHEN - create calendar
-    Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
       dayTypes,
       assignments,
       operatingDays,
@@ -159,7 +157,7 @@ public class DayTypeAssignmentMapperTest {
     }
 
     // WHEN - create calendar
-    Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
       dayTypes,
       assignments,
       EMPTY_OPERATING_DAYS,
@@ -196,7 +194,7 @@ public class DayTypeAssignmentMapperTest {
     }
 
     // WHEN - create calendar
-    Map<String, Set<ServiceDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
       dayTypes,
       assignments,
       operatingDays,
@@ -213,7 +211,7 @@ public class DayTypeAssignmentMapperTest {
 
   /* private helper methods */
 
-  private String toStr(Map<String, Set<ServiceDate>> result, String key) {
-    return result.get(key).stream().sorted().collect(Collectors.toList()).toString();
+  private String toStr(Map<String, Set<LocalDate>> result, String key) {
+    return result.get(key).stream().sorted().toList().toString();
   }
 }

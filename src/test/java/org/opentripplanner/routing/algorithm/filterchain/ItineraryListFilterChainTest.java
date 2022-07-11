@@ -3,9 +3,11 @@ package org.opentripplanner.routing.algorithm.filterchain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
@@ -14,11 +16,14 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
@@ -171,6 +176,24 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
       routingErrors.get(0).code
     );
+  }
+
+  @Test
+  void transitAlertsTest() {
+    var transitAlertService = Mockito.mock(TransitAlertService.class);
+
+    // Given a chain with transit alerts
+    var chain = createBuilder(false, false, 20)
+      .withTransitAlerts(transitAlertService, ignore -> null)
+      .build();
+
+    // When running it with transit itineraries
+    chain.filter(List.of(i1, i2, i3));
+
+    // Then transitAlertService should have been called with stop and route ids
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(A.stop.getId());
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(E.stop.getId());
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getRouteAlerts(BUS_ROUTE.getId());
   }
 
   private ItineraryListFilterChainBuilder createBuilder(

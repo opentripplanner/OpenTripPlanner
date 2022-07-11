@@ -11,10 +11,11 @@ import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactory
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,11 +29,11 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (08.11.2017)
@@ -45,11 +46,11 @@ public class CalendarServiceDataFactoryImplTest {
 
   private static final FeedScopedId SERVICE_WEEKDAYS_ID = id("weekdays");
 
-  private static final ServiceDate A_FRIDAY = new ServiceDate(2009, 1, 2);
+  private static final LocalDate A_FRIDAY = LocalDate.of(2009, 1, 2);
 
-  private static final ServiceDate A_SUNDAY = new ServiceDate(2009, 1, 4);
+  private static final LocalDate A_SUNDAY = LocalDate.of(2009, 1, 4);
 
-  private static final ServiceDate A_MONDAY = new ServiceDate(2009, 1, 5);
+  private static final LocalDate A_MONDAY = LocalDate.of(2009, 1, 5);
 
   private static CalendarServiceData data;
 
@@ -77,14 +78,14 @@ public class CalendarServiceDataFactoryImplTest {
 
   @Test
   public void testDataGetServiceDatesForServiceId() {
-    List<ServiceDate> alldays = data.getServiceDatesForServiceId(SERVICE_ALLDAYS_ID);
+    List<LocalDate> alldays = data.getServiceDatesForServiceId(SERVICE_ALLDAYS_ID);
     assertEquals(
       "[20090101, 20090102, 20090103, 20090104, 20090106, 20090107, 20090108]",
       sevenFirstDays(alldays).toString()
     );
     assertEquals(14975, alldays.size());
 
-    List<ServiceDate> weekdays = data.getServiceDatesForServiceId(SERVICE_WEEKDAYS_ID);
+    List<LocalDate> weekdays = data.getServiceDatesForServiceId(SERVICE_WEEKDAYS_ID);
     assertEquals(
       "[20090101, 20090102, 20090105, 20090106, 20090107, 20090108, 20090109]",
       sevenFirstDays(weekdays).toString()
@@ -94,7 +95,7 @@ public class CalendarServiceDataFactoryImplTest {
 
   @Test
   public void testDataGetTimeZoneForAgencyId() {
-    assertEquals("America/New_York", data.getTimeZoneForAgencyId(id(AGENCY)).getID());
+    assertEquals("America/New_York", data.getTimeZoneForAgencyId(id(AGENCY)).getId());
   }
 
   @Test
@@ -118,19 +119,19 @@ public class CalendarServiceDataFactoryImplTest {
 
   @Test
   public void testServiceGetTimeZoneForAgencyId() {
-    TimeZone result = calendarService.getTimeZoneForAgencyId(id(AGENCY));
-    assertEquals("America/New_York", result.getID());
+    ZoneId result = calendarService.getTimeZoneForAgencyId(id(AGENCY));
+    assertEquals("America/New_York", result.getId());
   }
 
   @Test
   public void testServiceGetServiceDatesForServiceId() {
-    Set<ServiceDate> alldays = calendarService.getServiceDatesForServiceId(SERVICE_ALLDAYS_ID);
+    Set<LocalDate> alldays = calendarService.getServiceDatesForServiceId(SERVICE_ALLDAYS_ID);
 
     assertTrue(alldays.contains(A_FRIDAY));
     assertTrue(alldays.contains(A_SUNDAY));
     assertEquals(14975, alldays.size());
 
-    Set<ServiceDate> weekdays = calendarService.getServiceDatesForServiceId(SERVICE_WEEKDAYS_ID);
+    Set<LocalDate> weekdays = calendarService.getServiceDatesForServiceId(SERVICE_WEEKDAYS_ID);
 
     assertTrue(weekdays.contains(A_FRIDAY));
     Assertions.assertFalse(weekdays.contains(A_SUNDAY));
@@ -166,7 +167,7 @@ public class CalendarServiceDataFactoryImplTest {
   private static ServiceCalendarDate removeMondayFromAlldays() {
     return new ServiceCalendarDate(
       SERVICE_ALLDAYS_ID,
-      new ServiceDate(2009, 1, 5),
+      LocalDate.of(2009, 1, 5),
       EXCEPTION_TYPE_REMOVE
     );
   }
@@ -183,7 +184,7 @@ public class CalendarServiceDataFactoryImplTest {
     return c.stream().sorted(comparing(Object::toString)).toList().toString();
   }
 
-  private static List<String> sevenFirstDays(List<ServiceDate> dates) {
-    return dates.stream().limit(7).map(ServiceDate::asCompactString).collect(toList());
+  private static List<String> sevenFirstDays(List<LocalDate> dates) {
+    return dates.stream().limit(7).map(ServiceDateUtils::asCompactString).collect(toList());
   }
 }

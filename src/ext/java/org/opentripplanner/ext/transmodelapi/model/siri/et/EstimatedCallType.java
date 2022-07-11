@@ -11,24 +11,24 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.DatedServiceJourneyHelper;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 
 public class EstimatedCallType {
 
@@ -286,7 +286,6 @@ public class EstimatedCallType {
               .of(environment.getSource())
               .map(TripTimeOnDate.class::cast)
               .map(TripTimeOnDate::getServiceDay)
-              .map(ServiceDate::toLocalDate)
               .orElse(null)
           )
           .build()
@@ -342,7 +341,7 @@ public class EstimatedCallType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .description("Get all relevant situations for this EstimatedCall.")
           .dataFetcher(environment ->
-            getAllRelevantAlerts(environment.getSource(), GqlUtil.getRoutingService(environment))
+            getAllRelevantAlerts(environment.getSource(), GqlUtil.getTransitService(environment))
           )
           .build()
       )
@@ -371,7 +370,7 @@ public class EstimatedCallType {
    */
   private static Collection<TransitAlert> getAllRelevantAlerts(
     TripTimeOnDate tripTimeOnDate,
-    RoutingService routingService
+    TransitService transitService
   ) {
     Trip trip = tripTimeOnDate.getTrip();
     FeedScopedId tripId = trip.getId();
@@ -384,9 +383,9 @@ public class EstimatedCallType {
 
     Collection<TransitAlert> allAlerts = new HashSet<>();
 
-    TransitAlertService alertPatchService = routingService.getTransitAlertService();
+    TransitAlertService alertPatchService = transitService.getTransitAlertService();
 
-    final ServiceDate serviceDate = tripTimeOnDate.getServiceDay();
+    final LocalDate serviceDate = tripTimeOnDate.getServiceDay();
 
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
@@ -408,14 +407,14 @@ public class EstimatedCallType {
       alertPatchService.getDirectionAndRouteAlerts(trip.getDirection().gtfsCode, routeId)
     );
 
-    long serviceDayMillis = 1000L * tripTimeOnDate.getServiceDayMidnight();
-    long arrivalMillis = 1000L * tripTimeOnDate.getRealtimeArrival();
-    long departureMillis = 1000L * tripTimeOnDate.getRealtimeDeparture();
+    long serviceDay = tripTimeOnDate.getServiceDayMidnight();
+    long arrivalTime = tripTimeOnDate.getRealtimeArrival();
+    long departureTime = tripTimeOnDate.getRealtimeDeparture();
 
     filterSituationsByDateAndStopConditions(
       allAlerts,
-      new Date(serviceDayMillis + arrivalMillis),
-      new Date(serviceDayMillis + departureMillis),
+      Instant.ofEpochSecond(serviceDay + arrivalTime),
+      Instant.ofEpochSecond(serviceDay + departureTime),
       Arrays.asList(StopCondition.STOP, StopCondition.START_POINT, StopCondition.EXCEPTIONAL_STOP)
     );
 
@@ -424,20 +423,20 @@ public class EstimatedCallType {
 
   private static void filterSituationsByDateAndStopConditions(
     Collection<TransitAlert> alertPatches,
-    Date fromTime,
-    Date toTime,
+    Instant fromTime,
+    Instant toTime,
     List<StopCondition> stopConditions
   ) {
     if (alertPatches != null) {
       // First and last period
       alertPatches.removeIf(alert ->
-        (alert.getEffectiveStartDate() != null && alert.getEffectiveStartDate().after(toTime)) ||
-        (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().before(fromTime))
+        (alert.getEffectiveStartDate() != null && alert.getEffectiveStartDate().isAfter(toTime)) ||
+        (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().isBefore(fromTime))
       );
 
       // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch ->
-        !alertPatch.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)
+        !alertPatch.displayDuring(fromTime.getEpochSecond(), toTime.getEpochSecond())
       );
 
       alertPatches.removeIf(alert ->

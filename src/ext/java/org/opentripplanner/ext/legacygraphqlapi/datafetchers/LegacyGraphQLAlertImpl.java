@@ -7,8 +7,8 @@ import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLSeve
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -126,22 +126,22 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<Long> effectiveEndDate() {
     return environment -> {
-      Date effectiveEndDate = getSource(environment).getEffectiveEndDate();
+      Instant effectiveEndDate = getSource(environment).getEffectiveEndDate();
       if (effectiveEndDate == null) {
         return null;
       }
-      return effectiveEndDate.getTime() / 1000;
+      return effectiveEndDate.getEpochSecond();
     };
   }
 
   @Override
   public DataFetcher<Long> effectiveStartDate() {
     return environment -> {
-      Date effectiveStartDate = getSource(environment).getEffectiveStartDate();
+      Instant effectiveStartDate = getSource(environment).getEffectiveStartDate();
       if (effectiveStartDate == null) {
         return null;
       }
-      return effectiveStartDate.getTime() / 1000;
+      return effectiveStartDate.getEpochSecond();
     };
   }
 

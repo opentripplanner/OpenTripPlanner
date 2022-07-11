@@ -51,6 +51,7 @@ config:
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String
     Geometry: org.locationtech.jts.geom.Geometry#Geometry
+    InputField: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField#LegacyGraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
@@ -64,6 +65,8 @@ config:
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
     Route: org.opentripplanner.transit.model.network.Route#Route
+    RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError
+    RoutingErrorCode: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode#LegacyGraphQLRoutingErrorCode
     serviceTimeRange: Object
     step: org.opentripplanner.model.plan.WalkStep#WalkStep
     Stop: Object # Can be either Stop or Station
@@ -89,4 +92,3 @@ config:
     FormFactor: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor
     PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
     RentalVehicleType: org.opentripplanner.routing.vehicle_rental.RentalVehicleType#RentalVehicleType
-

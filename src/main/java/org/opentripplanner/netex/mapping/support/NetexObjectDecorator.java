@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping.support;
 
 import java.util.function.Consumer;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;
 
@@ -46,7 +46,7 @@ public class NetexObjectDecorator {
    *            the right scope - this class is just a utility class, or the messenger.
    * @param ref the unexpected reference to an unmapped object.
    */
-  public static void logUnmappedEntityRef(Logger log, @NotNull VersionOfObjectRefStructure ref) {
+  public static void logUnmappedEntityRef(Logger log, @Nonnull VersionOfObjectRefStructure ref) {
     log.warn("Unexpected entity {} in NeTEx import. The entity is ignored.", ref);
   }
 }

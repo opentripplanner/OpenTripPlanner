@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.DebugHandler;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 /**
  * Generic abstract implementation of the {@link DebugHandler} interface. The main purpose is

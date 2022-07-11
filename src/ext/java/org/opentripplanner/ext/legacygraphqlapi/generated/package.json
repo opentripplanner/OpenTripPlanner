@@ -2,6 +2,9 @@
   "name": "legacy-graphql-generator",
   "version": "1.0.0",
   "description": "Generates Java code from GraphQL schema",
+  "engines": {
+    "node": ">=12.13.0"
+  },
   "scripts": {
     "generate": "graphql-codegen -c graphql-codegen.yml"
   },

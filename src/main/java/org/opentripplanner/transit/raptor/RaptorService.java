@@ -1,13 +1,12 @@
 package org.opentripplanner.transit.raptor;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
 import org.opentripplanner.transit.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.transit.raptor.service.RangeRaptorDynamicSearch;
 import org.slf4j.Logger;
@@ -76,7 +75,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    Collection<Path<T>> paths = config.createStdWorker(transitData, request).route();
-    return new RaptorResponse<>(paths, request, request);
+    Worker<T> worker = config.createStdWorker(transitData, request);
+    worker.route();
+    return new RaptorResponse<>(worker.paths(), worker.stopArrivals(), request, request);
   }
 }

@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.site;
 
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
-import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -110,7 +110,7 @@ public interface StopLocation extends LogInfo {
   Geometry getGeometry();
 
   @Nullable
-  default TimeZone getTimeZone() {
+  default ZoneId getTimeZone() {
     return null;
   }
 

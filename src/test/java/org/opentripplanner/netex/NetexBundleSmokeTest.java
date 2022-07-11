@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +24,6 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -240,7 +240,7 @@ public class NetexBundleSmokeTest {
     assertEquals("[RB:RUT:Authority:RUT]", cal.getAgencyIds().toString());
     assertEquals(
       "Europe/Oslo",
-      cal.getTimeZoneForAgencyId(new FeedScopedId("RB", "RUT:Authority:RUT")).toZoneId().toString()
+      cal.getTimeZoneForAgencyId(new FeedScopedId("RB", "RUT:Authority:RUT")).toString()
     );
 
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
@@ -248,8 +248,8 @@ public class NetexBundleSmokeTest {
     FeedScopedId serviceId1 = sIds.get(0);
     FeedScopedId serviceId2 = sIds.get(1);
 
-    List<ServiceDate> dates1 = cal.getServiceDatesForServiceId(serviceId1);
-    List<ServiceDate> dates2 = cal.getServiceDatesForServiceId(serviceId2);
+    List<LocalDate> dates1 = cal.getServiceDatesForServiceId(serviceId1);
+    List<LocalDate> dates2 = cal.getServiceDatesForServiceId(serviceId2);
 
     if (dates1.size() > dates2.size()) {
       var datesTemp = dates1;

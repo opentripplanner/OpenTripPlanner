@@ -11,9 +11,19 @@ import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetC
 import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndRelaxedCost;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
+import org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
+import org.opentripplanner.transit.raptor.rangeraptor.path.ForwardPathMapper;
+import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
+import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
 /**
@@ -42,7 +52,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
       ctx.calculator(),
       ctx.costCalculator(),
       ctx.slackProvider(),
-      ctx.pathMapper(),
+      createPathMapper(),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
@@ -80,5 +90,45 @@ public class PathConfig<T extends RaptorTripSchedule> {
       return comparatorStandardAndLatestDepature();
     }
     return comparatorStandard();
+  }
+
+  private PathMapper<T> createPathMapper() {
+    return createPathMapper(
+      ctx.transit().transferConstraintsSearch(),
+      ctx.costCalculator(),
+      ctx.stopNameResolver(),
+      ctx.lifeCycle(),
+      ctx.searchDirection(),
+      ctx.profile(),
+      ctx.raptorSlackProvider()
+    );
+  }
+
+  private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
+    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+    CostCalculator<S> costCalculator,
+    RaptorStopNameResolver stopNameResolver,
+    WorkerLifeCycle lifeCycle,
+    SearchDirection searchDirection,
+    RaptorProfile profile,
+    RaptorSlackProvider slackProvider
+  ) {
+    return searchDirection.isForward()
+      ? new ForwardPathMapper<S>(
+        txConstraintsSearch,
+        slackProvider,
+        costCalculator,
+        stopNameResolver,
+        lifeCycle,
+        profile.useApproximateTripSearch()
+      )
+      : new ReversePathMapper<S>(
+        txConstraintsSearch,
+        slackProvider,
+        costCalculator,
+        stopNameResolver,
+        lifeCycle,
+        profile.useApproximateTripSearch()
+      );
   }
 }

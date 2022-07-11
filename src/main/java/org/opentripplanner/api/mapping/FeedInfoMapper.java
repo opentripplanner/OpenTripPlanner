@@ -15,8 +15,8 @@ public class FeedInfoMapper {
     api.publisherName = domain.getPublisherName();
     api.publisherUrl = domain.getPublisherUrl();
     api.lang = domain.getLang();
-    api.startDate = ServiceDateMapper.mapToApi(domain.getStartDate());
-    api.endDate = ServiceDateMapper.mapToApi(domain.getEndDate());
+    api.startDate = LocalDateMapper.mapToApi(domain.getStartDate());
+    api.endDate = LocalDateMapper.mapToApi(domain.getEndDate());
     api.version = domain.getVersion();
 
     return api;

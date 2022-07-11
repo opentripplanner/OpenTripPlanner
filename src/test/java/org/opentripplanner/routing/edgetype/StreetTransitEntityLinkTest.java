@@ -7,6 +7,7 @@ import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO
 import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.POSSIBLE;
 
 import java.util.Set;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
@@ -14,15 +15,19 @@ import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 class StreetTransitEntityLinkTest {
 
-  Graph graph = new Graph();
+  private static Graph graph;
+  private static TransitModel transitModel;
 
   Stop inaccessibleStop = TransitModelForTest.stopForTest(
     "A:inaccessible",
@@ -50,6 +55,14 @@ class StreetTransitEntityLinkTest {
     NO_INFORMATION
   );
 
+  @BeforeAll
+  static void setup() {
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(stopModel, deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
+  }
+
   @Test
   void disallowInaccessibleStop() {
     var afterTraversal = traverse(inaccessibleStop, true);
@@ -74,7 +87,12 @@ class StreetTransitEntityLinkTest {
 
   private State traverse(Stop stop, boolean onlyAccessible) {
     var from = new SimpleVertex(graph, "A", 10, 10);
-    var to = new TransitStopVertex(graph, stop, Set.of(TransitMode.RAIL));
+    var to = new TransitStopVertexBuilder()
+      .withGraph(graph)
+      .withStop(stop)
+      .withTransitModel(transitModel)
+      .withModes(Set.of(TransitMode.RAIL))
+      .build();
 
     var req = new RoutingRequest();
     WheelchairAccessibilityFeature feature;

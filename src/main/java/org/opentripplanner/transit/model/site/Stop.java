@@ -1,11 +1,11 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.site;
 
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -25,7 +25,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   private final I18NString url;
 
-  private final TimeZone timeZone;
+  private final ZoneId timeZone;
 
   private final TransitMode gtfsVehicleType;
 
@@ -74,7 +74,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   @Override
   @Nullable
-  public TimeZone getTimeZone() {
+  public ZoneId getTimeZone() {
     return timeZone;
   }
 

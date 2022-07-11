@@ -77,7 +77,7 @@ public class GbfsStationStatusMapper {
       status.getLastReported() != null
         ? Instant
           .ofEpochSecond(status.getLastReported().longValue())
-          .atZone(station.system.timezone.toZoneId())
+          .atZone(station.system.timezone)
         : null;
   }
 }

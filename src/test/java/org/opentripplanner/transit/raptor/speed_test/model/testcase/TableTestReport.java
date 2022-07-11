@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.util.DiffEntry;
-import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.lang.TableFormatter;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**

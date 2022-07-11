@@ -8,6 +8,7 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -17,11 +18,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.locationtech.jts.geom.Geometry;
+import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -32,6 +34,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class BarrierRoutingTest {
@@ -42,7 +45,10 @@ public class BarrierRoutingTest {
 
   @BeforeAll
   public static void createGraph() {
-    graph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_BARRIER_GATES_OSM);
+    OtpModel otpModel = ConstantsForTests.buildOsmGraph(
+      ConstantsForTests.HERRENBERG_BARRIER_GATES_OSM
+    );
+    graph = otpModel.graph;
   }
 
   /**
@@ -162,12 +168,18 @@ public class BarrierRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
-    var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry));
+    var gpf = new GraphPathFinder(
+      new Router(
+        graph,
+        Mockito.mock(TransitModel.class),
+        RouterConfig.DEFAULT,
+        Metrics.globalRegistry
+      )
+    );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      graph.getTimeZone(),
-      new AlertToLegMapper(graph.getTransitAlertService()),
+      ZoneId.of("Europe/Berlin"),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );

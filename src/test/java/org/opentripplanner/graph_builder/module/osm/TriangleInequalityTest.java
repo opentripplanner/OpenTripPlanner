@@ -9,7 +9,6 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +28,14 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class TriangleInequalityTest {
 
   private static Graph graph;
+  private static TransitModel transitModel;
 
   private Vertex start;
   private Vertex end;
@@ -40,7 +43,10 @@ public class TriangleInequalityTest {
   @BeforeAll
   public static void onlyOnce() {
     HashMap<Class<?>, Object> extra = new HashMap<>();
-    graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(stopModel, deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(
@@ -51,9 +57,9 @@ public class TriangleInequalityTest {
     DataSource source = new FileDataSource(file, FileType.OSM);
     OpenStreetMapProvider provider = new OpenStreetMapProvider(source, true);
 
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-    loader.buildGraph(graph, extra);
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+    osmModule.buildGraph(graph, transitModel, extra);
   }
 
   @BeforeEach

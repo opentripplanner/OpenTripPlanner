@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.debug;
 import java.util.LinkedList;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<ArrivalView<?>> {
 

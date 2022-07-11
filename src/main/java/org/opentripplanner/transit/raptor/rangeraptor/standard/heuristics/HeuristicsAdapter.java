@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.IntUtils;
@@ -148,7 +148,7 @@ public class HeuristicsAdapter implements Heuristics {
 
     egressPaths.forEachEntry((stop, list) -> {
       boolean stopReached = times.isStopReached(stop);
-      boolean stopReachedByTransit = times.isStopReachedOnBoard(stop);
+      boolean stopReachedByTransit = times.isStopReachedByTransit(stop);
 
       if (stopReached || stopReachedByTransit) {
         for (RaptorTransfer it : list) {

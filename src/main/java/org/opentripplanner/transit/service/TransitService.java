@@ -1,13 +1,17 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import gnu.trove.set.TIntSet;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
-import org.opentripplanner.common.model.T2;
+import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.MultiModalStation;
@@ -21,10 +25,10 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -58,15 +62,6 @@ public interface TransitService {
   Collection<TripPattern> getTripPatterns();
 
   Collection<Notice> getNotices();
-
-  Collection<StopLocation> getStopsByBoundingBox(
-    double minLat,
-    double minLon,
-    double maxLat,
-    double maxLon
-  );
-
-  List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius);
 
   Station getStationById(FeedScopedId id);
 
@@ -124,7 +119,7 @@ public interface TransitService {
 
   List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture
   );
 
@@ -145,9 +140,9 @@ public interface TransitService {
 
   GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id);
 
-  Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate);
+  Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 
-  TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, ServiceDate serviceDate);
+  TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, LocalDate serviceDate);
 
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);
 
@@ -165,5 +160,19 @@ public interface TransitService {
 
   CalendarService getCalendarService();
 
-  TimeZone getTimeZone();
+  ZoneId getTimeZone();
+
+  TransitAlertService getTransitAlertService();
+
+  FlexIndex getFlexIndex();
+
+  TIntSet getServicesRunningForDate(LocalDate parseString);
+
+  ZonedDateTime getTransitServiceEnds();
+
+  ZonedDateTime getTransitServiceStarts();
+
+  Map<Stop, TransitStopVertex> getStopVertexForStop();
+
+  HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex();
 }

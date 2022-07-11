@@ -15,12 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
@@ -38,7 +40,8 @@ public class GraphSerializationTest {
    */
   @Test
   public void testRoundTripSerializationForGTFSGraph() throws Exception {
-    testRoundTrip(ConstantsForTests.buildNewPortlandGraph(true));
+    OtpModel otpModel = ConstantsForTests.buildNewPortlandGraph(true);
+    testRoundTrip(otpModel.graph, otpModel.transitModel);
   }
 
   /**
@@ -46,7 +49,8 @@ public class GraphSerializationTest {
    */
   @Test
   public void testRoundTripSerializationForNetexGraph() throws Exception {
-    testRoundTrip(ConstantsForTests.buildNewMinimalNetexGraph());
+    OtpModel otpModel = ConstantsForTests.buildNewMinimalNetexGraph();
+    testRoundTrip(otpModel.graph, otpModel.transitModel);
   }
 
   // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
@@ -70,7 +74,10 @@ public class GraphSerializationTest {
    */
   @Test
   public void compareGraphToItself() {
-    Graph originalGraph = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    OtpModel cachedPortlandGraph = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    Graph originalGraph = cachedPortlandGraph.graph;
+    TransitModel originalTransitModel = cachedPortlandGraph.transitModel;
+    originalTransitModel.index();
     originalGraph.index();
     // We can exclude relatively few classes here, because the object trees are of course perfectly identical.
     // We do skip edge lists - otherwise we trigger a depth-first search of the graph causing a stack overflow.
@@ -150,25 +157,38 @@ public class GraphSerializationTest {
    * Tests that saving a Graph to disk and reloading it results in a separate but semantically
    * identical Graph.
    */
-  private void testRoundTrip(Graph originalGraph) throws Exception {
+  private void testRoundTrip(Graph originalGraph, TransitModel originalTransitModel)
+    throws Exception {
     // The cached timezone in the graph is transient and lazy-initialized.
     // Previous tests may have caused a timezone to be cached.
-    originalGraph.clearTimeZone();
+    originalTransitModel.clearTimeZone();
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
     SerializedGraphObject serializedObj = new SerializedGraphObject(
       originalGraph,
+      originalTransitModel,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
-    Graph copiedGraph1 = SerializedGraphObject.load(tempFile);
+    SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
+    Graph copiedGraph1 = deserializedGraph.graph;
+    TransitModel copiedTransitModel1 = deserializedGraph.transitModel;
     // Index both graph - we do no know if the original is indexed, because it is cached and
     // might be indexed by other tests.
+
+    originalTransitModel.index();
     originalGraph.index();
+
+    copiedTransitModel1.index();
     copiedGraph1.index();
+
     assertNoDifferences(originalGraph, copiedGraph1);
-    Graph copiedGraph2 = SerializedGraphObject.load(tempFile);
+
+    SerializedGraphObject deserializedGraph2 = SerializedGraphObject.load(tempFile);
+    Graph copiedGraph2 = deserializedGraph2.graph;
+    TransitModel copiedTransitModel2 = deserializedGraph2.transitModel;
+    copiedTransitModel2.index();
     copiedGraph2.index();
     assertNoDifferences(copiedGraph1, copiedGraph2);
   }

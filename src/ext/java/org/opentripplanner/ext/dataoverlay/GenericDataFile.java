@@ -2,11 +2,13 @@ package org.opentripplanner.ext.dataoverlay;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.IndexVariable;
 import ucar.ma2.Array;
@@ -65,9 +67,11 @@ public class GenericDataFile {
       }
 
       DateUnit dateUnit = new DateUnit(time.getUnitsString());
-      Date dateOrigin = dateUnit.getDateOrigin();
+      Optional<Instant> dateOrigin = Optional
+        .ofNullable(dateUnit.getDateOrigin())
+        .map(Date::toInstant);
 
-      if (dateOrigin == null) {
+      if (dateOrigin.isEmpty()) {
         error = String.format("Missing origin date from %s file", file.getAbsolutePath());
         return;
       }
@@ -82,7 +86,7 @@ public class GenericDataFile {
         return;
       }
 
-      originDate = OffsetDateTime.ofInstant(dateOrigin.toInstant(), ZoneId.systemDefault());
+      originDate = OffsetDateTime.ofInstant(dateOrigin.get(), ZoneId.systemDefault());
       timeArray = time.read();
       latitudeArray = latitude.read();
       longitudeArray = longitude.read();

@@ -5,12 +5,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
@@ -32,7 +33,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   implements WorkerState<T> {
 
-  private final StopArrivals<T> arrivals;
+  private final McStopArrivals<T> arrivals;
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicsProvider<T> heuristics;
   private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
@@ -44,7 +45,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
    * duration
    */
   public McRangeRaptorWorkerState(
-    StopArrivals<T> arrivals,
+    McStopArrivals<T> arrivals,
     DestinationArrivalPaths<T> paths,
     HeuristicsProvider<T> heuristics,
     CostCalculator<T> costCalculator,
@@ -111,6 +112,11 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     return paths.listPaths();
   }
 
+  @Override
+  public StopArrivals extractStopArrivals() {
+    return arrivals;
+  }
+
   Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
     return arrivals.listArrivalsAfterMarker(stop);
   }
@@ -131,20 +137,20 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
     }
 
     final int costTransit = costCalculator.transitArrivalCost(
-      ride.boardCost,
+      ride.boardCost(),
       alightSlack,
-      alightTime - ride.boardTime,
-      ride.trip,
+      alightTime - ride.boardTime(),
+      ride.trip(),
       alightStop
     );
 
     arrivalsCache.add(
       new TransitStopArrival<>(
-        ride.prevArrival,
+        ride.prevArrival(),
         alightStop,
         stopArrivalTime,
         costTransit,
-        ride.trip
+        ride.trip()
       )
     );
   }

@@ -1,5 +1,6 @@
 package org.opentripplanner.api.mapping;
 
+import java.util.Date;
 import java.util.Locale;
 import org.opentripplanner.api.model.ApiTripPlan;
 import org.opentripplanner.model.plan.TripPlan;
@@ -19,7 +20,7 @@ public class TripPlanMapper {
       return null;
     }
     ApiTripPlan api = new ApiTripPlan();
-    api.date = domain.date;
+    api.date = Date.from(domain.date);
     // The origin/destination do not have arrival/depature times; Hence {@code null} is used.
     api.from = placeMapper.mapPlace(domain.from, null, null, null, null);
     api.to = placeMapper.mapPlace(domain.to, null, null, null, null);

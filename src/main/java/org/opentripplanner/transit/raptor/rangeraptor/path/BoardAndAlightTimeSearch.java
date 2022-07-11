@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
+import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 
 /**
  * This interface is used by the path mappers to find the board and alight times for a known trip.

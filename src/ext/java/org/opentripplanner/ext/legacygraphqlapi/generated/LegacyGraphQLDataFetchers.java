@@ -10,6 +10,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripPattern;
@@ -21,6 +23,7 @@ import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -514,6 +517,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<String> previousPageCursor();
 
+    public DataFetcher<Iterable<RoutingError>> routingErrors();
+
     public DataFetcher<Long> searchWindowUsed();
 
     public DataFetcher<StopArrival> to();
@@ -679,6 +684,15 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Integer> routeType();
 
     public DataFetcher<Iterable<Route>> routes();
+  }
+
+  /** Description of the reason, why the planner did not return any results */
+  public interface LegacyGraphQLRoutingError {
+    public DataFetcher<LegacyGraphQLRoutingErrorCode> code();
+
+    public DataFetcher<String> description();
+
+    public DataFetcher<LegacyGraphQLInputField> inputField();
   }
 
   /**

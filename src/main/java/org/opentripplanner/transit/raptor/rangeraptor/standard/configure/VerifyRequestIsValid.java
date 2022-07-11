@@ -4,7 +4,7 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
+import org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext;
 
 /**
  * This class verify that the request is valid in the context of Standard Range Raptor.

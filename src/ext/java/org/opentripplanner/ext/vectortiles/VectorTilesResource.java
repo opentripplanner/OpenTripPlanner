@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.ws.rs.GET;
@@ -31,12 +30,13 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.VectorTileConfig;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.WorldEnvelope;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
 
-  private static final Map<LayerType, BiFunction<Graph, LayerParameters, LayerBuilder>> layers = new HashMap<>();
+  private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
   private final OTPServer otpServer;
   private final String ignoreRouterId;
 
@@ -92,7 +92,7 @@ public class VectorTilesResource {
         mvtBuilder.addLayers(
           VectorTilesResource.layers
             .get(LayerType.valueOf(layerParameters.type()))
-            .apply(router.graph, layerParameters)
+            .create(router.graph, router.transitModel, layerParameters)
             .build(envelope, layerParameters)
         );
       }
@@ -114,7 +114,13 @@ public class VectorTilesResource {
     @Context HttpHeaders headers,
     @PathParam("layers") String requestedLayers
   ) {
-    return new TileJson(otpServer.getRouter().graph, uri, headers, requestedLayers);
+    return new TileJson(
+      otpServer.getRouter().graph,
+      otpServer.getRouter().transitModel,
+      uri,
+      headers,
+      requestedLayers
+    );
   }
 
   private String getBaseAddress(UriInfo uri, HttpHeaders headers) {
@@ -176,12 +182,18 @@ public class VectorTilesResource {
     public final double[] bounds;
     public final double[] center;
 
-    private TileJson(Graph graph, UriInfo uri, HttpHeaders headers, String layers) {
+    private TileJson(
+      Graph graph,
+      TransitModel transitModel,
+      UriInfo uri,
+      HttpHeaders headers,
+      String layers
+    ) {
       attribution =
-        graph
+        transitModel
           .getFeedIds()
           .stream()
-          .map(graph::getFeedInfo)
+          .map(transitModel::getFeedInfo)
           .filter(Predicate.not(Objects::isNull))
           .map(feedInfo ->
             "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
@@ -209,7 +221,8 @@ public class VectorTilesResource {
         };
 
       center =
-        graph
+        transitModel
+          .getStopModel()
           .getCenter()
           .map(coordinate -> new double[] { coordinate.x, coordinate.y, 9 })
           .orElse(null);

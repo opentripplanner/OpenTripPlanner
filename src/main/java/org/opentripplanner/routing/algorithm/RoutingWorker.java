@@ -21,17 +21,18 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class RoutingWorker {
    * The transit service time-zero normalized for the current search. All transit times are relative
    * to a "time-zero". This enables us to use an integer(small memory footprint). The times are
    * number for seconds past the {@code transitSearchTimeZero}. In the internal model all times are
-   * stored relative to the {@link org.opentripplanner.model.calendar.ServiceDate}, but to be able
+   * stored relative to the {@link java.time.LocalDate}, but to be able
    * to compare trip times for different service days we normalize all times by calculating an
    * offset. Now all times for the selected trip patterns become relative to the {@code
    * transitSearchTimeZero}.
@@ -69,7 +70,7 @@ public class RoutingWorker {
     this.request = request;
     this.router = router;
     this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.tags);
-    this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
+    this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.getDateTime(), zoneId);
     this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
     this.additionalSearchDays =
       createAdditionalSearchDays(router.routerConfig.raptorTuningParameters(), zoneId, request);
@@ -123,7 +124,10 @@ public class RoutingWorker {
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
       request.wheelchairAccessibility.enabled(),
-      request.wheelchairAccessibility.maxSlope()
+      request.wheelchairAccessibility.maxSlope(),
+      router.graph.getService(FareService.class),
+      router.transitModel.getTransitAlertService(),
+      router.transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations()::get
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);

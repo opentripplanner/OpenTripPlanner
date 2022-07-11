@@ -19,6 +19,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -28,6 +29,8 @@ class VehicleParkingUpdaterTest {
 
   private DataSource<VehicleParking> dataSource;
   private Graph graph;
+
+  private TransitModel transitModel;
   private VehicleParkingUpdater vehicleParkingUpdater;
 
   @BeforeEach
@@ -35,14 +38,15 @@ class VehicleParkingUpdaterTest {
   public void setup() {
     VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
     graphData.initGraph();
-    this.graph = graphData.getGraph();
+    graph = graphData.getGraph();
+    transitModel = graphData.getTransitModel();
 
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
     when(dataSource.update()).thenReturn(true);
 
     var parameters = new VehicleParkingUpdaterParameters(null, -1, null);
     vehicleParkingUpdater = new VehicleParkingUpdater(parameters, dataSource);
-    vehicleParkingUpdater.setup(graph);
+    vehicleParkingUpdater.setup(graph, transitModel);
   }
 
   @Test
@@ -228,18 +232,22 @@ class VehicleParkingUpdaterTest {
   private void runUpdaterOnce() {
     class GraphUpdaterMock extends GraphUpdaterManager {
 
-      public GraphUpdaterMock(Graph graph, List<GraphUpdater> updaters) {
-        super(graph, updaters);
+      public GraphUpdaterMock(Graph graph, TransitModel transitModel, List<GraphUpdater> updaters) {
+        super(graph, transitModel, updaters);
       }
 
       @Override
       public Future<?> execute(GraphWriterRunnable runnable) {
-        runnable.run(graph);
+        runnable.run(graph, transitModel);
         return Futures.immediateVoidFuture();
       }
     }
 
-    var graphUpdaterManager = new GraphUpdaterMock(graph, List.of(vehicleParkingUpdater));
+    var graphUpdaterManager = new GraphUpdaterMock(
+      graph,
+      transitModel,
+      List.of(vehicleParkingUpdater)
+    );
     graphUpdaterManager.startUpdaters();
     graphUpdaterManager.stop();
   }

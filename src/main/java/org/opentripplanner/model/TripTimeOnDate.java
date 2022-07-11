@@ -1,11 +1,10 @@
 package org.opentripplanner.model;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -24,34 +23,29 @@ public class TripTimeOnDate {
   private final int stopIndex;
   // This is only needed because TripTimes has no reference to TripPattern
   private final TripPattern tripPattern;
-  private final ServiceDate serviceDate;
+  private final LocalDate serviceDate;
   private final long midnight;
 
-  public TripTimeOnDate(
-    TripTimes tripTimes,
-    int stopIndex,
-    TripPattern tripPattern,
-    ServiceDay serviceDay
-  ) {
+  public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern) {
     this.tripTimes = tripTimes;
     this.stopIndex = stopIndex;
     this.tripPattern = tripPattern;
-    this.serviceDate = serviceDay != null ? serviceDay.getServiceDate() : null;
-    this.midnight = serviceDay != null ? serviceDay.time(0) : UNDEFINED;
+    this.serviceDate = null;
+    this.midnight = UNDEFINED;
   }
 
   public TripTimeOnDate(
     TripTimes tripTimes,
     int stopIndex,
     TripPattern tripPattern,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     Instant midnight
   ) {
     this.tripTimes = tripTimes;
     this.stopIndex = stopIndex;
     this.tripPattern = tripPattern;
     this.serviceDate = serviceDate;
-    this.midnight = midnight.getEpochSecond();
+    this.midnight = midnight != null ? midnight.getEpochSecond() : UNDEFINED;
   }
 
   /**
@@ -62,7 +56,7 @@ public class TripTimeOnDate {
     TripTimes times = table.getTripTimes(trip);
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
-      out.add(new TripTimeOnDate(times, i, table.getPattern(), (ServiceDay) null));
+      out.add(new TripTimeOnDate(times, i, table.getPattern()));
     }
     return out;
   }
@@ -71,17 +65,18 @@ public class TripTimeOnDate {
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
    * StopPatterns.
    *
-   * @param serviceDay service day to set, if null none is set
+   * @param serviceDate service day to set, if null none is set
    */
   public static List<TripTimeOnDate> fromTripTimes(
     Timetable table,
     Trip trip,
-    ServiceDay serviceDay
+    LocalDate serviceDate,
+    Instant midnight
   ) {
     TripTimes times = table.getTripTimes(trip);
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
-      out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDay));
+      out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
     }
     return out;
   }
@@ -194,7 +189,7 @@ public class TripTimeOnDate {
     return midnight;
   }
 
-  public ServiceDate getServiceDay() {
+  public LocalDate getServiceDay() {
     return serviceDate;
   }
 

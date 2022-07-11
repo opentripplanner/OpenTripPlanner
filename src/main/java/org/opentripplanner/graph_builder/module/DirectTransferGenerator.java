@@ -16,11 +16,12 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitModelIndex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -58,16 +59,18 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    /* Initialize graph index which is needed by the nearby stop finder. */
-    if (graph.index == null) {
-      graph.index = new GraphIndex(graph);
+    /* Initialize transit model index which is needed by the nearby stop finder. */
+    if (transitModel.index == null) {
+      transitModel.index = new TransitModelIndex(transitModel);
+      transitModel.getStopModel().index();
     }
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
-    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(graph, radiusByDuration);
+    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(graph, transitModel, radiusByDuration);
     if (nearbyStopFinder.useStreets) {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
     } else {
@@ -162,7 +165,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         progress.step(m -> LOG.info(m));
       });
 
-    graph.transfersByStop.putAll(transfersByStop);
+    transitModel.transfersByStop.putAll(transfersByStop);
 
     LOG.info(progress.completeMessage());
     LOG.info(
@@ -170,7 +173,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
-    graph.hasDirectTransfers = true;
+    transitModel.hasDirectTransfers = true;
   }
 
   @Override

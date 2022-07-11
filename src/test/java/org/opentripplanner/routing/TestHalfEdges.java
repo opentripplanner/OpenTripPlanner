@@ -40,11 +40,15 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TestUtils;
 
@@ -58,6 +62,7 @@ public class TestHalfEdges {
   private IntersectionVertex br, tr, bl, tl;
   private TransitStopVertex station1;
   private TransitStopVertex station2;
+  private TransitModel transitModel;
 
   public LineString createGeometry(Vertex a, Vertex b) {
     GeometryFactory factory = new GeometryFactory();
@@ -69,7 +74,10 @@ public class TestHalfEdges {
 
   @BeforeEach
   public void setUp() {
-    graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(stopModel, deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
     // a 0.1 degree x 0.1 degree square
     tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
     tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
@@ -162,14 +170,24 @@ public class TestHalfEdges {
 
     Stop s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
 
-    station1 = new TransitStopVertex(graph, s1, null);
-    station2 = new TransitStopVertex(graph, s2, null);
+    station1 =
+      new TransitStopVertexBuilder()
+        .withGraph(graph)
+        .withStop(s1)
+        .withTransitModel(transitModel)
+        .build();
+    station2 =
+      new TransitStopVertexBuilder()
+        .withGraph(graph)
+        .withStop(s2)
+        .withTransitModel(transitModel)
+        .build();
     station1.addMode(TransitMode.RAIL);
     station2.addMode(TransitMode.RAIL);
 
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
-    graph.hasTransit = true;
+    transitModel.hasTransit = true;
   }
 
   @Test
@@ -551,6 +569,8 @@ public class TestHalfEdges {
   @Test
   public void testStreetLocationFinder() {
     RoutingRequest options = new RoutingRequest();
+    transitModel.index();
+    graph.index();
     StreetVertexIndex finder = graph.getStreetIndex();
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
     // test that the local stop finder finds stops
@@ -622,7 +642,7 @@ public class TestHalfEdges {
   public void testNetworkLinker() {
     int numVerticesBefore = graph.getVertices().size();
     StreetLinkerModule ttsnm = new StreetLinkerModule();
-    ttsnm.buildGraph(graph, new HashMap<>());
+    ttsnm.buildGraph(graph, transitModel, new HashMap<>());
     int numVerticesAfter = graph.getVertices().size();
     assertEquals(4, numVerticesAfter - numVerticesBefore);
     Collection<Edge> outgoing = station1.getOutgoing();

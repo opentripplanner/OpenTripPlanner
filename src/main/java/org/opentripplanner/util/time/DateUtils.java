@@ -2,69 +2,82 @@ package org.opentripplanner.util.time;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.TimeZone;
+import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g) October 20, 2009
  */
-public class DateUtils implements DateConstants {
+public class DateUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 
   private static final int SANITY_CHECK_CUTOFF_YEAR = 1000;
 
+  // NOTE: don't change the order of these strings...the simplest should be on the
+  // bottom...you risk parsing the wrong thing (and ending up with year 0012)
+  private static final List<DateTimeFormatter> DF_LIST = List.of(
+    DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm.ss"),
+    DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm"),
+    DateTimeFormatter.ofPattern("yyyy.MM.dd.HH.mm.ss.SS"),
+    DateTimeFormatter.ofPattern("M.d.yy h.mm a"),
+    DateTimeFormatter.ofPattern("M.d.yyyy h.mm a"),
+    DateTimeFormatter.ofPattern("M.d.yyyy h.mma"),
+    DateTimeFormatter.ofPattern("M.d.yyyy h.mm"),
+    DateTimeFormatter.ofPattern("M.d.yyyy k.mm"),
+    DateTimeFormatter.ofPattern("M.d.yyyy"),
+    DateTimeFormatter.ofPattern("yyyy.M.d"),
+    DateTimeFormatter.ofPattern("h.mm a")
+    // NOTE: don't change the order of these strings...the simplest should be on the
+    // bottom...you risk parsing the wrong thing (and ending up with year 0012)
+  );
+
+  private static final List<DateTimeFormatter> SMALL_DF_LIST = List.of(
+    DateTimeFormatter.ofPattern("M.d.yy"),
+    DateTimeFormatter.ofPattern("yy.M.d"),
+    DateTimeFormatter.ofPattern("h.mm a")
+  );
+
   /**
    * Returns a Date object based on input date and time parameters Defaults to today / now (when
    * date / time are null)
    */
-  public static Date toDate(String date, String time, TimeZone tz) {
+  public static ZonedDateTime toZonedDateTime(String date, String time, ZoneId tz) {
     //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
     LOG.debug("Parsing date {} and time {}", date, time);
     LOG.debug("using timezone {}", tz);
-    Date retVal = new Date();
+    ZonedDateTime retVal = ZonedDateTime.ofInstant(Instant.now(), tz);
     if (date != null) {
-      Date d = parseDate(date, tz);
-      if (d == null) {
+      LocalDate localDate = parseDate(date);
+      if (localDate == null) {
         return null; //unparseable date
       }
-      Calendar cal = new GregorianCalendar(tz);
-      cal.setTime(d);
       boolean timed = false;
       if (time != null) {
-        int[] hms = parseTime(time);
-        if (hms != null) {
-          cal.set(Calendar.HOUR_OF_DAY, hms[0]);
-          cal.set(Calendar.MINUTE, hms[1]);
-          cal.set(Calendar.SECOND, hms[2]);
-          cal.set(Calendar.MILLISECOND, 0);
+        LocalTime localTime = parseTime(time);
+        if (localTime != null) {
+          retVal = LocalDateTime.of(localDate, localTime).atZone(tz);
           timed = true;
         }
       }
       if (!timed) {
         //assume t = now
-        Calendar today = new GregorianCalendar();
-        cal.set(Calendar.HOUR_OF_DAY, today.get(Calendar.HOUR_OF_DAY));
-        cal.set(Calendar.MINUTE, today.get(Calendar.MINUTE));
-        cal.set(Calendar.SECOND, today.get(Calendar.SECOND));
-        cal.set(Calendar.MILLISECOND, today.get(Calendar.MILLISECOND));
+        retVal = LocalDateTime.of(localDate, retVal.toLocalTime()).atZone(tz);
       }
-      retVal = cal.getTime();
     } else if (time != null) {
-      int[] hms = parseTime(time);
-      if (hms != null) {
-        Calendar cal = new GregorianCalendar(tz);
-
-        cal.set(Calendar.HOUR_OF_DAY, hms[0]);
-        cal.set(Calendar.MINUTE, hms[1]);
-        cal.set(Calendar.SECOND, hms[2]);
-        cal.set(Calendar.MILLISECOND, 0);
-        retVal = cal.getTime();
+      LocalTime localTime = parseTime(time);
+      if (localTime != null) {
+        retVal = LocalDateTime.of(retVal.toLocalDate(), localTime).atZone(tz);
       }
     }
     LOG.debug("resulting date is {}", retVal);
@@ -72,8 +85,8 @@ public class DateUtils implements DateConstants {
   }
 
   // TODO: could be replaced with Apache's DateFormat.parseDate ???
-  public static Date parseDate(String input, TimeZone tz) {
-    Date retVal = null;
+  public static LocalDate parseDate(@Nonnull String input) {
+    LocalDate retVal = null;
     try {
       String newString = input
         .trim()
@@ -81,38 +94,34 @@ public class DateUtils implements DateConstants {
         .replace('-', '.')
         .replace(':', '.')
         .replace('/', '.');
-      if (newString != null) {
-        List<String> dl = DF_LIST;
+      List<DateTimeFormatter> dateTimeFormatterList = DF_LIST;
 
-        if (newString.length() <= 8) {
-          if (newString.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
-            // Accept dates without punctuation if they consist of exactly eight digits.
-            newString =
-              newString.substring(0, 4) +
-              '.' +
-              newString.substring(4, 6) +
-              '.' +
-              newString.substring(6, 8);
-          } else if (!(newString.matches(".*20\\d\\d.*"))) {
-            // if it looks like we have a small date format, ala 11.4.09, then use
-            // another set of compares
-            dl = SMALL_DF_LIST;
-          }
+      if (newString.length() <= 8) {
+        if (newString.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
+          // Accept dates without punctuation if they consist of exactly eight digits.
+          newString =
+            newString.substring(0, 4) +
+            '.' +
+            newString.substring(4, 6) +
+            '.' +
+            newString.substring(6, 8);
+        } else if (!(newString.matches(".*20\\d\\d.*"))) {
+          // if it looks like we have a small date format, ala 11.4.09, then use
+          // another set of compares
+          dateTimeFormatterList = SMALL_DF_LIST;
         }
+      }
 
-        for (String df : dl) {
-          SimpleDateFormat sdf = new SimpleDateFormat(df);
-          sdf.setTimeZone(tz);
-          retVal = DateUtils.parseDate(sdf, newString);
+      for (DateTimeFormatter dateTimeFormatter : dateTimeFormatterList) {
+        try {
+          retVal = LocalDate.parse(newString, dateTimeFormatter);
           if (retVal != null) {
-            Calendar cal = new GregorianCalendar(tz);
-            cal.setTime(retVal);
-            int year = cal.get(Calendar.YEAR);
+            int year = retVal.getYear();
             if (year >= SANITY_CHECK_CUTOFF_YEAR) {
               break;
             }
           }
-        }
+        } catch (DateTimeParseException ex) {}
       }
     } catch (Exception ex) {
       throw new RuntimeException("Could not parse " + input);
@@ -163,37 +172,6 @@ public class DateUtils implements DateConstants {
     return retVal;
   }
 
-  public static String formatDate(String sdfFormat, Date date, TimeZone tz) {
-    return formatDate(sdfFormat, date, null, tz);
-  }
-
-  public static String formatDate(String sdfFormat, Date date, String defValue, TimeZone tz) {
-    String retVal = defValue;
-    try {
-      SimpleDateFormat sdf = new SimpleDateFormat(sdfFormat);
-      sdf.setTimeZone(tz);
-      retVal = sdf.format(date);
-    } catch (Exception e) {
-      retVal = defValue;
-    }
-
-    return retVal;
-  }
-
-  public static Date parseDate(String sdf, String string) {
-    return parseDate(new SimpleDateFormat(sdf), string);
-  }
-
-  public static synchronized Date parseDate(SimpleDateFormat sdf, String string) {
-    sdf.setLenient(false);
-    try {
-      return sdf.parse(string);
-    } catch (Exception e) {
-      // log.debug(string + " was not recognized by " + format.toString());
-    }
-    return null;
-  }
-
   public static long absoluteTimeout(Duration timeout) {
     if (timeout == null) {
       return Long.MAX_VALUE;
@@ -202,9 +180,7 @@ public class DateUtils implements DateConstants {
     }
   }
 
-  private static int[] parseTime(String time) {
-    int[] retVal = null;
-
+  private static LocalTime parseTime(String time) {
     boolean amPm = false;
     int addHours = 0;
     int hour = 0, min = 0, sec = 0;
@@ -214,13 +190,7 @@ public class DateUtils implements DateConstants {
       // if we don't have a colon sep string, assume string is int and represents seconds past
       // midnight
       if (hms.length < 2) {
-        int secondsPastMidnight = getIntegerFromString(time);
-        retVal =
-          new int[] {
-            secondsPastMidnight / 3600,
-            (secondsPastMidnight % 3600) / 60,
-            secondsPastMidnight % 60,
-          };
+        return LocalTime.ofSecondOfDay(getIntegerFromString(time));
       }
 
       if (hms[1].endsWith("PM") || hms[1].endsWith("AM")) {
@@ -247,12 +217,10 @@ public class DateUtils implements DateConstants {
         sec = Integer.parseInt(trim(hms[2]));
       }
 
-      retVal = new int[] { hour, min, sec };
+      return LocalTime.of(hour, min, sec);
     } catch (Exception ignore) {
       LOG.info("Time '{}' didn't parse", time);
-      retVal = null;
+      return null;
     }
-
-    return retVal;
   }
 }
