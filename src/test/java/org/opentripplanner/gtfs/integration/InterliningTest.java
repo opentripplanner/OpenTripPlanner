@@ -1,4 +1,4 @@
-package org.opentripplanner.mmri;
+package org.opentripplanner.gtfs.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,6 +31,4 @@ public class InterliningTest extends GtfsTest {
     assertTrue(secondLeg.isInterlinedWithPreviousLeg());
     assertEquals(0, itinerary.getNumberOfTransfers());
   }
-  // TODO test for trips on the same block with no transfer allowed (Trimet special case)
-
 }
