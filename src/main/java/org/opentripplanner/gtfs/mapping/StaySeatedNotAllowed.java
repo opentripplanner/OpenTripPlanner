@@ -1,4 +1,4 @@
-package org.opentripplanner.model.impl;
+package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.transit.model.timetable.Trip;
 

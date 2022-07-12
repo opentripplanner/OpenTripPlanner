@@ -7,9 +7,9 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTi
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.impl.StaySeatedNotAllowed;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.trippattern.Deduplicator;

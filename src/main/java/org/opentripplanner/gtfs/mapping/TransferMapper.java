@@ -12,7 +12,6 @@ import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
 import org.opentripplanner.graph_builder.issues.InvalidGtfsTransfer;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.impl.StaySeatedNotAllowed;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;
