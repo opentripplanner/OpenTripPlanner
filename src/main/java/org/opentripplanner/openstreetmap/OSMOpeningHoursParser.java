@@ -171,11 +171,7 @@ public class OSMOpeningHoursParser {
       .stream()
       .map(dayRange ->
         setWeekDayRangeRangeForOpeningHoursBuilder(
-          calendarBuilder.openingHours(
-            dayRange.toString(),
-            LocalTime.of(0, 0),
-            LocalTime.of(23, 59)
-          ),
+          calendarBuilder.openingHours(dayRange.toString(), LocalTime.MIN, LocalTime.MAX),
           dayRange
         )
       )
@@ -332,14 +328,10 @@ public class OSMOpeningHoursParser {
     }
     if (timeSpan.getEnd() > 1440) {
       return List.of(
-        calendarBuilder.openingHours(
-          description,
-          getStartTime(timeSpan.getStart()),
-          LocalTime.of(23, 59)
-        ),
+        calendarBuilder.openingHours(description, getStartTime(timeSpan.getStart()), LocalTime.MAX),
         calendarBuilder.openingHours(
           description + " after midnight",
-          LocalTime.of(0, 0),
+          LocalTime.MIN,
           getEndTime(timeSpan.getEnd() - 1440),
           true
         )
@@ -364,8 +356,8 @@ public class OSMOpeningHoursParser {
   ) {
     var openingHoursBuilder = calendarBuilder.openingHours(
       "Every day",
-      LocalTime.of(0, 0),
-      LocalTime.of(23, 59)
+      LocalTime.MIN,
+      LocalTime.MAX
     );
     return openingHoursBuilder.everyDay();
   }
@@ -489,7 +481,7 @@ public class OSMOpeningHoursParser {
    */
   private LocalTime getEndTime(int endTimeMinutes) {
     if (endTimeMinutes < 0) {
-      return LocalTime.of(23, 59);
+      return LocalTime.MAX;
     }
     return LocalTime.ofSecondOfDay(Math.min(endTimeMinutes * 60, 86399));
   }

@@ -255,6 +255,6 @@ public class HslParkToVehicleParkingMapper {
   private LocalTime convertTimeStringLocalTime(String timeString) {
     int hours = Integer.parseInt(timeString.substring(0, 2));
     int minutes = timeString.length() > 2 ? Integer.parseInt(timeString.substring(3, 5)) : 0;
-    return hours == 24 ? LocalTime.of(23, 59) : LocalTime.of(hours, minutes);
+    return hours == 24 ? LocalTime.MAX : LocalTime.of(hours, minutes);
   }
 }

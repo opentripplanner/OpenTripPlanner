@@ -45,8 +45,8 @@ class OHCalendarTest {
     calBuilder.openingHours("OCT-25", time(1, 0), time(3, 0)).on(date(Month.OCTOBER, 25)).add();
 
     //  May 17th 22:00 - May 18th 03:00
-    calBuilder.openingHours("17th May", time(22, 0), time(23, 59)).on(date(Month.MAY, 17)).add();
-    calBuilder.openingHours("18th May", time(0, 0), time(2, 0)).on(date(Month.MAY, 17)).add();
+    calBuilder.openingHours("17th May", time(22, 0), LocalTime.MAX).on(date(Month.MAY, 17)).add();
+    calBuilder.openingHours("18th May", LocalTime.MIN, time(2, 0)).on(date(Month.MAY, 17)).add();
 
     //  Possibilities for the adding date methods:
     //  - on(LocalDate)
@@ -64,7 +64,7 @@ class OHCalendarTest {
       "OHCalendar{" +
       "zoneId: Europe/Paris, " +
       "openingHours: [18th May 0:00-2:00, OCT-25 1:00-3:00, " +
-      "1-3. April 8:00-16:30, 17th May 22:00-23:59]" +
+      "1-3. April 8:00-16:30, 17th May 22:00-23:59:59]" +
       "}",
       c.toString()
     );
