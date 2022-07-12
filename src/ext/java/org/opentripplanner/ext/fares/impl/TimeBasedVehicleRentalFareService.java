@@ -37,7 +37,7 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
     var totalCost = itinerary
       .getLegs()
       .stream()
-      .filter(l -> l.getRentedVehicle())
+      .filter(Leg::getRentedVehicle)
       .mapToInt(this::getLegCost)
       .sum();
 
