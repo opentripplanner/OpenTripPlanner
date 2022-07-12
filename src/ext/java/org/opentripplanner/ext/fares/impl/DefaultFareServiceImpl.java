@@ -218,7 +218,7 @@ public class DefaultFareServiceImpl implements FareService {
   }
 
   protected boolean shouldCombineInterlinedLegs() {
-    return false;
+    return true;
   }
 
   private static List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
