@@ -31,6 +31,14 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null,
     null
   );
+  FareProduct singleToOuter = new FareProduct(
+    new FeedScopedId(FEED_ID, "single_to_outer"),
+    "Single one-way ticket to outer zone",
+    Money.euros(100),
+    null,
+    null,
+    null
+  );
   FareProduct dayPass = new FareProduct(
     new FeedScopedId(FEED_ID, "day_pass"),
     "Day Pass",
@@ -77,6 +85,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
       new FareLegRule(FEED_ID, null, null, null, single),
+      new FareLegRule(FEED_ID, null, null, OUTER_ZONE, singleToOuter),
       new FareLegRule(FEED_ID, null, null, null, dayPass),
       new FareLegRule(FEED_ID, express, null, null, expressPass),
       new FareLegRule(FEED_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
@@ -123,5 +132,27 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       List.of(innerToOuterZoneSingle),
       result.productsCoveringItinerary().stream().toList()
     );
+  }
+
+  @Test
+  void onlyToAreaId() {
+    Itinerary i1 = newItinerary(A, 0)
+      .walk(20, B)
+      .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
+      .build();
+
+    var result = service.getProducts(i1);
+    assertEquals(List.of(singleToOuter), result.productsCoveringItinerary().stream().toList());
+  }
+
+  @Test
+  void onlyFromAreaId() {
+    Itinerary i1 = newItinerary(A, 0)
+      .walk(20, OUTER_ZONE_STOP)
+      .faresV2Rail(ID, 0, 50, B, null)
+      .build();
+
+    var result = service.getProducts(i1);
+    assertEquals(List.of(singleToOuter), result.productsCoveringItinerary().stream().toList());
   }
 }
