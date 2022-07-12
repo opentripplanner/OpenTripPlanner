@@ -1249,27 +1249,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
   }
 
-  /** Check if route is preferred according to this request. */
-  public long preferencesPenaltyForRoute(Route route) {
-    long preferences_penalty = 0;
-    FeedScopedId agencyID = route.getAgency().getId();
-    FeedScopedId routeID = route.getId();
-    if (!preferredRoutes.isEmpty() || !preferredAgencies.isEmpty()) {
-      boolean isPreferedRoute = preferredRoutes.contains(routeID);
-      boolean isPreferedAgency = preferredAgencies.contains(agencyID);
-
-      if (!isPreferedRoute && !isPreferedAgency) {
-        preferences_penalty += otherThanPreferredRoutesPenalty;
-      }
-    }
-    boolean isUnpreferedRoute = unpreferredRoutes.contains(routeID);
-    boolean isUnpreferedAgency = unpreferredAgencies.contains(agencyID);
-    if (isUnpreferedRoute || isUnpreferedAgency) {
-      preferences_penalty += unpreferredRouteCost.apply(0);
-    }
-    return preferences_penalty;
-  }
-
   /**
    * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
    * and speed. These three fields of the RoutingRequest should have values between 0 and 1, and
