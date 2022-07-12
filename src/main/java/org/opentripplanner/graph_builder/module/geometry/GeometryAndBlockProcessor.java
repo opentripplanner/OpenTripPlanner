@@ -106,12 +106,6 @@ public class GeometryAndBlockProcessor {
   public void run(Graph graph, TransitModel transitModel, DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
 
-    /* Assign 0-based numeric codes to all GTFS service IDs. */
-    for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
-      // TODO: FIX Service code collision for multiple feeds.
-      transitModel.getServiceCodes().put(serviceId, transitModel.getServiceCodes().size());
-    }
-
     LOG.info("Processing geometries and blocks on graph...");
 
     // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving
@@ -121,9 +115,6 @@ public class GeometryAndBlockProcessor {
     Map<TripPattern, LineString[]> geometriesByTripPattern = new ConcurrentHashMap<>();
 
     Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
-
-    /* Generate unique human-readable names for all the TableTripPatterns. */
-    TripPattern.generateUniqueNames(tripPatterns, issueStore);
 
     /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
     ProgressTracker progress = ProgressTracker.track(
@@ -167,10 +158,6 @@ public class GeometryAndBlockProcessor {
         // Make a single unified geometry, and also store the per-hop split geometries.
         tripPattern.setHopGeometries(hopGeometries);
       }
-      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
-
-      // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
     }
 
     /* Identify interlined trips and create the necessary edges. */

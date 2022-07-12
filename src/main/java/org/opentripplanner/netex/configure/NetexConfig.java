@@ -54,8 +54,6 @@ public class NetexConfig {
     return new NetexModule(
       buildParams.netex.netexFeedId,
       buildParams.getSubwayAccessTimeSeconds(),
-      buildParams.maxInterlineDistance,
-      buildParams.maxStopToShapeSnapDistance,
       buildParams.getTransitServicePeriod(),
       netexBundles
     );
@@ -67,7 +65,8 @@ public class NetexConfig {
       buildParams.netex.netexFeedId,
       source,
       hierarchy(source),
-      buildParams.netex.ferryIdsNotAllowedForBicycle
+      buildParams.netex.ferryIdsNotAllowedForBicycle,
+      buildParams.maxStopToShapeSnapDistance
     );
   }
 

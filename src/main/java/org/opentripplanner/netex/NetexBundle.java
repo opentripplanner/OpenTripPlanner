@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NetexBundle implements Closeable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
+  private static final Logger LOG = LoggerFactory.getLogger(NetexBundle.class);
 
   private final CompositeDataSource source;
 
@@ -42,6 +42,7 @@ public class NetexBundle implements Closeable {
 
   private final String netexFeedId;
   private final Set<String> ferryIdsNotAllowedForBicycle;
+  private final double maxStopToShapeSnapDistance;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
   /** Report errors to issue store */
@@ -54,12 +55,14 @@ public class NetexBundle implements Closeable {
     String netexFeedId,
     CompositeDataSource source,
     NetexDataSourceHierarchy hierarchy,
-    Set<String> ferryIdsNotAllowedForBicycle
+    Set<String> ferryIdsNotAllowedForBicycle,
+    double maxStopToShapeSnapDistance
   ) {
     this.netexFeedId = netexFeedId;
     this.source = source;
     this.hierarchy = hierarchy;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
+    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
   }
 
   /** load the bundle, map it to the OTP transit model and return */
@@ -82,7 +85,8 @@ public class NetexBundle implements Closeable {
         netexFeedId,
         deduplicator,
         issueStore,
-        ferryIdsNotAllowedForBicycle
+        ferryIdsNotAllowedForBicycle,
+        maxStopToShapeSnapDistance
       );
 
     // Load data
