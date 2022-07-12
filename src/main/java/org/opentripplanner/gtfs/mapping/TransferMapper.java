@@ -143,7 +143,7 @@ class TransferMapper {
   private StaySeatedNotAllowed toStaySeatedNotAllowed(Transfer t) {
     Trip fromTrip = tripMapper.map(t.getFromTrip());
     Trip toTrip = tripMapper.map(t.getToTrip());
-    if (t.getTransferType() == STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip)) {
+    if (t.getTransferType() == STAY_SEATED_NOT_ALLOWED) {
       return new StaySeatedNotAllowed(fromTrip, toTrip);
     } else return null;
   }
