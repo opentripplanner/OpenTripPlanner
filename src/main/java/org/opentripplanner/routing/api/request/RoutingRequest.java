@@ -70,7 +70,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RoutingRequest implements Cloneable, Serializable {
 
-
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
