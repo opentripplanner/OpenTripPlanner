@@ -177,7 +177,7 @@ public class InterlineProcessor {
  * This compound key object is used when grouping interlining trips together by (serviceId,
  * blockId).
  */
-record BlockIdAndServiceId(String blockId, FeedScopedId serviceId) {
+private record BlockIdAndServiceId(String blockId, FeedScopedId serviceId) {
   static BlockIdAndServiceId ofTrip(Trip trip) {
     return new BlockIdAndServiceId(trip.getGtfsBlockId(), trip.getServiceId());
   }
