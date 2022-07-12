@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.DoubleFunction;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -68,6 +69,7 @@ import org.slf4j.LoggerFactory;
  *           REST API.
  */
 public class RoutingRequest implements Cloneable, Serializable {
+
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
