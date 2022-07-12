@@ -11,8 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
@@ -90,10 +94,14 @@ public class DefaultFareServiceImpl implements FareService {
 
   @Override
   public Fare getCost(Itinerary itinerary) {
-    List<Ride> rides = RideMapper.ridesForItinerary(itinerary);
-
+    var fareLegs = itinerary
+      .getLegs()
+      .stream()
+      .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
+      .map(Leg.class::cast)
+      .toList();
     // If there are no rides, there's no fare.
-    if (rides.size() == 0) {
+    if (fareLegs.isEmpty()) {
       return null;
     }
 
@@ -108,7 +116,7 @@ public class DefaultFareServiceImpl implements FareService {
         currency =
           Currency.getInstance(fareRules.iterator().next().getFareAttribute().getCurrencyType());
       }
-      hasFare = populateFare(fare, currency, fareType, rides, fareRules);
+      hasFare = populateFare(fare, currency, fareType, fareLegs, fareRules);
     }
     return hasFare ? fare : null;
   }
@@ -122,13 +130,13 @@ public class DefaultFareServiceImpl implements FareService {
     return new Money(new WrappedCurrency(currency), cents);
   }
 
-  protected float addFares(List<Ride> ride0, List<Ride> ride1, float cost0, float cost1) {
+  protected float addFares(List<Leg> ride0, List<Leg> ride1, float cost0, float cost1) {
     return cost0 + cost1;
   }
 
   protected float getLowestCost(
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     FareSearch r = performSearch(fareType, rides, fareRules);
@@ -155,7 +163,7 @@ public class DefaultFareServiceImpl implements FareService {
     Fare fare,
     Currency currency,
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     FareSearch r = performSearch(fareType, rides, fareRules);
@@ -179,7 +187,7 @@ public class DefaultFareServiceImpl implements FareService {
       FeedScopedId fareId = r.fareIds[start][via];
       FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
       for (int i = start; i <= via; ++i) {
-        detail.addRoute(rides.get(i).route);
+        detail.addRoute(rides.get(i).getRoute().getId());
       }
       details.add(detail);
       ++count;
@@ -193,7 +201,7 @@ public class DefaultFareServiceImpl implements FareService {
 
   protected float calculateCost(
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     return getBestFareAndId(fareType, rides, fareRules).fare;
@@ -201,7 +209,7 @@ public class DefaultFareServiceImpl implements FareService {
 
   private FareSearch performSearch(
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     FareSearch r = new FareSearch(rides.size());
@@ -245,7 +253,7 @@ public class DefaultFareServiceImpl implements FareService {
 
   private FareAndId getBestFareAndId(
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
     Set<String> zones = new HashSet<>();
@@ -253,25 +261,25 @@ public class DefaultFareServiceImpl implements FareService {
     Set<FeedScopedId> trips = new HashSet<>();
     int transfersUsed = -1;
 
-    Ride firstRide = rides.get(0);
-    ZonedDateTime startTime = firstRide.startTime;
-    String startZone = firstRide.startZone;
-    String endZone = firstRide.endZone;
+    var firstRide = legs.get(0);
+    ZonedDateTime startTime = firstRide.getStartTime();
+    String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
+    String endZone = firstRide.getTo().stop.getFirstZoneAsString();
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.firstStop.getId().getFeedId();
-    ZonedDateTime lastRideStartTime = firstRide.startTime;
-    ZonedDateTime lastRideEndTime = firstRide.endTime;
-    for (Ride ride : rides) {
-      if (!ride.firstStop.getId().getFeedId().equals(feedId)) {
-        LOG.debug("skipped multi-feed ride sequence {}", rides);
+    String feedId = firstRide.getFrom().stop.getId().getFeedId();
+    ZonedDateTime lastRideStartTime = firstRide.getStartTime();
+    ZonedDateTime lastRideEndTime = firstRide.getEndTime();
+    for (var leg : legs) {
+      if (!leg.getFrom().stop.getId().getFeedId().equals(feedId)) {
+        LOG.debug("skipped multi-feed ride sequence {}", legs);
         return new FareAndId(Float.POSITIVE_INFINITY, null);
       }
-      lastRideStartTime = ride.startTime;
-      lastRideEndTime = ride.endTime;
-      endZone = ride.endZone;
-      routes.add(ride.route);
-      zones.addAll(ride.zones);
-      trips.add(ride.trip);
+      lastRideStartTime = leg.getStartTime();
+      lastRideEndTime = leg.getEndTime();
+      endZone = leg.getTo().stop.getFirstZoneAsString();
+      routes.add(leg.getRoute().getId());
+      zones.addAll(leg.getFareZones().stream().map(z -> z.getId().getId()).toList());
+      trips.add(leg.getTrip().getId());
       transfersUsed += 1;
     }
 
@@ -313,9 +321,9 @@ public class DefaultFareServiceImpl implements FareService {
         }
       }
     }
-    LOG.debug("{} best for {}", bestAttribute, rides);
+    LOG.debug("{} best for {}", bestAttribute, legs);
     if (bestFare == Float.POSITIVE_INFINITY) {
-      LOG.debug("No fare for a ride sequence: {}", rides);
+      LOG.debug("No fare for a ride sequence: {}", legs);
     }
     return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
   }
