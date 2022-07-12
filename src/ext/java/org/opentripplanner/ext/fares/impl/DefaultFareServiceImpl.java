@@ -222,60 +222,30 @@ public class DefaultFareServiceImpl implements FareService {
   }
 
   private static List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
-    return fareLegs
-      .stream()
-      .collect(
-        new Collector<Leg, List<Leg>, List<Leg>>() {
-          @Override
-          public Supplier<List<Leg>> supplier() {
-            return ArrayList::new;
-          }
-
-          @Override
-          public BiConsumer<List<Leg>, Leg> accumulator() {
-            return (legs, leg) -> {
-              if (leg.isInterlinedWithPreviousLeg() && leg instanceof ScheduledTransitLeg stl) {
-                var previousLeg = (ScheduledTransitLeg) legs.get(legs.size() - 1);
-                var combinedLeg = new ScheduledTransitLeg(
-                  previousLeg.getTripTimes(),
-                  previousLeg.getTripPattern(),
-                  0,
-                  0,
-                  previousLeg.getStartTime(),
-                  stl.getEndTime(),
-                  stl.getServiceDate(),
-                  stl.getZoneId(),
-                  null,
-                  null,
-                  0,
-                  null
-                );
-                legs.add(legs.size() - 1, combinedLeg);
-              } else {
-                legs.add(leg);
-              }
-            };
-          }
-
-          @Override
-          public BinaryOperator<List<Leg>> combiner() {
-            return (l1, l2) -> {
-              l1.addAll(l2);
-              return l1;
-            };
-          }
-
-          @Override
-          public Function<List<Leg>, List<Leg>> finisher() {
-            return List::copyOf;
-          }
-
-          @Override
-          public Set<Characteristics> characteristics() {
-            return Set.of();
-          }
-        }
-      );
+    var result = new ArrayList<Leg>();
+    for (var leg : fareLegs) {
+      if (leg.isInterlinedWithPreviousLeg() && leg instanceof ScheduledTransitLeg stl) {
+        var previousLeg = (ScheduledTransitLeg) result.get(result.size() - 1);
+        var combinedLeg = new ScheduledTransitLeg(
+          previousLeg.getTripTimes(),
+          previousLeg.getTripPattern(),
+          0,
+          0,
+          previousLeg.getStartTime(),
+          stl.getEndTime(),
+          stl.getServiceDate(),
+          stl.getZoneId(),
+          null,
+          null,
+          0,
+          null
+        );
+        result.add(result.size() - 1, combinedLeg);
+      } else {
+        result.add(leg);
+      }
+    }
+    return result;
   }
 
   private FareSearch performSearch(
