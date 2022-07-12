@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
-import java.util.Collections;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.junit.jupiter.api.Test;
@@ -58,8 +57,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       new HierarchicalMapById<>(),
       new HierarchicalMap<>(),
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     limitation.withWheelchairAccess(wheelchairLimitation);
@@ -88,8 +86,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       new HierarchicalMapById<>(),
       new HierarchicalMap<>(),
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     ServiceJourney serviceJourney = createExampleServiceJourney();
@@ -130,8 +127,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       routeById,
       journeyPatternById,
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);

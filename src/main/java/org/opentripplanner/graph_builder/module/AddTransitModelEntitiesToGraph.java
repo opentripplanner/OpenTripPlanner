@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.distance;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.BoardingArea;
@@ -102,6 +104,8 @@ public class AddTransitModelEntitiesToGraph {
     }
     addFeedInfoToGraph(transitModel);
     addAgenciesToGraph(transitModel);
+    addServicesToTransitModel(transitModel);
+    addTripPatternsToTransitModel(transitModel);
 
     /* Interpret the transfers explicitly defined in transfers.txt. */
     addTransfersToGraph(transitModel);
@@ -382,6 +386,28 @@ public class AddTransitModelEntitiesToGraph {
 
   private void addTransfersToGraph(TransitModel transitModel) {
     transitModel.getTransferService().addAll(otpTransitService.getAllTransfers());
+  }
+
+  private void addServicesToTransitModel(TransitModel transitModel) {
+    /* Assign 0-based numeric codes to all GTFS service IDs. */
+    for (FeedScopedId serviceId : otpTransitService.getAllServiceIds()) {
+      transitModel.getServiceCodes().put(serviceId, transitModel.getServiceCodes().size());
+    }
+  }
+
+  private void addTripPatternsToTransitModel(TransitModel transitModel) {
+    Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns();
+
+    /* Generate unique human-readable names for all the TableTripPatterns. */
+    TripPattern.generateUniqueNames(tripPatterns);
+
+    /* Loop over all new TripPatterns setting the service codes. */
+    for (TripPattern tripPattern : tripPatterns) {
+      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
+
+      // Store the tripPattern in the Graph so it will be serialized and usable in routing.
+      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
+    }
   }
 
   private void addFlexTripsToGraph(TransitModel transitModel) {
