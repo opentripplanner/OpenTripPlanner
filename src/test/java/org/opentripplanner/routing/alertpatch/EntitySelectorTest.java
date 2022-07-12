@@ -3,8 +3,8 @@ package org.opentripplanner.routing.alertpatch;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class EntitySelectorTest {
@@ -31,13 +31,13 @@ public class EntitySelectorTest {
     // Assert match on specific date
     assertNotEquals(
       key,
-      new EntitySelector.StopAndTrip(stopId, tripId, new ServiceDate(2021, 01, 01))
+      new EntitySelector.StopAndTrip(stopId, tripId, LocalDate.of(2021, 01, 01))
     );
 
     // Assert match on another specific date
     assertNotEquals(
       key,
-      new EntitySelector.StopAndTrip(stopId, tripId, new ServiceDate(2021, 01, 31))
+      new EntitySelector.StopAndTrip(stopId, tripId, LocalDate.of(2021, 01, 31))
     );
   }
 
@@ -52,7 +52,7 @@ public class EntitySelectorTest {
     FeedScopedId stopId = new FeedScopedId("T", "123");
     FeedScopedId tripId = new FeedScopedId("T", "234");
 
-    final ServiceDate serviceDate = new ServiceDate(2021, 01, 01);
+    final LocalDate serviceDate = LocalDate.of(2021, 01, 01);
 
     final EntitySelector.StopAndTrip key = new EntitySelector.StopAndTrip(
       stopId,
@@ -67,7 +67,7 @@ public class EntitySelectorTest {
     assertEquals(key, new EntitySelector.StopAndTrip(stopId, tripId, serviceDate));
 
     // Assert NO match on another date
-    assertNotEquals(key, new EntitySelector.StopAndTrip(stopId, tripId, serviceDate.next()));
+    assertNotEquals(key, new EntitySelector.StopAndTrip(stopId, tripId, serviceDate.plusDays(1)));
   }
 
   @Test
@@ -92,7 +92,7 @@ public class EntitySelectorTest {
     assertEquals(key, new EntitySelector.Trip(tripId, null));
 
     // Assert match on specific date.
-    assertEquals(key, new EntitySelector.Trip(tripId, new ServiceDate(2021, 01, 01)));
+    assertEquals(key, new EntitySelector.Trip(tripId, LocalDate.of(2021, 1, 1)));
   }
 
   @Test
@@ -105,7 +105,7 @@ public class EntitySelectorTest {
          */
 
     final FeedScopedId tripId = new FeedScopedId("T", "234");
-    final ServiceDate serviceDate = new ServiceDate(2021, 01, 01);
+    final LocalDate serviceDate = LocalDate.of(2021, 1, 1);
 
     final EntitySelector.Trip key = new EntitySelector.Trip(tripId, serviceDate);
 
@@ -116,6 +116,6 @@ public class EntitySelectorTest {
     assertEquals(key, new EntitySelector.Trip(tripId, serviceDate));
 
     // Assert NO match on another date
-    assertNotEquals(key, new EntitySelector.Trip(tripId, serviceDate.next()));
+    assertNotEquals(key, new EntitySelector.Trip(tripId, serviceDate.plusDays(1)));
   }
 }

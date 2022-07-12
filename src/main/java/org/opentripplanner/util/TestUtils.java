@@ -3,8 +3,6 @@ package org.opentripplanner.util;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 public class TestUtils {
 
@@ -44,13 +42,16 @@ public class TestUtils {
     int minute,
     int second
   ) {
-    TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
-    GregorianCalendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
-    calendar.setTimeZone(timeZone);
-    return calendar.getTimeInMillis() / 1000;
-  }
-
-  public static long toSeconds(GregorianCalendar time) {
-    return time.getTimeInMillis() / 1000;
+    ZonedDateTime time = ZonedDateTime.of(
+      year,
+      month + 1,
+      day,
+      hour,
+      minute,
+      second,
+      0,
+      ZoneId.of(timeZoneId)
+    );
+    return time.toEpochSecond();
   }
 }

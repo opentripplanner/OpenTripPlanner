@@ -56,7 +56,7 @@ class StopMapper {
       .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
       .withWheelchairAccessibility(wheelchair)
       .withVehicleType(transitMode.first)
-      .withNetexSubmode(transitMode.second);
+      .withNetexVehicleSubmode(transitMode.second);
 
     builder.fareZones().addAll(fareZones);
 

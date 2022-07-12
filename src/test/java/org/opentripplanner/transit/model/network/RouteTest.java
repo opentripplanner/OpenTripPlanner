@@ -7,16 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLevel;
 
 class RouteTest {
 
@@ -24,22 +19,11 @@ class RouteTest {
   private static final String SHORT_NAME = "short name";
   private static final String LONG_NAME = "long name";
   private static final String DESCRIPTION = "description";
-  private static final Station PARENT_STATION = TransitModelForTest.station("stationId").build();
-  private static final String CODE = "code";
 
-  public static final WgsCoordinate COORDINATE = new WgsCoordinate(0, 0);
-  private static final StopLevel LEVEL = new StopLevel("level", 0);
-  private static final WheelchairAccessibility WHEELCHAIR_ACCESSIBILITY =
-    WheelchairAccessibility.POSSIBLE;
-
-  public static final String HEAD_SIGN = "head sign";
   private static final BikeAccess BIKE_ACCESS = BikeAccess.ALLOWED;
   private static final TransitMode TRANSIT_MODE = TransitMode.BUS;
-  private static final String BLOCK_ID = "blockId";
-  private static final String FARE_ID = "fareId";
-  private static final TripAlteration TRIP_ALTERATION = TripAlteration.CANCELLATION;
-  private static final String NETEX_SUBMODE = "submode";
-  private static final String NETEX_INTERNAL_PLANNING_CODE = "internalPlanningCode";
+  private static final String NETEX_SUBMODE_NAME = "submode";
+  private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
   private static final Operator OPERATOR = Operator
     .of(FeedScopedId.parseId("x:operatorId"))
     .withName("operator name")
@@ -62,7 +46,7 @@ class RouteTest {
     .withDescription(DESCRIPTION)
     .withBikesAllowed(BIKE_ACCESS)
     .withMode(TRANSIT_MODE)
-    .withNetexSubmode(NETEX_SUBMODE)
+    .withNetexSubmode(NETEX_SUBMODE_NAME)
     .withOperator(OPERATOR)
     .withAgency(AGENCY)
     .withBranding(BRANDING)

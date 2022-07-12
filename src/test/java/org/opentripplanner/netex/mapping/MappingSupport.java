@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -54,7 +54,7 @@ public class MappingSupport {
    * @return the value wrapped in a JAXBElement
    */
   @SuppressWarnings("unchecked")
-  public static <T> JAXBElement<T> createJaxbElement(@NotNull T value) {
+  public static <T> JAXBElement<T> createJaxbElement(@Nonnull T value) {
     return new JAXBElement<>(new QName("x"), (Class<T>) value.getClass(), value);
   }
 }

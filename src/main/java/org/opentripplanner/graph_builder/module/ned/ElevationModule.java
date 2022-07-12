@@ -39,6 +39,7 @@ import org.opentripplanner.routing.edgetype.StreetElevationExtension;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -136,6 +137,7 @@ public class ElevationModule implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {

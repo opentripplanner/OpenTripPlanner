@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,15 +10,15 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedCall;
@@ -246,9 +247,9 @@ public class SiriFuzzyTripMatcher {
    */
   public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDateAndMode(
     String internalPlanningCode,
-    ServiceDate serviceDate,
+    LocalDate serviceDate,
     TransitMode mode,
-    String transportSubmode
+    SubMode transportSubmode
   ) {
     Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(internalPlanningCode);
 
@@ -260,7 +261,7 @@ public class SiriFuzzyTripMatcher {
     for (Trip trip : cachedTripsBySiriId) {
       final TripPattern tripPattern = transitService.getPatternForTrip().get(trip);
       if (tripPattern.matchesModeOrSubMode(mode, transportSubmode)) {
-        Set<ServiceDate> serviceDates = transitService
+        Set<LocalDate> serviceDates = transitService
           .getCalendarService()
           .getServiceDatesForServiceId(trip.getServiceId());
         if (
@@ -313,7 +314,7 @@ public class SiriFuzzyTripMatcher {
 
         if (
           tripPattern != null &&
-          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, "railReplacementBus")
+          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, SubMode.of("railReplacementBus"))
         ) {
           if (trip.getNetexInternalPlanningCode() != null) {
             String internalPlanningCode = trip.getNetexInternalPlanningCode();
@@ -394,15 +395,15 @@ public class SiriFuzzyTripMatcher {
     String lastStopPoint,
     ZonedDateTime arrivalTime
   ) {
-    int secondsSinceMidnight = DateMapper.secondsSinceStartOfService(
+    int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime,
       arrivalTime,
-      transitService.getTimeZone().toZoneId()
+      transitService.getTimeZone()
     );
-    int secondsSinceMidnightYesterday = DateMapper.secondsSinceStartOfService(
+    int secondsSinceMidnightYesterday = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime.minusDays(1),
       arrivalTime,
-      transitService.getTimeZone().toZoneId()
+      transitService.getTimeZone()
     );
 
     Set<Trip> trips = start_stop_tripCache.get(

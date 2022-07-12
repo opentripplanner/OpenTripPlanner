@@ -11,7 +11,6 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -37,7 +36,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    var graph = graphOf(
+    var otpModel = graphOf(
       new Builder() {
         @Override
         public void build() {
@@ -118,10 +117,11 @@ class StreetGraphFinderTest extends GraphRoutingTest {
       }
     );
 
-    graph.index = new GraphIndex(graph);
+    var graph = otpModel.graph;
+    var transitModel = otpModel.transitModel;
 
-    routingService = new RoutingService(graph);
-    transitService = new DefaultTransitService(graph);
+    routingService = new RoutingService(graph, transitModel);
+    transitService = new DefaultTransitService(transitModel);
     graphFinder = new StreetGraphFinder(graph);
   }
 

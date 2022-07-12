@@ -2,14 +2,16 @@ package org.opentripplanner.model.plan;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -19,59 +21,55 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class StreetLeg implements Leg {
 
   private final TraverseMode mode;
-
   private final ZonedDateTime startTime;
-
   private final ZonedDateTime endTime;
-
   private final double distanceMeters;
-
   private final Place from;
-
   private final Place to;
+  private final int generalizedCost;
+  private final Double elevationLost;
+  private final Double elevationGained;
 
   private final LineString legGeometry;
   private final List<WalkStep> walkSteps;
-  private final Set<StreetNote> streetNotes = new HashSet<>();
-  private final int generalizedCost;
+  private final Set<StreetNote> streetNotes;
   private final List<P2<Double>> legElevation;
-  private Double elevationLost = null;
-  private Double elevationGained = null;
 
-  private FeedScopedId pathwayId;
-  private Boolean walkingBike;
-  private Boolean rentedVehicle;
-  private String vehicleRentalNetwork;
+  private final FeedScopedId pathwayId;
+  private final Boolean walkingBike;
+  private final Boolean rentedVehicle;
+  private final String vehicleRentalNetwork;
 
-  public StreetLeg(
-    TraverseMode mode,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime,
-    Place from,
-    Place to,
-    double distanceMeters,
-    int generalizedCost,
-    LineString geometry,
-    List<P2<Double>> elevation,
-    List<WalkStep> walkSteps
-  ) {
-    if (mode.isTransit()) {
+  private final Float accessibilityScore;
+
+  public StreetLeg(StreetLegBuilder builder) {
+    if (builder.getMode().isTransit()) {
       throw new IllegalArgumentException(
         "To create a transit leg use the other classes implementing Leg."
       );
     }
-    this.mode = mode;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.distanceMeters = distanceMeters;
-    this.from = from;
-    this.to = to;
-    this.generalizedCost = generalizedCost;
-    this.legElevation = elevation;
-    this.legGeometry = geometry;
-    this.walkSteps = walkSteps;
+    this.mode = builder.getMode();
+    this.startTime = builder.getStartTime();
+    this.endTime = builder.getEndTime();
+    this.distanceMeters = DoubleUtils.roundTo2Decimals(builder.getDistanceMeters());
+    this.from = builder.getFrom();
+    this.to = builder.getTo();
+    this.generalizedCost = builder.getGeneralizedCost();
+    this.legElevation = normalizeElevation(builder.getElevation());
+    this.legGeometry = builder.getGeometry();
+    this.walkSteps = builder.getWalkSteps();
+    this.elevationGained = calculateElevationGained(legElevation);
+    this.elevationLost = calculateElevationLost(legElevation);
+    this.streetNotes = Set.copyOf(builder.getStreetNotes());
+    this.pathwayId = builder.getPathwayId();
+    this.walkingBike = builder.getWalkingBike();
+    this.rentedVehicle = builder.getRentedVehicle();
+    this.vehicleRentalNetwork = builder.getVehicleRentalNetwork();
+    this.accessibilityScore = builder.getAccessibilityScore();
+  }
 
-    updateElevationChanges();
+  public static StreetLegBuilder create() {
+    return new StreetLegBuilder();
   }
 
   @Override
@@ -112,10 +110,6 @@ public class StreetLeg implements Leg {
   @Override
   public FeedScopedId getPathwayId() {
     return pathwayId;
-  }
-
-  public void setPathwayId(FeedScopedId pathwayId) {
-    this.pathwayId = pathwayId;
   }
 
   @Override
@@ -163,8 +157,10 @@ public class StreetLeg implements Leg {
     return walkingBike;
   }
 
-  public void setWalkingBike(Boolean walkingBike) {
-    this.walkingBike = walkingBike;
+  @Override
+  @Nullable
+  public Float accessibilityScore() {
+    return accessibilityScore;
   }
 
   @Override
@@ -172,17 +168,9 @@ public class StreetLeg implements Leg {
     return rentedVehicle;
   }
 
-  public void setRentedVehicle(Boolean rentedVehicle) {
-    this.rentedVehicle = rentedVehicle;
-  }
-
   @Override
   public String getVehicleRentalNetwork() {
     return vehicleRentalNetwork;
-  }
-
-  public void setVehicleRentalNetwork(String network) {
-    vehicleRentalNetwork = network;
   }
 
   @Override
@@ -190,31 +178,17 @@ public class StreetLeg implements Leg {
     return generalizedCost;
   }
 
-  public void addStretNote(StreetNote streetNote) {
-    streetNotes.add(streetNote);
-  }
-
   @Override
   public Leg withTimeShift(Duration duration) {
-    StreetLeg copy = new StreetLeg(
-      mode,
-      startTime.plus(duration),
-      endTime.plus(duration),
-      from,
-      to,
-      distanceMeters,
-      generalizedCost,
-      legGeometry,
-      legElevation,
-      walkSteps
-    );
+    return StreetLegBuilder
+      .of(this)
+      .withStartTime(startTime.plus(duration))
+      .withEndTime(endTime.plus(duration))
+      .build();
+  }
 
-    copy.setPathwayId(pathwayId);
-    copy.setWalkingBike(walkingBike);
-    copy.setRentedVehicle(rentedVehicle);
-    copy.setVehicleRentalNetwork(vehicleRentalNetwork);
-
-    return copy;
+  public StreetLeg withAccessibilityScore(float accessibilityScore) {
+    return StreetLegBuilder.of(this).withAccessibilityScore(accessibilityScore).build();
   }
 
   /**
@@ -244,27 +218,46 @@ public class StreetLeg implements Leg {
       .toString();
   }
 
-  private void updateElevationChanges() {
-    if (legElevation != null) {
-      double elevationGained = 0.0;
-      double elevationLost = 0.0;
+  static List<P2<Double>> normalizeElevation(List<P2<Double>> elevation) {
+    return elevation == null
+      ? null
+      : elevation
+        .stream()
+        .map(it ->
+          new P2<>(DoubleUtils.roundTo2Decimals(it.first), DoubleUtils.roundTo2Decimals(it.second))
+        )
+        .toList();
+  }
 
-      Double lastElevation = null;
-      for (final P2<Double> p2 : legElevation) {
-        double elevation = p2.second;
-        if (lastElevation != null) {
-          double change = elevation - lastElevation;
-          if (change > 0) {
-            elevationGained += change;
-          } else if (change < 0) {
-            elevationLost -= change;
-          }
-        }
-        lastElevation = elevation;
-      }
+  private static Double calculateElevationGained(List<P2<Double>> legElevation) {
+    return calculateElevationChange(legElevation, v -> v > 0.0);
+  }
 
-      this.elevationGained = elevationGained;
-      this.elevationLost = elevationLost;
+  private static Double calculateElevationLost(List<P2<Double>> legElevation) {
+    return calculateElevationChange(legElevation, v -> v < 0.0);
+  }
+
+  private static Double calculateElevationChange(
+    List<P2<Double>> legElevation,
+    Predicate<Double> elevationFilter
+  ) {
+    if (legElevation == null) {
+      return null;
     }
+    double sum = 0.0;
+    Double lastElevation = null;
+
+    for (final P2<Double> p2 : legElevation) {
+      double elevation = p2.second;
+      if (lastElevation != null) {
+        double change = elevation - lastElevation;
+        if (elevationFilter.test(change)) {
+          sum += Math.abs(change);
+        }
+      }
+      lastElevation = elevation;
+    }
+
+    return DoubleUtils.roundTo2Decimals(sum);
   }
 }

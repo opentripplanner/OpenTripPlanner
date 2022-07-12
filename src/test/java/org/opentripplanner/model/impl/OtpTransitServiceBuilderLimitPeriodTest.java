@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +17,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -37,10 +37,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public class OtpTransitServiceBuilderLimitPeriodTest {
 
-  private static final ServiceDate D0 = new ServiceDate(2020, 1, 1);
-  private static final ServiceDate D1 = new ServiceDate(2020, 1, 8);
-  private static final ServiceDate D2 = new ServiceDate(2020, 1, 15);
-  private static final ServiceDate D3 = new ServiceDate(2020, 1, 31);
+  private static final LocalDate D0 = LocalDate.of(2020, 1, 1);
+  private static final LocalDate D1 = LocalDate.of(2020, 1, 8);
+  private static final LocalDate D2 = LocalDate.of(2020, 1, 15);
+  private static final LocalDate D3 = LocalDate.of(2020, 1, 31);
   private static final FeedScopedId SERVICE_C_IN = TransitModelForTest.id("CalSrvIn");
   private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
   private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
@@ -155,8 +155,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
   private static ServiceCalendar createServiceCalendar(
     FeedScopedId serviceId,
-    ServiceDate start,
-    ServiceDate end
+    LocalDate start,
+    LocalDate end
   ) {
     ServiceCalendar calendar = new ServiceCalendar();
     calendar.setPeriod(new ServiceDateInterval(start, end));

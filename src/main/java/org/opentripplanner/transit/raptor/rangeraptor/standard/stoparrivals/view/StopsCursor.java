@@ -6,8 +6,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StdStopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 /**
@@ -23,12 +23,12 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  */
 public class StopsCursor<T extends RaptorTripSchedule> {
 
-  private final StopArrivals<T> arrivals;
+  private final StdStopArrivals<T> arrivals;
   private final TransitCalculator<T> transitCalculator;
   private final ToIntFunction<RaptorTripPattern> boardSlackProvider;
 
   public StopsCursor(
-    StopArrivals<T> arrivals,
+    StdStopArrivals<T> arrivals,
     TransitCalculator<T> transitCalculator,
     ToIntFunction<RaptorTripPattern> boardSlackProvider
   ) {

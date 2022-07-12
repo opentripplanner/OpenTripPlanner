@@ -27,6 +27,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.util.HttpUtils;
@@ -142,10 +143,11 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) throws Exception {
+  public void setup(Graph graph, TransitModel transitModel) throws Exception {
     // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
     //           - Ideally we should inject the snapshotSource on this class.
-    snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+    snapshotSource =
+      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
   }
 
   @Override
@@ -366,8 +368,13 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
           );
         }
 
-        var f = saveResultOnGraph.execute(graph ->
-          snapshotSource.applyEstimatedTimetable(graph, feedId, false, estimatedTimetableDeliveries)
+        var f = saveResultOnGraph.execute((graph, transitModel) ->
+          snapshotSource.applyEstimatedTimetable(
+            transitModel,
+            feedId,
+            false,
+            estimatedTimetableDeliveries
+          )
         );
 
         if (!isPrimed()) {

@@ -6,9 +6,13 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
-import java.util.stream.Collectors;
+import java.util.function.Function;
+import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
+import org.opentripplanner.ext.fares.FaresFilter;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
@@ -21,14 +25,17 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveP
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
+import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.Station;
 
 /**
  * Create a filter chain based on the given config.
@@ -53,6 +60,10 @@ public class ItineraryListFilterChainBuilder {
   private Instant latestDepartureTimeLimit = null;
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
+  private double wheelchairMaxSlope;
+  private FareService faresService;
+  private TransitAlertService transitAlertService;
+  private Function<Station, MultiModalStation> getMultiModalStation;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -220,8 +231,21 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withAccessibilityScore(boolean enable) {
+  /**
+   * Enable the IBI feature for calculating a very simple numeric accessibility score between 0 and
+   * 1 for each leg in the itinerary.
+   */
+  public ItineraryListFilterChainBuilder withAccessibilityScore(
+    boolean enable,
+    double wheelchairMaxSlope
+  ) {
     this.accessibilityScore = enable;
+    this.wheelchairMaxSlope = wheelchairMaxSlope;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withFares(FareService fareService) {
+    this.faresService = fareService;
     return this;
   }
 
@@ -237,7 +261,15 @@ public class ItineraryListFilterChainBuilder {
     }
 
     if (accessibilityScore) {
-      filters.add(new AccessibilityScoreFilter());
+      filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
+    }
+
+    if (faresService != null) {
+      filters.add(new FaresFilter(faresService));
+    }
+
+    if (transitAlertService != null) {
+      filters.add(new TransitAlertFilter(transitAlertService, getMultiModalStation));
     }
 
     // Filter transit itineraries on generalized-cost
@@ -318,6 +350,16 @@ public class ItineraryListFilterChainBuilder {
     return new ItineraryListFilterChain(filters, debug);
   }
 
+  public ItineraryListFilterChainBuilder withTransitAlerts(
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
+  ) {
+    this.transitAlertService = transitAlertService;
+    this.getMultiModalStation = getMultiModalStation;
+
+    return this;
+  }
+
   /**
    * These filters will group the itineraries by the main-legs and reduce the number of itineraries
    * in each group. The main legs is the legs that together constitute more than a given　percentage
@@ -332,7 +374,7 @@ public class ItineraryListFilterChainBuilder {
     List<GroupBySimilarity> groupBy = groupBySimilarity
       .stream()
       .sorted(Comparator.comparingDouble(o -> o.groupByP))
-      .collect(Collectors.toList());
+      .toList();
 
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 

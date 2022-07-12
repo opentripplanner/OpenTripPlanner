@@ -22,6 +22,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -65,7 +66,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) {
+  public void setup(Graph graph, TransitModel transitModel) {
     // Creation of network linker library will not modify the graph
     linker = graph.getLinker();
     // Adding a vehicle parking station service needs a graph writer runnable
@@ -105,7 +106,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(Graph graph) {
+    public void run(Graph graph, TransitModel transitModel) {
       // Apply stations to graph
       /* Add any new park and update space available for existing parks */
       Set<VehicleParking> toAdd = new HashSet<>();

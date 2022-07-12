@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
@@ -13,18 +14,13 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  */
 public final class WgsCoordinate implements Serializable {
 
-  /**
-   * A epsilon of 1E-7 gives a precision for coordinates at equator at 1.1 cm, which is good enough
-   * for compering most coordinates in OTP.
-   */
-  private static final double EPSILON = 1E-7;
-
   private final double latitude;
   private final double longitude;
 
   public WgsCoordinate(double latitude, double longitude) {
-    this.latitude = latitude;
-    this.longitude = longitude;
+    // Normalize coordinates to precision around ~ 1 centimeters (7 decimals)
+    this.latitude = DoubleUtils.roundTo7Decimals(latitude);
+    this.longitude = DoubleUtils.roundTo7Decimals(longitude);
   }
 
   /**
@@ -100,10 +96,7 @@ public final class WgsCoordinate implements Serializable {
    * but {@code x.sameLocation(z)} is {@code false}.
    */
   public boolean sameLocation(WgsCoordinate other) {
-    if (this == other) {
-      return true;
-    }
-    return isCloseTo(latitude, other.latitude) && isCloseTo(longitude, other.longitude);
+    return equals(other);
   }
 
   /**
@@ -116,9 +109,9 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
-   * Return true if the coordinates are numerically equal.
-   * Use {@link #sameLocation(WgsCoordinate)} instead for checking if coordinates are so close
-   * to each other that they are geographically identical for all practical purposes.
+   * Return true if the coordinates are numerically equal. The coordinate latitude and longitude
+   * are rounded to the closest number of 1E-7 when constructed. This enforces two coordinates
+   * that is close together to be equals.
    */
   @Override
   public boolean equals(Object o) {
@@ -128,19 +121,12 @@ public final class WgsCoordinate implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WgsCoordinate that = (WgsCoordinate) o;
-    return (
-      Double.compare(that.latitude, latitude) == 0 && Double.compare(that.longitude, longitude) == 0
-    );
+    WgsCoordinate other = (WgsCoordinate) o;
+    return latitude == other.latitude && longitude == other.longitude;
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(latitude, longitude);
-  }
-
-  private static boolean isCloseTo(double a, double b) {
-    double delta = Math.abs(a - b);
-    return delta < EPSILON;
   }
 }

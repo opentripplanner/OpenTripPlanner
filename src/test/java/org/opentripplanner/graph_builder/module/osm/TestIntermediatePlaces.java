@@ -7,18 +7,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.TimeZone;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -31,6 +31,7 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Tests for planning with intermediate places
@@ -44,7 +45,7 @@ public class TestIntermediatePlaces {
    */
   public static final double DELTA = 0.005;
 
-  private static TimeZone timeZone;
+  private static ZoneId timeZone;
 
   private static GraphPathFinder graphPathFinder;
 
@@ -55,19 +56,20 @@ public class TestIntermediatePlaces {
   @BeforeAll
   public static void setUp() {
     try {
-      graph = FakeGraph.buildGraphNoTransit();
-      FakeGraph.addPerpendicularRoutes(graph);
-      FakeGraph.link(graph);
+      OtpModel otpModel = FakeGraph.buildGraphNoTransit();
+      graph = otpModel.graph;
+      TransitModel transitModel = otpModel.transitModel;
+      FakeGraph.addPerpendicularRoutes(graph, transitModel);
+      FakeGraph.link(graph, transitModel);
       graph.index();
-      Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
+      Router router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
       router.startup();
       TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
-      timeZone = graph.getTimeZone();
+      timeZone = transitModel.getTimeZone();
 
       graphPathToItineraryMapper =
         new GraphPathToItineraryMapper(
-          graph.getTimeZone(),
-          new AlertToLegMapper(graph.getTransitAlertService()),
+          timeZone,
           graph.streetNotesService,
           graph.ellipsoidToGeoidDifference
         );
@@ -265,11 +267,11 @@ public class TestIntermediatePlaces {
       assertTrue(1 <= plan.itineraries.size());
       for (Itinerary itinerary : plan.itineraries) {
         validateIntermediatePlacesVisited(itinerary, via);
-        assertTrue(via.length < itinerary.legs.size());
+        assertTrue(via.length < itinerary.getLegs().size());
         validateLegsTemporally(request, itinerary);
         validateLegsSpatially(plan, itinerary);
         if (modes.contains(TraverseMode.TRANSIT)) {
-          assertTrue(itinerary.transitTimeSeconds > 0);
+          assertTrue(itinerary.getTransitTimeSeconds() > 0);
         }
       }
     }
@@ -283,10 +285,10 @@ public class TestIntermediatePlaces {
       Leg leg;
       do {
         assertTrue(
-          legIndex < itinerary.legs.size(),
+          legIndex < itinerary.getLegs().size(),
           "Intermediate location was not an endpoint of any leg"
         );
-        leg = itinerary.legs.get(legIndex);
+        leg = itinerary.getLegs().get(legIndex);
         legIndex++;
       } while (
         Math.abs(leg.getTo().coordinate.latitude() - location.lat) > DELTA ||
@@ -298,7 +300,7 @@ public class TestIntermediatePlaces {
   // Check that the end point of a leg is also the start point of the next leg
   private void validateLegsSpatially(TripPlan plan, Itinerary itinerary) {
     Place place = plan.from;
-    for (Leg leg : itinerary.legs) {
+    for (Leg leg : itinerary.getLegs()) {
       assertEquals(place.coordinate, leg.getFrom().coordinate);
       place = leg.getTo();
     }
@@ -310,27 +312,27 @@ public class TestIntermediatePlaces {
     Instant departTime;
     Instant arriveTime;
     if (request.arriveBy) {
-      departTime = itinerary.legs.get(0).getStartTime().toInstant();
+      departTime = itinerary.getLegs().get(0).getStartTime().toInstant();
       arriveTime = request.getDateTime();
     } else {
       departTime = request.getDateTime();
-      arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).getEndTime().toInstant();
+      arriveTime = itinerary.getLegs().get(itinerary.getLegs().size() - 1).getEndTime().toInstant();
     }
     long sumOfDuration = 0;
-    for (Leg leg : itinerary.legs) {
+    for (Leg leg : itinerary.getLegs()) {
       assertFalse(departTime.isAfter(leg.getStartTime().toInstant()));
       assertFalse(leg.getStartTime().isAfter(leg.getEndTime()));
 
       departTime = leg.getEndTime().toInstant();
       sumOfDuration += leg.getDuration();
     }
-    sumOfDuration += itinerary.waitingTimeSeconds;
+    sumOfDuration += itinerary.getWaitingTimeSeconds();
 
     assertFalse(departTime.isAfter(arriveTime));
 
     // Check the total duration of the legs,
-    int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors
-    assertEquals(sumOfDuration, itinerary.durationSeconds, accuracy);
+    int accuracy = itinerary.getLegs().size(); // allow 1 second per leg for rounding errors
+    assertEquals(sumOfDuration, itinerary.getDurationSeconds(), accuracy);
   }
 
   private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {

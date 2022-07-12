@@ -110,10 +110,11 @@ public class LineType {
           .newFieldDefinition()
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
-          .dataFetcher(environment -> {
-            final String netexSubMode = ((Route) environment.getSource()).getNetexSubmode();
-            return netexSubMode != null ? TransmodelTransportSubmode.fromValue(netexSubMode) : null;
-          })
+          .dataFetcher(environment ->
+            TransmodelTransportSubmode.fromValue(
+              ((Route) environment.getSource()).getNetexSubmode()
+            )
+          )
           .build()
       )
       .field(
@@ -192,7 +193,7 @@ public class LineType {
               // Workaround since flex trips are not part of patterns yet
               result.addAll(
                 GqlUtil
-                  .getRoutingService(environment)
+                  .getTransitService(environment)
                   .getFlexIndex()
                   .tripById.values()
                   .stream()
@@ -224,7 +225,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTransitAlertService()
               .getRouteAlerts(((Route) environment.getSource()).getId())
           )

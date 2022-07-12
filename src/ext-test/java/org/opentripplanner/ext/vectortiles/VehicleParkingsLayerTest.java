@@ -25,6 +25,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
 
@@ -68,10 +69,12 @@ public class VehicleParkingsLayerTest {
     when(service.getVehicleParkings()).thenReturn(List.of(vehicleParking).stream());
 
     Graph graph = mock(Graph.class);
+    TransitModel transitModel = mock(TransitModel.class);
     when(graph.getVehicleParkingService()).thenReturn(service);
 
     VehicleParkingsLayerBuilderWithPublicGeometry builder = new VehicleParkingsLayerBuilderWithPublicGeometry(
       graph,
+      transitModel,
       new VectorTilesResource.LayerParameters() {
         @Override
         public String name() {
@@ -165,9 +168,10 @@ public class VehicleParkingsLayerTest {
 
     public VehicleParkingsLayerBuilderWithPublicGeometry(
       Graph graph,
+      TransitModel transitModel,
       VectorTilesResource.LayerParameters layerParameters
     ) {
-      super(graph, layerParameters);
+      super(graph, transitModel, layerParameters);
     }
 
     @Override

@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -24,8 +23,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +44,17 @@ public class TransitLayerMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerMapper.class);
 
-  private final Graph graph;
+  private final TransitModel transitModel;
 
-  private TransitLayerMapper(Graph graph) {
-    this.graph = graph;
+  private TransitLayerMapper(TransitModel transitModel) {
+    this.transitModel = transitModel;
   }
 
-  public static TransitLayer map(TransitTuningParameters tuningParameters, Graph graph) {
-    return new TransitLayerMapper(graph).map(tuningParameters);
+  public static TransitLayer map(
+    TransitTuningParameters tuningParameters,
+    TransitModel transitModel
+  ) {
+    return new TransitLayerMapper(transitModel).map(tuningParameters);
   }
 
   // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
@@ -73,22 +75,26 @@ public class TransitLayerMapper {
 
     LOG.info("Mapping transitLayer from Graph...");
 
-    stopIndex = new StopIndexForRaptor(graph.index.getAllStops(), tuningParameters);
+    stopIndex =
+      new StopIndexForRaptor(
+        transitModel.getStopModel().getStopModelIndex().getAllStops(),
+        tuningParameters
+      );
 
-    Collection<TripPattern> allTripPatterns = graph.tripPatternForId.values();
+    Collection<TripPattern> allTripPatterns = transitModel.tripPatternForId.values();
     TripPatternMapper tripPatternMapper = new TripPatternMapper();
     newTripPatternForOld =
       tripPatternMapper.mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns, newTripPatternForOld);
 
-    transferByStopIndex = mapTransfers(stopIndex, graph.transfersByStop);
+    transferByStopIndex = mapTransfers(stopIndex, transitModel.transfersByStop);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator =
         new TransferIndexGenerator(
-          graph.getTransferService().listAll(),
+          transitModel.getTransferService().listAll(),
           newTripPatternForOld.values(),
           stopIndex
         );
@@ -102,9 +108,9 @@ public class TransitLayerMapper {
     return new TransitLayer(
       tripPatternsByStopByDate,
       transferByStopIndex,
-      graph.getTransferService(),
+      transitModel.getTransferService(),
       stopIndex,
-      graph.getTimeZone().toZoneId(),
+      transitModel.getTimeZone(),
       transferCache,
       tripPatternMapper,
       transferIndexGenerator
@@ -122,11 +128,11 @@ public class TransitLayerMapper {
     Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld
   ) {
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      graph.index.getServiceCodesRunningForDate(),
+      transitModel.index.getServiceCodesRunningForDate(),
       newTripPatternForOld
     );
 
-    Set<ServiceDate> allServiceDates = graph.index.getServiceCodesRunningForDate().keySet();
+    Set<LocalDate> allServiceDates = transitModel.index.getServiceCodesRunningForDate().keySet();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 

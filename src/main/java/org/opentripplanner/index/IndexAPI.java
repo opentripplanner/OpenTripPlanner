@@ -1,6 +1,7 @@
 package org.opentripplanner.index;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,7 +50,6 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -62,6 +62,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolyline;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -159,10 +160,10 @@ public class IndexAPI {
     @PathParam("feedId") String feedId,
     @PathParam("agencyId") String agencyId
   ) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = new FeedScopedId(feedId, agencyId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getAgencyAlerts(id));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getAgencyAlerts(id));
   }
 
   /** Return specific transit stop in the graph, by ID. */
@@ -202,7 +203,7 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return createTransitService()
+      return createRoutingService()
         .getStopsInRadius(new WgsCoordinate(lat, lon), radius)
         .stream()
         .map(it -> StopMapper.mapToApiShort(it.first, it.second.intValue()))
@@ -217,7 +218,7 @@ public class IndexAPI {
         .lessThan("minLat", minLat, "maxLat", maxLat)
         .lessThan("minLon", minLon, "maxLon", maxLon)
         .validate();
-      var stops = createTransitService().getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
+      var stops = createRoutingService().getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
       return StopMapper.mapToApiShort(stops);
     }
   }
@@ -295,7 +296,7 @@ public class IndexAPI {
   ) {
     TransitService transitService = createTransitService();
     var stop = getStop(transitService, stopId);
-    ServiceDate serviceDate = parseServiceDate("date", date);
+    LocalDate serviceDate = parseServiceDate("date", date);
     List<StopTimesInPattern> stopTimes = transitService.getStopTimesForStop(
       stop,
       serviceDate,
@@ -327,10 +328,10 @@ public class IndexAPI {
   @GET
   @Path("/stops/{stopId}/alerts")
   public Collection<ApiAlert> getAlertsForStop(@PathParam("stopId") String stopId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = createId("stopId", stopId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getStopAlerts(id));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getStopAlerts(id));
   }
 
   /** Return a list of all routes in the graph. */
@@ -411,10 +412,10 @@ public class IndexAPI {
   @GET
   @Path("/routes/{routeId}/alerts")
   public Collection<ApiAlert> getAlertsForRoute(@PathParam("routeId") String routeId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = createId("routeId", routeId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getRouteAlerts(id));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getRouteAlerts(id));
   }
 
   // Not implemented, results would be too voluminous.
@@ -451,7 +452,10 @@ public class IndexAPI {
     Trip trip = getTrip(transitService, tripId);
     TripPattern pattern = getTripPattern(transitService, trip);
     // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
-    Timetable table = transitService.getTimetableForTripPattern(pattern, null);
+    Timetable table = transitService.getTimetableForTripPattern(
+      pattern,
+      LocalDate.now(transitService.getTimeZone())
+    );
     var tripTimesOnDate = TripTimeOnDate.fromTripTimes(table, trip);
     return TripTimeMapper.mapToApi(tripTimesOnDate);
   }
@@ -470,10 +474,10 @@ public class IndexAPI {
   @GET
   @Path("/trips/{tripId}/alerts")
   public Collection<ApiAlert> getAlertsForTrip(@PathParam("tripId") String tripId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     FeedScopedId id = createId("tripId", tripId);
-    return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id, null));
+    return alertMapper.mapToApi(transitService.getTransitAlertService().getTripAlerts(id, null));
   }
 
   @GET
@@ -525,11 +529,11 @@ public class IndexAPI {
   @GET
   @Path("/patterns/{patternId}/alerts")
   public Collection<ApiAlert> getAlertsForPattern(@PathParam("patternId") String patternId) {
-    RoutingService routingService = createRoutingService();
+    TransitService transitService = createTransitService();
     AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
     TripPattern pattern = getTripPattern(createTransitService(), patternId);
     return alertMapper.mapToApi(
-      routingService
+      transitService
         .getTransitAlertService()
         .getDirectionAndRouteAlerts(pattern.getDirection().gtfsCode, pattern.getRoute().getId())
     );
@@ -566,9 +570,9 @@ public class IndexAPI {
   }
 
   @SuppressWarnings("SameParameterValue")
-  private static ServiceDate parseServiceDate(String label, String date) {
+  private static LocalDate parseServiceDate(String label, String date) {
     try {
-      return ServiceDate.parseString(date);
+      return ServiceDateUtils.parseString(date);
     } catch (ParseException e) {
       throw new BadRequestException(
         "Unable to parse date, not on format: YYYY-MM-DD. " + label + ": '" + date + "'"

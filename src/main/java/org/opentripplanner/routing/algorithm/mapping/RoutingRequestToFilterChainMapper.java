@@ -2,6 +2,8 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import java.time.Instant;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
@@ -9,6 +11,9 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChai
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.Station;
 
 public class RoutingRequestToFilterChainMapper {
 
@@ -26,7 +31,11 @@ public class RoutingRequestToFilterChainMapper {
     boolean removeWalkAllTheWayResults,
     boolean maxNumberOfItinerariesCropHead,
     Consumer<Itinerary> maxLimitReachedSubscriber,
-    boolean wheelchairAccessible
+    boolean wheelchairAccessible,
+    double wheelchairMaxSlope,
+    FareService fareService,
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
   ) {
     var builder = new ItineraryListFilterChainBuilder(sortOrder);
 
@@ -59,7 +68,9 @@ public class RoutingRequestToFilterChainMapper {
       .withParkAndRideDurationRatio(params.parkAndRideDurationRatio)
       .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit)
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip)
-      .withAccessibilityScore(params.accessibilityScore && wheelchairAccessible)
+      .withAccessibilityScore(params.accessibilityScore && wheelchairAccessible, wheelchairMaxSlope)
+      .withFares(fareService)
+      .withTransitAlerts(transitAlertService, getMultiModalStation)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)

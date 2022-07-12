@@ -2,15 +2,14 @@ package org.opentripplanner.routing.stoptimes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -29,21 +28,19 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testPreviousLegs() throws Exception {
-    var routingService = new RoutingService(graph);
-    var transitService = new DefaultTransitService(graph);
+    var transitService = new DefaultTransitService(transitModel);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(this.feedId.getId(), "1.2"),
-      ServiceDate.parseString("2022-04-02"),
+      LocalDate.parse("2022-04-02"),
       1,
       2
     )
-      .getLeg(routingService, transitService);
+      .getLeg(transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       3,
-      routingService,
       transitService,
       true,
       AlternativeLegsFilter.NO_FILTER
@@ -67,21 +64,19 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testNextLegs() throws Exception {
-    var routingService = new RoutingService(graph);
-    var transitService = new DefaultTransitService(graph);
+    var transitService = new DefaultTransitService(transitModel);
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(this.feedId.getId(), "2.2"),
-      ServiceDate.parseString("2022-04-02"),
+      LocalDate.parse("2022-04-02"),
       0,
       1
     )
-      .getLeg(routingService, transitService);
+      .getLeg(transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       3,
-      routingService,
       transitService,
       false,
       AlternativeLegsFilter.NO_FILTER

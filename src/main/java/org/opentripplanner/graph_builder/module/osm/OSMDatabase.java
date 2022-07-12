@@ -84,11 +84,6 @@ public class OSMDatabase {
   /* All bike parking areas */
   private final List<Area> bikeParkingAreas = new ArrayList<>();
 
-  /**
-   * Boarding location ways where passengers wait for transit
-   */
-  private final List<Area> boardingLocationAreas = new ArrayList<>();
-
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
 
@@ -183,10 +178,6 @@ public class OSMDatabase {
     return Collections.unmodifiableCollection(bikeParkingAreas);
   }
 
-  public Collection<Area> getBoardingLocationAreas() {
-    return List.copyOf(boardingLocationAreas);
-  }
-
   public Collection<Long> getTurnRestrictionWayIds() {
     return Collections.unmodifiableCollection(turnRestrictionsByFromWay.keySet());
   }
@@ -239,12 +230,7 @@ public class OSMDatabase {
     if (nodesById.containsKey(node.getId())) {
       return;
     }
-
     nodesById.put(node.getId(), node);
-
-    if (nodesById.size() % 100000 == 0) {
-      LOG.debug("nodes=" + nodesById.size());
-    }
   }
 
   public void addWay(OSMWay way) {
@@ -278,7 +264,7 @@ public class OSMDatabase {
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
         way.isTag("amenity", "bicycle_parking") ||
-        way.isBoardingLocation()
+        way.isBoardingArea()
       ) &&
       way.getNodeRefs().size() > 2
     ) {
@@ -879,12 +865,6 @@ public class OSMDatabase {
     }
     if (area.parent.isBikeParking()) {
       bikeParkingAreas.add(area);
-    }
-    if (
-      area.parent.isBoardingLocation() &&
-      !area.parent.getMultiTagValues(boardingAreaRefTags).isEmpty()
-    ) {
-      boardingLocationAreas.add(area);
     }
   }
 

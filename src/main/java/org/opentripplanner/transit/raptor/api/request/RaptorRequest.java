@@ -4,10 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.routing.api.request.RoutingTag;
+import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +23,14 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RaptorRequest.class);
 
+  private final String alias;
   private final SearchParams searchParams;
   private final RaptorProfile profile;
   private final SearchDirection searchDirection;
   private final Set<Optimization> optimizations;
   private final DebugRequest debug;
   private final RaptorSlackProvider slackProvider;
-  private final Set<RoutingTag> tags;
+  private final RaptorTimers performanceTimers;
 
   private RaptorRequest() {
     searchParams = SearchParams.defaults();
@@ -37,23 +39,34 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     optimizations = Collections.emptySet();
     // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
     slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
-    tags = Set.of();
+    performanceTimers = RaptorTimers.NOOP;
     debug = DebugRequest.defaults();
+    alias = RaptorRequestBuilder.generateRequestAlias(profile, searchDirection, optimizations);
   }
 
   RaptorRequest(RaptorRequestBuilder<T> builder) {
+    this.alias = builder.generateAlias();
     this.searchParams = builder.searchParams().buildSearchParam();
     this.profile = builder.profile();
     this.searchDirection = builder.searchDirection();
     this.optimizations = Set.copyOf(builder.optimizations());
     this.slackProvider = builder.slackProvider();
-    this.tags = Set.copyOf(builder.tags());
+    this.performanceTimers = builder.performanceTimers();
     this.debug = builder.debug().build();
     verify();
   }
 
   public RaptorRequestBuilder<T> mutate() {
     return new RaptorRequestBuilder<>(this);
+  }
+
+  /**
+   * A unique short name for the request based on {@code profile}, {@code searchDirection},
+   * {@code optimizations} for use in logging, debugging and performance monitoring. It is
+   * not ment to identify a request, but it is used to group requests of the same "type".
+   */
+  public String alias() {
+    return alias;
   }
 
   /**
@@ -123,8 +136,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     return optimizationEnabled(Optimization.PARALLEL);
   }
 
-  public Set<RoutingTag> tags() {
-    return tags;
+  public RaptorTimers performanceTimers() {
+    return performanceTimers;
   }
 
   /**
@@ -166,7 +179,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
       .addCol("optimizations", optimizations)
       .addObj("debug", debug, DebugRequest.defaults())
       .addObj("searchParams", searchParams)
-      .addCol("tags", tags)
+      .addBoolIfTrue("withPerformanceTimers", performanceTimers != RaptorTimers.NOOP)
       .toString();
   }
 

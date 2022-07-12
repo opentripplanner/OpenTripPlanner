@@ -10,9 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.issues.DayTypeScheduleIsEmpty;
@@ -23,7 +21,7 @@ import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.PropertyOfDay;
 
 /**
- * Map {@link DayTypeAssignment}s to set of {@link ServiceDate}s.
+ * Map {@link DayTypeAssignment}s to set of {@link LocalDate}s.
  * <p>
  * Use the static {@code #mapDayTypes(...)} method to perform the mapping.
  * <p>
@@ -31,8 +29,8 @@ import org.rutebanken.netex.model.PropertyOfDay;
  * <p>
  * To simplify the logic in this class and avoid passing input parameters down the call chain this
  * class perform the mapping by first creating an instance with READ-ONLY input members. The result
- * i added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final step,
- * the to collections are merged (dates-datesToRemove) and then mapped to {@link ServiceDate}s.
+ * is added to {@link #dates} and {@link #datesToRemove} during the mapping process. As a final step,
+ * the to collections are merged (dates-datesToRemove) and then mapped to {@link LocalDate}s.
  * <p>
  * This class is THREAD-SAFE. A static mapping method is the single point of entry and a private
  * constructor ensure the instance is used in one thread only.
@@ -63,17 +61,17 @@ public class DayTypeAssignmentMapper {
   }
 
   /**
-   * Map all given {@code dayTypeAssignments} into a map of {@link ServiceDate} by {@code
+   * Map all given {@code dayTypeAssignments} into a map of {@link LocalDate} by {@code
    * dayTypeId}s.
    */
-  public static Map<String, Set<ServiceDate>> mapDayTypes(
+  public static Map<String, Set<LocalDate>> mapDayTypes(
     ReadOnlyHierarchicalMapById<DayType> dayTypes,
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> assignments,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDays,
     ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriods,
     DataImportIssueStore issueStore
   ) {
-    Map<String, Set<ServiceDate>> result = new HashMap<>();
+    Map<String, Set<LocalDate>> result = new HashMap<>();
 
     for (var dayType : dayTypes.localValues()) {
       var mapper = new DayTypeAssignmentMapper(dayType, operatingDays, operatingPeriods);
@@ -81,7 +79,7 @@ public class DayTypeAssignmentMapper {
       for (DayTypeAssignment it : assignments.lookup(dayType.getId())) {
         mapper.map(it);
       }
-      Set<ServiceDate> dates = mapper.mergeAndMapDates();
+      Set<LocalDate> dates = mapper.mergeAndMapDates();
 
       if (dates.isEmpty()) {
         issueStore.add(new DayTypeScheduleIsEmpty(dayType.getId()));
@@ -138,10 +136,9 @@ public class DayTypeAssignmentMapper {
    *
    * @return the list of service dates for all dayTypes mapped.
    */
-  private Set<ServiceDate> mergeAndMapDates() {
+  private Set<LocalDate> mergeAndMapDates() {
     dates.removeAll(datesToRemove);
-    // Map to ServiceDates
-    return dates.stream().map(ServiceDate::new).collect(Collectors.toSet());
+    return new HashSet<>(dates);
   }
 
   private void addSpecificDate(DayTypeAssignment dayTypeAssignment) {

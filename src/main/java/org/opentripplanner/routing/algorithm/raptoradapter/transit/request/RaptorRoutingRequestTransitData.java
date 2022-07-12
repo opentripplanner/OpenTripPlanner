@@ -10,7 +10,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransfe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
@@ -23,6 +22,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,
@@ -96,13 +96,13 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       );
 
     this.validTransitDataStartTime =
-      DateMapper.secondsSinceStartOfTime(
+      ServiceDateUtils.secondsSinceStartOfTime(
         this.transitSearchTimeZero,
         this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
       );
     // The +1 is due to the validity being to the end of the day
     this.validTransitDataEndTime =
-      DateMapper.secondsSinceStartOfTime(
+      ServiceDateUtils.secondsSinceStartOfTime(
         this.transitSearchTimeZero,
         this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
       );

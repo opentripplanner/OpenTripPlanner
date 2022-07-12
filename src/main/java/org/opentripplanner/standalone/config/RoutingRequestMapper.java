@@ -98,7 +98,7 @@ public class RoutingRequestMapper {
     request.maxDirectStreetDurationForMode =
       c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
-    request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes);
+    request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes());
     request.nonpreferredTransferCost =
       c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
     request.numItineraries = c.asInt("numItineraries", dft.numItineraries);

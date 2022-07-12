@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 
 class AccessEgressFunctionsTest implements RaptorTestConstants {
 

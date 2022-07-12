@@ -3,8 +3,9 @@ package org.opentripplanner.util.time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.util.time.DateUtils.secToHHMM;
 
-import java.util.Date;
-import java.util.TimeZone;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
 public class DateUtilsTest {
@@ -27,13 +28,17 @@ public class DateUtilsTest {
   private static final int N08_07 = -(8 * 60 + 7) * 60;
   private static final int N08_47 = -(8 * 60 + 47) * 60;
 
+  public static final ZoneId UTC = ZoneId.of("UTC");
+
   @Test
   public final void testToDate() {
-    Date date = DateUtils.toDate("1970-01-01", "00:00", TimeZone.getTimeZone("UTC"));
-    assertEquals(0, date.getTime());
+    ZonedDateTime date = DateUtils.toZonedDateTime("1970-01-01", "00:00", UTC);
+    assertEquals("1970-01-01", date.toLocalDate().toString());
+    assertEquals(0, date.toEpochSecond());
 
-    date = DateUtils.toDate(null, "00:00", TimeZone.getTimeZone("UTC"));
-    assertEquals(0, date.getTime() % DateUtils.ONE_DAY_MILLI);
+    date = DateUtils.toZonedDateTime(null, "00:00", UTC);
+    assertEquals(LocalDate.now(UTC).toString(), date.toLocalDate().toString());
+    assertEquals(0, date.toEpochSecond() % TimeUtils.ONE_DAY_SECONDS);
   }
 
   @Test

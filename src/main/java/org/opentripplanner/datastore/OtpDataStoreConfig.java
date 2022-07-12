@@ -4,7 +4,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * The {@link OtpDataStore} config, needed to create a store. This should be provided by the OTP
@@ -78,7 +78,7 @@ public interface OtpDataStoreConfig {
    * This parameter is optional. If {@code null} GTFS files are loaded from {@link
    * #baseDirectory()}.
    */
-  @NotNull
+  @Nonnull
   List<URI> gtfsFiles();
 
   /**
@@ -87,7 +87,7 @@ public interface OtpDataStoreConfig {
    * This parameter is optional. If {@code null} Netex files are loaded from {@link
    * #baseDirectory()}.
    */
-  @NotNull
+  @Nonnull
   List<URI> netexFiles();
 
   /**

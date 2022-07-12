@@ -3,10 +3,10 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.debug;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.DebugHandler;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
-import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 
 /**
  * Send debug events to the {@link DebugHandler} using the {@link StopsCursor}.

@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
@@ -32,28 +31,27 @@ import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
 import org.opentripplanner.graph_builder.issues.InterliningTeleport;
+import org.opentripplanner.graph_builder.issues.MissingShapeGeometry;
+import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract
- * and prepare geometries. It also does some other postprocessing involving fares and interlined
- * blocks.
+ * and prepare geometries. It also does some other postprocessing involving interlined blocks.
  *
  * <p>
  * THREAD SAFETY The computation runs in parallel so be careful about threadsafety when modifying
@@ -73,25 +71,19 @@ public class GeometryAndBlockProcessor {
   private final double maxStopToShapeSnapDistance;
   private final int maxInterlineDistance;
   private DataImportIssueStore issueStore;
-  private FareServiceFactory fareServiceFactory;
 
   public GeometryAndBlockProcessor(GtfsContext context) {
-    this(context.getTransitService(), null, -1, -1);
+    this(context.getTransitService(), -1, -1);
   }
 
   public GeometryAndBlockProcessor(
     // TODO OTP2 - Operate on the builder, not the transit service and move the executon of
     //           - this to where the builder is in context.
     OtpTransitService transitService,
-    // TODO OTP2 - This does not belong here - Do geometry and blocks have anything with
-    //           - a FareService.
-    FareServiceFactory fareServiceFactory,
     double maxStopToShapeSnapDistance,
     int maxInterlineDistance
   ) {
     this.transitService = transitService;
-    this.fareServiceFactory =
-      fareServiceFactory != null ? fareServiceFactory : new DefaultFareServiceFactory();
     this.maxStopToShapeSnapDistance =
       maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
@@ -99,8 +91,8 @@ public class GeometryAndBlockProcessor {
 
   // TODO OTP2 - Instead of exposing the graph (the entire world) to this class, this class should
   //           - Create a datastructure and return it, then that should be injected into the graph.
-  public void run(Graph graph) {
-    run(graph, new DataImportIssueStore(false));
+  public void run(Graph graph, TransitModel transitModel) {
+    run(graph, transitModel, new DataImportIssueStore(false));
   }
 
   /**
@@ -111,15 +103,13 @@ public class GeometryAndBlockProcessor {
    * the graph, the OtpTransitService and others are not.
    */
   @SuppressWarnings("Convert2MethodRef")
-  public void run(Graph graph, DataImportIssueStore issueStore) {
+  public void run(Graph graph, TransitModel transitModel, DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
-
-    fareServiceFactory.processGtfs(transitService);
 
     /* Assign 0-based numeric codes to all GTFS service IDs. */
     for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
       // TODO: FIX Service code collision for multiple feeds.
-      graph.getServiceCodes().put(serviceId, graph.getServiceCodes().size());
+      transitModel.getServiceCodes().put(serviceId, transitModel.getServiceCodes().size());
     }
 
     LOG.info("Processing geometries and blocks on graph...");
@@ -177,26 +167,14 @@ public class GeometryAndBlockProcessor {
         // Make a single unified geometry, and also store the per-hop split geometries.
         tripPattern.setHopGeometries(hopGeometries);
       }
-      tripPattern.setServiceCodes(graph.getServiceCodes()); // TODO this could be more elegant
+      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-      graph.tripPatternForId.put(tripPattern.getId(), tripPattern);
+      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
     }
 
     /* Identify interlined trips and create the necessary edges. */
     interline(tripPatterns);
-
-    /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
-    // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
-    for (TripPattern tableTripPattern : tripPatterns) {
-      tableTripPattern.getScheduledTimetable().finish();
-    }
-
-    graph.putService(FareService.class, fareServiceFactory.makeFareService());
-  }
-
-  public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
-    this.fareServiceFactory = fareServiceFactory;
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
@@ -301,6 +279,7 @@ public class GeometryAndBlockProcessor {
     if (shapeLineString == null) {
       // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
       // create straight line segments between stops for each hop
+      issueStore.add(new MissingShapeGeometry(stopTimes.get(0).getTrip().getId(), shapeId));
       return createStraightLineHopeGeometries(stopTimes, shapeId);
     }
 
@@ -309,6 +288,7 @@ public class GeometryAndBlockProcessor {
       // this only happens on shape which have points very far from
       // their stop sequence. So we'll fall back to trivial stop-to-stop
       // linking, even though theoretically we could do better.
+      issueStore.add(new ShapeGeometryTooFar(stopTimes.get(0).getTrip().getId(), shapeId));
       return createStraightLineHopeGeometries(stopTimes, shapeId);
     }
 
@@ -343,7 +323,7 @@ public class GeometryAndBlockProcessor {
         Coordinate to = shape.getCoordinateN(j + 1);
         double xd = from.x - to.x;
         double yd = from.y - to.y;
-        distanceSoFar += FastMath.sqrt(xd * xd + yd * yd);
+        distanceSoFar += Math.sqrt(xd * xd + yd * yd);
       }
       last = startLocation.getSegmentIndex();
 
@@ -355,7 +335,7 @@ public class GeometryAndBlockProcessor {
         Coordinate to = shape.getCoordinateN(j + 1);
         double xd = from.x - to.x;
         double yd = from.y - to.y;
-        distanceSoFar += FastMath.sqrt(xd * xd + yd * yd);
+        distanceSoFar += Math.sqrt(xd * xd + yd * yd);
       }
       last = startLocation.getSegmentIndex();
       double endIndex =
@@ -455,8 +435,6 @@ public class GeometryAndBlockProcessor {
       StopTime st1 = stopTimes.get(i + 1);
       LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
       geoms[i] = geometry;
-      //this warning is not strictly correct, but will do
-      issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
     }
     return geoms;
   }

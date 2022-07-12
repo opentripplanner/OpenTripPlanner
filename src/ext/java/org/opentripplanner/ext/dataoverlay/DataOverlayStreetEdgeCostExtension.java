@@ -26,7 +26,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     DataOverlayStreetEdgeCostExtension.class
   );
 
-  private final long dataStartTime;
+  private final Instant dataStartTime;
   private final Map<String, float[]> variableValues;
   private final TimeUnit timeUnit;
 
@@ -38,7 +38,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
    * @param timeUnit       time unit of the data overlay
    */
   DataOverlayStreetEdgeCostExtension(
-    long dataStartTime,
+    Instant dataStartTime,
     Map<String, float[]> variableValues,
     TimeUnit timeUnit
   ) {
@@ -77,7 +77,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
       var penalty = parameter.getPenalty();
       String indexVariableName = parameter.getVariable();
 
-      long dataStartTime = 0;
+      Instant dataStartTime = Instant.EPOCH;
       float[] genDataValuesForTime = new float[0];
 
       if (variableValues.containsKey(indexVariableName)) {
@@ -86,8 +86,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
       }
 
       //calculate time format based on the input file settings
-      Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
-      int dataQualityRequestedTime = timeUnit.between(aqiTimeInstant, requestInstant);
+      int dataQualityRequestedTime = timeUnit.between(dataStartTime, requestInstant);
 
       if (dataQualityRequestedTime >= 0) {
         if (dataQualityRequestedTime < genDataValuesForTime.length) {

@@ -9,6 +9,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
@@ -16,7 +17,7 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Long> date() {
-    return environment -> getSource(environment).getTripPlan().date.getTime();
+    return environment -> getSource(environment).getTripPlan().date.toEpochMilli();
   }
 
   @Override
@@ -55,6 +56,11 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
         .map(PlannerErrorMapper::mapMessage)
         .map(plannerError -> plannerError.message.get(environment.getLocale()))
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public DataFetcher<Iterable<RoutingError>> routingErrors() {
+    return environment -> getSource(environment).getRoutingErrors();
   }
 
   @Override

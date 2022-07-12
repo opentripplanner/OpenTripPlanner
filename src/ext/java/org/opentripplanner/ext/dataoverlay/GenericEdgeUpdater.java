@@ -37,7 +37,7 @@ class GenericEdgeUpdater {
   private final TimeUnit timeFormat;
 
   private final Map<String, Array> genericVariablesData;
-  private final long dataStartTime;
+  private final Instant dataStartTime;
   private int edgesUpdated;
 
   /**
@@ -80,15 +80,15 @@ class GenericEdgeUpdater {
    *
    * @return epoch milliseconds
    */
-  private long calculateDataStartTime(TimeUnit timeFormat) {
+  private Instant calculateDataStartTime(TimeUnit timeFormat) {
     Array timeArray = dataFile.getTimeArray();
-    Class dataType = timeArray.getDataType().getPrimitiveClassType();
+    Class<?> dataType = timeArray.getDataType().getPrimitiveClassType();
     Instant originInstant = this.dataFile.getOriginDate().toInstant();
 
     if ((timeFormat == null || timeFormat == TimeUnit.SECONDS) && dataType.equals(Integer.TYPE)) {
-      return originInstant.plusSeconds(timeArray.getInt(0)).toEpochMilli();
+      return originInstant.plusSeconds(timeArray.getInt(0));
     } else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
-      return timeArray.getLong(0);
+      return Instant.ofEpochMilli(timeArray.getLong(0));
     } else {
       long addSeconds = 0;
       if (dataType.equals(Double.TYPE)) {
@@ -97,7 +97,7 @@ class GenericEdgeUpdater {
         addSeconds = (long) (timeArray.getFloat(0) * 3600);
       }
 
-      return originInstant.plusSeconds(addSeconds).toEpochMilli();
+      return originInstant.plusSeconds(addSeconds);
     }
   }
 

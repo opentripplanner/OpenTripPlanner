@@ -12,6 +12,7 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 
@@ -29,7 +30,8 @@ class TripTest {
   private static final String BLOCK_ID = "blockId";
   private static final String FARE_ID = "fareId";
   private static final TripAlteration TRIP_ALTERATION = TripAlteration.CANCELLATION;
-  private static final String NETEX_SUBMODE = "submode";
+  private static final String NETEX_SUBMODE_NAME = "submode";
+  private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
   private static final String NETEX_INTERNAL_PLANNING_CODE = "internalPlanningCode";
   private static final Operator OPERATOR = Operator
     .of(FeedScopedId.parseId("x:operatorId"))
@@ -48,7 +50,7 @@ class TripTest {
     .withGtfsBlockId(BLOCK_ID)
     .withGtfsFareId(FARE_ID)
     .withNetexAlteration(TRIP_ALTERATION)
-    .withNetexSubmode(NETEX_SUBMODE)
+    .withNetexSubmode(NETEX_SUBMODE_NAME)
     .withNetexInternalPlanningCode(NETEX_INTERNAL_PLANNING_CODE)
     .withOperator(OPERATOR)
     .withServiceId(SERVICE_ID)
@@ -74,7 +76,7 @@ class TripTest {
     assertEquals(BLOCK_ID, copy.getGtfsBlockId());
     assertEquals(FARE_ID, copy.getGtfsFareId());
     assertEquals(TRIP_ALTERATION, copy.getNetexAlteration());
-    assertEquals(NETEX_SUBMODE, copy.getNetexSubmode());
+    assertEquals(NETEX_SUBMODE, copy.getNetexSubMode());
     assertEquals(NETEX_INTERNAL_PLANNING_CODE, copy.getNetexInternalPlanningCode());
     assertEquals(OPERATOR, copy.getOperator());
     assertEquals(SERVICE_ID, copy.getServiceId());

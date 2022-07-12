@@ -19,6 +19,7 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServic
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
@@ -50,7 +51,11 @@ public abstract class GraphUpdaterConfigurator {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
-  public static void setupGraph(Graph graph, UpdatersParameters updatersParameters) {
+  public static void setupGraph(
+    Graph graph,
+    TransitModel transitModel,
+    UpdatersParameters updatersParameters
+  ) {
     List<GraphUpdater> updaters = new ArrayList<>();
 
     updaters.addAll(
@@ -67,8 +72,8 @@ public abstract class GraphUpdaterConfigurator {
       )
     );
 
-    setupUpdaters(graph, updaters);
-    GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, updaters);
+    setupUpdaters(graph, transitModel, updaters);
+    GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, transitModel, updaters);
     updaterManager.startUpdaters();
 
     // Stop the updater manager if it contains nothing
@@ -77,22 +82,26 @@ public abstract class GraphUpdaterConfigurator {
     }
     // Otherwise add it to the graph
     else {
-      graph.updaterManager = updaterManager;
+      transitModel.updaterManager = updaterManager;
     }
   }
 
-  public static void shutdownGraph(Graph graph) {
-    GraphUpdaterManager updaterManager = graph.updaterManager;
+  public static void shutdownGraph(TransitModel transitModel) {
+    GraphUpdaterManager updaterManager = transitModel.updaterManager;
     if (updaterManager != null) {
       LOG.info("Stopping updater manager with " + updaterManager.numberOfUpdaters() + " updaters.");
       updaterManager.stop();
     }
   }
 
-  public static void setupUpdaters(Graph graph, List<GraphUpdater> updaters) {
+  public static void setupUpdaters(
+    Graph graph,
+    TransitModel transitModel,
+    List<GraphUpdater> updaters
+  ) {
     for (GraphUpdater updater : updaters) {
       try {
-        updater.setup(graph);
+        updater.setup(graph, transitModel);
       } catch (Exception e) {
         LOG.warn("Failed to setup updater {}", updater.getConfigRef());
       }

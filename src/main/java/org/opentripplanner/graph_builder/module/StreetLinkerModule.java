@@ -19,6 +19,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -53,13 +54,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
   @Override
   public void buildGraph(
     Graph graph,
+    TransitModel transitModel,
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
+    transitModel.index();
+    graph.index();
     graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
 
     if (graph.hasStreets) {
-      linkTransitStops(graph);
+      linkTransitStops(graph, transitModel);
       linkTransitEntrances(graph);
       linkVehicleParks(graph, issueStore);
     }
@@ -73,7 +77,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     //no inputs
   }
 
-  public void linkTransitStops(Graph graph) {
+  public void linkTransitStops(Graph graph, TransitModel transitModel) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
@@ -92,7 +96,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       if (OTPFeature.FlexRouting.isOn()) {
         // If regular stops are used for flex trips, they also need to be connected to car routable
         // street edges.
-        if (graph.getAllFlexStopsFlat().contains(tStop.getStop())) {
+        if (transitModel.getAllFlexStopsFlat().contains(tStop.getStop())) {
           modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
         }
       }

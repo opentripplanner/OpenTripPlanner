@@ -1,10 +1,12 @@
 package org.opentripplanner.model.calendar;
 
-import static org.opentripplanner.model.calendar.ServiceDate.MAX_DATE;
-import static org.opentripplanner.model.calendar.ServiceDate.MIN_DATE;
+import static java.time.LocalDate.MAX;
+import static java.time.LocalDate.MIN;
 
+import java.time.LocalDate;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * Value object which represent an service date interval from a starting date until an end date.
@@ -17,14 +19,14 @@ import javax.validation.constraints.NotNull;
  */
 public final class ServiceDateInterval {
 
-  private static final ServiceDateInterval UNBOUNDED = new ServiceDateInterval(MIN_DATE, MAX_DATE);
+  private static final ServiceDateInterval UNBOUNDED = new ServiceDateInterval(MIN, MAX);
 
-  private final ServiceDate start;
-  private final ServiceDate end;
+  private final LocalDate start;
+  private final LocalDate end;
 
-  public ServiceDateInterval(ServiceDate start, ServiceDate end) {
-    this.start = start == null ? MIN_DATE : start;
-    this.end = end == null ? MAX_DATE : end;
+  public ServiceDateInterval(LocalDate start, LocalDate end) {
+    this.start = start == null ? MIN : start;
+    this.end = end == null ? MAX : end;
 
     // Guarantee that the start is before or equal the end.
     if (this.end.isBefore(this.start)) {
@@ -42,24 +44,24 @@ public final class ServiceDateInterval {
   }
 
   public boolean isUnbounded() {
-    return start.equals(MIN_DATE) && end.equals(MAX_DATE);
+    return start.equals(MIN) && end.equals(MAX);
   }
 
   /**
    * Return the interval start, inclusive. If the period start is unbounded the {@link
-   * ServiceDate#MIN_DATE} is returned.
+   * LocalDate#MIN} is returned.
    */
-  @NotNull
-  public ServiceDate getStart() {
+  @Nonnull
+  public LocalDate getStart() {
     return start;
   }
 
   /**
    * Return the interval end, inclusive. If the period start is unbounded the {@link
-   * ServiceDate#MAX_DATE} is returned.
+   * LocalDate#MAX} is returned.
    */
-  @NotNull
-  public ServiceDate getEnd() {
+  @Nonnull
+  public LocalDate getEnd() {
     return end;
   }
 
@@ -69,8 +71,8 @@ public final class ServiceDateInterval {
    * @see #intersection(ServiceDateInterval)
    */
   public boolean overlap(ServiceDateInterval other) {
-    if (start.isBeforeOrEq(other.end)) {
-      return end.isAfterOrEq(other.start);
+    if (!start.isAfter(other.end)) {
+      return !end.isBefore(other.start);
     }
     return false;
   }
@@ -83,14 +85,17 @@ public final class ServiceDateInterval {
    * @see #overlap(ServiceDateInterval) for checking an intersection exist.
    */
   public ServiceDateInterval intersection(ServiceDateInterval other) {
-    return new ServiceDateInterval(start.max(other.start), end.min(other.end));
+    return new ServiceDateInterval(
+      ServiceDateUtils.max(start, other.start),
+      ServiceDateUtils.min(end, other.end)
+    );
   }
 
   /**
    * Return {@code true} is the given {@code date} exist in this period.
    */
-  public boolean include(ServiceDate date) {
-    return start.isBeforeOrEq(date) && end.isAfterOrEq(date);
+  public boolean include(LocalDate date) {
+    return !start.isAfter(date) && !end.isBefore(date);
   }
 
   @Override
@@ -112,6 +117,6 @@ public final class ServiceDateInterval {
 
   @Override
   public String toString() {
-    return "[" + start + ", " + end + "]";
+    return "[" + ServiceDateUtils.toString(start) + ", " + ServiceDateUtils.toString(end) + "]";
   }
 }

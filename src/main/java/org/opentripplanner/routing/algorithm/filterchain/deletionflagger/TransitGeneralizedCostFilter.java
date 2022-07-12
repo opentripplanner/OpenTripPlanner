@@ -31,7 +31,7 @@ public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
     OptionalDouble minGeneralizedCost = itineraries
       .stream()
       .filter(Itinerary::hasTransit)
-      .mapToDouble(it -> it.generalizedCost)
+      .mapToDouble(it -> it.getGeneralizedCost())
       .min();
 
     if (minGeneralizedCost.isEmpty()) {
@@ -42,7 +42,7 @@ public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 
     return itineraries
       .stream()
-      .filter(it -> it.hasTransit() && it.generalizedCost > maxLimit)
+      .filter(it -> it.hasTransit() && it.getGeneralizedCost() > maxLimit)
       .collect(Collectors.toList());
   }
 }

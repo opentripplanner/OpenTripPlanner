@@ -21,14 +21,14 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 /**
  * This class is used to create a journeys with stop arrivals.

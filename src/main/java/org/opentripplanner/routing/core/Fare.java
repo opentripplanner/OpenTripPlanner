@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -39,6 +40,10 @@ public class Fare {
     }
   }
 
+  public static Fare empty() {
+    return new Fare();
+  }
+
   public void addFare(FareType fareType, WrappedCurrency currency, int cents) {
     fare.put(fareType, new Money(currency, cents));
   }
@@ -59,11 +64,17 @@ public class Fare {
     return Arrays.asList(details.get(type));
   }
 
-  public void addCost(int surcharge) {
-    for (Money cost : fare.values()) {
-      int cents = cost.getCents();
-      cost.setCents(cents + surcharge);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(fare, details);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Fare fare1 = (Fare) o;
+    return Objects.equals(fare, fare1.fare) && Objects.equals(details, fare1.details);
   }
 
   public String toString() {

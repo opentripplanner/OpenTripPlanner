@@ -5,11 +5,12 @@ import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -25,7 +25,6 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
@@ -68,8 +67,6 @@ import org.slf4j.LoggerFactory;
  *           REST API.
  */
 public class RoutingRequest implements Cloneable, Serializable {
-
-  private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
@@ -146,13 +143,7 @@ public class RoutingRequest implements Cloneable, Serializable {
    * <p>
    * // TODO OTP2 Street routing requests should eventually be split into its own request class.
    */
-  public RequestModes modes = new RequestModes(
-    StreetMode.WALK,
-    StreetMode.WALK,
-    StreetMode.WALK,
-    StreetMode.WALK,
-    AllowedTransitMode.getAllTransitModes()
-  );
+  public RequestModes modes = RequestModes.defaultRequestModes();
   /**
    * The set of TraverseModes allowed when doing creating sub requests and doing street routing. //
    * TODO OTP2 Street routing requests should eventually be split into its own request class.
@@ -915,8 +906,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.dateTime = dateTime;
   }
 
-  public void setDateTime(String date, String time, TimeZone tz) {
-    Date dateObject = DateUtils.toDate(date, time, tz);
+  public void setDateTime(String date, String time, ZoneId tz) {
+    ZonedDateTime dateObject = DateUtils.toZonedDateTime(date, time, tz);
     setDateTime(dateObject == null ? Instant.now() : dateObject.toInstant());
   }
 
@@ -951,7 +942,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         arriveBy = false;
       }
       setDateTime(arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime);
-      modes.directMode = StreetMode.NOT_SET;
+      modes = modes.copy().withDirectMode(StreetMode.NOT_SET).build();
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }

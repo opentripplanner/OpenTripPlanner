@@ -10,13 +10,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.lang.ToStringBuilder;
 

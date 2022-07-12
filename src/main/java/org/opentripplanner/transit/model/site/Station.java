@@ -3,11 +3,11 @@ package org.opentripplanner.transit.model.site;
 import static org.opentripplanner.common.geometry.GeometryUtils.getGeometryFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +38,7 @@ public class Station
   private final WgsCoordinate coordinate;
   private final StopTransferPriority priority;
   private final I18NString url;
-  private final TimeZone timezone;
+  private final ZoneId timezone;
 
   // We serialize this class to json only for snapshot tests, and this creates cyclical structures
   @JsonBackReference
@@ -136,7 +136,7 @@ public class Station
   }
 
   @Nullable
-  public TimeZone getTimezone() {
+  public ZoneId getTimezone() {
     return timezone;
   }
 

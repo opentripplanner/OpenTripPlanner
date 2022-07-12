@@ -71,7 +71,7 @@ public class PlannerResource extends RoutingResource {
       router = otpServer.getRouter();
 
       // Route
-      RoutingService routingService = new RoutingService(router.graph);
+      RoutingService routingService = new RoutingService(router.graph, router.transitModel);
       res = routingService.route(request, router);
 
       // Map to API
@@ -139,7 +139,7 @@ public class PlannerResource extends RoutingResource {
       sb.append(' ');
       if (res != null) {
         for (Itinerary it : res.getTripPlan().itineraries) {
-          sb.append(it.durationSeconds);
+          sb.append(it.getDurationSeconds());
           sb.append(' ');
         }
       }

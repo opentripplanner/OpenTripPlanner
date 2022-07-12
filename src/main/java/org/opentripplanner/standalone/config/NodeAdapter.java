@@ -23,7 +23,7 @@ import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -69,14 +69,14 @@ public class NodeAdapter {
    */
   private final List<NodeAdapter> children = new ArrayList<>();
 
-  public NodeAdapter(@NotNull JsonNode node, String source) {
+  public NodeAdapter(@Nonnull JsonNode node, String source) {
     this(node, source, null);
   }
 
   /**
    * Constructor for nested configuration nodes.
    */
-  private NodeAdapter(@NotNull JsonNode node, String source, String contextPath) {
+  private NodeAdapter(@Nonnull JsonNode node, String source, String contextPath) {
     this.json = node;
     this.source = source;
     this.contextPath = contextPath;

@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.api.path;
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
@@ -10,8 +11,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * The path builder is a utility to build paths. The path builder is responsible for reconstructing

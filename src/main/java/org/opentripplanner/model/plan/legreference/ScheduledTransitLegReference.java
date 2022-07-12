@@ -1,16 +1,16 @@
 package org.opentripplanner.model.plan.legreference;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * A reference which can be used to rebuild an exact copy of a {@link ScheduledTransitLeg} using the
@@ -18,13 +18,13 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public record ScheduledTransitLegReference(
   FeedScopedId tripId,
-  ServiceDate serviceDate,
+  LocalDate serviceDate,
   int fromStopPositionInPattern,
   int toStopPositionInPattern
 )
   implements LegReference {
   @Override
-  public ScheduledTransitLeg getLeg(RoutingService routingService, TransitService transitService) {
+  public ScheduledTransitLeg getLeg(TransitService transitService) {
     Trip trip = transitService.getTripForId().get(tripId);
 
     if (trip == null) {
@@ -54,7 +54,7 @@ public record ScheduledTransitLegReference(
     TripTimes tripTimes = timetable.getTripTimes(trip);
 
     // TODO: What should we have here
-    ZoneId timeZone = routingService.getTimeZone().toZoneId();
+    ZoneId timeZone = transitService.getTimeZone();
 
     int boardingTime = tripTimes.getDepartureTime(fromStopPositionInPattern);
     int alightingTime = tripTimes.getArrivalTime(toStopPositionInPattern);
@@ -64,9 +64,9 @@ public record ScheduledTransitLegReference(
       tripPattern,
       fromStopPositionInPattern,
       toStopPositionInPattern,
-      serviceDate.toZonedDateTime(timeZone, boardingTime),
-      serviceDate.toZonedDateTime(timeZone, alightingTime),
-      serviceDate.toLocalDate(),
+      ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, boardingTime),
+      ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, alightingTime),
+      serviceDate,
       timeZone,
       null,
       null,

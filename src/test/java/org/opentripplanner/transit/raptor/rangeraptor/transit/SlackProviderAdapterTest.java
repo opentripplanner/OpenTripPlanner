@@ -5,11 +5,10 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.SlackProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 
 public class SlackProviderAdapterTest implements RaptorTestConstants {
 

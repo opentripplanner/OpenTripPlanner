@@ -24,6 +24,27 @@ public class OSMWay extends OSMWithTags {
   }
 
   /**
+   * Returns true if way geometry is a closed loop
+   */
+  public boolean isClosed() {
+    int size = nodes.size();
+
+    if (size > 2) {
+      long a = nodes.get(0);
+      long b = nodes.get(size - 1);
+      return a == b;
+    }
+    return false;
+  }
+
+  /**
+   * Returns true if way is both boarding location and closed polygon
+   */
+  public boolean isBoardingArea() {
+    return isBoardingLocation() && isClosed();
+  }
+
+  /**
    * Returns true if bicycle dismounts are forced.
    */
   public boolean isBicycleDismountForced() {

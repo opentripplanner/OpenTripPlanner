@@ -2,9 +2,9 @@ package org.opentripplanner.gtfs.mapping;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.util.TranslationHelper;
@@ -76,7 +76,7 @@ class StationMapper {
     );
 
     if (rhs.getTimezone() != null) {
-      builder.withTimezone(TimeZone.getTimeZone(rhs.getTimezone()));
+      builder.withTimezone(ZoneId.of(rhs.getTimezone()));
     }
     return builder.build();
   }

@@ -6,26 +6,27 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 public class ServiceDateIntervalTest {
 
-  private final ServiceDate d0 = new ServiceDate(2020, 1, 1);
-  private final ServiceDate d1 = new ServiceDate(2020, 1, 7);
-  private final ServiceDate d2 = new ServiceDate(2020, 1, 15);
-  private final ServiceDate d3 = new ServiceDate(2020, 2, 1);
-  private final ServiceDate d4 = new ServiceDate(2020, 2, 7);
+  private final LocalDate d0 = LocalDate.of(2020, 1, 1);
+  private final LocalDate d1 = LocalDate.of(2020, 1, 7);
+  private final LocalDate d2 = LocalDate.of(2020, 1, 15);
+  private final LocalDate d3 = LocalDate.of(2020, 2, 1);
+  private final LocalDate d4 = LocalDate.of(2020, 2, 7);
 
   @Test
   public void constructorFailsIfEndIsBeforeTheStart() {
-    assertThrows(IllegalArgumentException.class, () -> new ServiceDateInterval(d1.shift(1), d1));
+    assertThrows(IllegalArgumentException.class, () -> new ServiceDateInterval(d1.plusDays(1), d1));
   }
 
   @Test
   public void unlimited() {
     ServiceDateInterval u = ServiceDateInterval.unbounded();
-    assertTrue(u.include(ServiceDate.MIN_DATE));
-    assertTrue(u.include(ServiceDate.MAX_DATE));
+    assertTrue(u.include(LocalDate.MIN));
+    assertTrue(u.include(LocalDate.MAX));
   }
 
   @Test
@@ -38,13 +39,13 @@ public class ServiceDateIntervalTest {
   @Test
   public void getStart() {
     assertEquals(d1, new ServiceDateInterval(d1, d2).getStart());
-    assertEquals(ServiceDate.MIN_DATE, ServiceDateInterval.unbounded().getStart());
+    assertEquals(LocalDate.MIN, ServiceDateInterval.unbounded().getStart());
   }
 
   @Test
   public void getEnd() {
     assertEquals(d2, new ServiceDateInterval(d1, d2).getEnd());
-    assertEquals(ServiceDate.MAX_DATE, ServiceDateInterval.unbounded().getEnd());
+    assertEquals(LocalDate.MAX, ServiceDateInterval.unbounded().getEnd());
   }
 
   @Test
@@ -69,11 +70,11 @@ public class ServiceDateIntervalTest {
     assertTrue(subject.overlap(other), subject + " should overlap " + other);
 
     // Period ending day before, do NOT overlap
-    other = new ServiceDateInterval(d0, d1.shift(-1));
+    other = new ServiceDateInterval(d0, d1.minusDays(1));
     assertFalse(subject.overlap(other), subject + " should not overlap " + other);
 
     // Period start day after, do NOT overlap
-    other = new ServiceDateInterval(d2.shift(1), d3);
+    other = new ServiceDateInterval(d2.plusDays(1), d3);
     assertFalse(subject.overlap(other), subject + " should not overlap " + other);
 
     // Period overlap with unlimited
@@ -111,7 +112,8 @@ public class ServiceDateIntervalTest {
   public void intersectionFailsIfAUnionDoNotExist() {
     assertThrows(
       IllegalArgumentException.class,
-      () -> new ServiceDateInterval(d0, d1).intersection(new ServiceDateInterval(d1.shift(1), d2))
+      () ->
+        new ServiceDateInterval(d0, d1).intersection(new ServiceDateInterval(d1.plusDays(1), d2))
     );
   }
 

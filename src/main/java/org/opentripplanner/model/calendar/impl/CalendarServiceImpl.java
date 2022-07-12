@@ -1,13 +1,13 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.calendar.impl;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -30,9 +30,9 @@ public class CalendarServiceImpl implements CalendarService {
   }
 
   @Override
-  public Set<ServiceDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
-    Set<ServiceDate> dates = new HashSet<>();
-    List<ServiceDate> serviceDates = data.getServiceDatesForServiceId(serviceId);
+  public Set<LocalDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
+    Set<LocalDate> dates = new HashSet<>();
+    List<LocalDate> serviceDates = data.getServiceDatesForServiceId(serviceId);
     if (serviceDates != null) {
       dates.addAll(serviceDates);
     }
@@ -40,12 +40,12 @@ public class CalendarServiceImpl implements CalendarService {
   }
 
   @Override
-  public Set<FeedScopedId> getServiceIdsOnDate(ServiceDate date) {
+  public Set<FeedScopedId> getServiceIdsOnDate(LocalDate date) {
     return data.getServiceIdsForDate(date);
   }
 
   @Override
-  public TimeZone getTimeZoneForAgencyId(FeedScopedId agencyId) {
+  public ZoneId getTimeZoneForAgencyId(FeedScopedId agencyId) {
     return data.getTimeZoneForAgencyId(agencyId);
   }
 
@@ -58,7 +58,7 @@ public class CalendarServiceImpl implements CalendarService {
    *
    * @param serviceDate service date for the added service id
    */
-  public FeedScopedId getOrCreateServiceIdForDate(ServiceDate serviceDate) {
+  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     return data.getOrCreateServiceIdForDate(serviceDate);
   }
 }

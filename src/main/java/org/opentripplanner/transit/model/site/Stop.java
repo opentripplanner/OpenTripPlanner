@@ -1,16 +1,17 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.site;
 
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.SubMode;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.I18NString;
 
@@ -24,11 +25,11 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   private final I18NString url;
 
-  private final TimeZone timeZone;
+  private final ZoneId timeZone;
 
   private final TransitMode gtfsVehicleType;
 
-  private final String netexVehicleSubmode;
+  private final SubMode netexVehicleSubmode;
 
   private final Set<BoardingArea> boardingAreas;
 
@@ -40,7 +41,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
     this.url = builder.url();
     this.timeZone = builder.timeZone();
     this.gtfsVehicleType = builder.vehicleType();
-    this.netexVehicleSubmode = builder.netexSubmode();
+    this.netexVehicleSubmode = SubMode.getOrBuildAndCacheForever(builder.netexVehicleSubmode());
     this.boardingAreas = setOfNullSafe(builder.boardingAreas());
     this.fareZones = setOfNullSafe(builder.fareZones());
     if (isPartOfStation()) {
@@ -73,7 +74,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   @Override
   @Nullable
-  public TimeZone getTimeZone() {
+  public ZoneId getTimeZone() {
     return timeZone;
   }
 
@@ -87,9 +88,8 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
     return gtfsVehicleType;
   }
 
-  @Override
-  @Nullable
-  public String getNetexVehicleSubmode() {
+  @Nonnull
+  public SubMode getNetexVehicleSubmode() {
     return netexVehicleSubmode;
   }
 

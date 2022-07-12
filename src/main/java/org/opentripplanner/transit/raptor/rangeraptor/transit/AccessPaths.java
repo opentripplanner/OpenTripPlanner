@@ -57,7 +57,7 @@ public class AccessPaths {
    * <p>
    * This method is static and package local to enable unit-testing.
    */
-  static AccessPaths create(Collection<RaptorTransfer> paths, RaptorProfile profile) {
+  public static AccessPaths create(Collection<RaptorTransfer> paths, RaptorProfile profile) {
     if (!profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNoneOptimalPathsForStandardRaptor(paths);
     }

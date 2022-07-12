@@ -16,13 +16,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -163,7 +164,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GraphVisualizer.class);
-  private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(
+    "yyyy-MM-dd HH:mm:ss z"
+  );
+  public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss z");
   /* The router we are visualizing. */
   private final Router router;
   /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
@@ -429,12 +433,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   }
 
   protected void route(String from, String to) {
-    Date when;
+    Instant when;
     // Year + 1900
     try {
-      when = dateFormat.parse(searchDate.getText());
-    } catch (ParseException e) {
-      searchDate.setText("Format: " + dateFormat.toPattern());
+      when = ZonedDateTime.parse(searchDate.getText(), DATE_FORMAT).toInstant();
+    } catch (DateTimeParseException e) {
+      searchDate.setText("Format: " + DATE_FORMAT.toString());
       return;
     }
     TraverseModeSet modeSet = new TraverseModeSet();
@@ -459,7 +463,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
     // there should be a ui element for walk distance and optimize type
     options.setBicycleOptimizeType(getSelectedOptimizeType());
-    options.setDateTime(when.toInstant());
+    options.setDateTime(when);
     options.setFromString(from);
     options.setToString(to);
     options.walkSpeed = Float.parseFloat(walkSpeed.getText());
@@ -1283,13 +1287,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     resetSearchDateButton.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          searchDate.setText(dateFormat.format(new Date()));
+          searchDate.setText(DATE_FORMAT.format(Instant.now()));
         }
       }
     );
     routingPanel.add(resetSearchDateButton);
     searchDate = new JTextField();
-    searchDate.setText(dateFormat.format(new Date()));
+    searchDate.setText(DATE_FORMAT.format(Instant.now()));
     routingPanel.add(searchDate);
 
     // row: launch, continue, and clear path search
@@ -1352,9 +1356,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
 
     public String toString() {
-      SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
-      String startTime = shortDateFormat.format(new Date(gp.getStartTime() * 1000));
-      String endTime = shortDateFormat.format(new Date(gp.getEndTime() * 1000));
+      String startTime = TIME_FORMAT.format(Instant.ofEpochSecond(gp.getStartTime()));
+      String endTime = TIME_FORMAT.format(Instant.ofEpochSecond(gp.getEndTime()));
       return (
         "Path (" +
         startTime +

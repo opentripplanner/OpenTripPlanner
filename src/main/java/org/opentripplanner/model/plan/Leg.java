@@ -1,16 +1,18 @@
 package org.opentripplanner.model.plan;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -19,6 +21,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -231,7 +234,7 @@ public interface Leg {
    * for a given trip may happen at service date March 25th and service time 25:00, which in local
    * time would be Mach 26th 01:00.
    */
-  default ServiceDate getServiceDate() {
+  default LocalDate getServiceDate() {
     return null;
   }
 
@@ -352,7 +355,7 @@ public interface Leg {
   }
 
   /**
-   * An experimental feature for calculating a numeric score between 0 and 1 which indicates
+   * A sandbox feature for calculating a numeric score between 0 and 1 which indicates
    * how accessible the itinerary is as a whole. This is not a very scientific method but just
    * a rough guidance that expresses certainty or uncertainty about the accessibility.
    *
@@ -396,5 +399,24 @@ public interface Leg {
 
   default Leg withTimeShift(Duration duration) {
     throw new UnsupportedOperationException();
+  }
+
+  default Set<FareZone> getFareZones() {
+    var intermediate = getIntermediateStops()
+      .stream()
+      .flatMap(stopArrival -> stopArrival.place.stop.getFareZones().stream());
+
+    var start = getFareZones(this.getFrom());
+    var end = getFareZones(this.getTo());
+
+    return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
+  }
+
+  private static Stream<FareZone> getFareZones(Place place) {
+    if (place.stop == null) {
+      return Stream.empty();
+    } else {
+      return place.stop.getFareZones().stream();
+    }
   }
 }
