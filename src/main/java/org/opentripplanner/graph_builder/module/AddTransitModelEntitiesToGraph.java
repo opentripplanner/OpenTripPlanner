@@ -356,7 +356,7 @@ public class AddTransitModelEntitiesToGraph {
 
   private void addLocationsToGraph(TransitModel transitModel) {
     for (FlexStopLocation flexStopLocation : otpTransitService.getAllLocations()) {
-      transitModel.getStopModel().addLocations(flexStopLocation.getId(), flexStopLocation);
+      transitModel.getStopModel().addFlexLocation(flexStopLocation.getId(), flexStopLocation);
     }
   }
 

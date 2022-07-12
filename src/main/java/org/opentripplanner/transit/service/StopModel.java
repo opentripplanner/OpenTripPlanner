@@ -128,11 +128,11 @@ public class StopModel implements Serializable {
     return transitStopVertices.values();
   }
 
-  public boolean hasLocations() {
+  public boolean hasFlexLocations() {
     return !locationsById.isEmpty();
   }
 
-  public void addLocations(FeedScopedId id, FlexStopLocation flexStopLocation) {
+  public void addFlexLocation(FeedScopedId id, FlexStopLocation flexStopLocation) {
     locationsById.put(id, flexStopLocation);
   }
 

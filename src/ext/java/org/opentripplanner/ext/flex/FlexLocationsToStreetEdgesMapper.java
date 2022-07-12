@@ -27,7 +27,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    if (!transitModel.getStopModel().hasLocations()) {
+    if (!transitModel.getStopModel().hasFlexLocations()) {
       return;
     }
 
