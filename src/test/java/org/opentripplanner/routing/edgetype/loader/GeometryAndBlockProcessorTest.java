@@ -135,7 +135,7 @@ public class GeometryAndBlockProcessorTest {
     StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    transitModel.hasTransit = true;
+    transitModel.setHasTransit(true);
     ttsnm.buildGraph(graph, transitModel, new HashMap<>());
   }
 

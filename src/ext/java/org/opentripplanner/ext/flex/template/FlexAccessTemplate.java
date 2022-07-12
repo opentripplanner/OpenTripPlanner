@@ -111,7 +111,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   }
 
   protected Collection<PathTransfer> getTransfersFromTransferStop(TransitModel transitModel) {
-    return transitModel.transfersByStop.get(transferStop);
+    return transitModel.getTransfersByStop(transferStop);
   }
 
   protected Vertex getFlexVertex(Edge edge) {

@@ -64,8 +64,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     DataImportIssueStore issueStore
   ) {
     /* Initialize transit model index which is needed by the nearby stop finder. */
-    if (transitModel.index == null) {
-      transitModel.index = new TransitModelIndex(transitModel);
+    if (transitModel.getTransitModelIndex() == null) {
+      transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
       transitModel.getStopModel().index();
     }
 
@@ -165,7 +165,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         progress.step(m -> LOG.info(m));
       });
 
-    transitModel.transfersByStop.putAll(transfersByStop);
+    transitModel.addAllTransfersByStops(transfersByStop);
 
     LOG.info(progress.completeMessage());
     LOG.info(
@@ -173,7 +173,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
-    transitModel.hasDirectTransfers = true;
+    transitModel.setHasDirectTransfers(true);
   }
 
   @Override

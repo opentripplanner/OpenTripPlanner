@@ -249,7 +249,7 @@ public class TransitRouter {
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
-      createRequestTransitDataProviderFilter(transitModel.index),
+      createRequestTransitDataProviderFilter(transitModel.getTransitModelIndex()),
       new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
     );
   }

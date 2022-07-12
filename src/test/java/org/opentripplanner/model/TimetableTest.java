@@ -51,7 +51,7 @@ public class TimetableTest {
     feedId = transitModel.getFeedIds().stream().findFirst().get();
     patternIndex = new HashMap<>();
 
-    for (TripPattern pattern : transitModel.tripPatternForId.values()) {
+    for (TripPattern pattern : transitModel.getAllTripPatterns()) {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 

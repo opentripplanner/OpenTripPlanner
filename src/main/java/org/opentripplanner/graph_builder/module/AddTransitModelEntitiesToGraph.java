@@ -360,7 +360,7 @@ public class AddTransitModelEntitiesToGraph {
 
   private void addLocationsToGraph(TransitModel transitModel) {
     for (FlexStopLocation flexStopLocation : otpTransitService.getAllLocations()) {
-      transitModel.getStopModel().locationsById.put(flexStopLocation.getId(), flexStopLocation);
+      transitModel.getStopModel().addFlexLocation(flexStopLocation.getId(), flexStopLocation);
     }
   }
 
@@ -368,7 +368,7 @@ public class AddTransitModelEntitiesToGraph {
     for (FlexLocationGroup flexLocationGroup : otpTransitService.getAllLocationGroups()) {
       transitModel
         .getStopModel()
-        .locationGroupsById.put(flexLocationGroup.getId(), flexLocationGroup);
+        .addFlexLocationGroup(flexLocationGroup.getId(), flexLocationGroup);
     }
   }
 
@@ -406,14 +406,13 @@ public class AddTransitModelEntitiesToGraph {
       tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
+      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
     }
   }
 
   private void addFlexTripsToGraph(TransitModel transitModel) {
-    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) transitModel.flexTripsById.put(
-      flexTrip.getId(),
-      flexTrip
-    );
+    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) {
+      transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
+    }
   }
 }

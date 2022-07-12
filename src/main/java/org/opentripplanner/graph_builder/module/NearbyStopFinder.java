@@ -125,12 +125,15 @@ public class NearbyStopFinder {
 
       if (ts1 instanceof Stop) {
         /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-        for (TripPattern pattern : transitModel.index.getPatternsForStop(ts1)) {
+        for (TripPattern pattern : transitModel.getTransitModelIndex().getPatternsForStop(ts1)) {
           closestStopForPattern.putMin(pattern, nearbyStop);
         }
       }
       if (OTPFeature.FlexRouting.isOn()) {
-        for (FlexTrip trip : transitModel.index.getFlexIndex().flexTripsByStop.get(ts1)) {
+        for (FlexTrip trip : transitModel
+          .getTransitModelIndex()
+          .getFlexIndex()
+          .flexTripsByStop.get(ts1)) {
           closestStopForFlexTrip.putMin(trip, nearbyStop);
         }
       }
@@ -285,13 +288,17 @@ public class NearbyStopFinder {
       OTPFeature.VehicleToStopHeuristics.isOn() &&
       VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)
     ) {
-      var strategy = new VehicleToStopSkipEdgeStrategy(transitModel.index::getRoutesForStop);
+      var strategy = new VehicleToStopSkipEdgeStrategy(
+        transitModel.getTransitModelIndex()::getRoutesForStop
+      );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&
       routingRequest.modes.accessMode == StreetMode.BIKE
     ) {
-      var strategy = new BikeToStopSkipEdgeStrategy(transitModel.index::getTripsForStop);
+      var strategy = new BikeToStopSkipEdgeStrategy(
+        transitModel.getTransitModelIndex()::getTripsForStop
+      );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else {
       return durationSkipEdgeStrategy;

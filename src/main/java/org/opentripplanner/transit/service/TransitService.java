@@ -59,7 +59,7 @@ public interface TransitService {
 
   TripPattern getTripPatternForId(FeedScopedId id);
 
-  Collection<TripPattern> getTripPatterns();
+  Collection<TripPattern> getAllTripPatterns();
 
   Collection<Notice> getNotices();
 
