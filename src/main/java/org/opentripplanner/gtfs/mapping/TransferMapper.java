@@ -287,9 +287,4 @@ class TransferMapper {
     }
     return a.getGtfsBlockId() != null && a.getGtfsBlockId().equals(b.getGtfsBlockId());
   }
-
-  public record TransferMappingResult(
-    Collection<ConstrainedTransfer> constrainedTransfers,
-    Collection<StaySeatedNotAllowed> staySeatedNotAllowed
-  ) {}
 }

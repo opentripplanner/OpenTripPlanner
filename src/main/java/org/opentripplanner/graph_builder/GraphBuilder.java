@@ -124,7 +124,6 @@ public class GraphBuilder implements Runnable {
         }
         gtfsBundle.parentStationTransfers = config.stationTransfers;
         gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
-        gtfsBundle.maxInterlineDistance = config.maxInterlineDistance;
         gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
         gtfsBundles.add(gtfsBundle);
       }
@@ -132,7 +131,8 @@ public class GraphBuilder implements Runnable {
         gtfsBundles,
         config.getTransitServicePeriod(),
         config.fareServiceFactory,
-        config.discardMinTransferTimes
+        config.discardMinTransferTimes,
+        config.maxInterlineDistance
       );
       graphBuilder.addModule(gtfsModule);
     }

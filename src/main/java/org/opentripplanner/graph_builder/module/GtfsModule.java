@@ -62,22 +62,25 @@ public class GtfsModule implements GraphBuilderModule {
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
   private final boolean discardMinTransferTimes;
+  private final int maxInterlineDistance;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
   public GtfsModule(
     List<GtfsBundle> bundles,
     ServiceDateInterval transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
-    boolean discardMinTransferTimes
+    boolean discardMinTransferTimes,
+    int maxInterlineDistance
   ) {
     this.gtfsBundles = bundles;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
     this.discardMinTransferTimes = discardMinTransferTimes;
+    this.maxInterlineDistance = maxInterlineDistance;
   }
 
   public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
-    this(bundles, transitPeriodLimit, new DefaultFareServiceFactory(), false);
+    this(bundles, transitPeriodLimit, new DefaultFareServiceFactory(), false, 100);
   }
 
   @Override
@@ -147,10 +150,10 @@ public class GtfsModule implements GraphBuilderModule {
         new InterlineProcessor(
           transitModel.getTransferService(),
           builder.getStaySeatedNotAllowed(),
-          gtfsBundle.maxInterlineDistance,
+          maxInterlineDistance,
           issueStore
         )
-          .run(transitModel.getTripPatterns());
+          .run(transitModel.getAllTripPatterns());
 
         fareServiceFactory.processGtfs(otpTransitService);
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
