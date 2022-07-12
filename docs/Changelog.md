@@ -70,6 +70,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Expose SIRI ET PredictionInaccurate in Transmodel-API [#4217](https://github.com/opentripplanner/OpenTripPlanner/pull/4217)
 - Do not apply walkable area processing to open platform geometries [#4225](https://github.com/opentripplanner/OpenTripPlanner/pull/4225)
 - Add field 'routingErrors' to LegacyGraphQLAPI [#4253](https://github.com/opentripplanner/OpenTripPlanner/pull/4253)
+- Use full seconds for A-star state [#4260](https://github.com/opentripplanner/OpenTripPlanner/pull/4260)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
