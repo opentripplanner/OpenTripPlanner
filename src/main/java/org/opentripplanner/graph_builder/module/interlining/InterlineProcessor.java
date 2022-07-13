@@ -52,7 +52,7 @@ public class InterlineProcessor {
     var transfers = interlinedTrips
       .entries()
       .stream()
-      .filter(this::staySeatedNotForbidden)
+      .filter(this::staySeatedAllowed)
       .map(p -> {
         var constraint = TransferConstraint.create();
         constraint.staySeated();
@@ -87,7 +87,7 @@ public class InterlineProcessor {
     return transfers;
   }
 
-  private boolean staySeatedNotForbidden(Map.Entry<P2<TripPattern>, P2<Trip>> p) {
+  private boolean staySeatedAllowed(Map.Entry<P2<TripPattern>, P2<Trip>> p) {
     var fromTrip = p.getValue().first;
     var toTrip = p.getValue().second;
     return staySeatedNotAllowed
