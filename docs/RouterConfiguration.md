@@ -175,9 +175,11 @@ multiplier for transit leg  travel time `x` (in seconds). Example configuration:
 ```JSON
 // router-config.json
 {
-  "unpreferredRouteCost": "300 + 2.0 x",
-  "unprefer": {
-    "routes": ["feed1:101", "feed1:102"]
+  "routingDefaults": {
+    "unpreferredRouteCost": "300 + 2.0 x",
+    "unpreferred": {
+      "routes": ["feed1:101", "feed1:102"]
+    }
   }
 }
 ```

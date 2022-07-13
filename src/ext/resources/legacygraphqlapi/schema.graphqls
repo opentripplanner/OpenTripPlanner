@@ -1124,8 +1124,10 @@ input InputUnpreferred {
     """
     Penalty added for using route that is unpreferred, i.e. number of seconds that we are willing to
     wait for route that is unpreferred.
+
+    Deprecated: Use `unpreferredRouteCost` instead.
     """
-    useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredRouteCost instead.")
+    useUnpreferredRoutesPenalty: Int
 }
 
 enum RoutingErrorCode {
