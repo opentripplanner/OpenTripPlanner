@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiCurrency;
 import org.opentripplanner.api.model.ApiFare;
 import org.opentripplanner.api.model.ApiFareComponent;
+import org.opentripplanner.api.model.ApiFareQualifier;
 import org.opentripplanner.api.model.ApiMoney;
 import org.opentripplanner.model.FareContainer;
 import org.opentripplanner.model.RiderCategory;
@@ -56,8 +57,14 @@ public class FareMapper {
       m.fareId(),
       toApiMoney(m.price()),
       m.routes(),
-      Optional.ofNullable(m.container()).map(FareContainer::name).orElse(null),
-      Optional.ofNullable(m.category()).map(RiderCategory::name).orElse(null)
+      Optional
+        .ofNullable(m.container())
+        .map(c -> new ApiFareQualifier(c.id(), c.name()))
+        .orElse(null),
+      Optional
+        .ofNullable(m.category())
+        .map(c -> new ApiFareQualifier(c.id(), c.name()))
+        .orElse(null)
     );
   }
 }
