@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.OtpModel;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
@@ -288,7 +289,8 @@ public abstract class GraphRoutingTest {
         length,
         0,
         0,
-        false
+        false,
+        PathwayMode.WALKWAY
       );
     }
 
