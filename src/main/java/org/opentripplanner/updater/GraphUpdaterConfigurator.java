@@ -62,7 +62,7 @@ public abstract class GraphUpdaterConfigurator {
       createUpdatersFromConfig(
         updatersParameters,
         graph.getOpeningHoursCalendarService(),
-        graph.getTimeZone().toZoneId()
+        transitModel.getTimeZone()
       )
     );
     updaters.addAll(

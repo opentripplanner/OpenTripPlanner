@@ -32,6 +32,7 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -61,11 +62,13 @@ public class GraphBuilder implements Runnable {
 
   private boolean hasTransitData = false;
 
-  private GraphBuilder(Graph baseGraph) {
+  private GraphBuilder(Graph baseGraph, ServiceDateInterval serviceDateInterval) {
     if (baseGraph == null) {
       StopModel stopModel = new StopModel();
       Deduplicator deduplicator = new Deduplicator();
-      this.graph = new Graph(stopModel, deduplicator);
+      Graph graph = new Graph(stopModel, deduplicator);
+      graph.setOpeningHoursCalendarService(serviceDateInterval);
+      this.graph = graph;
       this.transitModel = new TransitModel(stopModel, deduplicator);
     } else {
       this.graph = baseGraph;
@@ -90,7 +93,7 @@ public class GraphBuilder implements Runnable {
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
 
-    GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
+    GraphBuilder graphBuilder = new GraphBuilder(baseGraph, config.getTransitServicePeriod());
     graphBuilder.hasTransitData = hasTransitData;
 
     if (hasOsm) {

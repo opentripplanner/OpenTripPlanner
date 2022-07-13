@@ -174,7 +174,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.osmOpeningHoursParser =
       new OSMOpeningHoursParser(
         graph.getOpeningHoursCalendarService(),
-        graph.getTimeZone().toZoneId(),
+        transitModel.getTimeZone(),
         issueStore
       );
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);

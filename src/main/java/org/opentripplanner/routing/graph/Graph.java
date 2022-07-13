@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
@@ -354,26 +354,16 @@ public class Graph implements Serializable {
   }
 
   public OpeningHoursCalendarService getOpeningHoursCalendarService() {
-    if (openingHoursCalendarService == null) {
-      if (transitServiceStarts == Long.MAX_VALUE) {
-        // transit start/end has not been set, default to -1 year and +3 years
-        this.openingHoursCalendarService =
-          new OpeningHoursCalendarService(
-            deduplicator,
-            LocalDate.now().minusYears(1),
-            LocalDate.now().plusYears(3)
-          );
-      } else {
-        // Use transitServiceStarts and transitServiceEnds to limit opening hours if defined
-        this.openingHoursCalendarService =
-          new OpeningHoursCalendarService(
-            deduplicator,
-            Instant.ofEpochSecond(transitServiceStarts).atZone(timeZone.toZoneId()).toLocalDate(),
-            Instant.ofEpochSecond(transitServiceEnds).atZone(timeZone.toZoneId()).toLocalDate()
-          );
-      }
-    }
     return this.openingHoursCalendarService;
+  }
+
+  public void setOpeningHoursCalendarService(ServiceDateInterval serviceDateInterval) {
+    this.openingHoursCalendarService =
+      new OpeningHoursCalendarService(
+        deduplicator,
+        serviceDateInterval.getStart(),
+        serviceDateInterval.getEnd()
+      );
   }
 
   public StreetVertexIndex getStreetIndex() {
