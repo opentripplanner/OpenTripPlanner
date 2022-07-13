@@ -39,6 +39,16 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null,
     null
   );
+
+  FareProduct singleFromOuter = new FareProduct(
+    new FeedScopedId(FEED_ID, "single_from_outer"),
+    "Single one-way ticket from outer zone to anywhere",
+    Money.euros(100),
+    null,
+    null,
+    null
+  );
+
   FareProduct dayPass = new FareProduct(
     new FeedScopedId(FEED_ID, "day_pass"),
     "Day Pass",
@@ -86,6 +96,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     List.of(
       new FareLegRule(FEED_ID, null, null, null, single),
       new FareLegRule(FEED_ID, null, null, OUTER_ZONE, singleToOuter),
+      new FareLegRule(FEED_ID, null, OUTER_ZONE, null, singleFromOuter),
       new FareLegRule(FEED_ID, null, null, null, dayPass),
       new FareLegRule(FEED_ID, express, null, null, expressPass),
       new FareLegRule(FEED_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
@@ -101,7 +112,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(single, dayPass), result.productsCoveringItinerary().stream().toList());
+    assertEquals(List.of(single, dayPass), result.productsCoveringItinerary());
   }
 
   @Test
@@ -109,7 +120,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(dayPass), result.productsCoveringItinerary().stream().toList());
+    assertEquals(List.of(dayPass), result.productsCoveringItinerary());
   }
 
   @Test
@@ -117,7 +128,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, express).build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(expressPass), result.productsCoveringItinerary().stream().toList());
+    assertEquals(List.of(expressPass), result.productsCoveringItinerary());
   }
 
   @Test
@@ -128,10 +139,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .build();
 
     var result = service.getProducts(i1);
-    assertEquals(
-      List.of(innerToOuterZoneSingle),
-      result.productsCoveringItinerary().stream().toList()
-    );
+    assertEquals(List.of(innerToOuterZoneSingle), result.productsCoveringItinerary());
   }
 
   @Test
@@ -142,7 +150,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(singleToOuter), result.productsCoveringItinerary().stream().toList());
+    assertEquals(List.of(singleToOuter), result.productsCoveringItinerary());
   }
 
   @Test
@@ -153,6 +161,6 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(singleToOuter), result.productsCoveringItinerary().stream().toList());
+    assertEquals(List.of(singleFromOuter), result.productsCoveringItinerary());
   }
 }

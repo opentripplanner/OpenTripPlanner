@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -44,7 +46,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .distinct()
       .toList();
 
-    return new ProductResult(coveringItinerary);
+    return new ProductResult(coveringItinerary, Map.of());
   }
 
   private static Set<String> findAreasWithRules(
@@ -96,4 +98,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 }
 
-record ProductResult(List<FareProduct> productsCoveringItinerary) {}
+record ProductResult(
+  List<FareProduct> productsCoveringItinerary,
+  Map<Leg, List<FareProduct>> productsByLeg
+) {}
