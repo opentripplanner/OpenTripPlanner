@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.FareProduct;
 
 /**
@@ -101,6 +102,27 @@ public class Fare {
 
   public Set<Money> getMoneys() {
     return details.values().stream().map(FareEntry::amount).collect(Collectors.toSet());
+  }
+
+  public void addLegProducts(List<LegProducts> legProducts) {
+    legProducts.forEach(lp -> {
+      var sum = Money.usDollars(1000);
+      var components = lp
+        .products()
+        .stream()
+        .map(p ->
+          new FareComponent(
+            p.id(),
+            p.amount(),
+            List.of(lp.leg().getRoute().getId()),
+            p.container(),
+            p.category()
+          )
+        )
+        .toList();
+      var id = lp.products().stream().map(l -> l.id().toString()).collect(Collectors.joining());
+      details.put(id, new FareEntry(sum, components));
+    });
   }
 
   public enum FareType implements Serializable {

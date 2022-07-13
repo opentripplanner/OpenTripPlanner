@@ -7,11 +7,11 @@ import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
@@ -113,8 +113,6 @@ public final class GtfsFaresV2Service implements Serializable {
     );
   }
 }
-
-record LegProducts(Leg leg, Set<FareProduct> products) {}
 
 record ProductResult(List<FareProduct> productsCoveringItinerary, List<LegProducts> legProducts) {
   public Set<FareProduct> getProducts(Leg leg) {

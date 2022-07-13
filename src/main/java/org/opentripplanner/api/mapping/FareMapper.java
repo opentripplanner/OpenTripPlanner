@@ -11,8 +11,6 @@ import org.opentripplanner.api.model.ApiFare;
 import org.opentripplanner.api.model.ApiFareComponent;
 import org.opentripplanner.api.model.ApiFareQualifier;
 import org.opentripplanner.api.model.ApiMoney;
-import org.opentripplanner.model.FareContainer;
-import org.opentripplanner.model.RiderCategory;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
