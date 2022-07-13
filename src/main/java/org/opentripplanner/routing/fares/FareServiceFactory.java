@@ -8,5 +8,5 @@ public interface FareServiceFactory {
 
   void processGtfs(OtpTransitService transitService);
 
-  void configure(JsonNode onfig);
+  void configure(JsonNode config);
 }
