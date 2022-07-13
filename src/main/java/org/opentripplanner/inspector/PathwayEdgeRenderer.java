@@ -83,7 +83,7 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
 
     attrs.label = sb.toString();
     attrs.color =
-      switch (stationElement.getClass().getName()) {
+      switch (stationElement.getClass().getSimpleName()) {
         case "Stop" -> Color.ORANGE;
         case "PathwayNode" -> new Color(217, 38, 145);
         case "Entrance" -> new Color(38, 184, 217);
