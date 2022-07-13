@@ -5,3 +5,4 @@ route1,serv0,route1-trip1,block2
 route1,serv0,route1-trip2,block2
 route2,serv0,route2-trip1,block3
 route2,serv0,route2-trip2,block3
+route3,serv0,route3-trip1,block0

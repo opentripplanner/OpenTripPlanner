@@ -19,7 +19,7 @@ public class InterliningTest extends GtfsTest {
   }
 
   @Test
-  public void shouldInterline() {
+  public void interlineOnSameRoute() {
     // We should arrive at the destination using two legs, both of which are on
     // the same route and with zero transfers.
     Itinerary itinerary = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
@@ -28,6 +28,18 @@ public class InterliningTest extends GtfsTest {
 
     var secondLeg = itinerary.getLegs().get(1);
     assertEquals(secondLeg.getRoute().getId().getId(), "route1");
+    assertTrue(secondLeg.isInterlinedWithPreviousLeg());
+    assertEquals(0, itinerary.getNumberOfTransfers());
+  }
+
+  @Test
+  public void interlineOnDifferentRoute() {
+    var itinerary = plan(time, "stop0", "stop6", null, false, false, null, null, null, 2);
+
+    assertEquals(itinerary.getLegs().get(0).getRoute().getId().getId(), "route0");
+
+    var secondLeg = itinerary.getLegs().get(1);
+    assertEquals(secondLeg.getRoute().getId().getId(), "route3");
     assertTrue(secondLeg.isInterlinedWithPreviousLeg());
     assertEquals(0, itinerary.getNumberOfTransfers());
   }
