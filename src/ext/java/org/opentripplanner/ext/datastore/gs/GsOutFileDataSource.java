@@ -33,6 +33,6 @@ class GsOutFileDataSource extends AbstractGsDataSource implements DataSource {
   @Override
   public OutputStream asOutputStream() {
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId()).build();
-    return newOutputStream(storage.writer(blobInfo));
+    return newOutputStream(storage.writer(blobInfo, Storage.BlobWriteOption.doesNotExist()));
   }
 }
