@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
@@ -38,15 +37,30 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public ProductResult getProducts(Itinerary itinerary) {
-    var coveringItinerary = itinerary
-      .getTransitLegs()
-      .stream()
-      .flatMap(this::getLegProducts)
-      .filter(p -> p.coversItinerary(itinerary))
-      .distinct()
-      .toList();
+    var legProducts = itinerary.getTransitLegs().stream().map(this::getLegProduct).toList();
 
-    return new ProductResult(coveringItinerary, Map.of());
+    var coveringItinerary = productsCoveringItinerary(itinerary, legProducts);
+
+    return new ProductResult(coveringItinerary, legProducts);
+  }
+
+  private List<FareProduct> productsCoveringItinerary(
+    Itinerary itinerary,
+    List<LegProducts> legProducts
+  ) {
+    var distinctProductSets = legProducts
+      .stream()
+      .map(LegProducts::products)
+      .collect(Collectors.toSet());
+
+    if (distinctProductSets.size() <= 1) {
+      return distinctProductSets
+        .stream()
+        .flatMap(p -> p.stream().filter(ps -> ps.coversItinerary(itinerary)))
+        .toList();
+    } else {
+      return List.of();
+    }
   }
 
   private static Set<String> findAreasWithRules(
@@ -64,8 +78,8 @@ public final class GtfsFaresV2Service implements Serializable {
       .collect(Collectors.toSet());
   }
 
-  private Stream<FareProduct> getLegProducts(ScheduledTransitLeg leg) {
-    return legRules
+  private LegProducts getLegProduct(ScheduledTransitLeg leg) {
+    var products = legRules
       .stream()
       // make sure that you only get rules for the correct feed
       .filter(legRule -> leg.getAgency().getId().getFeedId().equals(legRule.feedId()))
@@ -75,7 +89,9 @@ public final class GtfsFaresV2Service implements Serializable {
       // covers this area
       .filter(rule -> filterByArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules))
       .filter(rule -> filterByArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules))
-      .map(FareLegRule::fareProduct);
+      .map(FareLegRule::fareProduct)
+      .collect(Collectors.toSet());
+    return new LegProducts(leg, products);
   }
 
   private boolean filterByArea(StopLocation stop, String areaId, Set<String> areasWithRules) {
@@ -98,7 +114,15 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 }
 
-record ProductResult(
-  List<FareProduct> productsCoveringItinerary,
-  Map<Leg, List<FareProduct>> productsByLeg
-) {}
+record LegProducts(Leg leg, Set<FareProduct> products) {}
+
+record ProductResult(List<FareProduct> productsCoveringItinerary, List<LegProducts> legProducts) {
+  public Set<FareProduct> getProducts(Leg leg) {
+    return legProducts
+      .stream()
+      .filter(lp -> lp.leg().equals(leg))
+      .findFirst()
+      .map(LegProducts::products)
+      .orElse(Set.of());
+  }
+}

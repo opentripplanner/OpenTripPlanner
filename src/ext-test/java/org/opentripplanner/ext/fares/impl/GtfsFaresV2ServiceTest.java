@@ -8,6 +8,7 @@ import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FareLegRule;
 import org.opentripplanner.model.FareProduct;
@@ -21,7 +22,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   int ID = 100;
-  String express = "express";
+  String expressNetwork = "express";
+  String localNetwork = "local";
 
   FareProduct single = new FareProduct(
     new FeedScopedId(FEED_ID, "single"),
@@ -83,6 +85,14 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null
   );
 
+  FareProduct localPass = new FareProduct(
+    new FeedScopedId(FEED_ID, "local_pass"),
+    "Local Pass",
+    Money.euros(2000),
+    Duration.ofDays(1),
+    null,
+    null
+  );
   Place INNER_ZONE_STOP = Place.forStop(
     TransitModelForTest.stop("inner city stop").withCoordinate(1, 1).build()
   );
@@ -98,7 +108,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       new FareLegRule(FEED_ID, null, null, OUTER_ZONE, singleToOuter),
       new FareLegRule(FEED_ID, null, OUTER_ZONE, null, singleFromOuter),
       new FareLegRule(FEED_ID, null, null, null, dayPass),
-      new FareLegRule(FEED_ID, express, null, null, expressPass),
+      new FareLegRule(FEED_ID, expressNetwork, null, null, expressPass),
+      new FareLegRule(FEED_ID, localNetwork, null, null, localPass),
       new FareLegRule(FEED_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
       new FareLegRule("another-feed", null, null, null, monthlyPass)
     ),
@@ -125,7 +136,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   @Test
   void networkId() {
-    Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, express).build();
+    Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
     var result = service.getProducts(i1);
     assertEquals(List.of(expressPass), result.productsCoveringItinerary());
@@ -162,5 +173,28 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     var result = service.getProducts(i1);
     assertEquals(List.of(singleFromOuter), result.productsCoveringItinerary());
+  }
+
+  /**
+   * Because we use both the local and the express network, there is no product covering both.
+   */
+  @Test
+  void separateFares() {
+    Itinerary i1 = newItinerary(A, 0)
+      .walk(20, A)
+      .faresV2Rail(ID, 0, 50, B, localNetwork)
+      .faresV2Rail(ID, 60, 100, C, expressNetwork)
+      .build();
+
+    var result = service.getProducts(i1);
+    assertEquals(0, result.productsCoveringItinerary().size());
+
+    var localLeg = i1.getLegs().get(1);
+    var localLegProducts = result.getProducts(localLeg);
+    assertEquals(Set.of(localPass), localLegProducts);
+
+    var expressLeg = i1.getLegs().get(2);
+    var expressProducts = result.getProducts(expressLeg);
+    assertEquals(Set.of(expressPass), expressProducts);
   }
 }
