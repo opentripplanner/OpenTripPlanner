@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
@@ -16,15 +17,15 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
   private static final long serialVersionUID = 20120229L;
 
   private final boolean analyzeInterlinedTransfers;
-  private final int freeTransferWindowInMinutes;
+  private final Duration freeTransferWindow;
 
   public HighestFareInFreeTransferWindowFareService(
     Collection<FareRuleSet> regularFareRules,
-    int freeTransferWindowInMinutes,
+    Duration freeTransferWindow,
     boolean analyzeInterlinedTransfers
   ) {
     addFareRules(FareType.regular, regularFareRules);
-    this.freeTransferWindowInMinutes = freeTransferWindowInMinutes;
+    this.freeTransferWindow = freeTransferWindow;
     this.analyzeInterlinedTransfers = analyzeInterlinedTransfers;
   }
 
@@ -66,7 +67,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
         // the new transfer window end time should be calculated by adding the ride's start time (which is in
         // seconds past the epoch) and the number of equivalent seconds in the free transfer window minutes.
         freeTransferWindowEndTimeEpochSeconds =
-          leg.getStartTime().toEpochSecond() + freeTransferWindowInMinutes * 60L;
+          leg.getStartTime().plus(freeTransferWindow).toEpochSecond();
       }
 
       currentTransferWindowCost = Float.max(currentTransferWindowCost, rideCost);

@@ -11,6 +11,7 @@ import org.opentripplanner.ext.fares.impl.SFBayFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.SeattleFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.TimeBasedVehicleRentalFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.standalone.config.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

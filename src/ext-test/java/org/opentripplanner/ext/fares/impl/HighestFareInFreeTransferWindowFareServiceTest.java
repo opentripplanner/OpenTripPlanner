@@ -4,6 +4,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -80,7 +81,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     FareService defaultFareService = new HighestFareInFreeTransferWindowFareService(
       defaultFareRules,
-      150,
+      Duration.ofMinutes(150),
       false
     );
 
@@ -206,7 +207,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     // analyzeInterlinedTransfers set to true should calculate the second route cost
     FareService fareServiceWithAnalyzedInterlinedTransfersConfig = new HighestFareInFreeTransferWindowFareService(
       defaultFareRules,
-      150,
+      Duration.ofMinutes(150),
       true
     );
 
