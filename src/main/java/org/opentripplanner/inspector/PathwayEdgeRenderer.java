@@ -1,45 +1,97 @@
 package org.opentripplanner.inspector;
 
 import java.awt.Color;
-import java.util.Optional;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
-import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.site.StationElement;
+import org.opentripplanner.transit.model.site.Stop;
 
 public class PathwayEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
   public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-    if (e instanceof PathwayEdge pwe) {
-      attrs.label =
-        "distance=%s,time=%s".formatted(
-            Math.round(pwe.getDistanceMeters()),
-            pwe.getDistanceIndependentTime()
-          );
-      attrs.color = new Color(145, 217, 38);
-      return true;
+    if (!(e instanceof PathwayEdge pwe)) {
+      return false;
     }
-    return false;
+
+    StringBuilder sb = new StringBuilder();
+
+    if (!pwe.hasBogusName()) {
+      sb.append("name=").append(pwe.getName()).append(", ");
+    }
+
+    if (pwe.getDistanceMeters() != 0) {
+      sb.append("distance=").append(Math.round(pwe.getDistanceMeters())).append(", ");
+    }
+
+    if (pwe.getDistanceIndependentTime() != 0) {
+      sb.append("time=").append(pwe.getDistanceIndependentTime()).append(", ");
+    }
+
+    if (pwe.getSteps() != 0) {
+      sb.append("steps=").append(pwe.getSteps()).append(", ");
+    }
+
+    // remove last comma
+    if (!sb.isEmpty()) {
+      sb.setLength(sb.length() - 2);
+    }
+
+    attrs.label = sb.toString();
+
+    attrs.color =
+      switch (pwe.getMode()) {
+        case WALKWAY -> new Color(145, 217, 38);
+        case STAIRS -> Color.CYAN;
+        case MOVING_SIDEWALK -> Color.GREEN;
+        case ESCALATOR -> Color.BLUE;
+        case ELEVATOR -> Color.PINK;
+        case FARE_GATE -> Color.RED;
+        case EXIT_GATE -> Color.MAGENTA;
+      };
+
+    if (!pwe.isWheelchairAccessible()) {
+      attrs.color = attrs.color.darker();
+    }
+
+    return true;
   }
 
   @Override
   public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
-    if (v instanceof TransitPathwayNodeVertex) {
-      attrs.color = new Color(217, 38, 145);
-      return true;
-    } else if (v instanceof TransitEntranceVertex tev) {
-      attrs.label = Optional.ofNullable(tev.getName()).map(I18NString::toString).orElse(null);
-      attrs.color = new Color(38, 184, 217);
-      return true;
+    StationElement stationElement = v.getStationElement();
+
+    if (stationElement == null) {
+      return false;
     }
-    return false;
+
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(stationElement.getName());
+
+    if (stationElement instanceof Stop stop && stop.getPlatformCode() != null) {
+      sb.append(" [").append(stop.getPlatformCode()).append("]");
+    }
+
+    if (stationElement.getCode() != null) {
+      sb.append(" (").append(stationElement.getCode()).append(")");
+    }
+
+    attrs.label = sb.toString();
+    attrs.color =
+      switch (stationElement.getClass().getName()) {
+        case "Stop" -> Color.ORANGE;
+        case "PathwayNode" -> new Color(217, 38, 145);
+        case "Entrance" -> new Color(38, 184, 217);
+        case "BoardingArea" -> Color.PINK;
+        default -> Color.LIGHT_GRAY;
+      };
+
+    return true;
   }
 
   @Override
