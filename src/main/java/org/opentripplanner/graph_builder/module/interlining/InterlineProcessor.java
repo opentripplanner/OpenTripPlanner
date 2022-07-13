@@ -33,7 +33,7 @@ public class InterlineProcessor {
   private final TransferService transferService;
   private final int maxInterlineDistance;
   private final DataImportIssueStore issueStore;
-  private List<StaySeatedNotAllowed> staySeatedNotAllowed;
+  private final List<StaySeatedNotAllowed> staySeatedNotAllowed;
 
   public InterlineProcessor(
     TransferService transferService,
@@ -171,14 +171,14 @@ public class InterlineProcessor {
 
     return interlines;
   }
-}
 
-/**
- * This compound key object is used when grouping interlining trips together by (serviceId,
- * blockId).
- */
-record BlockIdAndServiceId(String blockId, FeedScopedId serviceId) {
-  static BlockIdAndServiceId ofTrip(Trip trip) {
-    return new BlockIdAndServiceId(trip.getGtfsBlockId(), trip.getServiceId());
+  /**
+   * This compound key object is used when grouping interlining trips together by (serviceId,
+   * blockId).
+   */
+  private record BlockIdAndServiceId(String blockId, FeedScopedId serviceId) {
+    static BlockIdAndServiceId ofTrip(Trip trip) {
+      return new BlockIdAndServiceId(trip.getGtfsBlockId(), trip.getServiceId());
+    }
   }
 }
