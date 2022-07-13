@@ -1,12 +1,14 @@
 package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.jsonNodeForTest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceImpl;
 
 public class BuildConfigTest {
 
@@ -28,5 +30,12 @@ public class BuildConfigTest {
     var subject = new BuildConfig(node, "Test", false);
 
     assertEquals(Set.of("a-ha", "royksopp"), subject.boardingLocationTags);
+  }
+
+  @Test
+  public void fareService() {
+    var node = jsonNodeForTest("{ 'fares' : \"default\" }");
+    var conf = new BuildConfig(node, "Test", false);
+    assertSame(DefaultFareServiceImpl.class, conf.fareServiceFactory.makeFareService().getClass());
   }
 }

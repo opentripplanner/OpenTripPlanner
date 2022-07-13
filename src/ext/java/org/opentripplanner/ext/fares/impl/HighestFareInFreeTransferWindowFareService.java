@@ -29,6 +29,14 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
     this.analyzeInterlinedTransfers = analyzeInterlinedTransfers;
   }
 
+  public boolean analyzeInterlinedTransfers() {
+    return analyzeInterlinedTransfers;
+  }
+
+  public Duration freeTransferWindow() {
+    return freeTransferWindow;
+  }
+
   /**
    * The fare calculation is designed to charge the rider incrementally as they use each service.
    * The total cost of the itinerary will be equal to the leg of the journey that had the maximum

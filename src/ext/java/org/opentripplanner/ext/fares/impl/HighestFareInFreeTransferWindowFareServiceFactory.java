@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
   }
 
   @Override
-  public void configure(NodeAdapter config) {
+  public void configure(JsonNode config) {
     var adapter = new NodeAdapter(config, null);
     freeTransferWindow = adapter.asDuration("freeTransferWindow", freeTransferWindow);
 
