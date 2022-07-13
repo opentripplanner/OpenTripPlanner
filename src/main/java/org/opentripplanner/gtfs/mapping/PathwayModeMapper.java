@@ -13,7 +13,7 @@ public class PathwayModeMapper {
       case 5 -> PathwayMode.ELEVATOR;
       case 6 -> PathwayMode.FARE_GATE;
       case 7 -> PathwayMode.EXIT_GATE;
-      default -> throw new IllegalArgumentException("Invalid pathway mode: " + pathwayMode);
+      default -> PathwayMode.UNKNOWN;
     };
   }
 }

@@ -52,6 +52,7 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
         case ELEVATOR -> Color.PINK;
         case FARE_GATE -> Color.RED;
         case EXIT_GATE -> Color.MAGENTA;
+        case UNKNOWN -> Color.GRAY;
       };
 
     if (!pwe.isWheelchairAccessible()) {

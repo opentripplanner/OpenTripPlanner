@@ -8,4 +8,5 @@ public enum PathwayMode {
   ELEVATOR,
   FARE_GATE,
   EXIT_GATE,
+  UNKNOWN,
 }
