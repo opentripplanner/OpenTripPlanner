@@ -138,6 +138,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return name;
   }
 
+  @Override
+  public boolean hasBogusName() {
+    return name.equals(DEFAULT_NAME);
+  }
+
   public LineString getGeometry() {
     Coordinate[] coordinates = new Coordinate[] {
       getFromVertex().getCoordinate(),
@@ -162,6 +167,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   @Override
   public int getDistanceIndependentTime() {
     return traversalTime;
+  }
+
+  public int getSteps() {
+    return steps;
   }
 
   public FeedScopedId getId() {
