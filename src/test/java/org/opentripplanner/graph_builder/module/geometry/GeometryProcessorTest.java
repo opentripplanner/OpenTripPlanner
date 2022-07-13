@@ -11,7 +11,7 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
-public class GeometryAndBlockProcessorTest {
+public class GeometryProcessorTest {
 
   @Test
   public void testBikesAllowed() throws IOException {
@@ -38,8 +38,8 @@ public class GeometryAndBlockProcessorTest {
       .withIssueStoreAndDeduplicator(graph)
       .build();
 
-    GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
+    GeometryProcessor processor = new GeometryProcessor(context);
 
-    factory.run(graph, transitModel);
+    processor.run(transitModel);
   }
 }

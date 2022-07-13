@@ -182,6 +182,8 @@ public class GTFSToOtpTransitServiceMapper {
       discardMinTransferTimes,
       issueStore
     );
-    builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
+    var result = transferMapper.map(data.getAllTransfers());
+    builder.getTransfers().addAll(result.constrainedTransfers());
+    builder.getStaySeatedNotAllowed().addAll(result.staySeatedNotAllowed());
   }
 }

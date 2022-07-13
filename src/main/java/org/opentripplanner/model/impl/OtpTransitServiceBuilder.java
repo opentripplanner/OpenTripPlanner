@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
@@ -104,6 +105,8 @@ public class OtpTransitServiceBuilder {
   private final EntityById<FareZone> fareZonesById = new EntityById<>();
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
+
+  private final List<StaySeatedNotAllowed> staySeatedNotAllowed = new ArrayList<>();
 
   private final EntityById<Trip> tripsById = new EntityById<>();
 
@@ -221,6 +224,10 @@ public class OtpTransitServiceBuilder {
 
   public List<ConstrainedTransfer> getTransfers() {
     return transfers;
+  }
+
+  public List<StaySeatedNotAllowed> getStaySeatedNotAllowed() {
+    return staySeatedNotAllowed;
   }
 
   public EntityById<Trip> getTripsById() {

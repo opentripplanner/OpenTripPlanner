@@ -1,14 +1,8 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,26 +18,20 @@ import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
-import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.graph_builder.issues.MissingShapeGeometry;
 import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -51,50 +39,45 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract
- * and prepare geometries. It also does some other postprocessing involving interlined blocks.
+ * and prepare geometries.
  *
  * <p>
- * THREAD SAFETY The computation runs in parallel so be careful about threadsafety when modifying
+ * THREAD SAFETY The computation runs in parallel so be careful about thread safety when modifying
  * the logic here.
  */
-public class GeometryAndBlockProcessor {
+public class GeometryProcessor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GeometryAndBlockProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GeometryProcessor.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
   private final OtpTransitService transitService;
-  // this is threadsafe implementation
+  // this is a thread-safe implementation
   private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
-  // this is threadsafe implementation
+  // this is a thread-safe implementation
   private final Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
-  // this is threadsafe implementation
+  // this is a thread-safe implementation
   private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
   private final double maxStopToShapeSnapDistance;
-  private final int maxInterlineDistance;
-  private DataImportIssueStore issueStore;
+  private final DataImportIssueStore issueStore;
 
-  public GeometryAndBlockProcessor(GtfsContext context) {
-    this(context.getTransitService(), -1, -1);
+  public GeometryProcessor(GtfsContext context) {
+    this(context.getTransitService(), -1, DataImportIssueStore.noop());
   }
 
-  public GeometryAndBlockProcessor(
-    // TODO OTP2 - Operate on the builder, not the transit service and move the executon of
+  public GeometryProcessor(
+    // TODO OTP2 - Operate on the builder, not the transit service and move the execution of
     //           - this to where the builder is in context.
     OtpTransitService transitService,
     double maxStopToShapeSnapDistance,
-    int maxInterlineDistance
+    DataImportIssueStore issueStore
   ) {
     this.transitService = transitService;
     this.maxStopToShapeSnapDistance =
       maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
-    this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
+    this.issueStore = issueStore;
   }
 
   // TODO OTP2 - Instead of exposing the graph (the entire world) to this class, this class should
   //           - Create a datastructure and return it, then that should be injected into the graph.
-  public void run(Graph graph, TransitModel transitModel) {
-    run(graph, transitModel, new DataImportIssueStore(false));
-  }
-
   /**
    * Generate the edges. Assumes that there are already vertices in the graph for the stops.
    * <p>
@@ -103,9 +86,7 @@ public class GeometryAndBlockProcessor {
    * the graph, the OtpTransitService and others are not.
    */
   @SuppressWarnings("Convert2MethodRef")
-  public void run(Graph graph, TransitModel transitModel, DataImportIssueStore issueStore) {
-    this.issueStore = issueStore;
-
+  public void run(TransitModel transitModel) {
     LOG.info("Processing geometries and blocks on graph...");
 
     // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving
@@ -159,9 +140,7 @@ public class GeometryAndBlockProcessor {
         tripPattern.setHopGeometries(hopGeometries);
       }
     }
-
     /* Identify interlined trips and create the necessary edges. */
-    interline(tripPatterns);
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
@@ -170,80 +149,6 @@ public class GeometryAndBlockProcessor {
       startIndex.getSegmentFraction() == endIndex.getSegmentFraction() &&
       startIndex.getComponentIndex() == endIndex.getComponentIndex()
     );
-  }
-
-  /**
-   * Identify interlined trips (where a physical vehicle continues on to another logical trip) and
-   * update the TripPatterns accordingly.
-   */
-  private void interline(Collection<TripPattern> tripPatterns) {
-    /* Record which Pattern each interlined TripTimes belongs to. */
-    Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();
-
-    /* TripTimes grouped by the block ID and service ID of their trips. Must be a ListMultimap to allow sorting. */
-    ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
-
-    LOG.info("Finding interlining trips based on block IDs.");
-    for (TripPattern pattern : tripPatterns) {
-      Timetable timetable = pattern.getScheduledTimetable();
-      /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
-      for (TripTimes tripTimes : timetable.getTripTimes()) {
-        Trip trip = tripTimes.getTrip();
-        if (!Strings.isNullOrEmpty(trip.getGtfsBlockId())) {
-          tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
-          // For space efficiency, only record times that are part of a block.
-          patternForTripTimes.put(tripTimes, pattern);
-        }
-      }
-    }
-
-    // Associate pairs of TripPatterns with lists of trips that continue from one pattern to the other.
-    Multimap<P2<TripPattern>, P2<Trip>> interlines = ArrayListMultimap.create();
-
-    // Sort trips within each block by first departure time, then iterate over trips in this block and service,
-    // linking them. Has no effect on single-trip blocks.
-    SERVICE_BLOCK:for (BlockIdAndServiceId block : tripTimesForBlock.keySet()) {
-      List<TripTimes> blockTripTimes = tripTimesForBlock.get(block);
-      Collections.sort(blockTripTimes);
-      TripTimes prev = null;
-      for (TripTimes curr : blockTripTimes) {
-        if (prev != null) {
-          if (prev.getDepartureTime(prev.getNumStops() - 1) > curr.getArrivalTime(0)) {
-            LOG.error(
-              "Trip times within block {} are not increasing on service {} after trip {}.",
-              block.blockId,
-              block.serviceId,
-              prev.getTrip().getId()
-            );
-            continue SERVICE_BLOCK;
-          }
-          TripPattern prevPattern = patternForTripTimes.get(prev);
-          TripPattern currPattern = patternForTripTimes.get(curr);
-          var fromStop = prevPattern.lastStop();
-          var toStop = currPattern.firstStop();
-          double teleportationDistance = SphericalDistanceLibrary.fastDistance(
-            fromStop.getLat(),
-            fromStop.getLon(),
-            toStop.getLat(),
-            toStop.getLon()
-          );
-          if (teleportationDistance > maxInterlineDistance) {
-            issueStore.add(
-              new InterliningTeleport(prev.getTrip(), block.blockId, (int) teleportationDistance)
-            );
-            // Only skip this particular interline edge; there may be other valid ones in the block.
-          } else {
-            interlines.put(
-              new P2<>(prevPattern, currPattern),
-              new P2<>(prev.getTrip(), curr.getTrip())
-            );
-          }
-        }
-        prev = curr;
-      }
-    }
-
-    LOG.info("Done finding interlining trips.");
   }
 
   /**
