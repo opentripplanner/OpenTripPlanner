@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.jsonNodeForTest;
@@ -34,8 +35,8 @@ public class BuildConfigTest {
 
   @Test
   public void fareService() {
-    var node = jsonNodeForTest("{ 'fares' : \"default\" }");
+    var node = jsonNodeForTest("{ 'fares' : \"highestFareInFreeTransferWindow\" }");
     var conf = new BuildConfig(node, "Test", false);
-    assertSame(DefaultFareServiceImpl.class, conf.fareServiceFactory.makeFareService().getClass());
+    assertInstanceOf(DefaultFareServiceImpl.class, conf.fareServiceFactory.makeFareService());
   }
 }
