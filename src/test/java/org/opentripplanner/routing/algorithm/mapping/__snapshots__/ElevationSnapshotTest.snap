@@ -17,7 +17,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -33,7 +36,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -488,7 +494,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -504,7 +513,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -811,7 +823,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -827,7 +842,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -1282,7 +1300,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -1298,7 +1319,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -1753,7 +1777,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -1769,7 +1796,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -2076,7 +2106,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -2092,7 +2125,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -3133,7 +3169,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -3149,7 +3188,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -3508,7 +3550,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -3524,7 +3569,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -3909,7 +3957,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -3925,7 +3976,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -4284,7 +4338,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -4300,7 +4357,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -4737,7 +4797,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -4753,7 +4816,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -5112,7 +5178,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -5128,7 +5197,10 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }

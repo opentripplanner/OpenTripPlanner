@@ -17,7 +17,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -33,7 +36,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -484,7 +490,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -500,7 +509,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -896,7 +908,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -912,7 +927,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -1321,7 +1339,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -1337,7 +1358,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -1642,7 +1666,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -1658,7 +1685,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -2109,7 +2139,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -2125,7 +2158,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -3251,7 +3287,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -3267,7 +3306,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -3770,7 +3812,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -3786,7 +3831,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -4169,7 +4217,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -4185,7 +4236,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -4542,7 +4596,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -4558,7 +4615,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -5061,7 +5121,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -5077,7 +5140,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
@@ -5460,7 +5526,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "price": {
                 "cents": 200,
                 "currency": {
-                  "value": "USD"
+                  "currency": "USD",
+                  "currencyCode": "USD",
+                  "defaultFractionDigits": 2,
+                  "symbol": "$"
                 }
               },
               "routes": [
@@ -5476,7 +5545,10 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "regular": {
             "cents": 200,
             "currency": {
-              "value": "USD"
+              "currency": "USD",
+              "currencyCode": "USD",
+              "defaultFractionDigits": 2,
+              "symbol": "$"
             }
           }
         }
