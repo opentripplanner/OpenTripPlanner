@@ -1127,7 +1127,7 @@ input InputUnpreferred {
 
     Deprecated: Use `unpreferredRouteCost` instead.
     """
-    useUnpreferredRoutesPenalty: Int
+    useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredRouteCost instead")
 }
 
 enum RoutingErrorCode {
