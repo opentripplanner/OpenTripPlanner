@@ -98,6 +98,10 @@ public class ScheduledTransitLeg implements Leg {
     setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
   }
 
+  public ZoneId getZoneId() {
+    return zoneId;
+  }
+
   public TripTimes getTripTimes() {
     return tripTimes;
   }

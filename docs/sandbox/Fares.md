@@ -7,6 +7,7 @@
 ## Changelog
 
 - Initial move into sandbox [#4241](https://github.com/opentripplanner/OpenTripPlanner/pull/4241)
+- Add HighestFareInFreeTransferWindowFareService [#4267](https://github.com/opentripplanner/OpenTripPlanner/pull/4267)
 
 ## Documentation
 
@@ -22,10 +23,11 @@ which are also part of the sandbox code.
 
 The classes and their maintainers are as follows:
 
-| class                    | maintainer |
-|--------------------------|------------|
-| DutchFareServiceImpl     | unknown    |
-| NycFareServiceImpl       | unknown    |
-| SeattleFareServiceImpl   | unknown    |
-| SFBayAreaFareServiceImpl | unknown    |
+| class                                                          | maintainer                                                 |
+|----------------------------------------------------------------|------------------------------------------------------------|
+| HighestFareInFreeTransferWindowFareServiceDutchFareServiceImpl | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
+| DutchFareServiceImpl                                           | unknown                                                    |
+| NycFareServiceImpl                                             | unknown                                                    |
+| SeattleFareServiceImpl                                         | unknown                                                    |
+| SFBayAreaFareServiceImpl                                       | unknown                                                    |
 
