@@ -475,6 +475,14 @@ The current list of custom fare type is:
 - `san-francisco` (no parameters)
 - `new-york` (no parameters)
 - `seattle` (no parameters)
+- `highestFareInFreeTransferWindow` Will apply the highest observed transit fare (across all
+  operators) within a free transfer window, adding to the cost if a trip is boarded outside the free
+  transfer window. It accepts the following parameters:
+    - `freeTransferWindow` the duration (in ISO8601-ish notation) that free transfers are
+      possible after the board time of the first transit leg. Default: `2h30m`.
+    - `analyzeInterlinedTransfers` If true, will treat interlined transfers as actual transfers.
+      This is merely a work-around for transit agencies that choose to code their fares in a
+      route-based fashion instead of a zone-based fashion. Default: `false`
 - `off` (no parameters)
 
 The current list of `combinationStrategy` is:

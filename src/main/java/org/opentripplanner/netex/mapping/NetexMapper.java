@@ -14,7 +14,6 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
@@ -65,6 +64,7 @@ public class NetexMapper {
   private final CalendarServiceBuilder calendarServiceBuilder;
   private final TripCalendarBuilder tripCalendarBuilder;
   private final Set<String> ferryIdsNotAllowedForBicycle;
+  private final double maxStopToShapeSnapDistance;
 
   /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
   private GroupNetexMapper groupMapper;
@@ -89,13 +89,15 @@ public class NetexMapper {
     String feedId,
     Deduplicator deduplicator,
     DataImportIssueStore issueStore,
-    Set<String> ferryIdsNotAllowedForBicycle
+    Set<String> ferryIdsNotAllowedForBicycle,
+    double maxStopToShapeSnapDistance
   ) {
     this.transitBuilder = transitBuilder;
     this.deduplicator = deduplicator;
     this.idFactory = new FeedScopedIdFactory(feedId);
     this.issueStore = issueStore;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
+    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
     this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
   }
@@ -158,7 +160,6 @@ public class NetexMapper {
 
     mapAuthorities();
     mapOperators();
-    mapShapePoints();
     mapBrandings();
 
     // The tariffZoneMapper is used to map all currently valid zones and to map the correct
@@ -264,22 +265,6 @@ public class NetexMapper {
       .getOperatorsById()
       .localValues()) {
       transitBuilder.getOperatorsById().add(mapper.mapOperator(operator));
-    }
-  }
-
-  private void mapShapePoints() {
-    ServiceLinkMapper serviceLinkMapper = new ServiceLinkMapper(idFactory, issueStore);
-    for (JourneyPattern journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {
-      Collection<ShapePoint> shapePoints = serviceLinkMapper.getShapePointsByJourneyPattern(
-        journeyPattern,
-        currentNetexIndex.getServiceLinkById(),
-        currentNetexIndex.getQuayIdByStopPointRef(),
-        currentNetexIndex.getQuayById()
-      );
-
-      for (ShapePoint shapePoint : shapePoints) {
-        transitBuilder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
-      }
     }
   }
 
@@ -425,19 +410,20 @@ public class NetexMapper {
       transitBuilder.getLocations(),
       transitBuilder.getLocationGroups(),
       transitBuilder.getRoutes(),
-      transitBuilder.getShapePoints().keySet(),
       currentNetexIndex.getRouteById(),
       currentNetexIndex.getJourneyPatternsById(),
       currentNetexIndex.getQuayIdByStopPointRef(),
       currentNetexIndex.getFlexibleStopPlaceByStopPointRef(),
       currentNetexIndex.getDestinationDisplayById(),
       currentNetexIndex.getServiceJourneyById(),
+      currentNetexIndex.getServiceLinkById(),
       currentNetexIndex.getFlexibleLineById(),
       currentNetexIndex.getOperatingDayById(),
       currentNetexIndex.getDatedServiceJourneys(),
       currentMapperIndexes.getDatedServiceJourneysBySjId(),
       serviceIds,
-      deduplicator
+      deduplicator,
+      maxStopToShapeSnapDistance
     );
 
     for (JourneyPattern journeyPattern : currentNetexIndex.getJourneyPatternsById().localValues()) {

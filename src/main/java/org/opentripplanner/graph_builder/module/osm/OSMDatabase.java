@@ -514,8 +514,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nA, epsilon)
             ) {
-              LOG.info(
-                "Node {} in way {} is coincident but disconnected with area {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in way %s is coincident but disconnected with area %s",
                 nA.getId(),
                 way.getId(),
                 ringSegment.area.parent.getId()
@@ -533,8 +534,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nA, nB, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nB, epsilon)
             ) {
-              LOG.info(
-                "Node {} in way {} is coincident but disconnected with area {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in way %s is coincident but disconnected with area %s",
                 nB.getId(),
                 way.getId(),
                 ringSegment.area.parent.getId()
@@ -553,8 +555,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nA, nB, epsilon)
             ) {
-              LOG.info(
-                "Node {} in area {} is coincident but disconnected with way {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in area %s is coincident but disconnected with way %s",
                 ringSegment.nA.getId(),
                 ringSegment.area.parent.getId(),
                 way.getId()
@@ -575,8 +578,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nB, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nB, epsilon)
             ) {
-              LOG.info(
-                "Node {} in area {} is coincident but disconnected with way {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in area %s is coincident but disconnected with way %s",
                 ringSegment.nB.getId(),
                 ringSegment.area.parent.getId(),
                 way.getId()

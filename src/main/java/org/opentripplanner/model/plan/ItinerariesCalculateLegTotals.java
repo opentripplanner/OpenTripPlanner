@@ -41,7 +41,9 @@ class ItinerariesCalculateLegTotals {
 
       if (leg.isTransitLeg()) {
         transitTimeSeconds += dt;
-        ++nTransitLegs;
+        if (!leg.isInterlinedWithPreviousLeg()) {
+          ++nTransitLegs;
+        }
       } else if (leg.isOnStreetNonTransit()) {
         nonTransitTimeSeconds += dt;
         nonTransitDistanceMeters += leg.getDistanceMeters();

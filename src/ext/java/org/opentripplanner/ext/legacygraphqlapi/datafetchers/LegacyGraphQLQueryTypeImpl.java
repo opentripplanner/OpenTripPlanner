@@ -577,7 +577,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment -> getTransitService(environment).getTripPatterns();
+    return environment -> getTransitService(environment).getAllTripPatterns();
   }
 
   @Override

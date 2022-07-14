@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import static graphql.Assert.assertFalse;
+import static graphql.Assert.assertTrue;
 
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.File;
@@ -63,7 +64,7 @@ public abstract class FlexTest {
     transitModel.index();
     graph.index();
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
-    assertFalse(transitModel.flexTripsById.isEmpty());
+    assertTrue(transitModel.hasFlexTrips());
     return new OtpModel(graph, transitModel);
   }
 }

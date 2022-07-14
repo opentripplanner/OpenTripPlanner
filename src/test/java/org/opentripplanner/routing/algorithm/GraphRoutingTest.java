@@ -452,7 +452,7 @@ public abstract class GraphRoutingTest {
 
     // Transit
     public void tripPattern(TripPattern tripPattern) {
-      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
+      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     public StopTime st(TransitStopVertex s1) {

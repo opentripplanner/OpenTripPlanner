@@ -1,3 +1,5 @@
 agency_id,route_id,route_short_name,route_long_name,route_type
 TEST,route0,,NoInterlining,2
 TEST,route1,,HasInterlining,2
+TEST,route2,,HasStaySeatedNotAllowed,2
+TEST,route3,,HasInterlining,2

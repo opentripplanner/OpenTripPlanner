@@ -105,8 +105,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return new TimetableSnapshotSource(
       transitModel.getTimeZone(),
       new DefaultTransitService(transitModel),
-      transitModel.transitLayerUpdater,
-      transitModel.deduplicator,
+      transitModel.getTransitLayerUpdater(),
+      transitModel.getDeduplicator(),
       transitModel.getServiceCodes()
     );
   }

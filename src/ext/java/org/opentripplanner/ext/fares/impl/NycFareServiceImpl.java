@@ -1,11 +1,15 @@
 package org.opentripplanner.ext.fares.impl;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
@@ -14,6 +18,7 @@ import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -333,7 +338,7 @@ public class NycFareServiceImpl implements FareService {
       ride.classifier = NycRideClassifier.WALK;
       return ride;
     } else if (leg.isTransitLeg()) {
-      Ride ride = RideMapper.rideForTransitPathLeg(leg);
+      Ride ride = rideForTransitPathLeg(leg);
       Route route = leg.getRoute();
       int routeType = route.getGtfsType();
 
@@ -378,5 +383,105 @@ public class NycFareServiceImpl implements FareService {
       out.add(new FeedScopedId("MTA NYCT", stop + "S"));
     }
     return out;
+  }
+
+  private static Ride rideForTransitPathLeg(Leg leg) {
+    Ride ride = new Ride();
+    ride.firstStop = leg.getFrom().stop;
+    ride.lastStop = leg.getTo().stop;
+
+    ride.startZone = ride.firstStop.getFirstZoneAsString();
+    ride.endZone = ride.lastStop.getFirstZoneAsString();
+
+    var zones = leg
+      .getIntermediateStops()
+      .stream()
+      .map(stopArrival -> stopArrival.place.stop.getFirstZoneAsString())
+      .collect(Collectors.toSet());
+
+    zones.addAll(
+      Stream.of(ride.startZone, ride.endZone).filter(Objects::nonNull).collect(Collectors.toSet())
+    );
+
+    ride.zones = zones;
+    ride.agency = leg.getRoute().getAgency().getId();
+    ride.route = leg.getRoute().getId();
+    ride.trip = leg.getTrip().getId();
+
+    ride.startTime = leg.getStartTime();
+    ride.endTime = leg.getEndTime();
+
+    // In the default fare service, we classify rides by mode.
+    ride.classifier = leg.getMode();
+    return ride;
+  }
+
+  /**
+   * A set of edges on a single route, with associated information. Used only in calculating fares.
+   */
+  private static class Ride {
+
+    FeedScopedId agency; // route agency
+
+    FeedScopedId route;
+
+    FeedScopedId trip;
+
+    Set<String> zones;
+
+    String startZone;
+
+    String endZone;
+
+    ZonedDateTime startTime;
+
+    ZonedDateTime endTime;
+
+    // in DefaultFareServiceImpl classifier is just the TraverseMode
+    // it can be used differently in custom fare services
+    public Object classifier;
+
+    public StopLocation firstStop;
+
+    public StopLocation lastStop;
+
+    public Ride() {
+      zones = new HashSet<>();
+    }
+
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      builder.append("Ride");
+      if (startZone != null) {
+        builder.append("(from zone ");
+        builder.append(startZone);
+      }
+      if (endZone != null) {
+        builder.append(" to zone ");
+        builder.append(endZone);
+      }
+      builder.append(" on route ");
+      builder.append(route);
+      if (zones.size() > 0) {
+        builder.append(" through zones ");
+        boolean first = true;
+        for (String zone : zones) {
+          if (first) {
+            first = false;
+          } else {
+            builder.append(",");
+          }
+          builder.append(zone);
+        }
+      }
+      builder.append(" at ");
+      builder.append(startTime);
+      if (classifier != null) {
+        builder.append(", classified by ");
+        builder.append(classifier.toString());
+      }
+      builder.append(")");
+      return builder.toString();
+    }
   }
 }

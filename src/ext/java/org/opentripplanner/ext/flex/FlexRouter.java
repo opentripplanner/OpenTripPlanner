@@ -70,7 +70,7 @@ public class FlexRouter {
     this.config = config;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
-    this.flexIndex = transitModel.index.getFlexIndex();
+    this.flexIndex = transitModel.getTransitModelIndex().getFlexIndex();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitModel.getTimeZone(),
@@ -105,7 +105,7 @@ public class FlexRouter {
         new FlexServiceDate(
           date,
           ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
-          transitModel.index.getServiceCodesRunningForDate().get(date)
+          transitModel.getTransitModelIndex().getServiceCodesRunningForDate().get(date)
         );
     }
   }

@@ -95,7 +95,7 @@ public class GraphPathFinder {
    */
   public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
     RoutingRequest request = routingContext.opt;
-    Instant reqTime = request.getDateTime().truncatedTo(ChronoUnit.MILLIS);
+    Instant reqTime = request.getDateTime().truncatedTo(ChronoUnit.SECONDS);
 
     List<GraphPath> paths = getPaths(routingContext);
 

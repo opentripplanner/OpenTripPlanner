@@ -65,7 +65,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   public DefaultTransitService(TransitModel transitModel) {
     this.transitModel = transitModel;
-    this.transitModelIndex = transitModel.index;
+    this.transitModelIndex = transitModel.getTransitModelIndex();
   }
 
   /** {@link TransitModel#getFeedIds()} */
@@ -128,10 +128,10 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModel.getTripPatternForId(id);
   }
 
-  /** {@link TransitModel#getTripPatterns()} */
+  /** {@link TransitModel#getAllTripPatterns()} ()} */
   @Override
-  public Collection<TripPattern> getTripPatterns() {
-    return this.transitModel.getTripPatterns();
+  public Collection<TripPattern> getAllTripPatterns() {
+    return this.transitModel.getAllTripPatterns();
   }
 
   /** {@link TransitModel#getNotices()} */
@@ -373,10 +373,9 @@ public class DefaultTransitService implements TransitEditorService {
     StopLocation stop,
     boolean includeRealtimeUpdates
   ) {
-    return transitModel.index.getPatternsForStop(
-      stop,
-      includeRealtimeUpdates ? lazyGetTimeTableSnapShot() : null
-    );
+    return transitModel
+      .getTransitModelIndex()
+      .getPatternsForStop(stop, includeRealtimeUpdates ? lazyGetTimeTableSnapShot() : null);
   }
 
   @Override

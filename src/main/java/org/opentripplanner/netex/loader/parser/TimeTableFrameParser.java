@@ -50,8 +50,6 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     warnOnMissingMapping(LOG, frame.getJourneyAccountings());
     warnOnMissingMapping(LOG, frame.getJourneyMeetings());
     warnOnMissingMapping(LOG, frame.getJourneyPartCouples());
-    warnOnMissingMapping(LOG, frame.getNotices());
-    warnOnMissingMapping(LOG, frame.getNoticeAssignments());
     warnOnMissingMapping(LOG, frame.getServiceCalendarFrameRef());
     warnOnMissingMapping(LOG, frame.getServiceFacilitySets());
     warnOnMissingMapping(LOG, frame.getTimeDemandTypes());

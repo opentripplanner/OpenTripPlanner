@@ -56,16 +56,16 @@ public class MetricsLogging {
     )
       .bindTo(Metrics.globalRegistry);
 
-    if (transitModel.updaterManager != null) {
+    if (transitModel.getUpdaterManager() != null) {
       new ExecutorServiceMetrics(
-        transitModel.updaterManager.getUpdaterPool(),
+        transitModel.getUpdaterManager().getUpdaterPool(),
         "graphUpdaters",
         List.of(Tag.of("pool", "graphUpdaters"))
       )
         .bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
-        transitModel.updaterManager.getScheduler(),
+        transitModel.getUpdaterManager().getScheduler(),
         "graphUpdateScheduler",
         List.of(Tag.of("pool", "graphUpdateScheduler"))
       )

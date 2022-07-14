@@ -7,13 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,15 +21,13 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
+import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -52,7 +48,7 @@ import org.opentripplanner.util.TestUtils;
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
 @Disabled
-public class GeometryAndBlockProcessorTest {
+public class GeometryProcessorTest {
 
   private Graph graph;
   private TransitModel transitModel;
@@ -73,8 +69,8 @@ public class GeometryAndBlockProcessorTest {
       contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
 
     feedId = context.getFeedId().getId();
-    GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-    factory.run(graph, transitModel, issueStore);
+    GeometryProcessor factory = new GeometryProcessor(context);
+    factory.run(transitModel);
     transitModel.putService(CalendarServiceData.class, context.getCalendarServiceData());
 
     String[] stops = {
@@ -135,7 +131,7 @@ public class GeometryAndBlockProcessorTest {
     StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    transitModel.hasTransit = true;
+    transitModel.setHasTransit(true);
     ttsnm.buildGraph(graph, transitModel, new HashMap<>());
   }
 
@@ -153,79 +149,7 @@ public class GeometryAndBlockProcessorTest {
   }
 
   @Test
-  public void testRouting() throws Exception {
-    Vertex stop_a = graph.getVertex(feedId + ":A");
-    Vertex stop_b = graph.getVertex(feedId + ":B");
-    Vertex stop_c = graph.getVertex(feedId + ":C");
-    Vertex stop_d = graph.getVertex(feedId + ":D");
-    Vertex stop_e = graph.getVertex(feedId + ":E");
-
-    RoutingRequest options = new RoutingRequest();
-    // test feed is designed for instantaneous transfers
-    options.transferSlack = 0;
-
-    long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
-    options.setDateTime(Instant.ofEpochSecond(startTime));
-
-    ShortestPathTree spt;
-    GraphPath path;
-
-    // A to B
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_b))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_b);
-    assertNotNull(path);
-    assertEquals(6, path.states.size());
-
-    // A to C
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    assertNotNull(path);
-    assertEquals(8, path.states.size());
-
-    // A to D (change at C)
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_d))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_d);
-    assertNotNull(path);
-    // there are two paths of different lengths
-    // both arrive at 40 minutes after midnight
-    List<TransitStopVertex> stops = extractStopVertices(path);
-    assertEquals(stops.size(), 3);
-    assertEquals(stops.get(1), stop_c);
-    long endTime = startTime + 40 * 60;
-    assertEquals(endTime, path.getEndTime());
-
-    //A to E (change at C)
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_e))
-        .getShortestPathTree();
-    path = spt.getPath(stop_e);
-    assertNotNull(path);
-    stops = extractStopVertices(path);
-    assertEquals(stops.size(), 3);
-    assertEquals(stops.get(1), stop_c);
-    endTime = startTime + 70 * 60;
-    assertEquals(endTime, path.getEndTime());
-  }
-
-  @Test
-  public void testRoutingOverMidnight() throws Exception {
+  public void testRoutingOverMidnight() {
     // this route only runs on weekdays
     Vertex stop_g = graph.getVertex(feedId + ":G_depart");
     Vertex stop_h = graph.getVertex(feedId + ":H_arrive");
@@ -264,7 +188,7 @@ public class GeometryAndBlockProcessorTest {
   }
 
   @Test
-  public void testPickupDropoff() throws Exception {
+  public void testPickupDropoff() {
     Vertex stop_o = graph.getVertex(feedId + ":O_depart");
     Vertex stop_p = graph.getVertex(feedId + ":P");
     assertEquals(2, stop_o.getOutgoing().size());
@@ -293,54 +217,7 @@ public class GeometryAndBlockProcessorTest {
   }
 
   @Test
-  public void testTraverseMode() throws Exception {
-    Vertex stop_a = graph.getVertex(feedId + ":A_depart");
-    Vertex stop_b = graph.getVertex(feedId + ":B_arrive");
-
-    ShortestPathTree spt;
-
-    RoutingRequest options = new RoutingRequest();
-    options.setStreetSubRequestModes(
-      new TraverseModeSet(
-        TraverseMode.TRAM,
-        TraverseMode.RAIL,
-        TraverseMode.SUBWAY,
-        TraverseMode.FUNICULAR,
-        TraverseMode.GONDOLA
-      )
-    );
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 0, 0, 0, 0));
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_b))
-        .getShortestPathTree();
-
-    //a to b is bus only
-    assertNull(spt.getPath(stop_b));
-
-    options.setStreetSubRequestModes(
-      new TraverseModeSet(
-        TraverseMode.TRAM,
-        TraverseMode.RAIL,
-        TraverseMode.SUBWAY,
-        TraverseMode.FUNICULAR,
-        TraverseMode.GONDOLA,
-        TraverseMode.CABLE_CAR,
-        TraverseMode.BUS
-      )
-    );
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_b))
-        .getShortestPathTree();
-
-    assertNotNull(spt.getPath(stop_b));
-  }
-
-  @Test
-  public void testTimelessStops() throws Exception {
+  public void testTimelessStops() {
     Vertex stop_d = graph.getVertex(feedId + ":D");
     Vertex stop_c = graph.getVertex(feedId + ":C");
     RoutingRequest options = new RoutingRequest();
@@ -359,54 +236,7 @@ public class GeometryAndBlockProcessorTest {
   }
 
   @Test
-  public void testTripBikesAllowed() throws Exception {
-    Vertex stop_a = graph.getVertex(feedId + ":A");
-    Vertex stop_b = graph.getVertex(feedId + ":B");
-    Vertex stop_c = graph.getVertex(feedId + ":C");
-    Vertex stop_d = graph.getVertex(feedId + ":D");
-
-    RoutingRequest options = new RoutingRequest();
-    options.streetSubRequestModes.setWalk(false);
-    options.streetSubRequestModes.setBicycle(true);
-    options.streetSubRequestModes.setTransit(true);
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
-
-    ShortestPathTree spt;
-    GraphPath path;
-
-    // route: bikes allowed, trip: no value
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_a, stop_b))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_b);
-    assertNotNull(path);
-
-    // route: bikes allowed, trip: bikes not allowed
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_d, stop_c))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_c);
-    assertNull(path);
-
-    // route: bikes not allowed, trip: bikes allowed
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_c, stop_d))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_d);
-    assertNotNull(path);
-  }
-
-  @Test
-  public void testWheelchairAccessible() throws Exception {
+  public void testWheelchairAccessible() {
     Vertex near_a = graph.getVertex("near_1_" + feedId + "_entrance_a");
     Vertex near_b = graph.getVertex("near_1_" + feedId + "_entrance_b");
     Vertex near_c = graph.getVertex("near_1_" + feedId + "_C");
@@ -555,44 +385,7 @@ public class GeometryAndBlockProcessorTest {
   }
 
   @Test
-  public void testFewestTransfers() {
-    Vertex stop_c = graph.getVertex(feedId + ":C");
-    Vertex stop_d = graph.getVertex(feedId + ":D");
-    RoutingRequest options = new RoutingRequest();
-    options.bicycleOptimizeType = BicycleOptimizeType.QUICK;
-    options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 16, 0, 0));
-
-    ShortestPathTree spt = AStarBuilder
-      .oneToOne()
-      .setContext(new RoutingContext(options, graph, stop_c, stop_d))
-      .getShortestPathTree();
-
-    //when optimizing for speed, take the fast two-bus path
-    GraphPath path = spt.getPath(stop_d);
-    assertNotNull(path);
-    assertEquals(
-      TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 20, 0),
-      path.getEndTime()
-    );
-
-    //when optimizing for fewest transfers, take the slow one-bus path
-    options.transferCost = 1800;
-    spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_c, stop_d))
-        .getShortestPathTree();
-
-    path = spt.getPath(stop_d);
-    assertNotNull(path);
-    assertEquals(
-      TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 50, 0),
-      path.getEndTime()
-    );
-  }
-
-  @Test
-  public void testPathways() throws Exception {
+  public void testPathways() {
     Vertex entrance = graph.getVertex(feedId + ":entrance_a");
     assertNotNull(entrance);
     Vertex stop = graph.getVertex(feedId + ":A");
@@ -611,15 +404,5 @@ public class GeometryAndBlockProcessorTest {
       TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 34),
       path.getEndTime()
     );
-  }
-
-  private List<TransitStopVertex> extractStopVertices(GraphPath path) {
-    List<TransitStopVertex> ret = Lists.newArrayList();
-    for (State state : path.states) {
-      if (state.getVertex() instanceof TransitStopVertex) {
-        ret.add(((TransitStopVertex) state.getVertex()));
-      }
-    }
-    return ret;
   }
 }

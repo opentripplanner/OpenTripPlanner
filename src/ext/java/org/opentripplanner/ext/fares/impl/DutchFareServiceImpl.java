@@ -5,6 +5,7 @@ import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -85,7 +86,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
   @Override
   protected float getLowestCost(
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     float cost = 0f;
@@ -102,25 +103,13 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     long alightedEasyTrip = 0;
     long alightedTariefEenheden = 0;
 
-    for (Ride ride : rides) {
-      LOG.trace(
-        String.format(
-          "%s %s %s %s %s %s",
-          ride.startZone,
-          ride.endZone,
-          ride.firstStop,
-          ride.lastStop,
-          ride.route,
-          ride.agency
-        )
-      );
-
-      if (ride.agency.getFeedId().equals("IFF")) {
+    for (var ride : rides) {
+      if (ride.getAgency().getId().getFeedId().equals("IFF")) {
         LOG.trace("1. Trains");
         /* In Reizen op Saldo we will try to fares as long as possible. */
 
         /* If our previous agency isn't this agency, then we must have checked out */
-        mustHaveCheckedOut |= !ride.agency.equals(lastAgencyId);
+        mustHaveCheckedOut |= !ride.getAgency().getId().equals(lastAgencyId);
 
         /* When a user has checked out, we first calculate the units made until then. */
         if (mustHaveCheckedOut && lastAgencyId != null) {
@@ -136,23 +125,23 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
           }
           lastFareZone = unitsFareZone.fareZone;
           units += unitsFareZone.units;
-          startTariefEenheden = ride.startZone;
+          startTariefEenheden = ride.getFrom().stop.getFirstZoneAsString();
           mustHaveCheckedOut = false;
         }
 
         /* The entrance Fee applies if the transfer time ends before the new trip starts. */
-        if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.startTime.toEpochSecond()) {
+        if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.getStartTime().toEpochSecond()) {
           LOG.trace("3. Exceeded Transfer Time");
           cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
           if (cost == Float.POSITIVE_INFINITY) {
             return cost;
           }
 
-          startTariefEenheden = ride.startZone;
+          startTariefEenheden = ride.getFrom().stop.getFirstZoneAsString();
           units = 0;
           prevSumUnits = 0;
           mustHaveCheckedOut = false;
-        } else if (!ride.agency.equals(lastAgencyId)) {
+        } else if (!ride.getAgency().getId().equals(lastAgencyId)) {
           LOG.trace("4. Swiched Rail Agency");
 
           cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
@@ -162,12 +151,12 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
           prevSumUnits += units;
           units = 0;
-          startTariefEenheden = ride.startZone;
+          startTariefEenheden = ride.getFrom().stop.getFirstZoneAsString();
         }
 
-        alightedTariefEenheden = ride.endTime.toEpochSecond();
-        endTariefEenheden = ride.endZone;
-        lastAgencyId = ride.agency;
+        alightedTariefEenheden = ride.getEndTime().toEpochSecond();
+        endTariefEenheden = ride.getTo().stop.getFirstZoneAsString();
+        lastAgencyId = ride.getAgency().getId();
       } else {
         LOG.trace("5. Easy Trip");
 
@@ -176,14 +165,14 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
         /* The entranceFee applies if the transfer time ends before the new trip starts. */
         boolean entranceFee =
-          ((alightedEasyTrip + TRANSFER_DURATION) < ride.startTime.toEpochSecond());
+          ((alightedEasyTrip + TRANSFER_DURATION) < ride.getStartTime().toEpochSecond());
 
         /* EasyTrip will always calculate its price per leg */
         cost +=
           getEasyTripFareByLineFromTo(
-            ride.route.getId(),
-            ride.startZone,
-            ride.endZone,
+            ride.getRoute().getId().getId(),
+            ride.getFrom().stop.getFirstZoneAsString(),
+            ride.getTo().stop.getFirstZoneAsString(),
             entranceFee,
             fareRules
           );
@@ -191,7 +180,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
           return cost;
         }
 
-        alightedEasyTrip = ride.endTime.toEpochSecond();
+        alightedEasyTrip = ride.getEndTime().toEpochSecond();
       }
     }
 
@@ -234,7 +223,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     Fare fare,
     Currency currency,
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     float lowestCost = getLowestCost(fareType, rides, fareRules);

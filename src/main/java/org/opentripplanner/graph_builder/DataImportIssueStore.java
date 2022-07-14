@@ -20,6 +20,10 @@ public class DataImportIssueStore {
     this.storeIssues = storeIssues;
   }
 
+  public static DataImportIssueStore noop() {
+    return new DataImportIssueStore(false);
+  }
+
   public void add(DataImportIssue issue) {
     ISSUE_LOG.debug("{} - {}", issue.getType(), issue.getMessage());
     if (storeIssues) {

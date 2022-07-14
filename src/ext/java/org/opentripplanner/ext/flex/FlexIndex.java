@@ -25,10 +25,10 @@ public class FlexIndex {
   public Map<FeedScopedId, FlexTrip> tripById = new HashMap<>();
 
   public FlexIndex(TransitModel transitModel) {
-    for (PathTransfer transfer : transitModel.transfersByStop.values()) {
+    for (PathTransfer transfer : transitModel.getAllPathTransfers()) {
       transfersToStop.put(transfer.to, transfer);
     }
-    for (FlexTrip flexTrip : transitModel.flexTripsById.values()) {
+    for (FlexTrip flexTrip : transitModel.getAllFlexTrips()) {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {

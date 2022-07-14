@@ -220,7 +220,7 @@ public class GraphStats {
             "empiricalDistTrips",
           }
         );
-        Collection<TripPattern> patterns = transitModel.tripPatternForId.values();
+        Collection<TripPattern> patterns = transitModel.getAllTripPatterns();
         Multiset<Integer> counts = TreeMultiset.create();
         int nPatterns = patterns.size();
         LOG.info("total number of patterns is: {}", nPatterns);
