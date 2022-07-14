@@ -6,7 +6,6 @@ import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripOnServiceDate;
@@ -26,9 +25,7 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class NetexModule implements GraphBuilderModule {
 
-  private final double maxStopToShapeSnapDistance;
   private final int subwayAccessTime;
-  private final int maxInterlineDistance;
   private final String netexFeedId;
 
   /**
@@ -42,17 +39,13 @@ public class NetexModule implements GraphBuilderModule {
   public NetexModule(
     String netexFeedId,
     int subwayAccessTime,
-    int maxInterlineDistance,
-    double maxStopToShapeSnapDistance,
     ServiceDateInterval transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
     this.netexFeedId = netexFeedId;
     this.subwayAccessTime = subwayAccessTime;
-    this.maxInterlineDistance = maxInterlineDistance;
     this.transitPeriodLimit = transitPeriodLimit;
     this.netexBundles = netexBundles;
-    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
   }
 
   @Override
@@ -73,7 +66,7 @@ public class NetexModule implements GraphBuilderModule {
           graph.deduplicator,
           issueStore
         );
-        transitBuilder.limitServiceDays(transitPeriodLimit, issueStore);
+        transitBuilder.limitServiceDays(transitPeriodLimit);
         for (TripOnServiceDate tripOnServiceDate : transitBuilder
           .getTripOnServiceDates()
           .values()) {
@@ -107,9 +100,6 @@ public class NetexModule implements GraphBuilderModule {
           graph,
           transitModel
         );
-
-        new GeometryAndBlockProcessor(otpService, maxStopToShapeSnapDistance, maxInterlineDistance)
-          .run(graph, transitModel, issueStore);
       }
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -120,7 +110,7 @@ public class NetexModule implements GraphBuilderModule {
     transitModel.updateTransitFeedValidity(calendarServiceData, issueStore);
 
     // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    transitModel.hasTransit = transitModel.hasTransit || hasTransit;
+    transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
     if (hasTransit) {
       transitModel.calculateTransitCenter();
     }

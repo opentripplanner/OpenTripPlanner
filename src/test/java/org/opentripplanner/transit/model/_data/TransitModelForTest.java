@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model._data;
 
 import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -118,5 +119,23 @@ public class TransitModelForTest {
       .withCoordinate(60.0, 10.0)
       .withDescription(new NonLocalizedString("Station " + idAndName))
       .withPriority(StopTransferPriority.ALLOWED);
+  }
+
+  public static StopTime stopTime(Trip trip, int seq) {
+    var stopTime = new StopTime();
+    stopTime.setTrip(trip);
+    stopTime.setStopSequence(seq);
+
+    var stop = TransitModelForTest.stopForTest("stop-" + seq, 0, 0);
+    stopTime.setStop(stop);
+
+    return stopTime;
+  }
+
+  public static StopTime stopTime(Trip trip, int seq, int time) {
+    var stopTime = TransitModelForTest.stopTime(trip, seq);
+    stopTime.setArrivalTime(time);
+    stopTime.setDepartureTime(time);
+    return stopTime;
   }
 }

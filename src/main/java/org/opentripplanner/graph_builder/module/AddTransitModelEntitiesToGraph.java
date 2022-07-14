@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.distance;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.BoardingArea;
@@ -102,6 +104,8 @@ public class AddTransitModelEntitiesToGraph {
     }
     addFeedInfoToGraph(transitModel);
     addAgenciesToGraph(transitModel);
+    addServicesToTransitModel(transitModel);
+    addTripPatternsToTransitModel(transitModel);
 
     /* Interpret the transfers explicitly defined in transfers.txt. */
     addTransfersToGraph(transitModel);
@@ -356,7 +360,7 @@ public class AddTransitModelEntitiesToGraph {
 
   private void addLocationsToGraph(TransitModel transitModel) {
     for (FlexStopLocation flexStopLocation : otpTransitService.getAllLocations()) {
-      transitModel.getStopModel().locationsById.put(flexStopLocation.getId(), flexStopLocation);
+      transitModel.getStopModel().addFlexLocation(flexStopLocation.getId(), flexStopLocation);
     }
   }
 
@@ -364,7 +368,7 @@ public class AddTransitModelEntitiesToGraph {
     for (FlexLocationGroup flexLocationGroup : otpTransitService.getAllLocationGroups()) {
       transitModel
         .getStopModel()
-        .locationGroupsById.put(flexLocationGroup.getId(), flexLocationGroup);
+        .addFlexLocationGroup(flexLocationGroup.getId(), flexLocationGroup);
     }
   }
 
@@ -384,10 +388,31 @@ public class AddTransitModelEntitiesToGraph {
     transitModel.getTransferService().addAll(otpTransitService.getAllTransfers());
   }
 
+  private void addServicesToTransitModel(TransitModel transitModel) {
+    /* Assign 0-based numeric codes to all GTFS service IDs. */
+    for (FeedScopedId serviceId : otpTransitService.getAllServiceIds()) {
+      transitModel.getServiceCodes().put(serviceId, transitModel.getServiceCodes().size());
+    }
+  }
+
+  private void addTripPatternsToTransitModel(TransitModel transitModel) {
+    Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns();
+
+    /* Generate unique human-readable names for all the TableTripPatterns. */
+    TripPattern.generateUniqueNames(tripPatterns);
+
+    /* Loop over all new TripPatterns setting the service codes. */
+    for (TripPattern tripPattern : tripPatterns) {
+      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
+
+      // Store the tripPattern in the Graph so it will be serialized and usable in routing.
+      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
+    }
+  }
+
   private void addFlexTripsToGraph(TransitModel transitModel) {
-    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) transitModel.flexTripsById.put(
-      flexTrip.getId(),
-      flexTrip
-    );
+    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) {
+      transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
+    }
   }
 }

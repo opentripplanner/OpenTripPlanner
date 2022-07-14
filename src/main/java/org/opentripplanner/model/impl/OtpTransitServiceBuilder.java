@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
@@ -106,6 +105,8 @@ public class OtpTransitServiceBuilder {
   private final EntityById<FareZone> fareZonesById = new EntityById<>();
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
+
+  private final List<StaySeatedNotAllowed> staySeatedNotAllowed = new ArrayList<>();
 
   private final EntityById<Trip> tripsById = new EntityById<>();
 
@@ -225,6 +226,10 @@ public class OtpTransitServiceBuilder {
     return transfers;
   }
 
+  public List<StaySeatedNotAllowed> getStaySeatedNotAllowed() {
+    return staySeatedNotAllowed;
+  }
+
   public EntityById<Trip> getTripsById() {
     return tripsById;
   }
@@ -270,7 +275,7 @@ public class OtpTransitServiceBuilder {
    * period. If a service is start before and/or ends after the period then the service is modified
    * to match the period.
    */
-  public void limitServiceDays(ServiceDateInterval periodLimit, DataImportIssueStore issues) {
+  public void limitServiceDays(ServiceDateInterval periodLimit) {
     if (periodLimit.isUnbounded()) {
       LOG.info("Limiting transit service is skipped, the period is unbounded.");
       return;
@@ -296,7 +301,7 @@ public class OtpTransitServiceBuilder {
       calendars.addAll(keepCal);
       logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
     }
-    removeEntitiesWithInvalidReferences(issues);
+    removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
   }
 
@@ -325,31 +330,12 @@ public class OtpTransitServiceBuilder {
    * Check all relations and remove entities which reference none existing entries. This may happen
    * as a result of inconsistent data or by deliberate removal of elements in the builder.
    */
-  private void removeEntitiesWithInvalidReferences(DataImportIssueStore issues) {
+  private void removeEntitiesWithInvalidReferences() {
     removeTripsWithNoneExistingServiceIds();
-    removeInvalidShapeIds(issues);
     removeStopTimesForNoneExistingTrips();
     fixOrRemovePatternsWhichReferenceNoneExistingTrips();
     removeTransfersForNoneExistingTrips();
     removeTripOnServiceDateForNonExistingTrip();
-  }
-
-  private void removeInvalidShapeIds(DataImportIssueStore issues) {
-    tripsById
-      .values()
-      .forEach(t -> {
-        var shapeId = t.getShapeId();
-        boolean shapeMissing = Objects.nonNull(shapeId) && !shapePoints.containsKey(shapeId);
-        if (shapeMissing) {
-          issues.add(
-            "InvalidShapeReference",
-            "Trip %s contains invalid reference to shape %s",
-            t.getId(),
-            shapeId
-          );
-          t.deleteShapeId();
-        }
-      });
   }
 
   /** Remove all trips which reference none existing service ids */

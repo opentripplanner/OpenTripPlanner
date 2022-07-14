@@ -69,12 +69,12 @@ public class StopModelIndex {
         multiModalStationForStations.put(childStation, multiModalStation);
       }
     }
-    for (FlexLocationGroup flexLocationGroup : stopModel.locationGroupsById.values()) {
+    for (FlexLocationGroup flexLocationGroup : stopModel.getAllFlexLocationGroups()) {
       for (StopLocation stop : flexLocationGroup.getLocations()) {
         locationGroupsByStop.put(stop, flexLocationGroup);
       }
     }
-    for (FlexStopLocation flexStopLocation : stopModel.locationsById.values()) {
+    for (FlexStopLocation flexStopLocation : stopModel.getAllFlexLocations()) {
       locationIndex.insert(flexStopLocation.getGeometry().getEnvelopeInternal(), flexStopLocation);
     }
 

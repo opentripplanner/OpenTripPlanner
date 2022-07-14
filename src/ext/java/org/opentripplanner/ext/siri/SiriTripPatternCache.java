@@ -73,7 +73,10 @@ public class SiriTripPatternCache {
 
       // TODO - SIRI: Add pattern to transitModel index?
 
-      TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
+      TripPattern originalTripPattern = transitModel
+        .getTransitModelIndex()
+        .getPatternForTrip()
+        .get(trip);
 
       tripPattern.setCreatedByRealtimeUpdater();
 

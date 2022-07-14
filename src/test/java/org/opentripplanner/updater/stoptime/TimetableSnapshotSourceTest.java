@@ -89,8 +89,8 @@ public class TimetableSnapshotSourceTest {
   public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-    final Trip trip = transitModel.index.getTripForId().get(tripId);
-    final TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
+    final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+    final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
@@ -112,8 +112,8 @@ public class TimetableSnapshotSourceTest {
   public void testHandleDelayedTrip() {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-    final Trip trip = transitModel.index.getTripForId().get(tripId);
-    final TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
+    final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+    final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
@@ -424,8 +424,11 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
-      final Trip trip = transitModel.index.getTripForId().get(tripId);
-      final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
+      final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+      final TripPattern originalTripPattern = transitModel
+        .getTransitModelIndex()
+        .getPatternForTrip()
+        .get(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
@@ -582,8 +585,11 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
 
     final FeedScopedId tripId = new FeedScopedId(feedId, scheduledTripId);
-    final Trip trip = transitModel.index.getTripForId().get(tripId);
-    final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
+    final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+    final TripPattern originalTripPattern = transitModel
+      .getTransitModelIndex()
+      .getPatternForTrip()
+      .get(trip);
 
     final Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
     final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -677,8 +683,11 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, scheduledTripId);
-      final Trip trip = transitModel.index.getTripForId().get(tripId);
-      final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
+      final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+      final TripPattern originalTripPattern = transitModel
+        .getTransitModelIndex()
+        .getPatternForTrip()
+        .get(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
@@ -834,8 +843,11 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, scheduledTripId);
-      final Trip trip = transitModel.index.getTripForId().get(tripId);
-      final TripPattern originalTripPattern = transitModel.index.getPatternForTrip().get(trip);
+      final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+      final TripPattern originalTripPattern = transitModel
+        .getTransitModelIndex()
+        .getPatternForTrip()
+        .get(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
@@ -898,8 +910,8 @@ public class TimetableSnapshotSourceTest {
   public void testPurgeExpiredData() throws InvalidProtocolBufferException {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final LocalDate previously = LocalDate.now(transitModel.getTimeZone()).minusDays(2); // Just to be safe...
-    final Trip trip = transitModel.index.getTripForId().get(tripId);
-    final TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
+    final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+    final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
 
     updater.maxSnapshotFrequency = 0;
     updater.purgeExpiredData = false;

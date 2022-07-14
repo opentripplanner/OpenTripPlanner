@@ -73,7 +73,7 @@ public class TransitModelIndex {
       this.operatorForId.put(operator.getId(), operator);
     }
 
-    for (TripPattern pattern : transitModel.tripPatternForId.values()) {
+    for (TripPattern pattern : transitModel.getAllTripPatterns()) {
       patternsForFeedId.put(pattern.getFeedId(), pattern);
       patternsForRoute.put(pattern.getRoute(), pattern);
       pattern
@@ -96,7 +96,7 @@ public class TransitModelIndex {
       groupOfRoutesForId.put(groupOfRoutes.getId(), groupOfRoutes);
     }
 
-    for (TripOnServiceDate tripOnServiceDate : transitModel.tripOnServiceDates.values()) {
+    for (TripOnServiceDate tripOnServiceDate : transitModel.getAllTripOnServiceDates()) {
       tripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(

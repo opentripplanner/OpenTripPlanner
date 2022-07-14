@@ -290,14 +290,15 @@ public class ConstantsForTests {
       List.of(bundle),
       ServiceDateInterval.unbounded(),
       fareServiceFactory,
-      false
+      false,
+      300
     );
 
     module.buildGraph(graph, transitModel, new HashMap<>());
 
     transitModel.index();
     graph.index();
-    transitModel.hasTransit = true;
+    transitModel.setHasTransit(true);
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {

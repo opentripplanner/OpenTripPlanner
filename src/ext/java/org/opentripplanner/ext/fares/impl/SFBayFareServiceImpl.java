@@ -7,6 +7,7 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -39,24 +40,24 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
   @Override
   protected float getLowestCost(
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
-    List<Ride> bartBlock = null;
+    List<Leg> bartBlock = null;
     Long sfmtaTransferIssued = null;
     Long alightedBart = null;
     String alightedBartStop = null;
     float cost = 0f;
     String agencyId = null;
-    for (Ride ride : rides) {
-      agencyId = ride.route.getFeedId();
+    for (var ride : rides) {
+      agencyId = ride.getRoute().getId().getFeedId();
       if (agencyId.equals("BART")) {
         if (bartBlock == null) {
           bartBlock = new ArrayList<>();
         }
         bartBlock.add(ride);
-        alightedBart = ride.endTime.toEpochSecond();
-        alightedBartStop = ride.lastStop.getId().getId();
+        alightedBart = ride.getEndTime().toEpochSecond();
+        alightedBartStop = ride.getTo().stop.getId().getId();
       } else { // non-BART agency
         if (bartBlock != null) {
           // finalize outstanding bart block, if any
@@ -64,17 +65,17 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
           bartBlock = null;
         }
         if (agencyId.equals("SFMTA")) {
-          if (ride.classifier == TraverseMode.CABLE_CAR) {
+          if (ride.getMode().equals(TraverseMode.CABLE_CAR)) {
             // no transfers issued or accepted
             cost += CABLE_CAR_FARE;
           } else if (
             sfmtaTransferIssued == null ||
-            sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.endTime.toEpochSecond()
+            sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.getEndTime().toEpochSecond()
           ) {
-            sfmtaTransferIssued = ride.startTime.toEpochSecond();
+            sfmtaTransferIssued = ride.getStartTime().toEpochSecond();
             if (
               alightedBart != null &&
-              alightedBart + BART_TRANSFER_DURATION > ride.startTime.toEpochSecond() &&
+              alightedBart + BART_TRANSFER_DURATION > ride.getEndTime().toEpochSecond() &&
               SFMTA_BART_TRANSFER_STOPS.contains(alightedBartStop)
             ) {
               // discount for BART to Muni transfer
@@ -107,7 +108,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     Fare fare,
     Currency currency,
     FareType fareType,
-    List<Ride> rides,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
     float lowestCost = getLowestCost(fareType, rides, fareRules);

@@ -37,8 +37,6 @@ public class GtfsBundle {
 
   private double maxStopToShapeSnapDistance = 150;
 
-  public int maxInterlineDistance;
-
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
     this(DataStoreFactory.compositeSource(gtfsFile, FileType.GTFS));

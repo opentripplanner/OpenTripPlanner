@@ -57,7 +57,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
   @Override
   public void setup(Graph graph, TransitModel transitModel) {
-    var index = transitModel.index;
+    var index = transitModel.getTransitModelIndex();
     vehiclePositionPatternMatcher =
       new VehiclePositionPatternMatcher(
         feedId,
@@ -101,6 +101,6 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     return Optional
       .ofNullable(transitModel.getTimetableSnapshot())
       .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
-      .orElseGet(() -> transitModel.index.getPatternForTrip().get(trip));
+      .orElseGet(() -> transitModel.getTransitModelIndex().getPatternForTrip().get(trip));
   }
 }

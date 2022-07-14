@@ -74,12 +74,12 @@ public abstract class GraphUpdaterConfigurator {
     }
     // Otherwise add it to the graph
     else {
-      transitModel.updaterManager = updaterManager;
+      transitModel.setUpdaterManager(updaterManager);
     }
   }
 
   public static void shutdownGraph(TransitModel transitModel) {
-    GraphUpdaterManager updaterManager = transitModel.updaterManager;
+    GraphUpdaterManager updaterManager = transitModel.getUpdaterManager();
     if (updaterManager != null) {
       LOG.info("Stopping updater manager with " + updaterManager.numberOfUpdaters() + " updaters.");
       updaterManager.stop();

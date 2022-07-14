@@ -29,7 +29,7 @@ public class UnscheduledTripTest extends FlexTest {
 
   @Test
   public void parseAspenTaxiAsUnscheduledTrip() {
-    var flexTrips = transitModel.flexTripsById.values();
+    var flexTrips = transitModel.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(
       Set.of("t_1289262_b_29084_tn_0", "t_1289257_b_28352_tn_0"),
@@ -86,7 +86,7 @@ public class UnscheduledTripTest extends FlexTest {
   }
 
   private static FlexTrip getFlexTrip() {
-    var flexTrips = transitModel.flexTripsById.values();
+    var flexTrips = transitModel.getAllFlexTrips();
     return flexTrips.iterator().next();
   }
 }
