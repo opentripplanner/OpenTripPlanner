@@ -173,10 +173,10 @@ class RaptorRoutingRequestTransitDataCreator {
       );
     }
 
-    if (LOG.isInfoEnabled()) {
+    if (LOG.isDebugEnabled()) {
       String time = DurationUtils.msToSecondsStr(System.currentTimeMillis() - start);
       long count = tripPatternForDates.size();
-      LOG.info("Prepare Transit model performed in {}, count: {}.", time, count);
+      LOG.debug("Prepare Transit model performed in {}, count: {}.", time, count);
     }
 
     return tripPatternForDates;
