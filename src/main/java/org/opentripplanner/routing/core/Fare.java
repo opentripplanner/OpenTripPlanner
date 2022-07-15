@@ -93,6 +93,11 @@ public class Fare {
     return Objects.equals(details, fare1.details);
   }
 
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
+  }
+
   public void addProducts(Collection<FareProduct> products) {
     products.forEach(this::addProduct);
   }
@@ -107,22 +112,22 @@ public class Fare {
 
   public void addLegProducts(List<LegProducts> legProducts) {
     legProducts.forEach(lp -> {
-      var sum = Money.usDollars(1100);
-      var components = lp
+      // we put -1 one here to tell clients that it's not the real price. the details
+      // about each leg are in the fare component.
+      var sum = Money.usDollars(-1);
+      lp
         .products()
-        .stream()
-        .map(p ->
-          new FareComponent(
+        .forEach(p -> {
+          var component = new FareComponent(
             p.id(),
             p.amount(),
             List.of(lp.leg().getRoute().getId()),
             p.container(),
             p.category()
-          )
-        )
-        .toList();
-      var id = lp.products().stream().map(l -> l.id().toString()).collect(Collectors.joining());
-      details.put(id, new FareEntry(sum, components));
+          );
+
+          details.put(p.id().toString(), new FareEntry(sum, List.of(component)));
+        });
     });
   }
 
@@ -136,9 +141,4 @@ public class Fare {
   }
 
   private record FareEntry(Money amount, List<FareComponent> components) {}
-
-  @Override
-  public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
-  }
 }
