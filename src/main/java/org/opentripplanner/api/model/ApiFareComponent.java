@@ -6,6 +6,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public record ApiFareComponent(
   FeedScopedId fareId,
+  String name,
   ApiMoney price,
   List<FeedScopedId> routes,
   ApiFareQualifier container,

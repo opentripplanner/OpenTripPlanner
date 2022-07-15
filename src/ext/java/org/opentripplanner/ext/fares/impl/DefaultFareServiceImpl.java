@@ -194,7 +194,7 @@ public class DefaultFareServiceImpl implements FareService {
       for (int i = start; i <= via; ++i) {
         routes.add(legs.get(i).getRoute().getId());
       }
-      var component = new FareComponent(fareId, getMoney(currency, cost), routes, null, null);
+      var component = new FareComponent(fareId, null, getMoney(currency, cost), routes, null, null);
       details.add(component);
       ++count;
       start = via + 1;

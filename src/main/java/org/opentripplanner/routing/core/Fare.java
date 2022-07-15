@@ -55,6 +55,7 @@ public class Fare {
         List.of(
           new FareComponent(
             product.id(),
+            product.name(),
             product.amount(),
             List.of(),
             product.container(),
@@ -121,6 +122,7 @@ public class Fare {
         .forEach(p -> {
           var component = new FareComponent(
             p.id(),
+            p.name(),
             p.amount(),
             List.of(lp.leg().getRoute().getId()),
             p.container(),

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
-import java.text.NumberFormat;
 import java.util.Currency;
 
 /**

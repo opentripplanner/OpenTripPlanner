@@ -53,6 +53,7 @@ public class FareMapper {
   private static ApiFareComponent toApiFareComponent(FareComponent m) {
     return new ApiFareComponent(
       m.fareId(),
+      m.name(),
       toApiMoney(m.price()),
       m.routes(),
       Optional

@@ -94,19 +94,62 @@ otp.modules.planner.Itinerary = otp.Class({
     getFareStr : function() {
         if(this.fareDisplayOverride) return this.fareDisplayOverride;
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
+
         if(this.itinData.fare && this.itinData.fare.fare) {
 
-            return Object.keys(this.itinData.fare.fare).map(key => {
-                var fare = this.itinData.fare.fare[key];
-                var decimalPlaces = fare.currency.defaultFractionDigits;
-                var fare_info = {
+            const table = document.createElement("table");
+            Object.keys(this.itinData.fare.fare).forEach(key => {
+                const tr = document.createElement("tr");
+                table.appendChild(tr);
+
+
+                const nameCell = document.createElement("td");
+                const catCell = document.createElement("td");
+                const containerCell = document.createElement("td");
+                const entireItineraryCell = document.createElement("td");
+
+                const detail = this.itinData.fare.details[key];
+                const firstDetail = detail[0];
+
+                if(firstDetail && firstDetail.name) {
+                    nameCell.innerText = firstDetail.name;
+                }
+                tr.appendChild(nameCell);
+
+                if(firstDetail && firstDetail.category && firstDetail.category.name) {
+                    catCell.innerText = firstDetail.category.name;
+                }
+
+                tr.appendChild(catCell);
+
+                if(firstDetail && firstDetail.container && firstDetail.container.name) {
+                    containerCell.innerText = firstDetail.container.name;
+                }
+                tr.appendChild(containerCell);
+
+                let fare = this.itinData.fare.fare[key];
+
+                if(fare.cents < 0) {
+                    fare = firstDetail.price;
+                }
+                else {
+                    entireItineraryCell.innerText = "✅";
+                }
+                const decimalPlaces = fare.currency.defaultFractionDigits;
+                const fare_info = {
                     'currency': fare.currency.symbol,
                     'price': (fare.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces),
                 }
                 //TRANSLATORS: Fare Currency Fare price
-                var price = _tr(`%(currency)s %(price)s`, fare_info) + "\n";
-                return `${key}: ${price}`;
-            }).join("<br>")
+                const price = _tr(`%(currency)s %(price)s`, fare_info) + "\n";
+                const priceCell = document.createElement("td");
+                priceCell.textContent = price;
+                tr.appendChild(priceCell);
+
+                tr.appendChild(entireItineraryCell);
+
+            });
+            return table.outerHTML;
         }
 
         return "N/A";
