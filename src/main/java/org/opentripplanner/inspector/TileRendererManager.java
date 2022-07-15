@@ -43,6 +43,7 @@ public class TileRendererManager {
       new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(routingRequest))
     );
     renderers.put("elevation", new EdgeVertexTileRenderer(new ElevationEdgeRenderer(graph)));
+    renderers.put("pathways", new EdgeVertexTileRenderer(new PathwayEdgeRenderer()));
   }
 
   public void registerRenderer(String layer, TileRenderer tileRenderer) {

@@ -16,6 +16,7 @@ import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
+import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -196,7 +197,8 @@ public class AddTransitModelEntitiesToGraph {
           platformVertex,
           boardingArea.getId(),
           boardingArea.getName(),
-          wheelchair
+          wheelchair,
+          PathwayMode.WALKWAY
         );
 
         PathwayEdge.lowCost(
@@ -204,7 +206,8 @@ public class AddTransitModelEntitiesToGraph {
           boardingAreaVertex,
           boardingArea.getId(),
           boardingArea.getName(),
-          wheelchair
+          wheelchair,
+          PathwayMode.WALKWAY
         );
       }
     }
@@ -217,7 +220,7 @@ public class AddTransitModelEntitiesToGraph {
 
       if (fromVertex != null && toVertex != null) {
         // Elevator
-        if (pathway.getPathwayMode() == 5) {
+        if (pathway.getPathwayMode() == PathwayMode.ELEVATOR) {
           createElevatorEdgesAndAddThemToGraph(graph, pathway, fromVertex, toVertex);
         } else {
           // the GTFS spec allows you to define a pathway which has neither traversal time, distance
@@ -237,7 +240,8 @@ public class AddTransitModelEntitiesToGraph {
             distance,
             pathway.getStairCount(),
             pathway.getSlope(),
-            pathway.isPathwayModeWheelchairAccessible()
+            pathway.isPathwayModeWheelchairAccessible(),
+            pathway.getPathwayMode()
           );
           if (pathway.isBidirectional()) {
             new PathwayEdge(
@@ -249,7 +253,8 @@ public class AddTransitModelEntitiesToGraph {
               distance,
               -1 * pathway.getStairCount(),
               -1 * pathway.getSlope(),
-              pathway.isPathwayModeWheelchairAccessible()
+              pathway.isPathwayModeWheelchairAccessible(),
+              pathway.getPathwayMode()
             );
           }
         }
@@ -311,8 +316,8 @@ public class AddTransitModelEntitiesToGraph {
       toVertexLevelName
     );
 
-    PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName());
-    PathwayEdge.lowCost(toOffboardVertex, toVertex, toVertex.getName());
+    PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName(), PathwayMode.ELEVATOR);
+    PathwayEdge.lowCost(toOffboardVertex, toVertex, toVertex.getName(), PathwayMode.ELEVATOR);
 
     ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
       graph,
@@ -343,8 +348,13 @@ public class AddTransitModelEntitiesToGraph {
     );
 
     if (pathway.isBidirectional()) {
-      PathwayEdge.lowCost(fromOffboardVertex, fromVertex, fromVertex.getName());
-      PathwayEdge.lowCost(toVertex, toOffboardVertex, toVertex.getName());
+      PathwayEdge.lowCost(
+        fromOffboardVertex,
+        fromVertex,
+        fromVertex.getName(),
+        PathwayMode.ELEVATOR
+      );
+      PathwayEdge.lowCost(toVertex, toOffboardVertex, toVertex.getName(), PathwayMode.ELEVATOR);
       new ElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
       new ElevatorAlightEdge(fromOnboardVertex, fromOffboardVertex, fromVertexLevelName);
       new ElevatorHopEdge(

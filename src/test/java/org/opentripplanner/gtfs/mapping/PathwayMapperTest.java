@@ -12,14 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.util.TranslationHelper;
 
 public class PathwayMapperTest {
 
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
-
-  private static final int PATHWAY_MODE = 2;
 
   private static final int TRAVERSAL_TIME = 3000;
 
@@ -30,8 +29,6 @@ public class PathwayMapperTest {
   private static final Stop FROM_STOP = new Stop();
 
   private static final Stop TO_STOP = new Stop();
-
-  private static final OtpTransitServiceBuilder otpTransitService = new OtpTransitServiceBuilder();
 
   private final PathwayMapper subject = new PathwayMapper(
     new StopMapper(TRANSLATION_HELPER, stationId -> null),
@@ -47,7 +44,7 @@ public class PathwayMapperTest {
     PATHWAY.setId(AGENCY_AND_ID);
     PATHWAY.setFromStop(FROM_STOP);
     PATHWAY.setToStop(TO_STOP);
-    PATHWAY.setPathwayMode(PATHWAY_MODE);
+    PATHWAY.setPathwayMode(2);
     PATHWAY.setTraversalTime(TRAVERSAL_TIME);
   }
 
@@ -65,7 +62,7 @@ public class PathwayMapperTest {
     assertEquals("A:1", result.getId().toString());
     assertNotNull(result.getFromStop());
     assertNotNull(result.getToStop());
-    assertEquals(PATHWAY_MODE, result.getPathwayMode());
+    assertEquals(PathwayMode.STAIRS, result.getPathwayMode());
     assertEquals(TRAVERSAL_TIME, result.getTraversalTime());
   }
 
@@ -79,7 +76,7 @@ public class PathwayMapperTest {
     assertNotNull(result.getId());
     assertNull(result.getFromStop());
     assertNull(result.getToStop());
-    assertEquals(0, result.getPathwayMode());
+    assertEquals(PathwayMode.UNKNOWN, result.getPathwayMode());
     assertEquals(0, result.getTraversalTime());
   }
 
