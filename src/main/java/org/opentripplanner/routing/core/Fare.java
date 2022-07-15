@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.FareProduct;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * <p>
@@ -106,7 +107,7 @@ public class Fare {
 
   public void addLegProducts(List<LegProducts> legProducts) {
     legProducts.forEach(lp -> {
-      var sum = Money.usDollars(1000);
+      var sum = Money.usDollars(1100);
       var components = lp
         .products()
         .stream()
@@ -135,4 +136,9 @@ public class Fare {
   }
 
   private record FareEntry(Money amount, List<FareComponent> components) {}
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
+  }
 }

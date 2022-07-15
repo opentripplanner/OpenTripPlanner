@@ -37,7 +37,12 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public ProductResult getProducts(Itinerary itinerary) {
-    var legProducts = itinerary.getTransitLegs().stream().map(this::getLegProduct).toList();
+    var legProducts = itinerary
+      .getTransitLegs()
+      .stream()
+      .map(this::getLegProduct)
+      .filter(lp -> !lp.products().isEmpty())
+      .toList();
 
     var coveringItinerary = productsCoveringItinerary(itinerary, legProducts);
 

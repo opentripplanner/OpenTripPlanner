@@ -40,7 +40,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   ) {
     Assertions.assertEquals(
       Math.round(expectedFare * 100),
-      fareService.getCost(i).fare.get(Fare.FareType.regular).getCents()
+      fareService.getCost(i).getFare(Fare.FareType.regular).getCents()
     );
   }
 

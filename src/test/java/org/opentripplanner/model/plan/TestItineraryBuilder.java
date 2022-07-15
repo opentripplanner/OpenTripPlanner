@@ -218,6 +218,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       TRIP_TO_STOP_INDEX,
       to,
       null,
+      null,
       null
     );
   }
