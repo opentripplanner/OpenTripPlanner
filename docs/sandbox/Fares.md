@@ -26,8 +26,17 @@ The classes and their maintainers are as follows:
 | class                                                          | maintainer                                                 |
 |----------------------------------------------------------------|------------------------------------------------------------|
 | HighestFareInFreeTransferWindowFareServiceDutchFareServiceImpl | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
-| DutchFareServiceImpl                                           | unknown                                                    |
-| NycFareServiceImpl                                             | unknown                                                    |
-| SeattleFareServiceImpl                                         | unknown                                                    |
-| SFBayAreaFareServiceImpl                                       | unknown                                                    |
 
+## Removed fare calculators
+
+The following calculators used to be part of the OTP codebase but since their maintainership
+was unclear and no-one [responded](https://groups.google.com/g/opentripplanner-dev/c/-8M2Eg_uj2o/m/FdmDsvjjBAAJ) 
+to [comment](https://github.com/opentripplanner/OpenTripPlanner/issues/4251), they were 
+[removed](https://github.com/opentripplanner/OpenTripPlanner/pull/4273) in July 2022.
+
+- NycFareServiceImpl
+- SeattleFareServiceImpl
+- SFBayFareServiceImpl
+- DutchFareServiceImpl
+
+If you were using these calculators, you're welcome to re-add them to the code base.
