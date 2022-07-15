@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class Fare {
     return new Fare();
   }
 
-  public void addFare(FareType fareType, WrappedCurrency currency, int cents) {
+  public void addFare(FareType fareType, Currency currency, int cents) {
     fare.put(fareType, new Money(currency, cents));
   }
 

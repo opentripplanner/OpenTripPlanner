@@ -32,7 +32,6 @@ import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -146,10 +145,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itinerary = itineraries.iterator().next();
     assertFalse(itinerary.getFare().fare.isEmpty());
 
-    assertEquals(
-      new Money(new WrappedCurrency("USD"), 250),
-      itinerary.getFare().getFare(FareType.regular)
-    );
+    assertEquals(Money.usDollars(250), itinerary.getFare().getFare(FareType.regular));
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
