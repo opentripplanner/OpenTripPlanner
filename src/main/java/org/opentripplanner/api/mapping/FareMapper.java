@@ -47,7 +47,7 @@ public class FareMapper {
   }
 
   private static ApiMoney toApiMoney(Money m) {
-    return new ApiMoney(m.getCents(), new ApiCurrency(m.getCurrency()));
+    return new ApiMoney(m.cents(), new ApiCurrency(m.currency()));
   }
 
   private static ApiFareComponent toApiFareComponent(FareComponent m) {

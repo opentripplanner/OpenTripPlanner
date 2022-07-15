@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +130,15 @@ public class Fare {
           details.put(p.id().toString(), new FareEntry(sum, List.of(component)));
         });
     });
+  }
+
+  public void updateAllCurrencies(Currency newCurrency) {
+    details
+      .keySet()
+      .forEach(key -> {
+        var entry = details.get(key);
+        new FareEntry(entry.amount().withCurrency(newCurrency), entry.components);
+      });
   }
 
   public enum FareType implements Serializable {
