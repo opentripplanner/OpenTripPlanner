@@ -31,7 +31,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastT
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.Station;
@@ -415,7 +415,7 @@ public class ItineraryListFilterChainBuilder {
       nested.add(new RemoveDeletionFlagForLeastTransfersItinerary());
 
       groupByFilters.add(
-        new GroupByFilter<>(it -> new GroupByTripIdAndDistance(it, group.groupByP), nested)
+        new GroupByFilter<>(it -> new GroupByDistance(it, group.groupByP), nested)
       );
     }
 

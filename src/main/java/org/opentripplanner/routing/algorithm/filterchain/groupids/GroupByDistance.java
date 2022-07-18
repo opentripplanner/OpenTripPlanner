@@ -22,14 +22,14 @@ import org.opentripplanner.model.plan.Leg;
  * out of the key-set. They must overlap in time to account for looping patterns - a pattern
  * visiting the same stops more than once.
  */
-public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistance> {
+public class GroupByDistance implements GroupId<GroupByDistance> {
 
   private final List<Leg> keySet;
 
   /**
    * @param p 'p' must be between 0.50 (50%) and 0.99 (99%).
    */
-  public GroupByTripIdAndDistance(Itinerary itinerary, double p) {
+  public GroupByDistance(Itinerary itinerary, double p) {
     assertPIsValid(p);
     List<Leg> transitLegs = itinerary
       .getLegs()
@@ -46,7 +46,7 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
   }
 
   @Override
-  public boolean match(GroupByTripIdAndDistance other) {
+  public boolean match(GroupByDistance other) {
     if (this == other) {
       return true;
     }
@@ -60,7 +60,7 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
   }
 
   @Override
-  public GroupByTripIdAndDistance merge(GroupByTripIdAndDistance other) {
+  public GroupByDistance merge(GroupByDistance other) {
     return keySet.size() <= other.keySet.size() ? this : other;
   }
 

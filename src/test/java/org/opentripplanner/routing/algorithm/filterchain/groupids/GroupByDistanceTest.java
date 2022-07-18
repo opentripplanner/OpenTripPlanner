@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.calculateTotalDistance;
-import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.getKeySetOfLegsByLimit;
+import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance.calculateTotalDistance;
+import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance.getKeySetOfLegsByLimit;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
-public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
+public class GroupByDistanceTest implements PlanTestConstants {
 
   @Test
   public void calculateTotalDistanceTest() {
@@ -69,7 +69,7 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
   @Test
   public void nonTransitShouldHaveAEmptyKey() {
-    GroupByTripIdAndDistance shortTransit = new GroupByTripIdAndDistance(
+    GroupByDistance shortTransit = new GroupByDistance(
       newItinerary(A, T11_00).walk(D10m, A).build(),
       0.5
     );
@@ -78,7 +78,7 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
   @Test
   public void shortTransitShouldBeTreatedAsNonTransit() {
-    GroupByTripIdAndDistance shortTransit = new GroupByTripIdAndDistance(
+    GroupByDistance shortTransit = new GroupByDistance(
       // walk 30 minutes, bus 1 minute => walking account for more than 50% of the distance
       newItinerary(A, T11_00).walk(D10m, A).bus(11, T11_32, T11_33, B).build(),
       0.5
@@ -89,11 +89,11 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
   @Test
   public void mergeBasedOnKeySetSize() {
-    GroupByTripIdAndDistance oneLeg = new GroupByTripIdAndDistance(
+    GroupByDistance oneLeg = new GroupByDistance(
       newItinerary(A).bus(11, T11_00, T11_30, D).build(),
       0.8
     );
-    GroupByTripIdAndDistance twoLegs = new GroupByTripIdAndDistance(
+    GroupByDistance twoLegs = new GroupByDistance(
       newItinerary(A).bus(11, T11_00, T11_10, B).bus(21, T11_20, T11_30, D).build(),
       0.8
     );
@@ -109,11 +109,11 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
   @Test
   public void transitDoesNotMatchEmptyKeySet() {
-    GroupByTripIdAndDistance transit = new GroupByTripIdAndDistance(
+    GroupByDistance transit = new GroupByDistance(
       newItinerary(A).bus(11, T11_00, T11_05, B).build(),
       0.5
     );
-    GroupByTripIdAndDistance nonTransit = new GroupByTripIdAndDistance(
+    GroupByDistance nonTransit = new GroupByDistance(
       newItinerary(A, T11_00).walk(D5m, B).build(),
       0.5
     );
@@ -126,11 +126,11 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
   @Test
   public void twoNonTransitKeySetShouldNotMatch() {
-    GroupByTripIdAndDistance nonTransitA = new GroupByTripIdAndDistance(
+    GroupByDistance nonTransitA = new GroupByDistance(
       newItinerary(A, T11_00).walk(D5m, B).build(),
       0.5
     );
-    GroupByTripIdAndDistance nonTransitB = new GroupByTripIdAndDistance(
+    GroupByDistance nonTransitB = new GroupByDistance(
       newItinerary(A, T11_00).walk(D5m, B).build(),
       0.5
     );
@@ -141,19 +141,19 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
   @Test
   public void matchDifferentTransitKeySet() {
-    GroupByTripIdAndDistance g_11 = new GroupByTripIdAndDistance(
+    GroupByDistance g_11 = new GroupByDistance(
       newItinerary(A).bus(11, T11_00, T11_05, E).build(),
       0.9
     );
-    GroupByTripIdAndDistance g_21 = new GroupByTripIdAndDistance(
+    GroupByDistance g_21 = new GroupByDistance(
       newItinerary(A).bus(21, T11_00, T11_05, E).build(),
       0.9
     );
-    GroupByTripIdAndDistance g_11_21 = new GroupByTripIdAndDistance(
+    GroupByDistance g_11_21 = new GroupByDistance(
       newItinerary(A).bus(11, T11_00, T11_03, D).bus(21, T11_04, T11_06, E).build(),
       0.9
     );
-    GroupByTripIdAndDistance g_31_11 = new GroupByTripIdAndDistance(
+    GroupByDistance g_31_11 = new GroupByDistance(
       newItinerary(A).bus(31, T11_01, T11_03, B).bus(11, T11_04, T11_06, E).build(),
       0.9
     );
@@ -176,11 +176,11 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
 
   @Test
   public void notMatchFrequencyTripsWithDifferentStartTime() {
-    GroupByTripIdAndDistance g_11_00 = new GroupByTripIdAndDistance(
+    GroupByDistance g_11_00 = new GroupByDistance(
       newItinerary(A).frequencyBus(11, T11_00, T11_05, B).build(),
       0.9
     );
-    GroupByTripIdAndDistance g_11_10 = new GroupByTripIdAndDistance(
+    GroupByDistance g_11_10 = new GroupByDistance(
       newItinerary(A).frequencyBus(11, T11_10, T11_15, B).build(),
       0.9
     );
@@ -196,7 +196,7 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
   public void illegalRangeForPUpperBound() {
     assertThrows(
       IllegalArgumentException.class,
-      () -> new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
+      () -> new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
     );
   }
 
@@ -204,7 +204,7 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
   public void illegalRangeForPLowerBound() {
     assertThrows(
       IllegalArgumentException.class,
-      () -> new GroupByTripIdAndDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
+      () -> new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
     );
   }
 }
