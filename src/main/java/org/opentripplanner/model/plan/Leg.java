@@ -52,11 +52,15 @@ public interface Leg {
     return false;
   }
 
+  /** The mode is walking. */
   default boolean isWalkingLeg() {
     return false;
   }
 
-  default boolean isOnStreetNonTransit() {
+  /**
+   * The mode is a street mode; Hence not a transit mode.
+   */
+  default boolean isStreetLeg() {
     return false;
   }
 

@@ -83,7 +83,7 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public boolean isOnStreetNonTransit() {
+  public boolean isStreetLeg() {
     return true;
   }
 

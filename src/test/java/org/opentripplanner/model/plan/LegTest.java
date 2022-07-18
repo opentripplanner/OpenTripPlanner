@@ -36,9 +36,9 @@ public class LegTest implements PlanTestConstants {
 
   @Test
   public void isOnStreetNonTransit() {
-    assertTrue(WALK_LEG.isOnStreetNonTransit());
-    assertFalse(BUS_LEG.isOnStreetNonTransit());
-    assertTrue(BICYCLE_LEG.isOnStreetNonTransit());
+    assertTrue(WALK_LEG.isStreetLeg());
+    assertFalse(BUS_LEG.isStreetLeg());
+    assertTrue(BICYCLE_LEG.isStreetLeg());
   }
 
   @Test
