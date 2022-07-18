@@ -408,6 +408,15 @@ public class TransitModel implements Serializable {
     return timeZone;
   }
 
+  public void setTimeZone(ZoneId timeZone) {
+    if (this.timeZone != null) {
+      throw new IllegalStateException("Timezone can't be re-set");
+    } else if (timeZone != null) {
+      this.timeZone = timeZone;
+      this.timeZoneExplicitlySet = true;
+    }
+  }
+
   /**
    * Returns the time zone for the first agency in this graph. This is used to interpret times in
    * API requests. The JVM default time zone cannot be used because we support multiple graphs on

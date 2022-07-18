@@ -93,6 +93,7 @@ public class GraphBuilder implements Runnable {
 
     GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
     graphBuilder.hasTransitData = hasTransitData;
+    graphBuilder.transitModel.setTimeZone(config.timeZone);
 
     if (hasOsm) {
       List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
