@@ -425,7 +425,7 @@ public class TransitModel implements Serializable {
    * may become necessary when we start making graphs with long distance train, boat, or air
    * services.
    */
-  private Collection<ZoneId> getAgencyTimeZones() {
+  public Collection<ZoneId> getAgencyTimeZones() {
     CalendarService cs = this.getCalendarService();
     Collection<ZoneId> ret = new HashSet<>();
     for (Agency agency : agencies) {
