@@ -109,6 +109,7 @@ public class TransitModel implements Serializable {
   private transient TransitModelIndex index;
   private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
   private transient ZoneId timeZone = null;
+  private boolean timeZoneExplicitlySet = false;
 
   /**
    * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
@@ -389,6 +390,25 @@ public class TransitModel implements Serializable {
   }
 
   /**
+   * Returns the time zone for the transit model. This is used to interpret times in API requests.
+   * Ideally we would want to interpret times in the time zone of the geographic location where the
+   * origin/destination vertex or board/alight event is located. This may become necessary when we
+   * start making graphs with long distance train, boat, or air services.
+   */
+  public ZoneId getTimeZone() {
+    if (timeZone == null) {
+      if (agencies.isEmpty()) {
+        timeZone = ZoneId.of("GMT");
+        LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
+      } else {
+        timeZone = getAgencyTimeZones().iterator().next();
+        LOG.debug("graph time zone set to {}", timeZone);
+      }
+    }
+    return timeZone;
+  }
+
+  /**
    * Returns the time zone for the first agency in this graph. This is used to interpret times in
    * API requests. The JVM default time zone cannot be used because we support multiple graphs on
    * one server via the routerId. Ideally we would want to interpret times in the time zone of the
@@ -396,25 +416,13 @@ public class TransitModel implements Serializable {
    * may become necessary when we start making graphs with long distance train, boat, or air
    * services.
    */
-  public ZoneId getTimeZone() {
-    if (timeZone == null) {
-      if (agencies.size() == 0) {
-        timeZone = ZoneId.of("GMT");
-        LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
-      } else {
-        CalendarService cs = this.getCalendarService();
-        for (Agency agency : agencies) {
-          ZoneId tz = cs.getTimeZoneForAgencyId(agency.getId());
-          if (timeZone == null) {
-            LOG.debug("graph time zone set to {}", tz);
-            timeZone = tz;
-          } else if (!timeZone.equals(tz)) {
-            LOG.error("agency time zone differs from graph time zone: {}", tz);
-          }
-        }
-      }
+  private Collection<ZoneId> getAgencyTimeZones() {
+    CalendarService cs = this.getCalendarService();
+    Collection<ZoneId> ret = new HashSet<>();
+    for (Agency agency : agencies) {
+      ret.add(cs.getTimeZoneForAgencyId(agency.getId()));
     }
-    return timeZone;
+    return ret;
   }
 
   public Collection<Operator> getOperators() {
@@ -422,11 +430,20 @@ public class TransitModel implements Serializable {
   }
 
   /**
-   * The timezone is cached by the graph. If you've done something to the graph that has the
-   * potential to change the time zone, you should call this to ensure it is reset.
+   * OTP doesn't currently support multiple time zones in a single graph, unless explicitly
+   * configured. Check that the time zone of the added agencies are the same as the current.
+   * At least this way we catch the error and log it instead of silently ignoring because the
+   * time zone from the first agency is used
    */
-  public void clearTimeZone() {
-    this.timeZone = null;
+  public void validateTimeZones() {
+    if (!timeZoneExplicitlySet) {
+      Collection<ZoneId> zones = getAgencyTimeZones();
+      if (zones.size() > 1) {
+        throw new IllegalStateException(
+          "The graph contains agencies with different time zones. Please configure the one to be used in the build-config.json"
+        );
+      }
+    }
   }
 
   public ZonedDateTime getTransitServiceStarts() {

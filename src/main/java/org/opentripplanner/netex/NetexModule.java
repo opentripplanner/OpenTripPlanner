@@ -55,7 +55,6 @@ public class NetexModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    transitModel.clearTimeZone();
     CalendarServiceData calendarServiceData = transitModel.getCalendarDataService();
     boolean hasTransit = false;
     try {
@@ -100,6 +99,8 @@ public class NetexModule implements GraphBuilderModule {
           graph,
           transitModel
         );
+
+        transitModel.validateTimeZones();
       }
     } catch (Exception e) {
       throw new RuntimeException(e);

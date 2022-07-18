@@ -90,13 +90,6 @@ public class GtfsModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    // we're about to add another agency to the graph, so clear the cached timezone
-    // in case it should change
-    // OTP doesn't currently support multiple time zones in a single graph;
-    // at least this way we catch the error and log it instead of silently ignoring
-    // because the time zone from the first agency is cached
-    transitModel.clearTimeZone();
-
     CalendarServiceData calendarServiceData = transitModel.getCalendarDataService();
 
     boolean hasTransit = false;
@@ -172,6 +165,9 @@ public class GtfsModule implements GraphBuilderModule {
       org.opentripplanner.model.calendar.CalendarServiceData.class,
       calendarServiceData
     );
+
+    transitModel.validateTimeZones();
+
     transitModel.updateTransitFeedValidity(calendarServiceData, issueStore);
 
     // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
