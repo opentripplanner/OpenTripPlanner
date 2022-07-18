@@ -3,9 +3,7 @@ package org.opentripplanner.model.calendar.impl;
 
 import static java.util.stream.Collectors.groupingBy;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +15,6 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,17 +30,14 @@ public class CalendarServiceDataFactoryImpl {
 
   private static final Logger LOG = LoggerFactory.getLogger(CalendarServiceDataFactoryImpl.class);
 
-  private final List<Agency> agencies;
   private final Map<FeedScopedId, List<ServiceCalendarDate>> calendarDatesByServiceId;
   private final Map<FeedScopedId, List<ServiceCalendar>> calendarsByServiceId;
   private final Set<FeedScopedId> serviceIds;
 
   private CalendarServiceDataFactoryImpl(
-    Collection<Agency> agencies,
     Collection<ServiceCalendarDate> calendarDates,
     Collection<ServiceCalendar> serviceCalendars
   ) {
-    this.agencies = new ArrayList<>(agencies);
     this.calendarDatesByServiceId =
       calendarDates.stream().collect(groupingBy(ServiceCalendarDate::getServiceId));
     this.calendarsByServiceId =
@@ -52,12 +46,10 @@ public class CalendarServiceDataFactoryImpl {
   }
 
   public static CalendarServiceData createCalendarServiceData(
-    Collection<Agency> agencies,
     Collection<ServiceCalendarDate> calendarDates,
     Collection<ServiceCalendar> serviceCalendars
   ) {
-    return new CalendarServiceDataFactoryImpl(agencies, calendarDates, serviceCalendars)
-      .createData();
+    return new CalendarServiceDataFactoryImpl(calendarDates, serviceCalendars).createData();
   }
 
   /** package local to be unit testable */
@@ -70,8 +62,6 @@ public class CalendarServiceDataFactoryImpl {
 
   private CalendarServiceData createData() {
     CalendarServiceData data = new CalendarServiceData();
-
-    setTimeZonesForAgencies(data);
 
     int index = 0;
 
@@ -116,16 +106,6 @@ public class CalendarServiceDataFactoryImpl {
       return calendars.get(0);
     }
     throw new MultipleCalendarsForServiceIdException(serviceId);
-  }
-
-  private void setTimeZonesForAgencies(CalendarServiceData data) {
-    for (Agency agency : agencies) {
-      try {
-        data.putTimeZoneForAgencyId(agency.getId(), ZoneId.of(agency.getTimezone()));
-      } catch (DateTimeException exception) {
-        throw new UnknownAgencyTimezoneException(agency.getName(), agency.getTimezone());
-      }
-    }
   }
 
   private void addDatesFromCalendar(ServiceCalendar calendar, Set<LocalDate> activeDates) {

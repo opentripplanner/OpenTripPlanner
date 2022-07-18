@@ -2,13 +2,13 @@ package org.opentripplanner.graph_builder.module;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -30,25 +30,15 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
       transitModel.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
     );
 
-    Map<FeedScopedId, Duration> agencyShift = new HashMap<>();
-
-    var calendarService = transitModel.getCalendarService();
+    Map<ZoneId, Duration> agencyShift = new HashMap<>();
 
     transitModel
       .getAllTripPatterns()
       .forEach(pattern -> {
         var timeShift = agencyShift.computeIfAbsent(
-          pattern.getRoute().getAgency().getId(),
-          agencyId ->
-            (
-              graphOffset.minusSeconds(
-                calendarService
-                  .getTimeZoneForAgencyId(agencyId)
-                  .getRules()
-                  .getOffset(serviceStart)
-                  .getTotalSeconds()
-              )
-            )
+          pattern.getRoute().getAgency().getTimezone(),
+          zoneId ->
+            (graphOffset.minusSeconds(zoneId.getRules().getOffset(serviceStart).getTotalSeconds()))
         );
 
         if (timeShift.isZero()) {

@@ -100,7 +100,7 @@ public class NetexBundleSmokeTest {
     assertEquals("RUT:Authority:RUT", a.getId().getId());
     assertEquals("RUT", a.getName());
     assertNull(a.getUrl());
-    assertEquals("Europe/Oslo", a.getTimezone());
+    assertEquals("Europe/Oslo", a.getTimezone().getId());
     assertNull(a.getLang());
     assertNull(a.getPhone());
     assertNull(a.getFareUrl());
@@ -237,12 +237,6 @@ public class NetexBundleSmokeTest {
   }
 
   private void assetServiceCalendar(CalendarServiceData cal) {
-    assertEquals("[RB:RUT:Authority:RUT]", cal.getAgencyIds().toString());
-    assertEquals(
-      "Europe/Oslo",
-      cal.getTimeZoneForAgencyId(new FeedScopedId("RB", "RUT:Authority:RUT")).toString()
-    );
-
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
     assertEquals(2, sIds.size());
     FeedScopedId serviceId1 = sIds.get(0);
@@ -269,6 +263,5 @@ public class NetexBundleSmokeTest {
       dates2.toString()
     );
     assertEquals(2, cal.getServiceIds().size());
-    assertEquals(1, cal.getAgencyIds().size());
   }
 }

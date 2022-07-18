@@ -3,7 +3,6 @@ package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,26 +21,9 @@ public class CalendarServiceData implements Serializable {
   private static final String CAL_SERVICE_FEED_ID = "CSID";
   private static final Logger LOG = LoggerFactory.getLogger(CalendarServiceData.class);
 
-  private final Map<FeedScopedId, ZoneId> timeZonesByAgencyId = new HashMap<>();
-
   private final Map<FeedScopedId, List<LocalDate>> serviceDatesByServiceId = new HashMap<>();
 
   private final Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate = new HashMap<>();
-
-  /**
-   * @return the time zone for the specified agencyId, or null if the agency was not found
-   */
-  public ZoneId getTimeZoneForAgencyId(FeedScopedId agencyId) {
-    return timeZonesByAgencyId.get(agencyId);
-  }
-
-  public void putTimeZoneForAgencyId(FeedScopedId agencyId, ZoneId timeZone) {
-    timeZonesByAgencyId.put(agencyId, timeZone);
-  }
-
-  public Set<FeedScopedId> getAgencyIds() {
-    return Collections.unmodifiableSet(timeZonesByAgencyId.keySet());
-  }
 
   public Set<FeedScopedId> getServiceIds() {
     return Collections.unmodifiableSet(serviceDatesByServiceId.keySet());
@@ -86,9 +68,6 @@ public class CalendarServiceData implements Serializable {
   }
 
   public void add(CalendarServiceData other) {
-    for (FeedScopedId agencyId : other.getAgencyIds()) {
-      putTimeZoneForAgencyId(agencyId, other.getTimeZoneForAgencyId(agencyId));
-    }
     for (FeedScopedId serviceId : other.serviceDatesByServiceId.keySet()) {
       putServiceDatesForServiceId(serviceId, other.serviceDatesByServiceId.get(serviceId));
     }

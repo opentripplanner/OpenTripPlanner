@@ -27,7 +27,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   static Agency agency = Agency
     .of(id("agency"))
     .withName("Houston")
-    .withTimezone("America/Houston")
+    .withTimezone("America/Chicago")
     .build();
 
   @ParameterizedTest(name = "[{index}] {0}")

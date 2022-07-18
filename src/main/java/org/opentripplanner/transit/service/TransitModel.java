@@ -429,7 +429,7 @@ public class TransitModel implements Serializable {
     CalendarService cs = this.getCalendarService();
     Collection<ZoneId> ret = new HashSet<>();
     for (Agency agency : agencies) {
-      ret.add(cs.getTimeZoneForAgencyId(agency.getId()));
+      ret.add(agency.getTimezone());
     }
     return ret;
   }
