@@ -194,7 +194,6 @@ public class ToStringBuilder {
     return addIfNotNull(name, num, numFormat::formatCoordinate);
   }
 
-
   public ToStringBuilder addDateTime(String name, Instant time) {
     return addIfNotNull(name, time, Instant::toString);
   }

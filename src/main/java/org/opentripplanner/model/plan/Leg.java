@@ -100,6 +100,58 @@ public interface Leg {
   }
 
   /**
+   * Return {@code true} if to legs are the same. The mode must match and the time must overlap.
+   * For transit the trip ID must match and board/alight position must overlap. (Two trips with
+   * different service-date can overlap in time, so we use boarding-/alight-position to verify).
+   */
+  default boolean isPartiallySameLeg(Leg other) {
+    // Assert both legs have the same mode
+    if (getMode() != other.getMode()) {
+      return false;
+    }
+
+    // Overlap in time
+    if (!overlapInTime(other)) {
+      return false;
+    }
+
+    // The mode is the same, so this and the other are both *street* or *transit* legs
+    if (isStreetLeg()) {
+      return true;
+    }
+    // Transit leg
+    else {
+      // If NOT the same trip, return false
+      if (!getTrip().getId().equals(other.getTrip().getId())) {
+        return false;
+      }
+
+      // Return true if legs overlap is space(have one common stop visit), this is necessary
+      // since the same trip id on two following service dates may overlap in time. For example,
+      // a trip may run in a loop for 48 hours, overlapping with the same trip id of the trip
+      // scheduled for the next service day. They both visit the same stops, with overlapping
+      // times, but the stop positions will be different.
+      return (
+        getBoardStopPosInPattern() < other.getAlightStopPosInPattern() &&
+        getAlightStopPosInPattern() > other.getBoardStopPosInPattern()
+      );
+    }
+  }
+
+  /**
+   * Return true if this leg and the given {@code other} leg overlap in time. If the
+   * start-time equals the end-time this method returns false.
+   */
+  default boolean overlapInTime(Leg other) {
+    return (
+      // We convert to epoc seconds to ignore nanos (save CPU),
+      // in favor of using the methods isAfter(...) and isBefore(...)
+      getStartTime().toEpochSecond() < other.getEndTime().toEpochSecond() &&
+      other.getStartTime().toEpochSecond() < getEndTime().toEpochSecond()
+    );
+  }
+
+  /**
    * For transit legs, the route agency. For non-transit legs {@code null}.
    */
   default Agency getAgency() {
