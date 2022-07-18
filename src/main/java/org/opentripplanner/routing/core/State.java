@@ -375,7 +375,7 @@ public class State implements Cloneable {
   public String toString() {
     return ToStringBuilder
       .of(State.class)
-      .addTime("time", getTime())
+      .addDateTime("time", getTime())
       .addNum("weight", weight)
       .addObj("vertex", vertex)
       .addBoolIfTrue("VEHICLE_RENT", isRentingVehicle())
