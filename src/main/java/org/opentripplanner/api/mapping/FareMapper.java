@@ -3,6 +3,7 @@ package org.opentripplanner.api.mapping;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiCurrency;
@@ -14,9 +15,8 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 
-public class FareMapper {
-
-  public static ApiFare mapFare(Fare fare) {
+public record FareMapper(Locale locale) {
+  public ApiFare mapFare(Fare fare) {
     Map<ApiFareType, ApiMoney> apiFare = fare.fare
       .entrySet()
       .stream()
@@ -32,7 +32,7 @@ public class FareMapper {
       .stream()
       .map(e -> {
         var type = toApiFare(e.getKey());
-        var money = Arrays.stream(e.getValue()).map(FareMapper::toApiFareComponent).toList();
+        var money = Arrays.stream(e.getValue()).map(this::toApiFareComponent).toList();
         return new SimpleEntry<>(type, money);
       })
       .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
@@ -40,7 +40,7 @@ public class FareMapper {
     return new ApiFare(apiFare, apiComponent);
   }
 
-  private static ApiFareType toApiFare(Fare.FareType t) {
+  private ApiFareType toApiFare(Fare.FareType t) {
     return switch (t) {
       case regular -> ApiFareType.regular;
       case student -> ApiFareType.student;
@@ -51,11 +51,20 @@ public class FareMapper {
     };
   }
 
-  private static ApiMoney toApiMoney(Money m) {
-    return new ApiMoney(m.getCents(), new ApiCurrency(m.getCurrency()));
+  private ApiMoney toApiMoney(Money m) {
+    var c = m.getCurrency();
+    return new ApiMoney(
+      m.getCents(),
+      new ApiCurrency(
+        c.getCurrencyCode(),
+        c.getDefaultFractionDigits(),
+        c.getCurrencyCode(),
+        c.getSymbol(locale)
+      )
+    );
   }
 
-  private static ApiFareComponent toApiFareComponent(FareComponent m) {
+  private ApiFareComponent toApiFareComponent(FareComponent m) {
     return new ApiFareComponent(m.fareId, toApiMoney(m.price), m.routes);
   }
 }
