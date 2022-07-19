@@ -49,7 +49,7 @@ class StopMapper {
       .of(idFactory.createId(quay.getId()))
       .withParentStation(parentStation)
       .withName(parentStation.getName())
-      .withCode(quay.getPublicCode())
+      .withPlatformCode(quay.getPublicCode())
       .withDescription(
         NonLocalizedString.ofNullable(quay.getDescription(), MultilingualString::getValue)
       )
