@@ -1,11 +1,16 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.DoubleFunction;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TransitMode;
 
 public class McCostParamsMapper {
@@ -23,6 +28,9 @@ public class McCostParamsMapper {
     builder.transitReluctanceFactors(mapTransitReluctance(request.transitReluctanceForMode()));
 
     builder.wheelchairAccessibility(request.wheelchairAccessibility);
+
+    builder.unpreferredRoutes(request.unpreferredRoutes.stream().collect(Collectors.toSet()));
+    builder.unpreferredCost(request.unpreferredRouteCost);
 
     return builder.build();
   }

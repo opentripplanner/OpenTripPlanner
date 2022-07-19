@@ -131,8 +131,8 @@ public class RoutingRequestMapper {
         "useVehicleParkingAvailabilityInformation",
         dft.useVehicleParkingAvailabilityInformation
       );
-    request.useUnpreferredRoutesPenalty =
-      c.asInt("useUnpreferredRoutesPenalty", dft.useUnpreferredRoutesPenalty);
+    request.unpreferredRouteCost =
+      c.asLinearFunction("unpreferredRouteCost", dft.unpreferredRouteCost);
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
     request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
     request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);
@@ -148,6 +148,9 @@ public class RoutingRequestMapper {
     );
 
     request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
+
+    request.unpreferredRoutes =
+      c.path("unpreferred").asFeedScopedIds("routes", dft.unpreferredRoutes);
 
     return request;
   }
