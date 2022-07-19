@@ -9,9 +9,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.LocalizedString;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.LocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
 /** This need to be public, because it is used in unit tests. Do not use it outside the osm package. */

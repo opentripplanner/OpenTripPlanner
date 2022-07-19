@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.transit.model.basic;
 
 import java.io.Serializable;
 import java.util.Locale;

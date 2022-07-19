@@ -27,7 +27,7 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 
 public class AlertsUpdateHandlerTest {
 

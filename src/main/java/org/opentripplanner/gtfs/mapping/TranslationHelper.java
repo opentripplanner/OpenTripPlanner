@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.gtfs.mapping;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -14,6 +14,9 @@ import org.onebusaway.csv_entities.schema.annotations.CsvFieldNameConvention;
 import org.onebusaway.csv_entities.schema.annotations.CsvFields;
 import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Translation;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 
 /**
  * This helper is util for translating wanted text found in GTFS's translation.txt -file.
@@ -21,16 +24,13 @@ import org.onebusaway.gtfs.model.Translation;
  * If translation not found then it will return given default value.
  */
 
-public final class TranslationHelper {
+final class TranslationHelper {
 
   private static final String TABLE_FEED_INFO = "feed_info";
   private final Map<String, Map<String, List<Translation>>> translationMap = new HashMap<>();
   private String feedLanguage = null;
 
-  public void importTranslations(
-    Collection<Translation> allTranslations,
-    Collection<FeedInfo> feedInfos
-  ) {
+  void importTranslations(Collection<Translation> allTranslations, Collection<FeedInfo> feedInfos) {
     if (feedInfos.iterator().hasNext()) {
       feedLanguage = feedInfos.iterator().next().getLang();
     }
@@ -82,7 +82,7 @@ public final class TranslationHelper {
   }
 
   @Nullable
-  public I18NString getTranslation(
+  I18NString getTranslation(
     @Nonnull Class<?> clazz,
     @Nonnull String fieldName,
     @Nonnull String recordId,
@@ -92,7 +92,7 @@ public final class TranslationHelper {
   }
 
   @Nullable
-  public I18NString getTranslation(
+  I18NString getTranslation(
     @Nonnull Class<?> clazz,
     @Nonnull String fieldName,
     @Nonnull String recordId,
