@@ -2653,9 +2653,21 @@ type QueryType {
         compactLegsByReversedSearch: Boolean
 
         """
-        Which bike rental networks can be used. By default, all networks are allowed.
+        Which vehicle rental networks can be used. By default, all networks are allowed.
+
+        Deprecated: Use `allowedVehicleRentalNetworks` instead.
         """
-        allowedBikeRentalNetworks: [String]
+        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedBikeRentalNetworks instead")
+
+        """
+        Which vehicle rental networks can be used. By default, all networks are allowed.
+        """
+        allowedVehicleRentalNetworks: [String]
+
+        """
+        Which vehicle rental networks cannot be used. By default, all networks are allowed.
+        """
+        bannedVehicleRentalNetworks: [String]
     ): Plan
 }
 
