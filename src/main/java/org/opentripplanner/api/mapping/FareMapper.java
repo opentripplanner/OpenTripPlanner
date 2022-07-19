@@ -15,7 +15,14 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 
-public record FareMapper(Locale locale) {
+public class FareMapper {
+
+  private final Locale locale;
+
+  public FareMapper(Locale locale) {
+    this.locale = locale;
+  }
+
   public ApiFare mapFare(Fare fare) {
     Map<ApiFareType, ApiMoney> apiFare = fare.fare
       .entrySet()
