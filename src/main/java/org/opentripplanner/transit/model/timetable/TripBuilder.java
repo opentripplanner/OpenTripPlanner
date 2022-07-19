@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.timetable;
 
-import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;

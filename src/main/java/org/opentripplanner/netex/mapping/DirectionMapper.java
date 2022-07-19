@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.Direction;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
 
 class DirectionMapper {
