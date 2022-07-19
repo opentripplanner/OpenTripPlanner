@@ -152,7 +152,7 @@ public class QuayType {
           .description(
             "Public code used to identify this quay within the stop place. For instance a platform code."
           )
-          .dataFetcher(environment -> (((StopLocation) environment.getSource()).getCode()))
+          .dataFetcher(environment -> (((StopLocation) environment.getSource()).getPlatformCode()))
           .build()
       )
       .field(
