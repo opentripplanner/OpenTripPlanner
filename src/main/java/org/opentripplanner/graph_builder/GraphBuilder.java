@@ -67,7 +67,7 @@ public class GraphBuilder implements Runnable {
       StopModel stopModel = new StopModel();
       Deduplicator deduplicator = new Deduplicator();
       Graph graph = new Graph(stopModel, deduplicator);
-      graph.setOpeningHoursCalendarService(serviceDateInterval);
+      graph.initOpeningHoursCalendarService(serviceDateInterval);
       this.graph = graph;
       this.transitModel = new TransitModel(stopModel, deduplicator);
     } else {

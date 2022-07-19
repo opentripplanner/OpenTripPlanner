@@ -357,7 +357,7 @@ public class Graph implements Serializable {
     return this.openingHoursCalendarService;
   }
 
-  public void setOpeningHoursCalendarService(ServiceDateInterval serviceDateInterval) {
+  public void initOpeningHoursCalendarService(ServiceDateInterval serviceDateInterval) {
     this.openingHoursCalendarService =
       new OpeningHoursCalendarService(
         deduplicator,
