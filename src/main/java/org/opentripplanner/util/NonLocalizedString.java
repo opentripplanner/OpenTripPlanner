@@ -19,10 +19,7 @@ public class NonLocalizedString implements I18NString, Serializable {
   private final String name;
 
   public NonLocalizedString(@Nonnull String name) {
-    if (name == null) {
-      throw new IllegalArgumentException();
-    }
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
   }
 
   /**
