@@ -7,11 +7,14 @@ public interface OtpArchitectureModules {
   /* Third party libs*/
 
   Package GNU_TROVE = Package.of("gnu.trove.(*)..");
+  Package JACKSON_ANNOTATIONS = Package.of("com.fasterxml.jackson.annotation");
+  Package JTS_GEOM = Package.of("org.locationtech.jts.(*)..");
 
   /* OTP Modules */
 
   Package OTP_ROOT = Package.of("org.opentripplanner");
   Package UTIL = OTP_ROOT.subPackage("util");
+  Package GEO_UTIL = OTP_ROOT.subPackage("common.geometry");
 
   /**
    * This is a bag of TRUE util classes - no dependencies to other OTP classes of frameworks.
