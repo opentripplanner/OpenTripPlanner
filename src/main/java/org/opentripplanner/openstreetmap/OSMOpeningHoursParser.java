@@ -20,7 +20,6 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -133,7 +132,7 @@ public class OSMOpeningHoursParser {
         // the object for a time range https://github.com/opening-hours/opening_hours.js/issues/53.
         openingHoursBuildersForRule.forEach(openingHoursBuilder ->
           openingHoursBuilders.addAll(
-            splitPreviousBuilders(calendarBuilder, openingHoursBuilder, openingHoursBuilders)
+            splitPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
           )
         );
       } else if (!rule.isAdditive()) {
@@ -373,12 +372,7 @@ public class OSMOpeningHoursParser {
   ) {
     previousOpeningHoursBuilders
       .stream()
-      .forEach(openingHoursBuilder ->
-        openingHoursBuilder.offWithTimeShift(
-          newOpeningHoursBuilder.getOpeningDays(),
-          newOpeningHoursBuilder.getPeriodDescription()
-        )
-      );
+      .forEach(openingHoursBuilder -> openingHoursBuilder.offWithTimeShift(newOpeningHoursBuilder));
   }
 
   /**
@@ -395,73 +389,16 @@ public class OSMOpeningHoursParser {
    * splitting existing builders.
    */
   private List<OHCalendarBuilder.OpeningHoursBuilder> splitPreviousBuilders(
-    OHCalendarBuilder calendarBuilder,
     OHCalendarBuilder.OpeningHoursBuilder closedOpeningHoursBuilder,
     List<OHCalendarBuilder.OpeningHoursBuilder> previousOpeningHoursBuilders
   ) {
     return previousOpeningHoursBuilders
       .stream()
       .flatMap(openingHoursBuilder -> {
-        LocalTime onStartTime = openingHoursBuilder.getStartTime();
-        LocalTime onEndTime = openingHoursBuilder.getEndTime();
-        LocalTime closedStartTime = closedOpeningHoursBuilder.getStartTime();
-        LocalTime closedEndTime = closedOpeningHoursBuilder.getEndTime();
-        if (
-          closedEndTime.equals(onStartTime) ||
-          closedEndTime.isBefore(onStartTime) ||
-          onEndTime.equals(closedStartTime) ||
-          onEndTime.isBefore(closedStartTime)
-        ) {
-          return null;
-        }
-        String offDescription = closedOpeningHoursBuilder.getPeriodDescription();
-        if (
-          (closedStartTime.isBefore(onStartTime) || closedStartTime.equals(onStartTime)) &&
-          ((onEndTime.isBefore(closedEndTime) || onEndTime.equals(closedEndTime)))
-        ) {
-          openingHoursBuilder.off(closedOpeningHoursBuilder.getOpeningDays(), offDescription);
-          return null;
-        }
-        BitSet commonDays = openingHoursBuilder.getCommonDays(
-          closedOpeningHoursBuilder.getOpeningDays()
+        var openingHoursBuilderAndNewBuilders = openingHoursBuilder.createBuildersForRelativeComplement(
+          closedOpeningHoursBuilder
         );
-        if (commonDays.isEmpty()) {
-          return null;
-        }
-        if (closedStartTime.equals(onStartTime) || closedStartTime.isBefore(onStartTime)) {
-          var newOpeningHoursBuilder = calendarBuilder.openingHours(
-            closedOpeningHoursBuilder.getPeriodDescription(),
-            closedEndTime,
-            onEndTime
-          );
-          newOpeningHoursBuilder.on(commonDays);
-          openingHoursBuilder.off(commonDays, offDescription);
-          return Stream.of(newOpeningHoursBuilder);
-        }
-        if (onEndTime.equals(closedEndTime) || onEndTime.isBefore(closedEndTime)) {
-          var newOpeningHoursBuilder = calendarBuilder.openingHours(
-            closedOpeningHoursBuilder.getPeriodDescription(),
-            onStartTime,
-            closedStartTime
-          );
-          newOpeningHoursBuilder.on(commonDays);
-          openingHoursBuilder.off(commonDays, offDescription);
-          return Stream.of(newOpeningHoursBuilder);
-        }
-        var firstNewOpeningHoursBuilder = calendarBuilder.openingHours(
-          closedOpeningHoursBuilder.getPeriodDescription(),
-          onStartTime,
-          closedStartTime
-        );
-        firstNewOpeningHoursBuilder.on(commonDays);
-        var secondNewOpeningHoursBuilder = calendarBuilder.openingHours(
-          closedOpeningHoursBuilder.getPeriodDescription(),
-          closedEndTime,
-          onEndTime
-        );
-        secondNewOpeningHoursBuilder.on(commonDays);
-        openingHoursBuilder.off(commonDays, offDescription);
-        return Stream.of(firstNewOpeningHoursBuilder, secondNewOpeningHoursBuilder);
+        return openingHoursBuilderAndNewBuilders.newBuilders().stream();
       })
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
