@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.core;
 
+import java.text.NumberFormat;
 import java.util.Currency;
-import org.opentripplanner.util.lang.ToStringBuilder;
+import java.util.Locale;
 
 /**
  * @param currency The currency of the money.
@@ -31,10 +32,8 @@ public record Money(Currency currency, int cents) implements Comparable<Money> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
-      .addObj("currency", currency)
-      .addNum("cents", cents)
-      .toString();
+    NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.ENGLISH);
+    nf.setCurrency(currency);
+    return nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
   }
 }
