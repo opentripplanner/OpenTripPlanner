@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import java.util.Currency;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * @param currency The currency of the money.
@@ -26,5 +27,14 @@ public record Money(Currency currency, int cents) implements Comparable<Money> {
 
   public Money withCurrency(Currency updatedCurrency) {
     return new Money(updatedCurrency, cents);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(this.getClass())
+      .addObj("currency", currency)
+      .addNum("cents", cents)
+      .toString();
   }
 }
