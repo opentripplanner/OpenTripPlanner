@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.module.osm.LocalizedStringMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -29,7 +30,6 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.LocalizedString;
 
 public class LinkStopToPlatformTest {
 
@@ -127,7 +127,7 @@ public class LinkStopToPlatformTest {
     LineString line = geometryFactory.createLineString(
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
-    I18NString name = new LocalizedString(nameString, new OSMWithTags());
+    I18NString name = LocalizedStringMapper.getInstance().map(nameString, new OSMWithTags());
 
     return new AreaEdge(
       v1,
