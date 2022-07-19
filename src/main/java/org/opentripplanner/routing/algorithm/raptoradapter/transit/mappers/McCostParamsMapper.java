@@ -6,7 +6,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostPa
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class McCostParamsMapper {
 

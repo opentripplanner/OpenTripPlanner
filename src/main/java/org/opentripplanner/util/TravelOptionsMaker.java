@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**

@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.network.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class RequestModes {

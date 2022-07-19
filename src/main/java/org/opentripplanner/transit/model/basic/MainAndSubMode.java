@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.network;
+package org.opentripplanner.transit.model.basic;
 
 import java.util.List;
 import java.util.stream.Stream;
