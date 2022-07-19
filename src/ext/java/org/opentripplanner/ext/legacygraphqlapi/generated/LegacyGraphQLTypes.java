@@ -594,12 +594,14 @@ public class LegacyGraphQLTypes {
 
     private String agencies;
     private String routes;
+    private String unpreferredRouteCost;
     private Integer useUnpreferredRoutesPenalty;
 
     public LegacyGraphQLInputUnpreferredInput(Map<String, Object> args) {
       if (args != null) {
         this.agencies = (String) args.get("agencies");
         this.routes = (String) args.get("routes");
+        this.unpreferredRouteCost = (String) args.get("unpreferredRouteCost");
         this.useUnpreferredRoutesPenalty = (Integer) args.get("useUnpreferredRoutesPenalty");
       }
     }
@@ -612,6 +614,10 @@ public class LegacyGraphQLTypes {
       return this.routes;
     }
 
+    public String getLegacyGraphQLUnpreferredRouteCost() {
+      return this.unpreferredRouteCost;
+    }
+
     public Integer getLegacyGraphQLUseUnpreferredRoutesPenalty() {
       return this.useUnpreferredRoutesPenalty;
     }
@@ -622,6 +628,10 @@ public class LegacyGraphQLTypes {
 
     public void setLegacyGraphQLRoutes(String routes) {
       this.routes = routes;
+    }
+
+    public void setLegacyGraphQLUnpreferredRouteCost(String unpreferredRouteCost) {
+      this.unpreferredRouteCost = unpreferredRouteCost;
     }
 
     public void setLegacyGraphQLUseUnpreferredRoutesPenalty(Integer useUnpreferredRoutesPenalty) {

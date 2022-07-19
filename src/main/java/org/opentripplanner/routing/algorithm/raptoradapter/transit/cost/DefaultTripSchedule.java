@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public interface DefaultTripSchedule extends RaptorTripSchedule {
@@ -14,4 +15,10 @@ public interface DefaultTripSchedule extends RaptorTripSchedule {
    * give non-wheelchair friendly trips a generalized-cost penalty.
    */
   WheelchairAccessibility wheelchairBoarding();
+
+  /**
+   * This is not used by the default calculator, but by the {@link RouteCostCalculator} to
+   * give unpreferred routes or agencies a generalized-cost penalty.
+   */
+  FeedScopedId routeId();
 }
