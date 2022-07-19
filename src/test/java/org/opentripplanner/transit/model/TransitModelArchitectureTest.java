@@ -4,7 +4,6 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 import static org.opentripplanner.OtpArchitectureModules.GEO_UTIL;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.JTS_GEOM;
-import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
 import static org.opentripplanner.OtpArchitectureModules.TRANSIT_MODEL;
 import static org.opentripplanner.OtpArchitectureModules.UTILS;
 
@@ -21,13 +20,10 @@ public class TransitModelArchitectureTest {
   private static final Package SITE = TRANSIT_MODEL.subPackage("site");
   private static final Package TIMETABLE = TRANSIT_MODEL.subPackage("timetable");
 
-  // TODO: Remove this dependency
-  private static final Package RESOURCE_BUNDLE = OTP_ROOT.subPackage("util");
-
   @Test
   void enforcePackageDependencies() {
     FRAMEWORK.dependsOn(UTILS).verify();
-    BASIC.dependsOn(UTILS, JTS_GEOM, RESOURCE_BUNDLE).verify();
+    BASIC.dependsOn(UTILS, JTS_GEOM).verify();
     ORGANIZATION.dependsOn(UTILS, FRAMEWORK, BASIC).verify();
     SITE
       .dependsOn(UTILS, JACKSON_ANNOTATIONS, JTS_GEOM, GEO_UTIL, FRAMEWORK, BASIC, ORGANIZATION)

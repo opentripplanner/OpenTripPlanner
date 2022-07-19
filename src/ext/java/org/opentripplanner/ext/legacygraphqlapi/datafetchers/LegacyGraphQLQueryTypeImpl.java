@@ -65,7 +65,7 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.resources.ResourceBundleSingleton;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLQueryTypeImpl

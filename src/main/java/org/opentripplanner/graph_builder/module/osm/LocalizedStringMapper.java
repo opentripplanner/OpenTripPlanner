@@ -12,7 +12,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.resources.ResourceBundleSingleton;
 
 /** This need to be public, because it is used in unit tests. Do not use it outside the osm package. */
 public class LocalizedStringMapper {
