@@ -100,7 +100,6 @@ otp.modules.planner.Itinerary = otp.Class({
             const tr = document.createElement("tr");
             table.appendChild(tr);
 
-
             const nameCell = document.createElement("td");
             nameCell.classList.add("name");
             nameCell.innerText = p.name || "";
@@ -135,7 +134,7 @@ otp.modules.planner.Itinerary = otp.Class({
 
         if(this.itinData.fare && this.itinData.fare.fare) {
 
-            const products = Object.keys(this.itinData.fare.fare).map(key => {
+            const productsCoveringItineraries = Object.keys(this.itinData.fare.fare).map(key => {
 
                 let fare = this.itinData.fare.fare[key];
 
@@ -161,15 +160,60 @@ otp.modules.planner.Itinerary = otp.Class({
                 }
 
                 return result;
+            }).filter(p => p.coversItinerary);
+
+            const legProducts = Object.keys(this.itinData.fare.fare).map(key => {
+
+                const fare = this.itinData.fare.fare[key];
+                // -1 is the magic number to tell if that it doesn't cover the itinerary
+                if(fare.cents !== -1) {
+                    return null;
+                }
+
+                const firstDetail = this.itinData.fare.details[key][0];
+
+                return {
+                    name: firstDetail.name,
+                    category: firstDetail.category?.name,
+                    container: firstDetail.container?.name,
+                    cents: firstDetail.price.cents,
+                    currency: firstDetail.price.currency,
+                    routes: firstDetail.routes
+                };
+            }).filter(product => product != null);
+
+            const groupedLegProducts = {};
+
+            legProducts.forEach(p => {
+                const key = p.routes.toString();
+                const existing = groupedLegProducts[key] || [];
+                existing.push(p);
+                groupedLegProducts[key] = existing;
             });
 
-            const coveringItinerary = document.createElement("div");
-            const title = document.createElement("strong");
-            title.innerText = "Covering entire itinerary";
-            coveringItinerary.appendChild(title);
-            coveringItinerary.appendChild(this.buildFaresTable(products.filter(p => p.coversItinerary)));
+            console.log(groupedLegProducts)
 
-            return coveringItinerary.outerHTML;
+            const allFares = document.createElement("div");
+            if(productsCoveringItineraries.length > 0) {
+                const title = document.createElement("strong");
+                title.innerText = "Covering entire itinerary";
+                allFares.appendChild(title);
+                allFares.appendChild(this.buildFaresTable(productsCoveringItineraries));
+            }
+
+            if(Object.keys(groupedLegProducts).length > 0) {
+                Object.keys(groupedLegProducts).forEach(key =>{
+                    console.log(key);
+
+                    const title = document.createElement("strong");
+                    title.innerText = `Covering leg ${key}`;
+                    allFares.appendChild(title);
+                    const products = groupedLegProducts[key];
+                    allFares.appendChild(this.buildFaresTable(products));
+                });
+            }
+
+            return allFares.outerHTML;
         }
 
         return "N/A";
