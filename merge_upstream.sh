@@ -6,7 +6,7 @@
 # Pushes the result (upstream + local modifications) to digitransit OTP dev-2.x branch
 # To apply this script, you need to set up upstream opentripplanner as remote (say a remote called otp)
 # First fetch the upstream: git fetch otp
-# Then run ./merge_upstream otp/dev-2.x
+# Then run ./merge_upstream.sh otp/dev-2.x
 # The result is that updated dev-2.x is pushed to our fork and gets deployed to development.
 
 #set -euo pipefail
