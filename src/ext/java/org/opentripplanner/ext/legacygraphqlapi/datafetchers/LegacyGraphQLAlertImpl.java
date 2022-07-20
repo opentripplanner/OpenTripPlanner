@@ -8,6 +8,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -223,7 +224,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                 : getUnknownForAlertEntityPair(
                   agency,
                   routeType,
-                  agency.toString(),
+                  null,
                   Integer.toString(routeType),
                   "agency",
                   "route type"
@@ -249,8 +250,8 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
               : List.of(
                 getUnknownForAlertEntityPair(
                   route,
-                  route.toString(),
                   direction,
+                  null,
                   direction.name(),
                   "route",
                   "direction"
@@ -264,7 +265,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
           }
           return List.of();
         })
-        .flatMap(list -> list.stream())
+        .flatMap(Collection::stream)
         .map(Object.class::cast)
         .collect(Collectors.toList());
   }

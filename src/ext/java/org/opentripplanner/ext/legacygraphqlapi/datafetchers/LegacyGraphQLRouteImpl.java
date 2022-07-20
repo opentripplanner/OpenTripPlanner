@@ -79,16 +79,16 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                           )
                       )
                   )
-                  .collect(Collectors.toList())
+                  .toList()
               );
               getStops(environment)
-                .forEach(stop -> {
-                  alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()));
-                });
+                .forEach(stop ->
+                  alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()))
+                );
               break;
             case STOPS_ON_TRIPS:
               Iterable<Trip> trips = getTrips(environment);
-              trips.forEach(trip -> {
+              trips.forEach(trip ->
                 alerts.addAll(
                   alertService
                     .getAllAlerts()
@@ -104,9 +104,9 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                             )
                         )
                     )
-                    .collect(Collectors.toList())
-                );
-              });
+                    .toList()
+                )
+              );
               break;
             case PATTERNS:
               alerts.addAll(
@@ -133,18 +133,12 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> bikesAllowed() {
-    return environment -> {
+    return environment ->
       switch (getSource(environment).getBikesAllowed()) {
-        case UNKNOWN:
-          return "NO_INFORMATION";
-        case ALLOWED:
-          return "POSSIBLE";
-        case NOT_ALLOWED:
-          return "NOT_POSSIBLE";
-        default:
-          return null;
-      }
-    };
+        case UNKNOWN -> "NO_INFORMATION";
+        case ALLOWED -> "POSSIBLE";
+        case NOT_ALLOWED -> "NOT_POSSIBLE";
+      };
   }
 
   @Override
@@ -191,7 +185,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Iterable<Object>> stops() {
-    return environment -> getStops(environment);
+    return this::getStops;
   }
 
   @Override
@@ -201,7 +195,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Iterable<Trip>> trips() {
-    return environment -> getTrips(environment);
+    return this::getTrips;
   }
 
   @Override

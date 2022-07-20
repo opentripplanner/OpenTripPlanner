@@ -358,7 +358,7 @@ public class EnumTypes {
   public static GraphQLEnumType TRANSPORT_SUBMODE = createEnum(
     "TransportSubmode",
     TransmodelTransportSubmode.values(),
-    (t -> t.getValue())
+    TransmodelTransportSubmode::getValue
   );
   /*
 
@@ -504,7 +504,7 @@ public class EnumTypes {
     .value("sameLine", AlternativeLegsFilter.SAME_ROUTE)
     .build();
 
-  private static <T extends Enum> GraphQLEnumType createEnum(
+  private static <T extends Enum<?>> GraphQLEnumType createEnum(
     String name,
     T[] values,
     Function<T, String> mapping
