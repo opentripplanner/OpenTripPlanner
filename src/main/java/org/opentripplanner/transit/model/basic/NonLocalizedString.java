@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.transit.model.basic;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -19,10 +19,7 @@ public class NonLocalizedString implements I18NString, Serializable {
   private final String name;
 
   public NonLocalizedString(@Nonnull String name) {
-    if (name == null) {
-      throw new IllegalArgumentException();
-    }
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
   }
 
   /**

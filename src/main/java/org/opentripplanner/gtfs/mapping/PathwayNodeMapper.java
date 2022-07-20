@@ -9,7 +9,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.util.MapUtils;
-import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Node into the OTP model. */
 class PathwayNodeMapper {

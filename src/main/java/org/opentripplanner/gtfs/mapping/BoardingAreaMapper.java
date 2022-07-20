@@ -11,7 +11,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.MapUtils;
-import org.opentripplanner.util.TranslationHelper;
 
 /**
  * Responsible for mapping GTFS Boarding areas into the OTP model.

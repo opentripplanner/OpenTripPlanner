@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.util.TranslationHelper;
 
 public class StopAndStationMapperTest {
 

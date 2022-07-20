@@ -15,7 +15,6 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.util.TranslationHelper;
 
 public class BoardingAreaMapperTest {
 

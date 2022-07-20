@@ -59,9 +59,9 @@ public class FareMapper {
   }
 
   private ApiMoney toApiMoney(Money m) {
-    var c = m.getCurrency();
+    var c = m.currency();
     return new ApiMoney(
-      m.getCents(),
+      m.cents(),
       new ApiCurrency(
         c.getCurrencyCode(),
         c.getDefaultFractionDigits(),

@@ -4,8 +4,6 @@ import graphql.schema.GraphQLEnumType;
 import java.util.Arrays;
 import java.util.function.Function;
 import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
@@ -20,8 +18,10 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.TripAlteration;
 
 public class EnumTypes {
 

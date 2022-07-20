@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.util.Date;
 import java.util.List;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -8,9 +7,9 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.LocalizedString;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.LocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class TripPlanMapper {
 

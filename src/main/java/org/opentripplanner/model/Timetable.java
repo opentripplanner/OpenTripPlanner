@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.util.time.ServiceDateUtils;

@@ -1,7 +1,7 @@
 package org.opentripplanner.api.common;
 
 import java.util.Locale;
-import org.opentripplanner.util.ResourceBundleAdaptor;
+import org.opentripplanner.util.resources.ResourceBundleAdaptor;
 
 /**
  * The purpose of Messages is to read supply Message.properties to underlying calling code... The

@@ -143,7 +143,7 @@ seconds by adding a line like
 `maxPreTransitTime = 1200` to the routingDefaults section. If the limit is too high on a very large
 street graph, routing performance may suffer.
 
-## Boarding and alighting times
+### Boarding and alighting times
 
 Sometimes there is a need to configure a longer ride or alighting times for specific modes, such as
 airplanes or ferries, where the check-in process needs to be done in good time before ride. The ride
@@ -160,6 +160,25 @@ alighting processes in `router-config.json` as follows:
     },
     "alightSlackForMode": {
       "AIRPLANE": 1200
+    }
+  }
+}
+```
+
+### Define unpreferred routes
+
+Routing engine can be configured to unprefer - add extra penalty - on some routes that can be listed
+in `router-config.json` with cost function. Cost function (`unpreferredRouteCost`) is defined as
+linear function of the form `A + B x`, where `A` is a fixed cost (in seconds) and `B` is reluctance
+multiplier for transit leg  travel time `x` (in seconds). Example configuration:
+
+```JSON
+// router-config.json
+{
+  "routingDefaults": {
+    "unpreferredRouteCost": "300 + 2.0 x",
+    "unpreferred": {
+      "routes": ["feed1:101", "feed1:102"]
     }
   }
 }

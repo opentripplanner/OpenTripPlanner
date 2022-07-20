@@ -1,7 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import java.util.Locale;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 public class I18NStringMapper {
 

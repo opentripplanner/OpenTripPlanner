@@ -3,11 +3,11 @@ package org.opentripplanner.ext.transmodelapi.model.stop;
 import java.time.ZoneId;
 import java.util.Collection;
 import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 public class MonoOrMultiModalStation extends TransitEntity {
 

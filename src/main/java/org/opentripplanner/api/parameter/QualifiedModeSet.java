@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
  * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift
