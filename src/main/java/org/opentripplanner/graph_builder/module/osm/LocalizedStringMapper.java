@@ -14,8 +14,7 @@ import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.util.resources.ResourceBundleSingleton;
 
-/** This need to be public, because it is used in unit tests. Do not use it outside the osm package. */
-public class LocalizedStringMapper {
+class LocalizedStringMapper {
 
   private static final LocalizedStringMapper INSTANCE = new LocalizedStringMapper();
 
@@ -26,8 +25,7 @@ public class LocalizedStringMapper {
    */
   private final ListMultimap<String, String> keyTagNames = ArrayListMultimap.create();
 
-  /** Public for test usage only. */
-  public static LocalizedStringMapper getInstance() {
+  static LocalizedStringMapper getInstance() {
     return INSTANCE;
   }
 
@@ -47,7 +45,7 @@ public class LocalizedStringMapper {
    *            and translations read from properties Files
    * @param way OSM way from which tag values are read
    */
-  public LocalizedString map(String key, OSMWithTags way) {
+  LocalizedString map(String key, OSMWithTags way) {
     List<I18NString> lparams = new ArrayList<>(4);
     //Which tags do we want from way
     List<String> tagNames = getTagNames(key);
@@ -68,8 +66,6 @@ public class LocalizedStringMapper {
    * For example "Platform {ref}" ref is way tagname.
    *
    * </p>
-   *
-   * @return tagName
    */
   private List<String> getTagNames(String key) {
     //TODO: after finding all keys for replacements replace strings to normal java strings
