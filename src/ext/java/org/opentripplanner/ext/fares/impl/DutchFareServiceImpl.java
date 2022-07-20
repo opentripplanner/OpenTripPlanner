@@ -37,11 +37,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     // guess what the currency is. This doesn't work on the Dutch data which has distances mixed in with Euros to
     // account for distance-derived fares.
     Fare fare = super.getCost(itinerary);
-    if (fare != null) {
-      for (Money money : fare.fare.values()) {
-        money.setCurrency(euros);
-      }
-    }
+    fare.updateAllCurrencies(euros);
     return fare;
   }
 

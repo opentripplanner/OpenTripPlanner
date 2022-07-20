@@ -36,7 +36,7 @@ public class Fare {
     this();
     if (aFare != null) {
       for (Map.Entry<FareType, Money> kv : aFare.fare.entrySet()) {
-        fare.put(kv.getKey(), new Money(kv.getValue().getCurrency(), kv.getValue().getCents()));
+        fare.put(kv.getKey(), new Money(kv.getValue().currency(), kv.getValue().cents()));
       }
     }
   }
@@ -90,6 +90,16 @@ public class Fare {
     }
     buffer.append(")");
     return buffer.toString();
+  }
+
+  public void updateAllCurrencies(Currency newCurrency) {
+    fare
+      .keySet()
+      .forEach(key -> {
+        var entry = fare.get(key);
+        var updated = entry.withCurrency(newCurrency);
+        fare.put(key, updated);
+      });
   }
 
   public enum FareType implements Serializable {

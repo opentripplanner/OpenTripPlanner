@@ -2,25 +2,20 @@ package org.opentripplanner.routing.core;
 
 import java.text.NumberFormat;
 import java.util.Currency;
+import java.util.Locale;
 
 /**
- * <strong>Fare support is very, very preliminary.</strong>
+ * @param currency The currency of the money.
+ * @param cents    The actual currency value in decimal fixed-point, with the default number of
+ *                 fraction digits from currency after the decimal point.
  */
-public class Money implements Comparable<Money> {
+public record Money(Currency currency, int cents) implements Comparable<Money> {
+  public static Money euros(int cents) {
+    return new Money(Currency.getInstance("EUR"), cents);
+  }
 
-  /**
-   * The currency of the money.
-   */
-  private Currency currency;
-  /**
-   * The actual currency value in decimal fixed-point, with the default number of fraction digits
-   * from currency after the decimal point.
-   */
-  private final int cents;
-
-  public Money(Currency currency, int cents) {
-    this.currency = currency;
-    this.cents = cents;
+  public static Money usDollars(int cents) {
+    return new Money(Currency.getInstance("USD"), cents);
   }
 
   @Override
@@ -31,47 +26,14 @@ public class Money implements Comparable<Money> {
     return cents - m.cents;
   }
 
-  public Currency getCurrency() {
-    return currency;
-  }
-
-  @Deprecated
-  public void setCurrency(Currency currency) {
-    this.currency = currency;
-  }
-
-  public int getCents() {
-    return cents;
+  public Money withCurrency(Currency updatedCurrency) {
+    return new Money(updatedCurrency, cents);
   }
 
   @Override
-  public int hashCode() {
-    return currency.hashCode() * 31 + cents;
-  }
-
-  public boolean equals(Object other) {
-    if (other instanceof Money) {
-      Money m = (Money) other;
-      return m.currency.equals(currency) && m.cents == cents;
-    }
-    return false;
-  }
-
   public String toString() {
-    NumberFormat nf = NumberFormat.getCurrencyInstance();
-    if (currency == null) {
-      return "Money()";
-    }
+    NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.ENGLISH);
     nf.setCurrency(currency);
-    String c = nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
-    return "Money(" + c + ")";
-  }
-
-  public static Money euros(int cents) {
-    return new Money(Currency.getInstance("EUR"), cents);
-  }
-
-  public static Money usDollars(int cents) {
-    return new Money(Currency.getInstance("USD"), cents);
+    return nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
   }
 }
