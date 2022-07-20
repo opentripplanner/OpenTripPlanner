@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -95,10 +94,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   static List<Leg> createKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
     // Sort legs descending on distance
     legs =
-      legs
-        .stream()
-        .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
-        .toList();
+      legs.stream().sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed()).toList();
 
     double sum = 0.0;
     int i = 0;
