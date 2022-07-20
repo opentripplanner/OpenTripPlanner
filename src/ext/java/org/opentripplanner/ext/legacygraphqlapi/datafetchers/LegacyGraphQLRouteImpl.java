@@ -16,6 +16,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -109,10 +110,16 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
               break;
             case PATTERNS:
               alerts.addAll(
-                alertService.getDirectionAndRouteAlerts(0, getSource(environment).getId())
+                alertService.getDirectionAndRouteAlerts(
+                  Direction.INBOUND,
+                  getSource(environment).getId()
+                )
               );
               alerts.addAll(
-                alertService.getDirectionAndRouteAlerts(1, getSource(environment).getId())
+                alertService.getDirectionAndRouteAlerts(
+                  Direction.OUTBOUND,
+                  getSource(environment).getId()
+                )
               );
               break;
           }

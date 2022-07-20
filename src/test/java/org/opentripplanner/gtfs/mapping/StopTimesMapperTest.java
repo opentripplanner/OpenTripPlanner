@@ -53,6 +53,8 @@ public class StopTimesMapperTest {
 
   private static final StopTime STOP_TIME = new StopTime();
 
+  public static final DataImportIssueStore ISSUE_STORE = new DataImportIssueStore(false);
+
   private final StopMapper stopMapper = new StopMapper(new TranslationHelper(), stationId -> null);
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
   private final LocationMapper locationMapper = new LocationMapper();
@@ -64,7 +66,10 @@ public class StopTimesMapperTest {
     stopMapper,
     locationMapper,
     locationGroupMapper,
-    new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))),
+    new TripMapper(
+      new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE),
+      new DirectionMapper(ISSUE_STORE)
+    ),
     bookingRuleMapper
   );
 

@@ -90,7 +90,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               if (types.contains(LegacyGraphQLStopAlertType.PATTERNS)) {
                 alerts.addAll(
                   alertService.getDirectionAndRouteAlerts(
-                    pattern.getDirection().gtfsCode,
+                    pattern.getDirection(),
                     pattern.getRoute().getId()
                   )
                 );

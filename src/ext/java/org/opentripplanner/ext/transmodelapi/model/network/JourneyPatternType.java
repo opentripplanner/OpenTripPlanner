@@ -150,7 +150,7 @@ public class JourneyPatternType {
               .getTransitService(environment)
               .getTransitAlertService()
               .getDirectionAndRouteAlerts(
-                tripPattern.getDirection().gtfsCode,
+                tripPattern.getDirection(),
                 tripPattern.getRoute().getId()
               );
           })

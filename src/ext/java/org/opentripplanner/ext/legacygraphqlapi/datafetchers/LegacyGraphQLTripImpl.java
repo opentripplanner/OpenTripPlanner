@@ -34,6 +34,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -86,6 +87,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               alerts.addAll(
                 alertService.getDirectionAndRouteAlerts(
                   getSource(environment).getDirection().gtfsCode,
+                  getSource(environment).getDirection(),
                   getRoute(environment).getId()
                 )
               );
@@ -228,7 +230,13 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> directionId() {
-    return environment -> getSource(environment).getGtfsDirectionIdAsString(null);
+    return environment -> {
+      Direction direction = getSource(environment).getDirection();
+      if (direction == Direction.UNKNOWN) {
+        return null;
+      }
+      return Integer.toString(direction.gtfsCode);
+    };
   }
 
   @Override

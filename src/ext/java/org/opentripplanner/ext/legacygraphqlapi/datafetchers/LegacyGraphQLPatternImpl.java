@@ -45,7 +45,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
             case PATTERN:
               alerts.addAll(
                 alertService.getDirectionAndRouteAlerts(
-                  getSource(environment).getDirection().gtfsCode,
+                  getSource(environment).getDirection(),
                   getRoute(environment).getId()
                 )
               );
@@ -128,7 +128,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         return alerts.stream().distinct().collect(Collectors.toList());
       } else {
         return alertService.getDirectionAndRouteAlerts(
-          getSource(environment).getDirection().gtfsCode,
+          getSource(environment).getDirection(),
           getRoute(environment).getId()
         );
       }
