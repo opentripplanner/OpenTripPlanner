@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -39,8 +38,6 @@ public class HopFactoryTest {
 
   private Graph graph;
 
-  private TransitModel transitModel;
-
   private String feedId;
 
   @BeforeEach
@@ -49,10 +46,10 @@ public class HopFactoryTest {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
     GeometryProcessor factory = new GeometryProcessor(context);
     factory.run(transitModel);
-    transitModel.putService(CalendarServiceData.class, context.getCalendarServiceData());
+    transitModel.updateCalendarServiceData(context.getCalendarServiceData(), null);
 
     feedId = context.getFeedId().getId();
   }
@@ -77,7 +74,7 @@ public class HopFactoryTest {
   }
 
   @Test
-  public void testRouting() throws Exception {
+  public void testRouting() {
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_b = graph.getVertex(feedId + ":B");
     Vertex stop_c = graph.getVertex(feedId + ":C");

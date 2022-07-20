@@ -55,10 +55,11 @@ public class NetexModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    transitModel.clearTimeZone();
-    CalendarServiceData calendarServiceData = transitModel.getCalendarDataService();
-    boolean hasTransit = false;
     try {
+      transitModel.clearTimeZone();
+      var calendarServiceData = new CalendarServiceData();
+      boolean hasTransit = false;
+
       for (NetexBundle netexBundle : netexBundles) {
         netexBundle.checkInputs();
 
@@ -86,7 +87,7 @@ public class NetexModule implements GraphBuilderModule {
         hasTransit = hasTransit || otpService.hasActiveTransit();
 
         // TODO OTP2 - Move this into the AddTransitModelEntitiesToGraph
-        //           - and make sure thay also work with GTFS feeds - GTFS do no
+        //           - and make sure they also work with GTFS feeds - GTFS do no
         //           - have operators and notice assignments.
         transitModel.getOperators().addAll(otpService.getAllOperators());
         transitModel.addNoticeAssignments(otpService.getNoticeAssignments());
@@ -101,18 +102,16 @@ public class NetexModule implements GraphBuilderModule {
           transitModel
         );
       }
+
+      transitModel.updateCalendarServiceData(calendarServiceData, issueStore);
+
+      // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
+      transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
+      if (hasTransit) {
+        transitModel.calculateTransitCenter();
+      }
     } catch (Exception e) {
       throw new RuntimeException(e);
-    }
-
-    transitModel.clearCachedCalenderService();
-    transitModel.putService(CalendarServiceData.class, calendarServiceData);
-    transitModel.updateTransitFeedValidity(calendarServiceData, issueStore);
-
-    // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
-    if (hasTransit) {
-      transitModel.calculateTransitCenter();
     }
   }
 
