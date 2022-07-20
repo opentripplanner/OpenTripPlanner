@@ -3,7 +3,6 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.MapUtils;
@@ -58,9 +57,7 @@ class TripMapper {
     lhs.withDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
     lhs.withGtfsBlockId(rhs.getBlockId());
     lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
-    lhs.withWheelchairBoarding(
-      WheelchairAccessibility.valueOfGtfsCode(rhs.getWheelchairAccessible())
-    );
+    lhs.withWheelchairBoarding(WheelchairAccessibilityMapper.map(rhs.getWheelchairAccessible()));
     lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
     lhs.withGtfsFareId(rhs.getFareId());
 

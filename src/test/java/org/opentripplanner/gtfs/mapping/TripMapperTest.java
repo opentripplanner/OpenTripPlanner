@@ -28,8 +28,7 @@ public class TripMapperTest {
   private static final String TRIP_HEADSIGN = "Trip Headsign";
   private static final String TRIP_SHORT_NAME = "Trip Short Name";
 
-  private static final WheelchairAccessibility WHEELCHAIR_ACCESSIBLE =
-    WheelchairAccessibility.POSSIBLE;
+  private static final int WHEELCHAIR_ACCESSIBLE = 1;
 
   private static final Trip TRIP = new Trip();
 
@@ -50,7 +49,7 @@ public class TripMapperTest {
     TRIP.setShapeId(AGENCY_AND_ID);
     TRIP.setTripHeadsign(TRIP_HEADSIGN);
     TRIP.setTripShortName(TRIP_SHORT_NAME);
-    TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE.gtfsCode);
+    TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE);
   }
 
   @Test
@@ -73,7 +72,7 @@ public class TripMapperTest {
     assertEquals("A:1", result.getShapeId().toString());
     assertEquals(TRIP_HEADSIGN, result.getHeadsign());
     assertEquals(TRIP_SHORT_NAME, result.getShortName());
-    assertEquals(WHEELCHAIR_ACCESSIBLE, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairBoarding());
     assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
   }
 
