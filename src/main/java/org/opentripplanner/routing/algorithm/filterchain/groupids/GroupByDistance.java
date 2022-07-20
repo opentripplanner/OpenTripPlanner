@@ -98,7 +98,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
       legs
         .stream()
         .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
-        .collect(Collectors.toList());
+        .toList();
 
     double sum = 0.0;
     int i = 0;

@@ -126,7 +126,7 @@ public interface Leg {
         return false;
       }
 
-      // Return true if legs overlap is space(have one common stop visit), this is necessary
+      // Return true if legs overlap in space(have one common stop visit), this is necessary
       // since the same trip id on two following service dates may overlap in time. For example,
       // a trip may run in a loop for 48 hours, overlapping with the same trip id of the trip
       // scheduled for the next service day. They both visit the same stops, with overlapping
@@ -144,7 +144,7 @@ public interface Leg {
    */
   default boolean overlapInTime(Leg other) {
     return (
-      // We convert to epoc seconds to ignore nanos (save CPU),
+      // We convert to epoch seconds to ignore nanos (save CPU),
       // in favor of using the methods isAfter(...) and isBefore(...)
       getStartTime().toEpochSecond() < other.getEndTime().toEpochSecond() &&
       other.getStartTime().toEpochSecond() < getEndTime().toEpochSecond()
