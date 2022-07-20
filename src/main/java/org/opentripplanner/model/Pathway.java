@@ -9,7 +9,7 @@ public final class Pathway extends TransitEntity {
 
   private static final long serialVersionUID = -2404871423254094109L;
 
-  private int pathwayMode;
+  private PathwayMode pathwayMode;
 
   private StationElement fromStop;
 
@@ -33,11 +33,11 @@ public final class Pathway extends TransitEntity {
     super(id);
   }
 
-  public int getPathwayMode() {
+  public PathwayMode getPathwayMode() {
     return pathwayMode;
   }
 
-  public void setPathwayMode(int pathwayMode) {
+  public void setPathwayMode(PathwayMode pathwayMode) {
     this.pathwayMode = pathwayMode;
   }
 
@@ -114,6 +114,6 @@ public final class Pathway extends TransitEntity {
   }
 
   public boolean isPathwayModeWheelchairAccessible() {
-    return getPathwayMode() != 2 && getPathwayMode() != 4;
+    return getPathwayMode() != PathwayMode.STAIRS && getPathwayMode() != PathwayMode.ESCALATOR;
   }
 }

@@ -16,8 +16,9 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
 
   public DelegatingTransitAlertServiceImpl(TransitModel transitModel) {
-    if (transitModel.updaterManager != null) {
-      transitModel.updaterManager
+    if (transitModel.getUpdaterManager() != null) {
+      transitModel
+        .getUpdaterManager()
         .getUpdaterList()
         .stream()
         .filter(TransitAlertProvider.class::isInstance)

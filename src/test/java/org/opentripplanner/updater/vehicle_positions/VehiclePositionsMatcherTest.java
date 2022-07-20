@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
@@ -201,23 +202,5 @@ public class VehiclePositionsMatcherTest {
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId1).setStartDate("20220314").build())
       .setStopId("stop-1")
       .build();
-  }
-
-  private static StopTime stopTime(Trip trip, int seq, int time) {
-    var stopTime = stopTime(trip, seq);
-    stopTime.setArrivalTime(time);
-    stopTime.setDepartureTime(time);
-    return stopTime;
-  }
-
-  private static StopTime stopTime(Trip trip, int seq) {
-    var stopTime = new StopTime();
-    stopTime.setTrip(trip);
-    stopTime.setStopSequence(seq);
-
-    var stop = TransitModelForTest.stopForTest("stop-" + seq, 0, 0);
-    stopTime.setStop(stop);
-
-    return stopTime;
   }
 }

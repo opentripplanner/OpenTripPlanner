@@ -50,9 +50,9 @@ public class StopModel implements Serializable {
   /** The density center of the graph for determining the initial geographic extent in the client. */
   private Coordinate center = null;
 
-  public Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
+  private Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
 
-  public Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
+  private Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
 
   private transient StopModelIndex index;
 
@@ -126,6 +126,26 @@ public class StopModel implements Serializable {
 
   public Collection<TransitStopVertex> getAllStopVertices() {
     return transitStopVertices.values();
+  }
+
+  public boolean hasFlexLocations() {
+    return !locationsById.isEmpty();
+  }
+
+  public void addFlexLocation(FeedScopedId id, FlexStopLocation flexStopLocation) {
+    locationsById.put(id, flexStopLocation);
+  }
+
+  public Collection<FlexStopLocation> getAllFlexLocations() {
+    return locationsById.values();
+  }
+
+  public Collection<FlexLocationGroup> getAllFlexLocationGroups() {
+    return locationGroupsById.values();
+  }
+
+  public void addFlexLocationGroup(FeedScopedId id, FlexLocationGroup flexLocationGroup) {
+    locationGroupsById.put(id, flexLocationGroup);
   }
 
   private Collection<StopLocation> getStopsForId(FeedScopedId id) {

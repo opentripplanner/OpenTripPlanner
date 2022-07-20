@@ -4,15 +4,16 @@ import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A walking pathway as described in GTFS
@@ -26,6 +27,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   private final double distance;
   private final int steps;
   private final double slope;
+  private final PathwayMode mode;
 
   private final boolean wheelchairAccessible;
   private final FeedScopedId id;
@@ -39,7 +41,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     double distance,
     int steps,
     double slope,
-    boolean wheelchairAccessible
+    boolean wheelchairAccessible,
+    PathwayMode mode
   ) {
     super(fromv, tov);
     this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
@@ -49,13 +52,14 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     this.slope = slope;
     this.wheelchairAccessible = wheelchairAccessible;
     this.distance = distance;
+    this.mode = mode;
   }
 
   /**
-   * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean)}
+   * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
    */
-  public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
-    return PathwayEdge.lowCost(fromV, toV, null, name, true);
+  public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name, PathwayMode mode) {
+    return PathwayEdge.lowCost(fromV, toV, null, name, true, mode);
   }
 
   /**
@@ -68,9 +72,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     Vertex toV,
     FeedScopedId id,
     I18NString name,
-    boolean wheelchairAccessible
+    boolean wheelchairAccessible,
+    PathwayMode mode
   ) {
-    return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible);
+    return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
   public String getDirection() {
@@ -133,6 +138,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return name;
   }
 
+  @Override
+  public boolean hasBogusName() {
+    return name.equals(DEFAULT_NAME);
+  }
+
   public LineString getGeometry() {
     Coordinate[] coordinates = new Coordinate[] {
       getFromVertex().getCoordinate(),
@@ -159,6 +169,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return traversalTime;
   }
 
+  public int getSteps() {
+    return steps;
+  }
+
   public FeedScopedId getId() {
     return id;
   }
@@ -166,6 +180,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   @Override
   public boolean isWheelchairAccessible() {
     return wheelchairAccessible;
+  }
+
+  public PathwayMode getMode() {
+    return mode;
   }
 
   private boolean isStairs() {

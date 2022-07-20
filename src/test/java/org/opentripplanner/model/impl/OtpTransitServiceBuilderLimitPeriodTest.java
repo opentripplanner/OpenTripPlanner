@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -24,6 +22,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -114,7 +113,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
     // Limit service to last half of month
-    subject.limitServiceDays(new ServiceDateInterval(D2, D3), new DataImportIssueStore(false));
+    subject.limitServiceDays(new ServiceDateInterval(D2, D3));
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();

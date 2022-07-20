@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.timetable;
 
 /**
  * Alterations specified on a Trip in the planned data. This is in some ways equivalent with GTFS-RT

@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.OtpModel;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
@@ -51,16 +52,16 @@ import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.NonLocalizedString;
 
 public abstract class GraphRoutingTest {
 
@@ -288,7 +289,8 @@ public abstract class GraphRoutingTest {
         length,
         0,
         0,
-        false
+        false,
+        PathwayMode.WALKWAY
       );
     }
 
@@ -452,7 +454,7 @@ public abstract class GraphRoutingTest {
 
     // Transit
     public void tripPattern(TripPattern tripPattern) {
-      transitModel.tripPatternForId.put(tripPattern.getId(), tripPattern);
+      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     public StopTime st(TransitStopVertex s1) {

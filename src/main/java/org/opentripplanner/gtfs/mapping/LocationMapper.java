@@ -8,8 +8,8 @@ import java.util.Map;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.UnsupportedGeometryException;
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.util.MapUtils;
-import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import java.util.Arrays;
-import org.opentripplanner.transit.model.network.SubMode;
+import org.opentripplanner.transit.model.basic.SubMode;
 
 public enum TransmodelTransportSubmode {
   UNKNOWN("unknown"),

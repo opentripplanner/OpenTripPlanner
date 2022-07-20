@@ -34,19 +34,8 @@ otp.core.Map = otp.Class({
 
 
         for(var i=0; i<otp.config.baseLayers.length; i++) { //otp.config.baseLayers.length-1; i >= 0; i--) {
-            var layerConfig = otp.config.baseLayers[i];
-
-            var layerProps = { };
-            if(layerConfig.attribution) layerProps['attribution'] = layerConfig.attribution;
-            if(layerConfig.subdomains) layerProps['subdomains'] = layerConfig.subdomains;
-
-            var layer = new L.TileLayer(layerConfig.tileUrl, layerProps);
-
-	        this.baseLayers[layerConfig.name] = layer;
-
-	        if(typeof layerConfig.getTileUrl != 'undefined') {
-        	    layer.getTileUrl = otp.config.getTileUrl;
-            }
+            const { tileUrl, name, ...layerConfig } = otp.config.baseLayers[i];
+            this.baseLayers[name] = new L.TileLayer(tileUrl, layerConfig);
         }
         const selectedLayer = otp.config.baseLayers.find(l => l.name === this.webapp.urlParams.baseLayer) || otp.config.baseLayers.find(m => m.isDefault);
         this.currentBaseLayer = selectedLayer.name;

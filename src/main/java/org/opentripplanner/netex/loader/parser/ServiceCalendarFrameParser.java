@@ -44,7 +44,6 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
 
     warnOnMissingMapping(LOG, frame.getTimebands());
     warnOnMissingMapping(LOG, frame.getGroupOfTimebands());
-    warnOnMissingMapping(LOG, frame.getOperatingDays());
 
     verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
   }

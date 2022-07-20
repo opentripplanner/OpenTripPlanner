@@ -43,6 +43,7 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,7 +127,6 @@ public class GraphBuilder implements Runnable {
         }
         gtfsBundle.parentStationTransfers = config.stationTransfers;
         gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
-        gtfsBundle.maxInterlineDistance = config.maxInterlineDistance;
         gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
         gtfsBundles.add(gtfsBundle);
       }
@@ -134,7 +134,8 @@ public class GraphBuilder implements Runnable {
         gtfsBundles,
         config.getTransitServicePeriod(),
         config.fareServiceFactory,
-        config.discardMinTransferTimes
+        config.discardMinTransferTimes,
+        config.maxInterlineDistance
       );
       graphBuilder.addModule(gtfsModule);
     }
@@ -282,7 +283,8 @@ public class GraphBuilder implements Runnable {
 
     long endTime = System.currentTimeMillis();
     LOG.info(
-      String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0)
+      "Graph building took {}.",
+      DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime))
     );
     LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
   }
@@ -301,7 +303,7 @@ public class GraphBuilder implements Runnable {
    * configuration, for example, then this function will throw a {@link OtpAppException}.
    */
   private void validate() {
-    if (hasTransitData() && !transitModel.hasTransit) {
+    if (hasTransitData() && !transitModel.hasTransit()) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit " +
         "service period. See build config 'transitServiceStart' and " +

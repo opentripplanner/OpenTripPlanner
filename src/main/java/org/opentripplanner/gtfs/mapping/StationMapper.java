@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
-import org.opentripplanner.util.TranslationHelper;
 
 /**
  * Responsible for mapping GTFS Stop into the OTP model.

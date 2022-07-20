@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.DutchFareServiceFactory;
+import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.MultipleFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.NoopFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.NycFareServiceFactory;
@@ -10,6 +11,7 @@ import org.opentripplanner.ext.fares.impl.SFBayFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.SeattleFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.TimeBasedVehicleRentalFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.standalone.config.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,26 +79,18 @@ public class FaresConfiguration {
   }
 
   private static FareServiceFactory createFactory(String type) {
-    switch (type) {
-      case "default":
-        return new DefaultFareServiceFactory();
-      case "off":
-        return new NoopFareServiceFactory();
-      case "composite:additive":
-        return new MultipleFareServiceFactory.AddingMultipleFareServiceFactory();
-      case "vehicle-rental-time-based":
-      case "bike-rental-time-based": //TODO: deprecated, remove in next major version
-        return new TimeBasedVehicleRentalFareServiceFactory();
-      case "dutch":
-        return new DutchFareServiceFactory();
-      case "san-francisco":
-        return new SFBayFareServiceFactory();
-      case "new-york":
-        return new NycFareServiceFactory();
-      case "seattle":
-        return new SeattleFareServiceFactory();
-      default:
-        throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
-    }
+    return switch (type) {
+      case "default" -> new DefaultFareServiceFactory();
+      case "off" -> new NoopFareServiceFactory();
+      case "composite:additive" -> new MultipleFareServiceFactory.AddingMultipleFareServiceFactory();
+      case "vehicle-rental-time-based",
+        "bike-rental-time-based" -> new TimeBasedVehicleRentalFareServiceFactory(); //TODO: deprecated, remove in next major version
+      case "dutch" -> new DutchFareServiceFactory();
+      case "san-francisco" -> new SFBayFareServiceFactory();
+      case "new-york" -> new NycFareServiceFactory();
+      case "seattle" -> new SeattleFareServiceFactory();
+      case "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
+      default -> throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
+    };
   }
 }

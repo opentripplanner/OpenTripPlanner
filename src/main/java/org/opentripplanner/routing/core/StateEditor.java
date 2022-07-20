@@ -157,11 +157,7 @@ public class StateEditor {
    * backward when traversing backward.
    */
   public void incrementTimeInSeconds(int seconds) {
-    incrementTimeInMilliseconds(seconds * 1000L);
-  }
-
-  public void incrementTimeInMilliseconds(long milliseconds) {
-    if (milliseconds < 0) {
+    if (seconds < 0) {
       LOG.warn(
         "A state's time is being incremented by a negative amount while traversing edge " +
         child.getBackEdge()
@@ -169,7 +165,7 @@ public class StateEditor {
       defectiveTraversal = true;
       return;
     }
-    child.time += (traversingBackward ? -milliseconds : milliseconds);
+    child.time += (traversingBackward ? -seconds : seconds);
   }
 
   public void incrementWalkDistance(double length) {
@@ -313,7 +309,7 @@ public class StateEditor {
   }
 
   public void setTimeSeconds(long seconds) {
-    child.time = seconds * 1000;
+    child.time = seconds;
   }
 
   /* PUBLIC GETTER METHODS */

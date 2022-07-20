@@ -42,10 +42,10 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.NonLocalizedString;
 
 public class ConstantsForTests {
 
@@ -290,14 +290,15 @@ public class ConstantsForTests {
       List.of(bundle),
       ServiceDateInterval.unbounded(),
       fareServiceFactory,
-      false
+      false,
+      300
     );
 
     module.buildGraph(graph, transitModel, new HashMap<>());
 
     transitModel.index();
     graph.index();
-    transitModel.hasTransit = true;
+    transitModel.setHasTransit(true);
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {

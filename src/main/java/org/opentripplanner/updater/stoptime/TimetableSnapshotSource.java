@@ -26,9 +26,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -105,8 +105,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return new TimetableSnapshotSource(
       transitModel.getTimeZone(),
       new DefaultTransitService(transitModel),
-      transitModel.transitLayerUpdater,
-      transitModel.deduplicator,
+      transitModel.getTransitLayerUpdater(),
+      transitModel.getDeduplicator(),
       transitModel.getServiceCodes()
     );
   }

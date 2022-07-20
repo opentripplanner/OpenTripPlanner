@@ -29,9 +29,9 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -117,7 +117,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   public SiriTimetableSnapshotSource(final TransitModel transitModel) {
     timeZone = transitModel.getTimeZone();
     transitService = new DefaultTransitService(transitModel);
-    transitLayerUpdater = transitModel.transitLayerUpdater;
+    transitLayerUpdater = transitModel.getTransitLayerUpdater();
     siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(transitService);
   }
 
@@ -502,7 +502,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       externalLineRef = lineRef;
     }
 
-    Operator operator = transitModel.index
+    Operator operator = transitModel
+      .getTransitModelIndex()
       .getOperatorForId()
       .get(new FeedScopedId(feedId, operatorRef));
     //        Preconditions.checkNotNull(operator, "Operator " + operatorRef + " is unknown");
@@ -511,11 +512,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     Route replacedRoute = null;
     if (externalLineRef != null) {
-      replacedRoute = transitModel.index.getRouteForId(new FeedScopedId(feedId, externalLineRef));
+      replacedRoute =
+        transitModel
+          .getTransitModelIndex()
+          .getRouteForId(new FeedScopedId(feedId, externalLineRef));
     }
 
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
-    Route route = transitModel.index.getRouteForId(routeId);
+    Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
 
     if (route == null) { // Route is unknown - create new
       var routeBuilder = Route.of(routeId);
@@ -529,7 +533,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       // TODO - SIRI: Is there a better way to find authority/Agency?
       // Finding first Route with same Operator, and using same Authority
-      Agency agency = transitModel.index
+      Agency agency = transitModel
+        .getTransitModelIndex()
         .getAllRoutes()
         .stream()
         .filter(route1 ->
@@ -550,7 +555,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
       route = routeBuilder.build();
       LOG.info("Adding route {} to transitModel.", routeId);
-      transitModel.index.addRoutes(route);
+      transitModel.getTransitModelIndex().addRoutes(route);
     }
 
     var tripBuilder = Trip.of(tripId);
@@ -679,7 +684,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     TripPattern pattern = new TripPattern(id, tripBuilder.getRoute(), stopPattern);
 
-    TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, transitModel.deduplicator);
+    TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, transitModel.getDeduplicator());
 
     boolean isJourneyPredictionInaccurate =
       (
@@ -725,8 +730,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Adding trip to index necessary to include values in graphql-queries
     // TODO - SIRI: should more data be added to index?
-    transitModel.index.getTripForId().put(tripId, trip);
-    transitModel.index.getPatternForTrip().put(trip, pattern);
+    transitModel.getTransitModelIndex().getTripForId().put(tripId, trip);
+    transitModel.getTransitModelIndex().getPatternForTrip().put(trip, pattern);
 
     if (
       estimatedVehicleJourney.isCancellation() != null && estimatedVehicleJourney.isCancellation()
@@ -857,7 +862,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           tripMatchedByServiceJourneyId.getId(),
           transitModel::getStopLocationById,
           timeZone,
-          transitModel.deduplicator
+          transitModel.getDeduplicator()
         );
         if (exactUpdatedTripTimes != null) {
           times.add(exactUpdatedTripTimes);
@@ -911,7 +916,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             matchingTrip.getId(),
             transitModel::getStopLocationById,
             timeZone,
-            transitModel.deduplicator
+            transitModel.getDeduplicator()
           );
           if (updatedTripTimes != null) {
             patterns.add(pattern);

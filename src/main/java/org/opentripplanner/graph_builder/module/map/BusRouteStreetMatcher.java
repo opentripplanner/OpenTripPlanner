@@ -51,7 +51,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
     StreetMatcher matcher = new StreetMatcher(graph);
     log.info("Finding corresponding street edges for trip patterns...");
     // Why do we need to iterate over the routes? Why not just patterns?
-    Collection<Route> allRoutes = transitModel.index.getAllRoutes();
+    Collection<Route> allRoutes = transitModel.getTransitModelIndex().getAllRoutes();
 
     // Track progress
     ProgressTracker progress = ProgressTracker.track(
@@ -62,7 +62,10 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
     log.info(progress.startMessage());
 
     for (Route route : allRoutes) {
-      for (TripPattern pattern : transitModel.index.getPatternsForRoute().get(route)) {
+      for (TripPattern pattern : transitModel
+        .getTransitModelIndex()
+        .getPatternsForRoute()
+        .get(route)) {
         if (pattern.getMode().onStreet()) {
           /* we can only match geometry to streets on bus routes */
           log.debug("Matching {}", pattern);

@@ -11,10 +11,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.Fare;
@@ -22,7 +26,6 @@ import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -73,7 +76,8 @@ class FareAndId {
  * rides on routes in another feed, for example. For more interesting fare structures like New
  * York's MTA, or cities with multiple feeds and inter-feed transfer rules, you get to implement
  * your own FareService. See this thread on gtfs-changes explaining the proper interpretation of
- * fares.txt: http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
+ * fares.txt:
+ * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
 public class DefaultFareServiceImpl implements FareService {
 
@@ -100,6 +104,11 @@ public class DefaultFareServiceImpl implements FareService {
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
       .map(Leg.class::cast)
       .toList();
+
+    if (shouldCombineInterlinedLegs()) {
+      fareLegs = combineInterlinedLegs(fareLegs);
+    }
+
     // If there are no rides, there's no fare.
     if (fareLegs.isEmpty()) {
       return null;
@@ -127,7 +136,7 @@ public class DefaultFareServiceImpl implements FareService {
       fractionDigits = currency.getDefaultFractionDigits();
     }
     int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
-    return new Money(new WrappedCurrency(currency), cents);
+    return new Money(currency, cents);
   }
 
   protected float addFares(List<Leg> ride0, List<Leg> ride1, float cost0, float cost1) {
@@ -163,15 +172,15 @@ public class DefaultFareServiceImpl implements FareService {
     Fare fare,
     Currency currency,
     FareType fareType,
-    List<Leg> rides,
+    List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    FareSearch r = performSearch(fareType, rides, fareRules);
+    FareSearch r = performSearch(fareType, legs, fareRules);
 
     List<FareComponent> details = new ArrayList<>();
     int count = 0;
     int start = 0;
-    int end = rides.size() - 1;
+    int end = legs.size() - 1;
     while (start <= end) {
       // skip parts where no fare is present, we want to return something
       // even if not all legs have fares
@@ -187,14 +196,14 @@ public class DefaultFareServiceImpl implements FareService {
       FeedScopedId fareId = r.fareIds[start][via];
       FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
       for (int i = start; i <= via; ++i) {
-        detail.addRoute(rides.get(i).getRoute().getId());
+        detail.addRoute(legs.get(i).getRoute().getId());
       }
       details.add(detail);
       ++count;
       start = via + 1;
     }
 
-    fare.addFare(fareType, getMoney(currency, r.resultTable[0][rides.size() - 1]));
+    fare.addFare(fareType, getMoney(currency, r.resultTable[0][legs.size() - 1]));
     fare.addFareDetails(fareType, details);
     return count > 0;
   }
@@ -205,6 +214,37 @@ public class DefaultFareServiceImpl implements FareService {
     Collection<FareRuleSet> fareRules
   ) {
     return getBestFareAndId(fareType, rides, fareRules).fare;
+  }
+
+  protected boolean shouldCombineInterlinedLegs() {
+    return true;
+  }
+
+  private static List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
+    var result = new ArrayList<Leg>();
+    for (var leg : fareLegs) {
+      if (leg.isInterlinedWithPreviousLeg() && leg instanceof ScheduledTransitLeg stl) {
+        var previousLeg = (ScheduledTransitLeg) result.get(result.size() - 1);
+        var combinedLeg = new ScheduledTransitLeg(
+          previousLeg.getTripTimes(),
+          previousLeg.getTripPattern(),
+          0,
+          0,
+          previousLeg.getStartTime(),
+          stl.getEndTime(),
+          stl.getServiceDate(),
+          stl.getZoneId(),
+          null,
+          null,
+          0,
+          null
+        );
+        result.add(result.size() - 1, combinedLeg);
+      } else {
+        result.add(leg);
+      }
+    }
+    return result;
   }
 
   private FareSearch performSearch(

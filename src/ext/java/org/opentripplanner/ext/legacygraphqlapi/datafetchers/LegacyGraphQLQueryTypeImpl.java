@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,6 +41,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -56,16 +58,16 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.resources.ResourceBundleSingleton;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLQueryTypeImpl
@@ -577,7 +579,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment -> getTransitService(environment).getTripPatterns();
+    return environment -> getTransitService(environment).getAllTripPatterns();
   }
 
   @Override
@@ -660,7 +662,14 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("preferred.agencies", request::setPreferredAgenciesFromString);
       callWith.argument("unpreferred.routes", request::setUnpreferredRoutesFromString);
       callWith.argument("unpreferred.agencies", request::setUnpreferredAgenciesFromString);
-      // callWith.argument("unpreferred.useUnpreferredRoutesPenalty", request::setUseUnpreferredRoutesPenalty);
+      callWith.argument("unpreferred.unpreferredRouteCost", request::setUnpreferredRouteCost);
+      callWith.argument(
+        "unpreferred.useUnpreferredRoutesPenalty",
+        (Integer v) ->
+          request.setUnpreferredRouteCost(
+            RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
+          )
+      );
       callWith.argument("walkBoardCost", request::setWalkBoardCost);
       callWith.argument("bikeBoardCost", request::setBikeBoardCost);
       callWith.argument("banned.routes", request::setBannedRoutesFromString);
@@ -717,10 +726,18 @@ public class LegacyGraphQLQueryTypeImpl
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 
-      if (hasArgument(environment, "allowedBikeRentalNetworks")) {
-        // ArrayList<String> allowedBikeRentalNetworks = environment.getArgument("allowedBikeRentalNetworks");
-        // request.allowedBikeRentalNetworks = new HashSet<>(allowedBikeRentalNetworks);
-      }
+      callWith.argument(
+        "allowedBikeRentalNetworks",
+        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+      );
+      callWith.argument(
+        "allowedVehicleRentalNetworks",
+        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+      );
+      callWith.argument(
+        "bannedVehicleRentalNetworks",
+        (Collection<String> v) -> request.bannedVehicleRentalNetworks = new HashSet<>(v)
+      );
 
       if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
         //slower bike speed for bike sharing, based on empirical evidence from DC.

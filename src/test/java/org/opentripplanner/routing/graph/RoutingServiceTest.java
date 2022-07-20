@@ -45,9 +45,9 @@ public class RoutingServiceTest extends GtfsTest {
     /* Agencies */
     String feedId = transitModel.getFeedIds().iterator().next();
     Agency agency;
-    agency = transitModel.index.getAgencyForId(new FeedScopedId(feedId, "azerty"));
+    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "azerty"));
     assertNull(agency);
-    agency = transitModel.index.getAgencyForId(new FeedScopedId(feedId, "agency"));
+    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "agency"));
     assertEquals(agency.getId().toString(), feedId + ":" + "agency");
     assertEquals(agency.getName(), "Fake Agency");
 
@@ -66,18 +66,21 @@ public class RoutingServiceTest extends GtfsTest {
    */
   @Test
   public void testPatternsCoherent() {
-    for (Trip trip : transitModel.index.getTripForId().values()) {
-      TripPattern pattern = transitModel.index.getPatternForTrip().get(trip);
+    for (Trip trip : transitModel.getTransitModelIndex().getTripForId().values()) {
+      TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
       assertTrue(pattern.scheduledTripsAsStream().anyMatch(t -> t.equals(trip)));
     }
     /* This one depends on a feed where each TripPattern appears on only one route. */
-    for (Route route : transitModel.index.getAllRoutes()) {
-      for (TripPattern pattern : transitModel.index.getPatternsForRoute().get(route)) {
+    for (Route route : transitModel.getTransitModelIndex().getAllRoutes()) {
+      for (TripPattern pattern : transitModel
+        .getTransitModelIndex()
+        .getPatternsForRoute()
+        .get(route)) {
         assertEquals(pattern.getRoute(), route);
       }
     }
     for (var stop : transitModel.getStopModel().getStopModelIndex().getAllStops()) {
-      for (TripPattern pattern : transitModel.index.getPatternsForStop(stop)) {
+      for (TripPattern pattern : transitModel.getTransitModelIndex().getPatternsForStop(stop)) {
         int stopPos = pattern.findStopPosition(stop);
         assertTrue(stopPos >= 0, "Stop position exist");
       }

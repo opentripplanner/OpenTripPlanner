@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -295,7 +297,11 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> shapeId() {
-    return environment -> getSource(environment).getShapeId().toString();
+    return environment ->
+      Optional
+        .ofNullable(getSource(environment).getShapeId())
+        .map(FeedScopedId::toString)
+        .orElse(null);
   }
 
   @Override

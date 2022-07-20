@@ -32,7 +32,6 @@ import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -63,7 +62,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
   @Test
   public void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = transitModel.flexTripsById.values();
+    var flexTrips = transitModel.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -146,10 +145,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itinerary = itineraries.iterator().next();
     assertFalse(itinerary.getFare().fare.isEmpty());
 
-    assertEquals(
-      new Money(new WrappedCurrency("USD"), 250),
-      itinerary.getFare().getFare(FareType.regular)
-    );
+    assertEquals(Money.usDollars(250), itinerary.getFare().getFare(FareType.regular));
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
@@ -207,7 +203,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   @Test
   public void shouldNotInterpolateFlexTimes() {
     var feedId = transitModel.getFeedIds().iterator().next();
-    var pattern = transitModel.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
+    var pattern = transitModel.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
 
     assertEquals(3, pattern.numberOfStops());
 
@@ -288,6 +284,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   private static FlexTrip getFlexTrip() {
     var feedId = transitModel.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return transitModel.flexTripsById.get(tripId);
+    return transitModel.getFlexTrip(tripId);
   }
 }

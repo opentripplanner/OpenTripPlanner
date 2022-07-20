@@ -11,7 +11,7 @@ import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.resources.ResourceBundleSingleton;
 
 public class TripType {
 

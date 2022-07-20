@@ -8,16 +8,14 @@ import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TripAlteration;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.SubMode;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.lang.StringUtils;
 
@@ -30,12 +28,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
   private final TransitMode mode;
   private final SubMode netexSubmode;
   private final String headsign;
-
-  // TODO RT - Fix this after the Transmodel is refactored
-  // The shapeId is mutable to clear the reference in case the shape do not exist.
-  // This happens late in the graph-build process, but we can not create a new object
-  // because there are other objects witch may reference this particular instance.
-  private FeedScopedId shapeId;
+  private final FeedScopedId shapeId;
 
   private final Direction direction;
   private final BikeAccess bikesAllowed;
@@ -127,14 +120,6 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
   @Nullable
   public FeedScopedId getShapeId() {
     return shapeId;
-  }
-
-  /**
-   * Clear the shapeId if the shape is missing from the data. There is no way to set the
-   * shape again, so use this carefully.
-   */
-  public void deleteShapeId() {
-    shapeId = null;
   }
 
   /**

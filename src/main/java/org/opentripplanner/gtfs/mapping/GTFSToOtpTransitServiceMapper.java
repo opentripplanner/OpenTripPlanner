@@ -15,7 +15,6 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.util.TranslationHelper;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -182,6 +181,8 @@ public class GTFSToOtpTransitServiceMapper {
       discardMinTransferTimes,
       issueStore
     );
-    builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
+    var result = transferMapper.map(data.getAllTransfers());
+    builder.getTransfers().addAll(result.constrainedTransfers());
+    builder.getStaySeatedNotAllowed().addAll(result.staySeatedNotAllowed());
   }
 }
