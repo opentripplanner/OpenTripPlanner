@@ -9,6 +9,10 @@
   height: 300px;
 }
 
+.otp-defaultItinsWidget table.fares td {
+  padding: 0 3px 0 0;
+}
+
 @media only screen and (min-width: 1024px) {
   .otp-defaultItinsWidget {
     width: 450px;

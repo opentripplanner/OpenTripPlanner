@@ -91,65 +91,85 @@ otp.modules.planner.Itinerary = otp.Class({
         return this.itinData.generalizedCost;
     },
 
+    buildFaresTable: function (products) {
+        const table = document.createElement("table");
+        table.classList.add("fares")
+
+        products.forEach(p => {
+
+            const tr = document.createElement("tr");
+            table.appendChild(tr);
+
+
+            const nameCell = document.createElement("td");
+            nameCell.classList.add("name");
+            nameCell.innerText = p.name || "";
+            const catCell = document.createElement("td");
+            catCell.innerText = p.category || "";
+            const containerCell = document.createElement("td");
+            containerCell.innerText = p.container || "";
+
+            tr.appendChild(nameCell);
+            tr.appendChild(catCell);
+            tr.appendChild(containerCell);
+
+            const decimalPlaces = p.currency.defaultFractionDigits;
+            const fare_info = {
+                'currency': p.currency.symbol,
+                'price': (p.cents / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces),
+            }
+            //TRANSLATORS: Fare Currency Fare price
+            const price = _tr(`%(currency)s %(price)s`, fare_info) + "\n";
+            const priceCell = document.createElement("td");
+            priceCell.textContent = price;
+            tr.appendChild(priceCell);
+            table.appendChild(tr);
+
+        });
+        return table;
+    },
+
     getFareStr : function() {
         if(this.fareDisplayOverride) return this.fareDisplayOverride;
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
 
         if(this.itinData.fare && this.itinData.fare.fare) {
 
-            const table = document.createElement("table");
-            Object.keys(this.itinData.fare.fare).forEach(key => {
-                const tr = document.createElement("tr");
-                table.appendChild(tr);
+            const products = Object.keys(this.itinData.fare.fare).map(key => {
 
+                let fare = this.itinData.fare.fare[key];
 
-                const nameCell = document.createElement("td");
-                const catCell = document.createElement("td");
-                const containerCell = document.createElement("td");
-                const entireItineraryCell = document.createElement("td");
+                const result = {
+                   coversItinerary : fare.cents > 0,
+                   cents: fare.cents,
+                   currency: fare.currency
+                }
 
                 const detail = this.itinData.fare.details[key];
                 const firstDetail = detail[0];
 
                 if(firstDetail && firstDetail.name) {
-                    nameCell.innerText = firstDetail.name;
+                    result.name = firstDetail.name;
                 }
-                tr.appendChild(nameCell);
 
                 if(firstDetail && firstDetail.category && firstDetail.category.name) {
-                    catCell.innerText = firstDetail.category.name;
+                    result.category = firstDetail.category.name;
                 }
-
-                tr.appendChild(catCell);
 
                 if(firstDetail && firstDetail.container && firstDetail.container.name) {
-                    containerCell.innerText = firstDetail.container.name;
+                    result.container = firstDetail.container.name;
                 }
-                tr.appendChild(containerCell);
 
-                let fare = this.itinData.fare.fare[key];
-
-                if(fare.cents < 0) {
-                    fare = firstDetail.price;
-                }
-                else {
-                    entireItineraryCell.innerText = "✅";
-                }
-                const decimalPlaces = fare.currency.defaultFractionDigits;
-                const fare_info = {
-                    'currency': fare.currency.symbol,
-                    'price': (fare.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces),
-                }
-                //TRANSLATORS: Fare Currency Fare price
-                const price = _tr(`%(currency)s %(price)s`, fare_info) + "\n";
-                const priceCell = document.createElement("td");
-                priceCell.textContent = price;
-                tr.appendChild(priceCell);
-
-                tr.appendChild(entireItineraryCell);
-
+                return result;
             });
-            return table.outerHTML;
+
+            const coveringItinerary = document.createElement("div");
+            const title = document.createElement("strong");
+            title.innerText = "Covering entire itinerary";
+            coveringItinerary.appendChild(title);
+            coveringItinerary.appendChild(this.buildFaresTable(products.filter(p => p.coversItinerary)));
+
+            return coveringItinerary.outerHTML;
         }
 
         return "N/A";
