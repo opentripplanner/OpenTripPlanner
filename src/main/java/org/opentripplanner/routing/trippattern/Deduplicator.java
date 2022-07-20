@@ -8,7 +8,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -142,10 +144,13 @@ public class Deduplicator implements Serializable {
     if (canonical == null) {
       // The list may contain nulls, hence the use of the old unmodifiable wrapper
       //noinspection FuseStreamOperations
+      boolean containsNull = original.stream().anyMatch(Objects::isNull);
+      Stream<T> stream = original.stream().map(it -> deduplicateObject(clazz, it));
+      // The list may contain nulls, hence the use of the old unmodifiable wrapper
       canonical =
-        Collections.unmodifiableList(
-          original.stream().map(it -> deduplicateObject(clazz, it)).collect(Collectors.toList())
-        );
+        containsNull
+          ? Collections.unmodifiableList(stream.collect(Collectors.toList()))
+          : stream.collect(Collectors.toUnmodifiableList());
       canonicalLists.put(canonical, canonical);
     }
 

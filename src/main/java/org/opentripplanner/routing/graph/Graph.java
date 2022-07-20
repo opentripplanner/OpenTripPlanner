@@ -28,6 +28,8 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -77,6 +79,7 @@ public class Graph implements Serializable {
 
   private GraphBundle bundle;
 
+  private OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
 
   //Envelope of all OSM and transit vertices. Calculated during build time
@@ -348,6 +351,19 @@ public class Graph implements Serializable {
     LOG.info("Index street model...");
     streetIndex = new StreetVertexIndex(this, stopModel);
     LOG.info("Index street model complete.");
+  }
+
+  public OpeningHoursCalendarService getOpeningHoursCalendarService() {
+    return this.openingHoursCalendarService;
+  }
+
+  public void initOpeningHoursCalendarService(ServiceDateInterval serviceDateInterval) {
+    this.openingHoursCalendarService =
+      new OpeningHoursCalendarService(
+        deduplicator,
+        serviceDateInterval.getStart(),
+        serviceDateInterval.getEnd()
+      );
   }
 
   public StreetVertexIndex getStreetIndex() {
