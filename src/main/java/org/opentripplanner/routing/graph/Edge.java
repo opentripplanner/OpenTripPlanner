@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances; all

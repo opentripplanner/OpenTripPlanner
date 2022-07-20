@@ -8,7 +8,6 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.BeforeEach;

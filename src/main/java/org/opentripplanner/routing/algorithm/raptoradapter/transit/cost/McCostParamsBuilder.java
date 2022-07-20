@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;

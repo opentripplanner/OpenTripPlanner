@@ -19,8 +19,8 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.TranslatedString;
 
 public class PtSituationElementType {
 

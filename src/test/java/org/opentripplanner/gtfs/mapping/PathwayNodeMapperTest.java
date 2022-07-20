@@ -14,7 +14,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.util.TranslationHelper;
 
 public class PathwayNodeMapperTest {
 

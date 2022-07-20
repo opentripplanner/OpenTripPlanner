@@ -7,8 +7,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
 

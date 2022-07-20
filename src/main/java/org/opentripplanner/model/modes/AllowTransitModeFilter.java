@@ -2,10 +2,9 @@ package org.opentripplanner.model.modes;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Set;
-import org.opentripplanner.transit.model.network.MainAndSubMode;
-import org.opentripplanner.transit.model.network.SubMode;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
  * Used to filter out modes for routing requests.
