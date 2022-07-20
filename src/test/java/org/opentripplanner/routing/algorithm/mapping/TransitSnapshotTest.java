@@ -12,16 +12,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 
 @ExtendWith(SnapshotExtension.class)
-@Disabled(
-  """
-FAILS ON MAC WITH NORWEGIAN LANGUAGE SET:
-Changed content at line 1634:
-expecting:
-  ["                  "symbol": "$""]
-but was:
-  ["                  "symbol": "USD""]
-"""
-)
 public class TransitSnapshotTest extends SnapshotTestBase {
 
   static GenericLocation ptc = GenericLocation.fromStopId(
