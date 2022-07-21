@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -509,7 +510,9 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TIntSet getServicesRunningForDate(LocalDate serviceDate) {
-    return transitModelIndex.getServiceCodesRunningForDate().get(serviceDate);
+    return transitModelIndex
+      .getServiceCodesRunningForDate()
+      .getOrDefault(serviceDate, new TIntHashSet());
   }
 
   @Override
