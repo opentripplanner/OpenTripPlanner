@@ -146,7 +146,12 @@ public class OTPMain {
       }
       // Store graph and config used to build it, also store router-config for easy deployment
       // with using the embedded router config.
-      new SerializedGraphObject(graph, transitModel, configModel.buildConfig(), configModel.routerConfig())
+      new SerializedGraphObject(
+        graph,
+        transitModel,
+        configModel.buildConfig(),
+        configModel.routerConfig()
+      )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
       LOG.info("Memory optimized {}", graph.deduplicator.toString());
@@ -169,7 +174,12 @@ public class OTPMain {
     // publishing the config version info make it available to the APIs
     factory.setOtpConfigVersionsOnServerInfo();
 
-    Router router = new Router(graph, transitModel, configModel.routerConfig(), Metrics.globalRegistry);
+    Router router = new Router(
+      graph,
+      transitModel,
+      configModel.routerConfig(),
+      Metrics.globalRegistry
+    );
     router.startup();
 
     /* Start visualizer if requested. */

@@ -4,8 +4,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import javax.annotation.Nonnull;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 
 /**
  * Configure paths to each individual file resource. Use URIs to specify paths. If a parameter is
