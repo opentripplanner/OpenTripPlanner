@@ -3,7 +3,7 @@ package org.opentripplanner.routing.vertextype;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.TransitModel;
 

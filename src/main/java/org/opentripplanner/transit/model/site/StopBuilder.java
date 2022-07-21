@@ -5,9 +5,9 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
-import org.opentripplanner.util.I18NString;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a

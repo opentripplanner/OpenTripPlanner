@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.model.site;
 
 import java.time.ZoneId;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.I18NString;
 
 public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilder> {
 

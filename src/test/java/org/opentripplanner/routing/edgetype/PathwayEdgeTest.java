@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -17,7 +18,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 class PathwayEdgeTest {
 
@@ -29,14 +30,36 @@ class PathwayEdgeTest {
   void zeroLength() {
     // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
     // from the vertices as they most likely have identical coordinates
-    var edge = new PathwayEdge(from, to, null, new NonLocalizedString("pathway"), 0, 0, 0, 0, true);
+    var edge = new PathwayEdge(
+      from,
+      to,
+      null,
+      new NonLocalizedString("pathway"),
+      0,
+      0,
+      0,
+      0,
+      true,
+      PathwayMode.ELEVATOR
+    );
 
     assertThatEdgeIsTraversable(edge);
   }
 
   @Test
   void zeroLengthWithSteps() {
-    var edge = new PathwayEdge(from, to, null, new NonLocalizedString("pathway"), 0, 0, 2, 0, true);
+    var edge = new PathwayEdge(
+      from,
+      to,
+      null,
+      new NonLocalizedString("pathway"),
+      0,
+      0,
+      2,
+      0,
+      true,
+      PathwayMode.STAIRS
+    );
 
     assertThatEdgeIsTraversable(edge);
   }
@@ -52,7 +75,8 @@ class PathwayEdgeTest {
       0,
       0,
       0,
-      true
+      true,
+      PathwayMode.ESCALATOR
     );
 
     var state = assertThatEdgeIsTraversable(edge);
@@ -71,7 +95,8 @@ class PathwayEdgeTest {
       1000,
       0,
       0,
-      true
+      true,
+      PathwayMode.MOVING_SIDEWALK
     );
 
     assertEquals(1000, edge.getDistanceMeters());
@@ -92,7 +117,8 @@ class PathwayEdgeTest {
       100,
       0,
       0,
-      true
+      true,
+      PathwayMode.WALKWAY
     );
 
     var state = assertThatEdgeIsTraversable(edge);
@@ -111,7 +137,8 @@ class PathwayEdgeTest {
       100,
       0,
       0,
-      false
+      false,
+      PathwayMode.WALKWAY
     );
 
     var state = assertThatEdgeIsTraversable(edge, true);
@@ -153,7 +180,8 @@ class PathwayEdgeTest {
       100,
       0,
       slope,
-      true
+      true,
+      PathwayMode.WALKWAY
     );
 
     var state = assertThatEdgeIsTraversable(edge, true);

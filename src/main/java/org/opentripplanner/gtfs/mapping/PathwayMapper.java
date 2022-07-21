@@ -45,7 +45,7 @@ class PathwayMapper {
   private Pathway doMap(org.onebusaway.gtfs.model.Pathway rhs) {
     Pathway lhs = new Pathway(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
-    lhs.setPathwayMode(rhs.getPathwayMode());
+    lhs.setPathwayMode(PathwayModeMapper.map(rhs.getPathwayMode()));
     if (rhs.isTraversalTimeSet()) {
       lhs.setTraversalTime(rhs.getTraversalTime());
     }

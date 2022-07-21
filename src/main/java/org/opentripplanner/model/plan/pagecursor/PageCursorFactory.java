@@ -94,8 +94,8 @@ public class PageCursorFactory {
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
       .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
-      .addTime("removedItineraryStartTime", removedItineraryStartTime)
-      .addTime("removedItineraryEndTime", removedItineraryEndTime)
+      .addDateTime("removedItineraryStartTime", removedItineraryStartTime)
+      .addDateTime("removedItineraryEndTime", removedItineraryEndTime)
       .addObj("nextCursor", nextCursor)
       .addObj("prevCursor", prevCursor)
       .toString();
@@ -195,8 +195,8 @@ public class PageCursorFactory {
     public String toString() {
       return ToStringBuilder
         .of(SearchTime.class)
-        .addTime("edt", edt)
-        .addTime("lat", lat)
+        .addDateTime("edt", edt)
+        .addDateTime("lat", lat)
         .toString();
     }
   }

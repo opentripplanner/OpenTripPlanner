@@ -26,7 +26,6 @@ import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -137,7 +136,7 @@ public class DefaultFareServiceImpl implements FareService {
       fractionDigits = currency.getDefaultFractionDigits();
     }
     int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
-    return new Money(new WrappedCurrency(currency), cents);
+    return new Money(currency, cents);
   }
 
   protected float addFares(List<Leg> ride0, List<Leg> ride1, float cost0, float cost1) {

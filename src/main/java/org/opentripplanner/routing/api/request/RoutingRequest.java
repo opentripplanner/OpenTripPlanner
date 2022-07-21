@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.DoubleFunction;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -42,9 +44,9 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -455,12 +457,12 @@ public class RoutingRequest implements Cloneable, Serializable {
   private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
   /**
-   * Set of preferred routes by user.
+   * Set of preferred routes by user and configuration.
    *
    * @deprecated TODO OTP2 Needs to be implemented
    */
   @Deprecated
-  private RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
+  public List<FeedScopedId> preferredRoutes = List.of();
 
   /**
    * Penalty added for using every route that is not preferred if user set any route as preferred.
@@ -472,21 +474,18 @@ public class RoutingRequest implements Cloneable, Serializable {
   public int otherThanPreferredRoutesPenalty = 300;
 
   /**
-   * Set of unpreferred routes for given user.
-   *
-   * @deprecated TODO OTP2: Needs to be implemented
+   * Set of unpreferred routes for given user and configuration.
    */
-  @Deprecated
-  private RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
+  public List<FeedScopedId> unpreferredRoutes = List.of();
 
   /**
-   * Penalty added for using every unpreferred route. We return number of seconds that we are
-   * willing to wait for preferred route.
-   *
-   * @deprecated TODO OTP2: Needs to be implemented
+   * A cost function used to calculate penalty for an unpreferred route. Function should return
+   * number of seconds that we are willing to wait for preferred route.
    */
-  @Deprecated
-  public int useUnpreferredRoutesPenalty = 300;
+  public DoubleFunction<Double> unpreferredRouteCost = RequestFunctions.createLinearFunction(
+    0.0,
+    DEFAULT_ROUTE_RELUCTANCE
+  );
 
   /**
    * Do not use certain trips
@@ -789,6 +788,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
   }
 
+  public void setUnpreferredRouteCost(String constFunction) {
+    unpreferredRouteCost = RequestFunctions.parse(constFunction);
+  }
+
   public void setBannedAgencies(Collection<FeedScopedId> ids) {
     if (ids != null) {
       bannedAgencies = Set.copyOf(ids);
@@ -818,27 +821,27 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.otherThanPreferredRoutesPenalty = penalty;
   }
 
-  public void setPreferredRoutes(List<FeedScopedId> routeIds) {
-    preferredRoutes = RouteMatcher.idMatcher(routeIds);
+  public void setPreferredRoutes(Collection<FeedScopedId> routeIds) {
+    preferredRoutes = routeIds.stream().toList();
   }
 
   public void setPreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      preferredRoutes = RouteMatcher.parse(s);
+      preferredRoutes = FeedScopedId.parseListOfIds(s);
     } else {
-      preferredRoutes = RouteMatcher.emptyMatcher();
+      preferredRoutes = List.of();
     }
   }
 
-  public void setUnpreferredRoutes(List<FeedScopedId> routeIds) {
-    unpreferredRoutes = RouteMatcher.idMatcher(routeIds);
+  public void setUnpreferredRoutes(Collection<FeedScopedId> routeIds) {
+    unpreferredRoutes = routeIds.stream().toList();
   }
 
   public void setUnpreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      unpreferredRoutes = RouteMatcher.parse(s);
+      unpreferredRoutes = FeedScopedId.parseListOfIds(s);
     } else {
-      unpreferredRoutes = RouteMatcher.emptyMatcher();
+      unpreferredRoutes = List.of();
     }
   }
 
@@ -1120,8 +1123,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
       clone.bannedRoutes = bannedRoutes.clone();
       clone.whiteListedRoutes = whiteListedRoutes.clone();
-      clone.preferredRoutes = preferredRoutes.clone();
-      clone.unpreferredRoutes = unpreferredRoutes.clone();
+      clone.preferredRoutes = List.copyOf(preferredRoutes);
+      clone.unpreferredRoutes = List.copyOf(unpreferredRoutes);
 
       clone.bannedTrips = Set.copyOf(bannedTrips);
 
@@ -1243,26 +1246,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
   public Duration getMaxDirectStreetDuration(StreetMode mode) {
     return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
-  }
-
-  /** Check if route is preferred according to this request. */
-  public long preferencesPenaltyForRoute(Route route) {
-    long preferences_penalty = 0;
-    FeedScopedId agencyID = route.getAgency().getId();
-    if (!preferredRoutes.equals(RouteMatcher.emptyMatcher()) || !preferredAgencies.isEmpty()) {
-      boolean isPreferedRoute = preferredRoutes.matches(route);
-      boolean isPreferedAgency = preferredAgencies.contains(agencyID);
-
-      if (!isPreferedRoute && !isPreferedAgency) {
-        preferences_penalty += otherThanPreferredRoutesPenalty;
-      }
-    }
-    boolean isUnpreferedRoute = unpreferredRoutes.matches(route);
-    boolean isUnpreferedAgency = unpreferredAgencies.contains(agencyID);
-    if (isUnpreferedRoute || isUnpreferedAgency) {
-      preferences_penalty += useUnpreferredRoutesPenalty;
-    }
-    return preferences_penalty;
   }
 
   /**

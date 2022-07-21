@@ -594,12 +594,14 @@ public class LegacyGraphQLTypes {
 
     private String agencies;
     private String routes;
+    private String unpreferredRouteCost;
     private Integer useUnpreferredRoutesPenalty;
 
     public LegacyGraphQLInputUnpreferredInput(Map<String, Object> args) {
       if (args != null) {
         this.agencies = (String) args.get("agencies");
         this.routes = (String) args.get("routes");
+        this.unpreferredRouteCost = (String) args.get("unpreferredRouteCost");
         this.useUnpreferredRoutesPenalty = (Integer) args.get("useUnpreferredRoutesPenalty");
       }
     }
@@ -612,6 +614,10 @@ public class LegacyGraphQLTypes {
       return this.routes;
     }
 
+    public String getLegacyGraphQLUnpreferredRouteCost() {
+      return this.unpreferredRouteCost;
+    }
+
     public Integer getLegacyGraphQLUseUnpreferredRoutesPenalty() {
       return this.useUnpreferredRoutesPenalty;
     }
@@ -622,6 +628,10 @@ public class LegacyGraphQLTypes {
 
     public void setLegacyGraphQLRoutes(String routes) {
       this.routes = routes;
+    }
+
+    public void setLegacyGraphQLUnpreferredRouteCost(String unpreferredRouteCost) {
+      this.unpreferredRouteCost = unpreferredRouteCost;
     }
 
     public void setLegacyGraphQLUseUnpreferredRoutesPenalty(Integer useUnpreferredRoutesPenalty) {
@@ -1351,8 +1361,10 @@ public class LegacyGraphQLTypes {
     private Boolean allowKeepingRentedBicycleAtDestination;
     private Iterable<String> allowedBikeRentalNetworks;
     private Iterable<String> allowedTicketTypes;
+    private Iterable<String> allowedVehicleRentalNetworks;
     private Boolean arriveBy;
     private LegacyGraphQLInputBannedInput banned;
+    private Iterable<String> bannedVehicleRentalNetworks;
     private Boolean batch;
     private Integer bikeBoardCost;
     private Double bikeReluctance;
@@ -1414,8 +1426,12 @@ public class LegacyGraphQLTypes {
           (Boolean) args.get("allowKeepingRentedBicycleAtDestination");
         this.allowedBikeRentalNetworks = (Iterable<String>) args.get("allowedBikeRentalNetworks");
         this.allowedTicketTypes = (Iterable<String>) args.get("allowedTicketTypes");
+        this.allowedVehicleRentalNetworks =
+          (Iterable<String>) args.get("allowedVehicleRentalNetworks");
         this.arriveBy = (Boolean) args.get("arriveBy");
         this.banned = new LegacyGraphQLInputBannedInput((Map<String, Object>) args.get("banned"));
+        this.bannedVehicleRentalNetworks =
+          (Iterable<String>) args.get("bannedVehicleRentalNetworks");
         this.batch = (Boolean) args.get("batch");
         this.bikeBoardCost = (Integer) args.get("bikeBoardCost");
         this.bikeReluctance = (Double) args.get("bikeReluctance");
@@ -1507,12 +1523,20 @@ public class LegacyGraphQLTypes {
       return this.allowedTicketTypes;
     }
 
+    public Iterable<String> getLegacyGraphQLAllowedVehicleRentalNetworks() {
+      return this.allowedVehicleRentalNetworks;
+    }
+
     public Boolean getLegacyGraphQLArriveBy() {
       return this.arriveBy;
     }
 
     public LegacyGraphQLInputBannedInput getLegacyGraphQLBanned() {
       return this.banned;
+    }
+
+    public Iterable<String> getLegacyGraphQLBannedVehicleRentalNetworks() {
+      return this.bannedVehicleRentalNetworks;
     }
 
     public Boolean getLegacyGraphQLBatch() {
@@ -1747,12 +1771,24 @@ public class LegacyGraphQLTypes {
       this.allowedTicketTypes = allowedTicketTypes;
     }
 
+    public void setLegacyGraphQLAllowedVehicleRentalNetworks(
+      Iterable<String> allowedVehicleRentalNetworks
+    ) {
+      this.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+    }
+
     public void setLegacyGraphQLArriveBy(Boolean arriveBy) {
       this.arriveBy = arriveBy;
     }
 
     public void setLegacyGraphQLBanned(LegacyGraphQLInputBannedInput banned) {
       this.banned = banned;
+    }
+
+    public void setLegacyGraphQLBannedVehicleRentalNetworks(
+      Iterable<String> bannedVehicleRentalNetworks
+    ) {
+      this.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
     }
 
     public void setLegacyGraphQLBatch(Boolean batch) {

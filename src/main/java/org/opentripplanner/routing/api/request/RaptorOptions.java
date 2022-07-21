@@ -90,7 +90,7 @@ public class RaptorOptions implements Serializable {
       .addCol("optimizations", optimizations)
       .addEnum("profile", profile)
       .addEnum("searchDirection", searchDirection)
-      .addTime("timeLimit", timeLimit)
+      .addDateTime("timeLimit", timeLimit)
       .toString();
   }
 }
