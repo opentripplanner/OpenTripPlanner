@@ -7,7 +7,6 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.util.TranslationHelper;
 
 public class TransferMapperTest {
 

@@ -11,9 +11,11 @@ import org.opentripplanner.model.plan.Itinerary;
 public class ItineraryMapper {
 
   private final LegMapper legMapper;
+  private final FareMapper fareMapper;
 
   public ItineraryMapper(Locale locale, boolean addIntermediateStops) {
     this.legMapper = new LegMapper(locale, addIntermediateStops);
+    this.fareMapper = new FareMapper(locale);
   }
 
   public List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
@@ -42,7 +44,7 @@ public class ItineraryMapper {
     api.transfers = domain.getNumberOfTransfers();
     api.tooSloped = domain.isTooSloped();
     api.arrivedAtDestinationWithRentedBicycle = domain.isArrivedAtDestinationWithRentedVehicle();
-    api.fare = FareMapper.mapFare(domain.getFare());
+    api.fare = fareMapper.mapFare(domain.getFare());
     api.legs = legMapper.mapLegs(domain.getLegs());
     api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.getSystemNotices());
     api.accessibilityScore = domain.getAccessibilityScore();

@@ -1114,10 +1114,20 @@ input InputUnpreferred {
     agencies: String
 
     """
-    Penalty added for using route that is unpreferred, i.e. number of seconds that
-    we are willing to wait for route that is unpreferred.
+    An cost function used to calculate penalty for an unpreferred route. Function should return
+    number of seconds that we are willing to wait for preferred route. String must be of the format:
+    `A + B x`, where A is fixed penalty and B is a multiplier of transit leg travel time x.
+    For example: `600 + 2.0 x`
     """
-    useUnpreferredRoutesPenalty: Int
+    unpreferredRouteCost: String
+
+    """
+    Penalty added for using route that is unpreferred, i.e. number of seconds that we are willing to
+    wait for route that is unpreferred.
+
+    Deprecated: Use `unpreferredRouteCost` instead.
+    """
+    useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredRouteCost instead")
 }
 
 enum RoutingErrorCode {
@@ -2396,7 +2406,7 @@ type QueryType {
         lengths of time. Empirically, values between 2 and 4 seem to correspond
         well to the concept of not wanting to walk too much without asking for
         totally ridiculous itineraries, but this observation should in no way be
-        taken as scientific or definitive. Your mileage may vary. See 
+        taken as scientific or definitive. Your mileage may vary. See
         https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
         performance with high values. Default value: 2.0
         """
@@ -2643,9 +2653,21 @@ type QueryType {
         compactLegsByReversedSearch: Boolean
 
         """
-        Which bike rental networks can be used. By default, all networks are allowed.
+        Which vehicle rental networks can be used. By default, all networks are allowed.
+
+        Deprecated: Use `allowedVehicleRentalNetworks` instead.
         """
-        allowedBikeRentalNetworks: [String]
+        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedBikeRentalNetworks instead")
+
+        """
+        Which vehicle rental networks can be used. By default, all networks are allowed.
+        """
+        allowedVehicleRentalNetworks: [String]
+
+        """
+        Which vehicle rental networks cannot be used. By default, all networks are allowed.
+        """
+        bannedVehicleRentalNetworks: [String]
     ): Plan
 }
 

@@ -6,15 +6,14 @@ import com.google.common.collect.Multimap;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,9 +45,9 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Stop;
@@ -66,8 +65,6 @@ public class TransitModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitModel.class);
 
-  private static final long serialVersionUID = 1L;
-
   private final Collection<Agency> agencies = new ArrayList<>();
   private final Collection<Operator> operators = new ArrayList<>();
   private final Collection<String> feedIds = new HashSet<>();
@@ -79,7 +76,6 @@ public class TransitModel implements Serializable {
    * {@link TransitEntity#getId()}. The notice is part of the static transit data.
    */
   private final Multimap<TransitEntity, Notice> noticesByElement = HashMultimap.create();
-  private final Map<Class<?>, Serializable> services = new HashMap<>();
   private final TransferService transferService = new TransferService();
 
   /** List of transit modes that are availible in GTFS data used in this graph **/
@@ -104,11 +100,12 @@ public class TransitModel implements Serializable {
   private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
 
   private final transient Deduplicator deduplicator;
-  private transient CalendarService calendarService;
+
+  private final CalendarServiceData calendarServiceData = new CalendarServiceData();
 
   private transient TransitModelIndex index;
   private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
-  private transient ZoneId timeZone = null;
+  private ZoneId timeZone = null;
   private boolean timeZoneExplicitlySet = false;
 
   /**
@@ -119,7 +116,7 @@ public class TransitModel implements Serializable {
    */
   private transient GraphUpdaterManager updaterManager = null;
 
-  /** True if GTFS data was loaded into this Graph. */
+  /** True if there are active transit services loaded into this Graph. */
   private boolean hasTransit = false;
 
   /** True if direct single-edge transfers were generated between transit stops in this Graph. */
@@ -138,10 +135,10 @@ public class TransitModel implements Serializable {
    * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
    * vertices/edges anymore.
    */
-  private Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
-  private Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
+  private final Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
+  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
 
-  private Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
   private transient TransitLayer transitLayer;
@@ -220,70 +217,8 @@ public class TransitModel implements Serializable {
     return realtimeTransitLayer != null;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends Serializable> T putService(Class<T> serviceType, T service) {
-    return (T) services.put(serviceType, service);
-  }
-
-  public boolean hasService(Class<? extends Serializable> serviceType) {
-    return services.containsKey(serviceType);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends Serializable> T getService(Class<T> serviceType) {
-    return (T) services.get(serviceType);
-  }
-
-  public <T extends Serializable> T getService(Class<T> serviceType, boolean autoCreate) {
-    T t = (T) services.get(serviceType);
-    if (t == null && autoCreate) {
-      try {
-        t = serviceType.getDeclaredConstructor().newInstance();
-      } catch (
-        IllegalAccessException
-        | InvocationTargetException
-        | NoSuchMethodException
-        | InstantiationException e
-      ) {
-        throw new RuntimeException(e);
-      }
-      services.put(serviceType, t);
-    }
-    return t;
-  }
-
   public TransferService getTransferService() {
     return transferService;
-  }
-
-  // Infer the time period covered by the transit feed
-  public void updateTransitFeedValidity(CalendarServiceData data, DataImportIssueStore issueStore) {
-    Instant now = Instant.now();
-    HashSet<String> agenciesWithFutureDates = new HashSet<>();
-    HashSet<String> agencies = new HashSet<>();
-    for (FeedScopedId sid : data.getServiceIds()) {
-      agencies.add(sid.getFeedId());
-      for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
-        // Adjust for timezone, assuming there is only one per graph.
-        ZonedDateTime t = ServiceDateUtils.asStartOfService(sd, getTimeZone());
-        if (t.toInstant().isAfter(now)) {
-          agenciesWithFutureDates.add(sid.getFeedId());
-        }
-        // assume feed is unreliable after midnight on last service day
-        ZonedDateTime u = t.plusDays(1);
-        if (t.isBefore(this.transitServiceStarts)) {
-          this.transitServiceStarts = t;
-        }
-        if (u.isAfter(this.transitServiceEnds)) {
-          this.transitServiceEnds = u;
-        }
-      }
-    }
-    for (String agency : agencies) {
-      if (!agenciesWithFutureDates.contains(agency)) {
-        issueStore.add(new NoFutureDates(agency));
-      }
-    }
   }
 
   // Check to see if we have transit information for a given date
@@ -306,27 +241,19 @@ public class TransitModel implements Serializable {
   }
 
   public CalendarService getCalendarService() {
-    if (calendarService == null) {
-      CalendarServiceData data = this.getService(CalendarServiceData.class);
-      if (data != null) {
-        this.calendarService = new CalendarServiceImpl(data);
-      }
-    }
-    return this.calendarService;
+    // No need to cache the CalendarService, it is a thin wrapper around the data
+    return new CalendarServiceImpl(calendarServiceData);
   }
 
-  public CalendarServiceData getCalendarDataService() {
-    CalendarServiceData calendarServiceData;
-    if (this.hasService(CalendarServiceData.class)) {
-      calendarServiceData = this.getService(CalendarServiceData.class);
-    } else {
-      calendarServiceData = new CalendarServiceData();
-    }
-    return calendarServiceData;
-  }
+  public void updateCalendarServiceData(
+    boolean hasActiveTransit,
+    CalendarServiceData data,
+    DataImportIssueStore issueStore
+  ) {
+    updateTransitFeedValidity(data, issueStore);
+    calendarServiceData.add(data);
 
-  public void clearCachedCalenderService() {
-    this.calendarService = null;
+    updateHasTransit(hasActiveTransit);
   }
 
   /**
@@ -396,15 +323,6 @@ public class TransitModel implements Serializable {
    * start making graphs with long distance train, boat, or air services.
    */
   public ZoneId getTimeZone() {
-    if (timeZone == null) {
-      if (agencies.isEmpty()) {
-        timeZone = ZoneId.of("GMT");
-        LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
-      } else {
-        timeZone = getAgencyTimeZones().iterator().next();
-        LOG.debug("graph time zone set to {}", timeZone);
-      }
-    }
     return timeZone;
   }
 
@@ -479,8 +397,7 @@ public class TransitModel implements Serializable {
   }
 
   public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
-    Collection<Notice> res = getNoticesByElement().get(entity);
-    return res == null ? Collections.emptyList() : res;
+    return getNoticesByElement().get(entity);
   }
 
   public TripPattern getTripPatternForId(FeedScopedId id) {
@@ -545,7 +462,7 @@ public class TransitModel implements Serializable {
         .filter(s -> s instanceof FlexLocationGroup)
         .flatMap(g -> ((FlexLocationGroup) g).getLocations().stream().filter(e -> e instanceof Stop)
         )
-        .collect(Collectors.toList())
+        .toList()
     );
 
     return stopLocations;
@@ -603,8 +520,11 @@ public class TransitModel implements Serializable {
     this.transitLayerUpdater = transitLayerUpdater;
   }
 
-  public void setHasTransit(boolean hasTransit) {
-    this.hasTransit = hasTransit;
+  private void updateHasTransit(boolean hasTransit) {
+    this.hasTransit = this.hasTransit || hasTransit;
+    if (hasTransit) {
+      calculateTransitCenter();
+    }
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip flexTrip) {
@@ -655,8 +575,61 @@ public class TransitModel implements Serializable {
     return flexTripsById.get(tripId);
   }
 
+  @Serial
   private void readObject(ObjectInputStream inputStream)
     throws ClassNotFoundException, IOException {
     inputStream.defaultReadObject();
+  }
+
+  /**
+   * Infer the time period covered by the transit feed
+   */
+  private void updateTransitFeedValidity(
+    CalendarServiceData data,
+    @Nullable DataImportIssueStore issueStore
+  ) {
+    Instant now = Instant.now();
+    HashSet<String> agenciesWithFutureDates = new HashSet<>();
+    HashSet<String> agencies = new HashSet<>();
+    initTimeZone();
+
+    for (FeedScopedId sid : data.getServiceIds()) {
+      agencies.add(sid.getFeedId());
+      for (LocalDate sd : data.getServiceDatesForServiceId(sid)) {
+        // Adjust for timezone, assuming there is only one per graph.
+
+        ZonedDateTime t = ServiceDateUtils.asStartOfService(sd, getTimeZone());
+        if (t.toInstant().isAfter(now)) {
+          agenciesWithFutureDates.add(sid.getFeedId());
+        }
+        // assume feed is unreliable after midnight on last service day
+        ZonedDateTime u = t.plusDays(1);
+        if (t.isBefore(this.transitServiceStarts)) {
+          this.transitServiceStarts = t;
+        }
+        if (u.isAfter(this.transitServiceEnds)) {
+          this.transitServiceEnds = u;
+        }
+      }
+    }
+    if (issueStore != null) {
+      for (String agency : agencies) {
+        if (!agenciesWithFutureDates.contains(agency)) {
+          issueStore.add(new NoFutureDates(agency));
+        }
+      }
+    }
+  }
+
+  private void initTimeZone() {
+    if (timeZone == null) {
+      if (agencies.isEmpty()) {
+        timeZone = ZoneId.of("GMT");
+        LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
+      } else {
+        timeZone = getAgencyTimeZones().iterator().next();
+        LOG.debug("graph time zone set to {}", timeZone);
+      }
+    }
   }
 }

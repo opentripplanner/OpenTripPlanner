@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A vertex representing a place along a street between two intersections that is not derived from

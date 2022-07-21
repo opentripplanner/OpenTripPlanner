@@ -13,8 +13,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.PathwayMode;
-import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.util.TranslationHelper;
 
 public class PathwayMapperTest {
 

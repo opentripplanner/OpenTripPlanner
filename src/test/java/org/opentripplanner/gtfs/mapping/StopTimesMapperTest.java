@@ -15,7 +15,6 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.util.TranslationHelper;
 
 public class StopTimesMapperTest {
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
-import org.opentripplanner.model.TripAlteration;
+import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 public class TripServiceAlterationMapper {

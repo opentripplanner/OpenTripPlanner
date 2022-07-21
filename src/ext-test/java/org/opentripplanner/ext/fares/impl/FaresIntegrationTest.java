@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.Comparator;
+import java.util.Currency;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -18,7 +19,6 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
@@ -28,7 +28,7 @@ import org.opentripplanner.util.TestUtils;
 
 public class FaresIntegrationTest {
 
-  private final WrappedCurrency USD = new WrappedCurrency("USD");
+  private final Currency USD = Currency.getInstance("USD");
 
   @Test
   public void testBasic() {

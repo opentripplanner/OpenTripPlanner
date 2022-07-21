@@ -90,7 +90,7 @@ public class GtfsModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    CalendarServiceData calendarServiceData = transitModel.getCalendarDataService();
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
 
     boolean hasTransit = false;
 
@@ -159,22 +159,9 @@ public class GtfsModule implements GraphBuilderModule {
       gtfsBundles.forEach(GtfsBundle::close);
     }
 
-    transitModel.clearCachedCalenderService();
-    // We need to save the calendar service data so we can use it later
-    transitModel.putService(
-      org.opentripplanner.model.calendar.CalendarServiceData.class,
-      calendarServiceData
-    );
-
     transitModel.validateTimeZones();
 
-    transitModel.updateTransitFeedValidity(calendarServiceData, issueStore);
-
-    // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
-    if (hasTransit) {
-      transitModel.calculateTransitCenter();
-    }
+    transitModel.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
   }
 
   @Override

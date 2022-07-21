@@ -4,7 +4,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 public final class TemporaryStreetLocation extends StreetLocation implements TemporaryVertex {
 

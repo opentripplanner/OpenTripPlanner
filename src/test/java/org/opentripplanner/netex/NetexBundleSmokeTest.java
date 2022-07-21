@@ -135,7 +135,7 @@ public class NetexBundleSmokeTest {
     assertEquals(59.909803, quay.getLat(), 0.000001);
     assertEquals(10.748062, quay.getLon(), 0.000001);
     assertEquals("RB:NSR:StopPlace:3995", quay.getParentStation().getId().toString());
-    assertEquals("L", quay.getCode());
+    assertEquals("L", quay.getPlatformCode());
     assertEquals(16, stops.size());
   }
 

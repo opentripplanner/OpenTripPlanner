@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping.support;
 
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 /** A tupple of main- and sub-mode for use in netex import only */
 public record MainAndSubMode(TransitMode mainMode, String subMode) {

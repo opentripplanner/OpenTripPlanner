@@ -23,7 +23,7 @@ import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.transit.model.network.SubMode;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.logging.ProgressTracker;
