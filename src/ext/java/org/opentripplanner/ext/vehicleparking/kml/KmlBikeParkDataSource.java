@@ -4,9 +4,9 @@ import static java.util.Locale.ROOT;
 
 import java.util.List;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.DataSource;
-import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

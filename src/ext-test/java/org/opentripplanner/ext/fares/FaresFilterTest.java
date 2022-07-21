@@ -9,7 +9,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
@@ -29,9 +29,8 @@ public class FaresFilterTest implements PlanTestConstants {
 
     input.forEach(i -> assertEquals(Fare.empty(), i.getFare()));
 
-    var wc = new WrappedCurrency("EUR");
     var twoEighty = new Fare();
-    twoEighty.addFare(Fare.FareType.regular, wc, 280);
+    twoEighty.addFare(Fare.FareType.regular, Money.euros(280));
 
     var filter = new FaresFilter((FareService) itinerary -> twoEighty);
     var filtered = filter.filter(input);

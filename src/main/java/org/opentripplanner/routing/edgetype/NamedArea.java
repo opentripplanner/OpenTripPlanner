@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A named area is a subset of an area with a certain set of properties (name, safety, etc). Its

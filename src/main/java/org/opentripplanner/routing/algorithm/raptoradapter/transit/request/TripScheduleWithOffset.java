@@ -7,6 +7,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -31,6 +32,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   private TripTimes tripTimes = null;
   private LocalDate serviceDate = null;
   private int secondsOffset;
+  private final FeedScopedId routeId;
 
   TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
     this.tripIndexForDates = tripIndexForDates;
@@ -44,6 +46,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
     // Trip times are sorted based on the arrival times at stop 0,
     this.sortIndex = arrivalTimes.applyAsInt(0);
+    this.routeId = pattern.getTripPattern().getPattern().getRoute().getId();
   }
 
   @Override
@@ -74,6 +77,11 @@ public final class TripScheduleWithOffset implements TripSchedule {
   @Override
   public WheelchairAccessibility wheelchairBoarding() {
     return pattern.wheelchairBoardingForTrip(tripIndexForDates);
+  }
+
+  @Override
+  public FeedScopedId routeId() {
+    return routeId;
   }
 
   /*

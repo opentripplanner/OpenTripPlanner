@@ -24,6 +24,7 @@
 - Take free-floating vehicles into account when computing state (February 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3857)
 - Fix issue with GraphQL code generator (February 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3881)
 - Add GBFS form factors for `rentalVehicle` (April 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4062)
+- Implement allowedBikeRentalNetworks while deprecating it and add allowedVehicleRentalNetworks and bannedVehicleRentalNetworks. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4279)
 
 ## Documentation
 

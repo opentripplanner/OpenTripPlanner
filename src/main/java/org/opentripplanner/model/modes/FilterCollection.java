@@ -2,8 +2,8 @@ package org.opentripplanner.model.modes;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.transit.model.network.SubMode;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
  * This class is used to combine more than one filter into one. It keeps a list of filters and

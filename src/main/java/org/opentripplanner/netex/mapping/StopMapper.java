@@ -6,13 +6,13 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.util.NonLocalizedString;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
@@ -49,7 +49,7 @@ class StopMapper {
       .of(idFactory.createId(quay.getId()))
       .withParentStation(parentStation)
       .withName(parentStation.getName())
-      .withCode(quay.getPublicCode())
+      .withPlatformCode(quay.getPublicCode())
       .withDescription(
         NonLocalizedString.ofNullable(quay.getDescription(), MultilingualString::getValue)
       )

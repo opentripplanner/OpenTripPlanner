@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.network;
+package org.opentripplanner.transit.model.basic;
 
 import java.io.Serializable;
 import java.util.BitSet;

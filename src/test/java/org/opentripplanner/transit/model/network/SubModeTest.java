@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.BitSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.basic.SubMode;
 
 class SubModeTest {
 

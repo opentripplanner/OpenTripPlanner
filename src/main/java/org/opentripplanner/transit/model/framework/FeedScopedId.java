@@ -6,6 +6,7 @@ import static org.opentripplanner.util.lang.AssertUtils.assertHasValue;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -78,6 +79,13 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   public static Set<FeedScopedId> parseSetOfIds(String s) {
     return Arrays.stream(s.split(",")).map(FeedScopedId::parseId).collect(Collectors.toSet());
+  }
+
+  /**
+   * Parses a string consisting of concatenated FeedScopedIds to a List
+   */
+  public static List<FeedScopedId> parseListOfIds(String s) {
+    return Arrays.stream(s.split(",")).map(FeedScopedId::parseId).collect(Collectors.toList());
   }
 
   public String getFeedId() {

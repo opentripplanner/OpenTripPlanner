@@ -6,15 +6,19 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class ToStringBuilderTest {
+
+  private static final ZoneId TIME_ZONE_ID_PARIS = ZoneId.of("Europe/Paris");
 
   @Test
   public void addFieldIfTrue() {
@@ -36,8 +40,13 @@ public class ToStringBuilderTest {
   @Test
   public void testAddNumWithDefaults() {
     assertEquals(
-      "ToStringBuilderTest{b: 3.0}",
-      subject().addNum("a", 3d, 3d).addNum("b", 3d, 2d).addNum("c", -1d, -1d).toString()
+      "ToStringBuilderTest{b: 3.0, d: null}",
+      subject()
+        .addNum("a", 3d, 3d)
+        .addNum("b", 3d, 2d)
+        .addNum("c", -1d, -1d)
+        .addNum("d", null, 2)
+        .toString()
     );
   }
 
@@ -127,6 +136,21 @@ public class ToStringBuilderTest {
   }
 
   @Test
+  public void addCollectionWithCustomToStringOperation() {
+    Function<?, String> op = e -> {
+      // Should not happen for null and empty collection
+      throw new IllegalStateException("" + e);
+    };
+    assertEquals("ToStringBuilderTest{}", subject().addCol("c", null, op).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addCol("c", List.of(), op).toString());
+
+    assertEquals(
+      "ToStringBuilderTest{c: [<1>, <3.0>, <true>]}",
+      subject().addCol("c", List.of(1, 3d, true), e -> "<" + e + ">").toString()
+    );
+  }
+
+  @Test
   public void addCollectionWithLimit() {
     assertEquals(
       "ToStringBuilderTest{c: [1, 2, 3]}",
@@ -136,6 +160,25 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{c(2/4): [1, 2, ..]}",
       subject().addCollection("c", List.of(1, 2, 3, 4), 2).toString()
     );
+
+    // null element in list
+    var list = new ArrayList<>();
+    list.add(null);
+    assertEquals(
+      "ToStringBuilderTest{c: [null]}",
+      subject().addCollection("c", list, 2).toString()
+    );
+    // collection is null
+    assertEquals("ToStringBuilderTest{}", subject().addCollection("c", null, 2).toString());
+  }
+
+  @Test
+  public void addColSize() {
+    assertEquals(
+      "ToStringBuilderTest{c: 3 items}",
+      subject().addColSize("c", List.of(1, 3, 7)).toString()
+    );
+    assertEquals("ToStringBuilderTest{}", subject().addColSize("c", null).toString());
   }
 
   @Test
@@ -144,6 +187,7 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{c: 2/3}",
       subject().addIntArraySize("c", new int[] { 1, -1, 3 }, -1).toString()
     );
+    assertEquals("ToStringBuilderTest{}", subject().addIntArraySize("c", null, -1).toString());
   }
 
   @Test
@@ -156,15 +200,28 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{bitSet: 2/4}",
       subject().addBitSetSize("bitSet", bset).toString()
     );
+
+    assertEquals("ToStringBuilderTest{}", subject().addBitSetSize("bitSet", null).toString());
   }
 
   @Test
-  public void addCalTime() {
+  public void addDateTime() {
+    var time = ZonedDateTime
+      .of(LocalDateTime.of(2012, 1, 28, 23, 45, 12), TIME_ZONE_ID_PARIS)
+      .toInstant();
+    assertEquals(
+      "ToStringBuilderTest{t: 2012-01-28T22:45:12Z}",
+      subject().addDateTime("t", time).toString()
+    );
+  }
+
+  @Test
+  public void addTime() {
     ZonedDateTime c = ZonedDateTime.of(
       LocalDateTime.of(2012, 1, 28, 23, 45, 12),
-      ZoneId.systemDefault()
+      TIME_ZONE_ID_PARIS
     );
-    assertEquals("ToStringBuilderTest{c: 23:45:12}", subject().addTimeCal("c", c).toString());
+    assertEquals("ToStringBuilderTest{t: 23:45:12}", subject().addTime("t", c).toString());
   }
 
   @Test

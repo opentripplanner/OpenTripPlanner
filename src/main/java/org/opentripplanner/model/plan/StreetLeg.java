@@ -83,7 +83,7 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public boolean isOnStreetNonTransit() {
+  public boolean isStreetLeg() {
     return true;
   }
 
@@ -200,8 +200,8 @@ public class StreetLeg implements Leg {
       .of(StreetLeg.class)
       .addObj("from", from)
       .addObj("to", to)
-      .addTimeCal("startTime", startTime)
-      .addTimeCal("endTime", endTime)
+      .addTime("startTime", startTime)
+      .addTime("endTime", endTime)
       .addEnum("mode", mode)
       .addNum("distance", distanceMeters, "m")
       .addNum("cost", generalizedCost)

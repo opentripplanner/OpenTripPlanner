@@ -6,6 +6,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
@@ -38,6 +39,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   protected final int headway;
   protected final LocalDate serviceDate;
   private final WheelchairAccessibility wheelChairBoarding;
+  private final FeedScopedId routeId;
 
   public FrequencyBoardOrAlightEvent(
     RaptorTripPattern raptorTripPattern,
@@ -58,6 +60,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
     this.headway = headway;
     this.serviceDate = serviceDate;
     wheelChairBoarding = tripTimes.getTrip().getWheelchairBoarding();
+    routeId = pattern.getRoute().getId();
   }
 
   /* RaptorTripScheduleBoardOrAlightEvent implementation */
@@ -140,5 +143,10 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   @Override
   public WheelchairAccessibility wheelchairBoarding() {
     return wheelChairBoarding;
+  }
+
+  @Override
+  public FeedScopedId routeId() {
+    return routeId;
   }
 }

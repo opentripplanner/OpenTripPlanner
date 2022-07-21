@@ -3,12 +3,13 @@ package org.opentripplanner.transit.model._data;
 import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
@@ -17,7 +18,6 @@ import org.opentripplanner.transit.model.site.StopBuilder;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Test utility class to help construct valid transit model objects.
