@@ -33,6 +33,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   private LocalDate serviceDate = null;
   private int secondsOffset;
   private final FeedScopedId routeId;
+  private final FeedScopedId agencyId;
 
   TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
     this.tripIndexForDates = tripIndexForDates;
@@ -47,6 +48,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
     // Trip times are sorted based on the arrival times at stop 0,
     this.sortIndex = arrivalTimes.applyAsInt(0);
     this.routeId = pattern.getTripPattern().getPattern().getRoute().getId();
+    this.agencyId = pattern.getTripPattern().getPattern().getRoute().getAgency().getId();
   }
 
   @Override
@@ -82,6 +84,11 @@ public final class TripScheduleWithOffset implements TripSchedule {
   @Override
   public FeedScopedId routeId() {
     return routeId;
+  }
+
+  @Override
+  public FeedScopedId agencyId() {
+    return agencyId;
   }
 
   /*

@@ -26,6 +26,7 @@ public class McCostParamsMapper {
     builder.wheelchairAccessibility(request.wheelchairAccessibility);
 
     builder.unpreferredRoutes(request.unpreferredRoutes.stream().collect(Collectors.toSet()));
+    builder.unpreferredAgencies(request.unpreferredAgencies);
     builder.unpreferredCost(request.unpreferredRouteCost);
 
     return builder.build();

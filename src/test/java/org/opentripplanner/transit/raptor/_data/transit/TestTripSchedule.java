@@ -20,12 +20,14 @@ public class TestTripSchedule implements DefaultTripSchedule {
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
   private static final String DEFAULT_ROUTE_FEED = "default";
   private static final String DEFAULT_ROUTE_ID_STR = "101";
+  private static final String DEFAULT_AGENCY_ID = "initech-travels";
   private final RaptorTripPattern pattern;
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
   private final WheelchairAccessibility wheelchairBoarding;
   private final FeedScopedId routeId;
+  private final FeedScopedId agencyId;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
@@ -33,7 +35,8 @@ public class TestTripSchedule implements DefaultTripSchedule {
     int[] departureTimes,
     int transitReluctanceIndex,
     WheelchairAccessibility wheelchairBoarding,
-    FeedScopedId routeId
+    FeedScopedId routeId,
+    FeedScopedId agencyId
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -41,6 +44,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
     this.transitReluctanceIndex = transitReluctanceIndex;
     this.wheelchairBoarding = wheelchairBoarding;
     this.routeId = routeId;
+    this.agencyId = agencyId;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -91,6 +95,11 @@ public class TestTripSchedule implements DefaultTripSchedule {
     return routeId;
   }
 
+  @Override
+  public FeedScopedId agencyId() {
+    return agencyId;
+  }
+
   public int size() {
     return arrivalTimes.length;
   }
@@ -120,6 +129,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
     private int transitReluctanceIndex = 0;
     private WheelchairAccessibility wheelchairBoarding = NO_INFORMATION;
     private FeedScopedId routeId;
+    private FeedScopedId agencyId;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -195,6 +205,11 @@ public class TestTripSchedule implements DefaultTripSchedule {
       return this;
     }
 
+    public TestTripSchedule.Builder agencyId(FeedScopedId agencyId) {
+      this.agencyId = agencyId;
+      return this;
+    }
+
     public TestTripSchedule build() {
       if (arrivalTimes == null) {
         arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
@@ -225,13 +240,18 @@ public class TestTripSchedule implements DefaultTripSchedule {
       if (routeId == null) {
         routeId = new FeedScopedId(DEFAULT_ROUTE_FEED, DEFAULT_ROUTE_ID_STR);
       }
+      if (agencyId == null) {
+        agencyId = new FeedScopedId(DEFAULT_ROUTE_FEED, DEFAULT_AGENCY_ID);
+      }
+
       return new TestTripSchedule(
         pattern,
         arrivalTimes,
         departureTimes,
         transitReluctanceIndex,
         wheelchairBoarding,
-        routeId
+        routeId,
+        agencyId
       );
     }
 

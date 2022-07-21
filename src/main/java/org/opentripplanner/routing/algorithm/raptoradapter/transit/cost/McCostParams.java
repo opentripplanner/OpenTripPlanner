@@ -27,6 +27,7 @@ public class McCostParams {
   private final double waitReluctanceFactor;
   private final WheelchairAccessibilityRequest accessibilityRequest;
   private final Set<FeedScopedId> unpreferredRoutes;
+  private final Set<FeedScopedId> unpreferredAgencies;
   private final DoubleFunction<Double> unpreferredCost;
 
   /**
@@ -40,6 +41,7 @@ public class McCostParams {
     this.waitReluctanceFactor = 1.0;
     this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULT;
     this.unpreferredRoutes = Set.of();
+    this.unpreferredAgencies = Set.of();
     this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
   }
 
@@ -50,6 +52,7 @@ public class McCostParams {
     this.waitReluctanceFactor = builder.waitReluctanceFactor();
     this.accessibilityRequest = builder.wheelchairAccessibility();
     this.unpreferredRoutes = builder.unpreferredRoutes();
+    this.unpreferredAgencies = builder.unpreferredAgencies();
     this.unpreferredCost = builder.unpreferredCost();
   }
 
@@ -87,6 +90,10 @@ public class McCostParams {
 
   public Set<FeedScopedId> unpreferredRoutes() {
     return unpreferredRoutes;
+  }
+
+  public Set<FeedScopedId> unpreferredAgencies() {
+    return unpreferredAgencies;
   }
 
   public DoubleFunction<Double> unnpreferredCost() {

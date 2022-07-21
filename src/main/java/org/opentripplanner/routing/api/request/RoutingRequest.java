@@ -442,8 +442,7 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * Set of unpreferred agencies for given user.
    */
-  @Deprecated
-  private Set<FeedScopedId> unpreferredAgencies = Set.of();
+  public Set<FeedScopedId> unpreferredAgencies = Set.of();
 
   /**
    * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId

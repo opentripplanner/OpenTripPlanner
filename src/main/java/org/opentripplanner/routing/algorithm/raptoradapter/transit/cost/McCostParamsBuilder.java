@@ -17,6 +17,7 @@ public class McCostParamsBuilder {
   private double waitReluctanceFactor;
   private WheelchairAccessibilityRequest accessibilityRequest;
   private Set<FeedScopedId> unpreferredRoutes;
+  private Set<FeedScopedId> unpreferredAgencies;
   private DoubleFunction<Double> unpreferredCost;
 
   public McCostParamsBuilder() {
@@ -30,6 +31,7 @@ public class McCostParamsBuilder {
     this.waitReluctanceFactor = other.waitReluctanceFactor();
     this.accessibilityRequest = other.accessibilityRequirements();
     this.unpreferredRoutes = other.unpreferredRoutes();
+    this.unpreferredAgencies = other.unpreferredAgencies();
   }
 
   public int boardCost() {
@@ -83,6 +85,15 @@ public class McCostParamsBuilder {
 
   public McCostParamsBuilder unpreferredRoutes(Set<FeedScopedId> routes) {
     this.unpreferredRoutes = routes;
+    return this;
+  }
+
+  public Set<FeedScopedId> unpreferredAgencies() {
+    return unpreferredAgencies;
+  }
+
+  public McCostParamsBuilder unpreferredAgencies(Set<FeedScopedId> agencies) {
+    this.unpreferredAgencies = agencies;
     return this;
   }
 
