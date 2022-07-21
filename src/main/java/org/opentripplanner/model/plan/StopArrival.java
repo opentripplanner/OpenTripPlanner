@@ -48,8 +48,8 @@ public class StopArrival {
   public String toString() {
     return ToStringBuilder
       .of(StopArrival.class)
-      .addTimeCal("arrival", arrival)
-      .addTimeCal("departure", departure)
+      .addTime("arrival", arrival)
+      .addTime("departure", departure)
       .addObj("place", place)
       .toString();
   }

@@ -44,14 +44,14 @@ class ItinerariesCalculateLegTotals {
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
-      } else if (leg.isOnStreetNonTransit()) {
+      } else if (leg.isStreetLeg()) {
         nonTransitTimeSeconds += dt;
         nonTransitDistanceMeters += leg.getDistanceMeters();
       }
       if (!leg.isWalkingLeg()) {
         walkOnly = false;
       }
-      if (!leg.isOnStreetNonTransit()) {
+      if (!leg.isStreetLeg()) {
         this.streetOnly = false;
       }
       if (leg.getElevationGained() != null && leg.getElevationLost() != null) {

@@ -37,7 +37,7 @@ public class LegacyGraphQLplaceAtDistanceImpl
         .field(environment.getMergedField())
         .fieldType(placeInterface)
         .schema(environment.getGraphQLSchema())
-        .graphQLContext(environment.getContext())
+        .graphQLContext(environment.getGraphQlContext())
         .build();
 
       GraphQLObjectType placeType = typeResolver.getType(resolution);

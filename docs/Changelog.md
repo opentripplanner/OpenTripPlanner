@@ -76,6 +76,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Re-add block-based interlining [#4264](https://github.com/opentripplanner/OpenTripPlanner/pull/4264)
 - Add support to unprefer certain routes [#4238](https://github.com/opentripplanner/OpenTripPlanner/pull/4238)
 - Fix inconsistent mapping of NeTEx quay publicCode [#4282](https://github.com/opentripplanner/OpenTripPlanner/pull/4282)
+- Take street legs into account when applying the similar legs filter [#4280](https://github.com/opentripplanner/OpenTripPlanner/pull/4280)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
