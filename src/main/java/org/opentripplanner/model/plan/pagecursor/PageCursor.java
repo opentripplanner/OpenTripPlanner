@@ -47,8 +47,8 @@ public class PageCursor {
       .of(PageCursor.class)
       .addEnum("type", type)
       .addEnum("sortOrder", originalSortOrder)
-      .addTime("edt", earliestDepartureTime)
-      .addTime("lat", latestArrivalTime)
+      .addDateTime("edt", earliestDepartureTime)
+      .addDateTime("lat", latestArrivalTime)
       .addDuration("searchWindow", searchWindow)
       .toString();
   }
