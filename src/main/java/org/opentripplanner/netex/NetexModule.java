@@ -8,7 +8,6 @@ import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -58,7 +57,7 @@ public class NetexModule implements GraphBuilderModule {
     try {
       transitModel.clearTimeZone();
       var calendarServiceData = new CalendarServiceData();
-      boolean hasTransit = false;
+      boolean hasActiveTransit = false;
 
       for (NetexBundle netexBundle : netexBundles) {
         netexBundle.checkInputs();
@@ -68,9 +67,7 @@ public class NetexModule implements GraphBuilderModule {
           issueStore
         );
         transitBuilder.limitServiceDays(transitPeriodLimit);
-        for (TripOnServiceDate tripOnServiceDate : transitBuilder
-          .getTripOnServiceDates()
-          .values()) {
+        for (var tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
           transitModel.getTripOnServiceDates().put(tripOnServiceDate.getId(), tripOnServiceDate);
         }
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
@@ -84,7 +81,7 @@ public class NetexModule implements GraphBuilderModule {
         OtpTransitService otpService = transitBuilder.build();
 
         // if this or previously processed netex bundle has transit that has not been filtered out
-        hasTransit = hasTransit || otpService.hasActiveTransit();
+        hasActiveTransit = hasActiveTransit || otpService.hasActiveTransit();
 
         // TODO OTP2 - Move this into the AddTransitModelEntitiesToGraph
         //           - and make sure they also work with GTFS feeds - GTFS do no
@@ -103,13 +100,7 @@ public class NetexModule implements GraphBuilderModule {
         );
       }
 
-      transitModel.updateCalendarServiceData(calendarServiceData, issueStore);
-
-      // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-      transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
-      if (hasTransit) {
-        transitModel.calculateTransitCenter();
-      }
+      transitModel.updateCalendarServiceData(hasActiveTransit, calendarServiceData, issueStore);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

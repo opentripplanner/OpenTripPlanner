@@ -298,7 +298,6 @@ public class ConstantsForTests {
 
     transitModel.index();
     graph.index();
-    transitModel.setHasTransit(true);
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {

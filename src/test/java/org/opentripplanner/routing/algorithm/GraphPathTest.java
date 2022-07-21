@@ -47,7 +47,7 @@ public class GraphPathTest {
 
     GeometryProcessor hl = new GeometryProcessor(context);
     hl.run(transitModel);
-    transitModel.updateCalendarServiceData(context.getCalendarServiceData(), null);
+    transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
   }
 
   @Test

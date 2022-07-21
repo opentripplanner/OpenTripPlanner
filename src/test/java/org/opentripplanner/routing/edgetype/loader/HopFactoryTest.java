@@ -49,7 +49,7 @@ public class HopFactoryTest {
     var transitModel = new TransitModel(stopModel, deduplicator);
     GeometryProcessor factory = new GeometryProcessor(context);
     factory.run(transitModel);
-    transitModel.updateCalendarServiceData(context.getCalendarServiceData(), null);
+    transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
 
     feedId = context.getFeedId().getId();
   }

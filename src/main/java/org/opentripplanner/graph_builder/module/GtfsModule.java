@@ -166,13 +166,7 @@ public class GtfsModule implements GraphBuilderModule {
       gtfsBundles.forEach(GtfsBundle::close);
     }
 
-    transitModel.updateCalendarServiceData(calendarServiceData, issueStore);
-
-    // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
-    if (hasTransit) {
-      transitModel.calculateTransitCenter();
-    }
+    transitModel.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
   }
 
   @Override

@@ -115,7 +115,7 @@ public class TransitModel implements Serializable {
    */
   private transient GraphUpdaterManager updaterManager = null;
 
-  /** True if GTFS data was loaded into this Graph. */
+  /** True if there are active transit services loaded into this Graph. */
   private boolean hasTransit = false;
 
   /** True if direct single-edge transfers were generated between transit stops in this Graph. */
@@ -244,9 +244,15 @@ public class TransitModel implements Serializable {
     return new CalendarServiceImpl(calendarServiceData);
   }
 
-  public void updateCalendarServiceData(CalendarServiceData data, DataImportIssueStore issueStore) {
+  public void updateCalendarServiceData(
+    boolean hasActiveTransit,
+    CalendarServiceData data,
+    DataImportIssueStore issueStore
+  ) {
     updateTransitFeedValidity(data, issueStore);
     calendarServiceData.add(data);
+
+    updateHasTransit(hasActiveTransit);
   }
 
   /**
@@ -480,8 +486,11 @@ public class TransitModel implements Serializable {
     this.transitLayerUpdater = transitLayerUpdater;
   }
 
-  public void setHasTransit(boolean hasTransit) {
-    this.hasTransit = hasTransit;
+  private void updateHasTransit(boolean hasTransit) {
+    this.hasTransit = this.hasTransit || hasTransit;
+    if (hasTransit) {
+      calculateTransitCenter();
+    }
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip flexTrip) {

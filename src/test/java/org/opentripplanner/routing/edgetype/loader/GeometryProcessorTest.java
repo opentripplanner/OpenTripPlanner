@@ -70,7 +70,7 @@ public class GeometryProcessorTest {
     feedId = context.getFeedId().getId();
     GeometryProcessor factory = new GeometryProcessor(context);
     factory.run(transitModel);
-    transitModel.updateCalendarServiceData(context.getCalendarServiceData(), null);
+    transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
 
     String[] stops = {
       feedId + ":A",
@@ -130,7 +130,6 @@ public class GeometryProcessorTest {
     StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    transitModel.setHasTransit(true);
     ttsnm.buildGraph(graph, transitModel, new HashMap<>());
   }
 
