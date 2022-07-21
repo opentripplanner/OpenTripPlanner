@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 public class CalendarServiceData implements Serializable {
 
-  private static final long serialVersionUID = 1L;
   private static final String CAL_SERVICE_FEED_ID = "CSID";
   private static final Logger LOG = LoggerFactory.getLogger(CalendarServiceData.class);
 
