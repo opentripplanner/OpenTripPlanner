@@ -41,7 +41,7 @@ class StopMappingWrapper {
   }
 
   public WheelchairAccessibility getWheelchairAccessibility() {
-    return WheelchairAccessibility.valueOfGtfsCode(stop.getWheelchairBoarding());
+    return WheelchairAccessibilityMapper.map(stop.getWheelchairBoarding());
   }
 
   public StopLevel getLevel() {

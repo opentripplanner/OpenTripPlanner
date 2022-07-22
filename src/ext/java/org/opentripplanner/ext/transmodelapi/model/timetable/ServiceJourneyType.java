@@ -156,6 +156,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("wheelchairAccessible")
           .type(EnumTypes.WHEELCHAIR_BOARDING)
+          .dataFetcher(environment -> trip(environment).getWheelchairBoarding())
           .description("Whether service journey is accessible with wheelchair.")
           .build()
       )

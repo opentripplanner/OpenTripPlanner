@@ -132,16 +132,12 @@ public class QuayType {
           .name("wheelchairAccessible")
           .type(EnumTypes.WHEELCHAIR_BOARDING)
           .description("Whether this quay is suitable for wheelchair boarding.")
-          .dataFetcher(environment -> {
-            var wheelChairBoarding =
-              (((StopLocation) environment.getSource()).getWheelchairAccessibility());
-
-            return Objects.requireNonNullElse(
-              wheelChairBoarding,
+          .dataFetcher(environment ->
+            Objects.requireNonNullElse(
+              (((StopLocation) environment.getSource()).getWheelchairAccessibility()),
               WheelchairAccessibility.NO_INFORMATION
             )
-              .gtfsCode;
-          })
+          )
           .build()
       )
       .field(

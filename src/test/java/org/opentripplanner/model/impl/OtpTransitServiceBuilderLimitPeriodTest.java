@@ -195,7 +195,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     return TransitModelForTest
       .trip(id)
       .withServiceId(serviceId)
-      .withDirection(Direction.valueOfGtfsCode(1))
+      .withDirection(Direction.INBOUND)
       .withRoute(route)
       .build();
   }

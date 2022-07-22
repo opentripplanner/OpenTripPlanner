@@ -63,6 +63,8 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final FareRuleMapper fareRuleMapper;
 
+  private final DirectionMapper directionMapper;
+
   private final DataImportIssueStore issueStore;
 
   private final GtfsRelationalDao data;
@@ -97,7 +99,8 @@ public class GTFSToOtpTransitServiceMapper {
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
     routeMapper = new RouteMapper(agencyMapper, issueStore);
-    tripMapper = new TripMapper(routeMapper);
+    directionMapper = new DirectionMapper(issueStore);
+    tripMapper = new TripMapper(routeMapper, directionMapper);
     bookingRuleMapper = new BookingRuleMapper();
     stopTimeMapper =
       new StopTimeMapper(
