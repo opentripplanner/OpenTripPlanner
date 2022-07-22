@@ -32,6 +32,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.Station;
@@ -253,6 +254,16 @@ public class ItineraryListFilterChainBuilder {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
+
+    filters.add(
+      new GroupByFilter<>(
+        GroupBySameRoutesAndStops::new,
+        List.of(
+          new SortingFilter(generalizedCostComparator()),
+          new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
+        )
+      )
+    );
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));

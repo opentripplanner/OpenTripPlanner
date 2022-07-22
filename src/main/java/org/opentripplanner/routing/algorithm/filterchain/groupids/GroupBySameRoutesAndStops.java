@@ -1,8 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import org.opentripplanner.common.model.P2;
+import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -17,24 +16,29 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * time advantage and the other a slight cost advantage eg. due to shorter walking distance inside
  * the station.
  */
-public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
+public class GroupBySameRoutesAndStops implements GroupId<GroupBySameRoutesAndStops> {
 
-  private final List<P2<FeedScopedId>> keySet;
+  public static final String TAG = "group-by-same-stations-and-routes";
+  private final List<FeedScopedId> keySet;
 
-  public GroupByAllSameStations(Itinerary itinerary) {
+  public GroupBySameRoutesAndStops(Itinerary itinerary) {
     keySet =
       itinerary
         .getLegs()
         .stream()
         .filter(Leg::isTransitLeg)
-        .map(leg ->
-          new P2<>(getStopOrStationId(leg.getFrom().stop), getStopOrStationId(leg.getTo().stop))
+        .flatMap(leg ->
+          Stream.of(
+            getStopOrStationId(leg.getFrom().stop),
+            leg.getRoute().getId(),
+            getStopOrStationId(leg.getTo().stop)
+          )
         )
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @Override
-  public boolean match(GroupByAllSameStations other) {
+  public boolean match(GroupBySameRoutesAndStops other) {
     if (this == other) {
       return true;
     }
@@ -48,7 +52,7 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
   }
 
   @Override
-  public GroupByAllSameStations merge(GroupByAllSameStations other) {
+  public GroupBySameRoutesAndStops merge(GroupBySameRoutesAndStops other) {
     return this;
   }
 
@@ -56,8 +60,8 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
    * Get the parent station id if such exists. Otherwise, return the stop id.
    */
   private static FeedScopedId getStopOrStationId(StopLocation stopPlace) {
-    if (stopPlace instanceof StationElement && ((StationElement) stopPlace).isPartOfStation()) {
-      return ((StationElement) stopPlace).getParentStation().getId();
+    if (stopPlace instanceof StationElement stationElement && stationElement.isPartOfStation()) {
+      return stationElement.getParentStation().getId();
     }
     return stopPlace.getId();
   }

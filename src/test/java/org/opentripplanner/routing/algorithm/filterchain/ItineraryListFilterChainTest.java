@@ -240,6 +240,16 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     }
   }
 
+  @Test
+  public void removeTimeshiftedDuplicates() {
+    var i1 = newItinerary(A).bus(21, T11_06, T11_28, E).bus(22, T11_30, T11_32, D).build();
+    var i2 = newItinerary(A).bus(21, T11_09, T11_30, E).bus(22, T11_32, T11_33, D).build();
+    var i3 = newItinerary(A).bus(21, T11_09, T11_30, D).build();
+
+    ItineraryListFilterChain chain = createBuilder(false, false, 10).build();
+    assertEquals(toStr(List.of(i3, i2)), toStr(chain.filter(List.of(i1, i2, i3))));
+  }
+
   @Nested
   class RemoveTransitWithHigherCostThanBestOnStreetOnlyTest {
 
