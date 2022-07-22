@@ -67,7 +67,6 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.util.resources.ResourceBundleSingleton;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLQueryTypeImpl
@@ -770,7 +769,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument(
         "locale",
-        (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v)
+        (String v) -> request.locale = LegacyGraphQLUtils.getLocale(environment, v)
       );
       RoutingResponse res = context.getRoutingService().route(request, context.getRouter());
       return DataFetcherResult

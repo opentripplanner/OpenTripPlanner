@@ -18,9 +18,12 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 public class LegacyGraphQLUtils {
 
   public static Locale getLocale(DataFetchingEnvironment environment) {
-    String argLang = environment.getArgument("language");
-    if (argLang != null) {
-      return Locale.forLanguageTag(argLang);
+    return getLocale(environment, environment.getArgument("language"));
+  }
+
+  public static Locale getLocale(DataFetchingEnvironment environment, String localeString) {
+    if (localeString != null) {
+      return Locale.forLanguageTag(localeString);
     }
 
     Map<String, ?> localContext = environment.getLocalContext();
