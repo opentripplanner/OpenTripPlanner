@@ -99,7 +99,7 @@ public class TravelTimeResource {
     @QueryParam("modes") String modes
   ) {
     router = otpServer.getRouter();
-    transitLayer = router.transitModel.getRealtimeTransitLayer();
+    transitLayer = router.transitModel().getRealtimeTransitLayer();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
     routingRequest = router.copyDefaultRoutingRequest();
     routingRequest.from = LocationStringParser.fromOldStyleString(location);
@@ -128,16 +128,16 @@ public class TravelTimeResource {
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
-        router.transitModel.getTransferService(),
+        router.transitModel().getTransferService(),
         transitLayer,
         startOfTime,
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
         new RoutingRequestTransitDataProviderFilter(
           routingRequest,
-          router.transitModel.getTransitModelIndex()
+          router.transitModel().getTransitModelIndex()
         ),
-        new RoutingContext(transferRoutingRequest, router.graph, (Vertex) null, null)
+        new RoutingContext(transferRoutingRequest, router.graph(), (Vertex) null, null)
       );
   }
 
@@ -219,14 +219,14 @@ public class TravelTimeResource {
 
     accessRequest.maxAccessEgressDuration = traveltimeRequest.maxAccessDuration;
 
-    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, accessRequest)) {
+    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph(), accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
 
       var arrivals = route(accessList).getArrivals();
 
       RoutingContext routingContext = new RoutingContext(
         routingRequest,
-        router.graph,
+        router.graph(),
         temporaryVertices
       );
 
@@ -246,8 +246,8 @@ public class TravelTimeResource {
     TemporaryVerticesContainer temporaryVertices
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-      new RoutingContext(accessRequest, router.graph, temporaryVertices),
-      router.transitModel,
+      new RoutingContext(accessRequest, router.graph(), temporaryVertices),
+      router.transitModel(),
       routingRequest.modes.accessMode,
       false
     );
@@ -272,7 +272,7 @@ public class TravelTimeResource {
         final int arrivalTime = arrivals.bestTransitArrivalTime(i);
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {
-          Vertex v = router.transitModel.getStopModel().getStopVertexForStop().get(stop);
+          Vertex v = router.transitModel().getStopModel().getStopVertexForStop().get(stop);
           if (v != null) {
             Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
             State s = new State(v, time, routingContext, stateData.clone());
@@ -300,7 +300,7 @@ public class TravelTimeResource {
       .constrainedTransfersEnabled(false) // TODO: Not compatible with best times
       .build();
 
-    var raptorService = new RaptorService<>(router.raptorConfig);
+    var raptorService = new RaptorService<>(router.raptorConfig());
 
     return raptorService.route(request, requestTransitDataProvider);
   }

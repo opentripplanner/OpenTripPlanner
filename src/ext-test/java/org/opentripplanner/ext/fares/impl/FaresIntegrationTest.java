@@ -276,7 +276,7 @@ public class FaresIntegrationTest {
     request.to = to;
     request.itineraryFilters.debug = true;
 
-    var routingWorker = new RoutingWorker(router, request, router.transitModel.getTimeZone());
+    var routingWorker = new RoutingWorker(router, request, router.transitModel().getTimeZone());
     var result = routingWorker.route();
 
     return result

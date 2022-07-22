@@ -324,7 +324,7 @@ public class OpenStreetMapModuleTest {
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    RoutingContext routingContext = new RoutingContext(request, router.graph, bottomV, topV);
+    RoutingContext routingContext = new RoutingContext(request, router.graph(), bottomV, topV);
 
     GraphPathFinder graphPathFinder = new GraphPathFinder(router);
     List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);

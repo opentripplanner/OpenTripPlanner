@@ -39,7 +39,7 @@ public class MetricsLogging {
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
 
     Router router = otpServer.getRouter();
-    TransitModel transitModel = router.transitModel;
+    TransitModel transitModel = router.transitModel();
 
     if (transitModel.getTransitLayer() != null) {
       new GuavaCacheMetrics(
@@ -72,9 +72,9 @@ public class MetricsLogging {
         .bindTo(Metrics.globalRegistry);
     }
 
-    if (router.raptorConfig.isMultiThreaded()) {
+    if (router.raptorConfig().isMultiThreaded()) {
       new ExecutorServiceMetrics(
-        router.raptorConfig.threadPool(),
+        router.raptorConfig().threadPool(),
         "raptorHeuristics",
         List.of(Tag.of("pool", "raptorHeuristics"))
       )

@@ -132,8 +132,8 @@ public class LuceneIndex implements Serializable {
   }
 
   public static synchronized LuceneIndex forServer(Router router) {
-    var graph = router.graph;
-    var transitModel = router.transitModel;
+    var graph = router.graph();
+    var transitModel = router.transitModel();
     var existingIndex = graph.getService(LuceneIndex.class);
     if (existingIndex != null) {
       return existingIndex;

@@ -69,11 +69,11 @@ public class RoutingWorker {
     request.applyPageCursor();
     this.request = request;
     this.router = router;
-    this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.tags);
+    this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry(), request.tags);
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.getDateTime(), zoneId);
-    this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
+    this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig());
     this.additionalSearchDays =
-      createAdditionalSearchDays(router.routerConfig.raptorTuningParameters(), zoneId, request);
+      createAdditionalSearchDays(router.routerConfig().raptorTuningParameters(), zoneId, request);
   }
 
   public RoutingResponse route() {
@@ -125,9 +125,13 @@ public class RoutingWorker {
       it -> firstRemovedItinerary = it,
       request.wheelchairAccessibility.enabled(),
       request.wheelchairAccessibility.maxSlope(),
-      router.graph.getService(FareService.class),
-      router.transitModel.getTransitAlertService(),
-      router.transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations()::get
+      router.graph().getService(FareService.class),
+      router.transitModel().getTransitAlertService(),
+      router
+        .transitModel()
+        .getStopModel()
+        .getStopModelIndex()
+        .getMultiModalStationForStations()::get
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);

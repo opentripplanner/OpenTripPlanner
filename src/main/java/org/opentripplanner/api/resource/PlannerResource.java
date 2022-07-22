@@ -71,7 +71,7 @@ public class PlannerResource extends RoutingResource {
       router = otpServer.getRouter();
 
       // Route
-      RoutingService routingService = new RoutingService(router.graph, router.transitModel);
+      RoutingService routingService = new RoutingService(router.graph(), router.transitModel());
       res = routingService.route(request, router);
 
       // Map to API
@@ -95,7 +95,7 @@ public class PlannerResource extends RoutingResource {
       /* Populate up the elevation metadata */
       response.elevationMetadata = new ElevationMetadata();
       response.elevationMetadata.ellipsoidToGeoidDifference =
-        router.graph.ellipsoidToGeoidDifference;
+        router.graph().ellipsoidToGeoidDifference;
       response.elevationMetadata.geoidElevation = request.geoidElevation;
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();

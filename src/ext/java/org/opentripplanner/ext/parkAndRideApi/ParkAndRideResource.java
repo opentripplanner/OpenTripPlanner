@@ -38,8 +38,8 @@ public class ParkAndRideResource {
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.vehicleParkingService = otpServer.getRouter().graph.getVehicleParkingService();
-    this.streetIndex = otpServer.getRouter().graph.getStreetIndex();
+    this.vehicleParkingService = otpServer.getRouter().graph().getVehicleParkingService();
+    this.streetIndex = otpServer.getRouter().graph().getStreetIndex();
   }
 
   /** Envelopes are in latitude, longitude format */

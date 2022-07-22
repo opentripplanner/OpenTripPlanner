@@ -23,10 +23,10 @@ public class DirectStreetRouter {
     }
 
     RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
-    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, directRequest)) {
+    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph(), directRequest)) {
       final RoutingContext routingContext = new RoutingContext(
         directRequest,
-        router.graph,
+        router.graph(),
         temporaryVertices
       );
 
@@ -40,9 +40,9 @@ public class DirectStreetRouter {
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        router.transitModel.getTimeZone(),
-        router.graph.streetNotesService,
-        router.graph.ellipsoidToGeoidDifference
+        router.transitModel().getTimeZone(),
+        router.graph().streetNotesService,
+        router.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
       ItinerariesHelper.decorateItinerariesWithRequestData(response, request);

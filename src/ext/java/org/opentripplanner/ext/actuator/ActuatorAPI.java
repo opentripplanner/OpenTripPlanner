@@ -59,7 +59,7 @@ public class ActuatorAPI {
   @GET
   @Path("/health")
   public Response health(@Context OTPServer otpServer) {
-    GraphUpdaterManager updaterManager = otpServer.getRouter().transitModel.getUpdaterManager();
+    GraphUpdaterManager updaterManager = otpServer.getRouter().transitModel().getUpdaterManager();
     if (updaterManager != null) {
       var listUnprimedUpdaters = updaterManager.listUnprimedUpdaters();
 

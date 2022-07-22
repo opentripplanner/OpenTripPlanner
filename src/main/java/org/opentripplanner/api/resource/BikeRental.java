@@ -59,9 +59,9 @@ public class BikeRental {
   ) {
     Router router = otpServer.getRouter();
 
-    VehicleRentalStationService vehicleRentalService = router.graph.getService(
-      VehicleRentalStationService.class
-    );
+    VehicleRentalStationService vehicleRentalService = router
+      .graph()
+      .getService(VehicleRentalStationService.class);
     Locale locale;
     locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
     if (vehicleRentalService == null) {

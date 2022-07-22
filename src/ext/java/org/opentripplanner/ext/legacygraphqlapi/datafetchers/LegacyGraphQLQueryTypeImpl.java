@@ -599,7 +599,7 @@ public class LegacyGraphQLQueryTypeImpl
       request.setDateTime(
         environment.getArgument("date"),
         environment.getArgument("time"),
-        context.getRouter().transitModel.getTimeZone()
+        context.getRouter().transitModel().getTimeZone()
       );
 
       callWith.argument("wheelchair", request::setWheelchairAccessible);

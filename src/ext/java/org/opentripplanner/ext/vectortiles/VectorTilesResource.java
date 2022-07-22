@@ -82,7 +82,7 @@ public class VectorTilesResource {
     Router router = otpServer.getRouter();
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : router.routerConfig.vectorTileLayers().layers()) {
+    for (LayerParameters layerParameters : router.routerConfig().vectorTileLayers().layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&
@@ -92,7 +92,7 @@ public class VectorTilesResource {
         mvtBuilder.addLayers(
           VectorTilesResource.layers
             .get(LayerType.valueOf(layerParameters.type()))
-            .create(router.graph, router.transitModel, layerParameters)
+            .create(router.graph(), router.transitModel(), layerParameters)
             .build(envelope, layerParameters)
         );
       }
@@ -115,8 +115,8 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     return new TileJson(
-      otpServer.getRouter().graph,
-      otpServer.getRouter().transitModel,
+      otpServer.getRouter().graph(),
+      otpServer.getRouter().transitModel(),
       uri,
       headers,
       requestedLayers

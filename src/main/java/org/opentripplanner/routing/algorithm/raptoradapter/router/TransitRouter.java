@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
@@ -83,15 +82,15 @@ public class TransitRouter {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!router.transitModel.transitFeedCovers(request.getDateTime())) {
+    if (!router.transitModel().transitFeedCovers(request.getDateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );
     }
 
     var transitLayer = request.ignoreRealtimeUpdates
-      ? router.transitModel.getTransitLayer()
-      : router.transitModel.getRealtimeTransitLayer();
+      ? router.transitModel().getTransitLayer()
+      : router.transitModel().getRealtimeTransitLayer();
 
     var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
 
@@ -108,13 +107,13 @@ public class TransitRouter {
     var raptorRequest = RaptorRequestMapper.mapRequest(
       request,
       transitSearchTimeZero,
-      router.raptorConfig.isMultiThreaded(),
+      router.raptorConfig().isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses()
     );
 
     // Route transit
-    var raptorService = new RaptorService<>(router.raptorConfig);
+    var raptorService = new RaptorService<>(router.raptorConfig());
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
     checkIfTransitConnectionExists(transitResponse);
@@ -129,7 +128,7 @@ public class TransitRouter {
           .createOptimizeTransferService(
             transitLayer::getStopByIndex,
             requestTransitDataProvider.stopNameResolver(),
-            router.transitModel.getTransferService(),
+            router.transitModel().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopIndex().stopBoardAlightCosts,
             raptorRequest,
@@ -141,8 +140,8 @@ public class TransitRouter {
     // Create itineraries
 
     RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
-      router.graph,
-      router.transitModel,
+      router.graph(),
+      router.transitModel(),
       transitLayer,
       transitSearchTimeZero,
       request
@@ -202,8 +201,8 @@ public class TransitRouter {
 
     // Prepare access/egress lists
     RoutingRequest accessRequest = request.getStreetSearchRequest(mode);
-    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, accessRequest)) {
-      var routingContext = new RoutingContext(accessRequest, router.graph, temporaryVertices);
+    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph(), accessRequest)) {
+      var routingContext = new RoutingContext(accessRequest, router.graph(), temporaryVertices);
 
       if (!isEgress) {
         accessRequest.allowKeepingRentedVehicleAtDestination = false;
@@ -211,7 +210,7 @@ public class TransitRouter {
 
       var nearbyStops = AccessEgressRouter.streetSearch(
         routingContext,
-        router.transitModel,
+        router.transitModel(),
         mode,
         isEgress
       );
@@ -222,9 +221,9 @@ public class TransitRouter {
       if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
         var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
           routingContext,
-          router.transitModel,
+          router.transitModel(),
           additionalSearchDays,
-          router.routerConfig.flexParameters(request),
+          router.routerConfig().flexParameters(request),
           isEgress
         );
 
@@ -238,8 +237,8 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    var graph = router.graph;
-    var transitModel = router.transitModel;
+    var graph = router.graph();
+    var transitModel = router.transitModel();
 
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 

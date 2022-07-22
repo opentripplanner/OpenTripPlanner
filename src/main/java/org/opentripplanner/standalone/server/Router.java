@@ -36,12 +36,12 @@ public class Router {
   private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
   private final RoutingRequest defaultRoutingRequest;
 
-  public final Graph graph;
-  public final TransitModel transitModel;
+  private final Graph graph;
+  private final TransitModel transitModel;
 
-  public final RouterConfig routerConfig;
-  public final MeterRegistry meterRegistry;
-  public final RaptorConfig<TripSchedule> raptorConfig;
+  private final RouterConfig routerConfig;
+  private final MeterRegistry meterRegistry;
+  private final RaptorConfig<TripSchedule> raptorConfig;
 
   /**
    * Separate logger for incoming requests. This should be handled with a Logback logger rather than
@@ -170,6 +170,26 @@ public class Router {
 
   public double streetRoutingTimeoutSeconds() {
     return routerConfig.streetRoutingTimeoutSeconds();
+  }
+
+  public Graph graph() {
+    return graph;
+  }
+
+  public TransitModel transitModel() {
+    return transitModel;
+  }
+
+  public RouterConfig routerConfig() {
+    return routerConfig;
+  }
+
+  public MeterRegistry meterRegistry() {
+    return meterRegistry;
+  }
+
+  public RaptorConfig<TripSchedule> raptorConfig() {
+    return raptorConfig;
   }
 
   /**
