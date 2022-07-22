@@ -1,12 +1,23 @@
 package org.opentripplanner.standalone.server;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Locale;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * instance of this object allows accessing any of the other OTP components.
  * TODO OTP2 refactor: rename to OTPContext or OTPComponents and use to draft injection approach
  */
-public class OTPServer {
+public class OTPServer implements OtpServerContext {
 
   private static final Logger LOG = LoggerFactory.getLogger(OTPServer.class);
 
@@ -29,10 +40,6 @@ public class OTPServer {
     this.params = params;
     this.router = router;
     Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownHook));
-  }
-
-  public Router getRouter() {
-    return router;
   }
 
   /**
@@ -49,6 +56,61 @@ public class OTPServer {
     return new DefaultTransitService(router.transitModel());
   }
 
+  @Override
+  public RoutingRequest copyDefaultRoutingRequest() {
+    return router.copyDefaultRoutingRequest();
+  }
+
+  @Override
+  public Locale getDefaultLocale() {
+    return router.getDefaultLocale();
+  }
+
+  @Override
+  public double streetRoutingTimeoutSeconds() {
+    return router.streetRoutingTimeoutSeconds();
+  }
+
+  @Override
+  public Graph graph() {
+    return router.graph();
+  }
+
+  @Override
+  public TransitModel transitModel() {
+    return router.transitModel();
+  }
+
+  @Override
+  public RouterConfig routerConfig() {
+    return router.routerConfig();
+  }
+
+  @Override
+  public MeterRegistry meterRegistry() {
+    return router.meterRegistry();
+  }
+
+  @Override
+  public RaptorConfig<TripSchedule> raptorConfig() {
+    return router.raptorConfig();
+  }
+
+  @Override
+  public Logger requestLogger() {
+    return router.requestLogger();
+  }
+
+  @Override
+  public TileRendererManager tileRendererManager() {
+    return router.tileRendererManager();
+  }
+
+  @Override
+  public GraphVisualizer graphVisualizer() {
+    return router.graphVisualizer();
+  }
+
   /**
    * Return an HK2 Binder that injects this specific OTPServer instance into Jersey web resources.
    * This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as a
@@ -62,7 +124,7 @@ public class OTPServer {
     return new AbstractBinder() {
       @Override
       protected void configure() {
-        bind(OTPServer.this).to(OTPServer.class);
+        bind(OTPServer.this).to(OtpServerContext.class);
       }
     };
   }

@@ -586,7 +586,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RoutingRequest request = context.getRouter().copyDefaultRoutingRequest();
+      RoutingRequest request = context.getServerContext().copyDefaultRoutingRequest();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -599,7 +599,7 @@ public class LegacyGraphQLQueryTypeImpl
       request.setDateTime(
         environment.getArgument("date"),
         environment.getArgument("time"),
-        context.getRouter().transitModel().getTimeZone()
+        context.getServerContext().transitModel().getTimeZone()
       );
 
       callWith.argument("wheelchair", request::setWheelchairAccessible);
@@ -772,7 +772,7 @@ public class LegacyGraphQLQueryTypeImpl
         "locale",
         (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v)
       );
-      RoutingResponse res = context.getRoutingService().route(request, context.getRouter());
+      RoutingResponse res = context.getRoutingService().route(request, context.getServerContext());
       return DataFetcherResult
         .<RoutingResponse>newResult()
         .data(res)

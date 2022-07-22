@@ -1,27 +1,27 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLRequestContext {
 
-  private final Router router;
+  private final OtpServerContext serverContext;
   private final RoutingService routingService;
   private final TransitService transitService;
 
   public LegacyGraphQLRequestContext(
-    Router router,
+    OtpServerContext serverContext,
     RoutingService routingService,
     TransitService transitService
   ) {
-    this.router = router;
+    this.serverContext = serverContext;
     this.routingService = routingService;
     this.transitService = transitService;
   }
 
-  public Router getRouter() {
-    return router;
+  public OtpServerContext getServerContext() {
+    return serverContext;
   }
 
   public RoutingService getRoutingService() {

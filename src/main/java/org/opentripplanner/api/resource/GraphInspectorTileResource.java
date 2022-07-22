@@ -16,8 +16,8 @@ import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -70,8 +70,8 @@ public class GraphInspectorTileResource {
     Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
     MapTile mapTile = new MapTile(env, 256, 256);
 
-    Router router = otpServer.getRouter();
-    BufferedImage image = router.tileRendererManager.renderTile(mapTile, layer);
+    OtpServerContext serverContext = otpServer;
+    BufferedImage image = serverContext.tileRendererManager().renderTile(mapTile, layer);
 
     MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
     ByteArrayOutputStream baos = new ByteArrayOutputStream(
@@ -93,7 +93,7 @@ public class GraphInspectorTileResource {
   @Path("layers")
   @Produces(MediaType.APPLICATION_JSON)
   public InspectorLayersList getLayers() {
-    Router router = otpServer.getRouter();
-    return new InspectorLayersList(router.tileRendererManager.getRenderers());
+    OtpServerContext serverContext = otpServer;
+    return new InspectorLayersList(serverContext.tileRendererManager().getRenderers());
   }
 }

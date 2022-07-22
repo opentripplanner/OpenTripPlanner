@@ -27,9 +27,9 @@ import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.VectorTileConfig;
 import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.WorldEnvelope;
 
@@ -67,7 +67,7 @@ public class VectorTilesResource {
     @PathParam("y") int y,
     @PathParam("z") int z,
     @PathParam("layers") String requestedLayers
-  ) throws Exception {
+  ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
 
     if (z < VectorTileConfig.MIN_ZOOM) {
@@ -79,10 +79,13 @@ public class VectorTilesResource {
 
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    Router router = otpServer.getRouter();
+    OtpServerContext serverContext = otpServer;
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : router.routerConfig().vectorTileLayers().layers()) {
+    for (LayerParameters layerParameters : serverContext
+      .routerConfig()
+      .vectorTileLayers()
+      .layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&
@@ -92,7 +95,7 @@ public class VectorTilesResource {
         mvtBuilder.addLayers(
           VectorTilesResource.layers
             .get(LayerType.valueOf(layerParameters.type()))
-            .create(router.graph(), router.transitModel(), layerParameters)
+            .create(serverContext.graph(), serverContext.transitModel(), layerParameters)
             .build(envelope, layerParameters)
         );
       }
@@ -115,8 +118,8 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     return new TileJson(
-      otpServer.getRouter().graph(),
-      otpServer.getRouter().transitModel(),
+      ((OtpServerContext) otpServer).graph(),
+      ((OtpServerContext) otpServer).transitModel(),
       uri,
       headers,
       requestedLayers
@@ -172,13 +175,9 @@ public class VectorTilesResource {
 
   private class TileJson implements Serializable {
 
-    public final String tilejson = "2.2.0";
     public final String name = "OpenTripPlanner";
     public final String attribution;
-    public final String scheme = "xyz";
     public final String[] tiles;
-    public final int minzoom = VectorTileConfig.MIN_ZOOM;
-    public final int maxzoom = VectorTileConfig.MAX_ZOOM;
     public final double[] bounds;
     public final double[] center;
 

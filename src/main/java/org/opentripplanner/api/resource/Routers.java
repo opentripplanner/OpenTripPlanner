@@ -10,8 +10,8 @@ import javax.ws.rs.core.MediaType;
 import org.opentripplanner.api.model.ApiRouterInfo;
 import org.opentripplanner.api.model.ApiRouterList;
 import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
 
 /**
  * This REST API endpoint returns some meta-info about a router. OTP2 does no longer support
@@ -62,8 +62,8 @@ public class Routers {
 
   private ApiRouterInfo getRouterInfo() {
     try {
-      Router router = otpServer.getRouter();
-      return new ApiRouterInfo("default", router.graph(), router.transitModel());
+      OtpServerContext serverContext = otpServer;
+      return new ApiRouterInfo("default", serverContext.graph(), serverContext.transitModel());
     } catch (GraphNotFoundException e) {
       return null;
     }

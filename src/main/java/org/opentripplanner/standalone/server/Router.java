@@ -17,6 +17,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -25,13 +26,14 @@ import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.WorldEnvelope;
 import org.opentripplanner.visualizer.GraphVisualizer;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Represents the configuration of a single router (a single graph for a specific geographic area)
  * in an OTP server.
  */
-public class Router {
+public class Router implements OtpServerContext {
 
   private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
   private final RoutingRequest defaultRoutingRequest;
@@ -53,7 +55,7 @@ public class Router {
         will be nothing but configuration values tied to a Graph. */
 
   /** Inspector/debug services */
-  public TileRendererManager tileRendererManager;
+  private TileRendererManager tileRendererManager;
 
   /** A graphical window that is used for visualizing search progress (debugging). */
   public GraphVisualizer graphVisualizer = null;
@@ -149,6 +151,7 @@ public class Router {
   /**
    * A RoutingRequest containing default parameters that will be cloned when handling each request.
    */
+  @Override
   public RoutingRequest copyDefaultRoutingRequest() {
     var copy = this.defaultRoutingRequest.clone();
     copy.setDateTime(Instant.now());
@@ -158,6 +161,7 @@ public class Router {
   /**
    * Return the default routing request locale(without cloning the request).
    */
+  @Override
   public Locale getDefaultLocale() {
     return this.defaultRoutingRequest.locale;
   }
@@ -168,28 +172,49 @@ public class Router {
     raptorConfig.shutdown();
   }
 
+  @Override
   public double streetRoutingTimeoutSeconds() {
     return routerConfig.streetRoutingTimeoutSeconds();
   }
 
+  @Override
   public Graph graph() {
     return graph;
   }
 
+  @Override
   public TransitModel transitModel() {
     return transitModel;
   }
 
+  @Override
   public RouterConfig routerConfig() {
     return routerConfig;
   }
 
+  @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
   }
 
+  @Override
   public RaptorConfig<TripSchedule> raptorConfig() {
     return raptorConfig;
+  }
+
+  @Override
+  public Logger requestLogger() {
+    return requestLogger;
+  }
+
+  @Override
+  public TileRendererManager tileRendererManager() {
+    return tileRendererManager;
+  }
+
+  @Override
+  public GraphVisualizer graphVisualizer() {
+    return graphVisualizer;
   }
 
   /**

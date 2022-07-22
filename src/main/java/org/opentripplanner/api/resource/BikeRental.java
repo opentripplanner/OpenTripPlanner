@@ -17,8 +17,8 @@ import org.opentripplanner.api.model.ApiVehicleRentalStation;
 import org.opentripplanner.api.model.ApiVehicleRentalStationList;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.resources.ResourceBundleSingleton;
 
 @Path("/routers/{ignoreRouterId}/bike_rental")
@@ -57,9 +57,9 @@ public class BikeRental {
     @QueryParam("upperRight") String upperRight,
     @QueryParam("locale") String locale_param
   ) {
-    Router router = otpServer.getRouter();
+    OtpServerContext serverContext = otpServer;
 
-    VehicleRentalStationService vehicleRentalService = router
+    VehicleRentalStationService vehicleRentalService = serverContext
       .graph()
       .getService(VehicleRentalStationService.class);
     Locale locale;

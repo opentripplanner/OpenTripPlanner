@@ -22,8 +22,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class LegacyGraphQLAPI {
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(LegacyGraphQLAPI.class);
 
-  private final Router router;
+  private final OtpServerContext serverContext;
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public LegacyGraphQLAPI(
@@ -47,7 +47,7 @@ public class LegacyGraphQLAPI {
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.router = otpServer.getRouter();
+    this.serverContext = otpServer;
   }
 
   @POST
@@ -69,7 +69,7 @@ public class LegacyGraphQLAPI {
 
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
-      : router.getDefaultLocale();
+      : serverContext.getDefaultLocale();
 
     String query = (String) queryParameters.get("query");
     Object queryVariables = queryParameters.getOrDefault("variables", null);
@@ -93,7 +93,7 @@ public class LegacyGraphQLAPI {
     }
     return LegacyGraphQLIndex.getGraphQLResponse(
       query,
-      router,
+      serverContext,
       variables,
       operationName,
       maxResolves,
@@ -112,10 +112,10 @@ public class LegacyGraphQLAPI {
   ) {
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
-      : router.getDefaultLocale();
+      : serverContext.getDefaultLocale();
     return LegacyGraphQLIndex.getGraphQLResponse(
       query,
-      router,
+      serverContext,
       null,
       null,
       maxResolves,
@@ -136,7 +136,7 @@ public class LegacyGraphQLAPI {
     List<Callable<ExecutionResult>> futures = new ArrayList<>();
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
-      : router.getDefaultLocale();
+      : serverContext.getDefaultLocale();
 
     for (HashMap<String, Object> query : queries) {
       Map<String, Object> variables;
@@ -162,7 +162,7 @@ public class LegacyGraphQLAPI {
       futures.add(() ->
         LegacyGraphQLIndex.getGraphQLExecutionResult(
           (String) query.get("query"),
-          router,
+          serverContext,
           variables,
           operationName,
           maxResolves,
