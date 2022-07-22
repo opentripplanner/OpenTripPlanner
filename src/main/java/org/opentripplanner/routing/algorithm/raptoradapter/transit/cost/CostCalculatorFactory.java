@@ -27,9 +27,9 @@ public class CostCalculatorFactory {
 
     if (!mcCostParams.unpreferredAgencies().isEmpty()) {
       calculator =
-        new RouteCostCalculator<>(
+        new AgencyCostCalculator<>(
           calculator,
-          mcCostParams.unpreferredRoutes(),
+          mcCostParams.unpreferredAgencies(),
           mcCostParams.unnpreferredCost()
         );
     }

@@ -2,6 +2,8 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
+import java.util.HashSet;
+import java.util.List;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -149,8 +151,14 @@ public class RoutingRequestMapper {
 
     request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
 
-    request.unpreferredRoutes =
-      c.path("unpreferred").asFeedScopedIds("routes", dft.unpreferredRoutes);
+    var unpreferred = c.path("unpreferred");
+    request.setUnpreferredRoutes(
+      unpreferred.asFeedScopedIdSet("routes", dft.getUnpreferredRoutes())
+    );
+
+    request.setUnpreferredAgencies(
+      unpreferred.asFeedScopedIdSet("agencies", dft.getUnpreferredAgencies())
+    );
 
     return request;
   }

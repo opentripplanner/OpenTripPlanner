@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.AgencyCostCalculator.DEFAULT_AGENCY_RELUCTANCE;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
@@ -442,7 +443,7 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * Set of unpreferred agencies for given user.
    */
-  public Set<FeedScopedId> unpreferredAgencies = Set.of();
+  private Set<FeedScopedId> unpreferredAgencies = Set.of();
 
   /**
    * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
@@ -475,7 +476,7 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * Set of unpreferred routes for given user and configuration.
    */
-  public List<FeedScopedId> unpreferredRoutes = List.of();
+  private Set<FeedScopedId> unpreferredRoutes = Set.of();
 
   /**
    * A cost function used to calculate penalty for an unpreferred route. Function should return
@@ -833,14 +834,14 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   public void setUnpreferredRoutes(Collection<FeedScopedId> routeIds) {
-    unpreferredRoutes = routeIds.stream().toList();
+    unpreferredRoutes = Set.copyOf(routeIds);
   }
 
   public void setUnpreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      unpreferredRoutes = FeedScopedId.parseListOfIds(s);
+      unpreferredRoutes = Set.copyOf(FeedScopedId.parseListOfIds(s));
     } else {
-      unpreferredRoutes = List.of();
+      unpreferredRoutes = Set.of();
     }
   }
 
@@ -1134,7 +1135,7 @@ public class RoutingRequest implements Cloneable, Serializable {
       clone.bannedRoutes = bannedRoutes.clone();
       clone.whiteListedRoutes = whiteListedRoutes.clone();
       clone.preferredRoutes = List.copyOf(preferredRoutes);
-      clone.unpreferredRoutes = List.copyOf(unpreferredRoutes);
+      clone.unpreferredRoutes = Set.copyOf(unpreferredRoutes);
 
       clone.bannedTrips = Set.copyOf(bannedTrips);
 
@@ -1256,6 +1257,14 @@ public class RoutingRequest implements Cloneable, Serializable {
 
   public Duration getMaxDirectStreetDuration(StreetMode mode) {
     return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
+  }
+
+  public Set<FeedScopedId> getUnpreferredAgencies() {
+    return unpreferredAgencies;
+  }
+
+  public Set<FeedScopedId> getUnpreferredRoutes() {
+    return unpreferredRoutes;
   }
 
   /**

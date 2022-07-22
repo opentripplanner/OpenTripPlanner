@@ -8,6 +8,9 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 
 public class AgencyCostCalculator<T extends DefaultTripSchedule> extends IdBasedCostCalculator<T> {
 
+  public static final double DEFAULT_AGENCY_RELUCTANCE = 1.0;
+  public static final double UNPREFERRED_AGENCY_RELUCTANCE = 2.0;
+
   public AgencyCostCalculator(
     @Nonnull CostCalculator<T> delegate,
     @Nonnull Set<FeedScopedId> unpreferredIds,
