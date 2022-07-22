@@ -1,11 +1,9 @@
-package org.opentripplanner.util;
+package org.opentripplanner.util.resources;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author mabu
@@ -13,15 +11,9 @@ import org.slf4j.LoggerFactory;
 public enum ResourceBundleSingleton {
   INSTANCE;
 
-  private static final Logger LOG = LoggerFactory.getLogger(ResourceBundleSingleton.class);
-
   static final ResourceBundle.Control noFallbackControl = Control.getNoFallbackControl(
     Control.FORMAT_PROPERTIES
   );
-
-  // The default locale to use if none is provided. This avoids using the system locale, which
-  // would lead to nondeterministic results.
-  private static final Locale defaultLocale = Locale.ENGLISH;
 
   //in singleton because resurce bundles are cached based on calling class
   //http://java2go.blogspot.com/2010/03/dont-be-smart-never-implement-resource.html
@@ -50,34 +42,6 @@ public enum ResourceBundleSingleton {
     } catch (MissingResourceException e) {
       //LOG.debug("Missing translation for key: " + key);
       return key;
-    }
-  }
-
-  /**
-   * Gets {@link Locale} from string. Expects en_US, en_GB, de etc.
-   * <p>
-   * If no valid locale was found defaultLocale (en) is returned.
-   *
-   * @param localeSpec String which should be locale (en_US, en_GB, de etc.)
-   * @return Locale specified with localeSpec
-   */
-  public Locale getLocale(String localeSpec) {
-    if (localeSpec == null || localeSpec.isEmpty()) {
-      return defaultLocale;
-    }
-    //TODO: This should probably use Locale.forLanguageTag
-    //but format is little (IETF language tag) different - instead of _
-    String[] localeSpecParts = localeSpec.split("_");
-    switch (localeSpecParts.length) {
-      case 1:
-        return new Locale(localeSpecParts[0]);
-      case 2:
-        return new Locale(localeSpecParts[0]);
-      case 3:
-        return new Locale(localeSpecParts[0]);
-      default:
-        LOG.debug("Bogus locale " + localeSpec + ", using default");
-        return defaultLocale;
     }
   }
 }

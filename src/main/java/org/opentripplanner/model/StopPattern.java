@@ -166,8 +166,8 @@ public final class StopPattern implements Serializable {
     // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are
     // not important and have changed between OTP versions.
     for (int hop = 0; hop < size - 1; hop++) {
-      hasher.putInt(pickups[hop].getGtfsCode());
-      hasher.putInt(dropoffs[hop + 1].getGtfsCode());
+      hasher.putInt(pickups[hop].ordinal());
+      hasher.putInt(dropoffs[hop + 1].ordinal());
     }
     return hasher.hash();
   }

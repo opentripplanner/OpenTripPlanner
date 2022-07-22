@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.timetable;
 
 /**
  * The direction of travel for a TripPattern. This is mapped 1-to-1 in NeTEx, while in GTFS only
@@ -17,16 +17,5 @@ public enum Direction {
 
   Direction(int gtfsCode) {
     this.gtfsCode = gtfsCode;
-  }
-
-  public static Direction valueOfGtfsCode(int gtfsCode) {
-    switch (gtfsCode) {
-      case 0:
-        return Direction.OUTBOUND;
-      case 1:
-        return Direction.INBOUND;
-      default:
-        return Direction.UNKNOWN;
-    }
   }
 }

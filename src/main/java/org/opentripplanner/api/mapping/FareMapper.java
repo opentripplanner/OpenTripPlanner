@@ -2,6 +2,7 @@ package org.opentripplanner.api.mapping;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -17,25 +18,31 @@ import org.opentripplanner.routing.core.Money;
 
 public class FareMapper {
 
-  public static ApiFare mapFare(Fare fare) {
+  private final Locale locale;
+
+  public FareMapper(Locale locale) {
+    this.locale = locale;
+  }
+
+  public ApiFare mapFare(Fare fare) {
     Map<String, ApiMoney> apiFare = combineFaresAndProducts(fare);
     Map<String, List<ApiFareComponent>> apiComponent = combineComponentsAndProducts(fare);
 
     return new ApiFare(apiFare, apiComponent);
   }
 
-  private static Map<String, List<ApiFareComponent>> combineComponentsAndProducts(Fare fare) {
+  private Map<String, List<ApiFareComponent>> combineComponentsAndProducts(Fare fare) {
     return fare
       .getTypes()
       .stream()
       .map(key -> {
-        var money = fare.getDetails(key).stream().map(FareMapper::toApiFareComponent).toList();
+        var money = fare.getDetails(key).stream().map(this::toApiFareComponent).toList();
         return new SimpleEntry<>(key, money);
       })
       .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
-  private static Map<String, ApiMoney> combineFaresAndProducts(Fare fare) {
+  private Map<String, ApiMoney> combineFaresAndProducts(Fare fare) {
     return fare
       .getTypes()
       .stream()
@@ -46,11 +53,20 @@ public class FareMapper {
       .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
-  private static ApiMoney toApiMoney(Money m) {
-    return new ApiMoney(m.cents(), new ApiCurrency(m.currency()));
+  private ApiMoney toApiMoney(Money m) {
+    var c = m.currency();
+    return new ApiMoney(
+      m.cents(),
+      new ApiCurrency(
+        c.getCurrencyCode(),
+        c.getDefaultFractionDigits(),
+        c.getCurrencyCode(),
+        c.getSymbol(locale)
+      )
+    );
   }
 
-  private static ApiFareComponent toApiFareComponent(FareComponent m) {
+  private ApiFareComponent toApiFareComponent(FareComponent m) {
     return new ApiFareComponent(
       m.fareId(),
       m.name(),

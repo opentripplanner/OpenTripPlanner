@@ -201,6 +201,17 @@ public class NodeAdapterTest {
   }
 
   @Test
+  public void asFeedScopedIds() {
+    NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12']}");
+    assertEquals("[A:23, B:12]", subject.asFeedScopedIds("routes", List.of()).toString());
+    assertEquals("[]", subject.asFeedScopedIds("missing-key", List.of()).toString());
+    assertEquals(
+      "[C:12]",
+      subject.asFeedScopedIds("missing-key", List.of(new FeedScopedId("C", "12"))).toString()
+    );
+  }
+
+  @Test
   public void asDateOrRelativePeriod() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ 'a' : '2020-02-28', 'b' : '-P3Y' }");

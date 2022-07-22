@@ -11,9 +11,9 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A walking pathway as described in GTFS

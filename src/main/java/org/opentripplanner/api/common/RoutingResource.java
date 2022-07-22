@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -21,7 +22,6 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -920,8 +920,9 @@ public abstract class RoutingResource {
       request.useVehicleParkingAvailabilityInformation = useVehicleParkingAvailabilityInformation;
     }
 
-    //getLocale function returns defaultLocale if locale is null
-    request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
+    if (locale != null) {
+      request.locale = Locale.forLanguageTag(locale.replaceAll("-", "_"));
+    }
 
     if (OTPFeature.DataOverlay.isOn()) {
       var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);

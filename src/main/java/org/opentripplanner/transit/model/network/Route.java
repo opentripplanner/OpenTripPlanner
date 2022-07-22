@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity2;

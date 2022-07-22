@@ -64,8 +64,7 @@ public class UnscheduledTrip extends FlexTrip {
       st.isArrivalTimeSet() || st.isDepartureTimeSet()
     );
     Predicate<StopTime> notContinuousStop = stopTime ->
-      stopTime.getFlexContinuousDropOff() == NONE.getGtfsCode() &&
-      stopTime.getFlexContinuousPickup() == NONE.getGtfsCode();
+      stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
     return (
       N_STOPS.contains(stopTimes.size()) &&
       stopTimes.stream().allMatch(noExplicitTimes) &&

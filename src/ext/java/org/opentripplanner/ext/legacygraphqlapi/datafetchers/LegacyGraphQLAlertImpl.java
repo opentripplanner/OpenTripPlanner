@@ -8,6 +8,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +25,15 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.EntitySelector.DirectionAndRoute;
 import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRouteOrTripKey;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.TranslatedString;
 
 public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
 
@@ -222,7 +224,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                 : getUnknownForAlertEntityPair(
                   agency,
                   routeType,
-                  agency.toString(),
+                  null,
                   Integer.toString(routeType),
                   "agency",
                   "route type"
@@ -235,7 +237,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
             return List.of(new LegacyGraphQLRouteTypeModel(null, routeType, feedId));
           }
           if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
-            int directionId = ((DirectionAndRoute) entitySelector).directionId;
+            Direction direction = ((DirectionAndRoute) entitySelector).direction;
             FeedScopedId routeId = ((EntitySelector.DirectionAndRoute) entitySelector).routeId;
             Route route = getTransitService(environment).getRouteForId(routeId);
             return route != null
@@ -243,14 +245,14 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                 .getPatternsForRoute()
                 .get(route)
                 .stream()
-                .filter(pattern -> pattern.getDirection().gtfsCode == directionId)
+                .filter(pattern -> pattern.getDirection() == direction)
                 .collect(Collectors.toList())
               : List.of(
                 getUnknownForAlertEntityPair(
                   route,
-                  directionId,
-                  route.toString(),
-                  Integer.toString(directionId),
+                  direction,
+                  null,
+                  direction.name(),
                   "route",
                   "direction"
                 )
@@ -263,7 +265,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
           }
           return List.of();
         })
-        .flatMap(list -> list.stream())
+        .flatMap(Collection::stream)
         .map(Object.class::cast)
         .collect(Collectors.toList());
   }

@@ -13,14 +13,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.TranslatedString;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
@@ -38,6 +40,11 @@ public class AlertsUpdateHandler {
 
   /** Set only if we should attempt to match the trip_id from other data in TripDescriptor */
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+
+  // TODO: replace this with a runtime solution
+  private final DirectionMapper directionMapper = new DirectionMapper(
+    new DataImportIssueStore(false)
+  );
 
   public void update(FeedMessage message) {
     Collection<TransitAlert> alerts = new ArrayList<>();
@@ -144,7 +151,10 @@ public class AlertsUpdateHandler {
           );
         } else if (directionId != MISSING_INT_FIELD_VALUE) {
           alertText.addEntity(
-            new EntitySelector.DirectionAndRoute(directionId, new FeedScopedId(feedId, routeId))
+            new EntitySelector.DirectionAndRoute(
+              directionMapper.map(directionId),
+              new FeedScopedId(feedId, routeId)
+            )
           );
         } else {
           alertText.addEntity(new EntitySelector.Route(new FeedScopedId(feedId, routeId)));

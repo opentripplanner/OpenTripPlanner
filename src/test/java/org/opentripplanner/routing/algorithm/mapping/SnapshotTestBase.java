@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,8 +48,8 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.model.network.MainAndSubMode;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.util.TestUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -65,7 +66,7 @@ public abstract class SnapshotTestBase {
   );
   private static final DateTimeFormatter apiTimeFormatter = DateTimeFormatter.ofPattern("H:mm%20a");
   private static final SnapshotSerializer snapshotSerializer = new SnapshotItinerarySerializer();
-  private static final ItineraryMapper itineraryMapper = new ItineraryMapper(null, true);
+  private static final ItineraryMapper itineraryMapper = new ItineraryMapper(Locale.ENGLISH, true);
 
   static final boolean verbose = Boolean.getBoolean("otp.test.verbose");
 

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,12 +35,15 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -56,20 +60,24 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLQueryTypeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLQueryType {
+
+  // TODO: figure out a runtime solution
+  private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
+    new DataImportIssueStore(false)
+  );
 
   public static <T> boolean hasArgument(Map<String, T> m, String name) {
     return m.containsKey(name) && m.get(name) != null;
@@ -356,7 +364,7 @@ public class LegacyGraphQLQueryTypeImpl
       return new GtfsRealtimeFuzzyTripMatcher(transitService)
         .getTrip(
           transitService.getRouteForId(FeedScopedId.parseId(args.getLegacyGraphQLRoute())),
-          args.getLegacyGraphQLDirection(),
+          DIRECTION_MAPPER.map(args.getLegacyGraphQLDirection()),
           args.getLegacyGraphQLTime(),
           ServiceDateUtils.parseString(args.getLegacyGraphQLDate())
         );
@@ -660,7 +668,14 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("preferred.agencies", request::setPreferredAgenciesFromString);
       callWith.argument("unpreferred.routes", request::setUnpreferredRoutesFromString);
       callWith.argument("unpreferred.agencies", request::setUnpreferredAgenciesFromString);
-      // callWith.argument("unpreferred.useUnpreferredRoutesPenalty", request::setUseUnpreferredRoutesPenalty);
+      callWith.argument("unpreferred.unpreferredRouteCost", request::setUnpreferredRouteCost);
+      callWith.argument(
+        "unpreferred.useUnpreferredRoutesPenalty",
+        (Integer v) ->
+          request.setUnpreferredRouteCost(
+            RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
+          )
+      );
       callWith.argument("walkBoardCost", request::setWalkBoardCost);
       callWith.argument("bikeBoardCost", request::setBikeBoardCost);
       callWith.argument("banned.routes", request::setBannedRoutesFromString);
@@ -717,10 +732,18 @@ public class LegacyGraphQLQueryTypeImpl
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 
-      if (hasArgument(environment, "allowedBikeRentalNetworks")) {
-        // ArrayList<String> allowedBikeRentalNetworks = environment.getArgument("allowedBikeRentalNetworks");
-        // request.allowedBikeRentalNetworks = new HashSet<>(allowedBikeRentalNetworks);
-      }
+      callWith.argument(
+        "allowedBikeRentalNetworks",
+        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+      );
+      callWith.argument(
+        "allowedVehicleRentalNetworks",
+        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+      );
+      callWith.argument(
+        "bannedVehicleRentalNetworks",
+        (Collection<String> v) -> request.bannedVehicleRentalNetworks = new HashSet<>(v)
+      );
 
       if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
         //slower bike speed for bike sharing, based on empirical evidence from DC.
@@ -753,7 +776,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument(
         "locale",
-        (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v)
+        (String v) -> request.locale = LegacyGraphQLUtils.getLocale(environment, v)
       );
       RoutingResponse res = context.getRoutingService().route(request, context.getRouter());
       return DataFetcherResult

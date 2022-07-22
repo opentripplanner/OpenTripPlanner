@@ -4,10 +4,13 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import gnu.trove.set.TIntSet;
 import java.text.ParseException;
 import java.time.LocalDate;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -23,6 +26,11 @@ import org.opentripplanner.util.time.TimeUtils;
 public class GtfsRealtimeFuzzyTripMatcher {
 
   private final TransitService transitService;
+
+  // TODO: replace this with a runtime solution
+  private final DirectionMapper directionMapper = new DirectionMapper(
+    new DataImportIssueStore(false)
+  );
 
   public GtfsRealtimeFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;
@@ -53,7 +61,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
     if (route == null) {
       return trip;
     }
-    int direction = trip.getDirectionId();
+    Direction direction = directionMapper.map(trip.getDirectionId());
 
     Trip matchedTrip = getTrip(route, direction, time, date);
 
@@ -72,10 +80,15 @@ public class GtfsRealtimeFuzzyTripMatcher {
     return trip.toBuilder().setTripId(matchedTrip.getId().getId()).build();
   }
 
-  public synchronized Trip getTrip(Route route, int direction, int startTime, LocalDate date) {
+  public synchronized Trip getTrip(
+    Route route,
+    Direction direction,
+    int startTime,
+    LocalDate date
+  ) {
     TIntSet servicesRunningForDate = transitService.getServicesRunningForDate(date);
     for (TripPattern pattern : transitService.getPatternsForRoute().get(route)) {
-      if (pattern.getDirection().gtfsCode != direction) continue;
+      if (pattern.getDirection() != direction) continue;
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {
         if (
           times.getScheduledDepartureTime(0) == startTime &&

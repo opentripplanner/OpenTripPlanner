@@ -7,7 +7,6 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.util.TranslationHelper;
 
 public class TransferMapperTest {
 
@@ -15,12 +14,17 @@ public class TransferMapperTest {
 
   private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
+  public static final DataImportIssueStore ISSUE_STORE = new DataImportIssueStore(false);
+
   private static final RouteMapper ROUTE_MAPPER = new RouteMapper(
     new AgencyMapper(FEED_ID),
-    new DataImportIssueStore(false)
+    ISSUE_STORE
   );
 
-  private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
+  private static final TripMapper TRIP_MAPPER = new TripMapper(
+    ROUTE_MAPPER,
+    new DirectionMapper(ISSUE_STORE)
+  );
 
   private static final StationMapper STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);
 

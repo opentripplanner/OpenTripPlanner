@@ -10,10 +10,10 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.MainAndSubMode;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModelIndex;
 

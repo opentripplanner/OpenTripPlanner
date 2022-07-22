@@ -31,8 +31,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.util.OTPFeature;

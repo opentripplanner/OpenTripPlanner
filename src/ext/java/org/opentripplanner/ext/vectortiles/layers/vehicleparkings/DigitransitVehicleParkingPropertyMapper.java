@@ -8,8 +8,8 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 
 public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
 

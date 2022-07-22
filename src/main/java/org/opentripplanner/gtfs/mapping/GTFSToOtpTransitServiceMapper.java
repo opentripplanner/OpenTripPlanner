@@ -15,7 +15,6 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.util.TranslationHelper;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -65,7 +64,11 @@ public class GTFSToOtpTransitServiceMapper {
   private final FareRuleMapper fareRuleMapper;
 
   private final FareProductMapper fareProductMapper;
+
   private final FareLegRuleMapper fareLegRuleMapper;
+
+  private final DirectionMapper directionMapper;
+
   private final DataImportIssueStore issueStore;
 
   private final GtfsRelationalDao data;
@@ -100,7 +103,8 @@ public class GTFSToOtpTransitServiceMapper {
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
     routeMapper = new RouteMapper(agencyMapper, issueStore);
-    tripMapper = new TripMapper(routeMapper);
+    directionMapper = new DirectionMapper(issueStore);
+    tripMapper = new TripMapper(routeMapper, directionMapper);
     bookingRuleMapper = new BookingRuleMapper();
     stopTimeMapper =
       new StopTimeMapper(

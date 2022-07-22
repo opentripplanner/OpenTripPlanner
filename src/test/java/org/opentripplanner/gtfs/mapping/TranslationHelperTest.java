@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,6 +12,7 @@ import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Translation;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 public class TranslationHelperTest {
 

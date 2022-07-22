@@ -15,7 +15,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.util.TranslationHelper;
+import org.opentripplanner.model.PickDrop;
 
 public class StopTimesMapperTest {
 
@@ -53,6 +53,8 @@ public class StopTimesMapperTest {
 
   private static final StopTime STOP_TIME = new StopTime();
 
+  public static final DataImportIssueStore ISSUE_STORE = new DataImportIssueStore(false);
+
   private final StopMapper stopMapper = new StopMapper(new TranslationHelper(), stationId -> null);
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
   private final LocationMapper locationMapper = new LocationMapper();
@@ -64,7 +66,10 @@ public class StopTimesMapperTest {
     stopMapper,
     locationMapper,
     locationGroupMapper,
-    new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))),
+    new TripMapper(
+      new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE),
+      new DirectionMapper(ISSUE_STORE)
+    ),
     bookingRuleMapper
   );
 
@@ -101,9 +106,9 @@ public class StopTimesMapperTest {
 
     assertEquals(ARRIVAL_TIME, result.getArrivalTime());
     assertEquals(DEPARTURE_TIME, result.getDepartureTime());
-    assertEquals(DROP_OFF_TYPE, result.getDropOffType().getGtfsCode());
+    assertEquals(PickDrop.CALL_AGENCY, result.getDropOffType());
     assertEquals(FARE_PERIOD_ID, result.getFarePeriodId());
-    assertEquals(PICKUP_TYPE, result.getPickupType().getGtfsCode());
+    assertEquals(PickDrop.COORDINATE_WITH_DRIVER, result.getPickupType());
     assertEquals(ROUTE_SHORT_NAME, result.getRouteShortName());
     assertEquals(SHAPE_DIST_TRAVELED, result.getShapeDistTraveled(), 0.0001d);
     assertNotNull(result.getStop());
@@ -119,9 +124,9 @@ public class StopTimesMapperTest {
 
     assertFalse(result.isArrivalTimeSet());
     assertFalse(result.isDepartureTimeSet());
-    assertEquals(0, result.getDropOffType().getGtfsCode());
+    assertEquals(PickDrop.SCHEDULED, result.getDropOffType());
     assertNull(result.getFarePeriodId());
-    assertEquals(0, result.getPickupType().getGtfsCode());
+    assertEquals(PickDrop.SCHEDULED, result.getPickupType());
     assertNull(result.getRouteShortName());
     assertFalse(result.isShapeDistTraveledSet());
     assertNull(result.getStop());

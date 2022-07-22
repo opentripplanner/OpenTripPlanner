@@ -12,15 +12,18 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.util.I18NString;
 
 public class LegacyGraphQLUtils {
 
   public static Locale getLocale(DataFetchingEnvironment environment) {
-    String argLang = environment.getArgument("language");
-    if (argLang != null) {
-      return Locale.forLanguageTag(argLang);
+    return getLocale(environment, environment.getArgument("language"));
+  }
+
+  public static Locale getLocale(DataFetchingEnvironment environment, String localeString) {
+    if (localeString != null) {
+      return Locale.forLanguageTag(localeString);
     }
 
     Map<String, ?> localContext = environment.getLocalContext();

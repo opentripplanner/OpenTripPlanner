@@ -8,7 +8,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.util.MapUtils;
-import org.opentripplanner.util.TranslationHelper;
 
 /**
  * Responsible for mapping GTFS Entrance into the OTP model.

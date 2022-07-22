@@ -15,7 +15,6 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
-import org.opentripplanner.util.TranslationHelper;
 
 public class BoardingAreaMapperTest {
 
@@ -39,8 +38,7 @@ public class BoardingAreaMapperTest {
 
   private static final int VEHICLE_TYPE = 5;
 
-  private static final WheelchairAccessibility WHEELCHAIR_BOARDING =
-    WheelchairAccessibility.POSSIBLE;
+  private static final int WHEELCHAIR_BOARDING = 1;
 
   private static final org.opentripplanner.transit.model.site.Stop PARENT_STOP = TransitModelForTest
     .stop(PARENT)
@@ -66,7 +64,7 @@ public class BoardingAreaMapperTest {
     STOP.setParentStation(PARENT);
     STOP.setTimezone(TIMEZONE);
     STOP.setVehicleType(VEHICLE_TYPE);
-    STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING.gtfsCode);
+    STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
     STOP.setZoneId(ZONE_ID);
   }
 
@@ -87,7 +85,7 @@ public class BoardingAreaMapperTest {
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
-    assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairAccessibility());
+    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairAccessibility());
     assertEquals(PARENT_STOP, result.getParentStop());
   }
 

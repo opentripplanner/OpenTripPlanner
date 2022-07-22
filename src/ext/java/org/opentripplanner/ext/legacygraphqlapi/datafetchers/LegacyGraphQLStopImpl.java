@@ -32,6 +32,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
@@ -47,7 +48,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLStopAlertsArgs(environment.getArguments());
       List<LegacyGraphQLTypes.LegacyGraphQLStopAlertType> types = (List) args.getLegacyGraphQLTypes();
-      FeedScopedId id = getValue(environment, stop -> stop.getId(), station -> station.getId());
+      FeedScopedId id = getValue(environment, StopLocation::getId, TransitEntity::getId);
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         if (types.contains(LegacyGraphQLStopAlertType.STOP)) {
@@ -90,7 +91,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               if (types.contains(LegacyGraphQLStopAlertType.PATTERNS)) {
                 alerts.addAll(
                   alertService.getDirectionAndRouteAlerts(
-                    pattern.getDirection().gtfsCode,
+                    pattern.getDirection(),
                     pattern.getRoute().getId()
                   )
                 );
@@ -448,7 +449,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             .orElse(null);
         },
         station -> {
-          RoutingService routingService = getRoutingService(environment);
           TransitService transitService = getTransitService(environment);
           return station
             .getChildStops()

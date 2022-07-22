@@ -23,7 +23,6 @@ import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
@@ -71,7 +70,7 @@ public class GeometryProcessorTest {
     feedId = context.getFeedId().getId();
     GeometryProcessor factory = new GeometryProcessor(context);
     factory.run(transitModel);
-    transitModel.putService(CalendarServiceData.class, context.getCalendarServiceData());
+    transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
 
     String[] stops = {
       feedId + ":A",
@@ -131,7 +130,6 @@ public class GeometryProcessorTest {
     StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    transitModel.setHasTransit(true);
     ttsnm.buildGraph(graph, transitModel, new HashMap<>());
   }
 

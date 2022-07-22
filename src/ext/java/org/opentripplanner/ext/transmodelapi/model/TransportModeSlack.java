@@ -20,7 +20,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransportModeSlack {
 

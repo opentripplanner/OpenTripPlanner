@@ -10,6 +10,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -119,7 +120,10 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getDirectionAndRouteAlerts(int directionId, FeedScopedId route) {
-    return alerts.get(new EntitySelector.DirectionAndRoute(directionId, route));
+  public Collection<TransitAlert> getDirectionAndRouteAlerts(
+    Direction direction,
+    FeedScopedId route
+  ) {
+    return alerts.get(new EntitySelector.DirectionAndRoute(direction, route));
   }
 }

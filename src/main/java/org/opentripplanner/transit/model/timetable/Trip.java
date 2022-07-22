@@ -8,16 +8,14 @@ import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TripAlteration;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.SubMode;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.lang.StringUtils;
 
@@ -130,12 +128,6 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
   @Nonnull
   public Direction getDirection() {
     return direction;
-  }
-
-  public String getGtfsDirectionIdAsString(String unknownValue) {
-    return direction.equals(Direction.UNKNOWN)
-      ? unknownValue
-      : Integer.toString(direction.gtfsCode);
   }
 
   @Nonnull

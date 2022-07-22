@@ -4,8 +4,6 @@ import graphql.schema.GraphQLEnumType;
 import java.util.Arrays;
 import java.util.function.Function;
 import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
@@ -20,21 +18,32 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.TripAlteration;
 
 public class EnumTypes {
 
   public static GraphQLEnumType WHEELCHAIR_BOARDING = GraphQLEnumType
     .newEnum()
     .name("WheelchairBoarding")
-    .value("noInformation", 0, "There is no accessibility information for the stopPlace/quay.")
+    .value(
+      "noInformation",
+      WheelchairAccessibility.NO_INFORMATION,
+      "There is no accessibility information for the stopPlace/quay."
+    )
     .value(
       "possible",
-      1,
+      WheelchairAccessibility.POSSIBLE,
       "Boarding wheelchair-accessible serviceJourneys is possible at this stopPlace/quay."
     )
-    .value("notPossible", 2, "Wheelchair boarding/alighting is not possible at this stop.")
+    .value(
+      "notPossible",
+      WheelchairAccessibility.NOT_POSSIBLE,
+      "Wheelchair boarding/alighting is not possible at this stop."
+    )
     .build();
 
   public static GraphQLEnumType INTERCHANGE_WEIGHTING = GraphQLEnumType
@@ -349,7 +358,7 @@ public class EnumTypes {
   public static GraphQLEnumType TRANSPORT_SUBMODE = createEnum(
     "TransportSubmode",
     TransmodelTransportSubmode.values(),
-    (t -> t.getValue())
+    TransmodelTransportSubmode::getValue
   );
   /*
 
@@ -495,7 +504,7 @@ public class EnumTypes {
     .value("sameLine", AlternativeLegsFilter.SAME_ROUTE)
     .build();
 
-  private static <T extends Enum> GraphQLEnumType createEnum(
+  private static <T extends Enum<?>> GraphQLEnumType createEnum(
     String name,
     T[] values,
     Function<T, String> mapping

@@ -3,9 +3,9 @@ package org.opentripplanner.model.modes;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.network.MainAndSubMode;
-import org.opentripplanner.transit.model.network.SubMode;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 class AllowMainAndSubModeFilter implements AllowTransitModeFilter {

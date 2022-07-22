@@ -18,7 +18,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * Created by demory on 7/26/18.

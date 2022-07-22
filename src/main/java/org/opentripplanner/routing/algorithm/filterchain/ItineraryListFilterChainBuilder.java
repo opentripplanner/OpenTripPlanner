@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
@@ -32,7 +31,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastT
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.Station;
@@ -181,7 +180,7 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * This will NOT delete itineraries, but tag them as deleted using the {@link
-   * Itinerary#systemNotices}.
+   * Itinerary#getSystemNotices()}.
    */
   public ItineraryListFilterChainBuilder withDebugEnabled(boolean value) {
     this.debug = value;
@@ -378,17 +377,16 @@ public class ItineraryListFilterChainBuilder {
 
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 
-    for (GroupBySimilarity it : groupBy) {
+    for (GroupBySimilarity group : groupBy) {
       String name =
-        "similar-legs-filter-" +
-        (int) (100d * it.groupByP) +
-        "p-" +
-        it.maxNumOfItinerariesPerGroup +
-        "x";
+        "similar-legs-filter-%.0fp-%dx".formatted(
+            100d * group.groupByP,
+            group.maxNumOfItinerariesPerGroup
+          );
 
       List<ItineraryListFilter> nested = new ArrayList<>();
 
-      if (it.nestedGroupingByAllSameStations) {
+      if (group.nestedGroupingByAllSameStations) {
         final String innerGroupName = name + "-group-by-all-same-stations";
         nested.add(
           new GroupByFilter<>(
@@ -401,26 +399,23 @@ public class ItineraryListFilterChainBuilder {
         );
       }
 
-      if (it.maxCostOtherLegsFactor > 1.0) {
+      if (group.maxCostOtherLegsFactor > 1.0) {
         nested.add(
           new DeletionFlaggingFilter(
-            new OtherThanSameLegsMaxGeneralizedCostFilter(it.maxCostOtherLegsFactor)
+            new OtherThanSameLegsMaxGeneralizedCostFilter(group.maxCostOtherLegsFactor)
           )
         );
       }
 
       nested.add(new SortingFilter(generalizedCostComparator()));
       nested.add(
-        new DeletionFlaggingFilter(new MaxLimitFilter(name, it.maxNumOfItinerariesPerGroup))
+        new DeletionFlaggingFilter(new MaxLimitFilter(name, group.maxNumOfItinerariesPerGroup))
       );
 
       nested.add(new RemoveDeletionFlagForLeastTransfersItinerary());
 
       groupByFilters.add(
-        new GroupByFilter<>(
-          itinerary -> new GroupByTripIdAndDistance(itinerary, it.groupByP),
-          nested
-        )
+        new GroupByFilter<>(it -> new GroupByDistance(it, group.groupByP), nested)
       );
     }
 

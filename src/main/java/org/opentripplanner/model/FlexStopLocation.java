@@ -3,12 +3,12 @@ package org.opentripplanner.model;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
