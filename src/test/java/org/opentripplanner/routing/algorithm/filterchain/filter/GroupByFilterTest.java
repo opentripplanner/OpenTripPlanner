@@ -20,8 +20,6 @@ public class GroupByFilterTest implements PlanTestConstants {
    */
   @Test
   public void aSimpleTestGroupByMatchingTripIdsNoMerge() {
-    List<Itinerary> result;
-
     // Group 1
     Itinerary i1 = newItinerary(A).bus(1, 0, 10, E).build();
 
@@ -38,7 +36,7 @@ public class GroupByFilterTest implements PlanTestConstants {
     assertTrue(i2b.isFlaggedForDeletion());
 
     // Remove notice after asserting
-    i2b.getSystemNotices().remove(0);
+    i2b.removeDeletionFlags();
 
     // With min Limit = 2, we get two from each group
     createFilter(2).filter(all);
@@ -80,9 +78,9 @@ public class GroupByFilterTest implements PlanTestConstants {
 
       // Remove notices after asserting
       assertTrue(i11.isFlaggedForDeletion());
-      i11.getSystemNotices().remove(0);
+      i11.removeDeletionFlags();
       assertTrue(i12.isFlaggedForDeletion());
-      i12.getSystemNotices().remove(0);
+      i12.removeDeletionFlags();
     }
   }
 
