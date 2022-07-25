@@ -255,19 +255,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               .toLocalDate();
             return Stream
               .concat(
-                getPatterns(environment)
-                  .stream()
-                  .flatMap(tripPattern ->
-                    tripPattern
-                      .scheduledTripsAsStream()
-                      .map(trip -> timetableSnapshot.getLastAddedTripPattern(trip.getId(), date))
-                  )
-                  // We only return realtime added patterns if they have the same stops in the same
-                  // order as the original pattern
-                  .filter(tripPattern ->
-                    tripPattern != null &&
-                    tripPattern.isModifiedFromTripPatternWithEqualStops(pattern)
-                  ),
+                getRealtimeAddedPatternsAsStream(pattern, timetableSnapshot, date),
                 Stream.of(pattern)
               )
               .flatMap(tripPattern ->
@@ -562,6 +550,23 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+  }
+
+  /**
+   * Get a stream of {@link TripPattern} that were created realtime based of the provided pattern.
+   * Only patterns that don't have removed (stops can still be skipped) or added stops are included.
+   */
+  private Stream<TripPattern> getRealtimeAddedPatternsAsStream(
+    TripPattern originalPattern,
+    TimetableSnapshot timetableSnapshot,
+    LocalDate date
+  ) {
+    return originalPattern
+      .scheduledTripsAsStream()
+      .map(trip -> timetableSnapshot.getLastAddedTripPattern(trip.getId(), date))
+      .filter(tripPattern ->
+        tripPattern != null && tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
+      );
   }
 
   private <T> T getValue(
