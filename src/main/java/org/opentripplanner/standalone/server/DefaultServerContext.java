@@ -8,6 +8,7 @@ import ch.qos.logback.core.FileAppender;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.RoutingService;
@@ -27,8 +28,11 @@ import org.slf4j.LoggerFactory;
 public class DefaultServerContext implements OtpServerContext {
 
   private final RoutingRequest defaultRoutingRequest;
+  private RoutingRequest requestScopedRoutingRequest = null;
   private final Graph graph;
   private final TransitModel transitModel;
+
+  private TransitService transitService = null;
   private final RouterConfig routerConfig;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
@@ -36,45 +40,89 @@ public class DefaultServerContext implements OtpServerContext {
   private final TileRendererManager tileRendererManager;
   public final GraphVisualizer graphVisualizer;
 
-  public DefaultServerContext(
+  /**
+   * Copy constructor - used to make an HTTP Request scoped copy of the context. All mutable
+   * components need to be coped here. This is
+   */
+  private DefaultServerContext(
+    RoutingRequest defaultRoutingRequest,
     Graph graph,
     TransitModel transitModel,
     RouterConfig routerConfig,
     MeterRegistry meterRegistry,
-    boolean initGraphVisualizer
+    RaptorConfig<TripSchedule> raptorConfig,
+    Logger requestLogger,
+    TileRendererManager tileRendererManager,
+    Function<OtpServerContext, GraphVisualizer> graphVisualizerProvider
   ) {
+    this.defaultRoutingRequest = defaultRoutingRequest;
     this.graph = graph;
     this.transitModel = transitModel;
     this.routerConfig = routerConfig;
-    this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
     this.meterRegistry = meterRegistry;
-    this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters());
-    this.requestLogger = createLogger(routerConfig.requestLogFile());
-    this.tileRendererManager = new TileRendererManager(this.graph, this.defaultRoutingRequest);
-    this.graphVisualizer = initGraphVisualizer ? new GraphVisualizer(this) : null;
+    this.raptorConfig = raptorConfig;
+    this.requestLogger = requestLogger;
+    this.tileRendererManager = tileRendererManager;
+    this.graphVisualizer = graphVisualizerProvider.apply(this);
   }
 
   /**
-   * A RoutingRequest containing default parameters that will be cloned when handling each request.
+   * Create a default server context witch can be cloned by calling
+   * {@link #createHttpRequestScopedCopy()} for each HTTP request.
    */
+  public static DefaultServerContext create(
+    RouterConfig routerConfig,
+    Graph graph,
+    TransitModel transitModel,
+    MeterRegistry meterRegistry,
+    boolean initGraphVisualizer
+  ) {
+    var defaultRoutingRequest = routerConfig.routingRequestDefaults();
+
+    return new DefaultServerContext(
+      defaultRoutingRequest,
+      graph,
+      transitModel,
+      routerConfig,
+      meterRegistry,
+      new RaptorConfig<>(routerConfig.raptorTuningParameters()),
+      createLogger(routerConfig.requestLogFile()),
+      new TileRendererManager(graph, defaultRoutingRequest),
+      initGraphVisualizer ? GraphVisualizer::new : ctx -> null
+    );
+  }
+
   @Override
-  public RoutingRequest copyDefaultRoutingRequest() {
-    var copy = this.defaultRoutingRequest.clone();
-    copy.setDateTime(Instant.now());
-    return copy;
+  public RoutingRequest defaultRoutingRequest() {
+    // Lazy initialize request-scoped request to avoid doing this when not needed
+    if (requestScopedRoutingRequest == null) {
+      requestScopedRoutingRequest = defaultRoutingRequest.clone();
+      requestScopedRoutingRequest.setDateTime(Instant.now());
+    }
+    return requestScopedRoutingRequest;
   }
 
   /**
    * Return the default routing request locale(without cloning the request).
    */
   @Override
-  public Locale getDefaultLocale() {
-    return this.defaultRoutingRequest.locale;
+  public Locale defaultLocale() {
+    return defaultRoutingRequest.locale;
   }
 
   @Override
   public double streetRoutingTimeoutSeconds() {
     return routerConfig.streetRoutingTimeoutSeconds();
+  }
+
+  @Override
+  public RouterConfig routerConfig() {
+    return routerConfig;
+  }
+
+  @Override
+  public RaptorConfig<TripSchedule> raptorConfig() {
+    return raptorConfig;
   }
 
   @Override
@@ -88,18 +136,21 @@ public class DefaultServerContext implements OtpServerContext {
   }
 
   @Override
-  public RouterConfig routerConfig() {
-    return routerConfig;
+  public TransitService transitService() {
+    if (transitService == null) {
+      this.transitService = new DefaultTransitService(transitModel);
+    }
+    return transitService;
+  }
+
+  @Override
+  public RoutingService routingService() {
+    return new RoutingService(graph(), transitModel());
   }
 
   @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
-  }
-
-  @Override
-  public RaptorConfig<TripSchedule> raptorConfig() {
-    return raptorConfig;
   }
 
   @Override
@@ -117,14 +168,18 @@ public class DefaultServerContext implements OtpServerContext {
     return graphVisualizer;
   }
 
-  @Override
-  public RoutingService routingRequestService() {
-    return new RoutingService(graph(), transitModel());
-  }
-
-  @Override
-  public TransitService transitRequestService() {
-    return new DefaultTransitService(transitModel());
+  public OtpServerContext createHttpRequestScopedCopy() {
+    return new DefaultServerContext(
+      defaultRoutingRequest,
+      graph,
+      transitModel,
+      routerConfig,
+      meterRegistry,
+      raptorConfig,
+      requestLogger,
+      tileRendererManager,
+      ctx -> graphVisualizer
+    );
   }
 
   /**

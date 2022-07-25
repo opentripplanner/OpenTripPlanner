@@ -79,10 +79,10 @@ public class BicycleRoutingTest {
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new DefaultServerContext(
+      DefaultServerContext.create(
+        RouterConfig.DEFAULT,
         graph,
         Mockito.mock(TransitModel.class),
-        RouterConfig.DEFAULT,
         null,
         false
       )

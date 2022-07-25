@@ -14,6 +14,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPWebApplication;
@@ -62,7 +63,7 @@ public class OTPAppConstruction {
    * Create a new Grizzly server - call this method once, the new instance is created every time
    * this method is called.
    */
-  public GrizzlyServer createGrizzlyServer(OtpServerContext serverContext) {
+  public GrizzlyServer createGrizzlyServer(DefaultServerContext serverContext) {
     return new GrizzlyServer(cli, createApplication(serverContext));
   }
 
@@ -106,7 +107,7 @@ public class OTPAppConstruction {
     return graphBuilderDataSources;
   }
 
-  private Application createApplication(OtpServerContext serverContext) {
+  private Application createApplication(DefaultServerContext serverContext) {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer(serverContext);
     return new OTPWebApplication(serverContext);
@@ -130,7 +131,7 @@ public class OTPAppConstruction {
       TransmodelAPI.setUp(
         context.routerConfig().transmodelApi(),
         context.transitModel(),
-        context.copyDefaultRoutingRequest()
+        context.defaultRoutingRequest()
       );
     }
 

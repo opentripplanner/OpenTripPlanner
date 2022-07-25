@@ -17,10 +17,10 @@ public class TestServerContext {
   /** Create a context for unit testing, using the default RoutingRequest. */
   public static OtpServerContext createServerContext(Graph graph, TransitModel transitModel) {
     transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
-    DefaultServerContext context = new DefaultServerContext(
+    DefaultServerContext context = DefaultServerContext.create(
+      RouterConfig.DEFAULT,
       graph,
       transitModel,
-      RouterConfig.DEFAULT,
       Metrics.globalRegistry,
       false
     );

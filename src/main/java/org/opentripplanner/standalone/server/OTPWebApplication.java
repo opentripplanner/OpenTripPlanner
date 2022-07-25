@@ -33,7 +33,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class OTPWebApplication extends Application {
 
   /* This object groups together all the modules for a single running OTP server. */
-  private final OtpServerContext serverContext;
+  private final DefaultServerContext serverContext;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
@@ -43,7 +43,7 @@ public class OTPWebApplication extends Application {
     SLF4JBridgeHandler.install();
   }
 
-  public OTPWebApplication(OtpServerContext serverContext) {
+  public OTPWebApplication(DefaultServerContext serverContext) {
     this.serverContext = serverContext;
   }
 
@@ -120,11 +120,11 @@ public class OTPWebApplication extends Application {
    * <p>
    * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */
-  private Binder makeBinder(OtpServerContext context) {
+  private Binder makeBinder(DefaultServerContext context) {
     return new AbstractBinder() {
       @Override
       protected void configure() {
-        bind(context).to(OtpServerContext.class);
+        bindFactory(context::createHttpRequestScopedCopy).to(OtpServerContext.class);
       }
     };
   }

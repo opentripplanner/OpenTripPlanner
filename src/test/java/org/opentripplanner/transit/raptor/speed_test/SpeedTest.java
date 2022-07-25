@@ -69,10 +69,10 @@ public class SpeedTest {
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
     this.serverContext =
-      new DefaultServerContext(
+      DefaultServerContext.create(
+        RouterConfig.DEFAULT,
         graph,
         transitModel,
-        RouterConfig.DEFAULT,
         timer.getRegistry(),
         false
       );

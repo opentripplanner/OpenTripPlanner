@@ -11,9 +11,10 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.OTPAppConstruction;
+import org.opentripplanner.standalone.configure.OTPApplicationFactory;
 import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.transit.service.TransitModel;
@@ -165,11 +166,21 @@ public class OTPMain {
       System.exit(101);
     }
 
-    if (!params.doServe()) {
+    if (params.doServe()) {
+      startOtpWebServer(params, graph, transitModel, app, factory, configModel);
+    } else {
       LOG.info("Done building graph. Exiting.");
-      return;
     }
+  }
 
+  private static void startOtpWebServer(
+    CommandLineParameters params,
+    Graph graph,
+    TransitModel transitModel,
+    OTPAppConstruction app,
+    OTPApplicationFactory factory,
+    ConfigModel configModel
+  ) {
     // Index graph for travel search
     transitModel.index();
     graph.index();
@@ -177,10 +188,10 @@ public class OTPMain {
     // publishing the config version info make it available to the APIs
     factory.setOtpConfigVersionsOnServerInfo();
 
-    OtpServerContext serverContext = new DefaultServerContext(
+    var serverContext = DefaultServerContext.create(
+      configModel.routerConfig(),
       graph,
       transitModel,
-      configModel.routerConfig(),
       Metrics.globalRegistry,
       params.visualize
     );
@@ -197,8 +208,7 @@ public class OTPMain {
     if (params.doServe()) {
       GrizzlyServer grizzlyServer = app.createGrizzlyServer(serverContext);
 
-      // Register a shutdown hook to gracefully shut down the server
-      Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdownHook(serverContext)));
+      registerShutdownHookToGracefullyShutDownServer(transitModel, serverContext);
 
       // Loop to restart server on uncaught fatal exceptions.
       while (true) {
@@ -224,12 +234,18 @@ public class OTPMain {
    *   external client to call them for cleaning-up.</li>
    * </ol>
    */
-  private static void shutdownHook(OtpServerContext context) {
-    LOG.info("OTP shutdown started...");
-    GraphUpdaterConfigurator.shutdownGraph(context.transitModel());
-    context.raptorConfig().shutdown();
-    WeakCollectionCleaner.DEFAULT.exit();
-    DeferredAuthorityFactory.exit();
+  private static void registerShutdownHookToGracefullyShutDownServer(
+    final TransitModel transitModel,
+    DefaultServerContext serverContext
+  ) {
+    var hook = new Thread(() -> {
+      LOG.info("OTP shutdown started...");
+      GraphUpdaterConfigurator.shutdownGraph(transitModel);
+      serverContext.raptorConfig().shutdown();
+      WeakCollectionCleaner.DEFAULT.exit();
+      DeferredAuthorityFactory.exit();
+    });
+    Runtime.getRuntime().addShutdownHook(hook);
   }
 
   private static void logLocationOfRequestLog(String requestLogFile) {
