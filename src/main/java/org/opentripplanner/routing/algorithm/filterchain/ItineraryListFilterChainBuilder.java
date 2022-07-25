@@ -64,6 +64,7 @@ public class ItineraryListFilterChainBuilder {
   private FareService faresService;
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
+  private boolean removeTimeshiftedDuplicates;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -249,20 +250,29 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withRemoveTimeshiftedDuplicates(boolean remove) {
+    this.removeTimeshiftedDuplicates = remove;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
-    filters.add(
-      new GroupByFilter<>(
-        GroupBySameRoutesAndStops::new,
-        List.of(
-          new SortingFilter(generalizedCostComparator()),
-          new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
+
+    if (removeTimeshiftedDuplicates) {
+      filters.add(
+        new GroupByFilter<>(
+          GroupBySameRoutesAndStops::new,
+          List.of(
+            new SortingFilter(generalizedCostComparator()),
+            new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
+          )
         )
-      )
-    );
+      );
+    }
+
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
       filters.add(new SameFirstOrLastTripFilter());

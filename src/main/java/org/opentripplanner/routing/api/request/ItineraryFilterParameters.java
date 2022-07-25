@@ -101,6 +101,12 @@ public class ItineraryFilterParameters {
    */
   public boolean accessibilityScore;
 
+  /**
+   * Whether to remove timeshifted "duplicates" from the search results so that you get a greater
+   * variety of results rather than the same ones at different times.
+   */
+  public boolean removeTimeshiftedDuplicates;
+
   private ItineraryFilterParameters() {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
@@ -112,6 +118,7 @@ public class ItineraryFilterParameters {
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
+    this.removeTimeshiftedDuplicates = false;
   }
 
   public ItineraryFilterParameters(ItineraryFilterParameters i) {
@@ -125,7 +132,8 @@ public class ItineraryFilterParameters {
       i.bikeRentalDistanceRatio,
       i.parkAndRideDurationRatio,
       i.filterItinerariesWithSameFirstOrLastTrip,
-      i.accessibilityScore
+      i.accessibilityScore,
+      i.removeTimeshiftedDuplicates
     );
   }
 
@@ -139,7 +147,8 @@ public class ItineraryFilterParameters {
     double bikeRentalDistanceRatio,
     double parkAndRideDurationRatio,
     boolean filterItinerariesWithSameFirstOrLastTrip,
-    boolean accessibilityScore
+    boolean accessibilityScore,
+    boolean removeTimeshiftedDuplicates
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -151,6 +160,7 @@ public class ItineraryFilterParameters {
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
     this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = accessibilityScore;
+    this.removeTimeshiftedDuplicates = removeTimeshiftedDuplicates;
   }
 
   public static ItineraryFilterParameters createDefault() {

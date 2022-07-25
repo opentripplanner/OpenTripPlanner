@@ -210,6 +210,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       // we need to add the group-by-distance-and-id filter because it undeletes those with the
       // fewest transfers and we want to make sure that the filter under test comes _after_
       .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
+      .withRemoveTimeshiftedDuplicates(true)
       .build();
     assertEquals(toStr(List.of(i4, i2)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
   }
