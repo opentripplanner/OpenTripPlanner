@@ -83,7 +83,7 @@ jobs:
       - name: Archive travel results file
         uses: actions/upload-artifact@v2
         with:
-          name: travelSearch-results.csv
+          name: ${{ matrix.location }}-travelSearch-results.csv
           path: |
             test/performance/${{ matrix.location }}/travelSearch-results.csv
 
