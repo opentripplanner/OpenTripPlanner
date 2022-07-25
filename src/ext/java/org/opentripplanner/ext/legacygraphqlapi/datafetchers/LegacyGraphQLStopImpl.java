@@ -249,8 +249,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
           long startTime = args.getLegacyGraphQLStartTime();
           if (timetableSnapshot != null && timetableSnapshot.hasLastAddedTripPatterns()) {
-            LocalDate date = Instant
-              .ofEpochSecond(startTime == 0 ? System.currentTimeMillis() / 1000 : startTime)
+            LocalDate date = (startTime == 0 ? Instant.now() : Instant.ofEpochSecond(startTime))
+              
               .atZone(transitService.getTimeZone())
               .toLocalDate();
             return Stream
