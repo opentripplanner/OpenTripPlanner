@@ -3,6 +3,7 @@ package org.opentripplanner.routing.alertpatch;
 import java.time.LocalDate;
 import java.util.Objects;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Direction;
 
 public interface EntitySelector {
   class Agency implements EntitySelector {
@@ -272,19 +273,19 @@ public interface EntitySelector {
 
   class DirectionAndRoute implements EntitySelector {
 
-    public final int directionId;
+    public final Direction direction;
 
     public final FeedScopedId routeId;
 
-    public DirectionAndRoute(int directionId, FeedScopedId routeId) {
-      this.directionId = directionId;
+    public DirectionAndRoute(Direction direction, FeedScopedId routeId) {
+      this.direction = direction;
       this.routeId = routeId;
     }
 
     @Override
     public int hashCode() {
       int routeHash = Objects.hash(routeId);
-      return 41 * directionId * routeHash;
+      return 41 * direction.ordinal() * routeHash;
     }
 
     @Override
@@ -296,7 +297,7 @@ public interface EntitySelector {
         return false;
       }
       DirectionAndRoute that = (DirectionAndRoute) o;
-      return directionId == that.directionId && routeId.equals(that.routeId);
+      return direction == that.direction && routeId.equals(that.routeId);
     }
   }
 

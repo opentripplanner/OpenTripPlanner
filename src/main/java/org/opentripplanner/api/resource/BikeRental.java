@@ -18,7 +18,6 @@ import org.opentripplanner.api.model.ApiVehicleRentalStationList;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.util.resources.ResourceBundleSingleton;
 
 @Path("/routers/{ignoreRouterId}/bike_rental")
 public class BikeRental {
@@ -61,8 +60,9 @@ public class BikeRental {
     VehicleRentalStationService vehicleRentalService = serverContext
       .graph()
       .getService(VehicleRentalStationService.class);
-    Locale locale;
-    locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
+    Locale locale = locale_param != null && !locale_param.isBlank()
+      ? Locale.forLanguageTag(locale_param.replaceAll("-", "_"))
+      : Locale.ENGLISH;
     if (vehicleRentalService == null) {
       return new ApiVehicleRentalStationList();
     }

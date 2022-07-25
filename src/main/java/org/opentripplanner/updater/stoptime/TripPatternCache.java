@@ -8,6 +8,7 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -76,20 +77,14 @@ public class TripPatternCache {
    */
   private FeedScopedId generateUniqueTripPatternCode(Trip trip) {
     FeedScopedId routeId = trip.getRoute().getId();
-    String directionId = trip.getGtfsDirectionIdAsString("");
+    Direction direction = trip.getDirection();
+    String directionId = direction == Direction.UNKNOWN ? "" : Integer.toString(direction.gtfsCode);
     if (counter == Integer.MAX_VALUE) {
       counter = 0;
     } else {
       counter++;
     }
-    // OBA library uses underscore as separator, we're moving toward colon.
-    String code = String.format(
-      "%s:%s:%s:rt#%d",
-      routeId.getFeedId(),
-      routeId.getId(),
-      directionId,
-      counter
-    );
-    return new FeedScopedId(trip.getId().getFeedId(), code);
+    String code = String.format("%s:%s:rt#%d", routeId.getId(), directionId, counter);
+    return new FeedScopedId(routeId.getFeedId(), code);
   }
 }

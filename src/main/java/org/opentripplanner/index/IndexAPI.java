@@ -535,7 +535,7 @@ public class IndexAPI {
     return alertMapper.mapToApi(
       transitService
         .getTransitAlertService()
-        .getDirectionAndRouteAlerts(pattern.getDirection().gtfsCode, pattern.getRoute().getId())
+        .getDirectionAndRouteAlerts(pattern.getDirection(), pattern.getRoute().getId())
     );
   }
 

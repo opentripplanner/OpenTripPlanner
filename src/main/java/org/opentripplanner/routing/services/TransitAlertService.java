@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Direction;
 
 public interface TransitAlertService {
   void setAlerts(Collection<TransitAlert> alerts);
@@ -32,5 +33,5 @@ public interface TransitAlertService {
 
   Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId);
 
-  Collection<TransitAlert> getDirectionAndRouteAlerts(int directionId, FeedScopedId route);
+  Collection<TransitAlert> getDirectionAndRouteAlerts(Direction direction, FeedScopedId route);
 }
