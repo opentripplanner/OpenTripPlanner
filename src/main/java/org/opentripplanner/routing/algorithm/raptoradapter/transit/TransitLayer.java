@@ -49,6 +49,8 @@ public class TransitLayer {
 
   private final TransferIndexGenerator transferIndexGenerator;
 
+  private final int[] stopBoardAlightCosts;
+
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
    * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace entire
@@ -63,7 +65,8 @@ public class TransitLayer {
       transitLayer.transitDataZoneId,
       transitLayer.transferCache,
       transitLayer.tripPatternMapper,
-      transitLayer.transferIndexGenerator
+      transitLayer.transferIndexGenerator,
+      transitLayer.stopBoardAlightCosts
     );
   }
 
@@ -75,7 +78,8 @@ public class TransitLayer {
     ZoneId transitDataZoneId,
     RaptorRequestTransferCache transferCache,
     TripPatternMapper tripPatternMapper,
-    TransferIndexGenerator transferIndexGenerator
+    TransferIndexGenerator transferIndexGenerator,
+    int[] stopBoardAlightCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -85,6 +89,7 @@ public class TransitLayer {
     this.transferCache = transferCache;
     this.tripPatternMapper = tripPatternMapper;
     this.transferIndexGenerator = transferIndexGenerator;
+    this.stopBoardAlightCosts = stopBoardAlightCosts;
   }
 
   public int getIndexByStop(Stop stop) {
@@ -153,6 +158,10 @@ public class TransitLayer {
 
   public TransferIndexGenerator getTransferIndexGenerator() {
     return transferIndexGenerator;
+  }
+
+  public int[] getStopBoardAlightCosts() {
+    return stopBoardAlightCosts;
   }
 
   /**

@@ -131,7 +131,7 @@ public class TransitRouter {
             requestTransitDataProvider.stopNameResolver(),
             router.transitModel.getTransferService(),
             requestTransitDataProvider,
-            transitLayer.getStopIndex().stopBoardAlightCosts,
+            transitLayer.getStopBoardAlightCosts(),
             raptorRequest,
             request.transferOptimization
           )
