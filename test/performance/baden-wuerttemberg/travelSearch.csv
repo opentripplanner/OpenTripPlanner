@@ -1,0 +1,2 @@
+testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon,destination,toPlace,toLat,toLon,category,modes
+1,Mannheim to Friedrichshafen,08:00,12:00,2h,Mannheim,Mannheim,47.6524377,9.49012756,Friedrichshafen,Friedrichshafen,49.4870852,8.4697723,transit,TRANSIT|WALK
