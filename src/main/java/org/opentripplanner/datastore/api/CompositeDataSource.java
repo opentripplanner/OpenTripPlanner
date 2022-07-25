@@ -1,4 +1,4 @@
-package org.opentripplanner.datastore;
+package org.opentripplanner.datastore.api;
 
 import java.io.Closeable;
 import java.util.Collection;

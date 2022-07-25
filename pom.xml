@@ -24,6 +24,7 @@
     <properties>
         <otp.serialization.version.id>41</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
+        <google.dagger.version>2.42</google.dagger.version>
         <geotools.version>26.4</geotools.version>
         <jackson.version>2.13.3</jackson.version>
         <jersey.version>2.34</jersey.version>
@@ -107,6 +108,13 @@
                 <configuration>
                     <!-- Target Java version -->
                     <release>17</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${google.dagger.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -483,6 +491,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.36</version>
+        </dependency>
+
+        <!-- dependency injection -->
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${google.dagger.version}</version>
         </dependency>
 
         <!-- JSON AST, not used much and is a good candidate for removal -->

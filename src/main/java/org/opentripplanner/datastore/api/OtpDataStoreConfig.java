@@ -1,10 +1,10 @@
-package org.opentripplanner.datastore;
+package org.opentripplanner.datastore.api;
 
-import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opentripplanner.datastore.OtpDataStore;
 
 /**
  * The {@link OtpDataStore} config, needed to create a store. This should be provided by the OTP
@@ -34,14 +34,8 @@ public interface OtpDataStoreConfig {
   String DEFAULT_DEM_PATTERN = "(?i)\\.tiff?$";
 
   /**
-   * The base directory on the local file-system. Used to lookup config files and all input files if
-   * no URIs are found in the config.
-   */
-  File baseDirectory();
-
-  /**
-   * Save the build issue report to this location (URI). If {@code null} the {@link
-   * #baseDirectory()} + {@code /report} is used.
+   * Save the build issue report to this location (URI). If {@code null} the {@code baseDirectory}
+   * + {@code /report} is used.
    */
   URI reportDirectory();
 
@@ -59,24 +53,21 @@ public interface OtpDataStoreConfig {
   /**
    * Array of URIs to the open street map pbf files (the pbf format is the only one supported).
    * <p>
-   * This parameter is optional. If {@code null} OSM files are loaded from {@link
-   * #baseDirectory()}.
+   * This parameter is optional. If {@code null} OSM files are loaded from {@code baseDirectory}.
    */
   List<URI> osmFiles();
 
   /**
    * Array of URIs to elevation data files.
    * <p>
-   * This parameter is optional. If {@code null} DEM files are loaded from {@link
-   * #baseDirectory()}.
+   * This parameter is optional. If {@code null} DEM files are loaded from {@code baseDirectory}.
    */
   List<URI> demFiles();
 
   /**
    * Array of URIs to GTFS data files .
    * <p>
-   * This parameter is optional. If {@code null} GTFS files are loaded from {@link
-   * #baseDirectory()}.
+   * This parameter is optional. If {@code null} GTFS files are loaded from {@code baseDirectory}.
    */
   @Nonnull
   List<URI> gtfsFiles();
@@ -84,8 +75,7 @@ public interface OtpDataStoreConfig {
   /**
    * Array of URIs to Netex data files.
    * <p>
-   * This parameter is optional. If {@code null} Netex files are loaded from {@link
-   * #baseDirectory()}.
+   * This parameter is optional. If {@code null} Netex files are loaded from {@code baseDirectory}.
    */
   @Nonnull
   List<URI> netexFiles();
