@@ -65,7 +65,7 @@ jobs:
           wget ${{ matrix.osm-url }} -O graph/osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
           wget ${{ matrix.transit-url }} -O graph/${{ matrix.transit-filename }} --no-clobber -q --show-progress --progress=bar:force || true
 
-      - name: Build Norway graph
+      - name: Build graph
         run: |
           cp test/performance/${{ matrix.location }}/build-config.json graph/build-config.json
           cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
@@ -75,6 +75,7 @@ jobs:
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           MEASUREMENT_ENVIRONMENT: CI
+          SPEEDTEST_LOCATION: ${{ matrix.location }}
         run: |
           mv graph/graph.obj test/performance/${{ matrix.location }}
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n 4 -i 3 -0"
