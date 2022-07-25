@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModelIndex;
 
 public class TransitLayer {
 
@@ -36,10 +37,7 @@ public class TransitLayer {
    */
   private final TransferService transferService;
 
-  /**
-   * Maps to original graph to retrieve additional data
-   */
-  private final StopIndexForRaptor stopIndex;
+  private final StopModelIndex stopIndex;
 
   private final ZoneId transitDataZoneId;
 
@@ -74,7 +72,7 @@ public class TransitLayer {
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
     List<List<Transfer>> transfersByStopIndex,
     TransferService transferService,
-    StopIndexForRaptor stopIndex,
+    StopModelIndex stopIndex,
     ZoneId transitDataZoneId,
     RaptorRequestTransferCache transferCache,
     TripPatternMapper tripPatternMapper,
@@ -101,7 +99,7 @@ public class TransitLayer {
     return stop == -1 ? null : this.stopIndex.stopByIndex(stop);
   }
 
-  public StopIndexForRaptor getStopIndex() {
+  public StopModelIndex getStopIndex() {
     return this.stopIndex;
   }
 

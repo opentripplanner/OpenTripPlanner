@@ -1,13 +1,14 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit;
+package org.opentripplanner.transit.service;
 
 import java.util.List;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class TestStopIndexForRaptor implements StopIndexForRaptor {
+public class StopIndexMock extends StopModelIndex {
 
   private final List<StopLocation> stops;
 
-  public TestStopIndexForRaptor(List<StopLocation> stops) {
+  public StopIndexMock(List<StopLocation> stops) {
+    super(new StopModel());
     this.stops = stops;
   }
 

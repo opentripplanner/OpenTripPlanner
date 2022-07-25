@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -26,6 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.transit.service.StopModelIndex;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -70,7 +70,7 @@ public class TransitLayerMapper {
   }
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
-    StopIndexForRaptor stopIndex;
+    StopModelIndex stopIndex;
     Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
@@ -192,10 +192,7 @@ public class TransitLayerMapper {
   /**
    * Create static board/alight cost for Raptor to include for each stop.
    */
-  static int[] createStopTransferCosts(
-    StopIndexForRaptor stops,
-    TransitTuningParameters tuningParams
-  ) {
+  static int[] createStopTransferCosts(StopModelIndex stops, TransitTuningParameters tuningParams) {
     if (!tuningParams.enableStopTransferPriority()) {
       return null;
     }

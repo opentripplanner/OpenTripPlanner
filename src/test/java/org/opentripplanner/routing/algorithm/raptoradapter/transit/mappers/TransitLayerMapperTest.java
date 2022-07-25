@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestStopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.transit.service.StopIndexMock;
 
 class TransitLayerMapperTest {
 
@@ -54,11 +54,10 @@ class TransitLayerMapperTest {
   @Test
   public void createStopTransferCosts() {
     int[] result = TransitLayerMapper.createStopTransferCosts(
-      new TestStopIndexForRaptor(STOPS),
+      new StopIndexMock(STOPS),
       TransitTuningParameters.FOR_TEST
     );
 
-    // Expect cost with Raptor precision
     assertEquals("[6000, 360000, 6000, 2000, 0]", Arrays.toString(result));
   }
 }

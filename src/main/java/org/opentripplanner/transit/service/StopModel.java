@@ -34,25 +34,25 @@ public class StopModel implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
 
   /** Parent stops **/
-  private Map<FeedScopedId, Station> stationById = new HashMap<>();
+  private final Map<FeedScopedId, Station> stationById = new HashMap<>();
   /**
    * Optional level above parent stops (only supported in NeTEx)
    */
-  private Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
+  private final Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
   /**
    * Optional grouping that can contain both stations and multimodal stations (only supported in
    * NeTEx)
    */
-  private Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
+  private final Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
 
-  private Map<FeedScopedId, TransitStopVertex> transitStopVertices = new HashMap<>();
+  private final Map<FeedScopedId, TransitStopVertex> transitStopVertices = new HashMap<>();
 
   /** The density center of the graph for determining the initial geographic extent in the client. */
   private Coordinate center = null;
 
-  private Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
 
-  private Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
 
   private transient StopModelIndex index;
 

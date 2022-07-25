@@ -12,7 +12,6 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
@@ -26,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-public class StopModelIndex implements StopIndexForRaptor {
+public class StopModelIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModelIndex.class);
 
@@ -111,17 +110,14 @@ public class StopModelIndex implements StopIndexForRaptor {
     return stopForId.values();
   }
 
-  @Override
   public StopLocation stopByIndex(int index) {
     return stopsByIndex.get(index);
   }
 
-  @Override
   public int indexOf(StopLocation stop) {
     return indexByStop.get(stop);
   }
 
-  @Override
   public int size() {
     return stopsByIndex.size();
   }
