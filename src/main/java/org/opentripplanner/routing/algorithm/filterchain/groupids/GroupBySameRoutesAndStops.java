@@ -1,20 +1,19 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
+import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByUtils.getStopOrStationId;
+
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * This creates a group identifier based on all origin and destination stations, or stops if there
- * is no parent station, of all legs in the itinerary.
+ * This creates a group identifier based on each transit leg's origin and destination stations/stops
+ * and their routes.
  * <p>
- * This is used to group itineraries that are almost the same, but where one might have a slight
- * time advantage and the other a slight cost advantage eg. due to shorter walking distance inside
- * the station.
+ * This is useful if you want to see a wide variety of possible options rather than the ones with
+ * the lowest cost.
  */
 public class GroupBySameRoutesAndStops implements GroupId<GroupBySameRoutesAndStops> {
 
@@ -54,15 +53,5 @@ public class GroupBySameRoutesAndStops implements GroupId<GroupBySameRoutesAndSt
   @Override
   public GroupBySameRoutesAndStops merge(GroupBySameRoutesAndStops other) {
     return this;
-  }
-
-  /**
-   * Get the parent station id if such exists. Otherwise, return the stop id.
-   */
-  private static FeedScopedId getStopOrStationId(StopLocation stopPlace) {
-    if (stopPlace instanceof StationElement stationElement && stationElement.isPartOfStation()) {
-      return stationElement.getParentStation().getId();
-    }
-    return stopPlace.getId();
   }
 }

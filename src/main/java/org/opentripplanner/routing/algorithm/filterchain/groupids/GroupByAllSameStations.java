@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
+import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByUtils.getStopOrStationId;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * This creates a group identifier based on all origin and destination stations, or stops if there
@@ -50,15 +50,5 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
   @Override
   public GroupByAllSameStations merge(GroupByAllSameStations other) {
     return this;
-  }
-
-  /**
-   * Get the parent station id if such exists. Otherwise, return the stop id.
-   */
-  private static FeedScopedId getStopOrStationId(StopLocation stopPlace) {
-    if (stopPlace instanceof StationElement && ((StationElement) stopPlace).isPartOfStation()) {
-      return ((StationElement) stopPlace).getParentStation().getId();
-    }
-    return stopPlace.getId();
   }
 }
