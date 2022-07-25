@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -442,6 +443,10 @@ public class NodeAdapter {
         "."
       );
     }
+  }
+
+  public ZoneId asZoneId(String paramName, ZoneId defaultValue) {
+    return exist(paramName) ? ZoneId.of(param(paramName).asText()) : defaultValue;
   }
 
   /**

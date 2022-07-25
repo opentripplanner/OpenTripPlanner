@@ -326,26 +326,30 @@ public class TransitModel implements Serializable {
     return timeZone;
   }
 
-  public void setTimeZone(ZoneId timeZone) {
+  /**
+   * Initialize the time zone, if it has not been set previously.
+   */
+  public void initTimeZone(ZoneId timeZone) {
     if (this.timeZone != null) {
       throw new IllegalStateException("Timezone can't be re-set");
-    } else if (timeZone != null) {
-      this.timeZone = timeZone;
-      this.timeZoneExplicitlySet = true;
     }
+    if (timeZone == null) {
+      return;
+    }
+    this.timeZone = timeZone;
+    this.timeZoneExplicitlySet = true;
   }
 
   /**
-   * Returns the time zone for the first agency in this graph. This is used to interpret times in
-   * API requests. The JVM default time zone cannot be used because we support multiple graphs on
-   * one server via the routerId. Ideally we would want to interpret times in the time zone of the
+   * Returns the time zone for the transit model. This is either configured in the build config, or
+   * from the agencies in the data, if they are on the same time zone. This is used to interpret
+   * times in API requests. Ideally we would want to interpret times in the time zone of the
    * geographic location where the origin/destination vertex or board/alight event is located. This
    * may become necessary when we start making graphs with long distance train, boat, or air
    * services.
    */
-  public Collection<ZoneId> getAgencyTimeZones() {
-    CalendarService cs = this.getCalendarService();
-    Collection<ZoneId> ret = new HashSet<>();
+  public Set<ZoneId> getAgencyTimeZones() {
+    Set<ZoneId> ret = new HashSet<>();
     for (Agency agency : agencies) {
       ret.add(agency.getTimezone());
     }

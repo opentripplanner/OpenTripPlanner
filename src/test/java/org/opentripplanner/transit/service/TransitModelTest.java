@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.model.Timetable;
@@ -54,7 +53,7 @@ class TransitModelTest {
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     // Whit explicit time zone
-    transitModel.setTimeZone(ZoneId.of("America/Chicago"));
+    transitModel.initTimeZone(ZoneId.of("America/Chicago"));
 
     // First GTFS bundle should be added successfully
     ConstantsForTests.addGtfsToGraph(

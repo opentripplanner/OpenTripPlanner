@@ -381,7 +381,7 @@ public class BuildConfig {
     maxElevationPropagationMeters = c.asInt("maxElevationPropagationMeters", 2000);
     boardingLocationTags = c.asTextSet("boardingLocationTags", Set.of("ref"));
     discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
-    timeZone = Optional.ofNullable(c.asText("timeZone", null)).map(ZoneId::of).orElse(null);
+    timeZone = c.asZoneId("timeZone", null);
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(c.asRawNode("fares"));
