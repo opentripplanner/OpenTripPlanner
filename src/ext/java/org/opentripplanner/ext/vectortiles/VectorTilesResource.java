@@ -174,6 +174,21 @@ public class VectorTilesResource {
 
   private class TileJson implements Serializable {
 
+    // Some fields(all @SuppressWarnings("unused")) below are required to support the TileJSON
+    // format. See https://github.com/mapbox/tilejson-spec
+
+    @SuppressWarnings("unused")
+    public final String tilejson = "2.2.0";
+
+    @SuppressWarnings("unused")
+    public final String scheme = "xyz";
+
+    @SuppressWarnings("unused")
+    public final int minzoom = VectorTileConfig.MIN_ZOOM;
+
+    @SuppressWarnings("unused")
+    public final int maxzoom = VectorTileConfig.MAX_ZOOM;
+
     public final String name = "OpenTripPlanner";
     public final String attribution;
     public final String[] tiles;
