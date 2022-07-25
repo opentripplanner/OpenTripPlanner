@@ -10,11 +10,11 @@ import java.util.Collection;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.timetable.Direction;
 
 public class TripMapperTest {
 
@@ -24,17 +24,18 @@ public class TripMapperTest {
   private static final String BLOCK_ID = "Block Id";
   private static final int DIRECTION_ID = 1;
   private static final String FARE_ID = "Fare Id";
-  private static final Route ROUTE = new Route();
   private static final String TRIP_HEADSIGN = "Trip Headsign";
   private static final String TRIP_SHORT_NAME = "Trip Short Name";
 
-  private static final WheelchairAccessibility WHEELCHAIR_ACCESSIBLE =
-    WheelchairAccessibility.POSSIBLE;
+  private static final int WHEELCHAIR_ACCESSIBLE = 1;
 
   private static final Trip TRIP = new Trip();
 
+  public static final DataImportIssueStore ISSUE_STORE = new DataImportIssueStore(false);
+
   private final TripMapper subject = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))
+    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE),
+    new DirectionMapper(ISSUE_STORE)
   );
 
   static {
@@ -50,7 +51,7 @@ public class TripMapperTest {
     TRIP.setShapeId(AGENCY_AND_ID);
     TRIP.setTripHeadsign(TRIP_HEADSIGN);
     TRIP.setTripShortName(TRIP_SHORT_NAME);
-    TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE.gtfsCode);
+    TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE);
   }
 
   @Test
@@ -66,14 +67,14 @@ public class TripMapperTest {
 
     assertEquals("A:1", result.getId().toString());
     assertEquals(BLOCK_ID, result.getGtfsBlockId());
-    assertEquals(DIRECTION_ID, result.getDirection().gtfsCode);
+    assertEquals(Direction.INBOUND, result.getDirection());
     assertEquals(FARE_ID, result.getGtfsFareId());
     assertNotNull(result.getRoute());
     assertEquals("A:1", result.getServiceId().toString());
     assertEquals("A:1", result.getShapeId().toString());
     assertEquals(TRIP_HEADSIGN, result.getHeadsign());
     assertEquals(TRIP_SHORT_NAME, result.getShortName());
-    assertEquals(WHEELCHAIR_ACCESSIBLE, result.getWheelchairBoarding());
+    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairBoarding());
     assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
   }
 
@@ -94,7 +95,7 @@ public class TripMapperTest {
     assertNull(result.getShapeId());
     assertNull(result.getHeadsign());
     assertNull(result.getShortName());
-    assertEquals(-1, result.getDirection().gtfsCode);
+    assertEquals(Direction.UNKNOWN, result.getDirection());
     assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairBoarding());
     assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
   }

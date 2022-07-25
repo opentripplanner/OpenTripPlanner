@@ -49,10 +49,10 @@ public final class StopTime implements Comparable<StopTime> {
   private int flexWindowEnd = MISSING_VALUE;
 
   // Disabled by default
-  private int flexContinuousPickup = MISSING_VALUE;
+  private PickDrop flexContinuousPickup = PickDrop.NONE;
 
   // Disabled by default
-  private int flexContinuousDropOff = MISSING_VALUE;
+  private PickDrop flexContinuousDropOff = PickDrop.NONE;
 
   private BookingInfo dropOffBookingInfo;
 
@@ -248,19 +248,19 @@ public final class StopTime implements Comparable<StopTime> {
     this.flexWindowEnd = flexWindowEnd;
   }
 
-  public int getFlexContinuousPickup() {
-    return flexContinuousPickup == MISSING_VALUE ? 1 : flexContinuousPickup;
+  public PickDrop getFlexContinuousPickup() {
+    return flexContinuousPickup;
   }
 
-  public void setFlexContinuousPickup(int flexContinuousPickup) {
+  public void setFlexContinuousPickup(PickDrop flexContinuousPickup) {
     this.flexContinuousPickup = flexContinuousPickup;
   }
 
-  public int getFlexContinuousDropOff() {
-    return flexContinuousDropOff == MISSING_VALUE ? 1 : flexContinuousDropOff;
+  public PickDrop getFlexContinuousDropOff() {
+    return flexContinuousDropOff;
   }
 
-  public void setFlexContinuousDropOff(int flexContinuousDropOff) {
+  public void setFlexContinuousDropOff(PickDrop flexContinuousDropOff) {
     this.flexContinuousDropOff = flexContinuousDropOff;
   }
 

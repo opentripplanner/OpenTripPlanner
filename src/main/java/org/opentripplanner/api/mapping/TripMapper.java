@@ -22,10 +22,13 @@ public class TripMapper {
     api.tripShortName = obj.getShortName();
     api.tripHeadsign = obj.getHeadsign();
     api.routeShortName = obj.getRoute().getShortName();
-    api.directionId = obj.getGtfsDirectionIdAsString(null);
+    final Integer directionId = DirectionMapper.mapToApi(obj.getDirection());
+    if (directionId != null) {
+      api.directionId = Integer.toString(directionId);
+    }
     api.blockId = obj.getGtfsBlockId();
     api.shapeId = FeedScopedIdMapper.mapToApi(obj.getShapeId());
-    api.wheelchairAccessible = obj.getWheelchairBoarding().gtfsCode;
+    api.wheelchairAccessible = WheelchairAccessibilityMapper.mapToApi(obj.getWheelchairBoarding());
     api.bikesAllowed = BikeAccessMapper.mapToApi(obj.getBikesAllowed());
     api.fareId = obj.getGtfsFareId();
 
@@ -45,7 +48,7 @@ public class TripMapper {
 
     // TODO OTP2 - All ids should be fully qualified including feed scope id.
     api.shapeId = shape == null ? null : shape.getId();
-    api.direction = domain.getDirection().gtfsCode;
+    api.direction = DirectionMapper.mapToApi(domain.getDirection());
 
     return api;
   }

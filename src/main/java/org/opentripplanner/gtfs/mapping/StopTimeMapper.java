@@ -66,14 +66,18 @@ class StopTimeMapper {
     lhs.setStopSequence(rhs.getStopSequence());
     lhs.setStopHeadsign(rhs.getStopHeadsign());
     lhs.setRouteShortName(rhs.getRouteShortName());
-    lhs.setPickupType(PickDrop.fromGtfsCode(rhs.getPickupType()));
-    lhs.setDropOffType(PickDrop.fromGtfsCode(rhs.getDropOffType()));
+    lhs.setPickupType(PickDropMapper.map(rhs.getPickupType()));
+    lhs.setDropOffType(PickDropMapper.map(rhs.getDropOffType()));
     lhs.setShapeDistTraveled(rhs.getShapeDistTraveled());
     lhs.setFarePeriodId(rhs.getFarePeriodId());
     lhs.setFlexWindowStart(rhs.getStartPickupDropOffWindow());
     lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
-    lhs.setFlexContinuousPickup(rhs.getContinuousPickup());
-    lhs.setFlexContinuousDropOff(rhs.getContinuousDropOff());
+    lhs.setFlexContinuousPickup(
+      PickDropMapper.mapFlexContinuousPickDrop(rhs.getContinuousPickup())
+    );
+    lhs.setFlexContinuousDropOff(
+      PickDropMapper.mapFlexContinuousPickDrop(rhs.getContinuousDropOff())
+    );
     lhs.setPickupBookingInfo(bookingRuleMapper.map(rhs.getPickupBookingRule()));
     lhs.setDropOffBookingInfo(bookingRuleMapper.map(rhs.getDropOffBookingRule()));
 
