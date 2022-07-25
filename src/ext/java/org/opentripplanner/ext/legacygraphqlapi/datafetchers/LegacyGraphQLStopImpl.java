@@ -4,6 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
@@ -244,12 +246,63 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             return null;
           }
 
+          TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
+          long startTime = args.getLegacyGraphQLStartTime();
+          if (timetableSnapshot != null && timetableSnapshot.hasLastAddedTripPatterns()) {
+            return Stream
+              .concat(
+                getPatterns(environment)
+                  .stream()
+                  .flatMap(tripPattern ->
+                    tripPattern
+                      .scheduledTripsAsStream()
+                      .map(trip -> {
+                        LocalDate date = Instant
+                          .ofEpochSecond(
+                            startTime == 0 ? System.currentTimeMillis() / 1000 : startTime
+                          )
+                          .atZone(transitService.getTimeZone())
+                          .toLocalDate();
+                        return timetableSnapshot.getLastAddedTripPattern(trip.getId(), date);
+                      })
+                  )
+                  // We only return realtime added patterns if they have the same stops in the same
+                  // order as the original pattern
+                  .filter(tripPattern ->
+                    tripPattern != null &&
+                    tripPattern.isModifiedFromTripPatternWithEqualStops(pattern)
+                  ),
+                Stream.of(pattern)
+              )
+              .flatMap(tripPattern ->
+                transitService
+                  .stopTimesForPatternAtStop(
+                    stop,
+                    tripPattern,
+                    startTime,
+                    args.getLegacyGraphQLTimeRange(),
+                    args.getLegacyGraphQLNumberOfDepartures(),
+                    args.getLegacyGraphQLOmitNonPickups()
+                      ? ArrivalDeparture.DEPARTURES
+                      : ArrivalDeparture.BOTH
+                  )
+                  .stream()
+              )
+              .sorted(
+                Comparator.comparing((TripTimeOnDate tts) ->
+                  tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
+                )
+              )
+              .limit(args.getLegacyGraphQLNumberOfDepartures())
+              .toList();
+          }
+
           // TODO: use args.getLegacyGraphQLOmitCanceled()
 
           return transitService.stopTimesForPatternAtStop(
             stop,
             pattern,
-            args.getLegacyGraphQLStartTime(),
+            startTime,
             args.getLegacyGraphQLTimeRange(),
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()

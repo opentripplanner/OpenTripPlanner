@@ -158,6 +158,13 @@ public class TimetableSnapshot {
   }
 
   /**
+   * @return if any trip patterns were added.
+   */
+  public boolean hasLastAddedTripPatterns() {
+    return !lastAddedTripPattern.isEmpty();
+  }
+
+  /**
    * Update the trip times of one trip in a timetable of a trip pattern. If the trip of the trip
    * times does not exist yet in the timetable, add it.
    *
