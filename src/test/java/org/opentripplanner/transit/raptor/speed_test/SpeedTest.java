@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+import static org.opentripplanner.standalone.configure.OTPAppConstruction.creatTransitLayerForRaptor;
 import static org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer.nanosToMillisecond;
 
 import java.io.File;
@@ -75,7 +76,9 @@ public class SpeedTest {
         timer.getRegistry(),
         false
       );
-    // TODO serverContext.startup();
+    // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
+    // we do it manually here
+    creatTransitLayerForRaptor(serverContext.transitModel(), serverContext.routerConfig());
 
     timer.setUp(opts.groupResultsByCategory());
   }

@@ -38,17 +38,11 @@ public class OTPWebApplication extends Application {
   static {
     // Remove existing handlers attached to the j.u.l root logger
     SLF4JBridgeHandler.removeHandlersForRootLogger();
-    // Bridge j.u.l (used by Jersey) to the SLF4J root logger, so all logging goes through the same API
+    // Bridge j.u.l (used by Jersey) to the SLF4J root logger, so all logging goes through the same
+    // API
     SLF4JBridgeHandler.install();
   }
 
-  /**
-   * The OTPServer provides entry points to OTP routing functionality for a collection of
-   * OTPRouters. It provides a Java API, not an HTTP API. The OTPApplication wraps an OTPServer in a
-   * Jersey (JAX-RS) Application, configuring an HTTP API.
-   *
-   * @param serverContext The OTP server to wrap
-   */
   public OTPWebApplication(OtpServerContext serverContext) {
     this.serverContext = serverContext;
   }
@@ -121,8 +115,8 @@ public class OTPWebApplication extends Application {
    * Return an HK2 Binder that injects this specific OtpServerContext instance into Jersey web
    * resources. This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as
    * a singleton. Jersey forces us to use injection to get application context into HTTP method
-   * handlers, but in OTP we always just inject this OTPServer instance and grab anything else we
-   * need (routers, graphs, application components) from this single object.
+   * handlers, but in OTP we always just inject this OTP server context and grab anything else we
+   * need (graph and other application components) from this single object.
    * <p>
    * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */

@@ -313,7 +313,6 @@ public class OpenStreetMapModuleTest {
     loader.buildGraph(graph, transitModel, extra);
 
     var serverContext = TestServerContext.createServerContext(graph, transitModel);
-    // TODO serverContext.startup();
 
     RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
 
