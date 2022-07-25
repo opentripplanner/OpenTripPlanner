@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
@@ -55,9 +55,9 @@ public class TestIntermediatePlaces {
   @BeforeAll
   public static void setUp() {
     try {
-      OtpModel otpModel = FakeGraph.buildGraphNoTransit();
-      graph = otpModel.graph;
-      TransitModel transitModel = otpModel.transitModel;
+      TestOtpModel model = FakeGraph.buildGraphNoTransit();
+      graph = model.graph();
+      TransitModel transitModel = model.transitModel();
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
       graph.index();

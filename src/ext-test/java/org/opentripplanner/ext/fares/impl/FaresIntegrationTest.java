@@ -10,7 +10,7 @@ import java.util.Currency;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -31,9 +31,9 @@ public class FaresIntegrationTest {
 
   @Test
   public void testBasic() {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
-    var graph = otpModel.graph;
-    var transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
+    var graph = model.graph();
+    var transitModel = model.transitModel();
 
     var feedId = transitModel.getFeedIds().iterator().next();
 
@@ -49,9 +49,9 @@ public class FaresIntegrationTest {
 
   @Test
   public void testPortland() {
-    OtpModel otpModel = ConstantsForTests.getInstance().getCachedPortlandGraph();
-    Graph graph = otpModel.graph;
-    TransitModel transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    Graph graph = model.graph();
+    TransitModel transitModel = model.transitModel();
     var portlandId = transitModel.getFeedIds().iterator().next();
 
     var serverContext = TestServerContext.createServerContext(graph, transitModel);
@@ -101,12 +101,12 @@ public class FaresIntegrationTest {
 
   @Test
   public void testKCM() {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(
       ConstantsForTests.KCM_GTFS,
       new SeattleFareServiceFactory()
     );
-    Graph graph = otpModel.graph;
-    TransitModel transitModel = otpModel.transitModel;
+    Graph graph = model.graph();
+    TransitModel transitModel = model.transitModel();
 
     assertEquals("America/Los_Angeles", transitModel.getTimeZone().getId());
 
@@ -140,9 +140,9 @@ public class FaresIntegrationTest {
 
   @Test
   public void testFareComponent() {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
-    Graph graph = otpModel.graph;
-    TransitModel transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
+    Graph graph = model.graph();
+    TransitModel transitModel = model.transitModel();
     String feedId = transitModel.getFeedIds().iterator().next();
 
     var serverContext = TestServerContext.createServerContext(graph, transitModel);

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -222,9 +222,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
   @BeforeAll
   static void setup() {
-    OtpModel otpModel = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
-    graph = otpModel.graph;
-    transitModel = otpModel.transitModel;
+    TestOtpModel model = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    graph = model.graph();
+    transitModel = model.transitModel();
   }
 
   private static List<Itinerary> getItineraries(

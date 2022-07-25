@@ -155,10 +155,10 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph;
+    graph = otpModel.graph();
 
     graph.hasStreets = true;
-    transitModel = otpModel.transitModel;
+    transitModel = otpModel.transitModel();
     new StreetLinkerModule().buildGraph(graph, transitModel, null, new DataImportIssueStore(false));
   }
 

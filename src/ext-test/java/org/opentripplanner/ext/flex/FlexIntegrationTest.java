@@ -20,7 +20,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
@@ -61,9 +61,9 @@ public class FlexIntegrationTest {
     var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
     var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
 
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(osmPath);
-    graph = otpModel.graph;
-    transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(osmPath);
+    graph = model.graph();
+    transitModel = model.transitModel();
 
     addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
     serverContext = TestServerContext.createServerContext(graph, transitModel);

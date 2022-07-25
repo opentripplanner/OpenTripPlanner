@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -31,8 +31,8 @@ public class BicycleRoutingTest {
   private final Graph herrenbergGraph;
 
   {
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
-    herrenbergGraph = otpModel.graph;
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    herrenbergGraph = model.graph();
   }
 
   /**

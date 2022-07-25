@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.model.StopTime;
@@ -80,13 +80,13 @@ public abstract class GraphRoutingTest {
       .collect(Collectors.joining(" - "));
   }
 
-  protected OtpModel graphOf(Builder builder) {
+  protected TestOtpModel graphOf(Builder builder) {
     builder.build();
     Graph graph = builder.graph();
     TransitModel transitModel = builder.transitModel();
     transitModel.index();
     graph.index();
-    return new OtpModel(graph, transitModel);
+    return new TestOtpModel(graph, transitModel);
   }
 
   protected GraphPath routeParkAndRide(

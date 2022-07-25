@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -34,8 +34,8 @@ public class CarRoutingTest {
 
   @BeforeAll
   public static void setup() {
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
-    herrenbergGraph = otpModel.graph;
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    herrenbergGraph = model.graph();
     herrenbergGraph.index();
   }
 
@@ -56,10 +56,10 @@ public class CarRoutingTest {
   @Test
   @DisplayName("car routes can contain loops (traversing the same edge twice)")
   public void shouldAllowLoopCausedByTurnRestrictions() {
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(
       ConstantsForTests.HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM
     );
-    var hindenburgStrUnderConstruction = otpModel.graph;
+    var hindenburgStrUnderConstruction = model.graph();
 
     var gueltsteinerStr = new GenericLocation(48.59240, 8.87024);
     var aufDemGraben = new GenericLocation(48.59487, 8.87133);

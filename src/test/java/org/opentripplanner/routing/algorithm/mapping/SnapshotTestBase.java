@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.api.mapping.ItineraryMapper;
 import org.opentripplanner.api.parameter.ApiRequestMode;
@@ -81,14 +81,14 @@ public abstract class SnapshotTestBase {
 
   protected OtpServerContext serverContext() {
     if (serverContext == null) {
-      OtpModel otpModel = getGraph();
-      serverContext = TestServerContext.createServerContext(otpModel.graph, otpModel.transitModel);
+      TestOtpModel model = getGraph();
+      serverContext = TestServerContext.createServerContext(model.graph(), model.transitModel());
     }
 
     return serverContext;
   }
 
-  protected OtpModel getGraph() {
+  protected TestOtpModel getGraph() {
     return ConstantsForTests.getInstance().getCachedPortlandGraph();
   }
 

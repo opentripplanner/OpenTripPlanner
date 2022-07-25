@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -58,9 +58,9 @@ public class SpeedTest {
   private SpeedTest(SpeedTestCmdLineOpts opts) {
     this.opts = opts;
     this.config = SpeedTestConfig.config(opts.rootDir());
-    OtpModel otpModel = loadGraph(opts.rootDir(), config.graph);
-    this.graph = otpModel.graph;
-    this.transitModel = otpModel.transitModel;
+    TestOtpModel model = loadGraph(opts.rootDir(), config.graph);
+    this.graph = model.graph();
+    this.transitModel = model.transitModel();
 
     this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
 
@@ -101,7 +101,7 @@ public class SpeedTest {
     }
   }
 
-  private static OtpModel loadGraph(File baseDir, URI path) {
+  private static TestOtpModel loadGraph(File baseDir, URI path) {
     File file = path == null
       ? OtpDataStore.graphFile(baseDir)
       : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
@@ -113,7 +113,7 @@ public class SpeedTest {
     TransitModel transitModel = serializedGraphObject.transitModel;
     transitModel.index();
     graph.index();
-    return new OtpModel(graph, transitModel);
+    return new TestOtpModel(graph, transitModel);
   }
 
   /**
