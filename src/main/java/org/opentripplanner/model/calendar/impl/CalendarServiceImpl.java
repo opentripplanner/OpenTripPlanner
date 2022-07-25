@@ -2,7 +2,6 @@
 package org.opentripplanner.model.calendar.impl;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,11 +41,6 @@ public class CalendarServiceImpl implements CalendarService {
   @Override
   public Set<FeedScopedId> getServiceIdsOnDate(LocalDate date) {
     return data.getServiceIdsForDate(date);
-  }
-
-  @Override
-  public ZoneId getTimeZoneForAgencyId(FeedScopedId agencyId) {
-    return data.getTimeZoneForAgencyId(agencyId);
   }
 
   /**

@@ -8,9 +8,9 @@ import com.google.cloud.storage.Storage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * This is a an adapter to to simulate a file directory on a GCS. Files created using an instance of

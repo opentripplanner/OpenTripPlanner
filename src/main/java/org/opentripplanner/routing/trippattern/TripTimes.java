@@ -4,6 +4,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -423,6 +424,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     // existing shift should usually (always?) be 0 on freqs
     shifted.timeShift = shifted.timeShift + shift;
     return shifted;
+  }
+
+  // Time-shift all times on this trip. This is used when updating the time zone for the trip.
+  public void timeShift(Duration duration) {
+    timeShift += duration.toSeconds();
   }
 
   /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */
