@@ -52,7 +52,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            graph/*.osm.pbf
+            graph/*.pbf
             graph/*.zip
           key: graph-${{ matrix.location }}
 
