@@ -127,7 +127,7 @@ public class RoutingWorker {
       request.wheelchairAccessibility.maxSlope(),
       router.graph.getService(FareService.class),
       router.transitModel.getTransitAlertService(),
-      router.transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations()::get
+      router.transitModel.getStopModel().getStopModelIndex()::getMultiModalStationForStation
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);

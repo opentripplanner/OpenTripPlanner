@@ -78,7 +78,9 @@ public class LuceneIndex implements Serializable {
         )
       ) {
         transitModel
-          .getAllStopLocations()
+          .getStopModel()
+          .getStopModelIndex()
+          .getAllStops()
           .forEach(stopLocation ->
             addToIndex(
               directoryWriter,

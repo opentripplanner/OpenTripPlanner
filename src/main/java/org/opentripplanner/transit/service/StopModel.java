@@ -56,8 +56,8 @@ public class StopModel implements Serializable {
 
   private transient StopModelIndex index;
 
-  public Map<Stop, TransitStopVertex> getStopVertexForStop() {
-    return index.getStopVertexForStop();
+  public TransitStopVertex getStopVertexForStop(Stop stop) {
+    return index.getStopVertexForStop(stop);
   }
 
   public void index() {
@@ -85,7 +85,12 @@ public class StopModel implements Serializable {
       return null;
     }
 
-    return stops.stream().map(index.getStopVertexForStop()::get).collect(Collectors.toSet());
+    return stops
+      .stream()
+      .filter(Stop.class::isInstance)
+      .map(Stop.class::cast)
+      .map(index::getStopVertexForStop)
+      .collect(Collectors.toSet());
   }
 
   /**

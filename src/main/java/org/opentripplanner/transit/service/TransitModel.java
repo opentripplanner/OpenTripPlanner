@@ -17,17 +17,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -50,7 +47,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -382,26 +378,7 @@ public class TransitModel implements Serializable {
    * Finds a {@link StopLocation} by id.
    */
   public StopLocation getStopLocationById(FeedScopedId id) {
-    var stop = stopModel.getStopModelIndex().getStopForId(id);
-    if (stop != null) {
-      return stop;
-    }
-
-    return getAllFlexStopsFlat()
-      .stream()
-      .filter(stopLocation -> stopLocation.getId().equals(id))
-      .findAny()
-      .orElse(null);
-  }
-
-  /**
-   * Returns all {@link StopLocation}s present in this graph, including normal and flex locations.
-   */
-  public Stream<StopLocation> getAllStopLocations() {
-    return Stream.concat(
-      getStopModel().getStopModelIndex().getAllStops().stream(),
-      getAllFlexStopsFlat().stream()
-    );
+    return stopModel.getStopModelIndex().getStopForId(id);
   }
 
   public Map<FeedScopedId, Integer> getServiceCodes() {
@@ -412,28 +389,6 @@ public class TransitModel implements Serializable {
     return transfersByStop.get(stop);
   }
 
-  /**
-   * Gets all the flex stop locations, including the elements of FlexLocationGroups.
-   */
-  public Set<StopLocation> getAllFlexStopsFlat() {
-    Set<StopLocation> stopLocations = flexTripsById
-      .values()
-      .stream()
-      .flatMap(t -> t.getStops().stream())
-      .collect(Collectors.toSet());
-
-    stopLocations.addAll(
-      stopLocations
-        .stream()
-        .filter(s -> s instanceof FlexLocationGroup)
-        .flatMap(g -> ((FlexLocationGroup) g).getLocations().stream().filter(e -> e instanceof Stop)
-        )
-        .toList()
-    );
-
-    return stopLocations;
-  }
-
   public void calculateTransitCenter() {
     stopModel.calculateTransitCenter();
   }
@@ -442,8 +397,8 @@ public class TransitModel implements Serializable {
     return stopModel;
   }
 
-  public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
-    return stopModel.getStopModelIndex().getStopSpatialIndex();
+  public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
+    return stopModel.getStopModelIndex().queryStopSpatialIndex(envelope);
   }
 
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {

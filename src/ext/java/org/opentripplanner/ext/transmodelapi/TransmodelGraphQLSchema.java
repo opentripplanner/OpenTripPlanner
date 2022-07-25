@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.apache.commons.collections4.CollectionUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
@@ -450,7 +451,7 @@ public class TransmodelGraphQLSchema {
               .map(station ->
                 new MonoOrMultiModalStation(
                   station,
-                  transitService.getMultiModalStationForStations().get(station)
+                  transitService.getMultiModalStationForStation(station)
                 )
               )
               .collect(Collectors.toList());
@@ -582,8 +583,7 @@ public class TransmodelGraphQLSchema {
                   .entrySet()
                   .stream()
                   .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
-                  .collect(Collectors.toList())
-                  .size() !=
+                  .count() !=
                 1
               ) {
                 throw new IllegalArgumentException("Unable to combine other filters with ids");
@@ -594,7 +594,9 @@ public class TransmodelGraphQLSchema {
                 .collect(Collectors.toList());
             }
             if (environment.getArgument("name") == null) {
-              return GqlUtil.getTransitService(environment).getAllStops();
+              return StreamSupport
+                .stream(GqlUtil.getTransitService(environment).getAllStops().spliterator(), false)
+                .toList();
             }
             //                            else {
             //                                return index.getLuceneIndex().query(environment.getArgument("name"), true, true, false)

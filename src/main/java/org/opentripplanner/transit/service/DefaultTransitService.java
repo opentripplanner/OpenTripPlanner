@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -170,12 +171,6 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModel.getStopModel().getLocationById(id);
   }
 
-  /** {@link TransitModel#getAllFlexStopsFlat()} */
-  @Override
-  public Set<StopLocation> getAllFlexStopsFlat() {
-    return this.transitModel.getAllFlexStopsFlat();
-  }
-
   /** {@link TransitModelIndex#getAgencyForId(FeedScopedId)} */
   @Override
   public Agency getAgencyForId(FeedScopedId id) {
@@ -235,7 +230,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link StopModelIndex#getAllStops()} */
   @Override
-  public Collection<StopLocation> getAllStops() {
+  public Iterable<StopLocation> getAllStops() {
     return this.transitModel.getStopModel().getStopModelIndex().getAllStops();
   }
 
@@ -269,10 +264,12 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternsForRoute();
   }
 
-  /** {@link StopModelIndex#getMultiModalStationForStations()} */
+  /** {@link StopModelIndex#getMultiModalStationForStation(Station)} */
   @Override
-  public Map<Station, MultiModalStation> getMultiModalStationForStations() {
-    return this.transitModel.getStopModel().getStopModelIndex().getMultiModalStationForStations();
+  public MultiModalStation getMultiModalStationForStation(Station station) {
+    return this.transitModel.getStopModel()
+      .getStopModelIndex()
+      .getMultiModalStationForStation(station);
   }
 
   /**
@@ -525,16 +522,14 @@ public class DefaultTransitService implements TransitEditorService {
     return transitModel.getTransitServiceStarts();
   }
 
-  /** {@link StopModelIndex#getStopVertexForStop()} */
+  /** {@link StopModelIndex#getStopVertexForStop(StopLocation)} */
   @Override
-  public Map<Stop, TransitStopVertex> getStopVertexForStop() {
-    return transitModel.getStopModel().getStopVertexForStop();
+  public TransitStopVertex getStopVertexForStop(Stop stop) {
+    return transitModel.getStopModel().getStopVertexForStop(stop);
   }
 
-  /** {@link StopModelIndex#getStopSpatialIndex()} */
-
   @Override
-  public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
-    return transitModel.getStopModel().getStopModelIndex().getStopSpatialIndex();
+  public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
+    return transitModel.getStopModel().getStopModelIndex().queryStopSpatialIndex(envelope);
   }
 }

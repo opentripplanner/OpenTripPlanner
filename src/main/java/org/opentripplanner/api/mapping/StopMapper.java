@@ -3,6 +3,7 @@ package org.opentripplanner.api.mapping;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.transit.model.site.Stop;
@@ -80,11 +81,14 @@ public class StopMapper {
     return api;
   }
 
-  public static List<ApiStopShort> mapToApiShort(Collection<StopLocation> domain) {
+  public static List<ApiStopShort> mapToApiShort(Iterable<StopLocation> domain) {
     if (domain == null) {
       return null;
     }
-    return domain.stream().map(StopMapper::mapToApiShort).collect(Collectors.toList());
+    return StreamSupport
+      .stream(domain.spliterator(), false)
+      .map(StopMapper::mapToApiShort)
+      .toList();
   }
 
   /**

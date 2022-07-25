@@ -34,13 +34,10 @@ public class StopModelIndex implements StopIndexForRaptor {
 
   private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
   private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
-
   private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
-
-  public final Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
-
-  public final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
-
+  private final Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
+  private final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
+  private final Map<FeedScopedId, StopLocation> stopForId = Maps.newHashMap();
   private final List<StopLocation> stopsByIndex;
   private final Map<StopLocation, Integer> indexByStop = new HashMap<>();
 
@@ -94,25 +91,23 @@ public class StopModelIndex implements StopIndexForRaptor {
     LOG.info("StopModelIndex init complete.");
   }
 
-  public Map<Stop, TransitStopVertex> getStopVertexForStop() {
-    return stopVertexForStop;
+  public TransitStopVertex getStopVertexForStop(Stop stop) {
+    return stopVertexForStop.get(stop);
   }
 
-  public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
-    return stopSpatialIndex;
+  public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
+    return stopSpatialIndex.query(envelope);
   }
-
-  private final Map<FeedScopedId, StopLocation> stopForId = Maps.newHashMap();
 
   public StopLocation getStopForId(FeedScopedId id) {
     return stopForId.get(id);
   }
 
-  public Map<Station, MultiModalStation> getMultiModalStationForStations() {
-    return multiModalStationForStations;
+  public MultiModalStation getMultiModalStationForStation(Station station) {
+    return multiModalStationForStations.get(station);
   }
 
-  public Collection<StopLocation> getAllStops() {
+  public Iterable<StopLocation> getAllStops() {
     return stopForId.values();
   }
 
@@ -129,5 +124,9 @@ public class StopModelIndex implements StopIndexForRaptor {
   @Override
   public int size() {
     return stopsByIndex.size();
+  }
+
+  public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
+    return locationIndex.query(envelope);
   }
 }

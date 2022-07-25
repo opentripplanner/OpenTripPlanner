@@ -1005,7 +1005,7 @@ public class LegacyGraphQLQueryTypeImpl
           .collect(Collectors.toList());
       }
 
-      var stopStream = transitService.getAllStops().stream();
+      var stopStream = StreamSupport.stream(transitService.getAllStops().spliterator(), false);
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
@@ -1036,8 +1036,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       Stream<Stop> stopStream = getTransitService(environment)
-        .getStopSpatialIndex()
-        .query(envelope)
+        .queryStopSpatialIndex(envelope)
         .stream()
         .filter(transitStopVertex -> envelope.contains(transitStopVertex.getCoordinate()))
         .map(TransitStopVertex::getStop);
