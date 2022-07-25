@@ -249,6 +249,10 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
           long startTime = args.getLegacyGraphQLStartTime();
           if (timetableSnapshot != null && timetableSnapshot.hasLastAddedTripPatterns()) {
+            LocalDate date = Instant
+              .ofEpochSecond(startTime == 0 ? System.currentTimeMillis() / 1000 : startTime)
+              .atZone(transitService.getTimeZone())
+              .toLocalDate();
             return Stream
               .concat(
                 getPatterns(environment)
@@ -256,15 +260,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
                   .flatMap(tripPattern ->
                     tripPattern
                       .scheduledTripsAsStream()
-                      .map(trip -> {
-                        LocalDate date = Instant
-                          .ofEpochSecond(
-                            startTime == 0 ? System.currentTimeMillis() / 1000 : startTime
-                          )
-                          .atZone(transitService.getTimeZone())
-                          .toLocalDate();
-                        return timetableSnapshot.getLastAddedTripPattern(trip.getId(), date);
-                      })
+                      .map(trip -> timetableSnapshot.getLastAddedTripPattern(trip.getId(), date))
                   )
                   // We only return realtime added patterns if they have the same stops in the same
                   // order as the original pattern
