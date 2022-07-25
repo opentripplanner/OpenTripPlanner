@@ -140,13 +140,20 @@ public class GtfsModule implements GraphBuilderModule {
         )
           .run(transitModel);
 
-        new InterlineProcessor(
-          transitModel.getTransferService(),
-          builder.getStaySeatedNotAllowed(),
-          maxInterlineDistance,
-          issueStore
-        )
-          .run(transitModel.getAllTripPatterns());
+        if (maxInterlineDistance >= 0) {
+          new InterlineProcessor(
+            transitModel.getTransferService(),
+            builder.getStaySeatedNotAllowed(),
+            maxInterlineDistance,
+            issueStore
+          )
+            .run(transitModel.getAllTripPatterns());
+        } else {
+          LOG.info(
+            "maxInterlineDistance is {}. Not inserting interlining trips based on block id.",
+            maxInterlineDistance
+          );
+        }
 
         fareServiceFactory.processGtfs(otpTransitService);
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
