@@ -53,8 +53,6 @@ public interface OtpServerContext {
 
   RaptorConfig<TripSchedule> raptorConfig();
 
-  double streetRoutingTimeoutSeconds();
-
   Graph graph();
 
   /**

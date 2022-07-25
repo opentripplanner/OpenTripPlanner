@@ -111,11 +111,6 @@ public class DefaultServerContext implements OtpServerContext {
   }
 
   @Override
-  public double streetRoutingTimeoutSeconds() {
-    return routerConfig.streetRoutingTimeoutSeconds();
-  }
-
-  @Override
   public RouterConfig routerConfig() {
     return routerConfig;
   }

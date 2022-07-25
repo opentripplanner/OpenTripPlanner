@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
@@ -68,7 +67,7 @@ public class GraphPathFinder {
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
-      .setTimeout(Duration.ofMillis((long) (serverContext.streetRoutingTimeoutSeconds() * 1000)));
+      .setTimeout(serverContext.routerConfig().streetRoutingTimeoutSeconds());
 
     // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
     if (serverContext.graphVisualizer() != null) {
