@@ -254,7 +254,6 @@ public class ItineraryListFilterChainBuilder {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
-
     filters.add(
       new GroupByFilter<>(
         GroupBySameRoutesAndStops::new,
@@ -264,7 +263,6 @@ public class ItineraryListFilterChainBuilder {
         )
       )
     );
-
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
       filters.add(new SameFirstOrLastTripFilter());
