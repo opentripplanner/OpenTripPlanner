@@ -21,7 +21,7 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
   AgencyBuilder(@Nonnull Agency original) {
     super(original);
     this.name = original.getName();
-    this.timezone = original.getTimezone();
+    this.timezone = original.getTimezone().getId();
     this.url = original.getUrl();
     this.lang = original.getLang();
     this.phone = original.getPhone();

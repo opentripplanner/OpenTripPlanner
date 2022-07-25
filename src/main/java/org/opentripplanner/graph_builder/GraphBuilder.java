@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -96,6 +97,7 @@ public class GraphBuilder implements Runnable {
 
     GraphBuilder graphBuilder = new GraphBuilder(baseGraph, config.getTransitServicePeriod());
     graphBuilder.hasTransitData = hasTransitData;
+    graphBuilder.transitModel.initTimeZone(config.timeZone);
 
     if (hasOsm) {
       List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
@@ -142,6 +144,10 @@ public class GraphBuilder implements Runnable {
 
     if (hasNetex) {
       graphBuilder.addModule(netexModule(config, dataSources.get(NETEX)));
+    }
+
+    if (hasTransitData && graphBuilder.transitModel.getAgencyTimeZones().size() > 1) {
+      graphBuilder.addModule(new TimeZoneAdjusterModule());
     }
 
     if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {

@@ -12,7 +12,6 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -32,15 +31,12 @@ import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (08.11.2017)
  */
 public class CalendarServiceDataFactoryImplTest {
-
-  private static final String AGENCY = "agency";
 
   private static final FeedScopedId SERVICE_ALLDAYS_ID = id("alldays");
 
@@ -94,11 +90,6 @@ public class CalendarServiceDataFactoryImplTest {
   }
 
   @Test
-  public void testDataGetTimeZoneForAgencyId() {
-    assertEquals("America/New_York", data.getTimeZoneForAgencyId(id(AGENCY)).getId());
-  }
-
-  @Test
   public void testServiceGetServiceIdsOnDate() {
     Set<FeedScopedId> servicesOnFriday = calendarService.getServiceIdsOnDate(A_FRIDAY);
     assertEquals("[F:alldays, F:weekdays]", sort(servicesOnFriday).toString());
@@ -115,12 +106,6 @@ public class CalendarServiceDataFactoryImplTest {
   public void testServiceGetServiceIds() {
     Set<FeedScopedId> serviceIds = calendarService.getServiceIds();
     assertEquals("[F:alldays, F:weekdays]", sort(serviceIds).toString());
-  }
-
-  @Test
-  public void testServiceGetTimeZoneForAgencyId() {
-    ZoneId result = calendarService.getTimeZoneForAgencyId(id(AGENCY));
-    assertEquals("America/New_York", result.getId());
   }
 
   @Test
@@ -156,10 +141,6 @@ public class CalendarServiceDataFactoryImplTest {
     return ctxBuilder.build();
   }
 
-  private static Agency agency(OtpTransitServiceBuilder builder) {
-    return first(builder.getAgenciesById().values());
-  }
-
   private static FareAttribute createFareAttribute() {
     return new FareAttribute(id("FA"));
   }
@@ -174,10 +155,6 @@ public class CalendarServiceDataFactoryImplTest {
 
   private static <T> List<T> sort(Collection<? extends T> c) {
     return c.stream().sorted(comparing(T::toString)).collect(toList());
-  }
-
-  private static <T> T first(Collection<? extends T> c) {
-    return sort(c).get(0);
   }
 
   private static String toString(Collection<?> c) {

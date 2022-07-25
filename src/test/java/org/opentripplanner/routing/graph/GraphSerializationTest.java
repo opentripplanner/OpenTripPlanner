@@ -159,9 +159,6 @@ public class GraphSerializationTest {
    */
   private void testRoundTrip(Graph originalGraph, TransitModel originalTransitModel)
     throws Exception {
-    // The cached timezone in the graph is transient and lazy-initialized.
-    // Previous tests may have caused a timezone to be cached.
-    originalTransitModel.clearTimeZone();
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
     SerializedGraphObject serializedObj = new SerializedGraphObject(

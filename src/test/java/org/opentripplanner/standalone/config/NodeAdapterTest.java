@@ -7,8 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -340,6 +342,20 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '4+8x' }");
     assertEquals("f(x) = 4.0 + 8.0 x", subject.asLinearFunction("key", null).toString());
     assertNull(subject.asLinearFunction("no-key", null));
+  }
+
+  @Test
+  public void asZoneId() {
+    NodeAdapter subject = newNodeAdapterForTest(
+      "{ key1 : 'UTC', key2 : 'Europe/Oslo', key3 : '+02:00', key4: 'invalid' }"
+    );
+    assertEquals("UTC", subject.asZoneId("key1", null).getId());
+    assertEquals("Europe/Oslo", subject.asZoneId("key2", null).getId());
+    assertEquals("+02:00", subject.asZoneId("key3", null).getId());
+
+    assertThrows(OtpAppException.class, () -> subject.asZoneId("key4", null));
+
+    assertEquals(ZoneId.of("UTC"), subject.asZoneId("missing-key", ZoneId.of("UTC")));
   }
 
   @Test

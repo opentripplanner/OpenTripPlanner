@@ -279,7 +279,7 @@ public class ConstantsForTests {
     return portlandGraphWithElevation;
   }
 
-  private static void addGtfsToGraph(
+  public static void addGtfsToGraph(
     Graph graph,
     TransitModel transitModel,
     String file,
