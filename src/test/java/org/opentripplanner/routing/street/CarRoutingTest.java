@@ -23,6 +23,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerContext;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
@@ -138,6 +139,7 @@ public class CarRoutingTest {
     var gpf = new GraphPathFinder(
       DefaultServerContext.create(
         RouterConfig.DEFAULT,
+        new RaptorConfig<>(RouterConfig.DEFAULT.raptorTuningParameters()),
         graph,
         Mockito.mock(TransitModel.class),
         null,

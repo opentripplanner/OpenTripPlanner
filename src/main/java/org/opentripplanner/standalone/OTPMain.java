@@ -4,7 +4,6 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import io.micrometer.core.instrument.Metrics;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.datastore.api.DataSource;
@@ -12,11 +11,10 @@ import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.OTPAppConstruction;
 import org.opentripplanner.standalone.configure.OTPApplicationFactory;
-import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.OtpAppException;
@@ -167,34 +165,22 @@ public class OTPMain {
     }
 
     if (params.doServe()) {
-      startOtpWebServer(params, graph, transitModel, app, factory, configModel);
+      app.updateModel(graph, transitModel);
+      startOtpWebServer(params, app);
     } else {
       LOG.info("Done building graph. Exiting.");
     }
   }
 
-  private static void startOtpWebServer(
-    CommandLineParameters params,
-    Graph graph,
-    TransitModel transitModel,
-    OTPAppConstruction app,
-    OTPApplicationFactory factory,
-    ConfigModel configModel
-  ) {
+  private static void startOtpWebServer(CommandLineParameters params, OTPAppConstruction app) {
     // Index graph for travel search
-    transitModel.index();
-    graph.index();
+    app.transitModel().index();
+    app.graph().index();
 
     // publishing the config version info make it available to the APIs
-    factory.setOtpConfigVersionsOnServerInfo();
+    setOtpConfigVersionsOnServerInfo(app.getFactory());
 
-    var serverContext = DefaultServerContext.create(
-      configModel.routerConfig(),
-      graph,
-      transitModel,
-      Metrics.globalRegistry,
-      params.visualize
-    );
+    var serverContext = app.serverContext();
 
     /* Start visualizer if requested. */
     if (params.visualize) {
@@ -206,9 +192,12 @@ public class OTPMain {
     // This would also avoid the awkward call to set the router on the appConstruction after it's constructed.
     // However, currently the server runs in a blocking way and waits for shutdown, so has to run last.
     if (params.doServe()) {
-      GrizzlyServer grizzlyServer = app.createGrizzlyServer(serverContext);
+      GrizzlyServer grizzlyServer = app.createGrizzlyServer();
 
-      registerShutdownHookToGracefullyShutDownServer(transitModel, serverContext);
+      registerShutdownHookToGracefullyShutDownServer(
+        app.transitModel(),
+        app.raptorTuningParameters()
+      );
 
       // Loop to restart server on uncaught fatal exceptions.
       while (true) {
@@ -235,13 +224,13 @@ public class OTPMain {
    * </ol>
    */
   private static void registerShutdownHookToGracefullyShutDownServer(
-    final TransitModel transitModel,
-    DefaultServerContext serverContext
+    TransitModel transitModel,
+    RaptorConfig<?> raptorConfig
   ) {
     var hook = new Thread(() -> {
       LOG.info("OTP shutdown started...");
       GraphUpdaterConfigurator.shutdownGraph(transitModel);
-      serverContext.raptorConfig().shutdown();
+      raptorConfig.shutdown();
       WeakCollectionCleaner.DEFAULT.exit();
       DeferredAuthorityFactory.exit();
     });
@@ -254,5 +243,12 @@ public class OTPMain {
     } else {
       LOG.info("Incoming requests will not be logged.");
     }
+  }
+
+  private static void setOtpConfigVersionsOnServerInfo(OTPApplicationFactory factory) {
+    var c = factory.configModel();
+    projectInfo().otpConfigVersion = c.otpConfig().configVersion;
+    projectInfo().buildConfigVersion = c.buildConfig().configVersion;
+    projectInfo().routerConfigVersion = c.routerConfig().getConfigVersion();
   }
 }

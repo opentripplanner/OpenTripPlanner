@@ -24,6 +24,7 @@ import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerContext;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
@@ -71,6 +72,7 @@ public class SpeedTest {
     this.serverContext =
       DefaultServerContext.create(
         RouterConfig.DEFAULT,
+        new RaptorConfig<>(RouterConfig.DEFAULT.raptorTuningParameters()),
         graph,
         transitModel,
         timer.getRegistry(),

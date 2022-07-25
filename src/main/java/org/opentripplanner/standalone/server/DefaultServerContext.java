@@ -27,8 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultServerContext implements OtpServerContext {
 
-  private final RoutingRequest defaultRoutingRequest;
-  private RoutingRequest requestScopedRoutingRequest = null;
+  private RoutingRequest routingRequest = null;
   private final Graph graph;
   private final TransitModel transitModel;
 
@@ -45,7 +44,6 @@ public class DefaultServerContext implements OtpServerContext {
    * components need to be coped here. This is
    */
   private DefaultServerContext(
-    RoutingRequest defaultRoutingRequest,
     Graph graph,
     TransitModel transitModel,
     RouterConfig routerConfig,
@@ -55,7 +53,6 @@ public class DefaultServerContext implements OtpServerContext {
     TileRendererManager tileRendererManager,
     Function<OtpServerContext, GraphVisualizer> graphVisualizerProvider
   ) {
-    this.defaultRoutingRequest = defaultRoutingRequest;
     this.graph = graph;
     this.transitModel = transitModel;
     this.routerConfig = routerConfig;
@@ -72,6 +69,7 @@ public class DefaultServerContext implements OtpServerContext {
    */
   public static DefaultServerContext create(
     RouterConfig routerConfig,
+    RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
     TransitModel transitModel,
     MeterRegistry meterRegistry,
@@ -80,12 +78,11 @@ public class DefaultServerContext implements OtpServerContext {
     var defaultRoutingRequest = routerConfig.routingRequestDefaults();
 
     return new DefaultServerContext(
-      defaultRoutingRequest,
       graph,
       transitModel,
       routerConfig,
       meterRegistry,
-      new RaptorConfig<>(routerConfig.raptorTuningParameters()),
+      raptorConfig,
       createLogger(routerConfig.requestLogFile()),
       new TileRendererManager(graph, defaultRoutingRequest),
       initGraphVisualizer ? GraphVisualizer::new : ctx -> null
@@ -95,11 +92,11 @@ public class DefaultServerContext implements OtpServerContext {
   @Override
   public RoutingRequest defaultRoutingRequest() {
     // Lazy initialize request-scoped request to avoid doing this when not needed
-    if (requestScopedRoutingRequest == null) {
-      requestScopedRoutingRequest = defaultRoutingRequest.clone();
-      requestScopedRoutingRequest.setDateTime(Instant.now());
+    if (routingRequest == null) {
+      routingRequest = routerConfig.routingRequestDefaults().clone();
+      routingRequest.setDateTime(Instant.now());
     }
-    return requestScopedRoutingRequest;
+    return routingRequest;
   }
 
   /**
@@ -107,7 +104,7 @@ public class DefaultServerContext implements OtpServerContext {
    */
   @Override
   public Locale defaultLocale() {
-    return defaultRoutingRequest.locale;
+    return routerConfig().routingRequestDefaults().locale;
   }
 
   @Override
@@ -165,7 +162,6 @@ public class DefaultServerContext implements OtpServerContext {
 
   public OtpServerContext createHttpRequestScopedCopy() {
     return new DefaultServerContext(
-      defaultRoutingRequest,
       graph,
       transitModel,
       routerConfig,
