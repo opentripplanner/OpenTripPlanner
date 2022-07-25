@@ -20,8 +20,9 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
@@ -48,7 +49,7 @@ public class SpeedTest {
   private final SpeedTestCmdLineOpts opts;
   private final SpeedTestConfig config;
   private final List<TestCaseInput> testCaseInputs;
-  private final Router router;
+  private final OtpServerContext serverContext;
   private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
   private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
   private final CsvFileIO tcIO;
@@ -66,8 +67,15 @@ public class SpeedTest {
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
-    this.router = new Router(graph, transitModel, RouterConfig.DEFAULT, timer.getRegistry());
-    this.router.startup();
+    this.serverContext =
+      new DefaultServerContext(
+        graph,
+        transitModel,
+        RouterConfig.DEFAULT,
+        timer.getRegistry(),
+        false
+      );
+    // TODO serverContext.startup();
 
     timer.setUp(opts.groupResultsByCategory());
   }
@@ -206,7 +214,7 @@ public class SpeedTest {
       );
       var routingRequest = speedTestRequest.toRoutingRequest();
 
-      var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
+      var worker = new RoutingWorker(this.serverContext, routingRequest, getTimeZoneId());
       RoutingResponse routingResponse = worker.route();
 
       var times = routingResponse.getDebugTimingAggregator().finishedRendering();

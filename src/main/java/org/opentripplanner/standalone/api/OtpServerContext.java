@@ -3,12 +3,14 @@ package org.opentripplanner.standalone.api;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
 import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 
@@ -24,6 +26,9 @@ import org.slf4j.Logger;
 public interface OtpServerContext {
   RoutingRequest copyDefaultRoutingRequest();
 
+  /**
+   * Return the default routing request locale(without cloning the request).
+   */
   Locale getDefaultLocale();
 
   double streetRoutingTimeoutSeconds();
@@ -38,9 +43,27 @@ public interface OtpServerContext {
 
   RaptorConfig<TripSchedule> raptorConfig();
 
+  /**
+   * Separate logger for incoming requests. This should be handled with a Logback logger rather than
+   * something simple like a PrintStream because requests come in multi-threaded.
+   */
   Logger requestLogger();
 
+  /** Inspector/debug services */
   TileRendererManager tileRendererManager();
 
+  /**
+   * A graphical window that is used for visualizing search progress (debugging).
+   */
   GraphVisualizer graphVisualizer();
+
+  /**
+   * This method is used to create a {@link RoutingService} valid for one request. It grantees that
+   * the data and services used are consistent and operate on the same transit snapshot. Any
+   * realtime update that happens during the request will not affect the returned service and will
+   * not be visible to the request.
+   */
+  RoutingService routingRequestService();
+
+  TransitService transitRequestService();
 }

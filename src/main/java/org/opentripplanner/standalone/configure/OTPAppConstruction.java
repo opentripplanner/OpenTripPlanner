@@ -3,23 +3,32 @@ package org.opentripplanner.standalone.configure;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.MetricsLogging;
-import org.opentripplanner.standalone.server.OTPApplication;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.server.OTPWebApplication;
+import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for creating the top level services like the {@link OTPServer}. The
- * purpose of this class is to wire the application, creating the necessary Services and modules
- * and putting them together. It is NOT responsible for starting or running the application. The
- * whole idea of this class is to separate application construction from running it.
+ * This class is responsible for creating the top level services like the {@link OTPWebApplication}
+ * and {@link GraphBuilder}. The purpose of this class is to wire the application, creating the
+ * necessary Services and modules and putting them together. It is NOT responsible for starting or
+ * running the application. The whole idea of this class is to separate application construction
+ * from running it.
  * <p>
  * The top level construction class(this class) may delegate to other construction classes
  * to inject configuration and services into sub-modules.
@@ -34,7 +43,6 @@ public class OTPAppConstruction {
 
   private final CommandLineParameters cli;
   private final OTPApplicationFactory factory;
-  private OTPServer server = null;
   private GraphBuilderDataSources graphBuilderDataSources = null;
 
   /**
@@ -54,8 +62,8 @@ public class OTPAppConstruction {
    * Create a new Grizzly server - call this method once, the new instance is created every time
    * this method is called.
    */
-  public GrizzlyServer createGrizzlyServer(Router router) {
-    return new GrizzlyServer(cli, createApplication(router));
+  public GrizzlyServer createGrizzlyServer(OtpServerContext serverContext) {
+    return new GrizzlyServer(cli, createApplication(serverContext));
   }
 
   public void validateConfigAndDataSources() {
@@ -98,21 +106,62 @@ public class OTPAppConstruction {
     return graphBuilderDataSources;
   }
 
-  private Application createApplication(Router router) {
-    return new OTPApplication(server(router));
+  private Application createApplication(OtpServerContext serverContext) {
+    LOG.info("Wiring up and configuring server.");
+    setupTransitRoutingServer(serverContext);
+    return new OTPWebApplication(serverContext);
+  }
+
+  private void setupTransitRoutingServer(OtpServerContext context) {
+    new MetricsLogging(context);
+
+    creatTransitLayerForRaptor(context.transitModel(), context.routerConfig());
+
+    /* Create Graph updater modules from JSON config. */
+    GraphUpdaterConfigurator.setupGraph(
+      context.graph(),
+      context.transitModel(),
+      context.routerConfig().updaterConfig()
+    );
+
+    context.graph().initEllipsoidToGeoidDifference();
+
+    if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
+      TransmodelAPI.setUp(
+        context.routerConfig().transmodelApi(),
+        context.transitModel(),
+        context.copyDefaultRoutingRequest()
+      );
+    }
+
+    if (OTPFeature.SandboxAPIGeocoder.isOn()) {
+      LOG.info("Creating debug client geocoder lucene index");
+      LuceneIndex.forServer(context);
+    }
   }
 
   /**
-   * Create the top-level objects that represent the OTP server. There is one server and it is
-   * created lazy at the first invocation of this method.
-   * <p>
-   * The method is {@code public} to allow test access.
+   * Create transit layer for Raptor routing. Here we map the scheduled timetables.
    */
-  private OTPServer server(Router router) {
-    if (server == null) {
-      server = new OTPServer(cli, router);
-      new MetricsLogging(server);
+  public static void creatTransitLayerForRaptor(
+    TransitModel transitModel,
+    RouterConfig routerConfig
+  ) {
+    if (!transitModel.hasTransit() || transitModel.getTransitModelIndex() == null) {
+      LOG.warn(
+        "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
+      );
     }
-    return server;
+    LOG.info("Creating transit layer for Raptor routing.");
+    transitModel.setTransitLayer(
+      TransitLayerMapper.map(routerConfig.transitTuningParameters(), transitModel)
+    );
+    transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
+    transitModel.setTransitLayerUpdater(
+      new TransitLayerUpdater(
+        transitModel,
+        transitModel.getTransitModelIndex().getServiceCodesRunningForDate()
+      )
+    );
   }
 }

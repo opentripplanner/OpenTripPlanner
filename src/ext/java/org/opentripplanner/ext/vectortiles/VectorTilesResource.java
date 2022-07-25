@@ -29,7 +29,6 @@ import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLay
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.VectorTileConfig;
-import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.WorldEnvelope;
 
@@ -37,7 +36,7 @@ import org.opentripplanner.util.WorldEnvelope;
 public class VectorTilesResource {
 
   private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
-  private final OTPServer otpServer;
+  private final OtpServerContext serverContext;
   private final String ignoreRouterId;
 
   static {
@@ -48,14 +47,14 @@ public class VectorTilesResource {
   }
 
   public VectorTilesResource(
-    @Context OTPServer otpServer,
+    @Context OtpServerContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.otpServer = otpServer;
+    this.serverContext = serverContext;
     this.ignoreRouterId = ignoreRouterId;
   }
 
@@ -79,7 +78,7 @@ public class VectorTilesResource {
 
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    OtpServerContext serverContext = otpServer;
+    OtpServerContext serverContext = this.serverContext;
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
     for (LayerParameters layerParameters : serverContext
@@ -118,8 +117,8 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     return new TileJson(
-      ((OtpServerContext) otpServer).graph(),
-      ((OtpServerContext) otpServer).transitModel(),
+      ((OtpServerContext) serverContext).graph(),
+      ((OtpServerContext) serverContext).transitModel(),
       uri,
       headers,
       requestedLayers

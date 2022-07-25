@@ -2,7 +2,6 @@ package org.opentripplanner.routing.street;
 
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +20,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
@@ -156,11 +155,12 @@ public class SplitEdgeTurnRestrictionsTest {
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new Router(
+      new DefaultServerContext(
         graph,
         Mockito.mock(TransitModel.class),
         RouterConfig.DEFAULT,
-        Metrics.globalRegistry
+        null,
+        false
       )
     );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);

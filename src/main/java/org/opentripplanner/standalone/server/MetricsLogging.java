@@ -26,7 +26,7 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 public class MetricsLogging {
 
-  public MetricsLogging(OTPServer otpServer) {
+  public MetricsLogging(OtpServerContext serverContext) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
     new JvmCompilationMetrics().bindTo(Metrics.globalRegistry);
@@ -39,7 +39,6 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
 
-    OtpServerContext serverContext = otpServer;
     TransitModel transitModel = serverContext.transitModel();
 
     if (transitModel.getTransitLayer() != null) {

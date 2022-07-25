@@ -8,7 +8,6 @@ import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.routing.core.TraverseMode.BUS;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
-import io.micrometer.core.instrument.Metrics;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
@@ -33,8 +33,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 
@@ -52,7 +51,24 @@ public class FlexIntegrationTest {
   static TransitModel transitModel;
 
   static RoutingService service;
-  static Router router;
+  static OtpServerContext serverContext;
+
+  @BeforeAll
+  static void setup() {
+    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
+    var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
+    var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
+    var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
+    var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
+
+    OtpModel otpModel = ConstantsForTests.buildOsmGraph(osmPath);
+    graph = otpModel.graph;
+    transitModel = otpModel.transitModel;
+
+    addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
+    serverContext = TestServerContext.createServerContext(graph, transitModel);
+    service = new RoutingService(graph, transitModel);
+  }
 
   @Test
   public void shouldReturnARouteTransferringFromBusToFlex() {
@@ -141,25 +157,6 @@ public class FlexIntegrationTest {
     assertEquals("2021-12-02T13:00-05:00[America/New_York]", flex.getStartTime().toString());
   }
 
-  @BeforeAll
-  static void setup() {
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
-    var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
-    var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
-    var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
-
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(osmPath);
-    graph = otpModel.graph;
-    transitModel = otpModel.transitModel;
-
-    addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
-    router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
-
-    service = new RoutingService(graph, transitModel);
-  }
-
   @AfterAll
   static void teardown() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
@@ -230,7 +227,7 @@ public class FlexIntegrationTest {
     }
     request.modes = modes.build();
 
-    var result = service.route(request, router);
+    var result = service.route(request, serverContext);
     var itineraries = result.getTripPlan().itineraries;
 
     assertFalse(itineraries.isEmpty());

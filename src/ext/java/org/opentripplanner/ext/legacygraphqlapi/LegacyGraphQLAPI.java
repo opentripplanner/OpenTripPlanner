@@ -23,7 +23,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.standalone.server.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +39,14 @@ public class LegacyGraphQLAPI {
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public LegacyGraphQLAPI(
-    @Context OTPServer otpServer,
+    @Context OtpServerContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.serverContext = otpServer;
+    this.serverContext = serverContext;
   }
 
   @POST

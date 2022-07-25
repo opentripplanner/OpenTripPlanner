@@ -12,11 +12,13 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -28,10 +30,10 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * Jersey has its own ResourceConfig class which is a subclass of Application. We can get away with
  * not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
  */
-public class OTPApplication extends Application {
+public class OTPWebApplication extends Application {
 
   /* This object groups together all the modules for a single running OTP server. */
-  public final OTPServer server;
+  private final OtpServerContext serverContext;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
@@ -45,10 +47,10 @@ public class OTPApplication extends Application {
    * OTPRouters. It provides a Java API, not an HTTP API. The OTPApplication wraps an OTPServer in a
    * Jersey (JAX-RS) Application, configuring an HTTP API.
    *
-   * @param server The OTP server to wrap
+   * @param serverContext The OTP server to wrap
    */
-  public OTPApplication(OTPServer server) {
-    this.server = server;
+  public OTPWebApplication(OtpServerContext serverContext) {
+    this.serverContext = serverContext;
   }
 
   /**
@@ -90,7 +92,7 @@ public class OTPApplication extends Application {
       // Serialize POJOs (unannotated) JSON using Jackson
       new JSONObjectMapperProvider(),
       // Allow injecting the OTP server object into Jersey resource classes
-      server.makeBinder(),
+      makeBinder(serverContext),
       // Add performance instrumentation of Jersey requests to micrometer
       getMetricsApplicationEventListener()
     );
@@ -115,6 +117,24 @@ public class OTPApplication extends Application {
     return props;
   }
 
+  /**
+   * Return an HK2 Binder that injects this specific OtpServerContext instance into Jersey web
+   * resources. This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as
+   * a singleton. Jersey forces us to use injection to get application context into HTTP method
+   * handlers, but in OTP we always just inject this OTPServer instance and grab anything else we
+   * need (routers, graphs, application components) from this single object.
+   * <p>
+   * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
+   */
+  private Binder makeBinder(OtpServerContext context) {
+    return new AbstractBinder() {
+      @Override
+      protected void configure() {
+        bind(context).to(OtpServerContext.class);
+      }
+    };
+  }
+
   private MetricsApplicationEventListener getMetricsApplicationEventListener() {
     return new MetricsApplicationEventListener(
       Metrics.globalRegistry,
@@ -129,7 +149,7 @@ public class OTPApplication extends Application {
    *
    * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
    */
-  private AbstractBinder getBoundPrometheusRegistry() {
+  private Binder getBoundPrometheusRegistry() {
     PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
       PrometheusConfig.DEFAULT
     );
