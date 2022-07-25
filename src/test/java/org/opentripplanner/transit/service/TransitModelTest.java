@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.OtpModel;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.model.Timetable;
@@ -15,18 +16,30 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 class TransitModelTest {
 
+  public static final String FAKE_FEED_ID = "FAKE";
+  public static final FeedScopedId SAMPLE_TRIP_ID = new FeedScopedId(FAKE_FEED_ID, "1.2");
+
   @Test
   void validateTimeZones() {
     // First GTFS bundle should be added successfully
-    var model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
-    TransitModel transitModel = model.transitModel;
-    TransitModelIndex transitModelIndex = transitModel.getTransitModelIndex();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var graph = new Graph(stopModel, deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
+    ConstantsForTests.addGtfsToGraph(
+      graph,
+      transitModel,
+      ConstantsForTests.FAKE_GTFS,
+      new DefaultFareServiceFactory(),
+      FAKE_FEED_ID
+    );
 
     // Then time zone should match the one provided in the feed
     assertEquals("America/New_York", transitModel.getTimeZone().getId());
 
     // Then trip times should be same as in input data
-    Trip trip = transitModelIndex.getTripForId().get(new FeedScopedId("1", "1.2"));
+    TransitModelIndex transitModelIndex = transitModel.getTransitModelIndex();
+    Trip trip = transitModelIndex.getTripForId().get(SAMPLE_TRIP_ID);
     Timetable timetable = transitModelIndex.getPatternForTrip().get(trip).getScheduledTimetable();
     assertEquals(20 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
 
@@ -35,7 +48,7 @@ class TransitModelTest {
       IllegalStateException.class,
       () ->
         ConstantsForTests.addGtfsToGraph(
-          model.graph,
+          graph,
           transitModel,
           ConstantsForTests.KCM_GTFS,
           new DefaultFareServiceFactory(),
@@ -61,7 +74,7 @@ class TransitModelTest {
       transitModel,
       ConstantsForTests.FAKE_GTFS,
       new DefaultFareServiceFactory(),
-      null
+      FAKE_FEED_ID
     );
 
     // Should load second bundle, with different agency time zone
@@ -81,7 +94,7 @@ class TransitModelTest {
     assertEquals("America/Chicago", transitModel.getTimeZone().getId());
 
     // Then trip times should be on hour less than in input data
-    Trip trip = transitModelIndex.getTripForId().get(new FeedScopedId("1", "1.2"));
+    Trip trip = transitModelIndex.getTripForId().get(SAMPLE_TRIP_ID);
     Timetable timetable = transitModelIndex.getPatternForTrip().get(trip).getScheduledTimetable();
     assertEquals(20 * 60 - 60 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
   }
