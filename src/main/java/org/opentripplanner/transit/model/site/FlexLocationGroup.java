@@ -32,8 +32,6 @@ public class FlexLocationGroup
 
   FlexLocationGroup(FlexLocationGroupBuilder builder) {
     super(builder.getId());
-    // according to the spec stop location names are optional for flex zones so, we set the id
-    // as the bogus name. *shrug*
     this.name = builder.name();
   }
 
