@@ -89,7 +89,7 @@ public class TransitRouter {
     }
 
     var transitLayer = request.ignoreRealtimeUpdates
-      ? serverContext.transitModel().getTransitLayer()
+      ? serverContext.transitService().getTransitLayer()
       : serverContext.transitModel().getRealtimeTransitLayer();
 
     var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
@@ -129,7 +129,7 @@ public class TransitRouter {
           .createOptimizeTransferService(
             transitLayer::getStopByIndex,
             requestTransitDataProvider.stopNameResolver(),
-            serverContext.transitModel().getTransferService(),
+            serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopIndex().stopBoardAlightCosts,
             raptorRequest,
@@ -142,7 +142,7 @@ public class TransitRouter {
 
     RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
       serverContext.graph(),
-      serverContext.transitModel(),
+      serverContext.transitService(),
       transitLayer,
       transitSearchTimeZero,
       request
@@ -244,19 +244,16 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    var graph = serverContext.graph();
-    var transitModel = serverContext.transitModel();
-
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
     return new RaptorRoutingRequestTransitData(
-      transitModel.getTransferService(),
+      serverContext.transitService().getTransferService(),
       transitLayer,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       createRequestTransitDataProviderFilter(serverContext.transitService()),
-      new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
+      new RoutingContext(transferRoutingRequest, serverContext.graph(), (Vertex) null, null)
     );
   }
 

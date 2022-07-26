@@ -66,7 +66,7 @@ class TransmodelGraph {
     TransmodelRequestContext transmodelRequestContext = new TransmodelRequestContext(
       serverContext,
       new RoutingService(serverContext.graph(), serverContext.transitService()),
-      new DefaultTransitService(serverContext.transitModel())
+      serverContext.transitService()
     );
 
     ExecutionInput executionInput = ExecutionInput

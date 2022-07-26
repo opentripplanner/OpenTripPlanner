@@ -274,7 +274,7 @@ public class FaresIntegrationTest {
     var routingWorker = new RoutingWorker(
       serverContext,
       request,
-      serverContext.transitModel().getTimeZone()
+      serverContext.transitService().getTimeZone()
     );
     var result = routingWorker.route();
 

@@ -195,7 +195,7 @@ class LegacyGraphQLIndex {
     LegacyGraphQLRequestContext requestContext = new LegacyGraphQLRequestContext(
       serverContext,
       new RoutingService(serverContext.graph(), serverContext.transitService()),
-      new DefaultTransitService(serverContext.transitModel())
+      serverContext.transitService()
     );
 
     ExecutionInput executionInput = ExecutionInput

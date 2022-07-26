@@ -105,7 +105,7 @@ public abstract class SnapshotTestBase {
     RoutingRequest request = serverContext.defaultRoutingRequest();
     request.setDateTime(
       TestUtils.dateInstant(
-        serverContext.transitModel().getTimeZone().getId(),
+        serverContext.transitService().getTimeZone().getId(),
         year,
         month,
         day,
@@ -270,7 +270,7 @@ public abstract class SnapshotTestBase {
         itineraries,
         startMillis,
         System.currentTimeMillis(),
-        serverContext.transitModel().getTimeZone()
+        serverContext.transitService().getTimeZone()
       );
     }
     return itineraries;
@@ -279,7 +279,7 @@ public abstract class SnapshotTestBase {
   private String createDebugUrlForRequest(RoutingRequest request) {
     var dateTime = Instant
       .ofEpochSecond(request.getDateTime().getEpochSecond())
-      .atZone(serverContext().transitModel().getTimeZone())
+      .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
     var transitModes = mapModes(request.modes.transitModes);
