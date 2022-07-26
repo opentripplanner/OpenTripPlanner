@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
@@ -27,7 +28,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public class VehicleParkingsLayerTest {
 
@@ -66,15 +67,15 @@ public class VehicleParkingsLayerTest {
   @Test
   public void vehicleParkingGeometryTest() {
     VehicleParkingService service = mock(VehicleParkingService.class);
-    when(service.getVehicleParkings()).thenReturn(List.of(vehicleParking).stream());
+    when(service.getVehicleParkings()).thenReturn(Stream.of(vehicleParking));
 
     Graph graph = mock(Graph.class);
-    TransitModel transitModel = mock(TransitModel.class);
+    TransitService transitService = mock(TransitService.class);
     when(graph.getVehicleParkingService()).thenReturn(service);
 
     VehicleParkingsLayerBuilderWithPublicGeometry builder = new VehicleParkingsLayerBuilderWithPublicGeometry(
       graph,
-      transitModel,
+      transitService,
       new VectorTilesResource.LayerParameters() {
         @Override
         public String name() {
@@ -168,10 +169,10 @@ public class VehicleParkingsLayerTest {
 
     public VehicleParkingsLayerBuilderWithPublicGeometry(
       Graph graph,
-      TransitModel transitModel,
+      TransitService transitService,
       VectorTilesResource.LayerParameters layerParameters
     ) {
-      super(graph, transitModel, layerParameters);
+      super(graph, transitService, layerParameters);
     }
 
     @Override

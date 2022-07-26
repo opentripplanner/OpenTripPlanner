@@ -30,6 +30,7 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
+import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -221,6 +222,11 @@ public class DefaultTransitService implements TransitEditorService {
     TimetableSnapshot timetableSnapshot
   ) {
     return this.transitModelIndex.getPatternsForStop(stop, timetableSnapshot);
+  }
+
+  @Override
+  public Collection<Trip> getTripsForStop(StopLocation stop) {
+    return this.transitModelIndex.getTripsForStop(stop);
   }
 
   /** {@link TransitModelIndex#getAllOperators()} */
@@ -543,5 +549,10 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Optional<Coordinate> getCenter() {
     return transitModel.getStopModel().getCenter();
+  }
+
+  @Override
+  public TransferService getTransferService() {
+    return transitModel.getTransferService();
   }
 }

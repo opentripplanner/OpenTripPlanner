@@ -37,7 +37,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
@@ -76,7 +76,7 @@ public class TransitModel implements Serializable {
    * {@link TransitEntity#getId()}. The notice is part of the static transit data.
    */
   private final Multimap<TransitEntity, Notice> noticesByElement = HashMultimap.create();
-  private final TransferService transferService = new TransferService();
+  private final DefaultTransferService transferService = new DefaultTransferService();
 
   /** List of transit modes that are availible in GTFS data used in this graph **/
   private final HashSet<TransitMode> transitModes = new HashSet<>();
@@ -217,7 +217,7 @@ public class TransitModel implements Serializable {
     return realtimeTransitLayer != null;
   }
 
-  public TransferService getTransferService() {
+  public DefaultTransferService getTransferService() {
     return transferService;
   }
 

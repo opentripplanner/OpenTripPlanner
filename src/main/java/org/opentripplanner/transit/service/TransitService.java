@@ -27,6 +27,7 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
+import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -91,6 +92,8 @@ public interface TransitService {
     StopLocation stop,
     TimetableSnapshot timetableSnapshot
   );
+
+  Collection<Trip> getTripsForStop(StopLocation stop);
 
   Collection<Operator> getAllOperators();
 
@@ -179,4 +182,6 @@ public interface TransitService {
   HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex();
 
   Optional<Coordinate> getCenter();
+
+  TransferService getTransferService();
 }

@@ -33,7 +33,7 @@ import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {
@@ -217,7 +217,7 @@ public class TransitRouter {
 
       var nearbyStops = AccessEgressRouter.streetSearch(
         routingContext,
-        serverContext.transitModel(),
+        serverContext.transitService(),
         mode,
         isEgress
       );
@@ -229,6 +229,7 @@ public class TransitRouter {
         var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
           routingContext,
           serverContext.transitModel(),
+          serverContext.transitService(),
           additionalSearchDays,
           serverContext.routerConfig().flexParameters(request),
           isEgress
@@ -255,15 +256,15 @@ public class TransitRouter {
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
-      createRequestTransitDataProviderFilter(transitModel.getTransitModelIndex()),
+      createRequestTransitDataProviderFilter(serverContext.transitService()),
       new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
     );
   }
 
   private TransitDataProviderFilter createRequestTransitDataProviderFilter(
-    TransitModelIndex transitModelIndex
+    TransitService transitService
   ) {
-    return new RoutingRequestTransitDataProviderFilter(request, transitModelIndex);
+    return new RoutingRequestTransitDataProviderFilter(request, transitService);
   }
 
   private void verifyAccessEgress(Collection<?> access, Collection<?> egress) {
