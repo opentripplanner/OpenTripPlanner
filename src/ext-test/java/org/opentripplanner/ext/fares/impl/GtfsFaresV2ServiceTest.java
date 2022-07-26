@@ -123,7 +123,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(single, dayPass), result.productsCoveringItinerary());
+    assertEquals(List.of(dayPass, single), result.productsCoveringItinerary());
   }
 
   @Test
