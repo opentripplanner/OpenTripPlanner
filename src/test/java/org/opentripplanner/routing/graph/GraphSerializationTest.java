@@ -17,7 +17,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.OtpModel;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -159,9 +159,6 @@ public class GraphSerializationTest {
    */
   private void testRoundTrip(Graph originalGraph, TransitModel originalTransitModel)
     throws Exception {
-    // The cached timezone in the graph is transient and lazy-initialized.
-    // Previous tests may have caused a timezone to be cached.
-    originalTransitModel.clearTimeZone();
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
     SerializedGraphObject serializedObj = new SerializedGraphObject(

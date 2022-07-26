@@ -99,7 +99,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
 
   @Override
   public DataFetcher<String> timezone() {
-    return environment -> getSource(environment).getTimezone();
+    return environment -> getSource(environment).getTimezone().getId();
   }
 
   @Override

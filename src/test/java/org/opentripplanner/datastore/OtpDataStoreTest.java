@@ -3,15 +3,14 @@ package org.opentripplanner.datastore;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.datastore.FileType.CONFIG;
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GRAPH;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.REPORT;
-import static org.opentripplanner.datastore.FileType.UNKNOWN;
-import static org.opentripplanner.standalone.config.CommandLineParameters.createCliForTest;
+import static org.opentripplanner.datastore.api.FileType.CONFIG;
+import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.GRAPH;
+import static org.opentripplanner.datastore.api.FileType.GTFS;
+import static org.opentripplanner.datastore.api.FileType.NETEX;
+import static org.opentripplanner.datastore.api.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.REPORT;
+import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,9 +28,12 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.configure.DataStoreFactory;
-import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.configure.OTPConfiguration;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
+import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.standalone.config.ConfigLoader;
 
 public class OtpDataStoreTest {
 
@@ -66,7 +68,8 @@ public class OtpDataStoreTest {
 
   @Test
   public void readEmptyDir() {
-    OtpDataStore store = new DataStoreFactory(config()).open();
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null);
+
     assertNoneExistingFile(store.getGraph(), GRAPH_FILENAME, GRAPH);
     assertNoneExistingFile(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     assertNoneExistingFile(store.getBuildReportDir(), REPORT_FILENAME, REPORT);
@@ -93,9 +96,10 @@ public class OtpDataStoreTest {
     write(baseDir, GRAPH_FILENAME, "Data");
     writeToDir(baseDir, REPORT_FILENAME, "index.json");
 
-    OtpDataStore store = new DataStoreFactory(config()).open();
-    assertExistingSource(store.getGraph(), GRAPH_FILENAME, GRAPH);
-    assertExistingSource(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null);
+
+    assertExistingGraph(store.getGraph(), GRAPH_FILENAME);
+    assertExistingGraph(store.getStreetGraph(), STREET_GRAPH_FILENAME);
     assertReportExist(store.getBuildReportDir());
 
     assertExistingSources(store.listExistingSourcesFor(OSM), OSM_FILENAME);
@@ -160,10 +164,11 @@ public class OtpDataStoreTest {
     write(tempDataDir, "unknown-2.txt", "Data");
 
     // Open data store using the base-dir
-    OtpDataStore store = new DataStoreFactory(
-      new OTPConfiguration(createCliForTest(baseDir)).createDataStoreConfig()
-    )
-      .open();
+
+    var confLoader = new ConfigLoader(baseDir);
+    var buildConfig = confLoader.loadBuildConfig();
+
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, buildConfig.storage, null);
 
     // Collect result and prepare it for assertion
     List<String> filenames = listFilesByRelativeName(store, baseDir, tempDataDir);
@@ -213,8 +218,8 @@ public class OtpDataStoreTest {
     assertFalse(source.exists());
   }
 
-  private static void assertExistingSource(DataSource source, String name, FileType type) {
-    assertEquals(type, source.type());
+  private static void assertExistingGraph(DataSource source, String name) {
+    assertEquals(GRAPH, source.type());
     assertEquals(name, source.name());
     assertTrue(source.exists());
     assertTrue(source.lastModified() > D2000_01_01, "Last modified: " + source.lastModified());
@@ -261,7 +266,8 @@ public class OtpDataStoreTest {
   }
 
   private OtpDataStoreConfig config() {
-    CommandLineParameters cli = CommandLineParameters.createCliForTest(baseDir);
-    return new OTPConfiguration(cli).createDataStoreConfig();
+    var confLoader = new ConfigLoader(baseDir);
+    var buildConfig = confLoader.loadBuildConfig();
+    return buildConfig.storage;
   }
 }

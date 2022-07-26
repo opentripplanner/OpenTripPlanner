@@ -24,7 +24,7 @@ public class AgencyMapper {
     api.id = FeedScopedIdMapper.mapToApi(domain.getId());
     api.name = domain.getName();
     api.url = domain.getUrl();
-    api.timezone = domain.getTimezone();
+    api.timezone = domain.getTimezone().getId();
     api.lang = domain.getLang();
     api.phone = domain.getPhone();
     api.fareUrl = domain.getFareUrl();

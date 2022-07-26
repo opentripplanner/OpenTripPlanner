@@ -14,9 +14,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * This is a manual integration test to test the Google Cloud Storage integration. To set up the

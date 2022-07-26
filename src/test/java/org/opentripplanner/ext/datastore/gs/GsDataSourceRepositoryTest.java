@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.net.URI;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.FileType;
 
 public class GsDataSourceRepositoryTest {
 

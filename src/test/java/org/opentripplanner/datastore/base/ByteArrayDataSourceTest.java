@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 public class ByteArrayDataSourceTest {
 

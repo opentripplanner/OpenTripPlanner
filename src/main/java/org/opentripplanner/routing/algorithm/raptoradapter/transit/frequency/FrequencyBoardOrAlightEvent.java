@@ -59,8 +59,8 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
     this.offset = offset;
     this.headway = headway;
     this.serviceDate = serviceDate;
-    wheelChairBoarding = tripTimes.getTrip().getWheelchairBoarding();
-    routeId = pattern.getRoute().getId();
+    this.routeId = pattern.getRoute().getId();
+    this.wheelChairBoarding = tripTimes.getWheelchairAccessibility();
   }
 
   /* RaptorTripScheduleBoardOrAlightEvent implementation */

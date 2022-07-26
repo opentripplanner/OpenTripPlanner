@@ -1,12 +1,8 @@
 package org.opentripplanner.standalone.configure;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
@@ -16,21 +12,19 @@ import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPApplication;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for creating the top level services like {@link OTPConfiguration} and
- * {@link OTPServer}. The purpose of this class is to wire the application, creating the necessary
- * Services and modules and putting them together. It is NOT responsible for starting or running the
- * application. The whole idea of this class is to separate application construction from running
- * it.
- *
- * <p> The top level construction class(this class) may delegate to other construction classes
+ * This class is responsible for creating the top level services like the {@link OTPServer}. The
+ * purpose of this class is to wire the application, creating the necessary Services and modules
+ * and putting them together. It is NOT responsible for starting or running the application. The
+ * whole idea of this class is to separate application construction from running it.
+ * <p>
+ * The top level construction class(this class) may delegate to other construction classes
  * to inject configuration and services into sub-modules.
- *
- * <p> THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
+ * <p>
+ * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
  * should be really fast, since the only IO operations are reading config files and logging. Loading
  * transit or map data should NOT happen during this phase.
  */
@@ -38,9 +32,8 @@ public class OTPAppConstruction {
 
   private static final Logger LOG = LoggerFactory.getLogger(OTPAppConstruction.class);
 
-  private final OTPConfiguration config;
-
-  private OtpDataStore store = null;
+  private final CommandLineParameters cli;
+  private final OTPApplicationFactory factory;
   private OTPServer server = null;
   private GraphBuilderDataSources graphBuilderDataSources = null;
 
@@ -48,18 +41,13 @@ public class OTPAppConstruction {
    * Create a new OTP configuration instance for a given directory.
    */
   public OTPAppConstruction(CommandLineParameters commandLineParameters) {
-    this.config = new OTPConfiguration(commandLineParameters);
-    initializeOtpFeatures();
+    this.cli = commandLineParameters;
+    this.factory =
+      DaggerOTPApplicationFactory.builder().baseDirectory(this.cli.getBaseDirectory()).build();
   }
 
-  /**
-   * Create or retrieve a data store which provide access to files, remote or local.
-   */
-  public OtpDataStore store() {
-    if (store == null) {
-      this.store = new DataStoreFactory(config.createDataStoreConfig()).open();
-    }
-    return store;
+  public OTPApplicationFactory getFactory() {
+    return factory;
   }
 
   /**
@@ -67,7 +55,7 @@ public class OTPAppConstruction {
    * this method is called.
    */
   public GrizzlyServer createGrizzlyServer(Router router) {
-    return new GrizzlyServer(config.getCli(), createApplication(router));
+    return new GrizzlyServer(cli, createApplication(router));
   }
 
   public void validateConfigAndDataSources() {
@@ -83,11 +71,11 @@ public class OTPAppConstruction {
   public GraphBuilder createGraphBuilder(Graph baseGraph) {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
-      config.buildConfig(),
+      factory.buildConfig(),
       graphBuilderDataSources(),
       baseGraph,
-      config.getCli().doLoadStreetGraph(),
-      config.getCli().doSaveStreetGraph()
+      cli.doLoadStreetGraph(),
+      cli.doSaveStreetGraph()
     );
   }
 
@@ -102,13 +90,16 @@ public class OTPAppConstruction {
     return graphBuilderDataSources().getOutputGraph();
   }
 
-  /**
-   * Return router configuration as loaded from the 'router-config.json' file.
-   * <p>
-   * The method is {@code public} to allow test access.
-   */
-  public OTPConfiguration config() {
-    return config;
+  private GraphBuilderDataSources graphBuilderDataSources() {
+    if (graphBuilderDataSources == null) {
+      graphBuilderDataSources =
+        GraphBuilderDataSources.create(cli, factory.buildConfig(), factory.datastore());
+    }
+    return graphBuilderDataSources;
+  }
+
+  private Application createApplication(Router router) {
+    return new OTPApplication(server(router));
   }
 
   /**
@@ -117,34 +108,11 @@ public class OTPAppConstruction {
    * <p>
    * The method is {@code public} to allow test access.
    */
-  public OTPServer server(Router router) {
+  private OTPServer server(Router router) {
     if (server == null) {
-      server = new OTPServer(config.getCli(), router);
+      server = new OTPServer(cli, router);
       new MetricsLogging(server);
     }
     return server;
-  }
-
-  public void setOtpConfigVersionsOnServerInfo() {
-    projectInfo().otpConfigVersion = config.otpConfig().configVersion;
-    projectInfo().buildConfigVersion = config.buildConfig().configVersion;
-    projectInfo().routerConfigVersion = config.routerConfig().getConfigVersion();
-  }
-
-  private GraphBuilderDataSources graphBuilderDataSources() {
-    if (graphBuilderDataSources == null) {
-      graphBuilderDataSources =
-        GraphBuilderDataSources.create(config.getCli(), config.buildConfig(), store());
-    }
-    return graphBuilderDataSources;
-  }
-
-  private void initializeOtpFeatures() {
-    OTPFeature.enableFeatures(config.otpConfig().otpFeatures);
-    OTPFeature.logFeatureSetup();
-  }
-
-  private Application createApplication(Router router) {
-    return new OTPApplication(server(router));
   }
 }

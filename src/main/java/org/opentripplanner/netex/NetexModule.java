@@ -55,7 +55,6 @@ public class NetexModule implements GraphBuilderModule {
     DataImportIssueStore issueStore
   ) {
     try {
-      transitModel.clearTimeZone();
       var calendarServiceData = new CalendarServiceData();
       boolean hasActiveTransit = false;
 
@@ -98,6 +97,8 @@ public class NetexModule implements GraphBuilderModule {
           graph,
           transitModel
         );
+
+        transitModel.validateTimeZones();
       }
 
       transitModel.updateCalendarServiceData(hasActiveTransit, calendarServiceData, issueStore);

@@ -5,7 +5,7 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import io.micrometer.core.instrument.Metrics;
-import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
@@ -109,6 +109,9 @@ public class OTPMain {
     Graph graph = null;
     TransitModel transitModel = null;
     OTPAppConstruction app = new OTPAppConstruction(params);
+    var factory = app.getFactory();
+    var datastore = factory.datastore();
+    var configModel = factory.configModel();
 
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
@@ -117,17 +120,12 @@ public class OTPMain {
     /* Load graph from disk if one is not present from build. */
     if (params.doLoadGraph() || params.doLoadStreetGraph()) {
       DataSource inputGraph = params.doLoadGraph()
-        ? app.store().getGraph()
-        : app.store().getStreetGraph();
-      SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(inputGraph);
-      graph = serializedGraphObject.graph;
-      transitModel = serializedGraphObject.transitModel;
-      app
-        .config()
-        .updateConfigFromSerializedGraph(
-          serializedGraphObject.buildConfig,
-          serializedGraphObject.routerConfig
-        );
+        ? datastore.getGraph()
+        : datastore.getStreetGraph();
+      SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
+      graph = obj.graph;
+      transitModel = obj.transitModel;
+      configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
     }
 
     /* Start graph builder if requested. */
@@ -151,8 +149,8 @@ public class OTPMain {
       new SerializedGraphObject(
         graph,
         transitModel,
-        app.config().buildConfig(),
-        app.config().routerConfig()
+        configModel.buildConfig(),
+        configModel.routerConfig()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
@@ -174,12 +172,12 @@ public class OTPMain {
     graph.index();
 
     // publishing the config version info make it available to the APIs
-    app.setOtpConfigVersionsOnServerInfo();
+    factory.setOtpConfigVersionsOnServerInfo();
 
     Router router = new Router(
       graph,
       transitModel,
-      app.config().routerConfig(),
+      configModel.routerConfig(),
       Metrics.globalRegistry
     );
     router.startup();

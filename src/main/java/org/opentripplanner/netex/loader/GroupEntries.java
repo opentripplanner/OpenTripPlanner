@@ -3,7 +3,7 @@ package org.opentripplanner.netex.loader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.api.DataSource;
 
 /**
  * A named group of NeTEx file entries. The entries are grouped together with a set of shared group

@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
@@ -276,7 +276,7 @@ public class ConstantsForTests {
     return portlandGraphWithElevation;
   }
 
-  private static void addGtfsToGraph(
+  public static void addGtfsToGraph(
     Graph graph,
     TransitModel transitModel,
     String file,
