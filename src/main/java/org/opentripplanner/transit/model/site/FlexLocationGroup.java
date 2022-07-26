@@ -1,6 +1,7 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -11,18 +12,17 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * A group of stopLocations, which can share a common Stoptime
  */
-public class FlexLocationGroup extends TransitEntity implements StopLocation {
+public class FlexLocationGroup
+  extends TransitEntity2<FlexLocationGroup, FlexLocationGroupBuilder>
+  implements StopLocation {
 
   private final Set<StopLocation> stopLocations = new HashSet<>();
-  private I18NString name;
+  private final I18NString name;
   private GeometryCollection geometry = new GeometryCollection(
     null,
     GeometryUtils.getGeometryFactory()
@@ -30,17 +30,20 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
   private WgsCoordinate centroid;
 
-  public FlexLocationGroup(FeedScopedId id) {
-    super(id);
+  FlexLocationGroup(FlexLocationGroupBuilder builder) {
+    super(builder.getId());
+    // according to the spec stop location names are optional for flex zones so, we set the id
+    // as the bogus name. *shrug*
+    this.name = builder.name();
+  }
+
+  public static FlexLocationGroupBuilder of(FeedScopedId id) {
+    return new FlexLocationGroupBuilder(id);
   }
 
   @Override
   public I18NString getName() {
     return name;
-  }
-
-  public void setName(I18NString name) {
-    this.name = name;
   }
 
   @Override
@@ -115,5 +118,20 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
    */
   public Set<StopLocation> getLocations() {
     return stopLocations;
+  }
+
+  @Override
+  public boolean sameAs(@Nonnull FlexLocationGroup other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(name, other.getName()) &&
+      Objects.equals(geometry, other.getGeometry())
+    );
+  }
+
+  @Override
+  @Nonnull
+  public FlexLocationGroupBuilder copy() {
+    return new FlexLocationGroupBuilder(this);
   }
 }

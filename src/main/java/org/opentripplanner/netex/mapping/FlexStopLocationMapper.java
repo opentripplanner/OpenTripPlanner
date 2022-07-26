@@ -7,9 +7,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -86,20 +86,21 @@ class FlexStopLocationMapper {
    */
   FlexStopLocation mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
     var name = new NonLocalizedString(flexibleStopPlace.getName().getValue());
-    FlexStopLocation result = FlexStopLocation
+    return FlexStopLocation
       .of(idFactory.createId(flexibleStopPlace.getId()))
       .withName(name)
+      .withGeometry(OpenGisMapper.mapGeometry(area.getPolygon()))
       .build();
-    result.setGeometry(OpenGisMapper.mapGeometry(area.getPolygon()));
-    return result;
   }
 
   /**
    * Allows pickup / drop off at any regular Stop inside the area
    */
   FlexLocationGroup mapStopsInFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
-    FlexLocationGroup result = new FlexLocationGroup(idFactory.createId(flexibleStopPlace.getId()));
-    result.setName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
+    FlexLocationGroup result = FlexLocationGroup
+      .of(idFactory.createId(flexibleStopPlace.getId()))
+      .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()))
+      .build();
     Geometry geometry = OpenGisMapper.mapGeometry(area.getPolygon());
 
     for (Stop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {
