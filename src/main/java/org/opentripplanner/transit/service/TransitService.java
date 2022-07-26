@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
+import gnu.trove.TByteCollection;
 import gnu.trove.set.TIntSet;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,6 +43,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -101,6 +103,12 @@ public interface TransitService {
   Map<FeedScopedId, Operator> getOperatorForId();
 
   Collection<StopLocation> getAllStops();
+
+  StopLocation getStopLocationById(FeedScopedId parseId);
+
+  Collection<StopCollection> getAllStopCollections();
+
+  StopCollection getStopCollectionById(FeedScopedId id);
 
   Map<FeedScopedId, Trip> getTripForId();
 

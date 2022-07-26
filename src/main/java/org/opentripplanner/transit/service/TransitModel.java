@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;

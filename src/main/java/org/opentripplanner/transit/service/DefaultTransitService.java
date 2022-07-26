@@ -47,6 +47,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -244,7 +245,22 @@ public class DefaultTransitService implements TransitEditorService {
   /** {@link StopModelIndex#getAllStops()} */
   @Override
   public Collection<StopLocation> getAllStops() {
-    return this.transitModel.getStopModel().getStopModelIndex().getAllStops();
+    return transitModel.getStopModel().getStopModelIndex().getAllStops();
+  }
+
+  @Override
+  public StopLocation getStopLocationById(FeedScopedId id) {
+    return transitModel.getStopModel().getStopModelIndex().getStopForId(id);
+  }
+
+  @Override
+  public Collection<StopCollection> getAllStopCollections() {
+    return transitModel.getStopModel().getAllStopCollections().toList();
+  }
+
+  @Override
+  public StopCollection getStopCollectionById(FeedScopedId id) {
+    return transitModel.getStopModel().getStopCollectionById(id);
   }
 
   /** {@link TransitModelIndex#getTripForId()} */
