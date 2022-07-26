@@ -62,7 +62,7 @@ public class TransmodelGraphQLPlanner {
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
       response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
-    Locale locale = request == null ? serverContext.getDefaultLocale() : request.locale;
+    Locale locale = request == null ? serverContext.defaultLocale() : request.locale;
     return DataFetcherResult
       .<PlanResponse>newResult()
       .data(response)
@@ -90,7 +90,7 @@ public class TransmodelGraphQLPlanner {
   private RoutingRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerContext serverContext = context.getServerContext();
-    RoutingRequest request = serverContext.copyDefaultRoutingRequest();
+    RoutingRequest request = serverContext.defaultRoutingRequest();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 

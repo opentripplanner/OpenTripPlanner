@@ -106,8 +106,8 @@ public class DurationUtils {
       return Duration.parse(d);
     } catch (DateTimeParseException e) {
       throw new DateTimeParseException(
-        e.getMessage() + ": " + e.getParsedString(),
-        e.getParsedString(),
+        e.getMessage() + ": '" + duration + "'",
+        duration,
         e.getErrorIndex()
       );
     }

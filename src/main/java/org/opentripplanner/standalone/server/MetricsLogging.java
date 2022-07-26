@@ -17,7 +17,7 @@ import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -26,7 +26,7 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 public class MetricsLogging {
 
-  public MetricsLogging(OtpServerContext serverContext) {
+  public MetricsLogging(TransitModel transitModel, RaptorConfig<?> raptorConfig) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
     new JvmCompilationMetrics().bindTo(Metrics.globalRegistry);
@@ -38,8 +38,6 @@ public class MetricsLogging {
     new LogbackMetrics().bindTo(Metrics.globalRegistry);
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
-
-    TransitModel transitModel = serverContext.transitModel();
 
     if (transitModel.getTransitLayer() != null) {
       new GuavaCacheMetrics(
@@ -72,9 +70,9 @@ public class MetricsLogging {
         .bindTo(Metrics.globalRegistry);
     }
 
-    if (serverContext.raptorConfig().isMultiThreaded()) {
+    if (raptorConfig.isMultiThreaded()) {
       new ExecutorServiceMetrics(
-        serverContext.raptorConfig().threadPool(),
+        raptorConfig.threadPool(),
         "raptorHeuristics",
         List.of(Tag.of("pool", "raptorHeuristics"))
       )

@@ -100,7 +100,7 @@ public class TravelTimeResource {
     this.serverContext = serverContext;
     transitLayer = this.serverContext.transitModel().getRealtimeTransitLayer();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
-    routingRequest = this.serverContext.copyDefaultRoutingRequest();
+    routingRequest = this.serverContext.defaultRoutingRequest();
     routingRequest.from = LocationStringParser.fromOldStyleString(location);
     if (modes != null) {
       routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();

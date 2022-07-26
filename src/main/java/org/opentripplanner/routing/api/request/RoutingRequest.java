@@ -1104,6 +1104,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     return streetRequest;
   }
 
+  /**
+   * This method is used to clone the default message, and insert a current time. A typical use-case
+   * is to copy the default request(from router-config), and then set all user specified parameters
+   * before performing a routing search.
+   */
+  public RoutingRequest copyWithDateTimeNow() {
+    RoutingRequest copy = clone();
+    copy.setDateTime(Instant.now());
+    return copy;
+  }
+
   @Override
   public RoutingRequest clone() {
     try {
