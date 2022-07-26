@@ -10,7 +10,7 @@ class RouterConfigTest {
 
   @Test
   void parseStreetRoutingTimeout() {
-    var DEFAULT_TIMEOUT = RouterConfig.DEFAULT.streetRoutingTimeoutSeconds();
+    var DEFAULT_TIMEOUT = RouterConfig.DEFAULT.streetRoutingTimeout();
     NodeAdapter c;
 
     // Fall back to default 5 seconds

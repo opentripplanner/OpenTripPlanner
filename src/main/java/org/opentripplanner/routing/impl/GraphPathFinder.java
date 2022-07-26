@@ -67,7 +67,7 @@ public class GraphPathFinder {
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
-      .setTimeout(serverContext.routerConfig().streetRoutingTimeoutSeconds());
+      .setTimeout(serverContext.routerConfig().streetRoutingTimeout());
 
     // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
     if (serverContext.graphVisualizer() != null) {

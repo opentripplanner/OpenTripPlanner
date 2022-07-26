@@ -90,7 +90,7 @@ public class RouterConfig implements Serializable {
    * CAR). So the default timeout for a street search is set quite high. This is used to abort the
    * search if the max distance is not reached within the timeout.
    */
-  public Duration streetRoutingTimeoutSeconds() {
+  public Duration streetRoutingTimeout() {
     return streetRoutingTimeout;
   }
 
