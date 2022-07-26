@@ -6,7 +6,6 @@ import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
@@ -20,7 +19,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.locationtech.jts.geom.Geometry;
 import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.WalkStep;
@@ -33,7 +32,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
@@ -45,10 +44,10 @@ public class BarrierRoutingTest {
 
   @BeforeAll
   public static void createGraph() {
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(
       ConstantsForTests.HERRENBERG_BARRIER_GATES_OSM
     );
-    graph = otpModel.graph;
+    graph = model.graph();
   }
 
   /**
@@ -169,11 +168,12 @@ public class BarrierRoutingTest {
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new Router(
+      new DefaultServerContext(
         graph,
         Mockito.mock(TransitModel.class),
         RouterConfig.DEFAULT,
-        Metrics.globalRegistry
+        null,
+        false
       )
     );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);

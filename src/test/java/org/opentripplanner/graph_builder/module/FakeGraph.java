@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -33,7 +33,7 @@ import org.opentripplanner.transit.service.TransitModel;
 public class FakeGraph {
 
   /** Build a graph in Columbus, OH with no transit */
-  public static OtpModel buildGraphNoTransit() throws URISyntaxException {
+  public static TestOtpModel buildGraphNoTransit() throws URISyntaxException {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var gg = new Graph(stopModel, deduplicator);
@@ -46,7 +46,7 @@ public class FakeGraph {
     osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     osmModule.buildGraph(gg, transitModel, new HashMap<>());
-    return new OtpModel(gg, transitModel);
+    return new TestOtpModel(gg, transitModel);
   }
 
   public static File getFileForResource(String resource) throws URISyntaxException {

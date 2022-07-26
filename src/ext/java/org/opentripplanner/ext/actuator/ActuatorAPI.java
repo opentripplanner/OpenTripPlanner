@@ -9,7 +9,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +58,8 @@ public class ActuatorAPI {
    */
   @GET
   @Path("/health")
-  public Response health(@Context OTPServer otpServer) {
-    GraphUpdaterManager updaterManager = otpServer.getRouter().transitModel.getUpdaterManager();
+  public Response health(@Context OtpServerContext serverContext) {
+    GraphUpdaterManager updaterManager = serverContext.transitModel().getUpdaterManager();
     if (updaterManager != null) {
       var listUnprimedUpdaters = updaterManager.listUnprimedUpdaters();
 

@@ -78,6 +78,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix inconsistent mapping of NeTEx quay publicCode [#4282](https://github.com/opentripplanner/OpenTripPlanner/pull/4282)
 - Take street legs into account when applying the similar legs filter [#4280](https://github.com/opentripplanner/OpenTripPlanner/pull/4280)
 - Make graph time zone configurable [#4281](https://github.com/opentripplanner/OpenTripPlanner/pull/4281)
+- Support real-time updated wheelchair accessibility for trips [#4255](https://github.com/opentripplanner/OpenTripPlanner/pull/4255)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

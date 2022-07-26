@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex;
 
-import static graphql.Assert.assertFalse;
 import static graphql.Assert.assertTrue;
 
 import gnu.trove.set.hash.TIntHashSet;
@@ -11,7 +10,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.FakeGraph;
@@ -42,7 +41,7 @@ public abstract class FlexTest {
   );
   static final FlexParameters params = new FlexParameters(300);
 
-  static OtpModel buildFlexGraph(String fileName) {
+  static TestOtpModel buildFlexGraph(String fileName) {
     File file = null;
     try {
       file = FakeGraph.getFileForResource(fileName);
@@ -65,6 +64,6 @@ public abstract class FlexTest {
     graph.index();
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     assertTrue(transitModel.hasFlexTrips());
-    return new OtpModel(graph, transitModel);
+    return new TestOtpModel(graph, transitModel);
   }
 }

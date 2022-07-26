@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
@@ -51,8 +51,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
 
     var otpModel = graph(false);
-    var graph = otpModel.graph;
-    var transitModel = otpModel.transitModel;
+    var graph = otpModel.graph();
+    var transitModel = otpModel.transitModel();
     graph.hasStreets = false;
 
     generator.buildGraph(graph, transitModel, null);
@@ -68,9 +68,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
 
     var otpModel = graph(true);
-    var graph = otpModel.graph;
+    var graph = otpModel.graph();
     graph.hasStreets = false;
-    var transitModel = otpModel.transitModel;
+    var transitModel = otpModel.transitModel();
 
     generator.buildGraph(graph, transitModel, null);
 
@@ -93,9 +93,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
 
     var otpModel = graph(false);
-    var graph = otpModel.graph;
+    var graph = otpModel.graph();
     graph.hasStreets = true;
-    var transitModel = otpModel.transitModel;
+    var transitModel = otpModel.transitModel();
 
     generator.buildGraph(graph, transitModel, null);
 
@@ -110,9 +110,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
 
     var otpModel = graph(true);
-    var graph = otpModel.graph;
+    var graph = otpModel.graph();
     graph.hasStreets = true;
-    var transitModel = otpModel.transitModel;
+    var transitModel = otpModel.transitModel();
 
     generator.buildGraph(graph, transitModel, null);
 
@@ -135,9 +135,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
 
     var otpModel = graph(false);
-    var graph = otpModel.graph;
+    var graph = otpModel.graph();
     graph.hasStreets = true;
-    var transitModel = otpModel.transitModel;
+    var transitModel = otpModel.transitModel();
 
     generator.buildGraph(graph, transitModel, null);
 
@@ -154,10 +154,10 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       )
     );
 
-    OtpModel otpModel = graph(true);
-    var graph = otpModel.graph;
+    TestOtpModel model = graph(true);
+    var graph = model.graph();
     graph.hasStreets = true;
-    var transitModel = otpModel.transitModel;
+    var transitModel = model.transitModel();
 
     generator.buildGraph(graph, transitModel, null);
     assertTransfers(
@@ -169,7 +169,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
   }
 
-  private OtpModel graph(boolean addPatterns) {
+  private TestOtpModel graph(boolean addPatterns) {
     return graphOf(
       new Builder() {
         @Override

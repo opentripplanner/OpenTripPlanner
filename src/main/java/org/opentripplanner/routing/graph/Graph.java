@@ -44,6 +44,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -436,6 +437,25 @@ public class Graph implements Serializable {
       calculateEnvelope();
     }
     this.envelope.expandToInclude(x, y);
+  }
+
+  public void initEllipsoidToGeoidDifference() {
+    try {
+      WorldEnvelope env = getEnvelope();
+      double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
+      double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
+      this.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
+      LOG.info(
+        "Computed ellipsoid/geoid offset at (" +
+        lat +
+        ", " +
+        lon +
+        ") as " +
+        this.ellipsoidToGeoidDifference
+      );
+    } catch (Exception e) {
+      LOG.error("Error computing ellipsoid/geoid difference");
+    }
   }
 
   public WorldEnvelope getEnvelope() {
