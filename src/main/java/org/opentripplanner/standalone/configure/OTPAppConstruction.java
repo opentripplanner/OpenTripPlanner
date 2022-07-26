@@ -85,7 +85,8 @@ public class OTPAppConstruction {
   public void updateModel(Graph graph, TransitModel transitModel) {
     this.graph = graph;
     this.transitModel = transitModel;
-    this.raptorTuningParameters = new RaptorConfig<>(factory.configModel().routerConfig().raptorTuningParameters());
+    this.raptorTuningParameters =
+      new RaptorConfig<>(factory.configModel().routerConfig().raptorTuningParameters());
     this.context =
       DefaultServerContext.create(
         factory.configModel().routerConfig(),
@@ -161,11 +162,7 @@ public class OTPAppConstruction {
     creatTransitLayerForRaptor(transitModel, routerConfig());
 
     /* Create Graph updater modules from JSON config. */
-    GraphUpdaterConfigurator.setupGraph(
-      graph(),
-      transitModel(),
-      routerConfig().updaterConfig()
-    );
+    GraphUpdaterConfigurator.setupGraph(graph(), transitModel(), routerConfig().updaterConfig());
 
     graph().initEllipsoidToGeoidDifference();
 
