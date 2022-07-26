@@ -9,7 +9,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -175,4 +177,6 @@ public interface TransitService {
   Map<Stop, TransitStopVertex> getStopVertexForStop();
 
   HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex();
+
+  Optional<Coordinate> getCenter();
 }

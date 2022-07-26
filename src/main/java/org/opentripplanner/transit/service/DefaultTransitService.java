@@ -10,8 +10,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -536,5 +538,10 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
     return transitModel.getStopModel().getStopModelIndex().getStopSpatialIndex();
+  }
+
+  @Override
+  public Optional<Coordinate> getCenter() {
+    return transitModel.getStopModel().getCenter();
   }
 }
