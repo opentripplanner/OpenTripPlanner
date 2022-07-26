@@ -12,7 +12,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import javax.media.jai.RasterFactory;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -93,7 +92,6 @@ public class TravelTimeResource {
   private final TravelTimeRequest traveltimeRequest;
   private final RaptorService<TripSchedule> raptorService;
   private final Graph graph;
-  private final Function<Stop, Vertex> stopVertexForStop;
   private final TransitService transitService;
 
   public TravelTimeResource(
@@ -144,7 +142,6 @@ public class TravelTimeResource {
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());
-    stopVertexForStop = transitService.getStopVertexForStop()::get;
   }
 
   @GET
@@ -274,7 +271,7 @@ public class TravelTimeResource {
         final int arrivalTime = arrivals.bestTransitArrivalTime(i);
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {
-          Vertex v = stopVertexForStop.apply(stop);
+          Vertex v = transitService.getStopVertexForStop(stop);
           if (v != null) {
             Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
             State s = new State(v, time, routingContext, stateData.clone());

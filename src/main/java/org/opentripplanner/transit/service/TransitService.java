@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FlexStopLocation;
@@ -79,8 +79,6 @@ public interface TransitService {
 
   FlexStopLocation getLocationById(FeedScopedId id);
 
-  Set<StopLocation> getAllFlexStopsFlat();
-
   Agency getAgencyForId(FeedScopedId id);
 
   StopLocation getStopForId(FeedScopedId id);
@@ -114,7 +112,7 @@ public interface TransitService {
 
   Multimap<Route, TripPattern> getPatternsForRoute();
 
-  Map<Station, MultiModalStation> getMultiModalStationForStations();
+  MultiModalStation getMultiModalStationForStation(Station station);
 
   List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
@@ -182,13 +180,13 @@ public interface TransitService {
 
   ZonedDateTime getTransitServiceStarts();
 
-  Map<Stop, TransitStopVertex> getStopVertexForStop();
-
-  HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex();
+  TransitStopVertex getStopVertexForStop(Stop stop);
 
   Optional<Coordinate> getCenter();
 
   TransferService getTransferService();
 
   boolean transitFeedCovers(Instant dateTime);
+
+  Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope);
 }

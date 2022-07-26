@@ -86,8 +86,8 @@ public abstract class FlexAccessEgressTemplate {
     Graph graph,
     TransitService transitService
   ) {
-    if (transferStop instanceof Stop) {
-      TransitStopVertex flexVertex = transitService.getStopVertexForStop().get(transferStop);
+    if (transferStop instanceof Stop stop) {
+      TransitStopVertex flexVertex = transitService.getStopVertexForStop(stop);
       return Stream
         .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
         .filter(Objects::nonNull);
