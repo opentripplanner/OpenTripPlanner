@@ -40,7 +40,6 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   protected final LocalDate serviceDate;
   private final WheelchairAccessibility wheelChairBoarding;
   private final FeedScopedId routeId;
-  private final FeedScopedId agencyId;
 
   public FrequencyBoardOrAlightEvent(
     RaptorTripPattern raptorTripPattern,
@@ -62,7 +61,6 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
     this.serviceDate = serviceDate;
     this.routeId = pattern.getRoute().getId();
     this.wheelChairBoarding = tripTimes.getWheelchairAccessibility();
-    this.agencyId = pattern.getRoute().getAgency().getId();
   }
 
   /* RaptorTripScheduleBoardOrAlightEvent implementation */
@@ -150,10 +148,5 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   @Override
   public FeedScopedId routeId() {
     return routeId;
-  }
-
-  @Override
-  public FeedScopedId agencyId() {
-    return agencyId;
   }
 }

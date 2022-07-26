@@ -108,12 +108,8 @@ public class RouteCostCalculatorTest {
     var errorMessageArr = String.format("Invalid arrival cost: %s", tc);
 
     // if we either have just unpreferred routes or just unpreferred agencies
-    if ((tc.unPrefRoute && !tc.unPrefAgency) || (!tc.unPrefRoute && tc.unPrefAgency)) {
+    if (tc.unPrefRoute || tc.unPrefAgency) {
       assertEquals(penaltyAppliedOnce, arrCost - defaultArrCost, errorMessageArr);
-    }
-
-    if (tc.unPrefRoute && tc.unPrefAgency) {
-      assertEquals(penaltyAppliedOnce * 2, arrCost - defaultArrCost, errorMessageArr);
     }
 
     if (tc.isDefault()) {
@@ -179,15 +175,15 @@ public class RouteCostCalculatorTest {
         UNPREFERRED_ROUTE_PENALTY,
         UNPREFERRED_ROUTE_RELUCTANCE
       );
-      Set<FeedScopedId> unprefRouteIds = new HashSet();
-      Set<FeedScopedId> unprefAgencyIds = new HashSet();
+
+      Set<FeedScopedId> unprefRouteIds = new HashSet<>();
 
       if (unPrefRoute) {
         unprefRouteIds.add(UNPREFERRED_ROUTE_ID);
       }
 
       if (unPrefAgency) {
-        unprefAgencyIds.add(UNPREFERRED_AGENCY_ID);
+        unprefRouteIds.add(UNPREFERRED_ROUTE_ID);
       }
 
       return new RouteCostCalculator<>(defaultCostCalculator, unprefRouteIds, unprefCostFn);
@@ -207,7 +203,7 @@ public class RouteCostCalculatorTest {
       }
 
       if (unPrefAgency) {
-        scheduleBuilder.agencyId(UNPREFERRED_AGENCY_ID);
+        scheduleBuilder.agencyId(UNPREFERRED_AGENCY_ID).routeId(UNPREFERRED_ROUTE_ID);
       }
 
       return scheduleBuilder.build();

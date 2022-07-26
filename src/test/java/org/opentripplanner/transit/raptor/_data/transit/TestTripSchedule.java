@@ -95,11 +95,6 @@ public class TestTripSchedule implements DefaultTripSchedule {
     return routeId;
   }
 
-  @Override
-  public FeedScopedId agencyId() {
-    return agencyId;
-  }
-
   public int size() {
     return arrivalTimes.length;
   }

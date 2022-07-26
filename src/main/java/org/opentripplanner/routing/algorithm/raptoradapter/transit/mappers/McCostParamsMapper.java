@@ -32,14 +32,12 @@ public class McCostParamsMapper {
 
     builder.wheelchairAccessibility(request.wheelchairAccessibility);
 
-    var unpreferredRoutes = new HashSet<>(
-      request
-        .getUnpreferredAgencies()
-        .stream()
-        .map(routesByAgency)
-        .flatMap(Collection::stream)
-        .toList()
-    );
+    var unpreferredRoutes = request
+      .getUnpreferredAgencies()
+      .stream()
+      .map(routesByAgency)
+      .flatMap(Collection::stream)
+      .collect(Collectors.toSet());
     unpreferredRoutes.addAll(request.getUnpreferredRoutes());
     builder.unpreferredRoutes(unpreferredRoutes);
 
