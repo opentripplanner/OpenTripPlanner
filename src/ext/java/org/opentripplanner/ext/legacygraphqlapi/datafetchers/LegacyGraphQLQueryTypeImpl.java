@@ -1005,7 +1005,7 @@ public class LegacyGraphQLQueryTypeImpl
           .collect(Collectors.toList());
       }
 
-      var stopStream = StreamSupport.stream(transitService.getAllStops().spliterator(), false);
+      var stopStream = transitService.getAllStops().stream();
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());

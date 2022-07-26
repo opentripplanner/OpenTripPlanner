@@ -93,7 +93,7 @@ public interface TransitService {
 
   Map<FeedScopedId, Operator> getOperatorForId();
 
-  Iterable<StopLocation> getAllStops();
+  Collection<StopLocation> getAllStops();
 
   Map<FeedScopedId, Trip> getTripForId();
 

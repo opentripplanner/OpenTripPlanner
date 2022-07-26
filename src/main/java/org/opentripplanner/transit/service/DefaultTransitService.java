@@ -230,7 +230,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link StopModelIndex#getAllStops()} */
   @Override
-  public Iterable<StopLocation> getAllStops() {
+  public Collection<StopLocation> getAllStops() {
     return this.transitModel.getStopModel().getStopModelIndex().getAllStops();
   }
 

@@ -594,9 +594,7 @@ public class TransmodelGraphQLSchema {
                 .collect(Collectors.toList());
             }
             if (environment.getArgument("name") == null) {
-              return StreamSupport
-                .stream(GqlUtil.getTransitService(environment).getAllStops().spliterator(), false)
-                .toList();
+              return GqlUtil.getTransitService(environment).getAllStops();
             }
             //                            else {
             //                                return index.getLuceneIndex().query(environment.getArgument("name"), true, true, false)

@@ -106,7 +106,7 @@ public class StopModelIndex {
     return multiModalStationForStations.get(station);
   }
 
-  public Iterable<StopLocation> getAllStops() {
+  public Collection<StopLocation> getAllStops() {
     return stopForId.values();
   }
 

@@ -81,7 +81,7 @@ public class StopMapper {
     return api;
   }
 
-  public static List<ApiStopShort> mapToApiShort(Iterable<StopLocation> domain) {
+  public static List<ApiStopShort> mapToApiShort(Collection<StopLocation> domain) {
     if (domain == null) {
       return null;
     }
