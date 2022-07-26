@@ -6,7 +6,6 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Instant;
 import java.util.Locale;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -93,8 +92,7 @@ public class DefaultServerContext implements OtpServerContext {
   public RoutingRequest defaultRoutingRequest() {
     // Lazy initialize request-scoped request to avoid doing this when not needed
     if (routingRequest == null) {
-      routingRequest = routerConfig.routingRequestDefaults().clone();
-      routingRequest.setDateTime(Instant.now());
+      routingRequest = routerConfig.routingRequestDefaults().copyWithDateTimeNow();
     }
     return routingRequest;
   }
