@@ -1,8 +1,13 @@
 package org.opentripplanner.standalone.config;
 
+import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItineraryFiltersMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ItineraryFiltersMapper.class);
 
   public static ItineraryFilterParameters map(NodeAdapter c) {
     ItineraryFilterParameters dft = ItineraryFilterParameters.createDefault();
@@ -19,7 +24,7 @@ public class ItineraryFiltersMapper {
         "groupedOtherThanSameLegsMaxCostMultiplier",
         dft.groupedOtherThanSameLegsMaxCostMultiplier
       ),
-      c.asLinearFunction("transitGeneralizedCostLimit", dft.transitGeneralizedCostLimit),
+      parseTransitGeneralizedCostLimit(c, dft.transitGeneralizedCostLimit),
       c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit),
       c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio),
       c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio),
@@ -28,6 +33,37 @@ public class ItineraryFiltersMapper {
         dft.filterItinerariesWithSameFirstOrLastTrip
       ),
       c.asBoolean("accessibilityScore", dft.accessibilityScore)
+    );
+  }
+
+  private static TransitGeneralizedCostFilterParams parseTransitGeneralizedCostLimit(
+    NodeAdapter nodeAdapter,
+    TransitGeneralizedCostFilterParams transitGeneralizedCostLimit
+  ) {
+    if (!nodeAdapter.exist("transitGeneralizedCostLimit")) {
+      return transitGeneralizedCostLimit;
+    }
+
+    var params = nodeAdapter.path("transitGeneralizedCostLimit");
+
+    if (params.isObject()) {
+      return new TransitGeneralizedCostFilterParams(
+        params.asLinearFunction(
+          "costLimitFunction",
+          transitGeneralizedCostLimit.costLimitFunction()
+        ),
+        params.asDouble("intervalRelaxFactor", transitGeneralizedCostLimit.intervalRelaxFactor())
+      );
+    }
+
+    LOG.warn(
+      "The format of transitGeneralizedCostLimit has changed, please see the documentation for new " +
+      "configuration format. The existing format will cease to work after OTP v2.2"
+    );
+
+    return new TransitGeneralizedCostFilterParams(
+      nodeAdapter.asLinearFunction("transitGeneralizedCostLimit", null),
+      0
     );
   }
 }
