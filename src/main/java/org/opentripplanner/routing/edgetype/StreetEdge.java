@@ -1073,7 +1073,8 @@ public class StreetEdge
         options,
         traverseMode,
         walkingBike,
-        isStairs()
+        isStairs(),
+        false
       );
     return new TraversalCosts(time, weight);
   }
@@ -1113,7 +1114,8 @@ public class StreetEdge
       req,
       TraverseMode.BICYCLE,
       false,
-      isStairs()
+      isStairs(),
+      false
     );
     weight *= reluctance;
     return new TraversalCosts(time, weight);
@@ -1131,7 +1133,8 @@ public class StreetEdge
         routingRequest,
         traverseMode,
         walkingBike,
-        isStairs()
+        isStairs(),
+        getStreetClass() == CLASS_STREET || getPermission().allows(TraverseMode.CAR)
       );
 
     double time, weight;

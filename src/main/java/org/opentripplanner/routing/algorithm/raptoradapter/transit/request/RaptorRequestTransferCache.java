@@ -102,6 +102,7 @@ public class RaptorRequestTransferCache {
     private final double stairsReluctance;
     private final double stairsTimeFactor;
     private final double turnReluctance;
+    private final double walkOnStreetReluctance;
     private final int elevatorBoardCost;
     private final int elevatorBoardTime;
     private final int elevatorHopCost;
@@ -128,6 +129,7 @@ public class RaptorRequestTransferCache {
       this.stairsReluctance = routingRequest.stairsReluctance;
       this.stairsTimeFactor = routingRequest.stairsTimeFactor;
       this.turnReluctance = routingRequest.turnReluctance;
+      this.walkOnStreetReluctance = routingRequest.walkOnStreetReluctance;
 
       this.elevatorBoardCost = routingRequest.elevatorBoardCost;
       this.elevatorBoardTime = routingRequest.elevatorBoardTime;
@@ -149,6 +151,7 @@ public class RaptorRequestTransferCache {
         walkReluctance,
         stairsReluctance,
         turnReluctance,
+        walkOnStreetReluctance,
         elevatorBoardCost,
         elevatorBoardTime,
         elevatorHopCost,
@@ -178,6 +181,7 @@ public class RaptorRequestTransferCache {
         Double.compare(that.stairsReluctance, stairsReluctance) == 0 &&
         Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
         Double.compare(that.turnReluctance, turnReluctance) == 0 &&
+        Double.compare(that.walkOnStreetReluctance, walkOnStreetReluctance) == 0 &&
         wheelchairAccessibility.equals(that.wheelchairAccessibility) &&
         elevatorBoardCost == that.elevatorBoardCost &&
         elevatorBoardTime == that.elevatorBoardTime &&

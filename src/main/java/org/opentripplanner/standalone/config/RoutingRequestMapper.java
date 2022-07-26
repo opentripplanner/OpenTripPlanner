@@ -138,6 +138,8 @@ public class RoutingRequestMapper {
     request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);
     request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
     request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
+    request.walkOnStreetReluctance =
+      c.asDouble("walkOnStreetReluctance", dft.walkOnStreetReluctance);
     request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
 
     request.wheelchairAccessibility = mapAccessibilityRequest(c.path("wheelchairAccessibility"));

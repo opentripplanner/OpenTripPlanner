@@ -619,7 +619,7 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("bikeWalkingReluctance", request::setBikeWalkingReluctance);
       callWith.argument("carReluctance", request::setCarReluctance);
       callWith.argument("walkReluctance", request::setWalkReluctance);
-      // callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
+      callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
       callWith.argument("waitReluctance", request::setWaitReluctance);
       callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
       callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);

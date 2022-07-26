@@ -16,13 +16,19 @@ class StreetEdgeReluctanceCalculator {
     RoutingRequest req,
     TraverseMode traverseMode,
     boolean walkingBike,
-    boolean edgeIsStairs
+    boolean edgeIsStairs,
+    boolean applyWalkOnStreetReluctance
   ) {
     if (edgeIsStairs) {
       return req.stairsReluctance;
     } else {
       return switch (traverseMode) {
-        case WALK -> walkingBike ? req.bikeWalkingReluctance : req.walkReluctance;
+        case WALK -> {
+          double baseReluctance = walkingBike ? req.bikeWalkingReluctance : req.walkReluctance;
+          yield applyWalkOnStreetReluctance
+            ? baseReluctance * req.walkOnStreetReluctance
+            : baseReluctance;
+        }
         case BICYCLE -> req.bikeReluctance;
         case CAR -> req.carReluctance;
         default -> throw new IllegalArgumentException(

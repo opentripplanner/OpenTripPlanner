@@ -333,6 +333,8 @@ public class RoutingRequest implements Cloneable, Serializable {
   public double stairsReluctance = 2.0;
   /** Multiplicative factor on expected turning time. */
   public double turnReluctance = 1.0;
+  /** Multiplicative factor on walking on streets with car traffic allowed. */
+  public double walkOnStreetReluctance = 1.0;
   /**
    * How long does it take to get an elevator, on average (actually, it probably should be a bit
    * *more* than average, to prevent optimistic trips)? Setting it to "seems like forever," while
@@ -1197,6 +1199,12 @@ public class RoutingRequest implements Cloneable, Serializable {
   public void setWalkReluctance(double walkReluctance) {
     if (walkReluctance > 0) {
       this.walkReluctance = walkReluctance;
+    }
+  }
+
+  public void setWalkOnStreetReluctance(double walkOnStreetReluctance) {
+    if (walkOnStreetReluctance > 0) {
+      this.walkOnStreetReluctance = walkOnStreetReluctance;
     }
   }
 
