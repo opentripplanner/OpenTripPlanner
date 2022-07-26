@@ -74,6 +74,8 @@ public interface TransitService {
 
   Map<FeedScopedId, Integer> getServiceCodes();
 
+  TIntSet getServiceCodesRunningForDate(LocalDate date);
+
   FlexStopLocation getLocationById(FeedScopedId id);
 
   Set<StopLocation> getAllFlexStopsFlat();

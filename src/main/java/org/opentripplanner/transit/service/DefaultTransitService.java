@@ -167,6 +167,11 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModel.getServiceCodes();
   }
 
+  @Override
+  public TIntSet getServiceCodesRunningForDate(LocalDate date) {
+    return transitModelIndex.getServiceCodesRunningForDate().get(date);
+  }
+
   /** {@link StopModel#getLocationById(FeedScopedId)} */
   @Override
   public FlexStopLocation getLocationById(FeedScopedId id) {

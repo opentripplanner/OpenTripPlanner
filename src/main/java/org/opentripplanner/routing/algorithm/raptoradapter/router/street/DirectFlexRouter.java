@@ -50,7 +50,7 @@ public class DirectFlexRouter {
 
       FlexRouter flexRouter = new FlexRouter(
         serverContext.graph(),
-        serverContext.transitModel(),
+        serverContext.transitService(),
         serverContext.routerConfig().flexParameters(request),
         directRequest.getDateTime(),
         directRequest.arriveBy,
