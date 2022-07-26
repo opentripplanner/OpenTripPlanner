@@ -72,7 +72,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,7 +169,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   );
   public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss z");
   /* The router we are visualizing. */
-  private final Router router;
+  private final OtpServerContext serverContext;
   /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
   private final Graph graph;
   private JPanel leftPanel;
@@ -250,13 +250,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   protected State lastStateClicked = null;
   private JCheckBox longDistanceModeCheckbox;
 
-  public GraphVisualizer(Router router) {
+  public GraphVisualizer(OtpServerContext serverContext) {
     super();
     LOG.info("Starting up graph visualizer...");
     setTitle("GraphVisualizer");
     setExtendedState(JFrame.MAXIMIZED_BOTH);
-    this.router = router;
-    this.graph = router.graph;
+    this.serverContext = serverContext;
+    this.graph = serverContext.graph();
     init();
   }
 
@@ -480,7 +480,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
     // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
     // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
-    GraphPathFinder finder = new GraphPathFinder(router);
+    GraphPathFinder finder = new GraphPathFinder(serverContext);
 
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)

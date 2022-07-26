@@ -30,8 +30,7 @@ import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,19 +48,19 @@ public class TransmodelAPI {
   private static GraphQLSchema schema;
   private static Collection<String> tracingHeaderTags;
 
-  private final Router router;
+  private final OtpServerContext serverContext;
   private final TransmodelGraph index;
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public TransmodelAPI(
-    @Context OTPServer otpServer,
+    @Context OtpServerContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.router = otpServer.getRouter();
+    this.serverContext = serverContext;
     this.index = new TransmodelGraph(schema);
   }
 
@@ -122,7 +121,7 @@ public class TransmodelAPI {
     }
     return index.getGraphQLResponse(
       query,
-      router,
+      serverContext,
       variables,
       operationName,
       maxResolves,
@@ -140,7 +139,7 @@ public class TransmodelAPI {
   ) {
     return index.getGraphQLResponse(
       query,
-      router,
+      serverContext,
       null,
       null,
       maxResolves,
@@ -179,7 +178,7 @@ public class TransmodelAPI {
       futures.add(() ->
         index.getGraphQLExecutionResult(
           (String) query.get("query"),
-          router,
+          serverContext,
           variables,
           operationName,
           maxResolves,

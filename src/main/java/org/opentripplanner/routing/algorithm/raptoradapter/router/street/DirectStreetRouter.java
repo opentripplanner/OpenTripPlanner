@@ -13,20 +13,20 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 
 public class DirectStreetRouter {
 
-  public static List<Itinerary> route(Router router, RoutingRequest request) {
+  public static List<Itinerary> route(OtpServerContext router, RoutingRequest request) {
     if (request.modes.directMode == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
 
     RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
-    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, directRequest)) {
+    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph(), directRequest)) {
       final RoutingContext routingContext = new RoutingContext(
         directRequest,
-        router.graph,
+        router.graph(),
         temporaryVertices
       );
 
@@ -40,9 +40,9 @@ public class DirectStreetRouter {
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        router.transitModel.getTimeZone(),
-        router.graph.streetNotesService,
-        router.graph.ellipsoidToGeoidDifference
+        router.transitModel().getTimeZone(),
+        router.graph().streetNotesService,
+        router.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
       ItinerariesHelper.decorateItinerariesWithRequestData(response, request);

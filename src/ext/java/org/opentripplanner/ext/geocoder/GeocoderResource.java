@@ -16,8 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -27,7 +26,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
-  private final Router router;
+  private final OtpServerContext serverContext;
 
   /**
    * @deprecated The support for multiple routers are removed from OTP2. See
@@ -37,8 +36,8 @@ public class GeocoderResource {
   @PathParam("ignoreRouterId")
   private String ignoreRouterId;
 
-  public GeocoderResource(@Context OTPServer otpServer) {
-    router = otpServer.getRouter();
+  public GeocoderResource(@Context OtpServerContext otpServerContext) {
+    serverContext = otpServerContext;
   }
 
   /**
@@ -92,7 +91,7 @@ public class GeocoderResource {
 
   private Collection<SearchResult> queryStopLocations(String query, boolean autocomplete) {
     return LuceneIndex
-      .forServer(router)
+      .forServer(serverContext)
       .queryStopLocations(query, autocomplete)
       .map(sl ->
         new SearchResult(
@@ -107,7 +106,7 @@ public class GeocoderResource {
 
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
     return LuceneIndex
-      .forServer(router)
+      .forServer(serverContext)
       .queryStopCollections(query, autocomplete)
       .map(sc ->
         new SearchResult(
@@ -122,7 +121,7 @@ public class GeocoderResource {
 
   private Collection<? extends SearchResult> queryCorners(String query, boolean autocomplete) {
     return LuceneIndex
-      .forServer(router)
+      .forServer(serverContext)
       .queryStreetVertices(query, autocomplete)
       .map(v -> new SearchResult(v.getLat(), v.getLon(), stringifyStreetVertex(v), v.getLabel()))
       .collect(Collectors.toList());

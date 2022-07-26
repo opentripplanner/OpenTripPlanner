@@ -37,7 +37,7 @@ import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopCollection;
@@ -131,9 +131,9 @@ public class LuceneIndex implements Serializable {
     }
   }
 
-  public static synchronized LuceneIndex forServer(Router router) {
-    var graph = router.graph;
-    var transitModel = router.transitModel;
+  public static synchronized LuceneIndex forServer(OtpServerContext serverContext) {
+    var graph = serverContext.graph();
+    var transitModel = serverContext.transitModel();
     var existingIndex = graph.getService(LuceneIndex.class);
     if (existingIndex != null) {
       return existingIndex;

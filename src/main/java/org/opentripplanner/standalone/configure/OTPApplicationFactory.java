@@ -15,17 +15,10 @@ import org.opentripplanner.standalone.config.ConfigModule;
 import org.opentripplanner.standalone.config.OtpBaseDirectory;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.OTPServer;
 
 /**
- * This class is responsible for creating the top level services like the {@link OTPServer}. The
- * purpose of this class is to wire the application, creating the necessary Services and modules
- * and putting them together using the Dagger 2 Dependency Injection framework . It is NOT
- * responsible for starting or running the application.
- * <p>
- * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This should be
- * really fast, since the only IO operations are reading config files and logging. Loading transit
- * or map data should NOT happen during this phase.
+ * This abstract class provide the top level service created and wired together using the Dagger 2
+ * Dependency Injection framework. Dagger picks up this class and implement it.
  */
 @Singleton
 @Component(modules = { ConfigModule.class, DataStoreModule.class, GsDataSourceModule.class })

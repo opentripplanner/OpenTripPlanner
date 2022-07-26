@@ -30,7 +30,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -44,12 +44,12 @@ public class TransmodelGraphQLPlanner {
   public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
     PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
-    Router router = ctx.getRouter();
+    OtpServerContext serverContext = ctx.getServerContext();
     RoutingRequest request = null;
     try {
       request = createRequest(environment);
 
-      RoutingResponse res = ctx.getRoutingService().route(request, router);
+      RoutingResponse res = ctx.getRoutingService().route(request, serverContext);
 
       response.plan = res.getTripPlan();
       response.metadata = res.getMetadata();
@@ -62,7 +62,7 @@ public class TransmodelGraphQLPlanner {
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
       response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
-    Locale locale = request == null ? router.getDefaultLocale() : request.locale;
+    Locale locale = request == null ? serverContext.getDefaultLocale() : request.locale;
     return DataFetcherResult
       .<PlanResponse>newResult()
       .data(response)
@@ -89,8 +89,8 @@ public class TransmodelGraphQLPlanner {
 
   private RoutingRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
-    Router router = context.getRouter();
-    RoutingRequest request = router.copyDefaultRoutingRequest();
+    OtpServerContext serverContext = context.getServerContext();
+    RoutingRequest request = serverContext.copyDefaultRoutingRequest();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 

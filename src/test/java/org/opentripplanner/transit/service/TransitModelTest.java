@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.model.Timetable;

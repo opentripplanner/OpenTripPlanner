@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
@@ -33,8 +33,8 @@ public class TimetableSnapshotTest {
 
   @BeforeAll
   public static void setUp() throws Exception {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
-    TransitModel transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    TransitModel transitModel = model.transitModel();
 
     feedId = transitModel.getFeedIds().iterator().next();
 
