@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev-2.x
-      - bw-speed-test
 
 jobs:
   perf-test:
