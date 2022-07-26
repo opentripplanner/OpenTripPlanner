@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.Locale;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.TestServerContext;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -312,8 +312,6 @@ public class OpenStreetMapModuleTest {
 
     loader.buildGraph(graph, transitModel, extra);
 
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
-
     RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
@@ -321,14 +319,9 @@ public class OpenStreetMapModuleTest {
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    RoutingContext routingContext = new RoutingContext(
-      request,
-      serverContext.graph(),
-      bottomV,
-      topV
-    );
+    RoutingContext routingContext = new RoutingContext(request, graph, bottomV, topV);
 
-    GraphPathFinder graphPathFinder = new GraphPathFinder(serverContext);
+    GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
     List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
 
     assertNotNull(pathList);

@@ -76,7 +76,7 @@ public class SpeedTest {
         graph,
         transitModel,
         timer.getRegistry(),
-        false
+        null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
     // we do it manually here

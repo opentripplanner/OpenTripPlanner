@@ -24,7 +24,7 @@ public class TestServerContext {
       graph,
       transitModel,
       Metrics.globalRegistry,
-      false
+      null
     );
     creatTransitLayerForRaptor(context.transitModel(), context.routerConfig());
     return context;
