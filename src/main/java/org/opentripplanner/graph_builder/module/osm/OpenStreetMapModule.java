@@ -828,8 +828,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       OSMWithTags entity
     ) {
       List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
+      var sortedAccessVertices = accessVertices
+        .stream()
+        .sorted(Comparator.comparing(vn -> vn.getVertex().getLabel()))
+        .toList();
 
-      for (var access : accessVertices) {
+      for (var access : sortedAccessVertices) {
         I18NString suffix = null;
         if (access.getName() != null) {
           suffix = access.getName();
