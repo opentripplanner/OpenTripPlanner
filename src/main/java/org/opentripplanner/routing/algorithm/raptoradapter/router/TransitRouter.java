@@ -109,7 +109,8 @@ public class TransitRouter {
       transitSearchTimeZero,
       serverContext.raptorConfig().isMultiThreaded(),
       accessEgresses.getAccesses(),
-      accessEgresses.getEgresses()
+      accessEgresses.getEgresses(),
+      serverContext.meterRegistry()
     );
 
     // Route transit
