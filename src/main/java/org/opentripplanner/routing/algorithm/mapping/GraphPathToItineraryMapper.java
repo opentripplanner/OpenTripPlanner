@@ -254,25 +254,32 @@ public class GraphPathToItineraryMapper {
    * @param states The states that go with the leg
    */
   private static TraverseMode resolveMode(List<State> states) {
-    for (State state : states) {
-      TraverseMode mode = state.getNonTransitMode();
+    return states
+      .stream()
+      // The first state is part of the previous leg
+      .skip(1)
+      .map(state -> {
+        var mode = state.getNonTransitMode();
 
-      if (mode != null) {
-        // Resolve correct mode if renting vehicle
-        if (state.isRentingVehicle()) {
-          return switch (state.stateData.rentalVehicleFormFactor) {
-            case BICYCLE, OTHER -> TraverseMode.BICYCLE;
-            case SCOOTER, MOPED -> TraverseMode.SCOOTER;
-            case CAR -> TraverseMode.CAR;
-          };
-        } else {
-          return mode;
+        if (mode != null) {
+          // Resolve correct mode if renting vehicle
+          if (state.isRentingVehicle()) {
+            return switch (state.stateData.rentalVehicleFormFactor) {
+              case BICYCLE, OTHER -> TraverseMode.BICYCLE;
+              case SCOOTER, MOPED -> TraverseMode.SCOOTER;
+              case CAR -> TraverseMode.CAR;
+            };
+          } else {
+            return mode;
+          }
         }
-      }
-    }
 
-    // Fallback to walking
-    return TraverseMode.WALK;
+        return null;
+      })
+      .filter(Objects::nonNull)
+      .findFirst()
+      // Fallback to walking
+      .orElse(TraverseMode.WALK);
   }
 
   private static List<P2<Double>> encodeElevationProfileWithNaN(

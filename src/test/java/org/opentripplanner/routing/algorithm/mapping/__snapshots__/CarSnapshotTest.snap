@@ -306,7 +306,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "length": 14,
             "points": "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
           },
-          "mode": "WALK",
+          "mode": "CAR",
           "pathway": false,
           "realTime": false,
           "rentedBike": false,
@@ -371,7 +371,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "length": 12,
             "points": "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
           },
-          "mode": "CAR",
+          "mode": "WALK",
           "pathway": false,
           "realTime": false,
           "rentedBike": false,
@@ -501,7 +501,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "length": 14,
             "points": "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
           },
-          "mode": "WALK",
+          "mode": "CAR",
           "pathway": false,
           "realTime": false,
           "rentedBike": false,
@@ -566,7 +566,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "length": 12,
             "points": "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
           },
-          "mode": "CAR",
+          "mode": "WALK",
           "pathway": false,
           "realTime": false,
           "rentedBike": false,
