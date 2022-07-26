@@ -36,7 +36,7 @@ public class LocationMapper {
     try {
       geometry = GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry());
     } catch (UnsupportedGeometryException e) {
-      LOG.warn("Unsupported geometry type for {}", gtfsLocation.getId());
+      LOG.error("Unsupported geometry type for {}", gtfsLocation.getId());
     }
 
     return FlexStopLocation
