@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -165,6 +166,8 @@ public interface TransitService {
 
   TransitLayer getTransitLayer();
 
+  TransitLayer getRealtimeTransitLayer();
+
   CalendarService getCalendarService();
 
   ZoneId getTimeZone();
@@ -186,4 +189,6 @@ public interface TransitService {
   Optional<Coordinate> getCenter();
 
   TransferService getTransferService();
+
+  boolean transitFeedCovers(Instant dateTime);
 }

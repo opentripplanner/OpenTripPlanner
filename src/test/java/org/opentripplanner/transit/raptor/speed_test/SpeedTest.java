@@ -69,10 +69,11 @@ public class SpeedTest {
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
+    var routerConfig = RouterConfig.DEFAULT;
     this.serverContext =
       DefaultServerContext.create(
-        RouterConfig.DEFAULT,
-        new RaptorConfig<>(RouterConfig.DEFAULT.raptorTuningParameters()),
+        routerConfig,
+        new RaptorConfig<>(routerConfig.raptorTuningParameters()),
         graph,
         transitModel,
         timer.getRegistry(),
@@ -80,7 +81,7 @@ public class SpeedTest {
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
     // we do it manually here
-    creatTransitLayerForRaptor(serverContext.transitModel(), serverContext.routerConfig());
+    creatTransitLayerForRaptor(transitModel, routerConfig);
 
     timer.setUp(opts.groupResultsByCategory());
   }

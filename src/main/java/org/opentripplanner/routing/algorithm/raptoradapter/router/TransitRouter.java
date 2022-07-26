@@ -82,7 +82,7 @@ public class TransitRouter {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!serverContext.transitModel().transitFeedCovers(request.getDateTime())) {
+    if (!serverContext.transitService().transitFeedCovers(request.getDateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );
@@ -90,7 +90,7 @@ public class TransitRouter {
 
     var transitLayer = request.ignoreRealtimeUpdates
       ? serverContext.transitService().getTransitLayer()
-      : serverContext.transitModel().getRealtimeTransitLayer();
+      : serverContext.transitService().getRealtimeTransitLayer();
 
     var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
 

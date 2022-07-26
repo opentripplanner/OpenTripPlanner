@@ -3,6 +3,7 @@ package org.opentripplanner.transit.service;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -492,6 +493,11 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModel.getTransitLayer();
   }
 
+  @Override
+  public TransitLayer getRealtimeTransitLayer() {
+    return this.transitModel.getRealtimeTransitLayer();
+  }
+
   /** {@link TransitModel#setTransitLayer(TransitLayer)} */
   @Override
   public void setTransitLayer(TransitLayer transitLayer) {
@@ -559,5 +565,10 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public TransferService getTransferService() {
     return transitModel.getTransferService();
+  }
+
+  @Override
+  public boolean transitFeedCovers(Instant dateTime) {
+    return transitModel.transitFeedCovers(dateTime);
   }
 }

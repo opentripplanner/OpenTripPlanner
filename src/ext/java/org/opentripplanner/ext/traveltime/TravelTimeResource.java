@@ -103,7 +103,7 @@ public class TravelTimeResource {
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
     @QueryParam("modes") String modes
   ) {
-    transitLayer = serverContext.transitModel().getRealtimeTransitLayer();
+    transitLayer = serverContext.transitService().getRealtimeTransitLayer();
     this.graph = serverContext.graph();
     this.transitService = serverContext.transitService();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
