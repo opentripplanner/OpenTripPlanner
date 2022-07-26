@@ -96,7 +96,7 @@ public class TripPatternForDates
     for (int d = 0; d < tripPatternForDates.size(); d++) {
       int offset = this.offsets[d];
       for (var trip : tripPatternForDates.get(d).tripTimes()) {
-        wheelchairBoardings[i] = trip.getTrip().getWheelchairBoarding();
+        wheelchairBoardings[i] = trip.getWheelchairAccessibility();
         for (int s = 0; s < nStops; s++) {
           this.arrivalTimes[s * numberOfTripSchedules + i] = trip.getArrivalTime(s) + offset;
           this.departureTimes[s * numberOfTripSchedules + i] = trip.getDepartureTime(s) + offset;

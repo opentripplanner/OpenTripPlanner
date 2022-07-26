@@ -47,6 +47,10 @@ public class RoutingRequestTransitDataProviderFilterTest {
   private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
     WheelchairAccessibilityRequest.DEFAULT;
 
+  private static final WheelchairAccessibilityRequest ENABLED_ACCESSIBILITY = WheelchairAccessibilityRequest.makeDefault(
+    true
+  );
+
   /**
    * Test filter for wheelchair access.
    *
@@ -250,7 +254,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      WheelchairAccessibilityRequest.makeDefault(true),
+      ENABLED_ACCESSIBILITY,
       false,
       MainAndSubMode.all(),
       Set.of(),
@@ -276,7 +280,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      DEFAULT_ACCESSIBILITY,
+      ENABLED_ACCESSIBILITY,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -286,6 +290,36 @@ public class RoutingRequestTransitDataProviderFilterTest {
     boolean valid = filter.tripTimesPredicate(wheelchairAccessibleTrip);
 
     assertTrue(valid);
+  }
+
+  @Test
+  public void keepRealTimeAccessibleTrip() {
+    TripTimes realTimeWheelchairAccessibleTrip = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      WheelchairAccessibility.NOT_POSSIBLE,
+      TripAlteration.PLANNED
+    );
+
+    var filter = new RoutingRequestTransitDataProviderFilter(
+      false,
+      ENABLED_ACCESSIBILITY,
+      false,
+      List.of(new MainAndSubMode(TransitMode.BUS)),
+      Set.of(),
+      Set.of()
+    );
+
+    assertFalse(filter.tripTimesPredicate(realTimeWheelchairAccessibleTrip));
+
+    realTimeWheelchairAccessibleTrip.updateWheelchairAccessibility(
+      WheelchairAccessibility.POSSIBLE
+    );
+
+    assertTrue(filter.tripTimesPredicate(realTimeWheelchairAccessibleTrip));
   }
 
   @Test
