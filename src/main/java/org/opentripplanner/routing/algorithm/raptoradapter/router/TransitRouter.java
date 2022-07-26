@@ -30,6 +30,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
@@ -250,13 +251,13 @@ public class TransitRouter {
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
     return new RaptorRoutingRequestTransitData(
-      transitModel.getTransferService(),
       transitLayer,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       createRequestTransitDataProviderFilter(transitModel.getTransitModelIndex()),
-      new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
+      new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null),
+      transitModel.getTransitModelIndex().getRoutesForAgency()::get
     );
   }
 

@@ -127,7 +127,6 @@ public class TravelTimeResource {
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
-        this.serverContext.transitModel().getTransferService(),
         transitLayer,
         startOfTime,
         0,
@@ -136,7 +135,8 @@ public class TravelTimeResource {
           routingRequest,
           this.serverContext.transitModel().getTransitModelIndex()
         ),
-        new RoutingContext(transferRoutingRequest, this.serverContext.graph(), (Vertex) null, null)
+        new RoutingContext(transferRoutingRequest, this.serverContext.graph(), (Vertex) null, null),
+        serverContext.transitModel().getTransitModelIndex().getRoutesForAgency()::get
       );
   }
 

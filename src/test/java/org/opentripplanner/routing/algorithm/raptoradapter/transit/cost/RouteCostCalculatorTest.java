@@ -71,12 +71,17 @@ public class RouteCostCalculatorTest {
   public void testMcCostParameterMapping() {
     RoutingRequest routingRequest = new RoutingRequest();
     routingRequest.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+    routingRequest.setUnpreferredAgencies(List.of(AGENCY_ID));
     routingRequest.setUnpreferredRouteCost("300 + 1.0 x");
 
-    McCostParams costParams = McCostParamsMapper.map(routingRequest);
+    McCostParams costParams = McCostParamsMapper.map(
+      routingRequest,
+      agencyId -> List.of(OTHER_ROUTE_ID)
+    );
     var routes = costParams.unpreferredRoutes();
 
     assertTrue(routes.contains(UNPREFERRED_ROUTE_ID));
+    assertTrue(routes.contains(OTHER_ROUTE_ID));
     assertFalse(routes.contains(DEFAULT_ROUTE_ID));
 
     // test creation of linear cost function
@@ -185,8 +190,7 @@ public class RouteCostCalculatorTest {
         unprefAgencyIds.add(UNPREFERRED_AGENCY_ID);
       }
 
-      var route = new RouteCostCalculator<>(defaultCostCalculator, unprefRouteIds, unprefCostFn);
-      return new AgencyCostCalculator<>(route, unprefAgencyIds, unprefCostFn);
+      return new RouteCostCalculator<>(defaultCostCalculator, unprefRouteIds, unprefCostFn);
     }
 
     /**

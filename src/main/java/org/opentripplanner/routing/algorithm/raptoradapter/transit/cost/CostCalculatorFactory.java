@@ -25,15 +25,6 @@ public class CostCalculatorFactory {
         );
     }
 
-    if (!mcCostParams.unpreferredAgencies().isEmpty()) {
-      calculator =
-        new AgencyCostCalculator<>(
-          calculator,
-          mcCostParams.unpreferredAgencies(),
-          mcCostParams.unnpreferredCost()
-        );
-    }
-
     return calculator;
   }
 }

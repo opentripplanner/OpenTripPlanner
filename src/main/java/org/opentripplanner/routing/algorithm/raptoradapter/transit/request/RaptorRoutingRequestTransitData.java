@@ -2,8 +2,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.ZonedDateTime;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
@@ -12,6 +14,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
@@ -59,15 +64,15 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   private final int validTransitDataEndTime;
 
   public RaptorRoutingRequestTransitData(
-    TransferService transferService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     TransitDataProviderFilter filter,
-    RoutingContext routingContext
+    RoutingContext routingContext,
+    Function<FeedScopedId, Collection<Route>> routesByAgency
   ) {
-    this.transferService = transferService;
+    this.transferService = transitLayer.getTransferService();
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
 
@@ -87,7 +92,10 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(patternIndex);
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
 
-    var mcCostParams = McCostParamsMapper.map(routingContext.opt);
+    var mcCostParams = McCostParamsMapper.map(
+      routingContext.opt,
+      agencyId -> routesByAgency.apply(agencyId).stream().map(TransitEntity::getId).toList()
+    );
 
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(

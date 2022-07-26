@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.AgencyCostCalculator.DEFAULT_AGENCY_RELUCTANCE;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
