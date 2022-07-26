@@ -134,7 +134,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   public void init() {
     if (routingService == null) {
-      routingService = new RoutingService(graph, transitModel);
+      routingService = new RoutingService(graph, serverContext.transitService());
       transitService = new DefaultTransitService(transitModel);
       transitModel.setUpdaterManager(new GraphUpdaterManager(graph, transitModel, List.of()));
     } else {

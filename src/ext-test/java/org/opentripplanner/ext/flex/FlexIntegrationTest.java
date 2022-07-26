@@ -67,7 +67,7 @@ public class FlexIntegrationTest {
 
     addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
     serverContext = TestServerContext.createServerContext(graph, transitModel);
-    service = new RoutingService(graph, transitModel);
+    service = new RoutingService(graph, serverContext.transitService());
   }
 
   @Test

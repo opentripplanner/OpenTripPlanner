@@ -117,12 +117,9 @@ class StreetGraphFinderTest extends GraphRoutingTest {
       }
     );
 
-    var graph = otpModel.graph();
-    var transitModel = otpModel.transitModel();
-
-    routingService = new RoutingService(graph, transitModel);
-    transitService = new DefaultTransitService(transitModel);
-    graphFinder = new StreetGraphFinder(graph);
+    transitService = new DefaultTransitService(otpModel.transitModel());
+    routingService = new RoutingService(otpModel.graph(), transitService);
+    graphFinder = new StreetGraphFinder(otpModel.graph());
   }
 
   @Test

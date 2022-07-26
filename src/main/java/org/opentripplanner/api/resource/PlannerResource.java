@@ -71,7 +71,7 @@ public class PlannerResource extends RoutingResource {
       // Route
       RoutingService routingService = new RoutingService(
         serverContext.graph(),
-        serverContext.transitModel()
+        serverContext.transitService()
       );
       res = routingService.route(request, serverContext);
 

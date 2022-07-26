@@ -259,7 +259,7 @@ public abstract class SnapshotTestBase {
     long startMillis = System.currentTimeMillis();
     RoutingService routingService = new RoutingService(
       serverContext.graph(),
-      serverContext.transitModel()
+      serverContext.transitService()
     );
     RoutingResponse response = routingService.route(request, context);
 

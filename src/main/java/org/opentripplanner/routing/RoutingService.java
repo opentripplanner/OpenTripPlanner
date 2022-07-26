@@ -32,7 +32,6 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
@@ -43,19 +42,19 @@ public class RoutingService {
 
   private final Graph graph;
 
-  private final TransitModel transitModel;
+  private final TransitService transitService;
 
   private final GraphFinder graphFinder;
 
-  public RoutingService(Graph graph, TransitModel transitModel) {
+  public RoutingService(Graph graph, TransitService transitService) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.graphFinder = GraphFinder.getInstance(graph);
   }
 
   // TODO We should probably not have the Router as a parameter here
   public RoutingResponse route(RoutingRequest request, OtpServerContext serverContext) {
-    RoutingWorker worker = new RoutingWorker(serverContext, request, transitModel.getTimeZone());
+    RoutingWorker worker = new RoutingWorker(serverContext, request, transitService.getTimeZone());
     return worker.route();
   }
 
@@ -211,11 +210,6 @@ public class RoutingService {
 
   public RealtimeVehiclePositionService getVehiclePositionService() {
     return this.graph.getVehiclePositionService();
-  }
-
-  /** {@link org.opentripplanner.transit.service.StopModel#getStopVerticesById(FeedScopedId)} */
-  public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-    return this.transitModel.getStopModel().getStopVerticesById(id);
   }
 
   /** {@link Graph#getVehicleRentalStationService()} */
