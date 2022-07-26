@@ -52,7 +52,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -72,21 +72,21 @@ public class IndexAPI {
 
   private static final double MAX_STOP_SEARCH_RADIUS = 5000;
 
-  private final OTPServer otpServer;
+  private final OtpServerContext serverContext;
 
   /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
   @Context
   UriInfo uriInfo;
 
   public IndexAPI(
-    @Context OTPServer otpServer,
+    @Context OtpServerContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.otpServer = otpServer;
+    this.serverContext = serverContext;
   }
 
   @GET
@@ -639,10 +639,10 @@ public class IndexAPI {
   }
 
   private RoutingService createRoutingService() {
-    return otpServer.createRoutingRequestService();
+    return serverContext.routingRequestService();
   }
 
   private TransitService createTransitService() {
-    return otpServer.createTransitRequestService();
+    return serverContext.transitRequestService();
   }
 }

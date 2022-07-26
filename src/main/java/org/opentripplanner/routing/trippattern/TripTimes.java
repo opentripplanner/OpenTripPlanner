@@ -4,6 +4,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +108,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   private RealTimeState realTimeState = RealTimeState.SCHEDULED;
 
+  public WheelchairAccessibility wheelchairAccessibility;
+
   /**
    * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. The
    * non-interpolated stoptimes should already be marked at timepoints by a previous filtering
@@ -153,6 +157,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.departureTimes = null;
     this.stopRealTimeStates = null;
     this.timepoints = deduplicator.deduplicateBitSet(timepoints);
+    this.wheelchairAccessibility = trip.getWheelchairBoarding();
     LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
   }
 
@@ -173,6 +178,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.originalGtfsStopSequence = object.originalGtfsStopSequence;
     this.realTimeState = object.realTimeState;
     this.timepoints = object.timepoints;
+    this.wheelchairAccessibility = object.wheelchairAccessibility;
   }
 
   /**
@@ -397,6 +403,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     arrivalTimes[stop] = scheduledArrivalTimes[stop] + timeShift + delay;
   }
 
+  public WheelchairAccessibility getWheelchairAccessibility() {
+    return wheelchairAccessibility;
+  }
+
+  public void updateWheelchairAccessibility(WheelchairAccessibility wheelchairAccessibility) {
+    this.wheelchairAccessibility = wheelchairAccessibility;
+  }
+
   public int getNumStops() {
     return scheduledArrivalTimes.length;
   }
@@ -423,6 +437,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     // existing shift should usually (always?) be 0 on freqs
     shifted.timeShift = shifted.timeShift + shift;
     return shifted;
+  }
+
+  // Time-shift all times on this trip. This is used when updating the time zone for the trip.
+  public void timeShift(Duration duration) {
+    timeShift += duration.toSeconds();
   }
 
   /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */

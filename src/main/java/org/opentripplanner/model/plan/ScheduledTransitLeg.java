@@ -23,6 +23,7 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -153,6 +154,11 @@ public class ScheduledTransitLeg implements Leg {
   @Override
   public Trip getTrip() {
     return tripTimes.getTrip();
+  }
+
+  @Override
+  public WheelchairAccessibility getTripWheelchairAccessibility() {
+    return tripTimes.getWheelchairAccessibility();
   }
 
   @Override

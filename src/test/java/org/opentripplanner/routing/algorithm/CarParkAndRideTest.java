@@ -82,7 +82,7 @@ public class CarParkAndRideTest extends ParkAndRideTest {
         }
       }
     );
-    graph = otpModel.graph;
+    graph = otpModel.graph();
   }
 
   @Test

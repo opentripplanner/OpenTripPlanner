@@ -4,7 +4,7 @@
 
     <name>OpenTripPlanner</name>
     <description>The OpenTripPlanner multimodal journey planning system</description>
-    <url>http://opentripplanner.org</url>
+    <url>https://opentripplanner.org</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
     <version>2.2.0-SNAPSHOT</version>
@@ -18,13 +18,14 @@
     </licenses>
 
     <scm>
-        <url>http://github.com/opentripplanner/OpenTripPlanner</url>
+        <url>https://github.com/opentripplanner/OpenTripPlanner</url>
     </scm>
 
     <properties>
-        <otp.serialization.version.id>41</otp.serialization.version.id>
+        <otp.serialization.version.id>43</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>26.4</geotools.version>
+        <geotools.version>27.0</geotools.version>
+        <google.dagger.version>2.42</google.dagger.version>
         <jackson.version>2.13.3</jackson.version>
         <jersey.version>2.34</jersey.version>
         <junit.version>5.8.2</junit.version>
@@ -107,6 +108,13 @@
                 <configuration>
                     <!-- Target Java version -->
                     <release>17</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${google.dagger.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -447,11 +455,6 @@
             <url>https://repo.osgeo.org/repository/release/</url>
         </repository>
         <repository>
-            <id>geosolutions</id>
-            <name>GeoSolutions Repository</name>
-            <url>https://maven.geo-solutions.it/</url>
-        </repository>
-        <repository>
             <id>onebusaway-releases</id>
             <name>Onebusaway Releases Repo</name>
             <url>https://repo.camsys-apps.com/releases/</url>
@@ -483,6 +486,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.36</version>
+        </dependency>
+
+        <!-- dependency injection -->
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${google.dagger.version}</version>
         </dependency>
 
         <!-- JSON AST, not used much and is a good candidate for removal -->
@@ -524,7 +534,7 @@
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-geojsondatastore</artifactId>
+            <artifactId>gt-geojson-core</artifactId>
             <version>${geotools.version}</version>
         </dependency>
 

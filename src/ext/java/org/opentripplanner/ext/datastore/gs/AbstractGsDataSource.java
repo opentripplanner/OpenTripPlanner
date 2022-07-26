@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.datastore.gs;
 
 import com.google.cloud.storage.BlobId;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 abstract class AbstractGsDataSource implements DataSource {
 

@@ -2,7 +2,6 @@ package org.opentripplanner.routing.street;
 
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Assertions;
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -21,7 +20,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
@@ -49,11 +48,11 @@ public class SplitEdgeTurnRestrictionsTest {
 
   @Test
   void shouldTakeDeufringenTurnRestrictionsIntoAccount() {
-    OtpModel otpModel = ConstantsForTests.buildOsmAndGtfsGraph(
+    TestOtpModel model = ConstantsForTests.buildOsmAndGtfsGraph(
       ConstantsForTests.DEUFRINGEN_OSM,
       ConstantsForTests.VVS_BUS_764_ONLY
     );
-    Graph graph = otpModel.graph;
+    Graph graph = model.graph();
     // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving Hardtheimer Weg
     // you must either turn right and take the long way to Steinhaldenweg or go past the intersection with the
     // turn restriction and turn around.
@@ -89,11 +88,11 @@ public class SplitEdgeTurnRestrictionsTest {
   void shouldTakeBoeblingenTurnRestrictionsIntoAccount() {
     // this tests that the following turn restriction is transferred correctly to the split edges
     // https://www.openstreetmap.org/relation/299171
-    OtpModel otpModel = ConstantsForTests.buildOsmAndGtfsGraph(
+    TestOtpModel model = ConstantsForTests.buildOsmAndGtfsGraph(
       ConstantsForTests.BOEBLINGEN_OSM,
       ConstantsForTests.VVS_BUS_751_ONLY
     );
-    var graph = otpModel.graph;
+    var graph = model.graph();
 
     // turning left from the main road onto a residential one
     var turnLeft = computeCarPolyline(graph, parkStrasse, paulGerhardtWegEast);
@@ -156,11 +155,12 @@ public class SplitEdgeTurnRestrictionsTest {
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new Router(
+      new DefaultServerContext(
         graph,
         Mockito.mock(TransitModel.class),
         RouterConfig.DEFAULT,
-        Metrics.globalRegistry
+        null,
+        false
       )
     );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);

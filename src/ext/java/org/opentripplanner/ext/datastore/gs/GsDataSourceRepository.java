@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import javax.annotation.Nonnull;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.ZipStreamDataSourceDecorator;
 

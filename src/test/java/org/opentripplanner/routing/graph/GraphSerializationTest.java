@@ -15,9 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -40,8 +40,8 @@ public class GraphSerializationTest {
    */
   @Test
   public void testRoundTripSerializationForGTFSGraph() throws Exception {
-    OtpModel otpModel = ConstantsForTests.buildNewPortlandGraph(true);
-    testRoundTrip(otpModel.graph, otpModel.transitModel);
+    TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
+    testRoundTrip(model.graph(), model.transitModel());
   }
 
   /**
@@ -49,8 +49,8 @@ public class GraphSerializationTest {
    */
   @Test
   public void testRoundTripSerializationForNetexGraph() throws Exception {
-    OtpModel otpModel = ConstantsForTests.buildNewMinimalNetexGraph();
-    testRoundTrip(otpModel.graph, otpModel.transitModel);
+    TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
+    testRoundTrip(model.graph(), model.transitModel());
   }
 
   // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
@@ -74,9 +74,9 @@ public class GraphSerializationTest {
    */
   @Test
   public void compareGraphToItself() {
-    OtpModel cachedPortlandGraph = ConstantsForTests.getInstance().getCachedPortlandGraph();
-    Graph originalGraph = cachedPortlandGraph.graph;
-    TransitModel originalTransitModel = cachedPortlandGraph.transitModel;
+    TestOtpModel cachedPortlandGraph = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    Graph originalGraph = cachedPortlandGraph.graph();
+    TransitModel originalTransitModel = cachedPortlandGraph.transitModel();
     originalTransitModel.index();
     originalGraph.index();
     // We can exclude relatively few classes here, because the object trees are of course perfectly identical.
@@ -159,9 +159,6 @@ public class GraphSerializationTest {
    */
   private void testRoundTrip(Graph originalGraph, TransitModel originalTransitModel)
     throws Exception {
-    // The cached timezone in the graph is transient and lazy-initialized.
-    // Previous tests may have caused a timezone to be cached.
-    originalTransitModel.clearTimeZone();
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
     SerializedGraphObject serializedObj = new SerializedGraphObject(

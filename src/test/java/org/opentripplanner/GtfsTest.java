@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import io.micrometer.core.instrument.Metrics;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -31,8 +30,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -48,7 +46,7 @@ public abstract class GtfsTest {
   AlertsUpdateHandler alertsUpdateHandler;
   TimetableSnapshotSource timetableSnapshotSource;
   TransitAlertServiceImpl alertPatchServiceImpl;
-  public Router router;
+  public OtpServerContext serverContext;
   public GtfsFeedId feedId;
 
   public abstract String getFeedName();
@@ -100,7 +98,11 @@ public abstract class GtfsTest {
     routingRequest.setWalkBoardCost(30);
     routingRequest.transferSlack = 0;
 
-    RoutingResponse res = new RoutingWorker(router, routingRequest, transitModel.getTimeZone())
+    RoutingResponse res = new RoutingWorker(
+      serverContext,
+      routingRequest,
+      transitModel.getTimeZone()
+    )
       .route();
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
     // Stored in instance field for use in individual tests
@@ -139,7 +141,7 @@ public abstract class GtfsTest {
   }
 
   @BeforeEach
-  protected void setUp() {
+  protected void setUp() throws Exception {
     File gtfs = new File("src/test/resources/" + getFeedName());
     File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
     GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
@@ -160,8 +162,7 @@ public abstract class GtfsTest {
     gtfsGraphBuilderImpl.buildGraph(graph, transitModel, null);
     transitModel.index();
     graph.index();
-    router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
+    serverContext = TestServerContext.createServerContext(graph, transitModel);
     timetableSnapshotSource = TimetableSnapshotSource.ofTransitModel(transitModel);
     timetableSnapshotSource.purgeExpiredData = false;
     transitModel.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);

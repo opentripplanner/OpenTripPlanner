@@ -264,7 +264,6 @@ public class OtpTransitServiceBuilder {
 
   public CalendarServiceData buildCalendarServiceData() {
     return CalendarServiceDataFactoryImpl.createCalendarServiceData(
-      getAgenciesById().values(),
       getCalendarDates(),
       getCalendars()
     );

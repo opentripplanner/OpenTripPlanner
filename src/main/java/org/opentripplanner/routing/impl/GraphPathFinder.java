@@ -7,13 +7,11 @@ import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +41,10 @@ public class GraphPathFinder {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphPathFinder.class);
 
-  Router router;
+  OtpServerContext serverContext;
 
-  public GraphPathFinder(Router router) {
-    this.router = router;
+  public GraphPathFinder(OtpServerContext serverContext) {
+    this.serverContext = serverContext;
   }
 
   /**
@@ -70,11 +68,11 @@ public class GraphPathFinder {
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
-      .setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
+      .setTimeout(Duration.ofMillis((long) (serverContext.streetRoutingTimeoutSeconds() * 1000)));
 
     // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
-    if (router.graphVisualizer != null) {
-      aStar.setTraverseVisitor(router.graphVisualizer.traverseVisitor);
+    if (serverContext.graphVisualizer() != null) {
+      aStar.setTraverseVisitor(serverContext.graphVisualizer().traverseVisitor);
     }
 
     LOG.debug("rreq={}", options);

@@ -26,7 +26,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -54,8 +54,8 @@ public class RoutingService {
   }
 
   // TODO We should probably not have the Router as a parameter here
-  public RoutingResponse route(RoutingRequest request, Router router) {
-    RoutingWorker worker = new RoutingWorker(router, request, transitModel.getTimeZone());
+  public RoutingResponse route(RoutingRequest request, OtpServerContext serverContext) {
+    RoutingWorker worker = new RoutingWorker(serverContext, request, transitModel.getTimeZone());
     return worker.route();
   }
 

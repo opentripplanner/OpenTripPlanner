@@ -17,7 +17,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
@@ -31,15 +31,15 @@ public class ParkAndRideResource {
   private final StreetVertexIndex streetIndex;
 
   public ParkAndRideResource(
-    @Context OTPServer otpServer,
+    @Context OtpServerContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.vehicleParkingService = otpServer.getRouter().graph.getVehicleParkingService();
-    this.streetIndex = otpServer.getRouter().graph.getStreetIndex();
+    this.vehicleParkingService = serverContext.graph().getVehicleParkingService();
+    this.streetIndex = serverContext.graph().getStreetIndex();
   }
 
   /** Envelopes are in latitude, longitude format */

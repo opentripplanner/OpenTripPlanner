@@ -105,13 +105,6 @@ public class GtfsModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    // we're about to add another agency to the graph, so clear the cached timezone
-    // in case it should change
-    // OTP doesn't currently support multiple time zones in a single graph;
-    // at least this way we catch the error and log it instead of silently ignoring
-    // because the time zone from the first agency is cached
-    transitModel.clearTimeZone();
-
     CalendarServiceData calendarServiceData = new CalendarServiceData();
 
     boolean hasTransit = false;
@@ -180,6 +173,8 @@ public class GtfsModule implements GraphBuilderModule {
       // code should be safe without the try/catch block.
       gtfsBundles.forEach(GtfsBundle::close);
     }
+
+    transitModel.validateTimeZones();
 
     transitModel.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
   }

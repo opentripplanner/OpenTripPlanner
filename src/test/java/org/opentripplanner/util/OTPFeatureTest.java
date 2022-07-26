@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.standalone.configure.OTPConfiguration;
+import org.opentripplanner.standalone.config.ConfigLoader;
 
 public class OTPFeatureTest {
 
@@ -60,10 +60,10 @@ public class OTPFeatureTest {
         }
         """;
 
-    OTPConfiguration config = OTPConfiguration.createForTest(json);
-
+    var configLoader = ConfigLoader.fromString(json);
+    var config = configLoader.loadOtpConfig();
     // When
-    OTPFeature.enableFeatures(config.otpConfig().otpFeatures);
+    OTPFeature.enableFeatures(config.otpFeatures);
 
     // Then
     assertTrue(OTPFeature.APIBikeRental.isOff());

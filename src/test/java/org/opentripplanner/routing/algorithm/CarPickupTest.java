@@ -132,7 +132,7 @@ public class CarPickupTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph;
+    graph = otpModel.graph();
   }
 
   private void assertPath(Vertex fromVertex, Vertex toVertex, String descriptor) {

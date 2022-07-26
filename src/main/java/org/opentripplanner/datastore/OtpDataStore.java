@@ -1,13 +1,13 @@
 package org.opentripplanner.datastore;
 
-import static org.opentripplanner.datastore.FileType.CONFIG;
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GRAPH;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.REPORT;
-import static org.opentripplanner.datastore.FileType.UNKNOWN;
+import static org.opentripplanner.datastore.api.FileType.CONFIG;
+import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.GRAPH;
+import static org.opentripplanner.datastore.api.FileType.GTFS;
+import static org.opentripplanner.datastore.api.FileType.NETEX;
+import static org.opentripplanner.datastore.api.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.REPORT;
+import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -22,9 +22,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
-import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 
 /**
@@ -38,7 +42,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
  * into cloud storage after building it. Depending on the source this might also offer enhanced
  * performance.
  * <p>
- * Use the {@link DataStoreFactory} to obtain a new instance of this class.
+ * Use the {@link DataStoreModule} to obtain a new instance of this class.
  */
 public class OtpDataStore {
 
@@ -56,14 +60,15 @@ public class OtpDataStore {
   private DataSource streetGraph;
   private DataSource graph;
   private CompositeDataSource buildReportDir;
+  private boolean opened = false;
 
   /**
-   * Use the {@link DataStoreFactory} to create a new instance of this class.
+   * Use the {@link DataStoreModule} to create a new instance of this class.
    */
   public OtpDataStore(OtpDataStoreConfig config, List<DataSourceRepository> repositories) {
     this.config = config;
     this.repositoryDescriptions.addAll(
-        repositories.stream().map(DataSourceRepository::description).collect(Collectors.toList())
+        repositories.stream().map(DataSourceRepository::description).toList()
       );
     this.allRepositories = repositories;
     this.localRepository = getLocalDataSourceRepo(repositories);
@@ -85,6 +90,9 @@ public class OtpDataStore {
   }
 
   public void open() {
+    if (opened) {
+      throw new IllegalStateException("Do not open DataSource twice.");
+    }
     allRepositories.forEach(DataSourceRepository::open);
     addAll(localRepository.listExistingSources(CONFIG));
     addAll(findMultipleSources(config.osmFiles(), OSM));
@@ -101,6 +109,7 @@ public class OtpDataStore {
     // Also read in unknown sources in case the data input source is miss-spelled,
     // We look for files on the local-file-system, other repositories ignore this call.
     addAll(findMultipleSources(Collections.emptyList(), UNKNOWN));
+    this.opened = true;
   }
 
   /**
@@ -121,26 +130,29 @@ public class OtpDataStore {
    */
   @Nonnull
   public Collection<DataSource> listExistingSourcesFor(FileType type) {
+    assertDataStoreIsOpened();
     return sources.get(type).stream().filter(DataSource::exists).collect(Collectors.toList());
   }
 
   @Nonnull
   public DataSource getStreetGraph() {
+    assertDataStoreIsOpened();
     return streetGraph;
   }
 
   @Nonnull
   public DataSource getGraph() {
+    assertDataStoreIsOpened();
     return graph;
   }
 
   @Nonnull
   public CompositeDataSource getBuildReportDir() {
+    assertDataStoreIsOpened();
     return buildReportDir;
   }
 
   /* private methods */
-
   private void add(DataSource source) {
     if (source != null) {
       sources.put(source.type(), source);
@@ -158,7 +170,7 @@ public class OtpDataStore {
       .stream()
       .filter(it -> it instanceof LocalDataSourceRepository)
       .map(it -> (LocalDataSourceRepository) it)
-      .collect(Collectors.toList());
+      .toList();
     if (localRepos.size() != 1) {
       throw new IllegalStateException("Only one LocalDataSourceRepository is supported.");
     }
@@ -231,5 +243,11 @@ public class OtpDataStore {
       }
     }
     return null;
+  }
+
+  private void assertDataStoreIsOpened() {
+    if (!opened) {
+      throw new IllegalStateException("Open data store before using it.");
+    }
   }
 }

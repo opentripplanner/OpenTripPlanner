@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -16,7 +15,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
@@ -37,8 +37,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -160,8 +159,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   public void flexTripInTransitMode() {
     var feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
+    var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId("Transfer Point for Route 30", feedId, "cujv");
@@ -171,7 +169,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       "yz85"
     );
 
-    var itineraries = getItineraries(from, to, router);
+    var itineraries = getItineraries(from, to, serverContext);
 
     assertEquals(2, itineraries.size());
 
@@ -224,15 +222,15 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
   @BeforeAll
   static void setup() {
-    OtpModel otpModel = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
-    graph = otpModel.graph;
-    transitModel = otpModel.transitModel;
+    TestOtpModel model = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    graph = model.graph();
+    transitModel = model.transitModel();
   }
 
   private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,
-    Router router
+    OtpServerContext serverContext
   ) {
     RoutingRequest request = new RoutingRequest();
     Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
@@ -245,7 +243,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     var result = TransitRouter.route(
       request,
-      router,
+      serverContext,
       time,
       additionalSearchDays,
       new DebugTimingAggregator()

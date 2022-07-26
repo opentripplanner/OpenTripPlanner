@@ -2,8 +2,8 @@ package org.opentripplanner.datastore.file;
 
 import java.io.File;
 import java.util.Objects;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * Abstract DataSource which wraps a {@link File}.

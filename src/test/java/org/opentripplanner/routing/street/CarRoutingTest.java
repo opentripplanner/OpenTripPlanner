@@ -2,7 +2,6 @@ package org.opentripplanner.routing.street;
 
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Assertions;
@@ -12,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -23,7 +22,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
@@ -35,8 +34,8 @@ public class CarRoutingTest {
 
   @BeforeAll
   public static void setup() {
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
-    herrenbergGraph = otpModel.graph;
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    herrenbergGraph = model.graph();
     herrenbergGraph.index();
   }
 
@@ -57,10 +56,10 @@ public class CarRoutingTest {
   @Test
   @DisplayName("car routes can contain loops (traversing the same edge twice)")
   public void shouldAllowLoopCausedByTurnRestrictions() {
-    OtpModel otpModel = ConstantsForTests.buildOsmGraph(
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(
       ConstantsForTests.HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM
     );
-    var hindenburgStrUnderConstruction = otpModel.graph;
+    var hindenburgStrUnderConstruction = model.graph();
 
     var gueltsteinerStr = new GenericLocation(48.59240, 8.87024);
     var aufDemGraben = new GenericLocation(48.59487, 8.87133);
@@ -137,11 +136,12 @@ public class CarRoutingTest {
     final RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new Router(
+      new DefaultServerContext(
         graph,
         Mockito.mock(TransitModel.class),
         RouterConfig.DEFAULT,
-        Metrics.globalRegistry
+        null,
+        false
       )
     );
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
