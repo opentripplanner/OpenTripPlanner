@@ -1,5 +1,6 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -7,15 +8,16 @@ import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
  * GTFS bundle.
  */
 
-public class FlexStopLocation extends TransitEntity implements StopLocation {
+public class FlexStopLocation
+  extends TransitEntity2<FlexStopLocation, FlexStopLocationBuilder>
+  implements StopLocation {
 
   private final I18NString name;
 
@@ -31,17 +33,21 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private WgsCoordinate centroid;
 
-  public FlexStopLocation(@Nonnull FeedScopedId id, I18NString name) {
-    super(id);
+  FlexStopLocation(FlexStopLocationBuilder builder) {
+    super(builder.getId());
     // according to the spec stop location names are optional for flex zones so, we set the id
     // as the bogus name. *shrug*
-    if (name == null) {
-      this.name = new NonLocalizedString(id.toString());
+    if (builder.name() == null) {
+      this.name = new NonLocalizedString(builder.getId().toString());
       hasFallbackName = true;
     } else {
-      this.name = name;
+      this.name = builder.name();
       hasFallbackName = false;
     }
+  }
+
+  public static FlexStopLocationBuilder of(FeedScopedId id) {
+    return new FlexStopLocationBuilder(id);
   }
 
   /**
@@ -117,5 +123,21 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    */
   public boolean hasFallbackName() {
     return hasFallbackName;
+  }
+
+  @Override
+  public boolean sameAs(@Nonnull FlexStopLocation other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(name, other.getName()) &&
+      Objects.equals(description, other.getDescription()) &&
+      Objects.equals(geometry, other.getGeometry())
+    );
+  }
+
+  @Override
+  @Nonnull
+  public FlexStopLocationBuilder copy() {
+    return new FlexStopLocationBuilder(this);
   }
 }

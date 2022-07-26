@@ -8,9 +8,9 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.rutebanken.netex.model.FlexibleArea;
@@ -86,10 +86,10 @@ class FlexStopLocationMapper {
    */
   FlexStopLocation mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
     var name = new NonLocalizedString(flexibleStopPlace.getName().getValue());
-    FlexStopLocation result = new FlexStopLocation(
-      idFactory.createId(flexibleStopPlace.getId()),
-      name
-    );
+    FlexStopLocation result = FlexStopLocation
+      .of(idFactory.createId(flexibleStopPlace.getId()))
+      .withName(name)
+      .build();
     result.setGeometry(OpenGisMapper.mapGeometry(area.getPolygon()));
     return result;
   }
