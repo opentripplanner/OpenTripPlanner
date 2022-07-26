@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -41,7 +40,7 @@ public class McCostParamsMapper {
     unpreferredRoutes.addAll(request.getUnpreferredRoutes());
     builder.unpreferredRoutes(unpreferredRoutes);
 
-    builder.unpreferredCost(request.unpreferredRouteCost);
+    builder.unpreferredCost(request.unpreferredCost);
 
     return builder.build();
   }

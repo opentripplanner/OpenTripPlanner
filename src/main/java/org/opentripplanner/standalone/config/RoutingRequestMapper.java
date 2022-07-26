@@ -2,8 +2,6 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
-import java.util.HashSet;
-import java.util.List;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -133,8 +131,7 @@ public class RoutingRequestMapper {
         "useVehicleParkingAvailabilityInformation",
         dft.useVehicleParkingAvailabilityInformation
       );
-    request.unpreferredRouteCost =
-      c.asLinearFunction("unpreferredRouteCost", dft.unpreferredRouteCost);
+    request.unpreferredCost = c.asLinearFunction("unpreferredCost", dft.unpreferredCost);
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
     request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
     request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);

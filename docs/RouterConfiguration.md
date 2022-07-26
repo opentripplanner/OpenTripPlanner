@@ -168,8 +168,8 @@ alighting processes in `router-config.json` as follows:
 ### Defining unpreferred routes or agencies
 
 The routing engine can be configured to unprefer - add extra penalty - on some routes or agencies
-that can be listed in `router-config.json` with cost function. 
-The cost function (`unpreferredRouteCost`) is defined as linear function of the form `A + B x`, 
+that can be listed in `router-config.json` with a cost function. 
+The cost function (`unpreferredCost`) is defined as a linear function of the form `A + B x`, 
 where `A` is a fixed cost (in seconds) and `B` is reluctance multiplier for transit leg 
 travel time `x` (in seconds). Example configuration:
 
@@ -177,7 +177,7 @@ travel time `x` (in seconds). Example configuration:
 // router-config.json
 {
   "routingDefaults": {
-    "unpreferredRouteCost": "300 + 2.0 x",
+    "unpreferredCost": "300 + 2.0 x",
     "unpreferred": {
       "routes": ["feed1:101", "feed1:102"],
       "agencies": ["feed1:203", "feed2:303"]

@@ -478,10 +478,10 @@ public class RoutingRequest implements Cloneable, Serializable {
   private Set<FeedScopedId> unpreferredRoutes = Set.of();
 
   /**
-   * A cost function used to calculate penalty for an unpreferred route. Function should return
-   * number of seconds that we are willing to wait for preferred route.
+   * A cost function used to calculate penalty for an unpreferred route or agency. Function should
+   * return number of seconds that we are willing to wait for preferred route.
    */
-  public DoubleFunction<Double> unpreferredRouteCost = RequestFunctions.createLinearFunction(
+  public DoubleFunction<Double> unpreferredCost = RequestFunctions.createLinearFunction(
     0.0,
     DEFAULT_ROUTE_RELUCTANCE
   );
@@ -787,8 +787,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
   }
 
-  public void setUnpreferredRouteCost(String constFunction) {
-    unpreferredRouteCost = RequestFunctions.parse(constFunction);
+  public void setUnpreferredCost(String constFunction) {
+    unpreferredCost = RequestFunctions.parse(constFunction);
   }
 
   public void setBannedAgencies(Collection<FeedScopedId> ids) {

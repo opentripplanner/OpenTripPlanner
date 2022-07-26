@@ -18,7 +18,7 @@ public interface DefaultTripSchedule extends RaptorTripSchedule {
 
   /**
    * This is not used by the default calculator, but by the {@link RouteCostCalculator} to
-   * give unpreferred routes a generalized-cost penalty.
+   * give unpreferred routes or agencies a generalized-cost penalty.
    */
   FeedScopedId routeId();
 }

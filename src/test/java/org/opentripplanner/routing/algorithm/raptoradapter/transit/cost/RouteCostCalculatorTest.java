@@ -72,7 +72,7 @@ public class RouteCostCalculatorTest {
     RoutingRequest routingRequest = new RoutingRequest();
     routingRequest.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
     routingRequest.setUnpreferredAgencies(List.of(AGENCY_ID));
-    routingRequest.setUnpreferredRouteCost("300 + 1.0 x");
+    routingRequest.setUnpreferredCost("300 + 1.0 x");
 
     McCostParams costParams = McCostParamsMapper.map(
       routingRequest,
