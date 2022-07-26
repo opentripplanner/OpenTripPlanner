@@ -239,8 +239,8 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1058.58,
-          "endTime": "2009-10-21T23:16:54.000+00:00",
+          "distance": 108.24,
+          "endTime": "2009-10-21T23:11:30.000+00:00",
           "from": {
             "departure": "2009-10-21T23:10:00.000+00:00",
             "lat": 45.53335,
@@ -248,11 +248,11 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name": "Chapman Elementary School (P3)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 748,
+          "generalizedCost": 169,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 34,
-            "points": "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILAASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC?LAFAJ?RBX?N@^?\\B\\AX?B"
+            "length": 10,
+            "points": "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILA"
           },
           "mode": "WALK",
           "pathway": false,
@@ -273,7 +273,46 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
               "stayOn": false,
               "streetName": "path",
               "walkingBike": false
-            },
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:11:30.000+00:00",
+            "departure": "2009-10-21T23:11:30.000+00:00",
+            "lat": 45.5325089,
+            "lon": -122.7048383,
+            "name": "corner of path and Northwest Pettygrove Street",
+            "vertexType": "NORMAL"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        },
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 864.7,
+          "endTime": "2009-10-21T23:14:43.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:11:30.000+00:00",
+            "departure": "2009-10-21T23:11:30.000+00:00",
+            "lat": 45.5325089,
+            "lon": -122.7048383,
+            "name": "corner of path and Northwest Pettygrove Street",
+            "vertexType": "NORMAL"
+          },
+          "generalizedCost": 325,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 14,
+            "points": "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
+          },
+          "mode": "WALK",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:11:30.000+00:00",
+          "steps": [
             {
               "absoluteDirection": "EAST",
               "area": false,
@@ -299,7 +338,46 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
               "stayOn": false,
               "streetName": "Northwest 22nd Avenue",
               "walkingBike": false
-            },
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:14:43.000+00:00",
+            "departure": "2009-10-21T23:14:43.000+00:00",
+            "lat": 45.5306177,
+            "lon": -122.6966188,
+            "name": "corner of Northwest 22nd Avenue and path",
+            "vertexType": "NORMAL"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        },
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 85.65,
+          "endTime": "2009-10-21T23:16:54.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:14:43.000+00:00",
+            "departure": "2009-10-21T23:14:43.000+00:00",
+            "lat": 45.5306177,
+            "lon": -122.6966188,
+            "name": "corner of Northwest 22nd Avenue and path",
+            "vertexType": "NORMAL"
+          },
+          "generalizedCost": 253,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 12,
+            "points": "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
+          },
+          "mode": "CAR",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:14:43.000+00:00",
+          "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
@@ -330,7 +408,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 1058.58,
+      "walkDistance": 1058.59,
       "walkLimitExceeded": false,
       "walkTime": 414
     }
@@ -356,8 +434,8 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1058.58,
-          "endTime": "2009-10-21T23:16:54.000+00:00",
+          "distance": 108.24,
+          "endTime": "2009-10-21T23:12:38.000+00:00",
           "from": {
             "departure": "2009-10-21T23:10:00.000+00:00",
             "lat": 45.53335,
@@ -365,11 +443,11 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
             "name": "Chapman Elementary School (P3)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 748,
+          "generalizedCost": 297,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 34,
-            "points": "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILAASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC?LAFAJ?RBX?N@^?\\B\\AX?B"
+            "length": 10,
+            "points": "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILA"
           },
           "mode": "WALK",
           "pathway": false,
@@ -390,7 +468,46 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
               "stayOn": false,
               "streetName": "path",
               "walkingBike": false
-            },
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:12:38.000+00:00",
+            "departure": "2009-10-21T23:12:38.000+00:00",
+            "lat": 45.5325089,
+            "lon": -122.7048383,
+            "name": "corner of path and Northwest Pettygrove Street",
+            "vertexType": "NORMAL"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        },
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 864.7,
+          "endTime": "2009-10-21T23:15:47.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:12:38.000+00:00",
+            "departure": "2009-10-21T23:12:38.000+00:00",
+            "lat": 45.5325089,
+            "lon": -122.7048383,
+            "name": "corner of path and Northwest Pettygrove Street",
+            "vertexType": "NORMAL"
+          },
+          "generalizedCost": 321,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 14,
+            "points": "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
+          },
+          "mode": "WALK",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:12:38.000+00:00",
+          "steps": [
             {
               "absoluteDirection": "EAST",
               "area": false,
@@ -416,7 +533,46 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
               "stayOn": false,
               "streetName": "Northwest 22nd Avenue",
               "walkingBike": false
-            },
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:15:47.000+00:00",
+            "departure": "2009-10-21T23:15:47.000+00:00",
+            "lat": 45.5306177,
+            "lon": -122.6966188,
+            "name": "corner of Northwest 22nd Avenue and path",
+            "vertexType": "NORMAL"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        },
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 85.65,
+          "endTime": "2009-10-21T23:16:54.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:15:47.000+00:00",
+            "departure": "2009-10-21T23:15:47.000+00:00",
+            "lat": 45.5306177,
+            "lon": -122.6966188,
+            "name": "corner of Northwest 22nd Avenue and path",
+            "vertexType": "NORMAL"
+          },
+          "generalizedCost": 129,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 12,
+            "points": "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
+          },
+          "mode": "CAR",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:15:47.000+00:00",
+          "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
@@ -447,7 +603,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 1058.58,
+      "walkDistance": 1058.59,
       "walkLimitExceeded": false,
       "walkTime": 414
     }

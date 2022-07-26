@@ -178,8 +178,9 @@ public class GraphPathToItineraryMapper {
         forwardState.backEdge instanceof FlexTripEdge || backState.backEdge instanceof FlexTripEdge;
       var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
       var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
+      var carPickupChange = backState.getCarPickupState() != forwardState.getCarPickupState();
 
-      if (parkingChange || flexChange || rentalChange) {
+      if (parkingChange || flexChange || rentalChange || carPickupChange) {
         int nextBreak = i;
 
         if (nextBreak > previousBreak) {
