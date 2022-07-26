@@ -23,15 +23,15 @@ public class FlexStopLocation
 
   private final boolean hasFallbackName;
 
-  private I18NString description;
+  private final I18NString description;
 
-  private Geometry geometry;
+  private final Geometry geometry;
 
-  private String zoneId;
+  private final String zoneId;
 
-  private I18NString url;
+  private final I18NString url;
 
-  private WgsCoordinate centroid;
+  private final WgsCoordinate centroid;
 
   FlexStopLocation(FlexStopLocationBuilder builder) {
     super(builder.getId());
@@ -42,8 +42,13 @@ public class FlexStopLocation
       hasFallbackName = true;
     } else {
       this.name = builder.name();
-      hasFallbackName = false;
+      hasFallbackName = builder.hasFallbackName();
     }
+    this.description = builder.description();
+    this.url = builder.url();
+    this.zoneId = builder.zoneId();
+    this.geometry = builder.geometry();
+    this.centroid = builder.centroid();
   }
 
   public static FlexStopLocationBuilder of(FeedScopedId id) {
@@ -71,10 +76,6 @@ public class FlexStopLocation
     return url;
   }
 
-  public void setUrl(I18NString url) {
-    this.url = url;
-  }
-
   @Override
   public String getFirstZoneAsString() {
     return zoneId;
@@ -94,11 +95,6 @@ public class FlexStopLocation
     return geometry;
   }
 
-  public void setGeometry(Geometry geometry) {
-    this.geometry = geometry;
-    this.centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
-  }
-
   @Override
   public boolean isPartOfStation() {
     return false;
@@ -107,14 +103,6 @@ public class FlexStopLocation
   @Override
   public boolean isPartOfSameStationAs(StopLocation alternativeStop) {
     return false;
-  }
-
-  public void setDescription(I18NString description) {
-    this.description = description;
-  }
-
-  public void setZoneId(String zoneId) {
-    this.zoneId = zoneId;
   }
 
   /**
@@ -131,7 +119,9 @@ public class FlexStopLocation
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
       Objects.equals(description, other.getDescription()) &&
-      Objects.equals(geometry, other.getGeometry())
+      Objects.equals(geometry, other.getGeometry()) &&
+      Objects.equals(url, other.url) &&
+      Objects.equals(zoneId, other.zoneId)
     );
   }
 

@@ -10,11 +10,14 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class FlexStopLocationBuilder
   extends AbstractEntityBuilder<FlexStopLocation, FlexStopLocationBuilder> {
 
-  private boolean hasFallbackName;
   private I18NString name;
+  private boolean hasFallbackName;
+  private I18NString description;
 
   private Geometry geometry;
   private WgsCoordinate centroid;
+  private I18NString url;
+  private String zoneId;
 
   FlexStopLocationBuilder(FeedScopedId id) {
     super(id);
@@ -25,6 +28,19 @@ public class FlexStopLocationBuilder
     // Optional fields
     this.name = original.getName();
     this.hasFallbackName = original.hasFallbackName();
+    this.url = original.getUrl();
+    this.description = original.getDescription();
+    this.zoneId = original.getFirstZoneAsString();
+    this.geometry = original.getGeometry();
+  }
+
+  public FlexStopLocationBuilder withZoneId(String zoneId) {
+    this.zoneId = zoneId;
+    return this;
+  }
+
+  public boolean hasFallbackName() {
+    return hasFallbackName;
   }
 
   @Override
@@ -32,12 +48,18 @@ public class FlexStopLocationBuilder
     return new FlexStopLocation(this);
   }
 
-  public boolean hasFallbackName() {
-    return hasFallbackName;
-  }
-
   public FlexStopLocationBuilder withName(I18NString name) {
     this.name = name;
+    return this;
+  }
+
+  public FlexStopLocationBuilder withDescription(I18NString description) {
+    this.description = description;
+    return this;
+  }
+
+  public FlexStopLocationBuilder withUrl(I18NString url) {
+    this.url = url;
     return this;
   }
 
@@ -49,6 +71,18 @@ public class FlexStopLocationBuilder
 
   public I18NString name() {
     return name;
+  }
+
+  public I18NString description() {
+    return description;
+  }
+
+  public I18NString url() {
+    return url;
+  }
+
+  public String zoneId() {
+    return zoneId;
   }
 
   public Geometry geometry() {
