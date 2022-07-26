@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
+import org.opentripplanner.transit.model.site.FlexLocationGroupBuilder;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,21 +34,22 @@ public class LocationGroupMapper {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  FlexLocationGroup map(org.onebusaway.gtfs.model.LocationGroup orginal) {
-    return orginal == null ? null : mappedLocationGroups.computeIfAbsent(orginal, this::doMap);
+  FlexLocationGroup map(org.onebusaway.gtfs.model.LocationGroup original) {
+    return original == null ? null : mappedLocationGroups.computeIfAbsent(original, this::doMap);
   }
 
   private FlexLocationGroup doMap(org.onebusaway.gtfs.model.LocationGroup element) {
-    FlexLocationGroup locationGroup = FlexLocationGroup
+    FlexLocationGroupBuilder flexLocationGroupBuilder = FlexLocationGroup
       .of(mapAgencyAndId(element.getId()))
-      .withName(new NonLocalizedString(element.getName()))
-      .build();
+      .withName(new NonLocalizedString(element.getName()));
 
     for (org.onebusaway.gtfs.model.StopLocation location : element.getLocations()) {
       if (location instanceof org.onebusaway.gtfs.model.Stop) {
-        locationGroup.addLocation(stopMapper.map((org.onebusaway.gtfs.model.Stop) location));
+        flexLocationGroupBuilder.addLocation(
+          stopMapper.map((org.onebusaway.gtfs.model.Stop) location)
+        );
       } else if (location instanceof org.onebusaway.gtfs.model.Location) {
-        locationGroup.addLocation(
+        flexLocationGroupBuilder.addLocation(
           locationMapper.map((org.onebusaway.gtfs.model.Location) location)
         );
       } else if (location instanceof org.onebusaway.gtfs.model.LocationGroup) {
@@ -57,6 +59,6 @@ public class LocationGroupMapper {
       }
     }
 
-    return locationGroup;
+    return flexLocationGroupBuilder.build();
   }
 }

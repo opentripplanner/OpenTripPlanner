@@ -1,14 +1,11 @@
 package org.opentripplanner.transit.model.site;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -21,18 +18,18 @@ public class FlexLocationGroup
   extends TransitEntity2<FlexLocationGroup, FlexLocationGroupBuilder>
   implements StopLocation {
 
-  private final Set<StopLocation> stopLocations = new HashSet<>();
+  private final Set<StopLocation> stopLocations;
   private final I18NString name;
-  private GeometryCollection geometry = new GeometryCollection(
-    null,
-    GeometryUtils.getGeometryFactory()
-  );
+  private final GeometryCollection geometry;
 
-  private WgsCoordinate centroid;
+  private final WgsCoordinate centroid;
 
   FlexLocationGroup(FlexLocationGroupBuilder builder) {
     super(builder.getId());
     this.name = builder.name();
+    this.geometry = builder.geometry();
+    this.centroid = builder.centroid();
+    this.stopLocations = builder.stopLocations();
   }
 
   public static FlexLocationGroupBuilder of(FeedScopedId id) {
@@ -88,28 +85,6 @@ public class FlexLocationGroup
    * Adds a new location to the location group. This should ONLY be used during the graph build
    * process.
    */
-  public void addLocation(StopLocation location) {
-    stopLocations.add(location);
-
-    int numGeometries = geometry.getNumGeometries();
-    Geometry[] newGeometries = new Geometry[numGeometries + 1];
-    for (int i = 0; i < numGeometries; i++) {
-      newGeometries[i] = geometry.getGeometryN(i);
-    }
-    if (location instanceof Stop) {
-      WgsCoordinate coordinate = location.getCoordinate();
-      Envelope envelope = new Envelope(coordinate.asJtsCoordinate());
-      double xscale = Math.cos(coordinate.latitude() * Math.PI / 180);
-      envelope.expandBy(100 / xscale, 100);
-      newGeometries[numGeometries] = GeometryUtils.getGeometryFactory().toGeometry(envelope);
-    } else if (location instanceof FlexStopLocation) {
-      newGeometries[numGeometries] = location.getGeometry();
-    } else {
-      throw new RuntimeException("Unknown location type");
-    }
-    geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());
-    centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
-  }
 
   /**
    * Returns all the locations belonging to this location group.
@@ -123,7 +98,7 @@ public class FlexLocationGroup
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
-      Objects.equals(geometry, other.getGeometry())
+      Objects.equals(stopLocations, other.getLocations())
     );
   }
 

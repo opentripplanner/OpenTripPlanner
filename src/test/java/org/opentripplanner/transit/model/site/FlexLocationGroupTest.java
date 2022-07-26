@@ -15,9 +15,16 @@ class FlexLocationGroupTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
+
+  private static final StopLocation STOP_LOCATION = TransitModelForTest.stopForTest(
+    "1:stop",
+    1d,
+    1d
+  );
   private static final FlexLocationGroup subject = FlexLocationGroup
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
+    .addLocation(STOP_LOCATION)
     .build();
 
   @Test
@@ -37,6 +44,7 @@ class FlexLocationGroupTest {
     assertEquals(subject, copy);
 
     assertEquals(ID, copy.getId().getId());
+    assertEquals(STOP_LOCATION, copy.getLocations().iterator().next());
     assertEquals("v2", copy.getName().toString());
   }
 
@@ -45,5 +53,10 @@ class FlexLocationGroupTest {
     assertTrue(subject.sameAs(subject.copy().build()));
     assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
+    assertFalse(
+      subject.sameAs(
+        subject.copy().addLocation(TransitModelForTest.stopForTest("2:stop", 1d, 2d)).build()
+      )
+    );
   }
 }

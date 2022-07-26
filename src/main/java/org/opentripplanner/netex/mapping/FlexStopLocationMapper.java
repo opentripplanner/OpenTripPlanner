@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
+import org.opentripplanner.transit.model.site.FlexLocationGroupBuilder;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -97,10 +98,10 @@ class FlexStopLocationMapper {
    * Allows pickup / drop off at any regular Stop inside the area
    */
   FlexLocationGroup mapStopsInFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
-    FlexLocationGroup result = FlexLocationGroup
+    FlexLocationGroupBuilder result = FlexLocationGroup
       .of(idFactory.createId(flexibleStopPlace.getId()))
-      .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()))
-      .build();
+      .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
+
     Geometry geometry = OpenGisMapper.mapGeometry(area.getPolygon());
 
     for (Stop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {
@@ -112,6 +113,6 @@ class FlexStopLocationMapper {
       }
     }
 
-    return result;
+    return result.build();
   }
 }
