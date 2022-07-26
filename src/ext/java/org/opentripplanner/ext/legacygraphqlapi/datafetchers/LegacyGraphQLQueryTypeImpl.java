@@ -1036,8 +1036,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       Stream<Stop> stopStream = getTransitService(environment)
-        .getStopSpatialIndex()
-        .query(envelope)
+        .queryStopSpatialIndex(envelope)
         .stream()
         .filter(transitStopVertex -> envelope.contains(transitStopVertex.getCoordinate()))
         .map(TransitStopVertex::getStop);

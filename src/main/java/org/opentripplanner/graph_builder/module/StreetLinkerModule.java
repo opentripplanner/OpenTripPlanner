@@ -3,10 +3,13 @@ package org.opentripplanner.graph_builder.module;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
@@ -19,6 +22,8 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -82,6 +87,27 @@ public class StreetLinkerModule implements GraphBuilderModule {
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
 
+    Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
+
+    if (OTPFeature.FlexRouting.isOn()) {
+      stopLocationsUsedForFlexTrips =
+        transitModel
+          .getAllFlexTrips()
+          .stream()
+          .flatMap(t -> t.getStops().stream())
+          .collect(Collectors.toSet());
+
+      stopLocationsUsedForFlexTrips.addAll(
+        stopLocationsUsedForFlexTrips
+          .stream()
+          .filter(s -> s instanceof FlexLocationGroup)
+          .flatMap(g ->
+            ((FlexLocationGroup) g).getLocations().stream().filter(e -> e instanceof Stop)
+          )
+          .toList()
+      );
+    }
+
     for (TransitStopVertex tStop : vertices) {
       // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
       if (tStop.hasPathways()) {
@@ -96,7 +122,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       if (OTPFeature.FlexRouting.isOn()) {
         // If regular stops are used for flex trips, they also need to be connected to car routable
         // street edges.
-        if (transitModel.getAllFlexStopsFlat().contains(tStop.getStop())) {
+        if (stopLocationsUsedForFlexTrips.contains(tStop.getStop())) {
           modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
         }
       }

@@ -273,7 +273,7 @@ public class TravelTimeResource {
         final int arrivalTime = arrivals.bestTransitArrivalTime(i);
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {
-          Vertex v = serverContext.transitModel().getStopModel().getStopVertexForStop().get(stop);
+          Vertex v = serverContext.transitModel().getStopModel().getStopVertexForStop(stop);
           if (v != null) {
             Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
             State s = new State(v, time, routingContext, stateData.clone());

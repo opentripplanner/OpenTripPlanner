@@ -15,15 +15,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.transit.service.StopModelIndex;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -68,18 +70,14 @@ public class TransitLayerMapper {
   }
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
-    StopIndexForRaptor stopIndex;
+    StopModelIndex stopIndex;
     Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
 
     LOG.info("Mapping transitLayer from Graph...");
 
-    stopIndex =
-      new StopIndexForRaptor(
-        transitModel.getStopModel().getStopModelIndex().getAllStops(),
-        tuningParameters
-      );
+    stopIndex = transitModel.getStopModel().getStopModelIndex();
 
     Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
     TripPatternMapper tripPatternMapper = new TripPatternMapper();
@@ -113,7 +111,8 @@ public class TransitLayerMapper {
       transitModel.getTimeZone(),
       transferCache,
       tripPatternMapper,
-      transferIndexGenerator
+      transferIndexGenerator,
+      createStopTransferCosts(stopIndex, tuningParameters)
     );
   }
 
@@ -188,5 +187,22 @@ public class TransitLayerMapper {
     }
 
     return result;
+  }
+
+  /**
+   * Create static board/alight cost for Raptor to include for each stop.
+   */
+  static int[] createStopTransferCosts(StopModelIndex stops, TransitTuningParameters tuningParams) {
+    if (!tuningParams.enableStopTransferPriority()) {
+      return null;
+    }
+    int[] stopTransferCosts = new int[stops.size()];
+
+    for (int i = 0; i < stops.size(); ++i) {
+      StopTransferPriority priority = stops.stopByIndex(i).getPriority();
+      int domainCost = tuningParams.stopTransferCost(priority);
+      stopTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
+    }
+    return stopTransferCosts;
   }
 }

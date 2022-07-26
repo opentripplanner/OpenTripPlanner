@@ -136,8 +136,7 @@ public class RoutingWorker {
       serverContext
         .transitModel()
         .getStopModel()
-        .getStopModelIndex()
-        .getMultiModalStationForStations()::get
+        .getStopModelIndex()::getMultiModalStationForStation
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
