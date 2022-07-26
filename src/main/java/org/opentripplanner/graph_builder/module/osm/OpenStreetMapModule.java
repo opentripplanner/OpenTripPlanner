@@ -7,6 +7,7 @@ import gnu.trove.list.TLongList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -777,6 +778,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       if (creativeName == null) {
         // ... otherwise resort to "CreativeNamer"s
         creativeName = wayPropertySet.getCreativeNameForWay(osmWithTags);
+      }
+      if (creativeName == null) {
+        creativeName =
+          new NonLocalizedString(
+            "Park & Ride (%s/%d)".formatted(
+                osmWithTags.getClass().getSimpleName(),
+                osmWithTags.getId()
+              )
+          );
       }
       return creativeName;
     }
