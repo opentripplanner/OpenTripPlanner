@@ -90,6 +90,11 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   }
 
   @Override
+  public String getConfigRef() {
+    return toString();
+  }
+
+  @Override
   protected void runPolling() {
     LOG.debug("Updating vehicle rental stations from " + source);
     if (!source.update()) {
