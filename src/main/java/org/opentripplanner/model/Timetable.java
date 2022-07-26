@@ -18,6 +18,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -316,6 +317,15 @@ public class Timetable implements Serializable {
         tripId
       );
       return null;
+    }
+
+    if (tripUpdate.hasVehicle()) {
+      var vehicleDescriptor = tripUpdate.getVehicle();
+      if (vehicleDescriptor.hasWheelchairAccessible()) {
+        GtfsRealtimeMapper
+          .mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
+          .ifPresent(newTimes::updateWheelchairAccessibility);
+      }
     }
 
     LOG.debug(
