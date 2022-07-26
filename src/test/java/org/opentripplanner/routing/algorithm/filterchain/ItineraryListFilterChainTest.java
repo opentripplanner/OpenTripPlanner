@@ -23,7 +23,6 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
@@ -197,7 +196,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void removeTimeshiftedDuplicates() {
+  public void removeTimeshiftedItinerariesWithSameRoutesAndStops() {
     var i1 = newItinerary(A).bus(21, T11_06, T11_28, E).bus(41, T11_30, T11_32, D).build();
     var i2 = newItinerary(A).bus(22, T11_09, T11_30, E).bus(42, T11_32, T11_33, D).build();
     var i3 = newItinerary(A).bus(23, T11_10, T11_32, E).bus(43, T11_33, T11_50, D).build();
@@ -210,7 +209,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       // we need to add the group-by-distance-and-id filter because it undeletes those with the
       // fewest transfers and we want to make sure that the filter under test comes _after_
       .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
-      .withRemoveTimeshiftedDuplicates(true)
+      .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(true)
       .build();
     assertEquals(toStr(List.of(i4, i2)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
   }

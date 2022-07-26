@@ -70,7 +70,9 @@ public class RoutingRequestToFilterChainMapper {
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip)
       .withAccessibilityScore(params.accessibilityScore && wheelchairAccessible, wheelchairMaxSlope)
       .withFares(fareService)
-      .withRemoveTimeshiftedDuplicates(params.removeTimeshiftedDuplicates)
+      .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
+        params.removeTimeshiftedItinerariesWithSameRoutesAndStops
+      )
       .withTransitAlerts(transitAlertService, getMultiModalStation)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)

@@ -28,7 +28,10 @@ public class ItineraryFiltersMapper {
         dft.filterItinerariesWithSameFirstOrLastTrip
       ),
       c.asBoolean("accessibilityScore", dft.accessibilityScore),
-      c.asBoolean("removeTimeshiftedDuplicates", dft.removeTimeshiftedDuplicates)
+      c.asBoolean(
+        "removeTimeshiftedItinerariesWithSameRoutesAndStops",
+        dft.removeTimeshiftedItinerariesWithSameRoutesAndStops
+      )
     );
   }
 }

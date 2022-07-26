@@ -64,7 +64,7 @@ public class ItineraryListFilterChainBuilder {
   private FareService faresService;
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
-  private boolean removeTimeshiftedDuplicates;
+  private boolean removeTimeshiftedItinerariesWithSameRoutesAndStops;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -250,8 +250,10 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withRemoveTimeshiftedDuplicates(boolean remove) {
-    this.removeTimeshiftedDuplicates = remove;
+  public ItineraryListFilterChainBuilder withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
+    boolean remove
+  ) {
+    this.removeTimeshiftedItinerariesWithSameRoutesAndStops = remove;
     return this;
   }
 
@@ -261,7 +263,7 @@ public class ItineraryListFilterChainBuilder {
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
-    if (removeTimeshiftedDuplicates) {
+    if (removeTimeshiftedItinerariesWithSameRoutesAndStops) {
       filters.add(
         new GroupByFilter<>(
           GroupBySameRoutesAndStops::new,
