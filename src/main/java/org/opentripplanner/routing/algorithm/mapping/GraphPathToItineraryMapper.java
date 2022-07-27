@@ -182,16 +182,16 @@ public class GraphPathToItineraryMapper {
       if (parkingChange || flexChange || rentalChange) {
         int nextBreak = i;
 
-        /* Remove the state for actually parking (traversing VehicleParkingEdge) from the
+        if (nextBreak > previousBreak) {
+          legsStates.add(states.subList(previousBreak, nextBreak + 1));
+        }
+
+        /* Remove the state for actually parking (traversing a VehicleParkingEdge) from the
          * states so that the leg from/to edges correspond to the actual entrances.
          * The actual time for parking is added to the walking leg in generateLeg().
          */
         if (parkingChange) {
           nextBreak++;
-        }
-
-        if (nextBreak > previousBreak) {
-          legsStates.add(states.subList(previousBreak, nextBreak + 1));
         }
 
         previousBreak = nextBreak;

@@ -17,7 +17,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 181.36,
-          "endTime": "2009-10-21T23:11:44.000+00:00",
+          "endTime": "2009-10-21T23:10:44.000+00:00",
           "from": {
             "departure": "2009-10-21T23:10:00.000+00:00",
             "lat": 45.53261,
@@ -25,7 +25,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             "name": "NW Pettygrove Ave. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 181,
+          "generalizedCost": 61,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 5,
@@ -92,14 +92,14 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:11:44.000+00:00",
+            "arrival": "2009-10-21T23:10:44.000+00:00",
             "departure": "2009-10-21T23:10:44.000+00:00",
-            "lat": 45.5314019,
-            "lon": -122.7016931,
-            "name": "P+R (#1)",
+            "lat": 45.5316391,
+            "lon": -122.7016859,
+            "name": "P+R (#2)",
             "vehicleParking": {
-              "entranceId": "OSM:OSMWay/-102488/osm:node:-102437",
-              "entranceName": "P+R (#1)",
+              "entranceId": "OSM:OSMWay/-102488/osm:node:-102438",
+              "entranceName": "P+R (#2)",
               "hasAnyCarPlaces": true,
               "hasBicyclePlaces": false,
               "hasCarPlaces": true,
@@ -123,7 +123,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
           "distance": 184.06,
           "endTime": "2009-10-21T23:14:13.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:11:44.000+00:00",
+            "arrival": "2009-10-21T23:10:44.000+00:00",
             "departure": "2009-10-21T23:10:44.000+00:00",
             "lat": 45.5314019,
             "lon": -122.7016931,
@@ -212,10 +212,10 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 0,
-      "waitingTime": -60,
+      "waitingTime": 0,
       "walkDistance": 365.42,
       "walkLimitExceeded": false,
-      "walkTime": 313
+      "walkTime": 253
     }
   ]
 ]
