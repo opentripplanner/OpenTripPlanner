@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * updaters, this should be done via the execute method of this manager to prevent race conditions
  * between graph write operations.
  */
-public class GraphUpdaterManager implements WriteToGraphCallback {
+public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterStatus {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
 
@@ -143,6 +143,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
     });
   }
 
+  @Override
   public int numberOfUpdaters() {
     return updaterList.size();
   }
@@ -152,6 +153,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
    *
    * @see GraphUpdater#isPrimed()
    */
+  @Override
   public List<String> listUnprimedUpdaters() {
     return updaterList
       .stream()
@@ -164,6 +166,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
    * Just an example of fetching status information from the graph updater manager to expose it in a
    * web service. More useful stuff should be added later.
    */
+  @Override
   public Map<Integer, String> getUpdaterDescriptions() {
     Map<Integer, String> ret = Maps.newTreeMap();
     int i = 0;
@@ -182,6 +185,11 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
       return null;
     }
     return updaterList.get(id);
+  }
+
+  public Class<?> getUpdaterClass(int id) {
+    GraphUpdater updater = getUpdater(id);
+    return updater == null ? null : updater.getClass();
   }
 
   public List<GraphUpdater> getUpdaterList() {

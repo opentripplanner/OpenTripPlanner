@@ -10,7 +10,6 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 
@@ -54,13 +53,6 @@ public interface OtpServerContext {
   RaptorConfig<TripSchedule> raptorConfig();
 
   Graph graph();
-
-  /**
-   * @deprecated Use {@link #transitService()} instead. The model should not be used in the APIs
-   * - all APIs are read-only; Hence should be able to use the transit service.
-   */
-  @Deprecated
-  TransitModel transitModel();
 
   @HttpRequestScoped
   TransitService transitService();

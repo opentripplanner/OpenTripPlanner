@@ -50,6 +50,7 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
  * Default implementation of the Transit Service and Transit Editor Service.
@@ -565,6 +566,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
     return transitModel.getStopModel().getStopModelIndex().queryStopSpatialIndex(envelope);
+  }
+
+  @Override
+  public GraphUpdaterStatus getUpdaterStatus() {
+    return transitModel.getUpdaterManager();
   }
 
   @Override

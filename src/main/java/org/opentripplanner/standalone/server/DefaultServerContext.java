@@ -120,11 +120,6 @@ public class DefaultServerContext implements OtpServerContext {
   }
 
   @Override
-  public TransitModel transitModel() {
-    return transitModel;
-  }
-
-  @Override
   public TransitService transitService() {
     if (transitService == null) {
       this.transitService = new DefaultTransitService(transitModel);

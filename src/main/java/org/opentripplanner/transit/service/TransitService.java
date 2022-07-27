@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
-import gnu.trove.TByteCollection;
 import gnu.trove.set.TIntSet;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -46,6 +45,7 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
  * Entry point for read-only requests towards the transit API.
@@ -197,4 +197,6 @@ public interface TransitService {
   boolean transitFeedCovers(Instant dateTime);
 
   Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope);
+
+  GraphUpdaterStatus getUpdaterStatus();
 }
