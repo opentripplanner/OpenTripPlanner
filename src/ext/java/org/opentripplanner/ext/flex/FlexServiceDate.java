@@ -33,7 +33,7 @@ public class FlexServiceDate {
     return (
       servicesRunning != null &&
       servicesRunning.contains(
-        transitService.getServiceCodes().get(flexTrip.getTrip().getServiceId())
+        transitService.getServiceCodeForId(flexTrip.getTrip().getServiceId())
       )
     );
   }

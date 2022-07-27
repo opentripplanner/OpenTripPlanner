@@ -32,7 +32,7 @@ public class DatedServiceJourneyHelper {
           .get(tuple);
       }
     }
-    return transitService.getTripOnServiceDateForTripAndDay().get(tuple);
+    return transitService.getTripOnServiceDateForTripAndDay(tuple);
   }
 
   /**
@@ -51,6 +51,6 @@ public class DatedServiceJourneyHelper {
       return timetableSnapshot.getLastAddedTripOnServiceDate().get(datedServiceJourneyId);
     }
 
-    return transitService.getTripOnServiceDateById().get(datedServiceJourneyId);
+    return transitService.getTripOnServiceDateById(datedServiceJourneyId);
   }
 }

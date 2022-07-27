@@ -1008,12 +1008,11 @@ public class TransmodelGraphQLSchema {
               .type(new GraphQLNonNull(Scalars.GraphQLString))
               .build()
           )
-          .dataFetcher(environment -> {
-            return GqlUtil
+          .dataFetcher(environment ->
+            GqlUtil
               .getTransitService(environment)
-              .getOperatorForId()
-              .get(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
-          })
+              .getOperatorForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
+          )
           .build()
       )
       .field(
@@ -1224,8 +1223,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             return GqlUtil
               .getTransitService(environment)
-              .getTripForId()
-              .get(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
+              .getTripForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
           .build()
       )
@@ -1279,8 +1277,7 @@ public class TransmodelGraphQLSchema {
             List<String> authorities = environment.getArgument("authorities");
             return GqlUtil
               .getTransitService(environment)
-              .getTripForId()
-              .values()
+              .getAllTrips()
               .stream()
               .filter(t ->
                 lineIds == null || lineIds.isEmpty() || lineIds.contains(t.getRoute().getId())

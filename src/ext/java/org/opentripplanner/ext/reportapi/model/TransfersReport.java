@@ -146,11 +146,10 @@ public class TransfersReport {
   private TxPoint pointInfo(TransferPoint p, boolean boarding) {
     var r = new TxPoint();
 
-    if (p instanceof TripTransferPoint) {
-      var tp = (TripTransferPoint) p;
+    if (p instanceof TripTransferPoint tp) {
       var trip = tp.getTrip();
       var route = trip.getRoute();
-      var ptn = transitService.getPatternForTrip().get(trip);
+      var ptn = transitService.getPatternForTrip(trip);
       r.operator = trip.getOperator().getId().getId();
       r.type = "Trip";
       r.entityId = trip.getId().getId();
@@ -158,17 +157,15 @@ public class TransfersReport {
       r.trip = trip.getHeadsign();
       var stop = ptn.getStop(tp.getStopPositionInPattern());
       addLocation(r, ptn, stop, trip, boarding);
-    } else if (p instanceof RouteStopTransferPoint) {
-      var rp = (RouteStopTransferPoint) p;
+    } else if (p instanceof RouteStopTransferPoint rp) {
       var route = rp.getRoute();
-      var ptn = transitService.getPatternsForRoute().get(route).stream().findFirst().orElse(null);
+      var ptn = transitService.getPatternsForRoute(route).stream().findFirst().orElse(null);
       r.operator = route.getOperator().getId().getId();
       r.type = "Route";
       r.entityId = route.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
       addLocation(r, ptn, rp.getStop(), null, boarding);
-    } else if (p instanceof RouteStationTransferPoint) {
-      var rp = (RouteStationTransferPoint) p;
+    } else if (p instanceof RouteStationTransferPoint rp) {
       var route = rp.getRoute();
       r.operator = route.getOperator().getId().getId();
       r.type = "Route";
@@ -176,15 +173,13 @@ public class TransfersReport {
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
       r.loc += rp.getStation().getName();
       r.coordinate = rp.getStation().getCoordinate();
-    } else if (p instanceof StopTransferPoint) {
-      var sp = (StopTransferPoint) p;
+    } else if (p instanceof StopTransferPoint sp) {
       StopLocation stop = sp.getStop();
       r.type = "Stop";
       r.entityId = stop.getId().getId();
       r.loc = stop.getName().toString();
       r.coordinate = stop.getCoordinate();
-    } else if (p instanceof StationTransferPoint) {
-      var sp = (StationTransferPoint) p;
+    } else if (p instanceof StationTransferPoint sp) {
       Station station = sp.getStation();
       r.type = "Station";
       r.entityId = station.getId().getId();

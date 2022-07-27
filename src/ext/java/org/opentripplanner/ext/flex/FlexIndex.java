@@ -16,6 +16,7 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public class FlexIndex {
 
+  //TODO: encapsulate
   public Multimap<StopLocation, PathTransfer> transfersToStop = ArrayListMultimap.create();
 
   public Multimap<StopLocation, FlexTrip> flexTripsByStop = HashMultimap.create();
