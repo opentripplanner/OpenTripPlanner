@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +59,9 @@ public class ActuatorAPI {
   @GET
   @Path("/health")
   public Response health(@Context OtpServerContext serverContext) {
-    GraphUpdaterManager updaterManager = serverContext.transitModel().getUpdaterManager();
-    if (updaterManager != null) {
-      var listUnprimedUpdaters = updaterManager.listUnprimedUpdaters();
+    GraphUpdaterStatus updaterStatus = serverContext.transitService().getUpdaterStatus();
+    if (updaterStatus != null) {
+      var listUnprimedUpdaters = updaterStatus.listUnprimedUpdaters();
 
       if (!listUnprimedUpdaters.isEmpty()) {
         LOG.info("Graph ready, waiting for updaters: {}", listUnprimedUpdaters);

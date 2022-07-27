@@ -115,10 +115,7 @@ public class QuayType {
             if (station != null) {
               return new MonoOrMultiModalStation(
                 station,
-                GqlUtil
-                  .getTransitService(environment)
-                  .getMultiModalStationForStations()
-                  .get(station)
+                GqlUtil.getTransitService(environment).getMultiModalStationForStation(station)
               );
             } else {
               return null;

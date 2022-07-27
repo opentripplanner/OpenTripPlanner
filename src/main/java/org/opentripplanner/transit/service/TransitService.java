@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -9,11 +10,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.PathTransfer;
@@ -25,6 +27,7 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
+import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -36,10 +39,13 @@ import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
  * Entry point for read-only requests towards the transit API.
@@ -71,9 +77,9 @@ public interface TransitService {
 
   Map<FeedScopedId, Integer> getServiceCodes();
 
-  FlexStopLocation getLocationById(FeedScopedId id);
+  TIntSet getServiceCodesRunningForDate(LocalDate date);
 
-  Set<StopLocation> getAllFlexStopsFlat();
+  FlexStopLocation getLocationById(FeedScopedId id);
 
   Agency getAgencyForId(FeedScopedId id);
 
@@ -90,11 +96,19 @@ public interface TransitService {
     TimetableSnapshot timetableSnapshot
   );
 
+  Collection<Trip> getTripsForStop(StopLocation stop);
+
   Collection<Operator> getAllOperators();
 
   Map<FeedScopedId, Operator> getOperatorForId();
 
   Collection<StopLocation> getAllStops();
+
+  StopLocation getStopLocationById(FeedScopedId parseId);
+
+  Collection<StopCollection> getAllStopCollections();
+
+  StopCollection getStopCollectionById(FeedScopedId id);
 
   Map<FeedScopedId, Trip> getTripForId();
 
@@ -106,7 +120,7 @@ public interface TransitService {
 
   Multimap<Route, TripPattern> getPatternsForRoute();
 
-  Map<Station, MultiModalStation> getMultiModalStationForStations();
+  MultiModalStation getMultiModalStationForStation(Station station);
 
   List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
@@ -158,6 +172,8 @@ public interface TransitService {
 
   TransitLayer getTransitLayer();
 
+  TransitLayer getRealtimeTransitLayer();
+
   CalendarService getCalendarService();
 
   ZoneId getTimeZone();
@@ -172,7 +188,15 @@ public interface TransitService {
 
   ZonedDateTime getTransitServiceStarts();
 
-  Map<Stop, TransitStopVertex> getStopVertexForStop();
+  TransitStopVertex getStopVertexForStop(Stop stop);
 
-  HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex();
+  Optional<Coordinate> getCenter();
+
+  TransferService getTransferService();
+
+  boolean transitFeedCovers(Instant dateTime);
+
+  Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope);
+
+  GraphUpdaterStatus getUpdaterStatus();
 }

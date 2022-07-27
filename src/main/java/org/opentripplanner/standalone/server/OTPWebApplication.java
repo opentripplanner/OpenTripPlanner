@@ -9,6 +9,7 @@ import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.ws.rs.core.Application;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
@@ -33,7 +34,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class OTPWebApplication extends Application {
 
   /* This object groups together all the modules for a single running OTP server. */
-  private final OtpServerContext serverContext;
+  private final Supplier<OtpServerContext> contextProvider;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
@@ -43,8 +44,8 @@ public class OTPWebApplication extends Application {
     SLF4JBridgeHandler.install();
   }
 
-  public OTPWebApplication(OtpServerContext serverContext) {
-    this.serverContext = serverContext;
+  public OTPWebApplication(Supplier<OtpServerContext> contextProvider) {
+    this.contextProvider = contextProvider;
   }
 
   /**
@@ -86,7 +87,7 @@ public class OTPWebApplication extends Application {
       // Serialize POJOs (unannotated) JSON using Jackson
       new JSONObjectMapperProvider(),
       // Allow injecting the OTP server object into Jersey resource classes
-      makeBinder(serverContext),
+      makeBinder(contextProvider),
       // Add performance instrumentation of Jersey requests to micrometer
       getMetricsApplicationEventListener()
     );
@@ -120,11 +121,11 @@ public class OTPWebApplication extends Application {
    * <p>
    * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */
-  private Binder makeBinder(OtpServerContext context) {
+  private Binder makeBinder(Supplier<OtpServerContext> contextProvider) {
     return new AbstractBinder() {
       @Override
       protected void configure() {
-        bind(context).to(OtpServerContext.class);
+        bindFactory(contextProvider).to(OtpServerContext.class);
       }
     };
   }

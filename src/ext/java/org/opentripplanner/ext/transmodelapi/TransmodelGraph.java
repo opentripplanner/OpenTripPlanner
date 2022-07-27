@@ -65,8 +65,8 @@ class TransmodelGraph {
 
     TransmodelRequestContext transmodelRequestContext = new TransmodelRequestContext(
       serverContext,
-      new RoutingService(serverContext.graph(), serverContext.transitModel()),
-      new DefaultTransitService(serverContext.transitModel())
+      serverContext.routingService(),
+      serverContext.transitService()
     );
 
     ExecutionInput executionInput = ExecutionInput
@@ -82,7 +82,7 @@ class TransmodelGraph {
 
   Response getGraphQLResponse(
     String query,
-    OtpServerContext router,
+    OtpServerContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -90,7 +90,7 @@ class TransmodelGraph {
   ) {
     ExecutionResult result = getGraphQLExecutionResult(
       query,
-      router,
+      serverContext,
       variables,
       operationName,
       maxResolves,

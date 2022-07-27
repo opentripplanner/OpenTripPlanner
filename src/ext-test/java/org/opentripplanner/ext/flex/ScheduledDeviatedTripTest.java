@@ -20,7 +20,6 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
@@ -39,6 +38,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
@@ -127,7 +128,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     var router = new FlexRouter(
       graph,
-      transitModel,
+      new DefaultTransitService(transitModel),
       new FlexParameters(300),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       false,

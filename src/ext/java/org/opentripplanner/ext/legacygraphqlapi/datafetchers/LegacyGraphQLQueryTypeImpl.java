@@ -452,7 +452,6 @@ public class LegacyGraphQLQueryTypeImpl
                 filterByBikeRentalStations,
                 filterByBikeParks,
                 filterByCarParks,
-                getRoutingService(environment),
                 getTransitService(environment)
               )
           );
@@ -592,7 +591,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RoutingRequest request = context.getServerContext().copyDefaultRoutingRequest();
+      RoutingRequest request = context.getServerContext().defaultRoutingRequest();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -605,7 +604,7 @@ public class LegacyGraphQLQueryTypeImpl
       request.setDateTime(
         environment.getArgument("date"),
         environment.getArgument("time"),
-        context.getServerContext().transitModel().getTimeZone()
+        context.getServerContext().transitService().getTimeZone()
       );
 
       callWith.argument("wheelchair", request::setWheelchairAccessible);
@@ -778,7 +777,7 @@ public class LegacyGraphQLQueryTypeImpl
         "locale",
         (String v) -> request.locale = LegacyGraphQLUtils.getLocale(environment, v)
       );
-      RoutingResponse res = context.getRoutingService().route(request, context.getServerContext());
+      RoutingResponse res = context.getRoutingService().route(request);
       return DataFetcherResult
         .<RoutingResponse>newResult()
         .data(res)
@@ -1036,8 +1035,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       Stream<Stop> stopStream = getTransitService(environment)
-        .getStopSpatialIndex()
-        .query(envelope)
+        .queryStopSpatialIndex(envelope)
         .stream()
         .filter(transitStopVertex -> envelope.contains(transitStopVertex.getCoordinate()))
         .map(TransitStopVertex::getStop);

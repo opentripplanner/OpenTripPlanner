@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 

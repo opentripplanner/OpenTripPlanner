@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -58,7 +57,6 @@ public class DirectGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService,
     TransitService transitService
   ) {
     throw new UnsupportedOperationException("Not implemented");

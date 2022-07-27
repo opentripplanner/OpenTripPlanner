@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.TestServerContext;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -29,7 +29,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -61,9 +60,7 @@ public class TestIntermediatePlaces {
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
       graph.index();
-      OtpServerContext serverContext = TestServerContext.createServerContext(graph, transitModel);
-      //TODO: serverContext.startup();
-      TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(serverContext);
+      TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
       timeZone = transitModel.getTimeZone();
 
       graphPathToItineraryMapper =

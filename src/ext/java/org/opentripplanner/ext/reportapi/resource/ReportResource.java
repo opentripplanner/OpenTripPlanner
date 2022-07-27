@@ -15,25 +15,26 @@ import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.transit.service.TransitService;
 
 @Path("/report")
 @Produces(MediaType.TEXT_PLAIN)
 public class ReportResource {
 
   private final TransferService transferService;
-  private final TransitModelIndex index;
+  private final TransitService transitService;
 
   @SuppressWarnings("unused")
   public ReportResource(@Context OtpServerContext otpServerContext) {
-    this.transferService = otpServerContext.transitModel().getTransferService();
-    this.index = otpServerContext.transitModel().getTransitModelIndex();
+    this.transferService = otpServerContext.transitService().getTransferService();
+    this.transitService = otpServerContext.transitService();
   }
 
   @GET
   @Path("/transfers.csv")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public String getTransfersAsCsv() {
-    return TransfersReport.export(transferService.listAll(), index);
+    return TransfersReport.export(transferService.listAll(), transitService);
   }
 
   @GET

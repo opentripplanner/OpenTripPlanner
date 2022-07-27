@@ -62,7 +62,7 @@ public class Routers {
   private ApiRouterInfo getRouterInfo() {
     try {
       OtpServerContext serverContext = this.serverContext;
-      return new ApiRouterInfo("default", serverContext.graph(), serverContext.transitModel());
+      return new ApiRouterInfo("default", serverContext.graph(), serverContext.transitService());
     } catch (GraphNotFoundException e) {
       return null;
     }

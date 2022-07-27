@@ -450,7 +450,7 @@ public class TransmodelGraphQLSchema {
               .map(station ->
                 new MonoOrMultiModalStation(
                   station,
-                  transitService.getMultiModalStationForStations().get(station)
+                  transitService.getMultiModalStationForStation(station)
                 )
               )
               .collect(Collectors.toList());
@@ -582,8 +582,7 @@ public class TransmodelGraphQLSchema {
                   .entrySet()
                   .stream()
                   .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
-                  .collect(Collectors.toList())
-                  .size() !=
+                  .count() !=
                 1
               ) {
                 throw new IllegalArgumentException("Unable to combine other filters with ids");
@@ -921,7 +920,6 @@ public class TransmodelGraphQLSchema {
                   filterByBikeRentalStations,
                   filterByBikeParks,
                   filterByCarParks,
-                  GqlUtil.getRoutingService(environment),
                   GqlUtil.getTransitService(environment)
                 );
 

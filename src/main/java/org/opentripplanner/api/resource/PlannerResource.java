@@ -69,11 +69,7 @@ public class PlannerResource extends RoutingResource {
       request = super.buildRequest(uriInfo.getQueryParameters());
 
       // Route
-      RoutingService routingService = new RoutingService(
-        serverContext.graph(),
-        serverContext.transitModel()
-      );
-      res = routingService.route(request, serverContext);
+      res = serverContext.routingService().route(request);
 
       // Map to API
       TripPlanMapper tripPlanMapper = new TripPlanMapper(

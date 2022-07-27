@@ -160,7 +160,7 @@ public class SiriFuzzyTripMatcher {
 
     //First, assume same agency
 
-    var firstStop = transitService.getAllStops().stream().findFirst().get();
+    var firstStop = transitService.getAllStops().iterator().next();
     FeedScopedId id = new FeedScopedId(firstStop.getId().getFeedId(), siriStopId);
     if (transitService.getStopForId(id) != null) {
       return id;
@@ -169,8 +169,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     //Not same agency - loop through all stops/Stations
-    var stops = transitService.getAllStops();
-    for (var stop : stops) {
+    for (var stop : transitService.getAllStops()) {
       if (stop.getId().getId().equals(siriStopId)) {
         return stop.getId();
       }

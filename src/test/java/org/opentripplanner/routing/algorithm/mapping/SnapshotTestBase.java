@@ -102,10 +102,10 @@ public abstract class SnapshotTestBase {
   ) {
     OtpServerContext serverContext = serverContext();
 
-    RoutingRequest request = serverContext.copyDefaultRoutingRequest();
+    RoutingRequest request = serverContext.defaultRoutingRequest();
     request.setDateTime(
       TestUtils.dateInstant(
-        serverContext.transitModel().getTimeZone().getId(),
+        serverContext.transitService().getTimeZone().getId(),
         year,
         month,
         day,
@@ -170,18 +170,14 @@ public abstract class SnapshotTestBase {
   }
 
   protected void expectRequestResponseToMatchSnapshot(RoutingRequest request) {
-    OtpServerContext serverContext = serverContext();
-
-    List<Itinerary> itineraries = retrieveItineraries(request, serverContext);
+    List<Itinerary> itineraries = retrieveItineraries(request);
 
     logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
   }
 
   protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request) {
-    OtpServerContext serverContext = serverContext();
-
     RoutingRequest departAt = request.clone();
-    List<Itinerary> departByItineraries = retrieveItineraries(departAt, serverContext);
+    List<Itinerary> departByItineraries = retrieveItineraries(departAt);
 
     logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
 
@@ -194,7 +190,7 @@ public abstract class SnapshotTestBase {
     arriveBy.setArriveBy(true);
     arriveBy.setDateTime(departByItineraries.get(0).lastLeg().getEndTime().toInstant());
 
-    List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, serverContext);
+    List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
 
     var departAtItinerary = departByItineraries.get(0);
     var arriveByItinerary = arriveByItineraries.get(0);
@@ -255,13 +251,9 @@ public abstract class SnapshotTestBase {
     return snapshotSerializer.apply(new Object[] { object });
   }
 
-  private List<Itinerary> retrieveItineraries(RoutingRequest request, OtpServerContext context) {
+  private List<Itinerary> retrieveItineraries(RoutingRequest request) {
     long startMillis = System.currentTimeMillis();
-    RoutingService routingService = new RoutingService(
-      serverContext.graph(),
-      serverContext.transitModel()
-    );
-    RoutingResponse response = routingService.route(request, context);
+    RoutingResponse response = serverContext.routingService().route(request);
 
     List<Itinerary> itineraries = response.getTripPlan().itineraries;
 
@@ -270,7 +262,7 @@ public abstract class SnapshotTestBase {
         itineraries,
         startMillis,
         System.currentTimeMillis(),
-        serverContext.transitModel().getTimeZone()
+        serverContext.transitService().getTimeZone()
       );
     }
     return itineraries;
@@ -279,7 +271,7 @@ public abstract class SnapshotTestBase {
   private String createDebugUrlForRequest(RoutingRequest request) {
     var dateTime = Instant
       .ofEpochSecond(request.getDateTime().getEpochSecond())
-      .atZone(serverContext().transitModel().getTimeZone())
+      .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
     var transitModes = mapModes(request.modes.transitModes);
