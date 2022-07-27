@@ -41,6 +41,8 @@ class TripPatternTest {
 
     assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getName());
+    assertEquals(ROUTE, copy.getRoute());
+    assertEquals(STOP_PATTERN, copy.getStopPattern());
   }
 
   @Test
@@ -48,5 +50,13 @@ class TripPatternTest {
     assertTrue(subject.sameAs(subject.copy().build()));
     assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(
+      subject.sameAs(
+        subject.copy().withRoute(TransitModelForTest.route("anotherId").build()).build()
+      )
+    );
+    assertFalse(
+      subject.sameAs(subject.copy().withStopPattern(StopPattern.create(11).build()).build())
+    );
   }
 }
