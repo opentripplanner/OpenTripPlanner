@@ -47,17 +47,6 @@ public class StopModelIndex {
      * Maybe we should just guarantee unique labels. */
     for (TransitStopVertex stopVertex : stopModel.getAllStopVertices()) {
       Stop stop = stopVertex.getStop();
-      stopVertexForStop.put(stop, stopVertex);
-    }
-    for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
-      Envelope envelope = new Envelope(stopVertex.getCoordinate());
-      stopSpatialIndex.insert(envelope, stopVertex);
-    }
-
-    /* We will keep a separate set of all vertices in case some have the same label.
-     * Maybe we should just guarantee unique labels. */
-    for (TransitStopVertex stopVertex : stopModel.getAllStopVertices()) {
-      Stop stop = stopVertex.getStop();
       stopForId.put(stop.getId(), stop);
       stopVertexForStop.put(stop, stopVertex);
     }

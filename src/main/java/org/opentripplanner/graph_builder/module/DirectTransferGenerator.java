@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitModelIndex;
 import org.opentripplanner.util.OTPFeature;
@@ -70,7 +71,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
-    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(graph, transitModel, radiusByDuration);
+    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
+      graph,
+      new DefaultTransitService(transitModel),
+      radiusByDuration
+    );
     if (nearbyStopFinder.useStreets) {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
     } else {
@@ -173,7 +178,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
-    transitModel.setHasDirectTransfers(true);
   }
 
   @Override

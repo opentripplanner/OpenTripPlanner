@@ -33,7 +33,7 @@ import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {
@@ -82,15 +82,15 @@ public class TransitRouter {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!serverContext.transitModel().transitFeedCovers(request.getDateTime())) {
+    if (!serverContext.transitService().transitFeedCovers(request.getDateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );
     }
 
     var transitLayer = request.ignoreRealtimeUpdates
-      ? serverContext.transitModel().getTransitLayer()
-      : serverContext.transitModel().getRealtimeTransitLayer();
+      ? serverContext.transitService().getTransitLayer()
+      : serverContext.transitService().getRealtimeTransitLayer();
 
     var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
 
@@ -129,7 +129,7 @@ public class TransitRouter {
           .createOptimizeTransferService(
             transitLayer::getStopByIndex,
             requestTransitDataProvider.stopNameResolver(),
-            serverContext.transitModel().getTransferService(),
+            serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
             raptorRequest,
@@ -142,7 +142,7 @@ public class TransitRouter {
 
     RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
       serverContext.graph(),
-      serverContext.transitModel(),
+      serverContext.transitService(),
       transitLayer,
       transitSearchTimeZero,
       request
@@ -217,7 +217,7 @@ public class TransitRouter {
 
       var nearbyStops = AccessEgressRouter.streetSearch(
         routingContext,
-        serverContext.transitModel(),
+        serverContext.transitService(),
         mode,
         isEgress
       );
@@ -228,7 +228,7 @@ public class TransitRouter {
       if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
         var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
           routingContext,
-          serverContext.transitModel(),
+          serverContext.transitService(),
           additionalSearchDays,
           serverContext.routerConfig().flexParameters(request),
           isEgress
@@ -244,26 +244,23 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    var graph = serverContext.graph();
-    var transitModel = serverContext.transitModel();
-
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
     return new RaptorRoutingRequestTransitData(
-      transitModel.getTransferService(),
+      serverContext.transitService().getTransferService(),
       transitLayer,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
-      createRequestTransitDataProviderFilter(transitModel.getTransitModelIndex()),
-      new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
+      createRequestTransitDataProviderFilter(serverContext.transitService()),
+      new RoutingContext(transferRoutingRequest, serverContext.graph(), (Vertex) null, null)
     );
   }
 
   private TransitDataProviderFilter createRequestTransitDataProviderFilter(
-    TransitModelIndex transitModelIndex
+    TransitService transitService
   ) {
-    return new RoutingRequestTransitDataProviderFilter(request, transitModelIndex);
+    return new RoutingRequestTransitDataProviderFilter(request, transitService);
   }
 
   private void verifyAccessEgress(Collection<?> access, Collection<?> egress) {

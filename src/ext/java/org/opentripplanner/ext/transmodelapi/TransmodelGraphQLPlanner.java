@@ -49,7 +49,7 @@ public class TransmodelGraphQLPlanner {
     try {
       request = createRequest(environment);
 
-      RoutingResponse res = ctx.getRoutingService().route(request, serverContext);
+      RoutingResponse res = ctx.getRoutingService().route(request);
 
       response.plan = res.getTripPlan();
       response.metadata = res.getMetadata();
@@ -108,10 +108,6 @@ public class TransmodelGraphQLPlanner {
     callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
     callWith.argument("wheelchairAccessible", request::setWheelchairAccessible);
     callWith.argument("numTripPatterns", request::setNumItineraries);
-    callWith.argument(
-      "transitGeneralizedCostLimit",
-      (DoubleFunction<Double> it) -> request.itineraryFilters.transitGeneralizedCostLimit = it
-    );
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
     //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
     //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));

@@ -854,9 +854,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       /*
               Found exact match
              */
-      TripPattern exactPattern = transitService
-        .getPatternForTrip()
-        .get(tripMatchedByServiceJourneyId);
+      TripPattern exactPattern = transitService.getPatternForTrip(tripMatchedByServiceJourneyId);
 
       if (exactPattern != null) {
         Timetable currentTimetable = getCurrentTimetable(exactPattern, serviceDate);
@@ -1145,7 +1143,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean cancelScheduledTrip(Trip trip, final LocalDate serviceDate) {
     boolean success = false;
 
-    final TripPattern pattern = transitService.getPatternForTrip().get(trip);
+    final TripPattern pattern = transitService.getPatternForTrip(trip);
 
     if (pattern != null) {
       // Cancel scheduled trip times for this trip in this pattern
@@ -1220,7 +1218,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     Set<TripPattern> patterns = new HashSet<>();
     for (Trip currentTrip : matches) {
-      TripPattern tripPattern = transitService.getPatternForTrip().get(currentTrip);
+      TripPattern tripPattern = transitService.getPatternForTrip(currentTrip);
       Set<LocalDate> serviceDates = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(currentTrip.getServiceId());
@@ -1333,7 +1331,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     if (lastAddedTripPattern != null) {
       tripPattern = lastAddedTripPattern;
     } else {
-      tripPattern = transitService.getPatternForTrip().get(trip);
+      tripPattern = transitService.getPatternForTrip(trip);
     }
 
     var firstStop = tripPattern.firstStop();
@@ -1467,7 +1465,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         .getCalendarService()
         .getServiceDatesForServiceId(trip.getServiceId());
       if (serviceDatesForServiceId.contains(serviceDate)) {
-        TripPattern pattern = transitService.getPatternForTrip().get(trip);
+        TripPattern pattern = transitService.getPatternForTrip(trip);
 
         if (stopNumber < pattern.numberOfStops()) {
           boolean firstReportedStopIsFound = false;

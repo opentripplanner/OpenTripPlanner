@@ -2,6 +2,7 @@ package org.opentripplanner.routing.street;
 
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Assertions;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
-import org.mockito.Mockito;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
@@ -21,10 +21,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.DefaultServerContext;
-import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class CarRoutingTest {
@@ -136,16 +132,7 @@ public class CarRoutingTest {
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
     final RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
-    var gpf = new GraphPathFinder(
-      DefaultServerContext.create(
-        RouterConfig.DEFAULT,
-        new RaptorConfig<>(RouterConfig.DEFAULT.raptorTuningParameters()),
-        graph,
-        Mockito.mock(TransitModel.class),
-        null,
-        false
-      )
-    );
+    var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

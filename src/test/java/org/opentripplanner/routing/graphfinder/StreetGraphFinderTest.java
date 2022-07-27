@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -26,7 +28,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
   private TransitStopVertex S1, S2, S3;
   private IntersectionVertex A, B, C, D;
   private VehicleRentalPlaceVertex BR1, BR2;
-  private RoutingService routingService;
 
   private TransitService transitService;
   private StreetGraphFinder graphFinder;
@@ -117,12 +118,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
       }
     );
 
-    var graph = otpModel.graph();
-    var transitModel = otpModel.transitModel();
-
-    routingService = new RoutingService(graph, transitModel);
-    transitService = new DefaultTransitService(transitModel);
-    graphFinder = new StreetGraphFinder(graph);
+    transitService = new DefaultTransitService(otpModel.transitModel());
+    graphFinder = new StreetGraphFinder(otpModel.graph());
   }
 
   @Test
@@ -159,7 +156,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -176,7 +172,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -193,7 +188,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -217,7 +211,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -234,7 +227,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -259,7 +251,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -276,7 +267,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         List.of(S2.getStop().getId()),
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -301,7 +291,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -318,7 +307,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         List.of(S2.getStop().getId()),
         List.of(R1.getId()),
         null,
-        routingService,
         transitService
       )
     );
@@ -344,7 +332,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -361,7 +348,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         List.of(R2.getId()),
         null,
-        routingService,
         transitService
       )
     );
@@ -384,7 +370,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -401,7 +386,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         List.of("BR2"),
-        routingService,
         transitService
       )
     );
@@ -423,7 +407,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
@@ -445,7 +428,6 @@ class StreetGraphFinderTest extends GraphRoutingTest {
         null,
         null,
         null,
-        routingService,
         transitService
       )
     );
