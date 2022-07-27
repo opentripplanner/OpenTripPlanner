@@ -37,7 +37,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.apache.commons.collections4.CollectionUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
@@ -921,7 +920,6 @@ public class TransmodelGraphQLSchema {
                   filterByBikeRentalStations,
                   filterByBikeParks,
                   filterByCarParks,
-                  GqlUtil.getRoutingService(environment),
                   GqlUtil.getTransitService(environment)
                 );
 

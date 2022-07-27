@@ -77,8 +77,6 @@ public class Graph implements Serializable {
   public final Instant buildTime = Instant.now();
   private StopModel stopModel;
 
-  private GraphBundle bundle;
-
   private OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
 

@@ -134,7 +134,7 @@ public class DefaultServerContext implements OtpServerContext {
 
   @Override
   public RoutingService routingService() {
-    return new RoutingService(graph(), transitService());
+    return new RoutingService(this);
   }
 
   @Override

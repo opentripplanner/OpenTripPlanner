@@ -49,7 +49,7 @@ public class TransmodelGraphQLPlanner {
     try {
       request = createRequest(environment);
 
-      RoutingResponse res = ctx.getRoutingService().route(request, serverContext);
+      RoutingResponse res = ctx.getRoutingService().route(request);
 
       response.plan = res.getTripPlan();
       response.metadata = res.getMetadata();

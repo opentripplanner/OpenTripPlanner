@@ -1,5 +1,6 @@
 package org.opentripplanner.routing;
 
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
@@ -36,21 +37,22 @@ import org.opentripplanner.util.WorldEnvelope;
  */
 public class RoutingService {
 
+  private final OtpServerContext serverContext;
   private final Graph graph;
 
-  private final TransitService transitService;
+  private final ZoneId timeZone;
 
   private final GraphFinder graphFinder;
 
-  public RoutingService(Graph graph, TransitService transitService) {
-    this.graph = graph;
-    this.transitService = transitService;
+  public RoutingService(OtpServerContext serverContext) {
+    this.serverContext = serverContext;
+    this.graph = serverContext.graph();
+    this.timeZone = serverContext.transitService().getTimeZone();
     this.graphFinder = GraphFinder.getInstance(graph);
   }
 
-  // TODO We should probably not have the Router as a parameter here
-  public RoutingResponse route(RoutingRequest request, OtpServerContext serverContext) {
-    RoutingWorker worker = new RoutingWorker(serverContext, request, transitService.getTimeZone());
+  public RoutingResponse route(RoutingRequest request) {
+    RoutingWorker worker = new RoutingWorker(serverContext, request, timeZone);
     return worker.route();
   }
 
@@ -154,8 +156,7 @@ public class RoutingService {
   }
 
   /**
-   * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List,
-   * RoutingService, TransitService)}
+   * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List, TransitService)}
    */
   public List<PlaceAtDistance> findClosestPlaces(
     double lat,
@@ -169,7 +170,6 @@ public class RoutingService {
     List<String> filterByBikeRentalStations,
     List<String> filterByBikeParks,
     List<String> filterByCarParks,
-    RoutingService routingService,
     TransitService transitService
   ) {
     return this.graphFinder.findClosestPlaces(
@@ -182,7 +182,6 @@ public class RoutingService {
         filterByStops,
         filterByRoutes,
         filterByBikeRentalStations,
-        routingService,
         transitService
       );
   }
