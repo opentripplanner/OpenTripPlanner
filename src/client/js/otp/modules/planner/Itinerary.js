@@ -104,18 +104,22 @@ otp.modules.planner.Itinerary = otp.Class({
             nameCell.classList.add("name");
             nameCell.innerText = p.name || "";
             const catCell = document.createElement("td");
-            catCell.innerText = p.category || "";
+            if(p.category) {
+                catCell.innerText = p.category.name || "";
+            }
             const containerCell = document.createElement("td");
-            containerCell.innerText = p.container || "";
+            if(p.container){
+                containerCell.innerText = p.container.name || "";
+            }
 
             tr.appendChild(nameCell);
             tr.appendChild(catCell);
             tr.appendChild(containerCell);
 
-            const decimalPlaces = p.currency.defaultFractionDigits;
+            const decimalPlaces = p.amount.currency.defaultFractionDigits;
             const fare_info = {
-                'currency': p.currency.symbol,
-                'price': (p.cents / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces),
+                'currency': p.amount.currency.symbol,
+                'price': (p.amount.cents / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces),
             }
             //TRANSLATORS: Fare Currency Fare price
             const price = _tr(`%(currency)s %(price)s`, fare_info) + "\n";
@@ -132,85 +136,24 @@ otp.modules.planner.Itinerary = otp.Class({
         if(this.fareDisplayOverride) return this.fareDisplayOverride;
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
 
-        if(this.itinData.fare && this.itinData.fare.fare) {
-
-            const productsCoveringItineraries = Object.keys(this.itinData.fare.fare).map(key => {
-
-                let fare = this.itinData.fare.fare[key];
-
-                const result = {
-                   coversItinerary : fare.cents > 0,
-                   cents: fare.cents,
-                   currency: fare.currency
-                }
-
-                const detail = this.itinData.fare.details[key];
-                const firstDetail = detail[0];
-
-                if(firstDetail && firstDetail.name) {
-                    result.name = firstDetail.name;
-                }
-
-                if(firstDetail && firstDetail.category && firstDetail.category.name) {
-                    result.category = firstDetail.category.name;
-                }
-
-                if(firstDetail && firstDetail.container && firstDetail.container.name) {
-                    result.container = firstDetail.container.name;
-                }
-
-                return result;
-            }).filter(p => p.coversItinerary);
-
-            const legProducts = Object.keys(this.itinData.fare.fare).map(key => {
-
-                const fare = this.itinData.fare.fare[key];
-                // -1 is the magic number to tell if that it doesn't cover the itinerary
-                if(fare.cents !== -1) {
-                    return null;
-                }
-
-                const firstDetail = this.itinData.fare.details[key][0];
-
-                return {
-                    name: firstDetail.name,
-                    category: firstDetail.category?.name,
-                    container: firstDetail.container?.name,
-                    cents: firstDetail.price.cents,
-                    currency: firstDetail.price.currency,
-                    routes: firstDetail.routes
-                };
-            }).filter(product => product != null);
-
-            const groupedLegProducts = {};
-
-            legProducts.forEach(p => {
-                const key = p.routes.toString();
-                const existing = groupedLegProducts[key] || [];
-                existing.push(p);
-                groupedLegProducts[key] = existing;
-            });
-
-            console.log(groupedLegProducts)
+        const fare = this.itinData.fare;
+        if(fare && (fare.coveringItinerary || fare.legProducts)) {
 
             const allFares = document.createElement("div");
-            if(productsCoveringItineraries.length > 0) {
+            if(fare.coveringItinerary && fare.coveringItinerary.length > 0) {
                 const title = document.createElement("strong");
                 title.innerText = "Covering entire itinerary";
                 allFares.appendChild(title);
-                allFares.appendChild(this.buildFaresTable(productsCoveringItineraries));
+                allFares.appendChild(this.buildFaresTable(this.itinData.fare.coveringItinerary));
             }
 
-            if(Object.keys(groupedLegProducts).length > 0) {
-                Object.keys(groupedLegProducts).forEach(key =>{
-                    console.log(key);
-
+            if(fare.legProducts && fare.legProducts.length > 0) {
+                console.log(Object.keys(fare.legProducts))
+                Object.keys(fare.legProducts).forEach(index => {
                     const title = document.createElement("strong");
-                    title.innerText = `Covering leg ${key}`;
+                    title.innerText = `Covering leg # ${index}`;
                     allFares.appendChild(title);
-                    const products = groupedLegProducts[key];
-                    allFares.appendChild(this.buildFaresTable(products));
-                });
+                })
             }
 
             return allFares.outerHTML;

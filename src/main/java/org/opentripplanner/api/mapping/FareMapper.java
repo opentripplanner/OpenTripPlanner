@@ -87,6 +87,7 @@ public class FareMapper {
           new ApiFareProduct(
             p.id().toString(),
             p.name(),
+            toApiMoney(p.amount()),
             toApiFareQualifier(p.category()),
             toApiFareQualifier(p.container())
           )
