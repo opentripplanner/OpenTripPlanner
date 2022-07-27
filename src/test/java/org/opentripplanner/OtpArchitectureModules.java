@@ -10,6 +10,8 @@ public interface OtpArchitectureModules {
   Package JACKSON_ANNOTATIONS = Package.of("com.fasterxml.jackson.annotation");
   Package JTS_GEOM = Package.of("org.locationtech.jts.(*)..");
 
+  Package GUAVA = Package.of("com.google.common.(*)..");
+
   /* OTP Modules */
 
   Package OTP_ROOT = Package.of("org.opentripplanner");
