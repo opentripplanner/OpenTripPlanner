@@ -38,7 +38,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
-import org.opentripplanner.ext.flex.FlexIndex;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
@@ -653,15 +654,21 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            return GqlUtil
-              .getRoutingService(environment)
-              .getStopsByBoundingBox(
-                environment.getArgument("minimumLatitude"),
+            Envelope envelope = new Envelope(
+              new Coordinate(
                 environment.getArgument("minimumLongitude"),
-                environment.getArgument("maximumLatitude"),
-                environment.getArgument("maximumLongitude")
+                environment.getArgument("minimumLatitude")
+              ),
+              new Coordinate(
+                environment.getArgument("maximumLongitude"),
+                environment.getArgument("maximumLatitude")
               )
+            );
+            return GqlUtil
+              .getTransitService(environment)
+              .queryStopSpatialIndex(envelope)
               .stream()
+              .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
               .filter(stop ->
                 environment.getArgument("authority") == null ||
                 stop.getId().getFeedId().equalsIgnoreCase(environment.getArgument("authority"))

@@ -22,6 +22,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
@@ -457,12 +459,17 @@ public class StopPlaceType {
     String multiModalMode,
     DataFetchingEnvironment environment
   ) {
-    final RoutingService routingService = GqlUtil.getRoutingService(environment);
     final TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Stream<Station> stations = routingService
-      .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
+    Envelope envelope = new Envelope(
+      new Coordinate(minLon, minLat),
+      new Coordinate(maxLon, maxLat)
+    );
+
+    Stream<Station> stations = transitService
+      .queryStopSpatialIndex(envelope)
       .stream()
+      .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
       .map(StopLocation::getParentStation)
       .filter(Objects::nonNull)
       .distinct();

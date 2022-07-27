@@ -7,7 +7,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.Stop;
@@ -28,7 +27,6 @@ public class StopsLayerTest {
   public void digitransitVehicleParkingPropertyMapperTest() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     transitModel.index();
     var transitService = new DefaultTransitService(transitModel);

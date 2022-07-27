@@ -21,6 +21,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.AgencyMapper;
 import org.opentripplanner.api.mapping.AlertMapper;
 import org.opentripplanner.api.mapping.FeedInfoMapper;
@@ -48,6 +50,8 @@ import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
@@ -55,6 +59,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
@@ -197,10 +202,10 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return routingService()
-        .getStopsInRadius(new WgsCoordinate(lat, lon), radius)
+      return new DirectGraphFinder(serverContext.graph())
+        .findClosestStops(lat, lon, radius)
         .stream()
-        .map(it -> StopMapper.mapToApiShort(it.first, it.second.intValue()))
+        .map(it -> StopMapper.mapToApiShort(it.stop, it.distance))
         .collect(Collectors.toList());
     } else {
       /* We're not circle mode, we must be in box mode. */
@@ -212,8 +217,18 @@ public class IndexAPI {
         .lessThan("minLat", minLat, "maxLat", maxLat)
         .lessThan("minLon", minLon, "maxLon", maxLon)
         .validate();
-      var stops = routingService().getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
-      return StopMapper.mapToApiShort(stops);
+
+      Envelope envelope = new Envelope(
+        new Coordinate(minLon, minLat),
+        new Coordinate(maxLon, maxLat)
+      );
+
+      var stops = transitService().queryStopSpatialIndex(envelope);
+      return stops
+        .stream()
+        .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
+        .map(StopMapper::mapToApiShort)
+        .toList();
     }
   }
 

@@ -58,7 +58,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -548,7 +547,7 @@ public class LegacyGraphQLQueryTypeImpl
             var stop = transitService.getStopForId(FeedScopedId.parseId(parts[1]));
 
             // TODO: Add geometry
-            return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null, null);
+            return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
           }
         case "TicketType":
           return null; //TODO

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.UUID;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.index.SpatialIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -28,7 +26,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
@@ -57,9 +54,8 @@ public class StreetVertexIndex {
   /**
    * Contains only instances of {@link StreetEdge}
    */
-  private final SpatialIndex edgeTree;
-  private final SpatialIndex transitStopTree;
-  private final SpatialIndex verticesTree;
+  private final HashGridSpatialIndex<Edge> edgeTree;
+  private final HashGridSpatialIndex<Vertex> verticesTree;
 
   /**
    * Should only be called by the graph.
@@ -68,7 +64,6 @@ public class StreetVertexIndex {
     this.graph = graph;
     this.stopModel = stopModel;
     edgeTree = new HashGridSpatialIndex<>();
-    transitStopTree = new HashGridSpatialIndex<>();
     verticesTree = new HashGridSpatialIndex<>();
     vertexLinker = new VertexLinker(graph, stopModel);
     postSetup();
@@ -138,30 +133,8 @@ public class StreetVertexIndex {
   }
 
   /**
-   * Get all transit stops within a given distance of a coordinate
-   *
-   * @return The transit stops within a certain radius of the given location.
-   */
-  public List<TransitStopVertex> getNearbyTransitStops(Coordinate coordinate, double radius) {
-    Envelope env = new Envelope(coordinate);
-    env.expandBy(
-      SphericalDistanceLibrary.metersToLonDegrees(radius, coordinate.y),
-      SphericalDistanceLibrary.metersToDegrees(radius)
-    );
-    List<TransitStopVertex> nearby = getTransitStopForEnvelope(env);
-    List<TransitStopVertex> results = new ArrayList<>();
-    for (TransitStopVertex v : nearby) {
-      if (SphericalDistanceLibrary.distance(v.getCoordinate(), coordinate) <= radius) {
-        results.add(v);
-      }
-    }
-    return results;
-  }
-
-  /**
    * Returns the vertices intersecting with the specified envelope.
    */
-  @SuppressWarnings("unchecked")
   public List<Vertex> getVerticesForEnvelope(Envelope envelope) {
     List<Vertex> vertices = verticesTree.query(envelope);
     // Here we assume vertices list modifiable
@@ -173,7 +146,6 @@ public class StreetVertexIndex {
    * Return the edges whose geometry intersect with the specified envelope. Warning: edges w/o
    * geometry will not be indexed.
    */
-  @SuppressWarnings("unchecked")
   public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
     List<Edge> edges = edgeTree.query(envelope);
     for (Iterator<Edge> ie = edges.iterator(); ie.hasNext();) {
@@ -188,16 +160,6 @@ public class StreetVertexIndex {
       }
     }
     return edges;
-  }
-
-  /**
-   * @return The transit stops within an envelope.
-   */
-  @SuppressWarnings("unchecked")
-  public List<TransitStopVertex> getTransitStopForEnvelope(Envelope envelope) {
-    List<TransitStopVertex> stopVertices = transitStopTree.query(envelope);
-    stopVertices.removeIf(ts -> !envelope.intersects(new Coordinate(ts.getLon(), ts.getLat())));
-    return stopVertices;
   }
 
   /**
@@ -421,7 +383,6 @@ public class StreetVertexIndex {
     return nonTransitMode;
   }
 
-  @SuppressWarnings("rawtypes")
   private void postSetup() {
     var progress = ProgressTracker.track("Index street vertex", 1000, graph.getVertices().size());
     LOG.info(progress.startMessage());
@@ -438,16 +399,7 @@ public class StreetVertexIndex {
        */
       for (Edge e : gv.getOutgoing()) {
         LineString geometry = edgeGeometryOrStraightLine(e);
-        Envelope env = geometry.getEnvelopeInternal();
-        if (edgeTree instanceof HashGridSpatialIndex) {
-          ((HashGridSpatialIndex) edgeTree).insert(geometry, e);
-        } else {
-          edgeTree.insert(env, e);
-        }
-      }
-      if (gv instanceof TransitStopVertex) {
-        Envelope env = new Envelope(gv.getCoordinate());
-        transitStopTree.insert(env, gv);
+        edgeTree.insert(geometry, e);
       }
       Envelope env = new Envelope(gv.getCoordinate());
       verticesTree.insert(env, gv);
