@@ -182,7 +182,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     FeedScopedId patternId = TransitModelForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
-    TripPattern p = new TripPattern(patternId, route, STOP_PATTERN);
+    TripPattern p = TripPattern
+      .of(patternId)
+      .withRoute(route)
+      .withStopPattern(STOP_PATTERN)
+      .build();
 
     p.setName("Pattern");
     for (Trip trip : trips) {

@@ -99,19 +99,19 @@ class StreetGraphFinderTest extends GraphRoutingTest {
 
           tripPattern(
             TP1 =
-              new TripPattern(
-                TransitModelForTest.id("TP1"),
-                R1,
-                new StopPattern(List.of(st(S1), st(S2)))
-              )
+              TripPattern
+                .of(TransitModelForTest.id("TP1"))
+                .withRoute(R1)
+                .withStopPattern(new StopPattern(List.of(st(S1), st(S2))))
+                .build()
           );
           tripPattern(
             TP2 =
-              new TripPattern(
-                TransitModelForTest.id("TP2"),
-                R2,
-                new StopPattern(List.of(st(S1), st(S3)))
-              )
+              TripPattern
+                .of(TransitModelForTest.id("TP2"))
+                .withRoute(R2)
+                .withStopPattern(new StopPattern(List.of(st(S1), st(S3))))
+                .build()
           );
         }
       }

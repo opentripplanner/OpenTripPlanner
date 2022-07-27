@@ -206,19 +206,19 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             var agency = TransitModelForTest.agency("Agency");
 
             tripPattern(
-              new TripPattern(
-                TransitModelForTest.id("TP1"),
-                route("R1", TransitMode.BUS, agency),
-                new StopPattern(List.of(st(S11), st(S12)))
-              )
+              TripPattern
+                .of(TransitModelForTest.id("TP1"))
+                .withRoute(route("R1", TransitMode.BUS, agency))
+                .withStopPattern(new StopPattern(List.of(st(S11), st(S12))))
+                .build()
             );
 
             tripPattern(
-              new TripPattern(
-                TransitModelForTest.id("TP2"),
-                route("R2", TransitMode.BUS, agency),
-                new StopPattern(List.of(st(S21), st(S22)))
-              )
+              TripPattern
+                .of(TransitModelForTest.id("TP2"))
+                .withRoute(route("R2", TransitMode.BUS, agency))
+                .withStopPattern(new StopPattern(List.of(st(S21), st(S22))))
+                .build()
             );
           }
         }

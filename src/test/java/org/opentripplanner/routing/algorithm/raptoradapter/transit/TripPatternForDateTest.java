@@ -37,7 +37,11 @@ class TripPatternForDateTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    TripPattern pattern = new TripPattern(TransitModelForTest.id("P1"), route, stopPattern);
+    TripPattern pattern = TripPattern
+      .of(TransitModelForTest.id("P1"))
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
 
     TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
       pattern,

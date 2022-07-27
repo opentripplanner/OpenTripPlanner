@@ -89,7 +89,11 @@ public class TripPatternTest {
     var stopPattern = builder.build();
     var route = TransitModelForTest.route("R1").build();
 
-    return new TripPattern(new FeedScopedId("Test", "T1"), route, stopPattern);
+    return TripPattern
+      .of(new FeedScopedId("Test", "T1"))
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
   }
 
   /**

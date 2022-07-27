@@ -682,7 +682,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
 
-    TripPattern pattern = new TripPattern(id, tripBuilder.getRoute(), stopPattern);
+    TripPattern pattern = TripPattern
+      .of(id)
+      .withRoute(tripBuilder.getRoute())
+      .withStopPattern(stopPattern)
+      .build();
 
     TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, transitModel.getDeduplicator());
 

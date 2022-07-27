@@ -75,7 +75,11 @@ class InterlineProcessorTest implements PlanTestConstants {
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
     var stopPattern = new StopPattern(stopTimes);
 
-    var tp = new TripPattern(TransitModelForTest.id(tripId), trip.getRoute(), stopPattern);
+    var tp = TripPattern
+      .of(TransitModelForTest.id(tripId))
+      .withRoute(trip.getRoute())
+      .withStopPattern(stopPattern)
+      .build();
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     tp.add(tripTimes);
     return tp;

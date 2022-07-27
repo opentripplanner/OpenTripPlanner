@@ -57,11 +57,11 @@ public class TestRouteData {
 
     raptorTripPattern =
       new TripPatternWithRaptorStopIndexes(
-        new TripPattern(
-          TransitModelForTest.id("TP:" + route),
-          this.route,
-          new StopPattern(stopTimesFistTrip)
-        ),
+        TripPattern
+          .of(TransitModelForTest.id("TP:" + route))
+          .withRoute(this.route)
+          .withStopPattern(new StopPattern(stopTimesFistTrip))
+          .build(),
         stopIndexes(stopTimesFistTrip)
       );
     tripTimes.forEach(t -> raptorTripPattern.getPattern().add(t));

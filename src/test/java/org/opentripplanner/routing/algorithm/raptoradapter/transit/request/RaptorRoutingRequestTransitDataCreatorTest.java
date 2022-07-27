@@ -29,11 +29,11 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   public static final FeedScopedId TP_ID_2 = id("2");
   public static final FeedScopedId TP_ID_3 = id("3");
 
-  private static final TripPattern TP = new TripPattern(
-    id("P1"),
-    TransitModelForTest.route("1").withMode(TransitMode.BUS).build(),
-    new StopPattern(List.of(createStopTime(), createStopTime()))
-  );
+  private static final TripPattern TP = TripPattern
+    .of(id("P1"))
+    .withRoute(TransitModelForTest.route("1").withMode(TransitMode.BUS).build())
+    .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
+    .build();
 
   @Test
   public void testMergeTripPatterns() {

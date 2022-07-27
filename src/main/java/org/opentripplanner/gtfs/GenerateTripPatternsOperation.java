@@ -167,7 +167,11 @@ public class GenerateTripPatternsOperation {
       }
     }
     FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
-    TripPattern tripPattern = new TripPattern(patternId, route, stopPattern);
+    TripPattern tripPattern = TripPattern
+      .of(patternId)
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
     tripPatterns.put(stopPattern, tripPattern);
     return tripPattern;
   }

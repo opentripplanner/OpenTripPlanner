@@ -303,7 +303,11 @@ public class TestItineraryBuilder implements PlanTestConstants {
     stopTimes.add(toStopTime);
 
     StopPattern stopPattern = new StopPattern(stopTimes);
-    TripPattern tripPattern = new TripPattern(route.getId(), route, stopPattern);
+    TripPattern tripPattern = TripPattern
+      .of(route.getId())
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
     final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
