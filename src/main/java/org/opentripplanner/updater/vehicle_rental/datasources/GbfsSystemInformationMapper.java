@@ -42,7 +42,6 @@ public class GbfsSystemInformationMapper {
       systemInformation.getPhoneNumber(),
       systemInformation.getEmail(),
       systemInformation.getFeedContactEmail(),
-      ZoneId.of(systemInformation.getTimezone()),
       systemInformation.getLicenseUrl(),
       android,
       ios
