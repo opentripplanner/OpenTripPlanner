@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.GroupOfStations;
@@ -63,10 +61,6 @@ public class OtpTransitServiceBuilder {
   private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
 
   private final List<ServiceCalendar> calendars = new ArrayList<>();
-
-  private final List<FareAttribute> fareAttributes = new ArrayList<>();
-
-  private final List<FareRule> fareRules = new ArrayList<>();
 
   private final List<FeedInfo> feedInfos = new ArrayList<>();
 
@@ -136,14 +130,6 @@ public class OtpTransitServiceBuilder {
 
   public List<ServiceCalendar> getCalendars() {
     return calendars;
-  }
-
-  public List<FareAttribute> getFareAttributes() {
-    return fareAttributes;
-  }
-
-  public List<FareRule> getFareRules() {
-    return fareRules;
   }
 
   public List<FeedInfo> getFeedInfos() {

@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -33,7 +34,7 @@ public class TimeBasedVehicleRentalFareServiceFactory implements FareServiceFact
   }
 
   @Override
-  public void processGtfs(OtpTransitService transitService) {
+  public void processGtfs(FareRulesData a, OtpTransitService b) {
     // Nothing to do
   }
 

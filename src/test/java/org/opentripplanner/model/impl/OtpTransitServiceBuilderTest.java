@@ -12,8 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
+import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.ShapePoint;
@@ -96,8 +95,6 @@ public class OtpTransitServiceBuilderTest {
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
-    builder.getFareAttributes().add(createFareAttribute());
-    builder.getFareRules().add(new FareRule());
     builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
     return builder;

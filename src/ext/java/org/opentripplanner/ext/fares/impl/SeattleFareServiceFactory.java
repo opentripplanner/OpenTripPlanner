@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -28,18 +29,14 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
   }
 
   @Override
-  public void processGtfs(OtpTransitService transitService) {
+  public void processGtfs(FareRulesData fareRuleService, OtpTransitService transitService) {
     // Add custom extension: trips may have a fare ID specified in KCM GTFS.
     // Need to ensure that we are scoped to feed when adding trips to FareRuleSet,
     // since fare IDs may not be unique across feeds and trip agency IDsqq
     // may not match fare attribute agency IDs (which are feed IDs).
 
     Map<FeedScopedId, FareRuleSet> feedFareRules = new HashMap<>();
-    fillFareRules(
-      transitService.getAllFareAttributes(),
-      transitService.getAllFareRules(),
-      feedFareRules
-    );
+    fillFareRules(fareRuleService.fareAttributes(), fareRuleService.fareRules(), feedFareRules);
 
     regularFareRules.putAll(feedFareRules);
 

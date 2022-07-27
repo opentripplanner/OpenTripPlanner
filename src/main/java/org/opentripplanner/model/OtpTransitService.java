@@ -34,10 +34,6 @@ public interface OtpTransitService {
    */
   Collection<Operator> getAllOperators();
 
-  Collection<FareAttribute> getAllFareAttributes();
-
-  Collection<FareRule> getAllFareRules();
-
   Collection<FeedInfo> getAllFeedInfos();
 
   Collection<GroupOfStations> getAllGroupsOfStations();
