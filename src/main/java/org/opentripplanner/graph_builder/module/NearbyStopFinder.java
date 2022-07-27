@@ -130,7 +130,7 @@ public class NearbyStopFinder {
         }
       }
       if (OTPFeature.FlexRouting.isOn()) {
-        for (FlexTrip trip : transitService.getFlexIndex().flexTripsByStop.get(ts1)) {
+        for (FlexTrip trip : transitService.getFlexIndex().getFlexTripsByStop(ts1)) {
           closestStopForFlexTrip.putMin(trip, nearbyStop);
         }
       }

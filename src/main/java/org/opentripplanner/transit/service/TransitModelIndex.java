@@ -109,10 +109,10 @@ public class TransitModelIndex {
 
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(transitModel);
-      for (Route route : flexIndex.routeById.values()) {
+      for (Route route : flexIndex.getAllFlexRoutes()) {
         routeForId.put(route.getId(), route);
       }
-      for (FlexTrip flexTrip : flexIndex.tripById.values()) {
+      for (FlexTrip flexTrip : flexIndex.getAllFlexTrips()) {
         tripForId.put(flexTrip.getId(), flexTrip.getTrip());
       }
     }

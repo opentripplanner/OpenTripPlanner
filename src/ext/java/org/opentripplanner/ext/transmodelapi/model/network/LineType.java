@@ -190,7 +190,7 @@ public class LineType {
                 GqlUtil
                   .getTransitService(environment)
                   .getFlexIndex()
-                  .tripById.values()
+                  .getAllFlexTrips()
                   .stream()
                   .map(FlexTrip::getTrip)
                   .filter(t -> t.getRoute().equals((Route) environment.getSource()))
