@@ -98,12 +98,7 @@ public abstract class GtfsTest {
     routingRequest.setWalkBoardCost(30);
     routingRequest.transferSlack = 0;
 
-    RoutingResponse res = new RoutingWorker(
-      serverContext,
-      routingRequest,
-      transitModel.getTimeZone()
-    )
-      .route();
+    RoutingResponse res = serverContext.routingService().route(routingRequest);
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
     // Stored in instance field for use in individual tests
     Itinerary itinerary = itineraries.get(0);

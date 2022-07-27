@@ -219,9 +219,7 @@ public class SpeedTest {
         getTimeZoneId()
       );
       var routingRequest = speedTestRequest.toRoutingRequest();
-
-      var worker = new RoutingWorker(this.serverContext, routingRequest, getTimeZoneId());
-      RoutingResponse routingResponse = worker.route();
+      RoutingResponse routingResponse = serverContext.routingService().route(routingRequest);
 
       var times = routingResponse.getDebugTimingAggregator().finishedRendering();
 
