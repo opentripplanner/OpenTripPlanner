@@ -13,6 +13,7 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.ConfigModule;
 import org.opentripplanner.standalone.config.OtpBaseDirectory;
+import org.opentripplanner.transit.configure.TransitModule;
 
 /**
  * This abstract class provide the top level service created and wired together using the Dagger 2
@@ -21,7 +22,11 @@ import org.opentripplanner.standalone.config.OtpBaseDirectory;
 @Singleton
 @Component(
   modules = {
-    ConfigModule.class, DataStoreModule.class, GsDataSourceModule.class, GraphModule.class,
+    ConfigModule.class,
+    DataStoreModule.class,
+    GraphModule.class,
+    GsDataSourceModule.class,
+    TransitModule.class,
   }
 )
 public interface OTPApplicationFactory {

@@ -34,7 +34,6 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -63,7 +62,7 @@ public class GraphBuilder implements Runnable {
 
   private boolean hasTransitData = false;
 
-  private GraphBuilder(@Nonnull Graph baseGraph, ServiceDateInterval serviceDateInterval) {
+  private GraphBuilder(@Nonnull Graph baseGraph) {
     this.graph = baseGraph;
     // ensure the street model and the transit model share the same deduplicator and stop model
     this.transitModel = new TransitModel(this.graph.getStopModel(), this.graph.deduplicator);
@@ -86,8 +85,7 @@ public class GraphBuilder implements Runnable {
 
     var config = appFactory.configModel().buildConfig();
     var graphBuilder = new GraphBuilder(
-      appFactory.graphModel().graph(),
-      config.getTransitServicePeriod()
+      appFactory.graphModel().graph()
     );
 
     graphBuilder.hasTransitData = hasTransitData;
