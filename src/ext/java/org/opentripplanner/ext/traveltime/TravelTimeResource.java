@@ -126,7 +126,7 @@ public class TravelTimeResource {
 
     LocalDate startDate = LocalDate.ofInstant(startTime, zoneId);
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
-    startOfTime = startDate.atStartOfDay(zoneId).toInstant().atZone(zoneId);
+    startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
 
