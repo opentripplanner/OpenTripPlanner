@@ -59,8 +59,6 @@ public interface TransitService {
 
   Collection<Operator> getOperators();
 
-  Multimap<TransitEntity, Notice> getNoticesByElement();
-
   Collection<Notice> getNoticesByEntity(TransitEntity entity);
 
   TripPattern getTripPatternForId(FeedScopedId id);

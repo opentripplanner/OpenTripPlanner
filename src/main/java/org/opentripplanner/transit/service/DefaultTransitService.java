@@ -112,20 +112,8 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModel#getNoticesByElement()} */
   @Override
-  public Multimap<TransitEntity, Notice> getNoticesByElement() {
-    return this.transitModel.getNoticesByElement();
-  }
-
-  /** {@link TransitModel#addNoticeAssignments(Multimap)} */
-  @Override
-  public void addNoticeAssignments(Multimap<TransitEntity, Notice> noticesByElement) {
-    this.transitModel.addNoticeAssignments(noticesByElement);
-  }
-
-  /** {@link TransitModel#getNoticesByEntity(TransitEntity)} */
-  @Override
   public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
-    return this.transitModel.getNoticesByEntity(entity);
+    return this.transitModel.getNoticesByElement().get(entity);
   }
 
   /** {@link TransitModel#getTripPatternForId(FeedScopedId)} */
@@ -140,10 +128,10 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModel.getAllTripPatterns();
   }
 
-  /** {@link TransitModel#getNotices()} */
+  /** {@link TransitModel#getNoticesByElement()} */
   @Override
   public Collection<Notice> getNotices() {
-    return this.transitModel.getNotices();
+    return this.transitModel.getNoticesByElement().values();
   }
 
   /** {@link StopModel#getStationById(FeedScopedId)} */
