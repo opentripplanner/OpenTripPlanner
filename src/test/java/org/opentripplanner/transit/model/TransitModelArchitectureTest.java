@@ -23,7 +23,7 @@ public class TransitModelArchitectureTest {
   @Test
   void enforcePackageDependencies() {
     FRAMEWORK.dependsOn(UTILS).verify();
-    BASIC.dependsOn(UTILS, JTS_GEOM).verify();
+    BASIC.dependsOn(UTILS, JTS_GEOM, FRAMEWORK).verify();
     ORGANIZATION.dependsOn(UTILS, FRAMEWORK, BASIC).verify();
     SITE
       .dependsOn(UTILS, JACKSON_ANNOTATIONS, JTS_GEOM, GEO_UTIL, FRAMEWORK, BASIC, ORGANIZATION)

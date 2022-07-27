@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.basic.NoticeBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -27,10 +28,12 @@ class NoticeMapper {
     Notice otpNotice = cache.get(id);
 
     if (otpNotice == null) {
-      otpNotice = new Notice(id);
+      otpNotice =
+        new NoticeBuilder(id)
+          .withPublicCode(netexNotice.getPublicCode())
+          .withText(netexNotice.getText().getValue())
+          .build();
 
-      otpNotice.setText(netexNotice.getText().getValue());
-      otpNotice.setPublicCode(netexNotice.getPublicCode());
       cache.add(otpNotice);
     }
     return otpNotice;

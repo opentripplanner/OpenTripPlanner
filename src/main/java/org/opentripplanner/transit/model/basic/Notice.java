@@ -1,38 +1,46 @@
 package org.opentripplanner.transit.model.basic;
 
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * This is an element that originates from the NeTEx specification and is described as "Text-based
  * notification describing circumstances which cannot be modelled as structured data." Any NeTEx
  * element can have a notice attached, although not all are supported in OTP.
  */
-public class Notice extends TransitEntity {
+public class Notice extends TransitEntity2<Notice, NoticeBuilder> {
 
-  private static final long serialVersionUID = 1L;
+  private final String text;
 
-  private String text;
+  private final String publicCode;
 
-  private String publicCode;
-
-  public Notice(FeedScopedId id) {
-    super(id);
+  public Notice(NoticeBuilder builder) {
+    super(builder.getId());
+    this.publicCode = builder.publicCode();
+    this.text = builder.text();
   }
 
-  public String getText() {
+  public String text() {
     return text;
   }
 
-  public void setText(String text) {
-    this.text = text;
-  }
-
-  public String getPublicCode() {
+  public String publicCode() {
     return publicCode;
   }
 
-  public void setPublicCode(String publicCode) {
-    this.publicCode = publicCode;
+  @Override
+  public boolean sameAs(@Nonnull Notice other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(publicCode, other.publicCode) &&
+      Objects.equals(text, other.text)
+    );
+  }
+
+  @Override
+  @Nonnull
+  public NoticeBuilder copy() {
+    return new NoticeBuilder(this);
   }
 }

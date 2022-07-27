@@ -65,7 +65,10 @@ public class NoticeAssignmentMapperTest {
       noticeAssignment
     );
 
-    org.opentripplanner.transit.model.basic.Notice notice2 = noticesByElement.get(route).iterator().next();
+    org.opentripplanner.transit.model.basic.Notice notice2 = noticesByElement
+      .get(route)
+      .iterator()
+      .next();
 
     assertEquals(NOTICE_ID, notice2.getId().getId());
   }

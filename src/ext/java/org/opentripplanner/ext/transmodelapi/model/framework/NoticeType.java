@@ -18,7 +18,7 @@ public class NoticeType {
           .newFieldDefinition()
           .name("text")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Notice) environment.getSource()).getText())
+          .dataFetcher(environment -> ((Notice) environment.getSource()).text())
           .build()
       )
       .field(
@@ -26,7 +26,7 @@ public class NoticeType {
           .newFieldDefinition()
           .name("publicCode")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Notice) environment.getSource()).getPublicCode())
+          .dataFetcher(environment -> ((Notice) environment.getSource()).publicCode())
           .build()
       )
       .build();

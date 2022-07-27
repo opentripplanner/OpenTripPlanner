@@ -223,8 +223,8 @@ public class NetexBundleSmokeTest {
     );
     Notice n = list.get(0);
     assertTrue(n.getId().toString().startsWith("RB:RUT:Notice:"));
-    assertEquals(code, n.getPublicCode());
-    assertEquals(text, n.getText());
+    assertEquals(code, n.publicCode());
+    assertEquals(text, n.text());
     assertEquals(1, list.size());
   }
 
