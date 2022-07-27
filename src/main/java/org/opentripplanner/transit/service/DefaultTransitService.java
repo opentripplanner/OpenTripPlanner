@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.service;
 
-import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import java.time.Instant;
@@ -8,9 +7,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -112,20 +109,8 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModel#getNoticesByElement()} */
   @Override
-  public Multimap<TransitEntity, Notice> getNoticesByElement() {
-    return this.transitModel.getNoticesByElement();
-  }
-
-  /** {@link TransitModel#addNoticeAssignments(Multimap)} */
-  @Override
-  public void addNoticeAssignments(Multimap<TransitEntity, Notice> noticesByElement) {
-    this.transitModel.addNoticeAssignments(noticesByElement);
-  }
-
-  /** {@link TransitModel#getNoticesByEntity(TransitEntity)} */
-  @Override
   public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
-    return this.transitModel.getNoticesByEntity(entity);
+    return this.transitModel.getNoticesByElement().get(entity);
   }
 
   /** {@link TransitModel#getTripPatternForId(FeedScopedId)} */
@@ -140,10 +125,10 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModel.getAllTripPatterns();
   }
 
-  /** {@link TransitModel#getNotices()} */
+  /** {@link TransitModel#getNoticesByElement()} */
   @Override
   public Collection<Notice> getNotices() {
-    return this.transitModel.getNotices();
+    return this.transitModel.getNoticesByElement().values();
   }
 
   /** {@link StopModel#getStationById(FeedScopedId)} */
@@ -166,8 +151,8 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModel#getServiceCodes()} */
   @Override
-  public Map<FeedScopedId, Integer> getServiceCodes() {
-    return this.transitModel.getServiceCodes();
+  public Integer getServiceCodeForId(FeedScopedId id) {
+    return this.transitModel.getServiceCodes().get(id);
   }
 
   @Override
@@ -239,8 +224,8 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModelIndex#getOperatorForId()} */
   @Override
-  public Map<FeedScopedId, Operator> getOperatorForId() {
-    return this.transitModelIndex.getOperatorForId();
+  public Operator getOperatorForId(FeedScopedId id) {
+    return this.transitModelIndex.getOperatorForId().get(id);
   }
 
   /** {@link StopModelIndex#getAllStops()} */
@@ -266,8 +251,13 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModelIndex#getTripForId()} */
   @Override
-  public Map<FeedScopedId, Trip> getTripForId() {
-    return this.transitModelIndex.getTripForId();
+  public Trip getTripForId(FeedScopedId id) {
+    return this.transitModelIndex.getTripForId().get(id);
+  }
+
+  @Override
+  public Collection<Trip> getAllTrips() {
+    return transitModelIndex.getTripForId().values();
   }
 
   /** {@link TransitModelIndex#getAllRoutes()} */
@@ -278,20 +268,14 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModelIndex#getPatternForTrip()} */
   @Override
-  public Map<Trip, TripPattern> getPatternForTrip() {
-    return this.transitModelIndex.getPatternForTrip();
-  }
-
-  /** {@link TransitModelIndex#getPatternsForFeedId()} */
-  @Override
-  public Multimap<String, TripPattern> getPatternsForFeedId() {
-    return this.transitModelIndex.getPatternsForFeedId();
+  public TripPattern getPatternForTrip(Trip trip) {
+    return this.transitModelIndex.getPatternForTrip().get(trip);
   }
 
   /** {@link TransitModelIndex#getPatternsForRoute()} */
   @Override
-  public Multimap<Route, TripPattern> getPatternsForRoute() {
-    return this.transitModelIndex.getPatternsForRoute();
+  public Collection<TripPattern> getPatternsForRoute(Route route) {
+    return this.transitModelIndex.getPatternsForRoute().get(route);
   }
 
   /** {@link StopModelIndex#getMultiModalStationForStation(Station)} */
@@ -446,26 +430,20 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TripOnServiceDate getTripOnServiceDateForTripAndDay(
-    FeedScopedId tripId,
-    LocalDate serviceDate
-  ) {
-    return DatedServiceJourneyHelper.getTripOnServiceDate(this, tripId, serviceDate);
-  }
-
-  @Override
   public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
     return DatedServiceJourneyHelper.getTripOnServiceDate(this, datedServiceJourneyId);
   }
 
   @Override
-  public Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
-    return transitModelIndex.getTripOnServiceDateForTripAndDay();
+  public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
+    return transitModelIndex.getTripOnServiceDateForTripAndDay().values();
   }
 
   @Override
-  public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById() {
-    return transitModelIndex.getTripOnServiceDateById();
+  public TripOnServiceDate getTripOnServiceDateForTripAndDay(
+    TripIdAndServiceDate tripIdAndServiceDate
+  ) {
+    return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
   }
 
   /** {@link TransitModel#addTransitMode(TransitMode)} */
@@ -476,7 +454,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModel#getTransitModes()} */
   @Override
-  public HashSet<TransitMode> getTransitModes() {
+  public Set<TransitMode> getTransitModes() {
     return this.transitModel.getTransitModes();
   }
 

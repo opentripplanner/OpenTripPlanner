@@ -95,8 +95,7 @@ public class DatedServiceJourneyQuery {
       .dataFetcher(environment -> {
         Stream<TripOnServiceDate> stream = GqlUtil
           .getTransitService(environment)
-          .getTripOnServiceDateById()
-          .values()
+          .getAllTripOnServiceDates()
           .stream();
 
         var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));

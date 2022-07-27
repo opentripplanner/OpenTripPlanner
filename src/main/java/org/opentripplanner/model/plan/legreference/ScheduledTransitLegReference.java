@@ -25,7 +25,7 @@ public record ScheduledTransitLegReference(
   implements LegReference {
   @Override
   public ScheduledTransitLeg getLeg(TransitService transitService) {
-    Trip trip = transitService.getTripForId().get(tripId);
+    Trip trip = transitService.getTripForId(tripId);
 
     if (trip == null) {
       return null;
@@ -41,7 +41,7 @@ public record ScheduledTransitLegReference(
 
     // Otherwise use scheduled pattern
     if (tripPattern == null) {
-      tripPattern = transitService.getPatternForTrip().get(trip);
+      tripPattern = transitService.getPatternForTrip(trip);
     }
 
     // no matching pattern found anywhere

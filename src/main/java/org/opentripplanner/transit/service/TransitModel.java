@@ -47,8 +47,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -372,20 +370,12 @@ public class TransitModel implements Serializable {
     return transitAlertService;
   }
 
-  public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
-    return getNoticesByElement().get(entity);
-  }
-
   public TripPattern getTripPatternForId(FeedScopedId id) {
     return tripPatternForId.get(id);
   }
 
   public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDates() {
     return tripOnServiceDates;
-  }
-
-  public Collection<Notice> getNotices() {
-    return getNoticesByElement().values();
   }
 
   /**

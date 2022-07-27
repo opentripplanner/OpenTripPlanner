@@ -405,11 +405,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   private TripPattern getTripPattern(DataFetchingEnvironment environment) {
-    return getTransitService(environment).getPatternForTrip().get(environment.getSource());
-  }
-
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+    return getTransitService(environment).getPatternForTrip(environment.getSource());
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
