@@ -120,13 +120,13 @@ public class RoutingServiceTest extends GtfsTest {
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    Collection<TransitStopVertex> stops = transitModel
+    Collection<Stop> stops = transitModel
       .getStopModel()
       .getStopModelIndex()
       .queryStopSpatialIndex(env);
-    assertTrue(stops.contains(stopvJ));
-    assertTrue(stops.contains(stopvL));
-    assertTrue(stops.contains(stopvM));
+    assertTrue(stops.contains(stopJ));
+    assertTrue(stops.contains(stopL));
+    assertTrue(stops.contains(stopM));
     assertTrue(stops.size() >= 3); // Query can overselect
   }
 

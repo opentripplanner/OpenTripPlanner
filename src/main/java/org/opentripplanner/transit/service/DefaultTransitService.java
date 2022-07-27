@@ -542,7 +542,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
+  public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
     return transitModel.getStopModel().getStopModelIndex().queryStopSpatialIndex(envelope);
   }
 

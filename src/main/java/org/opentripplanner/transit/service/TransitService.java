@@ -189,7 +189,7 @@ public interface TransitService {
 
   boolean transitFeedCovers(Instant dateTime);
 
-  Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope);
+  Collection<Stop> queryStopSpatialIndex(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
 }

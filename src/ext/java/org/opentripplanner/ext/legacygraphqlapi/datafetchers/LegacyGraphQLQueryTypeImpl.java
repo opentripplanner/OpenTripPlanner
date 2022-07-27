@@ -1037,8 +1037,7 @@ public class LegacyGraphQLQueryTypeImpl
       Stream<Stop> stopStream = getTransitService(environment)
         .queryStopSpatialIndex(envelope)
         .stream()
-        .filter(transitStopVertex -> envelope.contains(transitStopVertex.getCoordinate()))
-        .map(TransitStopVertex::getStop);
+        .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()));
 
       if (args.getLegacyGraphQLFeeds() != null) {
         List<String> feedIds = Lists.newArrayList(args.getLegacyGraphQLFeeds());
