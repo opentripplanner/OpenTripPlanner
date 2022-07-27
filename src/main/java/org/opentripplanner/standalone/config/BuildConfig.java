@@ -329,6 +329,11 @@ public class BuildConfig {
   public ZoneId timeZone;
 
   /**
+   * Whether to create stay-seated transfers in between two trips with the same block id.
+   */
+  public boolean blockBasedInterlining;
+
+  /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
    * MissingNode.getInstance() will cause all the defaults to be applied. This could be done
    * automatically with the "reflective query scraper" but it's less type safe and less clear. Until
@@ -359,6 +364,7 @@ public class BuildConfig {
     matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
     maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
     maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
+    blockBasedInterlining = c.asBoolean("blockBasedInterlining", true);
     maxTransferDurationSeconds =
       c.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
     maxStopToShapeSnapDistance = c.asDouble("maxStopToShapeSnapDistance", 150);

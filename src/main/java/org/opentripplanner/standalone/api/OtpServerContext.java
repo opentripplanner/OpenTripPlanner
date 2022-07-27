@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 
 /**
  * The purpose of this class is to allow APIs (HTTP Resources) to access the OTP Server Context.
- * By using an interface, and not inject each service class we avoid giving the resources assess
- * to the server implementation. The context is injected by Jersey. An alternative to inject this
+ * By using an interface, and not injecting each service class we avoid giving the resources access
+ * to the server implementation. The context is injected by Jersey. An alternative to injecting this
  * interface is to inject each individual component in the context - hence reducing the dependencies
  * further. But there is not a "real" need for this. For example, we do not have unit tests on the
  * Resources. If we in the future would decide to write unit tests for the APIs, then we could
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
  * </ol>
  * <p>
  * This class is not THREAD-SAFE, each HTTP request gets its own copy, but if there are multiple
- * threads witch access this context within the HTTP Request, then the caller is responsible
+ * threads witch accesses this context within the HTTP Request, then the caller is responsible
  * for the synchronization. Only request scoped components need to be synchronized - they are
  * potentially lazy initialized.
  */
