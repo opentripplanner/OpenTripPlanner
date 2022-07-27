@@ -17,6 +17,10 @@ public class VehicleRentalSystem {
   public final String email;
   public final String feedContactEmail;
   public final String licenseUrl;
+
+  // this is intentionally a string, not a zone id as the validator doesn't check the correctness
+  // https://github.com/MobilityData/gbfs-validator/issues/76
+  public final String timezone;
   public final VehicleRentalSystemAppInformation androidApp;
   public final VehicleRentalSystemAppInformation iosApp;
 
@@ -32,6 +36,7 @@ public class VehicleRentalSystem {
     String phoneNumber,
     String email,
     String feedContactEmail,
+    String timezone,
     String licenseUrl,
     VehicleRentalSystemAppInformation androidApp,
     VehicleRentalSystemAppInformation iosApp
@@ -47,6 +52,7 @@ public class VehicleRentalSystem {
     this.phoneNumber = phoneNumber;
     this.email = email;
     this.feedContactEmail = feedContactEmail;
+    this.timezone = timezone;
     this.licenseUrl = licenseUrl;
     this.androidApp = androidApp;
     this.iosApp = iosApp;

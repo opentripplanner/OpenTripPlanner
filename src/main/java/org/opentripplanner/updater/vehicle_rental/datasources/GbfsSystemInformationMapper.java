@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import java.time.ZoneId;
 import org.entur.gbfs.v2_2.system_information.GBFSData;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystemAppInformation;
@@ -43,6 +42,7 @@ public class GbfsSystemInformationMapper {
       systemInformation.getEmail(),
       systemInformation.getFeedContactEmail(),
       systemInformation.getLicenseUrl(),
+      systemInformation.getTimezone(),
       android,
       ios
     );
