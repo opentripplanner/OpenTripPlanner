@@ -7,6 +7,9 @@ import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
+import org.opentripplanner.routing.graph.GraphModel;
+import org.opentripplanner.routing.graph.configure.GraphModule;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.ConfigModule;
 import org.opentripplanner.standalone.config.OtpBaseDirectory;
@@ -16,10 +19,17 @@ import org.opentripplanner.standalone.config.OtpBaseDirectory;
  * Dependency Injection framework. Dagger picks up this class and implement it.
  */
 @Singleton
-@Component(modules = { ConfigModule.class, DataStoreModule.class, GsDataSourceModule.class })
+@Component(
+  modules = {
+    ConfigModule.class, DataStoreModule.class, GsDataSourceModule.class, GraphModule.class,
+  }
+)
 public interface OTPApplicationFactory {
   OtpDataStore datastore();
   ConfigModel configModel();
+  Deduplicator deduplicator();
+
+  GraphModel graphModel();
 
   @Component.Builder
   interface Builder {

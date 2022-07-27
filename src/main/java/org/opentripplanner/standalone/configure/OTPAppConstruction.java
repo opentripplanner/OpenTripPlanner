@@ -14,6 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -55,11 +56,6 @@ public class OTPAppConstruction {
   private GraphBuilderDataSources graphBuilderDataSources = null;
 
   /**
-   * The graph should be chased in the factory not here, this is an intermediate step.
-   */
-  private Graph graph;
-
-  /**
    * The transit model should be created by the factory not cashed here, this is an intermediate
    * step.
    */
@@ -86,8 +82,7 @@ public class OTPAppConstruction {
    * After the graph and transitModel is read from file or build, then it should be set here,
    * so it can be used during construction of the web server.
    */
-  public void updateModel(Graph graph, TransitModel transitModel) {
-    this.graph = graph;
+  public void updateModel(TransitModel transitModel) {
     this.transitModel = transitModel;
     this.raptorTuningParameters =
       new RaptorConfig<>(factory.configModel().routerConfig().raptorTuningParameters());
@@ -96,7 +91,7 @@ public class OTPAppConstruction {
       DefaultServerContext.create(
         factory.configModel().routerConfig(),
         raptorTuningParameters,
-        graph,
+        factory.graphModel().graph(),
         transitModel,
         Metrics.globalRegistry,
         traverseVisitor()
@@ -122,15 +117,12 @@ public class OTPAppConstruction {
 
   /**
    * Create the default graph builder.
-   *
-   * @param baseGraph the base graph to add more data on to of.
    */
-  public GraphBuilder createGraphBuilder(Graph baseGraph) {
+  public GraphBuilder createGraphBuilder() {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
-      buildConfig(),
+      factory,
       graphBuilderDataSources(),
-      baseGraph,
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -164,7 +156,10 @@ public class OTPAppConstruction {
   public GraphVisualizer graphVisualizer() {
     if (cli.visualize && graphVisualizer == null) {
       graphVisualizer =
-        new GraphVisualizer(graph, factory.configModel().routerConfig().streetRoutingTimeout());
+        new GraphVisualizer(
+          factory.graphModel().graph(),
+          factory.configModel().routerConfig().streetRoutingTimeout()
+        );
     }
     return graphVisualizer;
   }
@@ -232,14 +227,18 @@ public class OTPAppConstruction {
   }
 
   public Graph graph() {
-    return graph;
+    return getFactory().graphModel().graph();
+  }
+
+  public Deduplicator deduplicator() {
+    return getFactory().deduplicator();
   }
 
   private BuildConfig buildConfig() {
-    return factory.configModel().buildConfig();
+    return getFactory().configModel().buildConfig();
   }
 
   private RouterConfig routerConfig() {
-    return factory.configModel().routerConfig();
+    return getFactory().configModel().routerConfig();
   }
 }

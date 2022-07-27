@@ -8,7 +8,6 @@ import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.OTPAppConstruction;
@@ -103,12 +102,12 @@ public class OTPMain {
    * @throws RuntimeException if an error occurs while loading the graph.
    */
   private static void startOTPServer(CommandLineParameters params) {
+    boolean graphAvailable = false;
     LOG.info(
       "Searching for configuration and input files in {}",
       params.getBaseDirectory().getAbsolutePath()
     );
 
-    Graph graph = null;
     TransitModel transitModel = null;
     OTPAppConstruction app = new OTPAppConstruction(params);
     var factory = app.getFactory();
@@ -121,13 +120,14 @@ public class OTPMain {
 
     /* Load graph from disk if one is not present from build. */
     if (params.doLoadGraph() || params.doLoadStreetGraph()) {
-      DataSource inputGraph = params.doLoadGraph()
+      DataSource graphFile = params.doLoadGraph()
         ? datastore.getGraph()
         : datastore.getStreetGraph();
-      SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
-      graph = obj.graph;
+      SerializedGraphObject obj = SerializedGraphObject.load(graphFile);
+      app.getFactory().graphModel().setGraph(obj.graph);
       transitModel = obj.transitModel;
       configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+      graphAvailable = true;
     }
 
     /* Start graph builder if requested. */
@@ -137,35 +137,34 @@ public class OTPMain {
         app.graphOutputDataSource()
       );
 
-      GraphBuilder graphBuilder = app.createGraphBuilder(graph);
+      GraphBuilder graphBuilder = app.createGraphBuilder();
       if (graphBuilder != null) {
         graphBuilder.run();
-        // Hand off the graph to the server as the default graph
-        graph = graphBuilder.getGraph();
         transitModel = graphBuilder.getTransitModel();
+        graphAvailable = true;
       } else {
         throw new IllegalStateException("An error occurred while building the graph.");
       }
       // Store graph and config used to build it, also store router-config for easy deployment
       // with using the embedded router config.
       new SerializedGraphObject(
-        graph,
+        app.graph(),
         transitModel,
         configModel.buildConfig(),
         configModel.routerConfig()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
-      LOG.info("Memory optimized {}", graph.deduplicator.toString());
+      LOG.info("Memory optimized {}", app.graph().deduplicator.toString());
     }
 
-    if (graph == null) {
+    if (!graphAvailable) {
       LOG.error("Nothing to do, no graph loaded or build. Exiting.");
       System.exit(101);
     }
 
     if (params.doServe()) {
-      app.updateModel(graph, transitModel);
+      app.updateModel(transitModel);
       startOtpWebServer(params, app);
     } else {
       LOG.info("Done building graph. Exiting.");

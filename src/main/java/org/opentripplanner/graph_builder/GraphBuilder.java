@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
@@ -37,10 +38,8 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.S3BucketConfig;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.standalone.configure.OTPApplicationFactory;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
@@ -64,19 +63,10 @@ public class GraphBuilder implements Runnable {
 
   private boolean hasTransitData = false;
 
-  private GraphBuilder(Graph baseGraph, ServiceDateInterval serviceDateInterval) {
-    if (baseGraph == null) {
-      StopModel stopModel = new StopModel();
-      Deduplicator deduplicator = new Deduplicator();
-      Graph graph = new Graph(stopModel, deduplicator);
-      graph.initOpeningHoursCalendarService(serviceDateInterval);
-      this.graph = graph;
-      this.transitModel = new TransitModel(stopModel, deduplicator);
-    } else {
-      this.graph = baseGraph;
-      // ensure the street model and the transit model share the same deduplicator and stop model
-      this.transitModel = new TransitModel(this.graph.getStopModel(), this.graph.deduplicator);
-    }
+  private GraphBuilder(@Nonnull Graph baseGraph, ServiceDateInterval serviceDateInterval) {
+    this.graph = baseGraph;
+    // ensure the street model and the transit model share the same deduplicator and stop model
+    this.transitModel = new TransitModel(this.graph.getStopModel(), this.graph.deduplicator);
   }
 
   /**
@@ -84,9 +74,8 @@ public class GraphBuilder implements Runnable {
    * a graph from the given data source and configuration directory.
    */
   public static GraphBuilder create(
-    BuildConfig config,
+    OTPApplicationFactory appFactory,
     GraphBuilderDataSources dataSources,
-    Graph baseGraph,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
@@ -95,7 +84,12 @@ public class GraphBuilder implements Runnable {
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
 
-    GraphBuilder graphBuilder = new GraphBuilder(baseGraph, config.getTransitServicePeriod());
+    var config = appFactory.configModel().buildConfig();
+    var graphBuilder = new GraphBuilder(
+      appFactory.graphModel().graph(),
+      config.getTransitServicePeriod()
+    );
+
     graphBuilder.hasTransitData = hasTransitData;
     graphBuilder.transitModel.initTimeZone(config.timeZone);
 
@@ -259,10 +253,6 @@ public class GraphBuilder implements Runnable {
     }
 
     return graphBuilder;
-  }
-
-  public Graph getGraph() {
-    return graph;
   }
 
   public TransitModel getTransitModel() {
