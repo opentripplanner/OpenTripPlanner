@@ -27,7 +27,6 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
@@ -315,14 +314,6 @@ public class Graph implements Serializable {
       env.expandToInclude(v.getCoordinate());
     }
     return env;
-  }
-
-  public GraphBundle getBundle() {
-    return bundle;
-  }
-
-  public void setBundle(GraphBundle bundle) {
-    this.bundle = bundle;
   }
 
   public int countVertices() {

@@ -9,7 +9,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -136,16 +135,6 @@ public class RoutingService {
   /** {@link Graph#getExtent()} */
   public Envelope getExtent() {
     return this.graph.getExtent();
-  }
-
-  /** {@link Graph#getBundle()} */
-  public GraphBundle getBundle() {
-    return this.graph.getBundle();
-  }
-
-  /** {@link Graph#setBundle(GraphBundle)} */
-  public void setBundle(GraphBundle bundle) {
-    this.graph.setBundle(bundle);
   }
 
   /** {@link Graph#countVertices()} */
