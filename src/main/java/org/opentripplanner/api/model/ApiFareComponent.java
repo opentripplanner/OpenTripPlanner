@@ -8,7 +8,5 @@ public record ApiFareComponent(
   FeedScopedId fareId,
   String name,
   ApiMoney price,
-  List<FeedScopedId> routes,
-  ApiFareQualifier container,
-  ApiFareQualifier category
+  List<FeedScopedId> routes
 ) {}

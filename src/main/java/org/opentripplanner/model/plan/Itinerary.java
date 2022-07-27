@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -47,7 +47,7 @@ public class Itinerary {
   private final List<SystemNotice> systemNotices = new ArrayList<>();
   private List<Leg> legs;
 
-  private Fare fare = Fare.empty();
+  private ItineraryFares fare = ItineraryFares.empty();
 
   public Itinerary(List<Leg> legs) {
     setLegs(legs);
@@ -476,14 +476,28 @@ public class Itinerary {
     this.arrivedAtDestinationWithRentedVehicle = arrivedAtDestinationWithRentedVehicle;
   }
 
+  public int getLegIndex(Leg leg) {
+    var index = legs.indexOf(leg);
+    if (index > -1) {
+      return index;
+    } else {
+      return legs
+        .stream()
+        .filter(l -> l.getFrom().sameLocation(leg.getFrom()) && l.getTo().sameLocation(leg.getTo()))
+        .findFirst()
+        .map(legs::indexOf)
+        .orElse(-1);
+    }
+  }
+
   /**
    * The cost of this trip
    */
-  public Fare getFare() {
+  public ItineraryFares getFares() {
     return fare;
   }
 
-  public void setFare(Fare fare) {
+  public void setFare(ItineraryFares fare) {
     this.fare = fare;
   }
 

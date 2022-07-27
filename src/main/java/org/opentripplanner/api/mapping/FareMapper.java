@@ -1,19 +1,29 @@
 package org.opentripplanner.api.mapping;
 
+import com.google.common.collect.Multimap;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.api.model.ApiCurrency;
-import org.opentripplanner.api.model.ApiFare;
 import org.opentripplanner.api.model.ApiFareComponent;
+import org.opentripplanner.api.model.ApiFareProduct;
 import org.opentripplanner.api.model.ApiFareQualifier;
+import org.opentripplanner.api.model.ApiItineraryFares;
 import org.opentripplanner.api.model.ApiMoney;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.model.FareContainer;
+import org.opentripplanner.model.FareProduct;
+import org.opentripplanner.model.RiderCategory;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 
 public class FareMapper {
@@ -24,14 +34,68 @@ public class FareMapper {
     this.locale = locale;
   }
 
-  public ApiFare mapFare(Fare fare) {
-    Map<String, ApiMoney> apiFare = combineFaresAndProducts(fare);
-    Map<String, List<ApiFareComponent>> apiComponent = combineComponentsAndProducts(fare);
+  public ApiItineraryFares mapFare(Itinerary itinerary) {
+    var fares = itinerary.getFares();
+    Map<String, ApiMoney> apiFare = toApiMoneys(fares);
+    Map<String, List<ApiFareComponent>> apiComponent = toApiFareComponents(fares);
 
-    return new ApiFare(apiFare, apiComponent);
+    return new ApiItineraryFares(
+      apiFare,
+      apiComponent,
+      toApiFareProducts(fares.getProductsCoveringItinerary()),
+      toApiLegProducts(itinerary, fares.getLegProducts())
+    );
   }
 
-  private Map<String, List<ApiFareComponent>> combineComponentsAndProducts(Fare fare) {
+  private Map<Integer, Collection<ApiFareProduct>> toApiLegProducts(
+    Itinerary itinerary,
+    Multimap<Leg, FareProduct> legProducts
+  ) {
+    if (legProducts.isEmpty()) {
+      return null;
+    } else {
+      var products = new HashMap<Integer, Collection<ApiFareProduct>>();
+      legProducts
+        .keySet()
+        .forEach(leg -> {
+          var index = itinerary.getLegIndex(leg);
+          products.put(index, toApiFareProducts(legProducts.get(leg)));
+        });
+      return products;
+    }
+  }
+
+  private static ApiFareQualifier toApiFareQualifier(@Nullable FareContainer nullable) {
+    return Optional
+      .ofNullable(nullable)
+      .map(c -> new ApiFareQualifier(c.id(), c.name()))
+      .orElse(null);
+  }
+
+  private static ApiFareQualifier toApiFareQualifier(@Nullable RiderCategory nullable) {
+    return Optional
+      .ofNullable(nullable)
+      .map(c -> new ApiFareQualifier(c.id(), c.name()))
+      .orElse(null);
+  }
+
+  private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {
+    if (product.isEmpty()) return null; else {
+      return product
+        .stream()
+        .map(p ->
+          new ApiFareProduct(
+            p.id().toString(),
+            p.name(),
+            toApiFareQualifier(p.category()),
+            toApiFareQualifier(p.container())
+          )
+        )
+        .toList();
+    }
+  }
+
+  private Map<String, List<ApiFareComponent>> toApiFareComponents(ItineraryFares fare) {
     return fare
       .getTypes()
       .stream()
@@ -39,10 +103,10 @@ public class FareMapper {
         var money = fare.getDetails(key).stream().map(this::toApiFareComponent).toList();
         return new SimpleEntry<>(key, money);
       })
-      .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+      .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
   }
 
-  private Map<String, ApiMoney> combineFaresAndProducts(Fare fare) {
+  private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
     return fare
       .getTypes()
       .stream()
@@ -50,7 +114,7 @@ public class FareMapper {
         var money = toApiMoney(fare.getFare(key));
         return new SimpleEntry<>(key, money);
       })
-      .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+      .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
   }
 
   private ApiMoney toApiMoney(Money m) {
@@ -67,19 +131,6 @@ public class FareMapper {
   }
 
   private ApiFareComponent toApiFareComponent(FareComponent m) {
-    return new ApiFareComponent(
-      m.fareId(),
-      m.name(),
-      toApiMoney(m.price()),
-      m.routes(),
-      Optional
-        .ofNullable(m.container())
-        .map(c -> new ApiFareQualifier(c.id(), c.name()))
-        .orElse(null),
-      Optional
-        .ofNullable(m.category())
-        .map(c -> new ApiFareQualifier(c.id(), c.name()))
-        .orElse(null)
-    );
+    return new ApiFareComponent(m.fareId(), m.name(), toApiMoney(m.price()), m.routes());
   }
 }

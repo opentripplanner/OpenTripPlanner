@@ -14,7 +14,5 @@ public record FareComponent(
   FeedScopedId fareId,
   String name,
   Money price,
-  List<FeedScopedId> routes,
-  FareContainer container,
-  RiderCategory category
+  List<FeedScopedId> routes
 ) {}

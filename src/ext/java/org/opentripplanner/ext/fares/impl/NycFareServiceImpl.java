@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.routing.core.ItineraryFares.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -100,7 +100,7 @@ public class NycFareServiceImpl implements FareService {
   public NycFareServiceImpl() {}
 
   @Override
-  public Fare getCost(Itinerary itinerary) {
+  public ItineraryFares getCost(Itinerary itinerary) {
     // Use custom ride-categorizing method instead of the usual mapper from default fare service.
     List<Ride> rides = createRides(itinerary);
 
@@ -310,7 +310,7 @@ public class NycFareServiceImpl implements FareService {
     }
 
     Currency currency = Currency.getInstance("USD");
-    Fare fare = Fare.empty();
+    ItineraryFares fare = ItineraryFares.empty();
     fare.addFare(
       FareType.regular,
       new Money(

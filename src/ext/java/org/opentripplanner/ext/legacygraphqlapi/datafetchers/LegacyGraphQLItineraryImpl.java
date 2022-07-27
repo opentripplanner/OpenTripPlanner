@@ -9,7 +9,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.ItineraryFares;
 
 public class LegacyGraphQLItineraryImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {
@@ -42,7 +42,7 @@ public class LegacyGraphQLItineraryImpl
   @Override
   public DataFetcher<Iterable<Map<String, Object>>> fares() {
     return environment -> {
-      Fare fare = getSource(environment).getFare();
+      ItineraryFares fare = getSource(environment).getFares();
       if (fare == null) {
         return null;
       }

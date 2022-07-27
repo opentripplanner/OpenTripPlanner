@@ -14,10 +14,9 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.routing.core.ItineraryFares.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerContext;
@@ -43,7 +42,7 @@ public class FaresIntegrationTest {
     var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
-    Fare fare = getFare(from, to, start, serverContext);
+    ItineraryFares fare = getFare(from, to, start, serverContext);
     assertEquals(fare.getFare(FareType.regular), new Money(USD, 425));
   }
 
@@ -70,7 +69,7 @@ public class FaresIntegrationTest {
 
     Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
 
-    Fare fare = getFare(from, to, startTime, serverContext);
+    ItineraryFares fare = getFare(from, to, startTime, serverContext);
 
     assertEquals(new Money(USD, 200), fare.getFare(FareType.regular));
 
@@ -135,7 +134,7 @@ public class FaresIntegrationTest {
       "Leg's start should be before 09:00 but is " + startTime
     );
 
-    assertEquals(new Money(USD, 275), peakItinerary.getFare().getFare(FareType.regular));
+    assertEquals(new Money(USD, 275), peakItinerary.getFares().getFare(FareType.regular));
   }
 
   @Test
@@ -169,7 +168,7 @@ public class FaresIntegrationTest {
     from = GenericLocation.fromStopId("Origin", feedId, "D");
     to = GenericLocation.fromStopId("Destination", feedId, "E");
     fare = getFare(from, to, dateTime, serverContext);
-    assertEquals(Fare.empty(), fare);
+    assertEquals(ItineraryFares.empty(), fare);
 
     // A -> C, 2 components in a path
 
@@ -249,14 +248,14 @@ public class FaresIntegrationTest {
     assertEquals(fareComponents.get(1).routes().get(1), new FeedScopedId(feedId, "3"));
   }
 
-  private static Fare getFare(
+  private static ItineraryFares getFare(
     GenericLocation from,
     GenericLocation to,
     Instant time,
     OtpServerContext serverContext
   ) {
     Itinerary itinerary = getItineraries(from, to, time, serverContext).get(0);
-    return itinerary.getFare();
+    return itinerary.getFares();
   }
 
   private static List<Itinerary> getItineraries(

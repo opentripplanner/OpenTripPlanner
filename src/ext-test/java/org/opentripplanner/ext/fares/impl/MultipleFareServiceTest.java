@@ -5,12 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Currency;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.routing.core.ItineraryFares.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 
@@ -21,11 +20,11 @@ public class MultipleFareServiceTest {
 
   @Test
   public void testAddingMultipleFareService() {
-    Fare fare1 = new Fare();
+    ItineraryFares fare1 = new ItineraryFares();
     fare1.addFare(FareType.regular, Money.euros(100));
     FareService fs1 = new SimpleFareService(fare1);
 
-    Fare fare2 = new Fare();
+    ItineraryFares fare2 = new ItineraryFares();
     fare2.addFare(FareType.regular, Money.euros(140));
     fare2.addFare(FareType.student, Money.euros(120));
     FareService fs2 = new SimpleFareService(fare2);
@@ -34,12 +33,12 @@ public class MultipleFareServiceTest {
      * Note: this fare is not very representative, as you should probably always compute a
      * "regular" fare in case you want to add bike and transit fares.
      */
-    Fare fare3 = new Fare();
+    ItineraryFares fare3 = new ItineraryFares();
     fare3.addFare(FareType.student, Money.euros(80));
     FareService fs3 = new SimpleFareService(fare3);
 
     AddingMultipleFareService mfs = new AddingMultipleFareService(new ArrayList<>());
-    Fare fare = mfs.getCost(null);
+    ItineraryFares fare = mfs.getCost(null);
     assertNull(fare);
 
     mfs = new AddingMultipleFareService(List.of(fs1));
@@ -78,9 +77,9 @@ public class MultipleFareServiceTest {
     assertEquals(300, fare.getFare(FareType.student).cents());
   }
 
-  private record SimpleFareService(Fare fare) implements FareService {
+  private record SimpleFareService(ItineraryFares fare) implements FareService {
     @Override
-    public Fare getCost(Itinerary itin) {
+    public ItineraryFares getCost(Itinerary itin) {
       return fare;
     }
   }

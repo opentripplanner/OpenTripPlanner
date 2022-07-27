@@ -6,10 +6,9 @@ import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.routing.core.ItineraryFares.FareType;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +29,13 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
   }
 
   @Override
-  public Fare getCost(Itinerary itinerary) {
+  public ItineraryFares getCost(Itinerary itinerary) {
     Currency euros = Currency.getInstance("EUR");
     // Use the usual process from the default fare service, but force the currency to Euros.
     // The default process assumes there is only one currency per set of fare rules and looks at any old rule to
     // guess what the currency is. This doesn't work on the Dutch data which has distances mixed in with Euros to
     // account for distance-derived fares.
-    Fare fare = super.getCost(itinerary);
+    ItineraryFares fare = super.getCost(itinerary);
     fare.updateAllCurrencies(euros);
     return fare;
   }
@@ -216,7 +215,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
    */
   @Override
   protected boolean populateFare(
-    Fare fare,
+    ItineraryFares fare,
     Currency currency,
     FareType fareType,
     List<Leg> rides,
