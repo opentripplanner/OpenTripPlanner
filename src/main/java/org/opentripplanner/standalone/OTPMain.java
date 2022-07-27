@@ -180,11 +180,9 @@ public class OTPMain {
     // publishing the config version info make it available to the APIs
     setOtpConfigVersionsOnServerInfo(app.getFactory());
 
-    var serverContext = app.serverContext();
-
     /* Start visualizer if requested. */
     if (params.visualize) {
-      serverContext.graphVisualizer().run();
+      app.graphVisualizer().run();
     }
 
     /* Start web server if requested. */
@@ -210,7 +208,7 @@ public class OTPMain {
             ThrowableUtils.detailedString(throwable)
           );
         }
-        logLocationOfRequestLog(serverContext.routerConfig().requestLogFile());
+        logLocationOfRequestLog(app.getFactory().configModel().routerConfig().requestLogFile());
       }
     }
   }

@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This class is used to export transfers for human verification to a CSV file. This is useful when
@@ -32,16 +32,16 @@ public class TransfersReport {
   private static final int NOT_SET = -1;
 
   private final List<ConstrainedTransfer> transfers;
-  private final TransitModelIndex index;
+  private final TransitService transitService;
   private final CsvReportBuilder buf = new CsvReportBuilder();
 
-  private TransfersReport(List<ConstrainedTransfer> transfers, TransitModelIndex index) {
+  private TransfersReport(List<ConstrainedTransfer> transfers, TransitService transitService) {
     this.transfers = transfers;
-    this.index = index;
+    this.transitService = transitService;
   }
 
-  public static String export(List<ConstrainedTransfer> transfers, TransitModelIndex index) {
-    return new TransfersReport(transfers, index).export();
+  public static String export(List<ConstrainedTransfer> transfers, TransitService transitService) {
+    return new TransfersReport(transfers, transitService).export();
   }
 
   String export() {
@@ -150,7 +150,7 @@ public class TransfersReport {
       var tp = (TripTransferPoint) p;
       var trip = tp.getTrip();
       var route = trip.getRoute();
-      var ptn = index.getPatternForTrip().get(trip);
+      var ptn = transitService.getPatternForTrip().get(trip);
       r.operator = trip.getOperator().getId().getId();
       r.type = "Trip";
       r.entityId = trip.getId().getId();
@@ -161,7 +161,7 @@ public class TransfersReport {
     } else if (p instanceof RouteStopTransferPoint) {
       var rp = (RouteStopTransferPoint) p;
       var route = rp.getRoute();
-      var ptn = index.getPatternsForRoute().get(route).stream().findFirst().orElse(null);
+      var ptn = transitService.getPatternsForRoute().get(route).stream().findFirst().orElse(null);
       r.operator = route.getOperator().getId().getId();
       r.type = "Route";
       r.entityId = route.getId().getId();

@@ -37,12 +37,15 @@ public class DirectStreetRouter {
       }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
-      GraphPathFinder gpFinder = new GraphPathFinder(serverContext);
+      GraphPathFinder gpFinder = new GraphPathFinder(
+        serverContext.traverseVisitor(),
+        serverContext.routerConfig().streetRoutingTimeout()
+      );
       List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(routingContext);
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        serverContext.transitModel().getTimeZone(),
+        serverContext.transitService().getTimeZone(),
         serverContext.graph().streetNotesService,
         serverContext.graph().ellipsoidToGeoidDifference
       );

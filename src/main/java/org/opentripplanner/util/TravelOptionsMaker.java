@@ -6,7 +6,7 @@ import java.util.List;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Class which creates "Travel by" options list from supported transit modes and which extra modes
@@ -25,9 +25,9 @@ public final class TravelOptionsMaker {
     staticTravelOptions.add(new TravelOption(TraverseMode.CAR.toString()));
   }
 
-  public static List<TravelOption> makeOptions(Graph graph, TransitModel transitModel) {
+  public static List<TravelOption> makeOptions(Graph graph, TransitService transitService) {
     return makeOptions(
-      transitModel.getTransitModes(),
+      transitService.getTransitModes(),
       graph.hasBikeSharing,
       graph.hasBikeRide,
       graph.hasParkRide
