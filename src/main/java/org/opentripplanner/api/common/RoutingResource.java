@@ -703,7 +703,7 @@ public abstract class RoutingResource {
    * @param queryParameters incoming request parameters
    */
   protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
-    RoutingRequest request = serverContext.copyDefaultRoutingRequest();
+    RoutingRequest request = serverContext.defaultRoutingRequest();
 
     // The routing request should already contain defaults, which are set when it is initialized or
     // in the JSON router configuration and cloned. We check whether each parameter was supplied
@@ -714,7 +714,7 @@ public abstract class RoutingResource {
 
     {
       //FIXME: move into setter method on routing request
-      ZoneId tz = serverContext.transitModel().getTimeZone();
+      ZoneId tz = serverContext.transitService().getTimeZone();
       if (date == null && time != null) { // Time was provided but not date
         LOG.debug("parsing ISO datetime {}", time);
         try {

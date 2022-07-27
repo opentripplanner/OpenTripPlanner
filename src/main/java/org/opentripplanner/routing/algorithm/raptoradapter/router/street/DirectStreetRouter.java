@@ -17,16 +17,18 @@ import org.opentripplanner.standalone.api.OtpServerContext;
 
 public class DirectStreetRouter {
 
-  public static List<Itinerary> route(OtpServerContext router, RoutingRequest request) {
+  public static List<Itinerary> route(OtpServerContext serverContext, RoutingRequest request) {
     if (request.modes.directMode == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
 
     RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
-    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph(), directRequest)) {
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
+    ) {
       final RoutingContext routingContext = new RoutingContext(
         directRequest,
-        router.graph(),
+        serverContext.graph(),
         temporaryVertices
       );
 
@@ -35,14 +37,14 @@ public class DirectStreetRouter {
       }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
-      GraphPathFinder gpFinder = new GraphPathFinder(router);
+      GraphPathFinder gpFinder = new GraphPathFinder(serverContext);
       List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(routingContext);
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        router.transitModel().getTimeZone(),
-        router.graph().streetNotesService,
-        router.graph().ellipsoidToGeoidDifference
+        serverContext.transitModel().getTimeZone(),
+        serverContext.graph().streetNotesService,
+        serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
       ItinerariesHelper.decorateItinerariesWithRequestData(response, request);

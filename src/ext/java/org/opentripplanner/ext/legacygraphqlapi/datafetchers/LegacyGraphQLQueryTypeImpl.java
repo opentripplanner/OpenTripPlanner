@@ -592,7 +592,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RoutingRequest request = context.getServerContext().copyDefaultRoutingRequest();
+      RoutingRequest request = context.getServerContext().defaultRoutingRequest();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -1036,8 +1036,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       Stream<Stop> stopStream = getTransitService(environment)
-        .getStopSpatialIndex()
-        .query(envelope)
+        .queryStopSpatialIndex(envelope)
         .stream()
         .filter(transitStopVertex -> envelope.contains(transitStopVertex.getCoordinate()))
         .map(TransitStopVertex::getStop);

@@ -68,7 +68,7 @@ public class LegacyGraphQLAPI {
 
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
-      : serverContext.getDefaultLocale();
+      : serverContext.defaultLocale();
 
     String query = (String) queryParameters.get("query");
     Object queryVariables = queryParameters.getOrDefault("variables", null);
@@ -111,7 +111,7 @@ public class LegacyGraphQLAPI {
   ) {
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
-      : serverContext.getDefaultLocale();
+      : serverContext.defaultLocale();
     return LegacyGraphQLIndex.getGraphQLResponse(
       query,
       serverContext,
@@ -135,7 +135,7 @@ public class LegacyGraphQLAPI {
     List<Callable<ExecutionResult>> futures = new ArrayList<>();
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
-      : serverContext.getDefaultLocale();
+      : serverContext.defaultLocale();
 
     for (HashMap<String, Object> query : queries) {
       Map<String, Object> variables;

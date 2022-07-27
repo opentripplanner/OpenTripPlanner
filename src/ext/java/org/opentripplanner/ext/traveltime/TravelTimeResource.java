@@ -100,7 +100,7 @@ public class TravelTimeResource {
     this.serverContext = serverContext;
     transitLayer = this.serverContext.transitModel().getRealtimeTransitLayer();
     ZoneId zoneId = transitLayer.getTransitDataZoneId();
-    routingRequest = this.serverContext.copyDefaultRoutingRequest();
+    routingRequest = this.serverContext.defaultRoutingRequest();
     routingRequest.from = LocationStringParser.fromOldStyleString(location);
     if (modes != null) {
       routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();
@@ -273,7 +273,7 @@ public class TravelTimeResource {
         final int arrivalTime = arrivals.bestTransitArrivalTime(i);
         StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
         if (stopLocation instanceof Stop stop) {
-          Vertex v = serverContext.transitModel().getStopModel().getStopVertexForStop().get(stop);
+          Vertex v = serverContext.transitModel().getStopModel().getStopVertexForStop(stop);
           if (v != null) {
             Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
             State s = new State(v, time, routingContext, stateData.clone());

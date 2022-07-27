@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerContext;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
@@ -155,10 +156,11 @@ public class SplitEdgeTurnRestrictionsTest {
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
     var gpf = new GraphPathFinder(
-      new DefaultServerContext(
+      DefaultServerContext.create(
+        RouterConfig.DEFAULT,
+        new RaptorConfig<>(RouterConfig.DEFAULT.raptorTuningParameters()),
         graph,
         Mockito.mock(TransitModel.class),
-        RouterConfig.DEFAULT,
         null,
         false
       )

@@ -19,7 +19,7 @@ class FlexLocationAdder {
     ) {
       Point p = GeometryUtils.getGeometryFactory().createPoint(v0.getCoordinate());
       Envelope env = p.getEnvelopeInternal();
-      for (FlexStopLocation location : stopModel.getStopModelIndex().locationIndex.query(env)) {
+      for (FlexStopLocation location : stopModel.getStopModelIndex().queryLocationIndex(env)) {
         if (!location.getGeometry().disjoint(p)) {
           if (v0.flexStopLocations == null) {
             v0.flexStopLocations = new HashSet<>();
