@@ -24,7 +24,10 @@ public class ItineraryFiltersMapper {
         "groupedOtherThanSameLegsMaxCostMultiplier",
         dft.groupedOtherThanSameLegsMaxCostMultiplier
       ),
-      parseTransitGeneralizedCostLimit(c.path("transitGeneralizedCostLimit"), dft.transitGeneralizedCostLimit),
+      parseTransitGeneralizedCostLimit(
+        c.path("transitGeneralizedCostLimit"),
+        dft.transitGeneralizedCostLimit
+      ),
       c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit),
       c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio),
       c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio),
@@ -46,10 +49,7 @@ public class ItineraryFiltersMapper {
 
     if (node.isObject()) {
       return new TransitGeneralizedCostFilterParams(
-        node.asLinearFunction(
-          "costLimitFunction",
-          transitGeneralizedCostLimit.costLimitFunction()
-        ),
+        node.asLinearFunction("costLimitFunction", transitGeneralizedCostLimit.costLimitFunction()),
         node.asDouble("intervalRelaxFactor", transitGeneralizedCostLimit.intervalRelaxFactor())
       );
     }
