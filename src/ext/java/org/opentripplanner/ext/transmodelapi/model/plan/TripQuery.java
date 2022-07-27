@@ -421,14 +421,6 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("transitGeneralizedCostLimit")
-          .description("DEPRECATED. REPLACED BY 'itineraryFilters.transitGeneralizedCostLimit'")
-          .type(gqlUtil.doubleFunctionScalar)
-          .build()
-      )
-      .argument(
-        GraphQLArgument
-          .newArgument()
           .name("debugItineraryFilter")
           .description(
             "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries " +

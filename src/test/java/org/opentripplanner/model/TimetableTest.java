@@ -19,7 +19,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -44,9 +44,9 @@ public class TimetableTest {
 
   @BeforeAll
   public static void setUp() throws Exception {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
-    graph = otpModel.graph;
-    transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    graph = model.graph();
+    transitModel = model.transitModel();
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();
     patternIndex = new HashMap<>();

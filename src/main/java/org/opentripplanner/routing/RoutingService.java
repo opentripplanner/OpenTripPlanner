@@ -1,15 +1,12 @@
 package org.opentripplanner.routing;
 
-import java.io.Serializable;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -26,13 +23,12 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
@@ -41,32 +37,23 @@ import org.opentripplanner.util.WorldEnvelope;
  */
 public class RoutingService {
 
+  private final OtpServerContext serverContext;
   private final Graph graph;
 
-  private final TransitModel transitModel;
+  private final ZoneId timeZone;
 
   private final GraphFinder graphFinder;
 
-  public RoutingService(Graph graph, TransitModel transitModel) {
-    this.graph = graph;
-    this.transitModel = transitModel;
+  public RoutingService(OtpServerContext serverContext) {
+    this.serverContext = serverContext;
+    this.graph = serverContext.graph();
+    this.timeZone = serverContext.transitService().getTimeZone();
     this.graphFinder = GraphFinder.getInstance(graph);
   }
 
-  // TODO We should probably not have the Router as a parameter here
-  public RoutingResponse route(RoutingRequest request, Router router) {
-    RoutingWorker worker = new RoutingWorker(router, request, transitModel.getTimeZone());
+  public RoutingResponse route(RoutingRequest request) {
+    RoutingWorker worker = new RoutingWorker(serverContext, request, timeZone);
     return worker.route();
-  }
-
-  /** {@link Graph#addVertex(Vertex)} */
-  public void addVertex(Vertex v) {
-    this.graph.addVertex(v);
-  }
-
-  /** {@link Graph#removeEdge(Edge)} */
-  public void removeEdge(Edge e) {
-    this.graph.removeEdge(e);
   }
 
   /** {@link Graph#getVertex(String)} */
@@ -104,49 +91,9 @@ public class RoutingService {
     return this.graph.containsVertex(v);
   }
 
-  /** {@link Graph#putService(Class, Serializable)} */
-  public <T extends Serializable> T putService(Class<T> serviceType, T service) {
-    return this.graph.putService(serviceType, service);
-  }
-
-  /** {@link Graph#hasService(Class)} */
-  public boolean hasService(Class<? extends Serializable> serviceType) {
-    return this.graph.hasService(serviceType);
-  }
-
-  /** {@link Graph#getService(Class)} */
-  public <T extends Serializable> T getService(Class<T> serviceType) {
-    return this.graph.getService(serviceType);
-  }
-
-  /** {@link Graph#getService(Class, boolean)} */
-  public <T extends Serializable> T getService(Class<T> serviceType, boolean autoCreate) {
-    return this.graph.getService(serviceType, autoCreate);
-  }
-
-  /** {@link Graph#remove(Vertex)} */
-  public void remove(Vertex vertex) {
-    this.graph.remove(vertex);
-  }
-
-  /** {@link Graph#removeIfUnconnected(Vertex)} */
-  public void removeIfUnconnected(Vertex v) {
-    this.graph.removeIfUnconnected(v);
-  }
-
   /** {@link Graph#getExtent()} */
   public Envelope getExtent() {
     return this.graph.getExtent();
-  }
-
-  /** {@link Graph#getBundle()} */
-  public GraphBundle getBundle() {
-    return this.graph.getBundle();
-  }
-
-  /** {@link Graph#setBundle(GraphBundle)} */
-  public void setBundle(GraphBundle bundle) {
-    this.graph.setBundle(bundle);
   }
 
   /** {@link Graph#countVertices()} */
@@ -164,34 +111,9 @@ public class RoutingService {
     return this.graph.getStreetIndex();
   }
 
-  /** {@link Graph#getLinker()} */
-  public VertexLinker getLinker() {
-    return this.graph.getLinker();
-  }
-
-  /** {@link Graph#removeEdgelessVertices()} */
-  public int removeEdgelessVertices() {
-    return this.graph.removeEdgelessVertices();
-  }
-
-  /** {@link Graph#calculateEnvelope()} */
-  public void calculateEnvelope() {
-    this.graph.calculateEnvelope();
-  }
-
-  /** {@link Graph#calculateConvexHull()} */
-  public void calculateConvexHull() {
-    this.graph.calculateConvexHull();
-  }
-
   /** {@link Graph#getConvexHull()} */
   public Geometry getConvexHull() {
     return this.graph.getConvexHull();
-  }
-
-  /** {@link Graph#expandToInclude(double, double)} ()} */
-  public void expandToInclude(double x, double y) {
-    this.graph.expandToInclude(x, y);
   }
 
   /** {@link Graph#getEnvelope()} */
@@ -204,18 +126,8 @@ public class RoutingService {
     return this.graph.getDistanceBetweenElevationSamples();
   }
 
-  /** {@link Graph#setDistanceBetweenElevationSamples(double)} */
-  public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
-    this.graph.setDistanceBetweenElevationSamples(distanceBetweenElevationSamples);
-  }
-
   public RealtimeVehiclePositionService getVehiclePositionService() {
     return this.graph.getVehiclePositionService();
-  }
-
-  /** {@link org.opentripplanner.transit.service.StopModel#getStopVerticesById(FeedScopedId)} */
-  public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-    return this.transitModel.getStopModel().getStopVerticesById(id);
   }
 
   /** {@link Graph#getVehicleRentalStationService()} */
@@ -233,21 +145,9 @@ public class RoutingService {
     return this.graph.getDrivingDirection();
   }
 
-  /** {@link Graph#setDrivingDirection(DrivingDirection)} */
-  public void setDrivingDirection(DrivingDirection drivingDirection) {
-    this.graph.setDrivingDirection(drivingDirection);
-  }
-
   /** {@link Graph#getIntersectionTraversalModel()} */
   public IntersectionTraversalCostModel getIntersectionTraversalModel() {
     return this.graph.getIntersectionTraversalModel();
-  }
-
-  /** {@link Graph#setIntersectionTraversalCostModel(IntersectionTraversalCostModel)} */
-  public void setIntersectionTraversalCostModel(
-    IntersectionTraversalCostModel intersectionTraversalCostModel
-  ) {
-    this.graph.setIntersectionTraversalCostModel(intersectionTraversalCostModel);
   }
 
   /** {@link GraphFinder#findClosestStops(double, double, double)} */
@@ -256,8 +156,7 @@ public class RoutingService {
   }
 
   /**
-   * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List,
-   * RoutingService, TransitService)}
+   * {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List, TransitService)}
    */
   public List<PlaceAtDistance> findClosestPlaces(
     double lat,
@@ -271,7 +170,6 @@ public class RoutingService {
     List<String> filterByBikeRentalStations,
     List<String> filterByBikeParks,
     List<String> filterByCarParks,
-    RoutingService routingService,
     TransitService transitService
   ) {
     return this.graphFinder.findClosestPlaces(
@@ -284,7 +182,6 @@ public class RoutingService {
         filterByStops,
         filterByRoutes,
         filterByBikeRentalStations,
-        routingService,
         transitService
       );
   }

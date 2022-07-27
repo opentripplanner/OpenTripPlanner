@@ -86,7 +86,7 @@ public class BikeRentalTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph;
+    graph = otpModel.graph();
   }
 
   // This tests exists to test if the cost of walking with a bike changes

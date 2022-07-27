@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ class TransmodelGraph {
 
   ExecutionResult getGraphQLExecutionResult(
     String query,
-    Router router,
+    OtpServerContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -64,9 +64,9 @@ class TransmodelGraph {
     }
 
     TransmodelRequestContext transmodelRequestContext = new TransmodelRequestContext(
-      router,
-      new RoutingService(router.graph, router.transitModel),
-      new DefaultTransitService(router.transitModel)
+      serverContext,
+      serverContext.routingService(),
+      serverContext.transitService()
     );
 
     ExecutionInput executionInput = ExecutionInput
@@ -74,7 +74,7 @@ class TransmodelGraph {
       .query(query)
       .operationName(operationName)
       .context(transmodelRequestContext)
-      .root(router)
+      .root(serverContext)
       .variables(variables)
       .build();
     return graphQL.execute(executionInput);
@@ -82,7 +82,7 @@ class TransmodelGraph {
 
   Response getGraphQLResponse(
     String query,
-    Router router,
+    OtpServerContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -90,7 +90,7 @@ class TransmodelGraph {
   ) {
     ExecutionResult result = getGraphQLExecutionResult(
       query,
-      router,
+      serverContext,
       variables,
       operationName,
       maxResolves,

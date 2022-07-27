@@ -137,6 +137,7 @@ public class GraphBuilder implements Runnable {
         config.getTransitServicePeriod(),
         config.fareServiceFactory,
         config.discardMinTransferTimes,
+        config.blockBasedInterlining,
         config.maxInterlineDistance
       );
       graphBuilder.addModule(gtfsModule);

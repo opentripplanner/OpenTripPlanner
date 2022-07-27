@@ -11,7 +11,7 @@ import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -27,7 +27,7 @@ class InterlineProcessorTest implements PlanTestConstants {
 
   @Test
   void run() {
-    var transferService = new TransferService();
+    var transferService = new DefaultTransferService();
     var processor = new InterlineProcessor(
       transferService,
       List.of(),
@@ -45,7 +45,7 @@ class InterlineProcessorTest implements PlanTestConstants {
 
   @Test
   void staySeatedNotAllowed() {
-    var transferService = new TransferService();
+    var transferService = new DefaultTransferService();
 
     var fromTrip = patterns.get(0).getTrip(0);
     var toTrip = patterns.get(1).getTrip(0);

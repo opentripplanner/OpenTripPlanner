@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
-import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModelIndex;
 import org.opentripplanner.transit.service.TransitModel;
 
 class TransfersMapper {
@@ -15,10 +13,7 @@ class TransfersMapper {
   /**
    * Copy pre-calculated transfers from the original graph
    */
-  static List<List<Transfer>> mapTransfers(
-    StopIndexForRaptor stopIndex,
-    TransitModel transitModel
-  ) {
+  static List<List<Transfer>> mapTransfers(StopModelIndex stopIndex, TransitModel transitModel) {
     List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
     for (int i = 0; i < stopIndex.size(); ++i) {

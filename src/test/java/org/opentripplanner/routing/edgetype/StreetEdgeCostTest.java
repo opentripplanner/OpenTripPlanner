@@ -32,7 +32,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph;
+    graph = otpModel.graph();
   }
 
   static Stream<Arguments> walkReluctanceCases = Stream.of(

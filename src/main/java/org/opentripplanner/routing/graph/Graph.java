@@ -27,7 +27,6 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
@@ -44,6 +43,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +76,6 @@ public class Graph implements Serializable {
 
   public final Instant buildTime = Instant.now();
   private StopModel stopModel;
-
-  private GraphBundle bundle;
 
   private OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
@@ -316,14 +314,6 @@ public class Graph implements Serializable {
     return env;
   }
 
-  public GraphBundle getBundle() {
-    return bundle;
-  }
-
-  public void setBundle(GraphBundle bundle) {
-    this.bundle = bundle;
-  }
-
   public int countVertices() {
     return vertices.size();
   }
@@ -436,6 +426,25 @@ public class Graph implements Serializable {
       calculateEnvelope();
     }
     this.envelope.expandToInclude(x, y);
+  }
+
+  public void initEllipsoidToGeoidDifference() {
+    try {
+      WorldEnvelope env = getEnvelope();
+      double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
+      double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
+      this.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
+      LOG.info(
+        "Computed ellipsoid/geoid offset at (" +
+        lat +
+        ", " +
+        lon +
+        ") as " +
+        this.ellipsoidToGeoidDifference
+      );
+    } catch (Exception e) {
+      LOG.error("Error computing ellipsoid/geoid difference");
+    }
   }
 
   public WorldEnvelope getEnvelope() {

@@ -16,8 +16,7 @@ import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.inspector.TileRenderer;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -43,17 +42,17 @@ import org.opentripplanner.standalone.server.Router;
 @Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource {
 
-  private final OTPServer otpServer;
+  private final OtpServerContext serverContext;
 
   public GraphInspectorTileResource(
-    @Context OTPServer otpServer,
+    @Context OtpServerContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.otpServer = otpServer;
+    this.serverContext = serverContext;
   }
 
   @GET
@@ -70,8 +69,8 @@ public class GraphInspectorTileResource {
     Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
     MapTile mapTile = new MapTile(env, 256, 256);
 
-    Router router = otpServer.getRouter();
-    BufferedImage image = router.tileRendererManager.renderTile(mapTile, layer);
+    OtpServerContext serverContext = this.serverContext;
+    BufferedImage image = serverContext.tileRendererManager().renderTile(mapTile, layer);
 
     MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
     ByteArrayOutputStream baos = new ByteArrayOutputStream(
@@ -93,7 +92,7 @@ public class GraphInspectorTileResource {
   @Path("layers")
   @Produces(MediaType.APPLICATION_JSON)
   public InspectorLayersList getLayers() {
-    Router router = otpServer.getRouter();
-    return new InspectorLayersList(router.tileRendererManager.getRenderers());
+    OtpServerContext serverContext = this.serverContext;
+    return new InspectorLayersList(serverContext.tileRendererManager().getRenderers());
   }
 }
