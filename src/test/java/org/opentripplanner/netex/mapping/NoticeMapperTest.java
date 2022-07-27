@@ -14,7 +14,7 @@ public class NoticeMapperTest {
 
   @Test
   public void mapNotice() {
-    org.opentripplanner.model.Notice otpNotice;
+    org.opentripplanner.transit.model.basic.Notice otpNotice;
 
     // Given
     NoticeMapper mapper = new NoticeMapper(MappingSupport.ID_FACTORY);

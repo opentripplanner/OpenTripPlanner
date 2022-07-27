@@ -4,7 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.Notice;
+import org.opentripplanner.transit.model.basic.Notice;
 
 public class NoticeType {
 
