@@ -193,7 +193,7 @@ public class StopTimesHelper {
     boolean includeCancellations,
     boolean includeReplaced
   ) {
-    ZoneId zoneId = transitService.getTransitLayer().getTransitDataZoneId();
+    ZoneId zoneId = transitService.getTimeZone();
     LocalDate startDate = startTime.atZone(zoneId).toLocalDate().minusDays(1);
     LocalDate endDate = startTime.plus(timeRange).atZone(zoneId).toLocalDate();
 
