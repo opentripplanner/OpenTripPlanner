@@ -156,6 +156,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("wheelchairAccessible")
           .type(EnumTypes.WHEELCHAIR_BOARDING)
+          .dataFetcher(environment -> trip(environment).getWheelchairBoarding())
           .description("Whether service journey is accessible with wheelchair.")
           .build()
       )
@@ -172,7 +173,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("journeyPattern")
           .type(journeyPatternType)
-          .dataFetcher(env -> GqlUtil.getTransitService(env).getPatternForTrip().get(trip(env)))
+          .dataFetcher(env -> GqlUtil.getTransitService(env).getPatternForTrip(trip(env)))
           .build()
       )
       .field(
@@ -203,8 +204,7 @@ public class ServiceJourneyType {
 
             List<StopLocation> stops = GqlUtil
               .getTransitService(environment)
-              .getPatternForTrip()
-              .get(trip(environment))
+              .getPatternForTrip(trip(environment))
               .getStops();
 
             if (first != null && last != null) {
@@ -236,7 +236,7 @@ public class ServiceJourneyType {
           .dataFetcher(env -> {
             Trip trip = trip(env);
             return TripTimeOnDate.fromTripTimes(
-              GqlUtil.getTransitService(env).getPatternForTrip().get(trip).getScheduledTimetable(),
+              GqlUtil.getTransitService(env).getPatternForTrip(trip).getScheduledTimetable(),
               trip
             );
           })
@@ -285,8 +285,7 @@ public class ServiceJourneyType {
           .dataFetcher(environment -> {
             TripPattern tripPattern = GqlUtil
               .getTransitService(environment)
-              .getPatternForTrip()
-              .get(trip(environment));
+              .getPatternForTrip(trip(environment));
             if (tripPattern == null) {
               return null;
             }

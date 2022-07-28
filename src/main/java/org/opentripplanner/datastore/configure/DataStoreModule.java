@@ -1,18 +1,19 @@
 package org.opentripplanner.datastore.configure;
 
+import dagger.Module;
+import dagger.Provides;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.FileType;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.datastore.OtpDataStoreConfig;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
-import org.opentripplanner.ext.datastore.gs.GsDataSourceRepository;
-import org.opentripplanner.util.OTPFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.standalone.config.OtpBaseDirectory;
 
 /**
  * This is the global access point to create a data store and create datasource objects(tests). It
@@ -28,20 +29,8 @@ import org.slf4j.LoggerFactory;
  * Implementation details. This class should contain minimal amount of business logic, delegating
  * all tasks to the underlying implementations.
  */
-public class DataStoreFactory {
-
-  private static final Logger LOG = LoggerFactory.getLogger(DataStoreFactory.class);
-
-  private final OtpDataStoreConfig config;
-
-  /**
-   * @param config is used to create and configure the store.
-   */
-  public DataStoreFactory(OtpDataStoreConfig config) {
-    this.config = config;
-  }
-
-  /* static factory methods, mostly used by tests */
+@Module
+public abstract class DataStoreModule {
 
   /**
    * For test only.
@@ -55,30 +44,41 @@ public class DataStoreFactory {
   /**
    * Connect to data source and prepare to retrieve data.
    */
-  public OtpDataStore open() {
+  @Provides
+  public static OtpDataStore provideDataStore(
+    @OtpBaseDirectory File baseDirectory,
+    OtpDataStoreConfig config,
+    @Nullable @GoogleStorageDSRepository DataSourceRepository gsRepository
+  ) {
     List<DataSourceRepository> repositories = new ArrayList<>();
 
-    // Adding Google Cloud Storage, if the config file contains URIs with prefix "gs:"
-    if (OTPFeature.GoogleCloudStorage.isOn()) {
-      LOG.info("Google Cloud Store Repository enabled - GS resources detected.");
-      repositories.add(new GsDataSourceRepository(config.gsCredentials()));
+    if (gsRepository != null) {
+      repositories.add(gsRepository);
     }
     // The file data storage repository should be last, to allow
     // other repositories to "override" and grab files analyzing the
     // datasource uri passed in
-    repositories.add(
-      new FileDataSourceRepository(
-        config.baseDirectory(),
-        config.gtfsLocalFilePattern(),
-        config.netexLocalFilePattern(),
-        config.osmLocalFilePattern(),
-        config.demLocalFilePattern()
-      )
+    repositories.add(createFileDataSourceRepository(baseDirectory, config));
+
+    var dataStore = new OtpDataStore(config, repositories);
+
+    // It might not be "best-practice" to open files during application construction,
+    // but delegating this to the client(potentially more than one) is a bit messy as well.
+    dataStore.open();
+
+    return dataStore;
+  }
+
+  private static FileDataSourceRepository createFileDataSourceRepository(
+    File baseDirectory,
+    OtpDataStoreConfig config
+  ) {
+    return new FileDataSourceRepository(
+      baseDirectory,
+      config.gtfsLocalFilePattern(),
+      config.netexLocalFilePattern(),
+      config.osmLocalFilePattern(),
+      config.demLocalFilePattern()
     );
-
-    OtpDataStore store = new OtpDataStore(config, repositories);
-
-    store.open();
-    return store;
   }
 }

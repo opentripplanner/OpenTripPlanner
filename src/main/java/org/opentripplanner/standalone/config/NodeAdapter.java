@@ -3,9 +3,11 @@ package org.opentripplanner.standalone.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -99,6 +101,10 @@ public class NodeAdapter {
 
   public boolean isNonEmptyArray() {
     return json.isArray() && json.size() > 0;
+  }
+
+  public boolean isObject() {
+    return json.isObject() && json.size() > 0;
   }
 
   public String getSource() {
@@ -437,6 +443,27 @@ public class NodeAdapter {
         "'. The value '" +
         text +
         "' is not a valid function on the form \"a + b x\" (\"2.0 + 7.1 x\")." +
+        "Source: " +
+        source +
+        "."
+      );
+    }
+  }
+
+  public ZoneId asZoneId(String paramName, ZoneId defaultValue) {
+    if (!exist(paramName)) {
+      return defaultValue;
+    }
+    final String zoneId = param(paramName).asText();
+    try {
+      return ZoneId.of(zoneId);
+    } catch (DateTimeException e) {
+      throw new OtpAppException(
+        "Unable to parse parameter '" +
+        fullPath(paramName) +
+        "'. The value '" +
+        zoneId +
+        "' is is not a valid Zone ID, it should be parsable by java.time.ZoneId class. " +
         "Source: " +
         source +
         "."

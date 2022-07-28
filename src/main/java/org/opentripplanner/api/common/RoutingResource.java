@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -17,11 +18,9 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.resources.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -696,7 +695,7 @@ public abstract class RoutingResource {
    * semantic equality checks.
    */
   @Context
-  protected OTPServer otpServer;
+  protected OtpServerContext serverContext;
 
   /**
    * Range/sanity check the query parameter fields and build a Request object from them.
@@ -704,18 +703,18 @@ public abstract class RoutingResource {
    * @param queryParameters incoming request parameters
    */
   protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
-    Router router = otpServer.getRouter();
-    RoutingRequest request = router.copyDefaultRoutingRequest();
+    RoutingRequest request = serverContext.defaultRoutingRequest();
 
-    // The routing request should already contain defaults, which are set when it is initialized or in the JSON
-    // router configuration and cloned. We check whether each parameter was supplied before overwriting the default.
+    // The routing request should already contain defaults, which are set when it is initialized or
+    // in the JSON router configuration and cloned. We check whether each parameter was supplied
+    // before overwriting the default.
     if (fromPlace != null) request.from = LocationStringParser.fromOldStyleString(fromPlace);
 
     if (toPlace != null) request.to = LocationStringParser.fromOldStyleString(toPlace);
 
     {
       //FIXME: move into setter method on routing request
-      ZoneId tz = router.transitModel.getTimeZone();
+      ZoneId tz = serverContext.transitService().getTimeZone();
       if (date == null && time != null) { // Time was provided but not date
         LOG.debug("parsing ISO datetime {}", time);
         try {
@@ -920,8 +919,9 @@ public abstract class RoutingResource {
       request.useVehicleParkingAvailabilityInformation = useVehicleParkingAvailabilityInformation;
     }
 
-    //getLocale function returns defaultLocale if locale is null
-    request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
+    if (locale != null) {
+      request.locale = Locale.forLanguageTag(locale.replaceAll("-", "_"));
+    }
 
     if (OTPFeature.DataOverlay.isOn()) {
       var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);

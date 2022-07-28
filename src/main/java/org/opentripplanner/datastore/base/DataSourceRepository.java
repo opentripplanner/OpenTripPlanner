@@ -2,9 +2,9 @@ package org.opentripplanner.datastore.base;
 
 import java.net.URI;
 import javax.annotation.Nonnull;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * It is an abstraction to reading of and writing to files whenever the file is located on the local

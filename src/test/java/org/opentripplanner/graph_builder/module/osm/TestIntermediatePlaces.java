@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.micrometer.core.instrument.Metrics;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -29,8 +29,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -56,15 +54,13 @@ public class TestIntermediatePlaces {
   @BeforeAll
   public static void setUp() {
     try {
-      OtpModel otpModel = FakeGraph.buildGraphNoTransit();
-      graph = otpModel.graph;
-      TransitModel transitModel = otpModel.transitModel;
+      TestOtpModel model = FakeGraph.buildGraphNoTransit();
+      graph = model.graph();
+      TransitModel transitModel = model.transitModel();
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
       graph.index();
-      Router router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-      router.startup();
-      TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
+      TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
       timeZone = transitModel.getTimeZone();
 
       graphPathToItineraryMapper =

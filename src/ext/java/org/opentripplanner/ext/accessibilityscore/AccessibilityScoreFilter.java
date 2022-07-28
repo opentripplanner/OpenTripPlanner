@@ -38,7 +38,7 @@ public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements Iti
   public static float compute(ScheduledTransitLeg leg) {
     var fromStop = leg.getFrom().stop.getWheelchairAccessibility();
     var toStop = leg.getFrom().stop.getWheelchairAccessibility();
-    var trip = leg.getTrip().getWheelchairBoarding();
+    var trip = leg.getTripWheelchairAccessibility();
 
     var values = List.of(trip, fromStop, toStop);
     var sum = (float) values

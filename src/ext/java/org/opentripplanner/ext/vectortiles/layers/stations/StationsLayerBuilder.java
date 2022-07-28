@@ -14,31 +14,30 @@ import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public class StationsLayerBuilder extends LayerBuilder<Station> {
 
-  static Map<MapperType, Function<TransitModel, PropertyMapper<Station>>> mappers = Map.of(
+  static Map<MapperType, Function<TransitService, PropertyMapper<Station>>> mappers = Map.of(
     MapperType.Digitransit,
     DigitransitStationPropertyMapper::create
   );
-  private final TransitModel transitModel;
+  private final TransitService transitModel;
 
   public StationsLayerBuilder(
     Graph graph,
-    TransitModel transitModel,
+    TransitService transitService,
     VectorTilesResource.LayerParameters layerParameters
   ) {
     super(
       layerParameters.name(),
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitModel)
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService)
     );
-    this.transitModel = transitModel;
+    this.transitModel = transitService;
   }
 
   protected List<Geometry> getGeometries(Envelope query) {
     return transitModel
-      .getStopModel()
       .getStations()
       .stream()
       .map(station -> {

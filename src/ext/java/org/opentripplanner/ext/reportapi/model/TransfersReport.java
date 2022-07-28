@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This class is used to export transfers for human verification to a CSV file. This is useful when
@@ -32,16 +32,16 @@ public class TransfersReport {
   private static final int NOT_SET = -1;
 
   private final List<ConstrainedTransfer> transfers;
-  private final TransitModelIndex index;
+  private final TransitService transitService;
   private final CsvReportBuilder buf = new CsvReportBuilder();
 
-  private TransfersReport(List<ConstrainedTransfer> transfers, TransitModelIndex index) {
+  private TransfersReport(List<ConstrainedTransfer> transfers, TransitService transitService) {
     this.transfers = transfers;
-    this.index = index;
+    this.transitService = transitService;
   }
 
-  public static String export(List<ConstrainedTransfer> transfers, TransitModelIndex index) {
-    return new TransfersReport(transfers, index).export();
+  public static String export(List<ConstrainedTransfer> transfers, TransitService transitService) {
+    return new TransfersReport(transfers, transitService).export();
   }
 
   String export() {
@@ -146,11 +146,10 @@ public class TransfersReport {
   private TxPoint pointInfo(TransferPoint p, boolean boarding) {
     var r = new TxPoint();
 
-    if (p instanceof TripTransferPoint) {
-      var tp = (TripTransferPoint) p;
+    if (p instanceof TripTransferPoint tp) {
       var trip = tp.getTrip();
       var route = trip.getRoute();
-      var ptn = index.getPatternForTrip().get(trip);
+      var ptn = transitService.getPatternForTrip(trip);
       r.operator = trip.getOperator().getId().getId();
       r.type = "Trip";
       r.entityId = trip.getId().getId();
@@ -158,17 +157,15 @@ public class TransfersReport {
       r.trip = trip.getHeadsign();
       var stop = ptn.getStop(tp.getStopPositionInPattern());
       addLocation(r, ptn, stop, trip, boarding);
-    } else if (p instanceof RouteStopTransferPoint) {
-      var rp = (RouteStopTransferPoint) p;
+    } else if (p instanceof RouteStopTransferPoint rp) {
       var route = rp.getRoute();
-      var ptn = index.getPatternsForRoute().get(route).stream().findFirst().orElse(null);
+      var ptn = transitService.getPatternsForRoute(route).stream().findFirst().orElse(null);
       r.operator = route.getOperator().getId().getId();
       r.type = "Route";
       r.entityId = route.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
       addLocation(r, ptn, rp.getStop(), null, boarding);
-    } else if (p instanceof RouteStationTransferPoint) {
-      var rp = (RouteStationTransferPoint) p;
+    } else if (p instanceof RouteStationTransferPoint rp) {
       var route = rp.getRoute();
       r.operator = route.getOperator().getId().getId();
       r.type = "Route";
@@ -176,15 +173,13 @@ public class TransfersReport {
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
       r.loc += rp.getStation().getName();
       r.coordinate = rp.getStation().getCoordinate();
-    } else if (p instanceof StopTransferPoint) {
-      var sp = (StopTransferPoint) p;
+    } else if (p instanceof StopTransferPoint sp) {
       StopLocation stop = sp.getStop();
       r.type = "Stop";
       r.entityId = stop.getId().getId();
       r.loc = stop.getName().toString();
       r.coordinate = stop.getCoordinate();
-    } else if (p instanceof StationTransferPoint) {
-      var sp = (StationTransferPoint) p;
+    } else if (p instanceof StationTransferPoint sp) {
       Station station = sp.getStation();
       r.type = "Station";
       r.entityId = station.getId().getId();

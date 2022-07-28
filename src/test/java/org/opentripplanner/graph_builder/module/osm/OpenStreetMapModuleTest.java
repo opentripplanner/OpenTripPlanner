@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import io.micrometer.core.instrument.Metrics;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +34,6 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.service.StopModel;
@@ -314,9 +312,6 @@ public class OpenStreetMapModuleTest {
 
     loader.buildGraph(graph, transitModel, extra);
 
-    Router router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
-
     RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
@@ -324,9 +319,9 @@ public class OpenStreetMapModuleTest {
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    RoutingContext routingContext = new RoutingContext(request, router.graph, bottomV, topV);
+    RoutingContext routingContext = new RoutingContext(request, graph, bottomV, topV);
 
-    GraphPathFinder graphPathFinder = new GraphPathFinder(router);
+    GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
     List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
 
     assertNotNull(pathList);

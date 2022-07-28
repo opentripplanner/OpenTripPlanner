@@ -329,7 +329,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph;
+    graph = otpModel.graph();
   }
 
   private void assertBikePath(Vertex fromVertex, Vertex toVertex, String... descriptor) {

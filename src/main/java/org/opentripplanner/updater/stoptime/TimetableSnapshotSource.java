@@ -36,6 +36,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -726,7 +727,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Create StopPattern
     final StopPattern stopPattern = new StopPattern(stopTimes);
 
-    final TripPattern originalTripPattern = transitService.getPatternForTrip().get(trip);
+    final TripPattern originalTripPattern = transitService.getPatternForTrip(trip);
     // Get cached trip pattern or create one if it doesn't exist yet
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
@@ -757,6 +758,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Make sure that updated trip times have the correct real time state
     newTripTimes.setRealTimeState(realTimeState);
+
+    if (tripUpdate.hasVehicle()) {
+      var vehicleDescriptor = tripUpdate.getVehicle();
+      if (vehicleDescriptor.hasWheelchairAccessible()) {
+        GtfsRealtimeMapper
+          .mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
+          .ifPresent(newTripTimes::updateWheelchairAccessibility);
+      }
+    }
 
     // Add new trip times to the buffer
     return buffer.update(pattern, newTripTimes, serviceDate);
@@ -971,8 +981,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return trip pattern or null if no trip pattern was found
    */
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
-    Trip trip = transitService.getTripForId().get(tripId);
-    return transitService.getPatternForTrip().get(trip);
+    Trip trip = transitService.getTripForId(tripId);
+    return transitService.getPatternForTrip(trip);
   }
 
   /**
@@ -990,7 +1000,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return trip or null if trip can't be found in graph index
    */
   private Trip getTripForTripId(FeedScopedId tripId) {
-    return transitService.getTripForId().get(tripId);
+    return transitService.getTripForId(tripId);
   }
 
   /**

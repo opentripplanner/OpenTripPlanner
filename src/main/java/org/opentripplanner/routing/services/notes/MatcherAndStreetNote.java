@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.services.notes;
 
 import java.io.Serializable;
+import java.util.Objects;
 import org.opentripplanner.model.StreetNote;
 
 /**
@@ -25,5 +26,18 @@ public class MatcherAndStreetNote implements Serializable {
 
   public StreetNote getNote() {
     return note;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    MatcherAndStreetNote that = (MatcherAndStreetNote) o;
+    return matcher.equals(that.matcher) && note.equals(that.note);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(matcher, note);
   }
 }

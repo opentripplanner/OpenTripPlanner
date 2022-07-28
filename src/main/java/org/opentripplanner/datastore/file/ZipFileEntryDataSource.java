@@ -3,8 +3,8 @@ package org.opentripplanner.datastore.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 public class ZipFileEntryDataSource implements DataSource {
 

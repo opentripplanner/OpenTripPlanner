@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;

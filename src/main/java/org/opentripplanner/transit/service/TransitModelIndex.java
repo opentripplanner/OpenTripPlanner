@@ -49,7 +49,6 @@ public class TransitModelIndex {
   private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
 
   private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
-  private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
 
@@ -74,7 +73,6 @@ public class TransitModelIndex {
     }
 
     for (TripPattern pattern : transitModel.getAllTripPatterns()) {
-      patternsForFeedId.put(pattern.getFeedId(), pattern);
       patternsForRoute.put(pattern.getRoute(), pattern);
       pattern
         .scheduledTripsAsStream()
@@ -111,15 +109,11 @@ public class TransitModelIndex {
 
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(transitModel);
-      for (Route route : flexIndex.routeById.values()) {
+      for (Route route : flexIndex.getAllFlexRoutes()) {
         routeForId.put(route.getId(), route);
       }
-      for (FlexTrip flexTrip : flexIndex.tripById.values()) {
+      for (FlexTrip flexTrip : flexIndex.getAllFlexTrips()) {
         tripForId.put(flexTrip.getId(), flexTrip.getTrip());
-        flexTrip
-          .getStops()
-          .stream()
-          .forEach(stop -> transitModel.getStopModel().getStopModelIndex().addStop(stop));
       }
     }
 
@@ -209,10 +203,6 @@ public class TransitModelIndex {
 
   public Map<Trip, TripPattern> getPatternForTrip() {
     return patternForTrip;
-  }
-
-  public Multimap<String, TripPattern> getPatternsForFeedId() {
-    return patternsForFeedId;
   }
 
   public Multimap<Route, TripPattern> getPatternsForRoute() {

@@ -1,4 +1,4 @@
-package org.opentripplanner.datastore;
+package org.opentripplanner.datastore.api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.common.LoggingUtil;
+import org.opentripplanner.datastore.OtpDataStore;
 
 /**
  * A data source is generalized type to represent an file, database blob or unit that OTP read or

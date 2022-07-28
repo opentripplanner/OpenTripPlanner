@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder;
 
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.GTFS;
+import static org.opentripplanner.datastore.api.FileType.NETEX;
+import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 
 import com.google.common.collect.Lists;
@@ -12,8 +12,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -96,6 +97,7 @@ public class GraphBuilder implements Runnable {
 
     GraphBuilder graphBuilder = new GraphBuilder(baseGraph, config.getTransitServicePeriod());
     graphBuilder.hasTransitData = hasTransitData;
+    graphBuilder.transitModel.initTimeZone(config.timeZone);
 
     if (hasOsm) {
       List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
@@ -135,6 +137,7 @@ public class GraphBuilder implements Runnable {
         config.getTransitServicePeriod(),
         config.fareServiceFactory,
         config.discardMinTransferTimes,
+        config.blockBasedInterlining,
         config.maxInterlineDistance
       );
       graphBuilder.addModule(gtfsModule);
@@ -142,6 +145,10 @@ public class GraphBuilder implements Runnable {
 
     if (hasNetex) {
       graphBuilder.addModule(netexModule(config, dataSources.get(NETEX)));
+    }
+
+    if (hasTransitData && graphBuilder.transitModel.getAgencyTimeZones().size() > 1) {
+      graphBuilder.addModule(new TimeZoneAdjusterModule());
     }
 
     if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {

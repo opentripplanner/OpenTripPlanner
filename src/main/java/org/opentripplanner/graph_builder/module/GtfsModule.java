@@ -62,6 +62,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
   private final boolean discardMinTransferTimes;
+  private final boolean blockBasedInterlining;
   private final int maxInterlineDistance;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
@@ -70,17 +71,19 @@ public class GtfsModule implements GraphBuilderModule {
     ServiceDateInterval transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
     boolean discardMinTransferTimes,
+    boolean blockBasedInterlining,
     int maxInterlineDistance
   ) {
     this.gtfsBundles = bundles;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
     this.discardMinTransferTimes = discardMinTransferTimes;
+    this.blockBasedInterlining = blockBasedInterlining;
     this.maxInterlineDistance = maxInterlineDistance;
   }
 
   public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
-    this(bundles, transitPeriodLimit, new DefaultFareServiceFactory(), false, 100);
+    this(bundles, transitPeriodLimit, new DefaultFareServiceFactory(), false, true, 100);
   }
 
   @Override
@@ -90,14 +93,7 @@ public class GtfsModule implements GraphBuilderModule {
     HashMap<Class<?>, Object> extra,
     DataImportIssueStore issueStore
   ) {
-    // we're about to add another agency to the graph, so clear the cached timezone
-    // in case it should change
-    // OTP doesn't currently support multiple time zones in a single graph;
-    // at least this way we catch the error and log it instead of silently ignoring
-    // because the time zone from the first agency is cached
-    transitModel.clearTimeZone();
-
-    CalendarServiceData calendarServiceData = transitModel.getCalendarDataService();
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
 
     boolean hasTransit = false;
 
@@ -147,13 +143,15 @@ public class GtfsModule implements GraphBuilderModule {
         )
           .run(transitModel);
 
-        new InterlineProcessor(
-          transitModel.getTransferService(),
-          builder.getStaySeatedNotAllowed(),
-          maxInterlineDistance,
-          issueStore
-        )
-          .run(transitModel.getAllTripPatterns());
+        if (blockBasedInterlining) {
+          new InterlineProcessor(
+            transitModel.getTransferService(),
+            builder.getStaySeatedNotAllowed(),
+            maxInterlineDistance,
+            issueStore
+          )
+            .run(transitModel.getAllTripPatterns());
+        }
 
         fareServiceFactory.processGtfs(otpTransitService);
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
@@ -166,19 +164,9 @@ public class GtfsModule implements GraphBuilderModule {
       gtfsBundles.forEach(GtfsBundle::close);
     }
 
-    transitModel.clearCachedCalenderService();
-    // We need to save the calendar service data so we can use it later
-    transitModel.putService(
-      org.opentripplanner.model.calendar.CalendarServiceData.class,
-      calendarServiceData
-    );
-    transitModel.updateTransitFeedValidity(calendarServiceData, issueStore);
+    transitModel.validateTimeZones();
 
-    // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    transitModel.setHasTransit(transitModel.hasTransit() || hasTransit);
-    if (hasTransit) {
-      transitModel.calculateTransitCenter();
-    }
+    transitModel.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
   }
 
   @Override

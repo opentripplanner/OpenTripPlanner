@@ -115,10 +115,7 @@ public class QuayType {
             if (station != null) {
               return new MonoOrMultiModalStation(
                 station,
-                GqlUtil
-                  .getTransitService(environment)
-                  .getMultiModalStationForStations()
-                  .get(station)
+                GqlUtil.getTransitService(environment).getMultiModalStationForStation(station)
               );
             } else {
               return null;
@@ -132,16 +129,12 @@ public class QuayType {
           .name("wheelchairAccessible")
           .type(EnumTypes.WHEELCHAIR_BOARDING)
           .description("Whether this quay is suitable for wheelchair boarding.")
-          .dataFetcher(environment -> {
-            var wheelChairBoarding =
-              (((StopLocation) environment.getSource()).getWheelchairAccessibility());
-
-            return Objects.requireNonNullElse(
-              wheelChairBoarding,
+          .dataFetcher(environment ->
+            Objects.requireNonNullElse(
+              (((StopLocation) environment.getSource()).getWheelchairAccessibility()),
               WheelchairAccessibility.NO_INFORMATION
             )
-              .gtfsCode;
-          })
+          )
           .build()
       )
       .field(
