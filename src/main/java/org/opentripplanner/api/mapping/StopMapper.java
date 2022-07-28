@@ -70,13 +70,13 @@ public class StopMapper {
   }
 
   /** @param distance in integral meters, to avoid serializing a bunch of decimal places. */
-  public static ApiStopShort mapToApiShort(Stop domain, int distance) {
+  public static ApiStopShort mapToApiShort(StopLocation domain, double distance) {
     if (domain == null) {
       return null;
     }
 
     ApiStopShort api = mapToApiShort(domain);
-    api.dist = distance;
+    api.dist = (int) distance;
 
     return api;
   }
@@ -85,10 +85,7 @@ public class StopMapper {
     if (domain == null) {
       return null;
     }
-    return StreamSupport
-      .stream(domain.spliterator(), false)
-      .map(StopMapper::mapToApiShort)
-      .toList();
+    return domain.stream().map(StopMapper::mapToApiShort).toList();
   }
 
   /**

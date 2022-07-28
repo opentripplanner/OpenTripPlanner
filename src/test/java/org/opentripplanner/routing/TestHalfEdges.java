@@ -34,6 +34,8 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -571,10 +573,10 @@ public class TestHalfEdges {
     transitModel.index();
     graph.index();
     StreetVertexIndex finder = graph.getStreetIndex();
+    GraphFinder graphFinder = new DirectGraphFinder(graph);
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
     // test that the local stop finder finds stops
-    GenericLocation loc = new GenericLocation(40.01, -74.005000001);
-    assertTrue(finder.getNearbyTransitStops(loc.getCoordinate(), 100).size() > 0);
+    assertTrue(graphFinder.findClosestStops(40.01, -74.005000001, 100).size() > 0);
 
     // test that the closest vertex finder returns the closest vertex
     TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocationForTest(

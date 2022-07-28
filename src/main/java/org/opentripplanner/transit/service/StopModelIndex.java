@@ -32,7 +32,7 @@ public class StopModelIndex {
   // TODO: consistently key on model object or id string
 
   private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
-  private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<Stop> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
   private final Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
   private final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
@@ -52,7 +52,7 @@ public class StopModelIndex {
     }
     for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
       Envelope envelope = new Envelope(stopVertex.getCoordinate());
-      stopSpatialIndex.insert(envelope, stopVertex);
+      stopSpatialIndex.insert(envelope, stopVertex.getStop());
     }
 
     for (MultiModalStation multiModalStation : stopModel.getAllMultiModalStations()) {
@@ -83,7 +83,7 @@ public class StopModelIndex {
     return stopVertexForStop.get(stop);
   }
 
-  public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
+  public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
     return stopSpatialIndex.query(envelope);
   }
 

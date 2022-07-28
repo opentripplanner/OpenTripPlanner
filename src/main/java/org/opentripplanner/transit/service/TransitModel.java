@@ -407,10 +407,6 @@ public class TransitModel implements Serializable {
     return stopModel;
   }
 
-  public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
-    return stopModel.getStopModelIndex().queryStopSpatialIndex(envelope);
-  }
-
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
     tripPatternForId.put(id, tripPattern);
   }
