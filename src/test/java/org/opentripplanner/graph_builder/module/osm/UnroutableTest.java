@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import com.google.common.collect.Maps;
 import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -48,7 +47,7 @@ public class UnroutableTest {
     OpenStreetMapProvider provider = new OpenStreetMapProvider(osmDataFile, true);
     OpenStreetMapModule osmBuilder = new OpenStreetMapModule(provider);
     osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-    HashMap<Class<?>, Object> extra = Maps.newHashMap();
+    HashMap<Class<?>, Object> extra = new HashMap<>();
     osmBuilder.buildGraph(graph, transitModel, extra); // TODO get rid of this "extra" thing
   }
 

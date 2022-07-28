@@ -1,12 +1,12 @@
 package org.opentripplanner.standalone.server;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.jersey2.server.DefaultJerseyTagsProvider;
 import io.micrometer.jersey2.server.MetricsApplicationEventListener;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -106,7 +106,7 @@ public class OTPWebApplication extends Application {
    */
   @Override
   public Map<String, Object> getProperties() {
-    Map<String, Object> props = Maps.newHashMap();
+    Map<String, Object> props = new HashMap<>();
     props.put(ServerProperties.TRACING, Boolean.TRUE);
     props.put(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
     return props;
