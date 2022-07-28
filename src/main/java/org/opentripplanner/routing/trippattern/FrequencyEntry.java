@@ -2,6 +2,7 @@ package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
 import org.opentripplanner.model.Frequency;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * Uses a TripTimes to represent multiple trips following the same template at regular intervals.

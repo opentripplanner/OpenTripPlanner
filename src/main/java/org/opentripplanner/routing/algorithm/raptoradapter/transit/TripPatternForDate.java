@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**

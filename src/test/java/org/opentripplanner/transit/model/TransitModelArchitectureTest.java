@@ -32,7 +32,17 @@ public class TransitModelArchitectureTest {
       .dependsOn(UTILS, JACKSON_ANNOTATIONS, JTS_GEOM, GEO_UTIL, FRAMEWORK, BASIC, ORGANIZATION)
       .verify();
     NETWORK
-      .dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, SITE, LEGACY_MODEL, GUAVA, JTS_GEOM)
+      .dependsOn(
+        UTILS,
+        GUAVA,
+        JTS_GEOM,
+        FRAMEWORK,
+        BASIC,
+        ORGANIZATION,
+        SITE,
+        TIMETABLE,
+        LEGACY_MODEL
+      )
       .verify();
     TIMETABLE.dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE).verify();
   }
