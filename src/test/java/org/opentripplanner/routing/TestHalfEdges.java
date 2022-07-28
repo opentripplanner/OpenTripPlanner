@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -640,8 +639,7 @@ public class TestHalfEdges {
   @Test
   public void testNetworkLinker() {
     int numVerticesBefore = graph.getVertices().size();
-    StreetLinkerModule ttsnm = new StreetLinkerModule();
-    ttsnm.buildGraph(graph, transitModel, new HashMap<>());
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
     int numVerticesAfter = graph.getVertices().size();
     assertEquals(4, numVerticesAfter - numVerticesBefore);
     Collection<Edge> outgoing = station1.getOutgoing();

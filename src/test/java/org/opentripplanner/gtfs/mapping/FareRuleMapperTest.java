@@ -33,7 +33,7 @@ public class FareRuleMapperTest {
   private static final String ORIGIN_ID = "Origin Id";
 
   private final FareRuleMapper subject = new FareRuleMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)),
+    new RouteMapper(new AgencyMapper(FEED_ID), DataImportIssueStore.noopIssueStore()),
     new FareAttributeMapper()
   );
 

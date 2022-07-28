@@ -11,17 +11,26 @@ import org.slf4j.LoggerFactory;
 public class DataImportIssueStore {
 
   private static final Logger ISSUE_LOG = LoggerFactory.getLogger("DATA_IMPORT_ISSUES");
+  private static final DataImportIssueStore NOOP = new DataImportIssueStore(false);
 
   private final List<DataImportIssue> issues = new ArrayList<>();
 
   private final boolean storeIssues;
 
-  public DataImportIssueStore(boolean storeIssues) {
+  private DataImportIssueStore(boolean storeIssues) {
     this.storeIssues = storeIssues;
   }
 
+  public DataImportIssueStore() {
+    this.storeIssues = true;
+  }
+
+  public static DataImportIssueStore noopIssueStore() {
+    return NOOP;
+  }
+
   public static DataImportIssueStore noop() {
-    return new DataImportIssueStore(false);
+    return DataImportIssueStore.noopIssueStore();
   }
 
   public void add(DataImportIssue issue) {

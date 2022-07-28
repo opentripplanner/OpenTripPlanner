@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -40,12 +42,18 @@ public class PlatformLinkerTest {
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      gg,
+      transitModel.getTimeZone(),
+      DataImportIssueStore.noopIssueStore()
+    );
     osmModule.platformEntriesLinking = true;
     osmModule.skipVisibility = false;
     osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    osmModule.buildGraph(gg, transitModel, new HashMap<>());
+    osmModule.buildGraph();
 
     Vertex stairsEndpoint = gg.getVertex(stairsEndpointLabel);
 

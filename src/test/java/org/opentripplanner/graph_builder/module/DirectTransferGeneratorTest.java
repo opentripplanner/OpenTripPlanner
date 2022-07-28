@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -45,34 +46,44 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
   @Test
   public void testDirectTransfersWithoutPatterns() {
-    var generator = new DirectTransferGenerator(
-      MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
-    );
-
-    var otpModel = graph(false);
+    var otpModel = model(false);
     var graph = otpModel.graph();
     var transitModel = otpModel.transitModel();
+    var transferRequests = List.of(
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build())
+    );
     graph.hasStreets = false;
 
-    generator.buildGraph(graph, transitModel, null);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
     assertTransfers(transitModel.getAllPathTransfers());
   }
 
   @Test
   public void testDirectTransfersWithPatterns() {
-    var generator = new DirectTransferGenerator(
-      MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
-    );
-
-    var otpModel = graph(true);
+    var otpModel = model(true);
     var graph = otpModel.graph();
     graph.hasStreets = false;
     var transitModel = otpModel.transitModel();
+    var transferRequests = List.of(
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build())
+    );
 
-    generator.buildGraph(graph, transitModel, null);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
     assertTransfers(
       transitModel.getAllPathTransfers(),
@@ -87,34 +98,46 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
   @Test
   public void testSingleRequestWithoutPatterns() {
-    var generator = new DirectTransferGenerator(
-      MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
+    var transferRequests = List.of(
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build())
     );
 
-    var otpModel = graph(false);
+    var otpModel = model(false);
     var graph = otpModel.graph();
     graph.hasStreets = true;
     var transitModel = otpModel.transitModel();
 
-    generator.buildGraph(graph, transitModel, null);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
     assertTransfers(transitModel.getAllPathTransfers());
   }
 
   @Test
   public void testSingleRequestWithPatterns() {
-    var generator = new DirectTransferGenerator(
-      MAX_TRANSFER_DURATION,
-      List.of(new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()))
+    List<RoutingRequest> transferRequests = List.of(
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build())
     );
 
-    var otpModel = graph(true);
+    var otpModel = model(true);
     var graph = otpModel.graph();
     graph.hasStreets = true;
     var transitModel = otpModel.transitModel();
 
-    generator.buildGraph(graph, transitModel, null);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
     assertTransfers(
       transitModel.getAllPathTransfers(),
@@ -126,40 +149,49 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
   @Test
   public void testMultipleRequestsWithoutPatterns() {
-    var generator = new DirectTransferGenerator(
-      MAX_TRANSFER_DURATION,
-      List.of(
-        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()),
-        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.BIKE).build())
-      )
+    var transferRequests = List.of(
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()),
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.BIKE).build())
     );
 
-    var otpModel = graph(false);
+    var otpModel = model(false);
     var graph = otpModel.graph();
     graph.hasStreets = true;
     var transitModel = otpModel.transitModel();
 
-    generator.buildGraph(graph, transitModel, null);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
     assertTransfers(transitModel.getAllPathTransfers());
   }
 
   @Test
   public void testMultipleRequestsWithPatterns() {
-    var generator = new DirectTransferGenerator(
-      MAX_TRANSFER_DURATION,
-      List.of(
-        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()),
-        new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.BIKE).build())
-      )
+    var transferRequests = List.of(
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.WALK).build()),
+      new RoutingRequest(RequestModes.of().withTransferMode(StreetMode.BIKE).build())
     );
 
-    TestOtpModel model = graph(true);
+    TestOtpModel model = model(true);
     var graph = model.graph();
     graph.hasStreets = true;
     var transitModel = model.transitModel();
 
-    generator.buildGraph(graph, transitModel, null);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
+
     assertTransfers(
       transitModel.getAllPathTransfers(),
       tr(S0, 100, List.of(V0, V11), S11),
@@ -169,8 +201,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
   }
 
-  private TestOtpModel graph(boolean addPatterns) {
-    return graphOf(
+  private TestOtpModel model(boolean addPatterns) {
+    return modelOf(
       new Builder() {
         @Override
         public void build() {

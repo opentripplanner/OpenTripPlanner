@@ -5,10 +5,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -16,13 +14,14 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
+  private final TransitModel transitModel;
+
+  public TimeZoneAdjusterModule(TransitModel transitModel) {
+    this.transitModel = transitModel;
+  }
+
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     // TODO: We assume that all time zones follow the same DST rules. In reality we need to split up
     //  the services for each DST transition
     final Instant serviceStart = transitModel.getTransitServiceStarts().toInstant();

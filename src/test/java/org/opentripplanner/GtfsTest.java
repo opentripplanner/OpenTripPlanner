@@ -22,7 +22,6 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -143,10 +142,6 @@ public abstract class GtfsTest {
     feedId = new GtfsFeedId.Builder().id("FEED").build();
     gtfsBundle.setFeedId(feedId);
     List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
-    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
-      gtfsBundleList,
-      ServiceDateInterval.unbounded()
-    );
 
     alertsUpdateHandler = new AlertsUpdateHandler();
     var deduplicator = new Deduplicator();
@@ -154,7 +149,14 @@ public abstract class GtfsTest {
     graph = new Graph(stopModel, deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
 
-    gtfsGraphBuilderImpl.buildGraph(graph, transitModel, null);
+    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
+      gtfsBundleList,
+      transitModel,
+      graph,
+      ServiceDateInterval.unbounded()
+    );
+
+    gtfsGraphBuilderImpl.buildGraph();
     transitModel.index();
     graph.index();
     serverContext = TestServerContext.createServerContext(graph, transitModel);

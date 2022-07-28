@@ -52,7 +52,7 @@ public class NoticeAssignmentMapperTest {
     routesById.add(route);
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       List.of(),
       new HierarchicalMapById<>(),
@@ -100,7 +100,7 @@ public class NoticeAssignmentMapperTest {
       .withNoticeRef(new NoticeRefStructure().withRef(NOTICE_ID));
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       serviceJourneys,
       noticesById,

@@ -76,7 +76,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore()
   );
 
   public static <T> boolean hasArgument(Map<String, T> m, String name) {

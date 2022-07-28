@@ -7,7 +7,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.TestOtpModel;
@@ -56,10 +55,12 @@ public abstract class FlexTest {
     GtfsBundle gtfsBundle = new GtfsBundle(file);
     GtfsModule module = new GtfsModule(
       List.of(gtfsBundle),
+      transitModel,
+      graph,
       new ServiceDateInterval(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    module.buildGraph(graph, transitModel, new HashMap<>());
+    module.buildGraph();
     transitModel.index();
     graph.index();
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));

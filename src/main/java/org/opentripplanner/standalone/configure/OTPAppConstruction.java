@@ -82,7 +82,8 @@ public class OTPAppConstruction {
    * After the graph and transitModel is read from file or build, then it should be set here,
    * so it can be used during construction of the web server.
    */
-  public void updateModel(TransitModel transitModel) {
+  public void updateModel(Graph graph, TransitModel transitModel) {
+    getFactory().graphModel().setGraph(graph);
     this.transitModel = transitModel;
     this.raptorTuningParameters =
       new RaptorConfig<>(factory.configModel().routerConfig().raptorTuningParameters());
@@ -121,8 +122,10 @@ public class OTPAppConstruction {
   public GraphBuilder createGraphBuilder() {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
-      factory,
+      buildConfig(),
       graphBuilderDataSources(),
+      graph(),
+      transitModel(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );

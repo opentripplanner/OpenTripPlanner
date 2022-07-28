@@ -4,9 +4,10 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -42,10 +43,16 @@ public class FakeGraph {
     File file = getFileForResource("columbus.osm.pbf");
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      gg,
+      transitModel.getTimeZone(),
+      DataImportIssueStore.noopIssueStore()
+    );
     osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    osmModule.buildGraph(gg, transitModel, new HashMap<>());
+    osmModule.buildGraph();
     return new TestOtpModel(gg, transitModel);
   }
 
@@ -61,9 +68,11 @@ public class FakeGraph {
     throws URISyntaxException {
     GtfsModule gtfs = new GtfsModule(
       Arrays.asList(new GtfsBundle(getFileForResource("addTransitMultipleLines.gtfs.zip"))),
+      transitModel,
+      g,
       ServiceDateInterval.unbounded()
     );
-    gtfs.buildGraph(g, transitModel, new HashMap<>());
+    gtfs.buildGraph();
   }
 
   /**
@@ -71,11 +80,8 @@ public class FakeGraph {
    */
   public static void addPerpendicularRoutes(Graph graph, TransitModel transitModel)
     throws URISyntaxException {
-    GtfsModule gtfs = new GtfsModule(
-      Arrays.asList(new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip"))),
-      ServiceDateInterval.unbounded()
-    );
-    gtfs.buildGraph(graph, transitModel, new HashMap<>());
+    var input = List.of(new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip")));
+    new GtfsModule(input, transitModel, graph, ServiceDateInterval.unbounded()).buildGraph();
   }
 
   /** Add a regular grid of stops to the graph */

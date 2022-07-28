@@ -4,41 +4,17 @@ import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
-import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 
-import com.google.common.collect.Lists;
-import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
-import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
-import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.GraphCoherencyCheckerModule;
-import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
-import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
-import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
-import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
-import org.opentripplanner.graph_builder.module.ned.ElevationModule;
-import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.S3BucketConfig;
-import org.opentripplanner.standalone.configure.OTPApplicationFactory;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
@@ -55,17 +31,20 @@ public class GraphBuilder implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
   private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
-
   private final Graph graph;
-
   private final TransitModel transitModel;
+  private final DataImportIssueStore issueStore;
 
   private boolean hasTransitData = false;
 
-  private GraphBuilder(@Nonnull Graph baseGraph) {
+  public GraphBuilder(
+    @Nonnull Graph baseGraph,
+    @Nonnull TransitModel transitModel,
+    @Nonnull DataImportIssueStore issueStore
+  ) {
     this.graph = baseGraph;
-    // ensure the street model and the transit model share the same deduplicator and stop model
-    this.transitModel = new TransitModel(this.graph.getStopModel(), this.graph.deduplicator);
+    this.transitModel = transitModel;
+    this.issueStore = issueStore;
   }
 
   /**
@@ -73,188 +52,114 @@ public class GraphBuilder implements Runnable {
    * a graph from the given data source and configuration directory.
    */
   public static GraphBuilder create(
-    OTPApplicationFactory appFactory,
+    BuildConfig config,
     GraphBuilderDataSources dataSources,
+    Graph graph,
+    TransitModel transitModel,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
+    //DaggerGraphBuilderFactory appFactory = GraphBuilderFactoryDa
     boolean hasOsm = dataSources.has(OSM);
     boolean hasGtfs = dataSources.has(GTFS);
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
 
-    var config = appFactory.configModel().buildConfig();
-    var graphBuilder = new GraphBuilder(
-      appFactory.graphModel().graph()
-    );
+    var factory = GraphBuilderFactory
+      .of()
+      .withConfig(config)
+      .withGraph(graph)
+      .withTransitModel(transitModel)
+      .withIssueStore()
+      .build();
+
+    var graphBuilder = factory.createGraphBuilder();
 
     graphBuilder.hasTransitData = hasTransitData;
-    graphBuilder.transitModel.initTimeZone(config.timeZone);
+    transitModel.initTimeZone(config.timeZone);
 
     if (hasOsm) {
-      List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
-      for (DataSource osmFile : dataSources.get(OSM)) {
-        osmProviders.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
-      }
-      OpenStreetMapModule osmModule = new OpenStreetMapModule(
-        osmProviders,
-        config.boardingLocationTags
-      );
-      osmModule.customNamer = config.customNamer;
-      osmModule.setDefaultWayPropertySetSource(config.osmWayPropertySet);
-      osmModule.skipVisibility = !config.areaVisibility;
-      osmModule.platformEntriesLinking = config.platformEntriesLinking;
-      osmModule.staticBikeParkAndRide = config.staticBikeParkAndRide;
-      osmModule.staticParkAndRide = config.staticParkAndRide;
-      osmModule.banDiscouragedWalking = config.banDiscouragedWalking;
-      osmModule.banDiscouragedBiking = config.banDiscouragedBiking;
-      osmModule.maxAreaNodes = config.maxAreaNodes;
-      graphBuilder.addModule(osmModule);
+      graphBuilder.addModule(factory.createOpenStreetMapModule(dataSources.get(OSM)));
     }
-    if (hasGtfs) {
-      List<GtfsBundle> gtfsBundles = Lists.newArrayList();
-      for (DataSource gtfsData : dataSources.get(GTFS)) {
-        GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource) gtfsData);
 
-        if (config.parentStopLinking) {
-          gtfsBundle.linkStopsToParentStations = true;
-        }
-        gtfsBundle.parentStationTransfers = config.stationTransfers;
-        gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
-        gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
-        gtfsBundles.add(gtfsBundle);
-      }
-      GtfsModule gtfsModule = new GtfsModule(
-        gtfsBundles,
-        config.getTransitServicePeriod(),
-        config.fareServiceFactory,
-        config.discardMinTransferTimes,
-        config.blockBasedInterlining,
-        config.maxInterlineDistance
-      );
-      graphBuilder.addModule(gtfsModule);
+    if (hasGtfs) {
+      graphBuilder.addModule(factory.createGtfsModule(dataSources.get(GTFS)));
     }
 
     if (hasNetex) {
-      graphBuilder.addModule(netexModule(config, dataSources.get(NETEX)));
+      graphBuilder.addModule(factory.createNetexModule(dataSources.get(NETEX)));
     }
 
-    if (hasTransitData && graphBuilder.transitModel.getAgencyTimeZones().size() > 1) {
-      graphBuilder.addModule(new TimeZoneAdjusterModule());
+    if (hasTransitData && transitModel.getAgencyTimeZones().size() > 1) {
+      graphBuilder.addModule(factory.createTimeZoneAdjusterModule());
     }
 
     if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
       if (config.matchBusRoutesToStreets) {
-        graphBuilder.addModule(new BusRouteStreetMatcher());
+        graphBuilder.addModule(factory.createBusRouteStreetMatcher());
       }
-      graphBuilder.addModule(new OsmBoardingLocationsModule());
+      graphBuilder.addModule(factory.createOsmBoardingLocationsModule());
     }
 
     // This module is outside the hasGTFS conditional block because it also links things like bike rental
     // which need to be handled even when there's no transit.
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.setAddExtraEdgesToAreas(config.areaVisibility);
-    graphBuilder.addModule(streetLinkerModule);
+    graphBuilder.addModule(factory.createStreetLinkerModule());
 
     // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should
     // not be removed quite as easily
     if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
-      PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
-      pruneNoThruIslands.setPruningThresholdIslandWithoutStops(
-        config.pruningThresholdIslandWithoutStops
-      );
-      pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-      graphBuilder.addModule(pruneNoThruIslands);
+      graphBuilder.addModule(factory.createPruneNoThruIslands());
     }
 
     // Load elevation data and apply it to the streets.
     // We want to do run this module after loading the OSM street network but before finding transfers.
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
     if (config.elevationBucket != null) {
-      // Download the elevation tiles from an Amazon S3 bucket
-      S3BucketConfig bucketConfig = config.elevationBucket;
-      File cacheDirectory = new File(dataSources.getCacheDirectory(), "ned");
-      DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
-      awsTileSource.awsAccessKey = bucketConfig.accessKey;
-      awsTileSource.awsSecretKey = bucketConfig.secretKey;
-      awsTileSource.awsBucketName = bucketConfig.bucketName;
       elevationGridCoverageFactories.add(
-        new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource)
+        factory.createNedElevationFactory(dataSources.getCacheDirectory())
       );
     } else if (dataSources.has(DEM)) {
       // Load the elevation from a file in the graph inputs directory
       for (DataSource demSource : dataSources.get(DEM)) {
-        elevationGridCoverageFactories.add(new GeotiffGridCoverageFactoryImpl(demSource));
+        elevationGridCoverageFactories.add(factory.createGeotiffGridCoverageFactoryImpl(demSource));
       }
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
     // modules to the same graph builder. We do not actually know if this is supported by the
     // ElevationModule class.
-    for (ElevationGridCoverageFactory factory : elevationGridCoverageFactories) {
-      graphBuilder.addModule(
-        new ElevationModule(
-          factory,
-          new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
-          config.readCachedElevations,
-          config.writeCachedElevations,
-          config.elevationUnitMultiplier,
-          config.distanceBetweenElevationSamples,
-          config.maxElevationPropagationMeters,
-          config.includeEllipsoidToGeoidDifference,
-          config.multiThreadElevationCalculations
-        )
-      );
+    for (ElevationGridCoverageFactory it : elevationGridCoverageFactories) {
+      graphBuilder.addModule(factory.createElevationModule(it, dataSources.getCacheDirectory()));
     }
+
     if (hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
       if (OTPFeature.FlexRouting.isOn()) {
-        graphBuilder.addModule(new FlexLocationsToStreetEdgesMapper());
+        graphBuilder.addModule(factory.createFlexLocationsToStreetEdgesMapper());
       }
 
       // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-      graphBuilder.addModule(
-        new DirectTransferGenerator(
-          Duration.ofSeconds((long) config.maxTransferDurationSeconds),
-          config.transferRequests
-        )
-      );
+      graphBuilder.addModule(factory.createDirectTransferGenerator());
 
       // Analyze routing between stops to generate report
       if (OTPFeature.TransferAnalyzer.isOn()) {
-        graphBuilder.addModule(
-          new DirectTransferAnalyzer(
-            config.maxTransferDurationSeconds * new RoutingRequest().walkSpeed
-          )
-        );
+        graphBuilder.addModule(factory.createDirectTransferAnalyzer());
       }
     }
 
     if (loadStreetGraph || hasOsm) {
-      graphBuilder.addModule(new GraphCoherencyCheckerModule());
+      graphBuilder.addModule(factory.createGraphCoherencyCheckerModule());
     }
 
     if (config.dataImportReport) {
-      graphBuilder.addModule(
-        new DataImportIssuesToHTML(
-          dataSources.getBuildReportDir(),
-          config.maxDataImportIssuesPerFile
-        )
-      );
+      graphBuilder.addModule(factory.createDataImportIssuesToHTML(dataSources.getBuildReportDir()));
     }
 
     if (OTPFeature.DataOverlay.isOn()) {
-      var module = DataOverlayFactory.create(config.dataOverlay);
-      if (module != null) {
-        graphBuilder.addModule(module);
-      }
+      graphBuilder.addModuleOptional(factory.createDataOverlayFactory());
     }
 
     return graphBuilder;
-  }
-
-  public TransitModel getTransitModel() {
-    return transitModel;
   }
 
   public void run() {
@@ -267,12 +172,10 @@ public class GraphBuilder implements Runnable {
       builder.checkInputs();
     }
 
-    DataImportIssueStore issueStore = new DataImportIssueStore(true);
-    HashMap<Class<?>, Object> extra = new HashMap<>();
-
     for (GraphBuilderModule load : graphBuilderModules) {
-      load.buildGraph(graph, transitModel, extra, issueStore);
+      load.buildGraph();
     }
+
     issueStore.summarize();
     validate();
 
@@ -284,8 +187,14 @@ public class GraphBuilder implements Runnable {
     LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
   }
 
-  private void addModule(GraphBuilderModule loader) {
-    graphBuilderModules.add(loader);
+  private void addModule(GraphBuilderModule module) {
+    graphBuilderModules.add(module);
+  }
+
+  private void addModuleOptional(GraphBuilderModule module) {
+    if (module != null) {
+      graphBuilderModules.add(module);
+    }
   }
 
   private boolean hasTransitData() {

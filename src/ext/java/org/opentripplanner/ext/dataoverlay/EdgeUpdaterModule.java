@@ -1,12 +1,9 @@
 package org.opentripplanner.ext.dataoverlay;
 
-import java.util.HashMap;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This class allows updating the graph with the grid data from generic .nc file in accordance with
@@ -19,27 +16,25 @@ public class EdgeUpdaterModule implements GraphBuilderModule {
   private final GenericDataFile dataFile;
   private final TimeUnit timeFormat;
   private final DataOverlayParameterBindings parameterBindings;
+  private final Graph graph;
 
   /**
    * Sets the generic grid data file
    */
   public EdgeUpdaterModule(
+    Graph graph,
     GenericDataFile dataFile,
     TimeUnit timeFormat,
     DataOverlayParameterBindings parameterBindings
   ) {
+    this.graph = graph;
     this.dataFile = dataFile;
     this.timeFormat = timeFormat;
     this.parameterBindings = parameterBindings;
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(
       dataFile,
       timeFormat,

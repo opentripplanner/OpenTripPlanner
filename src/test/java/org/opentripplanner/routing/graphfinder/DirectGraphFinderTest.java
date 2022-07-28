@@ -22,7 +22,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    TestOtpModel model = graphOf(
+    TestOtpModel model = modelOf(
       new Builder() {
         @Override
         public void build() {

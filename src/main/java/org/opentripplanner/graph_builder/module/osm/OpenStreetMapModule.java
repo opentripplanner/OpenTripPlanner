@@ -4,6 +4,7 @@ import ch.poole.openinghoursparser.OpeningHoursParseException;
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,8 +32,7 @@ import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
-import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
@@ -77,7 +77,6 @@ import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +89,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
 
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
-  private final HashMap<Vertex, Double> elevationData = new HashMap<>();
+  private final Map<Vertex, Double> elevationData;
 
   // Private members that are only read or written internally.
   /**
@@ -134,22 +133,34 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    */
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
-  private DataImportIssueStore issueStore;
+  private final DataImportIssueStore issueStore;
   private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
-  /**
-   * Construct and set providers all at once.
-   */
+  private final Graph graph;
+  private final ZoneId timeZoneId;
+
   public OpenStreetMapModule(
-    List<OpenStreetMapProvider> providers,
-    Set<String> boardingAreaRefTags
+    Collection<OpenStreetMapProvider> providers,
+    Set<String> boardingAreaRefTags,
+    Graph graph,
+    ZoneId timeZoneId,
+    DataImportIssueStore issueStore
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
+    this.elevationData = new HashMap<>();
+    this.graph = graph;
+    this.timeZoneId = timeZoneId;
+    this.issueStore = issueStore;
   }
 
-  public OpenStreetMapModule(OpenStreetMapProvider provider) {
-    this(List.of(provider), Set.of());
+  public OpenStreetMapModule(
+    OpenStreetMapProvider provider,
+    Graph graph,
+    ZoneId timeZoneId,
+    DataImportIssueStore issueStore
+  ) {
+    this(List.of(provider), Set.of(), graph, timeZoneId, issueStore);
   }
 
   /**
@@ -164,21 +175,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
-    this.issueStore = issueStore;
+  public void buildGraph() {
     this.osmOpeningHoursParser =
-      new OSMOpeningHoursParser(
-        graph.getOpeningHoursCalendarService(),
-        transitModel.getTimeZone(),
-        issueStore
-      );
+      new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), timeZoneId, issueStore);
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
-    Handler handler = new Handler(graph, transitModel, osmdb);
+    Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: " + provider);
       provider.readOSM(osmdb);
@@ -196,10 +197,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     );
 
     LOG.info("Building street graph from OSM");
-    handler.buildGraph(extra);
+    handler.buildGraph();
     graph.hasStreets = true;
     //Calculates envelope for OSM
     graph.calculateEnvelope();
+  }
+
+  public Map<Vertex, Double> elevationDataOutput() {
+    return elevationData;
   }
 
   @Override
@@ -226,8 +231,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private final Graph graph;
 
-    private final TransitModel transitModel;
-
     private final OSMDatabase osmdb;
     // track OSM nodes which are decomposed into multiple graph vertices because they are
     // elevators. later they will be iterated over to build ElevatorEdges between them.
@@ -239,13 +242,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     private float bestBikeSafety = 1.0f;
 
-    public Handler(Graph graph, TransitModel transitModel, OSMDatabase osmdb) {
+    public Handler(Graph graph, OSMDatabase osmdb) {
       this.graph = graph;
-      this.transitModel = transitModel;
       this.osmdb = osmdb;
     }
 
-    public void buildGraph(HashMap<Class<?>, Object> extra) {
+    public void buildGraph() {
       if (staticParkAndRide) {
         processParkAndRideNodes(osmdb.getCarParkingNodes(), true);
       }
@@ -279,9 +281,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       if (customNamer != null) {
         customNamer.postprocess(graph);
       }
-
-      // generate elevation profiles
-      extra.put(ElevationPoint.class, elevationData);
 
       applyBikeSafetyFactor(graph);
     } // END buildGraph()

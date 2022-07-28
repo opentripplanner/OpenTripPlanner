@@ -86,7 +86,7 @@ class TransitModelTest {
       null
     );
 
-    new TimeZoneAdjusterModule().buildGraph(graph, transitModel, null);
+    new TimeZoneAdjusterModule(transitModel).buildGraph();
 
     TransitModelIndex transitModelIndex = transitModel.getTransitModelIndex();
 

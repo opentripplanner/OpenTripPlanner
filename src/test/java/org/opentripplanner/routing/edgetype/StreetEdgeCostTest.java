@@ -23,7 +23,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
   Graph graph;
 
   public StreetEdgeCostTest() {
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new Builder() {
         @Override
         public void build() {

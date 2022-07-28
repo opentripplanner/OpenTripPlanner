@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
-import java.util.HashMap;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -99,11 +98,11 @@ public class ElevationModuleTest {
     File cacheDirectory = new File(ElevationModuleTest.class.getResource("ned").getFile());
     DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
     NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
-    ElevationModule elevationModule = new ElevationModule(gcf);
+    ElevationModule elevationModule = new ElevationModule(gcf, graph);
 
     // build to graph to execute the elevation module
     elevationModule.checkInputs();
-    elevationModule.buildGraph(graph, transitModel, new HashMap<>());
+    elevationModule.buildGraph();
 
     // verify that elevation data has been set on the StreetWithElevationEdge
     assertNotNull(edge.getElevationProfile());

@@ -108,8 +108,7 @@ public class OTPMain {
       params.getBaseDirectory().getAbsolutePath()
     );
 
-    TransitModel transitModel = null;
-    OTPAppConstruction app = new OTPAppConstruction(params);
+    var app = new OTPAppConstruction(params);
     var factory = app.getFactory();
     var datastore = factory.datastore();
     var configModel = factory.configModel();
@@ -124,8 +123,8 @@ public class OTPMain {
         ? datastore.getGraph()
         : datastore.getStreetGraph();
       SerializedGraphObject obj = SerializedGraphObject.load(graphFile);
-      app.getFactory().graphModel().setGraph(obj.graph);
-      transitModel = obj.transitModel;
+      app.updateModel(obj.graph, obj.transitModel);
+
       configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
       graphAvailable = true;
     }
@@ -140,7 +139,6 @@ public class OTPMain {
       GraphBuilder graphBuilder = app.createGraphBuilder();
       if (graphBuilder != null) {
         graphBuilder.run();
-        transitModel = graphBuilder.getTransitModel();
         graphAvailable = true;
       } else {
         throw new IllegalStateException("An error occurred while building the graph.");
@@ -149,7 +147,7 @@ public class OTPMain {
       // with using the embedded router config.
       new SerializedGraphObject(
         app.graph(),
-        transitModel,
+        app.transitModel(),
         configModel.buildConfig(),
         configModel.routerConfig()
       )
@@ -164,7 +162,6 @@ public class OTPMain {
     }
 
     if (params.doServe()) {
-      app.updateModel(transitModel);
       startOtpWebServer(params, app);
     } else {
       LOG.info("Done building graph. Exiting.");
