@@ -1,6 +1,5 @@
 package org.opentripplanner.model;
 
-import com.google.common.collect.Lists;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
@@ -41,9 +40,9 @@ public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private final List<TripTimes> tripTimes = Lists.newArrayList();
+  private final List<TripTimes> tripTimes = new ArrayList<>();
 
-  private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+  private final List<FrequencyEntry> frequencyEntries = new ArrayList<>();
 
   private final LocalDate serviceDate;
 

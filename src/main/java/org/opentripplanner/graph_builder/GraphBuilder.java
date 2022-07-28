@@ -6,7 +6,6 @@ import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 
-import com.google.common.collect.Lists;
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class GraphBuilder implements Runnable {
     graphBuilder.transitModel.initTimeZone(config.timeZone);
 
     if (hasOsm) {
-      List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
+      List<OpenStreetMapProvider> osmProviders = new ArrayList<>();
       for (DataSource osmFile : dataSources.get(OSM)) {
         osmProviders.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
       }
@@ -120,7 +119,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(osmModule);
     }
     if (hasGtfs) {
-      List<GtfsBundle> gtfsBundles = Lists.newArrayList();
+      List<GtfsBundle> gtfsBundles = new ArrayList<>();
       for (DataSource gtfsData : dataSources.get(GTFS)) {
         GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource) gtfsData);
 

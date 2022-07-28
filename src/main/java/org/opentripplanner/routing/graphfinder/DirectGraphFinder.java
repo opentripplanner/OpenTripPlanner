@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graphfinder;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -30,7 +30,7 @@ public class DirectGraphFinder implements GraphFinder {
    */
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
-    List<NearbyStop> stopsFound = Lists.newArrayList();
+    List<NearbyStop> stopsFound = new ArrayList<>();
     Coordinate coordinate = new Coordinate(lon, lat);
     Envelope envelope = new Envelope(coordinate);
     envelope.expandBy(
