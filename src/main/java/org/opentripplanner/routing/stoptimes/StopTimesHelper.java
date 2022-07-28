@@ -2,9 +2,9 @@ package org.opentripplanner.routing.stoptimes;
 
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
-import static org.opentripplanner.util.time.TimeUtils.ONE_DAY_SECONDS;
 
 import com.google.common.collect.MinMaxPriorityQueue;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -38,8 +39,8 @@ public class StopTimesHelper {
    * TODO: Add frequency based trips
    *
    * @param stop                  Stop object to perform the search for
-   * @param startTime             Start time for the search. Seconds from UNIX epoch
-   * @param timeRange             Searches forward for timeRange seconds from startTime
+   * @param startTime             Start time for the search.
+   * @param timeRange             Searches forward for timeRange from startTime
    * @param numberOfDepartures    Number of departures to fetch per pattern
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
@@ -48,29 +49,13 @@ public class StopTimesHelper {
     TransitService transitService,
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
-    long startTime, // TODO: Migrate to instant
-    int timeRange, // TODO: Migrate to duration
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
   ) {
-    if (startTime == 0) {
-      startTime = Instant.now().getEpochSecond();
-    }
     List<StopTimesInPattern> result = new ArrayList<>();
-
-    ZoneId zoneId = transitService.getTransitLayer().getTransitDataZoneId();
-    LocalDate date = Instant.ofEpochSecond(startTime).atZone(zoneId).toLocalDate();
-
-    // Number of days requested + the following day
-    int numberOfDays = timeRange / ONE_DAY_SECONDS + 1;
-
-    List<LocalDate> dates = new ArrayList<>();
-
-    // Yesterday, today, number of requested days, following day
-    for (int i = -1; i <= numberOfDays; i++) {
-      dates.add(date.plusDays(i));
-    }
 
     // Fetch all patterns, including those from realtime sources
     Collection<TripPattern> patterns = transitService.getPatternsForStop(stop, timetableSnapshot);
@@ -86,8 +71,7 @@ public class StopTimesHelper {
         numberOfDepartures,
         arrivalDeparture,
         includeCancelledTrips,
-        false,
-        dates
+        false
       );
 
       result.addAll(getStopTimesInPattern(pattern, pq));
@@ -111,32 +95,30 @@ public class StopTimesHelper {
   ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
-    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop, true);
-    for (TripPattern pattern : patternsForStop) {
+    var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
+    Instant midnight = ServiceDateUtils
+      .asStartOfService(serviceDate, transitService.getTimeZone())
+      .toInstant();
+
+    for (TripPattern pattern : transitService.getPatternsForStop(stop, true)) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-      Timetable tt;
-      TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
-      if (timetableSnapshot != null) {
-        tt = timetableSnapshot.resolve(pattern, serviceDate);
-      } else {
-        tt = pattern.getScheduledTimetable();
-      }
-      var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
-      Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate, transitService.getTimeZone())
-        .toInstant();
-      int sidx = 0;
-      for (var currStop : pattern.getStops()) {
+      Timetable tt = Optional
+        .ofNullable(transitService.getTimetableSnapshot())
+        .map(timetableSnapshot -> timetableSnapshot.resolve(pattern, serviceDate))
+        .orElse(pattern.getScheduledTimetable());
+      List<StopLocation> stops = pattern.getStops();
+      for (int i = 0; i < stops.size(); i++) {
+        StopLocation currStop = stops.get(i);
         if (currStop == stop) {
-          if (skipByPickUpDropOff(pattern, arrivalDeparture, sidx)) continue;
+          if (skipByPickUpDropOff(pattern, arrivalDeparture, i)) {
+            continue;
+          }
           for (TripTimes t : tt.getTripTimes()) {
-            if (!servicesRunning.contains(t.getServiceCode())) {
-              continue;
+            if (servicesRunning.contains(t.getServiceCode())) {
+              stopTimes.times.add(new TripTimeOnDate(t, i, pattern, serviceDate, midnight));
             }
-            stopTimes.times.add(new TripTimeOnDate(t, sidx, pattern, serviceDate, midnight));
           }
         }
-        sidx++;
       }
       ret.add(stopTimes);
     }
@@ -153,8 +135,8 @@ public class StopTimesHelper {
    *
    * @param stop               Stop object to perform the search for
    * @param pattern            Pattern object to perform the search for
-   * @param startTime          Start time for the search. Seconds from UNIX epoch
-   * @param timeRange          Searches forward for timeRange seconds from startTime
+   * @param startTime          Start time for the search.
+   * @param timeRange          Searches forward for timeRange from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param arrivalDeparture   Filter by arrivals, departures, or both.
    */
@@ -163,20 +145,11 @@ public class StopTimesHelper {
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
-    long startTime, // TODO: Migrate to instant
-    int timeRange, // TODO: Migrate to duration
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
-    if (startTime == 0) {
-      startTime = System.currentTimeMillis() / 1000;
-    }
-    LocalDate date = Instant
-      .ofEpochSecond(startTime)
-      .atZone(transitService.getTimeZone())
-      .toLocalDate();
-    List<LocalDate> serviceDates = List.of(date.minusDays(1), date, date.plusDays(1));
-
     Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
       transitService,
       timetableSnapshot,
@@ -187,8 +160,7 @@ public class StopTimesHelper {
       numberOfDepartures,
       arrivalDeparture,
       false,
-      true,
-      serviceDates
+      true
     );
 
     return new ArrayList<>(pq);
@@ -214,14 +186,20 @@ public class StopTimesHelper {
     TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
-    long startTime, //TODO: Change to Instant
-    int timeRange, // TODO: Migrate to duration
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations,
-    boolean includeReplaced,
-    Collection<LocalDate> serviceDates
+    boolean includeReplaced
   ) {
+    ZoneId zoneId = transitService.getTransitLayer().getTransitDataZoneId();
+    LocalDate startDate = startTime.atZone(zoneId).toLocalDate().minusDays(1);
+    LocalDate endDate = startTime.plus(timeRange).atZone(zoneId).toLocalDate();
+
+    // datesUntil is exclusive in the end, so need to add one day
+    List<LocalDate> serviceDates = startDate.datesUntil(endDate.plusDays(1)).toList();
+
     // The bounded priority Q is used to keep a sorted short list of trip times. We can not
     // relay on the trip times to be in order because of real-time updates. This code can
     // probably be optimized, and the trip search in the Raptor search does almost the same
@@ -241,27 +219,25 @@ public class StopTimesHelper {
       .maximumSize(numberOfDepartures)
       .create();
 
+    int timeRangeSeconds = (int) timeRange.toSeconds();
+
     // Loop through all possible days
     for (LocalDate serviceDate : serviceDates) {
-      Timetable timetable;
-      if (timetableSnapshot != null) {
-        timetable = timetableSnapshot.resolve(pattern, serviceDate);
-      } else {
-        timetable = pattern.getScheduledTimetable();
-      }
+      Timetable timetable = Optional
+        .ofNullable(timetableSnapshot)
+        .map(timetableSnapshot1 -> timetableSnapshot1.resolve(pattern, serviceDate))
+        .orElse(pattern.getScheduledTimetable());
 
-      ZonedDateTime midnight = ServiceDateUtils.asStartOfService(
-        serviceDate,
-        transitService.getTimeZone()
-      );
+      ZonedDateTime midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
       int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
         midnight,
-        ZonedDateTime.ofInstant(Instant.ofEpochSecond(startTime), transitService.getTimeZone())
+        ZonedDateTime.ofInstant(startTime, zoneId)
       );
       var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
 
-      int stopIndex = 0;
-      for (var currStop : pattern.getStops()) {
+      List<StopLocation> stops = pattern.getStops();
+      for (int stopIndex = 0; stopIndex < stops.size(); stopIndex++) {
+        StopLocation currStop = stops.get(stopIndex);
         if (currStop == stop) {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, stopIndex)) {
             continue;
@@ -291,11 +267,11 @@ public class StopTimesHelper {
 
             boolean departureTimeInRange =
               tripTimes.getDepartureTime(stopIndex) >= secondsSinceMidnight &&
-              tripTimes.getDepartureTime(stopIndex) <= secondsSinceMidnight + timeRange;
+              tripTimes.getDepartureTime(stopIndex) <= secondsSinceMidnight + timeRangeSeconds;
 
             boolean arrivalTimeInRange =
               tripTimes.getArrivalTime(stopIndex) >= secondsSinceMidnight &&
-              tripTimes.getArrivalTime(stopIndex) <= secondsSinceMidnight + timeRange;
+              tripTimes.getArrivalTime(stopIndex) <= secondsSinceMidnight + timeRangeSeconds;
 
             // ARRIVAL: Arrival time has to be within range
             // DEPARTURES: Departure time has to be within range
@@ -311,7 +287,6 @@ public class StopTimesHelper {
           }
           // TODO Add back support for frequency entries
         }
-        stopIndex++;
       }
     }
     return pq;

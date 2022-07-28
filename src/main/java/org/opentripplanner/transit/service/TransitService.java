@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import gnu.trove.set.TIntSet;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -121,8 +122,8 @@ public interface TransitService {
 
   List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
@@ -137,8 +138,8 @@ public interface TransitService {
   List<TripTimeOnDate> stopTimesForPatternAtStop(
     StopLocation stop,
     TripPattern pattern,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   );

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -296,8 +297,8 @@ public class DefaultTransitService implements TransitEditorService {
    * TODO: Add frequency based trips
    *
    * @param stop                  Stop object to perform the search for
-   * @param startTime             Start time for the search. Seconds from UNIX epoch
-   * @param timeRange             Searches forward for timeRange seconds from startTime
+   * @param startTime             Start time for the search.
+   * @param timeRange             Searches forward for timeRange from startTime
    * @param numberOfDepartures    Number of departures to fetch per pattern
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result.
@@ -305,8 +306,8 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
@@ -349,8 +350,8 @@ public class DefaultTransitService implements TransitEditorService {
    *
    * @param stop               Stop object to perform the search for
    * @param pattern            Pattern object to perform the search for
-   * @param startTime          Start time for the search. Seconds from UNIX epoch
-   * @param timeRange          Searches forward for timeRange seconds from startTime
+   * @param startTime          Start time for the search.
+   * @param timeRange          Searches forward for timeRange from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param arrivalDeparture   Filter by arrivals, departures, or both
    */
@@ -358,8 +359,8 @@ public class DefaultTransitService implements TransitEditorService {
   public List<TripTimeOnDate> stopTimesForPatternAtStop(
     StopLocation stop,
     TripPattern pattern,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {

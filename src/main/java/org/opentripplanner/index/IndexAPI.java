@@ -1,6 +1,8 @@
 package org.opentripplanner.index;
 
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -244,7 +246,7 @@ public class IndexAPI {
    * Return upcoming vehicle arrival/departure times at the given stop.
    *
    * @param stopIdString       Stop ID in Agency:Stop ID format
-   * @param startTime          Start time for the search. Seconds from UNIX epoch
+   * @param startTimeSeconds          Start time for the search. Seconds from UNIX epoch
    * @param timeRange          Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    */
@@ -252,16 +254,20 @@ public class IndexAPI {
   @Path("/stops/{stopId}/stoptimes")
   public Collection<ApiStopTimesInPattern> getStopTimesForStop(
     @PathParam("stopId") String stopIdString,
-    @QueryParam("startTime") long startTime,
+    @QueryParam("startTime") long startTimeSeconds,
     @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
     @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
     @QueryParam("omitNonPickups") boolean omitNonPickups
   ) {
+    Instant startTime = startTimeSeconds == 0
+      ? Instant.now()
+      : Instant.ofEpochSecond(startTimeSeconds);
+
     return transitService()
       .stopTimesForStop(
         stop(stopIdString),
         startTime,
-        timeRange,
+        Duration.ofSeconds(timeRange),
         numberOfDepartures,
         omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
         false

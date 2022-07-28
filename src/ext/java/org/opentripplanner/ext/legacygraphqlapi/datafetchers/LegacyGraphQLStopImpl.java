@@ -4,6 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -247,7 +248,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           }
 
           TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
-          long startTime = args.getLegacyGraphQLStartTime();
+
+          Instant startTime = args.getLegacyGraphQLStartTime() != 0
+            ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
+            : Instant.now();
+
           if (timetableSnapshot != null && timetableSnapshot.hasLastAddedTripPatterns()) {
             return getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
               pattern,
@@ -264,7 +269,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             stop,
             pattern,
             startTime,
-            args.getLegacyGraphQLTimeRange(),
+            Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
               ? ArrivalDeparture.DEPARTURES
@@ -295,11 +300,15 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
+      Instant startTime = args.getLegacyGraphQLStartTime() != 0
+        ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
+        : Instant.now();
+
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
         transitService.stopTimesForStop(
           stop,
-          args.getLegacyGraphQLStartTime(),
-          args.getLegacyGraphQLTimeRange(),
+          startTime,
+          Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
           args.getLegacyGraphQLNumberOfDepartures(),
           args.getLegacyGraphQLOmitNonPickups()
             ? ArrivalDeparture.DEPARTURES
@@ -370,12 +379,15 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
+      Instant startTime = args.getLegacyGraphQLStartTime() != 0
+        ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
+        : Instant.now();
       Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
         transitService
           .stopTimesForStop(
             stop,
-            args.getLegacyGraphQLStartTime(),
-            args.getLegacyGraphQLTimeRange(),
+            startTime,
+            Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
               ? ArrivalDeparture.DEPARTURES
@@ -539,12 +551,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     TransitService transitService,
     LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args
   ) {
-    long startTime = args.getLegacyGraphQLStartTime();
-    LocalDate date =
-      (startTime == 0 ? Instant.now() : Instant.ofEpochSecond(startTime)).atZone(
-          transitService.getTimeZone()
-        )
-        .toLocalDate();
+    Instant startTime = args.getLegacyGraphQLStartTime() != 0
+      ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
+      : Instant.now();
+
+    LocalDate date = startTime.atZone(transitService.getTimeZone()).toLocalDate();
     return Stream
       .concat(
         getRealtimeAddedPatternsAsStream(originalPattern, timetableSnapshot, date),
@@ -556,7 +567,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             stop,
             tripPattern,
             startTime,
-            args.getLegacyGraphQLTimeRange(),
+            Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
               ? ArrivalDeparture.DEPARTURES
