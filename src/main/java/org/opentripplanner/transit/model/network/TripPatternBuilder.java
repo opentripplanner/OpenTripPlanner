@@ -21,11 +21,11 @@ public final class TripPatternBuilder
 
   private TripPattern originalTripPattern;
 
-  public TripPatternBuilder(FeedScopedId id) {
+  TripPatternBuilder(FeedScopedId id) {
     super(id);
   }
 
-  public TripPatternBuilder(TripPattern original) {
+  TripPatternBuilder(TripPattern original) {
     super(original);
     this.name = original.getName();
     this.route = original.getRoute();
