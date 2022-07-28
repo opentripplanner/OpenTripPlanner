@@ -77,6 +77,11 @@ public final class TripPattern
   private byte[][] hopGeometries;
 
   /**
+   * The original TripPattern this replaces at least for one modified trip.
+   */
+  private TripPattern originalTripPattern = null;
+
+  /**
    * Has the TripPattern been created by a real-time update.
    */
   private final boolean createdByRealtimeUpdater;
@@ -547,6 +552,10 @@ public final class TripPattern
    */
   public void removeTrips(Predicate<Trip> removeTrip) {
     scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
+  }
+
+  public void setOriginalTripPattern(TripPattern originalTripPattern) {
+    this.originalTripPattern = originalTripPattern;
   }
 
   /**
