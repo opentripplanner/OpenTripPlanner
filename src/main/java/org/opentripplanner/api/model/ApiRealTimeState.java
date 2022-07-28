@@ -1,5 +1,7 @@
 package org.opentripplanner.api.model;
 
+import org.opentripplanner.transit.model.timetable.RealTimeState;
+
 /**
  * The real-time state of a trip
  */
@@ -33,7 +35,7 @@ public enum ApiRealTimeState {
   MODIFIED;
 
   public static ApiRealTimeState RealTimeState(
-    org.opentripplanner.routing.trippattern.RealTimeState other
+    RealTimeState other
   ) {
     switch (other) {
       case SCHEDULED:
