@@ -7,6 +7,7 @@ import io.micrometer.jersey2.server.MetricsApplicationEventListener;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -58,10 +59,8 @@ public class OTPWebApplication extends Application {
    */
   @Override
   public Set<Class<?>> getClasses() {
-    Set<Class<?>> classes = Sets.newHashSet();
-
     // Add API Endpoints defined in the api package
-    classes.addAll(APIEndpoints.listAPIEndpoints());
+    Set<Class<?>> classes = new HashSet<>(APIEndpoints.listAPIEndpoints());
 
     /* Features and Filters: extend Jersey, manipulate requests and responses. */
     classes.add(CorsFilter.class);

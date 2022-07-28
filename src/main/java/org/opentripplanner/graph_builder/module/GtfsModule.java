@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
-import com.google.common.collect.Sets;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +53,7 @@ public class GtfsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
   private final EntityHandler counter = new EntityCounter();
-  private final Set<String> agencyIdsSeen = Sets.newHashSet();
+  private final Set<String> agencyIdsSeen = new HashSet<>();
   /**
    * @see BuildConfig#transitServiceStart
    * @see BuildConfig#transitServiceEnd

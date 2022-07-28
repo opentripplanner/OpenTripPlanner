@@ -1,8 +1,8 @@
 package org.opentripplanner.api.parameter;
 
-import com.google.common.collect.Sets;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -27,7 +27,7 @@ public class QualifiedModeSet implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  public Set<QualifiedMode> qModes = Sets.newHashSet();
+  public Set<QualifiedMode> qModes = new HashSet<>();
 
   public QualifiedModeSet(String[] modes) {
     for (String qMode : modes) {
