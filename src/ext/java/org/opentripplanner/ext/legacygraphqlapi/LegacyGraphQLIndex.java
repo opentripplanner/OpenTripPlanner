@@ -79,7 +79,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLservic
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -169,7 +169,7 @@ class LegacyGraphQLIndex {
 
   static ExecutionResult getGraphQLExecutionResult(
     String query,
-    Router router,
+    OtpServerContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -193,9 +193,9 @@ class LegacyGraphQLIndex {
     }
 
     LegacyGraphQLRequestContext requestContext = new LegacyGraphQLRequestContext(
-      router,
-      new RoutingService(router.graph, router.transitModel),
-      new DefaultTransitService(router.transitModel)
+      serverContext,
+      serverContext.routingService(),
+      serverContext.transitService()
     );
 
     ExecutionInput executionInput = ExecutionInput
@@ -203,7 +203,7 @@ class LegacyGraphQLIndex {
       .query(query)
       .operationName(operationName)
       .context(requestContext)
-      .root(router)
+      .root(serverContext)
       .variables(variables)
       .locale(locale)
       .build();
@@ -216,7 +216,7 @@ class LegacyGraphQLIndex {
 
   static Response getGraphQLResponse(
     String query,
-    Router router,
+    OtpServerContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -225,7 +225,7 @@ class LegacyGraphQLIndex {
   ) {
     ExecutionResult executionResult = getGraphQLExecutionResult(
       query,
-      router,
+      serverContext,
       variables,
       operationName,
       maxResolves,

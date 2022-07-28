@@ -5,6 +5,8 @@ import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRout
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -21,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RouterConfig implements Serializable {
 
-  private static final double DEFAULT_STREET_ROUTING_TIMEOUT = 5.0;
+  private static final Duration DEFAULT_STREET_ROUTING_TIMEOUT = Duration.ofSeconds(5);
   private static final Logger LOG = LoggerFactory.getLogger(RouterConfig.class);
 
   public static final RouterConfig DEFAULT = new RouterConfig(
@@ -37,7 +39,7 @@ public class RouterConfig implements Serializable {
   private final String configVersion;
   private final String requestLogFile;
   private final TransmodelAPIConfig transmodelApi;
-  private final double streetRoutingTimeoutSeconds;
+  private final Duration streetRoutingTimeout;
   private final RoutingRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
@@ -50,8 +52,7 @@ public class RouterConfig implements Serializable {
     this.configVersion = adapter.asText("configVersion", null);
     this.requestLogFile = adapter.asText("requestLogFile", null);
     this.transmodelApi = new TransmodelAPIConfig(adapter.path("transmodelApi"));
-    this.streetRoutingTimeoutSeconds =
-      adapter.asDouble("streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT);
+    this.streetRoutingTimeout = parseStreetRoutingTimeout(adapter);
     this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
     this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
     this.updatersParameters = new UpdatersConfig(adapter);
@@ -89,8 +90,8 @@ public class RouterConfig implements Serializable {
    * CAR). So the default timeout for a street search is set quite high. This is used to abort the
    * search if the max distance is not reached within the timeout.
    */
-  public double streetRoutingTimeoutSeconds() {
-    return streetRoutingTimeoutSeconds;
+  public Duration streetRoutingTimeout() {
+    return streetRoutingTimeout;
   }
 
   public TransmodelAPIConfig transmodelApi() {
@@ -135,5 +136,33 @@ public class RouterConfig implements Serializable {
   public String toString() {
     // Print ONLY the values set, not deafult values
     return rawJson.toPrettyString();
+  }
+
+  /**
+   * This method is needed, because we want to support the old format for the "streetRoutingTimeout"
+   * parameter. We will keep it for some time, to let OTP deployments update the config.
+   * @since 2.2 - The support for the old format can be removed in version > 2.2.
+   */
+  static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
+    try {
+      return adapter.asDuration("streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT);
+    } catch (DateTimeParseException ex) {
+      LOG.warn(
+        "The `streetRoutingTimeout` parameter input format changed from a real number to a " +
+        "Duration. Update you config, the support for the old format will be removed in the " +
+        "next version after v2.2. Details: " +
+        ex.getMessage()
+      );
+      // This is safe, because the asDouble, will fall back to the default value on parse error
+      return Duration.ofMillis(
+        (long) (
+          1000L *
+          adapter.asDouble(
+            "streetRoutingTimeout",
+            (double) DEFAULT_STREET_ROUTING_TIMEOUT.toSeconds()
+          )
+        )
+      );
+    }
   }
 }

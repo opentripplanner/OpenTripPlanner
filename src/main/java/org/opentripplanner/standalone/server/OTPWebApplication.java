@@ -9,14 +9,17 @@ import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.ws.rs.core.Application;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -28,27 +31,21 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * Jersey has its own ResourceConfig class which is a subclass of Application. We can get away with
  * not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
  */
-public class OTPApplication extends Application {
+public class OTPWebApplication extends Application {
 
   /* This object groups together all the modules for a single running OTP server. */
-  public final OTPServer server;
+  private final Supplier<OtpServerContext> contextProvider;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
     SLF4JBridgeHandler.removeHandlersForRootLogger();
-    // Bridge j.u.l (used by Jersey) to the SLF4J root logger, so all logging goes through the same API
+    // Bridge j.u.l (used by Jersey) to the SLF4J root logger, so all logging goes through the same
+    // API
     SLF4JBridgeHandler.install();
   }
 
-  /**
-   * The OTPServer provides entry points to OTP routing functionality for a collection of
-   * OTPRouters. It provides a Java API, not an HTTP API. The OTPApplication wraps an OTPServer in a
-   * Jersey (JAX-RS) Application, configuring an HTTP API.
-   *
-   * @param server The OTP server to wrap
-   */
-  public OTPApplication(OTPServer server) {
-    this.server = server;
+  public OTPWebApplication(Supplier<OtpServerContext> contextProvider) {
+    this.contextProvider = contextProvider;
   }
 
   /**
@@ -90,7 +87,7 @@ public class OTPApplication extends Application {
       // Serialize POJOs (unannotated) JSON using Jackson
       new JSONObjectMapperProvider(),
       // Allow injecting the OTP server object into Jersey resource classes
-      server.makeBinder(),
+      makeBinder(contextProvider),
       // Add performance instrumentation of Jersey requests to micrometer
       getMetricsApplicationEventListener()
     );
@@ -115,6 +112,24 @@ public class OTPApplication extends Application {
     return props;
   }
 
+  /**
+   * Return an HK2 Binder that injects this specific OtpServerContext instance into Jersey web
+   * resources. This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as
+   * a singleton. Jersey forces us to use injection to get application context into HTTP method
+   * handlers, but in OTP we always just inject this OTP server context and grab anything else we
+   * need (graph and other application components) from this single object.
+   * <p>
+   * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
+   */
+  private Binder makeBinder(Supplier<OtpServerContext> contextProvider) {
+    return new AbstractBinder() {
+      @Override
+      protected void configure() {
+        bindFactory(contextProvider).to(OtpServerContext.class);
+      }
+    };
+  }
+
   private MetricsApplicationEventListener getMetricsApplicationEventListener() {
     return new MetricsApplicationEventListener(
       Metrics.globalRegistry,
@@ -129,7 +144,7 @@ public class OTPApplication extends Application {
    *
    * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
    */
-  private AbstractBinder getBoundPrometheusRegistry() {
+  private Binder getBoundPrometheusRegistry() {
     PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
       PrometheusConfig.DEFAULT
     );

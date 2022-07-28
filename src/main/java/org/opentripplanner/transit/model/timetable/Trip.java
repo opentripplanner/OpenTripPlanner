@@ -130,12 +130,6 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> implements Log
     return direction;
   }
 
-  public String getGtfsDirectionIdAsString(String unknownValue) {
-    return direction.equals(Direction.UNKNOWN)
-      ? unknownValue
-      : Integer.toString(direction.gtfsCode);
-  }
-
   @Nonnull
   public BikeAccess getBikesAllowed() {
     return bikesAllowed;

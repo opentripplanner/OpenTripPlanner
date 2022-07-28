@@ -18,15 +18,4 @@ public enum Direction {
   Direction(int gtfsCode) {
     this.gtfsCode = gtfsCode;
   }
-
-  public static Direction valueOfGtfsCode(int gtfsCode) {
-    switch (gtfsCode) {
-      case 0:
-        return Direction.OUTBOUND;
-      case 1:
-        return Direction.INBOUND;
-      default:
-        return Direction.UNKNOWN;
-    }
-  }
 }

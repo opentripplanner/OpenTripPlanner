@@ -1,27 +1,25 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
-import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
 
-/**
- * A group of stopLocations, which can share a common Stoptime
- */
-public class FlexLocationGroup extends TransitEntity implements StopLocation {
+public class FlexLocationGroupBuilder
+  extends AbstractEntityBuilder<FlexLocationGroup, FlexLocationGroupBuilder> {
 
-  private final Set<StopLocation> stopLocations = new HashSet<>();
   private I18NString name;
+
+  private Set<StopLocation> stopLocations = new HashSet<>();
+
   private GeometryCollection geometry = new GeometryCollection(
     null,
     GeometryUtils.getGeometryFactory()
@@ -29,64 +27,34 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
   private WgsCoordinate centroid;
 
-  public FlexLocationGroup(FeedScopedId id) {
+  FlexLocationGroupBuilder(FeedScopedId id) {
     super(id);
   }
 
+  FlexLocationGroupBuilder(@Nonnull FlexLocationGroup original) {
+    super(original);
+    // Optional fields
+    this.name = original.getName();
+    this.stopLocations = new HashSet<>(original.getLocations());
+    this.geometry = (GeometryCollection) original.getGeometry();
+    this.centroid = original.getCoordinate();
+  }
+
   @Override
-  public I18NString getName() {
+  protected FlexLocationGroup buildFromValues() {
+    return new FlexLocationGroup(this);
+  }
+
+  public FlexLocationGroupBuilder withName(I18NString name) {
+    this.name = name;
+    return this;
+  }
+
+  public I18NString name() {
     return name;
   }
 
-  public void setName(I18NString name) {
-    this.name = name;
-  }
-
-  @Override
-  public I18NString getDescription() {
-    return null;
-  }
-
-  @Override
-  @Nullable
-  public I18NString getUrl() {
-    return null;
-  }
-
-  @Override
-  public String getFirstZoneAsString() {
-    return null;
-  }
-
-  /**
-   * Returns the centroid of all stops and areas belonging to this location group.
-   */
-  @Override
-  @Nonnull
-  public WgsCoordinate getCoordinate() {
-    return centroid;
-  }
-
-  @Override
-  public Geometry getGeometry() {
-    return geometry;
-  }
-
-  @Override
-  public boolean isPartOfStation() {
-    return false;
-  }
-
-  @Override
-  public boolean isPartOfSameStationAs(StopLocation alternativeStop) {
-    return false;
-  }
-
-  /**
-   * Adds a new location to the location group. This should ONLY be used during the graph build
-   * process.
-   */
-  public void addLocation(StopLocation location) {
+  public FlexLocationGroupBuilder addLocation(StopLocation location) {
     stopLocations.add(location);
 
     int numGeometries = geometry.getNumGeometries();
@@ -107,12 +75,19 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     }
     geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());
     centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
+
+    return this;
   }
 
-  /**
-   * Returns all the locations belonging to this location group.
-   */
-  public Set<StopLocation> getLocations() {
-    return stopLocations;
+  public Set<StopLocation> stopLocations() {
+    return Collections.unmodifiableSet(stopLocations);
+  }
+
+  public GeometryCollection geometry() {
+    return geometry;
+  }
+
+  public WgsCoordinate centroid() {
+    return centroid;
   }
 }

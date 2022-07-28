@@ -166,7 +166,7 @@ public class GenerateTripPatternsOperation {
         return tripPattern;
       }
     }
-    FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction.gtfsCode);
+    FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
     TripPattern tripPattern = new TripPattern(patternId, route, stopPattern);
     tripPatterns.put(stopPattern, tripPattern);
     return tripPattern;
@@ -177,17 +177,16 @@ public class GenerateTripPatternsOperation {
    * the direction and an integer. This only works if the Collection of TripPattern includes every
    * TripPattern for the agency.
    */
-  private FeedScopedId generateUniqueIdForTripPattern(Route route, int directionId) {
+  private FeedScopedId generateUniqueIdForTripPattern(Route route, Direction direction) {
     FeedScopedId routeId = route.getId();
-    String direction = directionId != -1 ? String.valueOf(directionId) : "";
+    String directionId = direction == Direction.UNKNOWN ? "" : Integer.toString(direction.gtfsCode);
     String key = routeId.getId() + ":" + direction;
 
     // Add 1 to counter and update it
     int counter = tripPatternIdCounters.getOrDefault(key, 0) + 1;
     tripPatternIdCounters.put(key, counter);
 
-    // OBA library uses underscore as separator, we're moving toward colon.
-    String id = String.format("%s:%s:%02d", routeId.getId(), direction, counter);
+    String id = String.format("%s:%s:%02d", routeId.getId(), directionId, counter);
 
     return new FeedScopedId(routeId.getFeedId(), id);
   }

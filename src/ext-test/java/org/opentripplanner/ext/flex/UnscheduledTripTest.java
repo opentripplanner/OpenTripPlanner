@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -75,8 +75,8 @@ public class UnscheduledTripTest extends FlexTest {
 
   @BeforeAll
   static void setup() {
-    OtpModel otpModel = FlexTest.buildFlexGraph(ASPEN_GTFS);
-    transitModel = otpModel.transitModel;
+    TestOtpModel model = FlexTest.buildFlexGraph(ASPEN_GTFS);
+    transitModel = model.transitModel();
   }
 
   private static NearbyStop getNearbyStop(FlexTrip trip) {

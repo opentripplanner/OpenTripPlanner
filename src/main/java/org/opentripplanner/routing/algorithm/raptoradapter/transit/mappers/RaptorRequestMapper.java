@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import static org.opentripplanner.transit.raptor.api.request.Optimization.PARALLEL;
 
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -26,19 +26,22 @@ public class RaptorRequestMapper {
   private final Collection<? extends RaptorTransfer> egressPaths;
   private final long transitSearchTimeZeroEpocSecond;
   private final boolean isMultiThreadedEnbled;
+  private final MeterRegistry meterRegistry;
 
   private RaptorRequestMapper(
     RoutingRequest request,
     boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
     Collection<? extends RaptorTransfer> egressPaths,
-    long transitSearchTimeZeroEpocSecond
+    long transitSearchTimeZeroEpocSecond,
+    MeterRegistry meterRegistry
   ) {
     this.request = request;
     this.isMultiThreadedEnbled = isMultiThreaded;
     this.accessPaths = accessPaths;
     this.egressPaths = egressPaths;
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
+    this.meterRegistry = meterRegistry;
   }
 
   public static RaptorRequest<TripSchedule> mapRequest(
@@ -46,14 +49,16 @@ public class RaptorRequestMapper {
     ZonedDateTime transitSearchTimeZero,
     boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
-    Collection<? extends RaptorTransfer> egressPaths
+    Collection<? extends RaptorTransfer> egressPaths,
+    MeterRegistry meterRegistry
   ) {
     return new RaptorRequestMapper(
       request,
       isMultiThreaded,
       accessPaths,
       egressPaths,
-      transitSearchTimeZero.toEpochSecond()
+      transitSearchTimeZero.toEpochSecond(),
+      meterRegistry
     )
       .doMap();
   }
@@ -144,7 +149,7 @@ public class RaptorRequestMapper {
 
     // Add this last, it depends on generating an alias from the set values
     builder.performanceTimers(
-      new PerformanceTimersForRaptor(builder.generateAlias(), request.tags, Metrics.globalRegistry)
+      new PerformanceTimersForRaptor(builder.generateAlias(), request.tags, meterRegistry)
     );
 
     return builder.build();

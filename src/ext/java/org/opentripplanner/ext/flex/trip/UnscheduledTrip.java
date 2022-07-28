@@ -18,10 +18,10 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -64,8 +64,7 @@ public class UnscheduledTrip extends FlexTrip {
       st.isArrivalTimeSet() || st.isDepartureTimeSet()
     );
     Predicate<StopTime> notContinuousStop = stopTime ->
-      stopTime.getFlexContinuousDropOff() == NONE.getGtfsCode() &&
-      stopTime.getFlexContinuousPickup() == NONE.getGtfsCode();
+      stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
     return (
       N_STOPS.contains(stopTimes.size()) &&
       stopTimes.stream().allMatch(noExplicitTimes) &&

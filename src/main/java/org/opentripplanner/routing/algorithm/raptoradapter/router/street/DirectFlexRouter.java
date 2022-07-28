@@ -12,12 +12,12 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 
 public class DirectFlexRouter {
 
   public static List<Itinerary> route(
-    Router router,
+    OtpServerContext serverContext,
     RoutingRequest request,
     AdditionalSearchDays additionalSearchDays
   ) {
@@ -25,31 +25,33 @@ public class DirectFlexRouter {
       return Collections.emptyList();
     }
     RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
-    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, directRequest)) {
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
+    ) {
       RoutingContext routingContext = new RoutingContext(
         directRequest,
-        router.graph,
+        serverContext.graph(),
         temporaryVertices
       );
 
       // Prepare access/egress transfers
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
         routingContext,
-        router.transitModel,
+        serverContext.transitService(),
         StreetMode.WALK,
         false
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
         routingContext,
-        router.transitModel,
+        serverContext.transitService(),
         StreetMode.WALK,
         true
       );
 
       FlexRouter flexRouter = new FlexRouter(
-        router.graph,
-        router.transitModel,
-        router.routerConfig.flexParameters(request),
+        serverContext.graph(),
+        serverContext.transitService(),
+        serverContext.routerConfig().flexParameters(request),
         directRequest.getDateTime(),
         directRequest.arriveBy,
         additionalSearchDays.additionalSearchDaysInPast(),

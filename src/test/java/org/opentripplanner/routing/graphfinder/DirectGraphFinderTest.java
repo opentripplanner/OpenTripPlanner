@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.graph.Graph;
@@ -22,7 +22,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    OtpModel otpModel = graphOf(
+    TestOtpModel model = graphOf(
       new Builder() {
         @Override
         public void build() {
@@ -32,7 +32,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph;
+    graph = model.graph();
   }
 
   @Test

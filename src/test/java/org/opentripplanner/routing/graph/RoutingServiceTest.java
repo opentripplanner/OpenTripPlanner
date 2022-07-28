@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -37,7 +38,7 @@ public class RoutingServiceTest extends GtfsTest {
     for (Vertex vertex : graph.getVertices()) {
       if (vertex instanceof TransitStopVertex) {
         Stop stop = ((TransitStopVertex) vertex).getStop();
-        Vertex index_vertex = transitModel.getStopModel().getStopVertexForStop().get(stop);
+        Vertex index_vertex = transitModel.getStopModel().getStopVertexForStop(stop);
         assertEquals(index_vertex, vertex);
       }
     }
@@ -105,29 +106,25 @@ public class RoutingServiceTest extends GtfsTest {
     TransitStopVertex stopvJ = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopVertexForStop()
-      .get(stopJ);
+      .getStopVertexForStop((Stop) stopJ);
     TransitStopVertex stopvL = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopVertexForStop()
-      .get(stopL);
+      .getStopVertexForStop((Stop) stopL);
     TransitStopVertex stopvM = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopVertexForStop()
-      .get(stopM);
+      .getStopVertexForStop((Stop) stopM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    List<TransitStopVertex> stops = transitModel
+    Collection<TransitStopVertex> stops = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopSpatialIndex()
-      .query(env);
+      .queryStopSpatialIndex(env);
     assertTrue(stops.contains(stopvJ));
     assertTrue(stops.contains(stopvL));
     assertTrue(stops.contains(stopvM));

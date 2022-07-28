@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.transit.service.TransitService;
 
 public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
 
@@ -49,14 +49,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
     RoutingRequest request,
-    TransitModelIndex transitModelIndex
+    TransitService transitService
   ) {
     this(
       request.modes.transferMode == StreetMode.BIKE,
       request.wheelchairAccessibility,
       request.includePlannedCancellations,
       request.modes.transitModes,
-      request.getBannedRoutes(transitModelIndex.getAllRoutes()),
+      request.getBannedRoutes(transitService.getAllRoutes()),
       request.bannedTrips
     );
   }
@@ -94,7 +94,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     if (wheelchairAccessibility.enabled()) {
       if (
         wheelchairAccessibility.trip().onlyConsiderAccessible() &&
-        trip.getWheelchairBoarding() != WheelchairAccessibility.POSSIBLE
+        tripTimes.getWheelchairAccessibility() != WheelchairAccessibility.POSSIBLE
       ) {
         return false;
       }

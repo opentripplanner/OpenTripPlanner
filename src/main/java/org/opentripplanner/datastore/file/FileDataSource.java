@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.FileType;
 
 public class FileDataSource extends AbstractFileDataSource {
 

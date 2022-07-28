@@ -843,6 +843,26 @@ message VehicleDescriptor {
   // The license plate of the vehicle.
   optional string license_plate = 3;
 
+  enum WheelchairAccessible {
+    // The trip doesn't have information about wheelchair accessibility.
+    // This is the **default** behavior. If the static GTFS contains a
+    // _wheelchair_accessible_ value, it won't be overwritten.
+    NO_VALUE = 0;
+
+    // The trip has no accessibility value present.
+    // This value will overwrite the value from the GTFS.
+    UNKNOWN = 1;
+
+    // The trip is wheelchair accessible.
+    // This value will overwrite the value from the GTFS.
+    WHEELCHAIR_ACCESSIBLE = 2;
+
+    // The trip is **not** wheelchair accessible.
+    // This value will overwrite the value from the GTFS.
+    WHEELCHAIR_INACCESSIBLE = 3;
+  }
+  optional WheelchairAccessible wheelchair_accessible = 4 [default = NO_VALUE];
+
   // The extensions namespace allows 3rd-party developers to extend the
   // GTFS Realtime Specification in order to add and evaluate new features and
   // modifications to the spec.

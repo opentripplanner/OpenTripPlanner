@@ -3,7 +3,6 @@ package org.opentripplanner.ext.fares.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.Comparator;
@@ -11,7 +10,8 @@ import java.util.Currency;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
@@ -20,8 +20,7 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
@@ -32,32 +31,30 @@ public class FaresIntegrationTest {
 
   @Test
   public void testBasic() {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
-    var graph = otpModel.graph;
-    var transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
+    var graph = model.graph();
+    var transitModel = model.transitModel();
 
     var feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
+    var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
     var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
     var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
-    Fare fare = getFare(from, to, start, router);
+    Fare fare = getFare(from, to, start, serverContext);
     assertEquals(fare.getFare(FareType.regular), new Money(USD, 425));
   }
 
   @Test
   public void testPortland() {
-    OtpModel otpModel = ConstantsForTests.getInstance().getCachedPortlandGraph();
-    Graph graph = otpModel.graph;
-    TransitModel transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    Graph graph = model.graph();
+    TransitModel transitModel = model.transitModel();
     var portlandId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
+    var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId(
@@ -73,7 +70,7 @@ public class FaresIntegrationTest {
 
     Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
 
-    Fare fare = getFare(from, to, startTime, router);
+    Fare fare = getFare(from, to, startTime, serverContext);
 
     assertEquals(new Money(USD, 200), fare.getFare(FareType.regular));
 
@@ -84,7 +81,7 @@ public class FaresIntegrationTest {
     from = GenericLocation.fromStopId("Origin", portlandId, "8389");
     to = GenericLocation.fromStopId("Destination", portlandId, "1252");
 
-    fare = getFare(from, to, startTime, router);
+    fare = getFare(from, to, startTime, serverContext);
     // this assertion was already commented out when I reactivated the test for OTP2 on 2021-11-11
     // not sure what the correct fare should be
     // assertEquals(new Money(new WrappedCurrency("USD"), 460), fare.getFare(FareType.regular));
@@ -104,12 +101,12 @@ public class FaresIntegrationTest {
 
   @Test
   public void testKCM() {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(
       ConstantsForTests.KCM_GTFS,
       new SeattleFareServiceFactory()
     );
-    Graph graph = otpModel.graph;
-    TransitModel transitModel = otpModel.transitModel;
+    Graph graph = model.graph();
+    TransitModel transitModel = model.transitModel();
 
     assertEquals("America/Los_Angeles", transitModel.getTimeZone().getId());
 
@@ -117,20 +114,19 @@ public class FaresIntegrationTest {
 
     var feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
+    var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
     var from = GenericLocation.fromStopId("Origin", feedId, "2010");
     var to = GenericLocation.fromStopId("Destination", feedId, "2140");
 
     var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
 
-    var costOffPeak = getFare(from, to, dateTime, router);
+    var costOffPeak = getFare(from, to, dateTime, serverContext);
 
     assertEquals(new Money(USD, 250), costOffPeak.getFare(FareType.regular));
 
     var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
-    var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
+    var peakItinerary = getItineraries(from, to, onPeakStartTime, serverContext).get(1);
     var leg = peakItinerary.getLegs().get(0);
     assertTrue(leg.getStartTime().toLocalTime().isAfter(LocalTime.parse("08:00")));
     var startTime = leg.getStartTime().toLocalTime();
@@ -144,13 +140,12 @@ public class FaresIntegrationTest {
 
   @Test
   public void testFareComponent() {
-    OtpModel otpModel = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
-    Graph graph = otpModel.graph;
-    TransitModel transitModel = otpModel.transitModel;
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
+    Graph graph = model.graph();
+    TransitModel transitModel = model.transitModel();
     String feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, transitModel, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
+    var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
     Money tenUSD = new Money(USD, 1000);
 
@@ -161,7 +156,7 @@ public class FaresIntegrationTest {
     var from = GenericLocation.fromStopId("Origin", feedId, "A");
     var to = GenericLocation.fromStopId("Destination", feedId, "B");
 
-    var fare = getFare(from, to, dateTime, router);
+    var fare = getFare(from, to, dateTime, serverContext);
 
     var fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
@@ -173,14 +168,14 @@ public class FaresIntegrationTest {
 
     from = GenericLocation.fromStopId("Origin", feedId, "D");
     to = GenericLocation.fromStopId("Destination", feedId, "E");
-    fare = getFare(from, to, dateTime, router);
+    fare = getFare(from, to, dateTime, serverContext);
     assertEquals(Fare.empty(), fare);
 
     // A -> C, 2 components in a path
 
     from = GenericLocation.fromStopId("Origin", feedId, "A");
     to = GenericLocation.fromStopId("Destination", feedId, "C");
-    fare = getFare(from, to, dateTime, router);
+    fare = getFare(from, to, dateTime, serverContext);
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 2);
@@ -194,7 +189,7 @@ public class FaresIntegrationTest {
     // B -> D, 2 fully connected components
     from = GenericLocation.fromStopId("Origin", feedId, "B");
     to = GenericLocation.fromStopId("Destination", feedId, "D");
-    fare = getFare(from, to, dateTime, router);
+    fare = getFare(from, to, dateTime, serverContext);
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
@@ -206,7 +201,7 @@ public class FaresIntegrationTest {
     // E -> G, missing in between fare
     from = GenericLocation.fromStopId("Origin", feedId, "E");
     to = GenericLocation.fromStopId("Destination", feedId, "G");
-    fare = getFare(from, to, dateTime, router);
+    fare = getFare(from, to, dateTime, serverContext);
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
@@ -218,7 +213,7 @@ public class FaresIntegrationTest {
     // C -> E, missing fare after
     from = GenericLocation.fromStopId("Origin", feedId, "C");
     to = GenericLocation.fromStopId("Destination", feedId, "E");
-    fare = getFare(from, to, dateTime, router);
+    fare = getFare(from, to, dateTime, serverContext);
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
@@ -229,7 +224,7 @@ public class FaresIntegrationTest {
     // D -> G, missing fare before
     from = GenericLocation.fromStopId("Origin", feedId, "D");
     to = GenericLocation.fromStopId("Destination", feedId, "G");
-    fare = getFare(from, to, dateTime, router);
+    fare = getFare(from, to, dateTime, serverContext);
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
@@ -241,7 +236,7 @@ public class FaresIntegrationTest {
     // A -> D, use individual component parts
     from = GenericLocation.fromStopId("Origin", feedId, "A");
     to = GenericLocation.fromStopId("Destination", feedId, "D");
-    fare = getFare(from, to, dateTime, router);
+    fare = getFare(from, to, dateTime, serverContext);
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 2);
@@ -258,9 +253,9 @@ public class FaresIntegrationTest {
     GenericLocation from,
     GenericLocation to,
     Instant time,
-    Router router
+    OtpServerContext serverContext
   ) {
-    Itinerary itinerary = getItineraries(from, to, time, router).get(0);
+    Itinerary itinerary = getItineraries(from, to, time, serverContext).get(0);
     return itinerary.getFare();
   }
 
@@ -268,7 +263,7 @@ public class FaresIntegrationTest {
     GenericLocation from,
     GenericLocation to,
     Instant time,
-    Router router
+    OtpServerContext serverContext
   ) {
     RoutingRequest request = new RoutingRequest();
     request.setDateTime(time);
@@ -276,8 +271,7 @@ public class FaresIntegrationTest {
     request.to = to;
     request.itineraryFilters.debug = true;
 
-    var routingWorker = new RoutingWorker(router, request, router.transitModel.getTimeZone());
-    var result = routingWorker.route();
+    var result = serverContext.routingService().route(request);
 
     return result
       .getTripPlan()

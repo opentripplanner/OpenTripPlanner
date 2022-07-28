@@ -17,6 +17,7 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -179,6 +180,10 @@ public interface Leg {
    * For transit legs, the trip. For non-transit legs, null.
    */
   default Trip getTrip() {
+    return null;
+  }
+
+  default WheelchairAccessibility getTripWheelchairAccessibility() {
     return null;
   }
 

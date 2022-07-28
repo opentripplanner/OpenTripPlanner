@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.micrometer.core.instrument.Metrics;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -34,7 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.OtpModel;
+import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner.api.mapping.ItineraryMapper;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -46,8 +46,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.util.TestUtils;
@@ -70,7 +69,7 @@ public abstract class SnapshotTestBase {
 
   static final boolean verbose = Boolean.getBoolean("otp.test.verbose");
 
-  protected Router router;
+  protected OtpServerContext serverContext;
 
   public static void loadGraphBeforeClass(boolean withElevation) {
     if (withElevation) {
@@ -80,23 +79,16 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  protected Router getRouter() {
-    if (router == null) {
-      OtpModel otpModel = getGraph();
-      router =
-        new Router(
-          otpModel.graph,
-          otpModel.transitModel,
-          RouterConfig.DEFAULT,
-          Metrics.globalRegistry
-        );
-      router.startup();
+  protected OtpServerContext serverContext() {
+    if (serverContext == null) {
+      TestOtpModel model = getGraph();
+      serverContext = TestServerContext.createServerContext(model.graph(), model.transitModel());
     }
 
-    return router;
+    return serverContext;
   }
 
-  protected OtpModel getGraph() {
+  protected TestOtpModel getGraph() {
     return ConstantsForTests.getInstance().getCachedPortlandGraph();
   }
 
@@ -108,12 +100,12 @@ public abstract class SnapshotTestBase {
     int minute,
     int second
   ) {
-    Router router = getRouter();
+    OtpServerContext serverContext = serverContext();
 
-    RoutingRequest request = router.copyDefaultRoutingRequest();
+    RoutingRequest request = serverContext.defaultRoutingRequest();
     request.setDateTime(
       TestUtils.dateInstant(
-        router.transitModel.getTimeZone().getId(),
+        serverContext.transitService().getTimeZone().getId(),
         year,
         month,
         day,
@@ -178,18 +170,14 @@ public abstract class SnapshotTestBase {
   }
 
   protected void expectRequestResponseToMatchSnapshot(RoutingRequest request) {
-    Router router = getRouter();
-
-    List<Itinerary> itineraries = retrieveItineraries(request, router);
+    List<Itinerary> itineraries = retrieveItineraries(request);
 
     logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
   }
 
   protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request) {
-    Router router = getRouter();
-
     RoutingRequest departAt = request.clone();
-    List<Itinerary> departByItineraries = retrieveItineraries(departAt, router);
+    List<Itinerary> departByItineraries = retrieveItineraries(departAt);
 
     logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
 
@@ -202,7 +190,7 @@ public abstract class SnapshotTestBase {
     arriveBy.setArriveBy(true);
     arriveBy.setDateTime(departByItineraries.get(0).lastLeg().getEndTime().toInstant());
 
-    List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, router);
+    List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
 
     var departAtItinerary = departByItineraries.get(0);
     var arriveByItinerary = arriveByItineraries.get(0);
@@ -263,10 +251,9 @@ public abstract class SnapshotTestBase {
     return snapshotSerializer.apply(new Object[] { object });
   }
 
-  private List<Itinerary> retrieveItineraries(RoutingRequest request, Router router) {
+  private List<Itinerary> retrieveItineraries(RoutingRequest request) {
     long startMillis = System.currentTimeMillis();
-    RoutingService routingService = new RoutingService(router.graph, router.transitModel);
-    RoutingResponse response = routingService.route(request, router);
+    RoutingResponse response = serverContext.routingService().route(request);
 
     List<Itinerary> itineraries = response.getTripPlan().itineraries;
 
@@ -275,7 +262,7 @@ public abstract class SnapshotTestBase {
         itineraries,
         startMillis,
         System.currentTimeMillis(),
-        router.transitModel.getTimeZone()
+        serverContext.transitService().getTimeZone()
       );
     }
     return itineraries;
@@ -284,7 +271,7 @@ public abstract class SnapshotTestBase {
   private String createDebugUrlForRequest(RoutingRequest request) {
     var dateTime = Instant
       .ofEpochSecond(request.getDateTime().getEpochSecond())
-      .atZone(getRouter().transitModel.getTimeZone())
+      .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
     var transitModes = mapModes(request.modes.transitModes);

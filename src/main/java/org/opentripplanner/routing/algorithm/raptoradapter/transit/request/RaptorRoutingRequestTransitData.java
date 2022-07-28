@@ -92,7 +92,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(
         mcCostParams,
-        transitLayer.getStopIndex().stopBoardAlightCosts
+        transitLayer.getStopBoardAlightCosts()
       );
 
     this.validTransitDataStartTime =

@@ -37,12 +37,12 @@ import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
 
@@ -55,13 +55,13 @@ public class LuceneIndex implements Serializable {
 
   private final Graph graph;
 
-  private final TransitModel transitModel;
+  private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
 
-  public LuceneIndex(Graph graph, TransitModel transitModel) {
+  public LuceneIndex(Graph graph, TransitService transitService) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.analyzer =
       new PerFieldAnalyzerWrapper(
         new StandardAnalyzer(),
@@ -77,8 +77,8 @@ public class LuceneIndex implements Serializable {
           iwcWithSuggestField(analyzer, Set.of(SUGGEST))
         )
       ) {
-        transitModel
-          .getAllStopLocations()
+        transitService
+          .getAllStops()
           .forEach(stopLocation ->
             addToIndex(
               directoryWriter,
@@ -91,8 +91,7 @@ public class LuceneIndex implements Serializable {
             )
           );
 
-        transitModel
-          .getStopModel()
+        transitService
           .getAllStopCollections()
           .forEach(stopCollection ->
             addToIndex(
@@ -131,28 +130,26 @@ public class LuceneIndex implements Serializable {
     }
   }
 
-  public static synchronized LuceneIndex forServer(Router router) {
-    var graph = router.graph;
-    var transitModel = router.transitModel;
+  public static synchronized LuceneIndex forServer(OtpServerContext serverContext) {
+    var graph = serverContext.graph();
     var existingIndex = graph.getService(LuceneIndex.class);
     if (existingIndex != null) {
       return existingIndex;
     }
 
-    var newIndex = new LuceneIndex(graph, transitModel);
+    var newIndex = new LuceneIndex(graph, serverContext.transitService());
     graph.putService(LuceneIndex.class, newIndex);
     return newIndex;
   }
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
     return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> transitModel.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
+      .map(document -> transitService.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
   }
 
   public Stream<StopCollection> queryStopCollections(String query, boolean autocomplete) {
     return matchingDocuments(StopCollection.class, query, autocomplete)
-      .map(document ->
-        transitModel.getStopModel().getStopCollectionById(FeedScopedId.parseId(document.get(ID)))
+      .map(document -> transitService.getStopCollectionById(FeedScopedId.parseId(document.get(ID)))
       );
   }
 

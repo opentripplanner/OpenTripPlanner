@@ -27,18 +27,18 @@ public class TripTimesShortHelper {
 
       TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
       if (pattern == null) {
-        pattern = transitService.getPatternForTrip().get(trip);
+        pattern = transitService.getPatternForTrip(trip);
       }
       timetable = timetableSnapshot.resolve(pattern, serviceDate);
 
       // If realtime moved pattern back to original trip, fetch it instead
       if (timetable.getTripIndex(trip.getId()) == -1) {
-        pattern = transitService.getPatternForTrip().get(trip);
+        pattern = transitService.getPatternForTrip(trip);
         timetable = timetableSnapshot.resolve(pattern, serviceDate);
       }
     }
     if (timetable == null) {
-      timetable = transitService.getPatternForTrip().get(trip).getScheduledTimetable();
+      timetable = transitService.getPatternForTrip(trip).getScheduledTimetable();
     }
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes

@@ -2,9 +2,9 @@ package org.opentripplanner.datastore.base;
 
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * This extends the {@link DataSourceRepository} and add the ability to retrieve files by name and

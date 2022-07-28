@@ -25,7 +25,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<VehicleParking> bikePark() {
-    return this::getVehicleParking;
+    return this::getBikePark;
   }
 
   @Override
@@ -43,7 +43,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<VehicleParking> carPark() {
-    return this::getVehicleParking;
+    return this::getCarPark;
   }
 
   @Override
@@ -128,6 +128,30 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
           throw new IllegalStateException("Unhandled vertexType: " + place.vertexType.name());
       }
     };
+  }
+
+  private VehicleParking getBikePark(DataFetchingEnvironment environment) {
+    var vehicleParkingWithEntrance = getSource(environment).place.vehicleParkingWithEntrance;
+    if (
+      vehicleParkingWithEntrance == null ||
+      !vehicleParkingWithEntrance.getVehicleParking().hasBicyclePlaces()
+    ) {
+      return null;
+    }
+
+    return vehicleParkingWithEntrance.getVehicleParking();
+  }
+
+  private VehicleParking getCarPark(DataFetchingEnvironment environment) {
+    var vehicleParkingWithEntrance = getSource(environment).place.vehicleParkingWithEntrance;
+    if (
+      vehicleParkingWithEntrance == null ||
+      !vehicleParkingWithEntrance.getVehicleParking().hasAnyCarPlaces()
+    ) {
+      return null;
+    }
+
+    return vehicleParkingWithEntrance.getVehicleParking();
   }
 
   private VehicleParking getVehicleParking(DataFetchingEnvironment environment) {

@@ -63,7 +63,7 @@ public class AgencyMapperTest {
     assertEquals(NAME, result.getName());
     assertEquals(LANG, result.getLang());
     assertEquals(PHONE, result.getPhone());
-    assertEquals(TIMEZONE, result.getTimezone());
+    assertEquals(TIMEZONE, result.getTimezone().getId());
     assertEquals(URL, result.getUrl());
     assertEquals(FARE_URL, result.getFareUrl());
     assertEquals(BRANDING_URL, result.getBrandingUrl());

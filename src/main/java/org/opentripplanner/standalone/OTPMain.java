@@ -4,19 +4,21 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import io.micrometer.core.instrument.Metrics;
-import org.opentripplanner.datastore.DataSource;
+import org.geotools.referencing.factory.DeferredAuthorityFactory;
+import org.geotools.util.WeakCollectionCleaner;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.OTPAppConstruction;
+import org.opentripplanner.standalone.configure.OTPApplicationFactory;
 import org.opentripplanner.standalone.server.GrizzlyServer;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.ThrowableUtils;
-import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -109,6 +111,9 @@ public class OTPMain {
     Graph graph = null;
     TransitModel transitModel = null;
     OTPAppConstruction app = new OTPAppConstruction(params);
+    var factory = app.getFactory();
+    var datastore = factory.datastore();
+    var configModel = factory.configModel();
 
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
@@ -117,17 +122,12 @@ public class OTPMain {
     /* Load graph from disk if one is not present from build. */
     if (params.doLoadGraph() || params.doLoadStreetGraph()) {
       DataSource inputGraph = params.doLoadGraph()
-        ? app.store().getGraph()
-        : app.store().getStreetGraph();
-      SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(inputGraph);
-      graph = serializedGraphObject.graph;
-      transitModel = serializedGraphObject.transitModel;
-      app
-        .config()
-        .updateConfigFromSerializedGraph(
-          serializedGraphObject.buildConfig,
-          serializedGraphObject.routerConfig
-        );
+        ? datastore.getGraph()
+        : datastore.getStreetGraph();
+      SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
+      graph = obj.graph;
+      transitModel = obj.transitModel;
+      configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
     }
 
     /* Start graph builder if requested. */
@@ -151,8 +151,8 @@ public class OTPMain {
       new SerializedGraphObject(
         graph,
         transitModel,
-        app.config().buildConfig(),
-        app.config().routerConfig()
+        configModel.buildConfig(),
+        configModel.routerConfig()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
@@ -164,30 +164,25 @@ public class OTPMain {
       System.exit(101);
     }
 
-    if (!params.doServe()) {
+    if (params.doServe()) {
+      app.updateModel(graph, transitModel);
+      startOtpWebServer(params, app);
+    } else {
       LOG.info("Done building graph. Exiting.");
-      return;
     }
+  }
 
+  private static void startOtpWebServer(CommandLineParameters params, OTPAppConstruction app) {
     // Index graph for travel search
-    transitModel.index();
-    graph.index();
+    app.transitModel().index();
+    app.graph().index();
 
     // publishing the config version info make it available to the APIs
-    app.setOtpConfigVersionsOnServerInfo();
-
-    Router router = new Router(
-      graph,
-      transitModel,
-      app.config().routerConfig(),
-      Metrics.globalRegistry
-    );
-    router.startup();
+    setOtpConfigVersionsOnServerInfo(app.getFactory());
 
     /* Start visualizer if requested. */
     if (params.visualize) {
-      router.graphVisualizer = new GraphVisualizer(router);
-      router.graphVisualizer.run();
+      app.graphVisualizer().run();
     }
 
     /* Start web server if requested. */
@@ -195,7 +190,13 @@ public class OTPMain {
     // This would also avoid the awkward call to set the router on the appConstruction after it's constructed.
     // However, currently the server runs in a blocking way and waits for shutdown, so has to run last.
     if (params.doServe()) {
-      GrizzlyServer grizzlyServer = app.createGrizzlyServer(router);
+      GrizzlyServer grizzlyServer = app.createGrizzlyServer();
+
+      registerShutdownHookToGracefullyShutDownServer(
+        app.transitModel(),
+        app.raptorTuningParameters()
+      );
+
       // Loop to restart server on uncaught fatal exceptions.
       while (true) {
         try {
@@ -207,7 +208,45 @@ public class OTPMain {
             ThrowableUtils.detailedString(throwable)
           );
         }
+        logLocationOfRequestLog(app.getFactory().configModel().routerConfig().requestLogFile());
       }
     }
+  }
+
+  /**
+   * Shut down this server when evicted or (auto-)reloaded.
+   * <ol>
+   *   <li>Stop any real-time updater threads.</li>
+   *   <li>Cleanup various stuff of some used libraries (org.geotools), which depend on the
+   *   external client to call them for cleaning-up.</li>
+   * </ol>
+   */
+  private static void registerShutdownHookToGracefullyShutDownServer(
+    TransitModel transitModel,
+    RaptorConfig<?> raptorConfig
+  ) {
+    var hook = new Thread(() -> {
+      LOG.info("OTP shutdown started...");
+      GraphUpdaterConfigurator.shutdownGraph(transitModel);
+      raptorConfig.shutdown();
+      WeakCollectionCleaner.DEFAULT.exit();
+      DeferredAuthorityFactory.exit();
+    });
+    Runtime.getRuntime().addShutdownHook(hook);
+  }
+
+  private static void logLocationOfRequestLog(String requestLogFile) {
+    if (requestLogFile != null) {
+      LOG.info("Logging incoming requests at '{}'", requestLogFile);
+    } else {
+      LOG.info("Incoming requests will not be logged.");
+    }
+  }
+
+  private static void setOtpConfigVersionsOnServerInfo(OTPApplicationFactory factory) {
+    var c = factory.configModel();
+    projectInfo().otpConfigVersion = c.otpConfig().configVersion;
+    projectInfo().buildConfigVersion = c.buildConfig().configVersion;
+    projectInfo().routerConfigVersion = c.routerConfig().getConfigVersion();
   }
 }

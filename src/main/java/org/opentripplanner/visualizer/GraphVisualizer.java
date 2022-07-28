@@ -16,6 +16,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -72,7 +73,6 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,8 +112,6 @@ class DisplayVertex {
  */
 class EdgeListModel extends AbstractListModel<Edge> {
 
-  private static final long serialVersionUID = 1L;
-
   private final ArrayList<Edge> edges;
 
   EdgeListModel(Iterable<Edge> edges) {
@@ -136,8 +134,6 @@ class EdgeListModel extends AbstractListModel<Edge> {
  * A list of vertices where the internal container is exposed.
  */
 class VertexList extends AbstractListModel<DisplayVertex> {
-
-  private static final long serialVersionUID = 1L;
 
   public List<Vertex> selected;
 
@@ -162,14 +158,12 @@ class VertexList extends AbstractListModel<DisplayVertex> {
  */
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GraphVisualizer.class);
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(
     "yyyy-MM-dd HH:mm:ss z"
   );
   public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss z");
-  /* The router we are visualizing. */
-  private final Router router;
+
   /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
   private final Graph graph;
   private JPanel leftPanel;
@@ -179,6 +173,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   /* The set of callbacks that display search progress on the showGraph Processing applet. */
   public TraverseVisitor traverseVisitor;
+
+  /* Needed by the GraphPathFinder */
+  private final Duration streetRoutingTimeout;
 
   public JList<DisplayVertex> nearbyVertices;
 
@@ -250,13 +247,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   protected State lastStateClicked = null;
   private JCheckBox longDistanceModeCheckbox;
 
-  public GraphVisualizer(Router router) {
+  public GraphVisualizer(Graph graph, Duration streetRoutingTimeout) {
     super();
     LOG.info("Starting up graph visualizer...");
     setTitle("GraphVisualizer");
     setExtendedState(JFrame.MAXIMIZED_BOTH);
-    this.router = router;
-    this.graph = router.graph;
+    this.graph = graph;
+    this.streetRoutingTimeout = streetRoutingTimeout;
     init();
   }
 
@@ -480,7 +477,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
     // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
     // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
-    GraphPathFinder finder = new GraphPathFinder(router);
+    GraphPathFinder finder = new GraphPathFinder(traverseVisitor, streetRoutingTimeout);
 
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)

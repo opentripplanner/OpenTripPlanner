@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.datastore.FileType.GRAPH;
+import static org.opentripplanner.datastore.api.FileType.GRAPH;
 
 import java.io.File;
 import java.io.IOException;

@@ -15,7 +15,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
@@ -27,7 +27,7 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
   public VehicleParkingsLayerBuilder(
     Graph graph,
-    TransitModel transitModel,
+    TransitService transitService,
     VectorTilesResource.LayerParameters layerParameters
   ) {
     super(

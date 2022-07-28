@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
+import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -108,6 +109,17 @@ public final class StopPattern implements Serializable {
     }
   }
 
+  /**
+   * Checks that stops equal without taking into account if pickup or dropoff is allowed.
+   */
+  public boolean stopsEqual(Object other) {
+    if (other instanceof StopPattern that) {
+      return Arrays.equals(this.stops, that.stops);
+    } else {
+      return false;
+    }
+  }
+
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("StopPattern: ");
@@ -166,8 +178,8 @@ public final class StopPattern implements Serializable {
     // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are
     // not important and have changed between OTP versions.
     for (int hop = 0; hop < size - 1; hop++) {
-      hasher.putInt(pickups[hop].getGtfsCode());
-      hasher.putInt(dropoffs[hop + 1].getGtfsCode());
+      hasher.putInt(pickups[hop].ordinal());
+      hasher.putInt(dropoffs[hop + 1].ordinal());
     }
     return hasher.hash();
   }

@@ -27,17 +27,16 @@ import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.VectorTileConfig;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
 
   private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
-  private final OTPServer otpServer;
+  private final OtpServerContext serverContext;
   private final String ignoreRouterId;
 
   static {
@@ -48,14 +47,14 @@ public class VectorTilesResource {
   }
 
   public VectorTilesResource(
-    @Context OTPServer otpServer,
+    @Context OtpServerContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.otpServer = otpServer;
+    this.serverContext = serverContext;
     this.ignoreRouterId = ignoreRouterId;
   }
 
@@ -67,7 +66,7 @@ public class VectorTilesResource {
     @PathParam("y") int y,
     @PathParam("z") int z,
     @PathParam("layers") String requestedLayers
-  ) throws Exception {
+  ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
 
     if (z < VectorTileConfig.MIN_ZOOM) {
@@ -79,10 +78,12 @@ public class VectorTilesResource {
 
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    Router router = otpServer.getRouter();
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    for (LayerParameters layerParameters : router.routerConfig.vectorTileLayers().layers()) {
+    for (LayerParameters layerParameters : serverContext
+      .routerConfig()
+      .vectorTileLayers()
+      .layers()) {
       if (
         layers.contains(layerParameters.name()) &&
         layerParameters.minZoom() <= z &&
@@ -92,7 +93,7 @@ public class VectorTilesResource {
         mvtBuilder.addLayers(
           VectorTilesResource.layers
             .get(LayerType.valueOf(layerParameters.type()))
-            .create(router.graph, router.transitModel, layerParameters)
+            .create(serverContext.graph(), serverContext.transitService(), layerParameters)
             .build(envelope, layerParameters)
         );
       }
@@ -115,8 +116,8 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     return new TileJson(
-      otpServer.getRouter().graph,
-      otpServer.getRouter().transitModel,
+      serverContext.graph(),
+      serverContext.transitService(),
       uri,
       headers,
       requestedLayers
@@ -172,28 +173,39 @@ public class VectorTilesResource {
 
   private class TileJson implements Serializable {
 
+    // Some fields(all @SuppressWarnings("unused")) below are required to support the TileJSON
+    // format. See https://github.com/mapbox/tilejson-spec
+
+    @SuppressWarnings("unused")
     public final String tilejson = "2.2.0";
+
+    @SuppressWarnings("unused")
+    public final String scheme = "xyz";
+
+    @SuppressWarnings("unused")
+    public final int minzoom = VectorTileConfig.MIN_ZOOM;
+
+    @SuppressWarnings("unused")
+    public final int maxzoom = VectorTileConfig.MAX_ZOOM;
+
     public final String name = "OpenTripPlanner";
     public final String attribution;
-    public final String scheme = "xyz";
     public final String[] tiles;
-    public final int minzoom = VectorTileConfig.MIN_ZOOM;
-    public final int maxzoom = VectorTileConfig.MAX_ZOOM;
     public final double[] bounds;
     public final double[] center;
 
     private TileJson(
       Graph graph,
-      TransitModel transitModel,
+      TransitService transitService,
       UriInfo uri,
       HttpHeaders headers,
       String layers
     ) {
       attribution =
-        transitModel
+        transitService
           .getFeedIds()
           .stream()
-          .map(transitModel::getFeedInfo)
+          .map(transitService::getFeedInfo)
           .filter(Predicate.not(Objects::isNull))
           .map(feedInfo ->
             "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
@@ -221,8 +233,7 @@ public class VectorTilesResource {
         };
 
       center =
-        transitModel
-          .getStopModel()
+        transitService
           .getCenter()
           .map(coordinate -> new double[] { coordinate.x, coordinate.y, 9 })
           .orElse(null);
