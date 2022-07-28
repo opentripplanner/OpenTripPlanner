@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.basic;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
@@ -15,10 +16,14 @@ public class Notice extends TransitEntity2<Notice, NoticeBuilder> {
 
   private final String publicCode;
 
-  public Notice(NoticeBuilder builder) {
+  Notice(NoticeBuilder builder) {
     super(builder.getId());
     this.publicCode = builder.publicCode();
     this.text = builder.text();
+  }
+
+  public static NoticeBuilder of(FeedScopedId id) {
+    return new NoticeBuilder(id);
   }
 
   public String text() {

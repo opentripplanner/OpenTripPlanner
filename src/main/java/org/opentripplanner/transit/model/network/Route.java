@@ -37,7 +37,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   private final String textColor;
   private final BikeAccess bikesAllowed;
 
-  public Route(RouteBuilder builder) {
+  Route(RouteBuilder builder) {
     super(builder.getId());
     // Required fields
     this.agency = requireNonNull(builder.getAgency());

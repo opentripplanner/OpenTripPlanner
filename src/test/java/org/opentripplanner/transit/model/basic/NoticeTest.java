@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.organization;
+package org.opentripplanner.transit.model.basic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,46 +9,44 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
-class OperatorTest {
+class NoticeTest {
 
   private static final String ID = "1";
-  private static final String NAME = "name";
-  private static final String URL = "http://info.aaa.com";
-  private static final String PHONE = "+47 95566333";
+  private static final String TEXT = "text";
+  private static final String PUBLIC_CODE = "public code";
 
-  private static final Operator subject = Operator
+  private static final Notice subject = Notice
     .of(TransitModelForTest.id(ID))
-    .withName(NAME)
-    .withUrl(URL)
-    .withPhone(PHONE)
+    .withPublicCode(PUBLIC_CODE)
+    .withText(TEXT)
     .build();
 
   @Test
   void copy() {
-    // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withName(NAME).build();
+    assertEquals(ID, subject.getId().getId());
+
+    // Make a copy, and set the same publicCode (nothing is changed)
+    var copy = subject.copy().withPublicCode(PUBLIC_CODE).build();
 
     assertSame(subject, copy);
 
     // Copy and change name
-    copy = subject.copy().withName("v2").build();
+    copy = subject.copy().withPublicCode("v2").build();
 
     // The two objects are not the same instance, but is equal(same id)
     assertNotSame(subject, copy);
     assertEquals(subject, copy);
 
     assertEquals(ID, copy.getId().getId());
-    assertEquals("v2", copy.getName());
-    assertEquals(URL, copy.getUrl());
-    assertEquals(PHONE, copy.getPhone());
+    assertEquals("v2", copy.publicCode());
+    assertEquals(TEXT, copy.text());
   }
 
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
     assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withPublicCode("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withText("X").build()));
   }
 }
