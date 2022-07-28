@@ -71,6 +71,8 @@ public class RoutingRequestMapper {
     request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
     request.boardSlackForMode =
       c.asEnumMap("boardSlackForMode", TransitMode.class, NodeAdapter::asInt);
+    request.maxAccessEgressDuration =
+      c.asDuration("maxAccessEgressDuration", dft.maxAccessEgressDuration);
     request.maxAccessEgressDurationForMode =
       c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
