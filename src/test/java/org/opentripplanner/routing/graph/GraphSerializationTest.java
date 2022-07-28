@@ -129,7 +129,9 @@ public class GraphSerializationTest {
       "tripPatternForId",
       "transitLayer",
       "realtimeTransitLayer",
-      "dateTime"
+      "dateTime",
+      "notesForEdge",
+      "uniqueMatchers"
     );
     // Edges have very detailed String representation including lat/lon coordinates and OSM IDs. They should be unique.
     objectDiffer.setKeyExtractor("turnRestrictions", edge -> edge.toString());
