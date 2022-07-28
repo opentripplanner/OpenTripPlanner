@@ -185,7 +185,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           int handledCounter = 0;
           int skippedCounter = 0;
           for (VehicleActivityStructure activity : activities) {
-            boolean handled = handleModifiedTrip(transitModel, activity, serviceDate);
+            boolean handled = handleModifiedTrip(transitModel, activity, serviceDate, feedId);
             if (handled) {
               handledCounter++;
             } else {
@@ -344,7 +344,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean handleModifiedTrip(
     TransitModel transitModel,
     VehicleActivityStructure activity,
-    LocalDate serviceDate
+    LocalDate serviceDate,
+    String feedId
   ) {
     if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
       //Activity has expired
@@ -366,7 +367,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    Set<Trip> trips = siriFuzzyTripMatcher.match(activity);
+    Set<Trip> trips = siriFuzzyTripMatcher.match(activity, feedId);
 
     if (trips == null || trips.isEmpty()) {
       if (keepLogging) {
@@ -877,7 +878,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       /*
                 No exact match found - search for trips based on arrival-times/stop-patterns
              */
-      Set<Trip> trips = siriFuzzyTripMatcher.match(estimatedVehicleJourney);
+      Set<Trip> trips = siriFuzzyTripMatcher.match(estimatedVehicleJourney, feedId);
 
       if (trips == null || trips.isEmpty()) {
         LOG.debug(
