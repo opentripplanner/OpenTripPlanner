@@ -15,6 +15,7 @@ public class UnscheduledTripBuilder
 
   public UnscheduledTripBuilder(UnscheduledTrip original) {
     super(original);
+    throw new IllegalStateException("Updating is not supported for UnscheduledTrip");
     // TODO: implement copying
     // this.stopTimes = original.stopTimes;
   }

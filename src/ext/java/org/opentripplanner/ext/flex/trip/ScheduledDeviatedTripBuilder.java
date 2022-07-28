@@ -15,6 +15,7 @@ public class ScheduledDeviatedTripBuilder
 
   public ScheduledDeviatedTripBuilder(ScheduledDeviatedTrip original) {
     super(original);
+    throw new IllegalStateException("Updating is not supported for ScheduledDeviatedTrip");
     // TODO: implement copying
     // this.stopTimes = original.stopTimes;
   }
