@@ -10,20 +10,20 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -182,7 +182,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     FeedScopedId patternId = TransitModelForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
-    TripPattern p = new TripPattern(patternId, route, STOP_PATTERN);
+    TripPattern p = TripPattern
+      .of(patternId)
+      .withRoute(route)
+      .withStopPattern(STOP_PATTERN)
+      .build();
 
     p.setName("Pattern");
     for (Trip trip : trips) {

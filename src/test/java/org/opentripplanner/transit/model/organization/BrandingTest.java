@@ -38,7 +38,7 @@ public class BrandingTest {
     // Copy and change name
     copy = subject.copy().withName("v2").build();
 
-    // The two objects are not he same instance, but is equal(sae id)
+    // The two objects are not the same instance, but is equal(same id)
     assertNotSame(copy, subject);
     assertEquals(copy, subject);
 

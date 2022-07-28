@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -23,8 +22,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.StopModelIndex;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -148,7 +148,7 @@ public class TransitLayerMapper {
 
         // This nested loop could be quite inefficient.
         // Maybe determine in advance which patterns are running on each service and day.
-        for (org.opentripplanner.model.TripPattern oldTripPattern : allTripPatterns) {
+        for (TripPattern oldTripPattern : allTripPatterns) {
           TripPatternForDate tripPatternForDate = tripPatternForDateMapper.map(
             oldTripPattern.getScheduledTimetable(),
             serviceDate
