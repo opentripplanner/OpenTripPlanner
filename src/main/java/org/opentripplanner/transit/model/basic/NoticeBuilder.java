@@ -8,7 +8,7 @@ public class NoticeBuilder extends AbstractEntityBuilder<Notice, NoticeBuilder> 
   private String publicCode;
   private String text;
 
-  public NoticeBuilder(FeedScopedId id) {
+  NoticeBuilder(FeedScopedId id) {
     super(id);
   }
 
