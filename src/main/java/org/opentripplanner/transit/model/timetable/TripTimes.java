@@ -12,8 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

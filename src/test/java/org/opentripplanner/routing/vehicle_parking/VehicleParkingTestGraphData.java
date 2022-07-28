@@ -2,8 +2,8 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 

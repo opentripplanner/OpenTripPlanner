@@ -46,7 +46,9 @@ public class TransitModelArchitectureTest {
         LEGACY_MODEL
       )
       .verify();
-    TIMETABLE.dependsOn(GUAVA, UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL).verify();
+    TIMETABLE
+      .dependsOn(GUAVA, UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
+      .verify();
   }
 
   @Test

@@ -11,7 +11,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -40,6 +39,7 @@ import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the

@@ -7,11 +7,11 @@ import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class FlexLocationGroupBuilder
   extends AbstractEntityBuilder<FlexLocationGroup, FlexLocationGroupBuilder> {

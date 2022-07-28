@@ -34,9 +34,7 @@ public enum ApiRealTimeState {
    */
   MODIFIED;
 
-  public static ApiRealTimeState RealTimeState(
-    RealTimeState other
-  ) {
+  public static ApiRealTimeState RealTimeState(RealTimeState other) {
     switch (other) {
       case SCHEDULED:
         return ApiRealTimeState.SCHEDULED;

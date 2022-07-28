@@ -11,8 +11,8 @@ import java.time.ZoneId;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class HslParkUpdaterTest {
 
