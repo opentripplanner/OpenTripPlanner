@@ -125,10 +125,7 @@ public class LinkingTest {
     link(g2, transitModel2);
 
     // compare the linkages
-    for (Vertex v : g1.getVertices()) {
-      if (!(v instanceof TransitStopVertex ts)) {
-        continue;
-      }
+    for (TransitStopVertex ts : g1.getVerticesOfType(TransitStopVertex.class)) {
       List<StreetTransitStopLink> stls1 = outgoingStls(ts);
       assertTrue(stls1.size() >= 1);
 
