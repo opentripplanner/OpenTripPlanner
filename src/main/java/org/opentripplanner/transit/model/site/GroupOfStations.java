@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
 import java.util.HashSet;

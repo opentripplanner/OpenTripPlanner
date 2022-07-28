@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.site;
 
 import java.util.ArrayList;
 import java.util.Collection;

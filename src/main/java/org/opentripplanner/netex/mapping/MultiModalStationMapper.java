@@ -2,10 +2,10 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.StopPlace;
