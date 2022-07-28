@@ -21,7 +21,7 @@ public class GroupOfStations
 
   private final Set<StopCollection> childStations;
   private final I18NString name;
-  private final PurposeOfGrouping purposeOfGrouping;
+  private final GroupOfStationsPurpose purposeOfGrouping;
   private final WgsCoordinate coordinate;
 
   GroupOfStations(GroupOfStationsBuilder builder) {
@@ -65,7 +65,7 @@ public class GroupOfStations
    * Categorization for the grouping
    */
   @Nullable
-  public PurposeOfGrouping getPurposeOfGrouping() {
+  public GroupOfStationsPurpose getPurposeOfGrouping() {
     return purposeOfGrouping;
   }
 
@@ -84,20 +84,5 @@ public class GroupOfStations
   @Override
   public GroupOfStationsBuilder copy() {
     return new GroupOfStationsBuilder(this);
-  }
-
-  /**
-   * Categorization for the grouping
-   */
-  public enum PurposeOfGrouping {
-    /**
-     * Group of prominent stop places within a town or city(centre)
-     */
-    GENERALIZATION,
-    /**
-     * Stop places in proximity to each other which have a natural geospatial- or public transport
-     * related relationship.
-     */
-    CLUSTER,
   }
 }

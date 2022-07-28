@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.model.site;
 
-import static org.opentripplanner.util.lang.AssertUtils.assertHasValue;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +14,7 @@ public class GroupOfStationsBuilder
 
   private I18NString name;
   private Set<StopCollection> childStations = new HashSet<>();
-  private GroupOfStations.PurposeOfGrouping purposeOfGrouping;
+  private GroupOfStationsPurpose purposeOfGrouping;
   private WgsCoordinate coordinate;
 
   GroupOfStationsBuilder(FeedScopedId id) {
@@ -65,14 +63,12 @@ public class GroupOfStationsBuilder
     return coordinate;
   }
 
-  public GroupOfStationsBuilder withPurposeOfGrouping(
-    GroupOfStations.PurposeOfGrouping purposeOfGrouping
-  ) {
+  public GroupOfStationsBuilder withPurposeOfGrouping(GroupOfStationsPurpose purposeOfGrouping) {
     this.purposeOfGrouping = purposeOfGrouping;
     return this;
   }
 
-  public GroupOfStations.PurposeOfGrouping purposeOfGrouping() {
+  public GroupOfStationsPurpose purposeOfGrouping() {
     return purposeOfGrouping;
   }
 }
