@@ -369,6 +369,13 @@ public abstract class RoutingResource {
   @QueryParam("bikeBoardCost")
   protected Integer bikeBoardCost;
 
+  /**
+   * Factor for how much the walk safety is considered in routing. If value is set to be 0, it is
+   * ignored. Default is 1.0.
+   */
+  @QueryParam("walkSafetyFactor")
+  protected Double walkSafetyFactor;
+
   @QueryParam("allowKeepingRentedBicycleAtDestination")
   protected Boolean allowKeepingRentedBicycleAtDestination;
 
@@ -839,6 +846,9 @@ public abstract class RoutingResource {
     }
     if (bikeBoardCost != null) {
       request.setBikeBoardCost(bikeBoardCost);
+    }
+    if (walkSafetyFactor != null) {
+      request.setWalkSafetyFactor(walkSafetyFactor);
     }
     if (bannedRoutes != null) {
       request.setBannedRoutesFromString(bannedRoutes);

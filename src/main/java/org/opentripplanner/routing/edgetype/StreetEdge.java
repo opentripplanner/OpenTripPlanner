@@ -1182,7 +1182,20 @@ public class StreetEdge
       weight *= nonWheelchairReluctance.get();
     } else {
       // take slopes into account when walking
-      time = weight = (getEffectiveWalkDistance() / speed);
+      time = getEffectiveWalkDistance() / speed;
+      if (routingRequest.walkSafetyFactor <= 0) {
+        weight = time;
+      } else if (routingRequest.walkSafetyFactor < 1) {
+        weight =
+          getEffectiveWalkSafetyDistance() *
+          routingRequest.walkSafetyFactor +
+          getEffectiveWalkDistance() *
+          (1 - routingRequest.walkSafetyFactor);
+        weight /= speed;
+      } else {
+        weight = getEffectiveWalkSafetyDistance() * routingRequest.walkSafetyFactor;
+        weight /= speed;
+      }
       weight *= nonWheelchairReluctance.get();
     }
     return new TraversalCosts(time, weight);
