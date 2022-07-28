@@ -3,8 +3,8 @@ package org.opentripplanner.routing.services;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 public class RealtimeVehiclePositionService {
 

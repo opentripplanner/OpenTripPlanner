@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareRuleSet implements Serializable {

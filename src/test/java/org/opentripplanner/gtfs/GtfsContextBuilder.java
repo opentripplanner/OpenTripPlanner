@@ -13,7 +13,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**
  * This class helps building GtfsContext and post process the GtfsDao by repairing
@@ -49,7 +49,7 @@ public class GtfsContextBuilder {
       false,
       gtfsImport.getDao()
     );
-    mapper.mapStopTripAndRouteDatantoBuilder();
+    mapper.mapStopTripAndRouteDataIntoBuilder();
     OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();
     return new GtfsContextBuilder(feedId, transitBuilder)
       .withDataImportIssueStore(new DataImportIssueStore(false));

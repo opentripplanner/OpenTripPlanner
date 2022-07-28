@@ -10,7 +10,7 @@ import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class ParkAPIUpdaterTest {
 

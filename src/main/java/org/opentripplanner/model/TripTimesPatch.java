@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import java.util.List;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * Contains a {@link TripTimes} and array of stop indices of a stop pattern that are skipped with a

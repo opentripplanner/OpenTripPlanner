@@ -19,17 +19,17 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.StopTimeKey;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Station;
@@ -223,8 +223,8 @@ public class NetexBundleSmokeTest {
     );
     Notice n = list.get(0);
     assertTrue(n.getId().toString().startsWith("RB:RUT:Notice:"));
-    assertEquals(code, n.getPublicCode());
-    assertEquals(text, n.getText());
+    assertEquals(code, n.publicCode());
+    assertEquals(text, n.text());
     assertEquals(1, list.size());
   }
 

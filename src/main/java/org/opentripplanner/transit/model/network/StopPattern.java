@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.network;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
+import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -104,6 +106,17 @@ public final class StopPattern implements Serializable {
         Arrays.equals(this.pickups, that.pickups) &&
         Arrays.equals(this.dropoffs, that.dropoffs)
       );
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Checks that stops equal without taking into account if pickup or dropoff is allowed.
+   */
+  public boolean stopsEqual(Object other) {
+    if (other instanceof StopPattern that) {
+      return Arrays.equals(this.stops, that.stops);
     } else {
       return false;
     }

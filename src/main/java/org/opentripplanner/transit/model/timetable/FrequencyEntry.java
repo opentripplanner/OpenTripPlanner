@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.transit.model.timetable;
 
 import java.io.Serializable;
 import org.opentripplanner.model.Frequency;

@@ -19,9 +19,9 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**

@@ -9,19 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -30,10 +25,13 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -63,10 +61,6 @@ public class OtpTransitServiceBuilder {
   private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
 
   private final List<ServiceCalendar> calendars = new ArrayList<>();
-
-  private final List<FareAttribute> fareAttributes = new ArrayList<>();
-
-  private final List<FareRule> fareRules = new ArrayList<>();
 
   private final List<FeedInfo> feedInfos = new ArrayList<>();
 
@@ -136,14 +130,6 @@ public class OtpTransitServiceBuilder {
 
   public List<ServiceCalendar> getCalendars() {
     return calendars;
-  }
-
-  public List<FareAttribute> getFareAttributes() {
-    return fareAttributes;
-  }
-
-  public List<FareRule> getFareRules() {
-    return fareRules;
   }
 
   public List<FeedInfo> getFeedInfos() {

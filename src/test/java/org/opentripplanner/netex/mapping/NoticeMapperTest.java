@@ -14,7 +14,7 @@ public class NoticeMapperTest {
 
   @Test
   public void mapNotice() {
-    org.opentripplanner.model.Notice otpNotice;
+    org.opentripplanner.transit.model.basic.Notice otpNotice;
 
     // Given
     NoticeMapper mapper = new NoticeMapper(MappingSupport.ID_FACTORY);
@@ -30,8 +30,8 @@ public class NoticeMapperTest {
 
     // Then
     assertEquals(NOTICE_ID, otpNotice.getId().getId());
-    assertEquals(NOTICE_TEXT, otpNotice.getText());
-    assertEquals(PUBLIC_CODE, otpNotice.getPublicCode());
+    assertEquals(NOTICE_TEXT, otpNotice.text());
+    assertEquals(PUBLIC_CODE, otpNotice.publicCode());
 
     // And when other instance with same id is mapped, the first one is returned
     // from cache - ignoring all properties except the id
@@ -45,6 +45,6 @@ public class NoticeMapperTest {
 
     // Then
     assertEquals(NOTICE_ID, otpNotice.getId().getId());
-    assertEquals(NOTICE_TEXT, otpNotice.getText(), "Not Albatross");
+    assertEquals(NOTICE_TEXT, otpNotice.text(), "Not Albatross");
   }
 }

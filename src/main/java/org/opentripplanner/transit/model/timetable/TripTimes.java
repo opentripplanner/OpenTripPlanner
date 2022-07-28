@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.transit.model.timetable;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -13,7 +13,7 @@ import java.util.List;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

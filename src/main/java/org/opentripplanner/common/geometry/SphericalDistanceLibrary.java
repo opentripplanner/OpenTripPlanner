@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public abstract class SphericalDistanceLibrary {
 
