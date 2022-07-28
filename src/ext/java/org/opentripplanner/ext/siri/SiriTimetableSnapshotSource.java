@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -473,18 +474,18 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Added ServiceJourneyId
     String newServiceJourneyRef = estimatedVehicleJourney.getEstimatedVehicleJourneyCode();
-    Preconditions.checkNotNull(newServiceJourneyRef, "EstimatedVehicleJourneyCode is required");
+    Objects.requireNonNull(newServiceJourneyRef, "EstimatedVehicleJourneyCode is required");
 
     // Replaced/duplicated ServiceJourneyId
     //        VehicleJourneyRef existingServiceJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
     //        Preconditions.checkNotNull(existingServiceJourneyRef, "VehicleJourneyRef is required");
 
     // LineRef of added trip
-    Preconditions.checkNotNull(estimatedVehicleJourney.getLineRef(), "LineRef is required");
+    Objects.requireNonNull(estimatedVehicleJourney.getLineRef(), "LineRef is required");
     String lineRef = estimatedVehicleJourney.getLineRef().getValue();
 
     //OperatorRef of added trip
-    Preconditions.checkNotNull(estimatedVehicleJourney.getOperatorRef(), "OperatorRef is required");
+    Objects.requireNonNull(estimatedVehicleJourney.getOperatorRef(), "OperatorRef is required");
     String operatorRef = estimatedVehicleJourney.getOperatorRef().getValue();
 
     //Required in SIRI, but currently not in use by OTP
@@ -1065,7 +1066,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       stopTimes.size() == stops.size(),
       "number of stop should match the number of stop time updates"
