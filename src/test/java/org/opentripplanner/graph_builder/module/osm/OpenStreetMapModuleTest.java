@@ -188,7 +188,7 @@ public class OpenStreetMapModuleTest {
     OSMSpecifier lane_only = new OSMSpecifier("cycleway=lane");
 
     WayProperties lane_is_safer = new WayProperties();
-    lane_is_safer.setSafetyFeatures(new P2<>(1.5, 1.5));
+    lane_is_safer.setBicycleSafetyFeatures(new P2<>(1.5, 1.5));
 
     wayPropertySet.addProperties(lane_only, lane_is_safer);
 
@@ -208,7 +208,7 @@ public class OpenStreetMapModuleTest {
     OSMSpecifier lane_and_footway = new OSMSpecifier("cycleway=lane;highway=footway");
 
     WayProperties safer_and_peds = new WayProperties();
-    safer_and_peds.setSafetyFeatures(new P2<>(0.75, 0.75));
+    safer_and_peds.setBicycleSafetyFeatures(new P2<>(0.75, 0.75));
     safer_and_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
 
     wayPropertySet.addProperties(lane_and_footway, safer_and_peds);
@@ -218,11 +218,11 @@ public class OpenStreetMapModuleTest {
     // add a mixin
     OSMSpecifier gravel = new OSMSpecifier("surface=gravel");
     WayProperties gravel_is_dangerous = new WayProperties();
-    gravel_is_dangerous.setSafetyFeatures(new P2<>(2.0, 2.0));
+    gravel_is_dangerous.setBicycleSafetyFeatures(new P2<>(2.0, 2.0));
     wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.getSafetyFeatures().first, 1.5);
+    assertEquals(dataForWay.getBicycleSafetyFeatures().first, 1.5);
 
     // test a left-right distinction
     way = new OSMWay();
@@ -232,13 +232,13 @@ public class OpenStreetMapModuleTest {
 
     OSMSpecifier track_only = new OSMSpecifier("highway=footway;cycleway=track");
     WayProperties track_is_safest = new WayProperties();
-    track_is_safest.setSafetyFeatures(new P2<>(0.25, 0.25));
+    track_is_safest.setBicycleSafetyFeatures(new P2<>(0.25, 0.25));
 
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(0.25, dataForWay.getSafetyFeatures().first); // right (with traffic) comes
+    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().first); // right (with traffic) comes
     // from track
-    assertEquals(0.75, dataForWay.getSafetyFeatures().second); // left comes from lane
+    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().second); // left comes from lane
 
     way = new OSMWay();
     way.addTag("highway", "footway");

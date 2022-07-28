@@ -21,14 +21,23 @@ public class WayProperties implements Cloneable {
    */
   private static final P2<Double> defaultSafetyFeatures = new P2<>(1.0, 1.0);
   private StreetTraversalPermission permission;
-  private P2<Double> safetyFeatures = defaultSafetyFeatures;
+  private P2<Double> bicycleSafetyFeatures = defaultSafetyFeatures;
+  private P2<Double> walkSafetyFeatures = defaultSafetyFeatures;
 
-  public P2<Double> getSafetyFeatures() {
-    return safetyFeatures;
+  public P2<Double> getBicycleSafetyFeatures() {
+    return bicycleSafetyFeatures;
   }
 
-  public void setSafetyFeatures(P2<Double> safetyFeatures) {
-    this.safetyFeatures = safetyFeatures;
+  public void setBicycleSafetyFeatures(P2<Double> bicycleSafetyFeatures) {
+    this.bicycleSafetyFeatures = bicycleSafetyFeatures;
+  }
+
+  public P2<Double> getWalkSafetyFeatures() {
+    return walkSafetyFeatures;
+  }
+
+  public void setWalkSafetyFeatures(P2<Double> walkSafetyFeatures) {
+    this.walkSafetyFeatures = walkSafetyFeatures;
   }
 
   public StreetTraversalPermission getPermission() {
@@ -40,13 +49,17 @@ public class WayProperties implements Cloneable {
   }
 
   public int hashCode() {
-    return safetyFeatures.hashCode() + permission.hashCode();
+    return bicycleSafetyFeatures.hashCode() + walkSafetyFeatures.hashCode() + permission.hashCode();
   }
 
   public boolean equals(Object o) {
     if (o instanceof WayProperties) {
       WayProperties other = (WayProperties) o;
-      return safetyFeatures.equals(other.safetyFeatures) && permission == other.permission;
+      return (
+        bicycleSafetyFeatures.equals(other.bicycleSafetyFeatures) &&
+        walkSafetyFeatures.equals(other.walkSafetyFeatures) &&
+        permission == other.permission
+      );
     }
     return false;
   }
@@ -55,7 +68,10 @@ public class WayProperties implements Cloneable {
     WayProperties result;
     try {
       result = (WayProperties) super.clone();
-      result.setSafetyFeatures(new P2<>(safetyFeatures.first, safetyFeatures.second));
+      result.setBicycleSafetyFeatures(
+        new P2<>(bicycleSafetyFeatures.first, bicycleSafetyFeatures.second)
+      );
+      result.setWalkSafetyFeatures(new P2<>(walkSafetyFeatures.first, walkSafetyFeatures.second));
       return result;
     } catch (CloneNotSupportedException e) {
       // unreached

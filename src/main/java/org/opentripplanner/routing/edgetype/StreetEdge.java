@@ -87,6 +87,13 @@ public class StreetEdge
    */
   protected float bicycleSafetyFactor;
 
+  /**
+   * walkSafetyFactor = length * walkSafetyFactor. For example, a 100m street with a safety
+   * factor of 2.0 will be considered in term of safety cost as the same as a 150m street with a
+   * safety factor of 1.0.
+   */
+  protected float walkSafetyFactor;
+
   private byte[] compactGeometry;
 
   private I18NString name;
@@ -148,6 +155,7 @@ public class StreetEdge
       );
     }
     this.bicycleSafetyFactor = 1.0f;
+    this.walkSafetyFactor = 1.0f;
     this.name = name;
     this.setPermission(permission);
     this.setCarSpeed(DEFAULT_CAR_SPEED);
@@ -337,6 +345,28 @@ public class StreetEdge
     return elevationExtension != null
       ? elevationExtension.getEffectiveBicycleSafetyDistance()
       : bicycleSafetyFactor * getDistanceMeters();
+  }
+
+  public float getWalkSafetyFactor() {
+    return walkSafetyFactor;
+  }
+
+  public void setWalkSafetyFactor(float walkSafetyFactor) {
+    if (hasElevationExtension()) {
+      throw new IllegalStateException(
+        "A walk safety factor may not be set if an elevation extension is set."
+      );
+    }
+    if (!Float.isFinite(walkSafetyFactor) || walkSafetyFactor <= 0) {
+      throw new IllegalArgumentException("Invalid walkSafetyFactor: " + walkSafetyFactor);
+    }
+    this.walkSafetyFactor = walkSafetyFactor;
+  }
+
+  public double getEffectiveWalkSafetyDistance() {
+    return elevationExtension != null
+      ? elevationExtension.getEffectiveWalkSafetyDistance()
+      : walkSafetyFactor * getDistanceMeters();
   }
 
   public String toString() {
@@ -847,6 +877,7 @@ public class StreetEdge
   ) {
     splitEdge.flags = this.flags;
     splitEdge.setBicycleSafetyFactor(bicycleSafetyFactor);
+    splitEdge.setWalkSafetyFactor(walkSafetyFactor);
     splitEdge.setStreetClass(getStreetClass());
     splitEdge.setCarSpeed(getCarSpeed());
     splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);

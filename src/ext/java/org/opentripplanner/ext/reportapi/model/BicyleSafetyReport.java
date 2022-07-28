@@ -32,7 +32,7 @@ public class BicyleSafetyReport {
         buf.addBoolean(p.isSafetyMixin());
         buf.addText(p.getProperties().getPermission().toString());
 
-        var safetyProps = p.getProperties().getSafetyFeatures();
+        var safetyProps = p.getProperties().getBicycleSafetyFeatures();
         buf.addNumber(safetyProps.first);
         buf.addNumber(safetyProps.second);
         buf.newLine();

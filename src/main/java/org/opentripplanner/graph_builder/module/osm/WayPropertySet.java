@@ -51,7 +51,8 @@ public class WayPropertySet {
   public WayPropertySet() {
     /* sensible defaults */
     defaultProperties = new WayProperties();
-    defaultProperties.setSafetyFeatures(new P2<>(1.0, 1.0));
+    defaultProperties.setBicycleSafetyFeatures(new P2<>(1.0, 1.0));
+    defaultProperties.setWalkSafetyFeatures(new P2<>(1.0, 1.0));
     defaultProperties.setPermission(StreetTraversalPermission.ALL);
     defaultSpeed = 11.2f; // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
     wayProperties = new ArrayList<>();
@@ -101,8 +102,14 @@ public class WayPropertySet {
     }
 
     WayProperties result = rightResult.clone();
-    result.setSafetyFeatures(
-      new P2<>(rightResult.getSafetyFeatures().first, leftResult.getSafetyFeatures().second)
+    result.setBicycleSafetyFeatures(
+      new P2<>(
+        rightResult.getBicycleSafetyFeatures().first,
+        leftResult.getBicycleSafetyFeatures().second
+      )
+    );
+    result.setWalkSafetyFeatures(
+      new P2<>(rightResult.getWalkSafetyFeatures().first, leftResult.getWalkSafetyFeatures().second)
     );
 
     /* apply mixins */
@@ -330,7 +337,34 @@ public class WayPropertySet {
   }
 
   public void setProperties(String spec, StreetTraversalPermission permission) {
-    setProperties(spec, permission, 1.0, 1.0);
+    setProperties(spec, permission, 1.0, 1.0, 1.0, 1.0);
+  }
+
+  /**
+   * Note that the safeties here will be adjusted such that the safest street has a safety value of
+   * 1, with all others scaled proportionately. Sets walk safety to be 1.0.
+   */
+  public void setProperties(
+    String spec,
+    StreetTraversalPermission permission,
+    double bicycleSafety,
+    double bicycleSafetyBack
+  ) {
+    setProperties(spec, permission, bicycleSafety, bicycleSafetyBack, 1.0, 1.0, false);
+  }
+
+  /**
+   * Note that the safeties here will be adjusted such that the safest street has a safety value of
+   * 1, with all others scaled proportionately. Sets walk safety to be 1.0.
+   */
+  public void setProperties(
+    String spec,
+    StreetTraversalPermission permission,
+    double bicycleSafety,
+    double bicycleSafetyBack,
+    boolean mixin
+  ) {
+    setProperties(spec, permission, bicycleSafety, bicycleSafetyBack, 1.0, 1.0, mixin);
   }
 
   /**
@@ -340,22 +374,35 @@ public class WayPropertySet {
   public void setProperties(
     String spec,
     StreetTraversalPermission permission,
-    double safety,
-    double safetyBack
+    double bicycleSafety,
+    double bicycleSafetyBack,
+    double walkSafety,
+    double walkSafetyBack
   ) {
-    setProperties(spec, permission, safety, safetyBack, false);
+    setProperties(
+      spec,
+      permission,
+      bicycleSafety,
+      bicycleSafetyBack,
+      walkSafety,
+      walkSafetyBack,
+      false
+    );
   }
 
   public void setProperties(
     String spec,
     StreetTraversalPermission permission,
-    double safety,
-    double safetyBack,
+    double bicycleSafety,
+    double bicycleSafetyBack,
+    double walkSafety,
+    double walkSafetyBack,
     boolean mixin
   ) {
     WayProperties properties = new WayProperties();
     properties.setPermission(permission);
-    properties.setSafetyFeatures(new P2<>(safety, safetyBack));
+    properties.setBicycleSafetyFeatures(new P2<>(bicycleSafety, bicycleSafetyBack));
+    properties.setWalkSafetyFeatures(new P2<>(walkSafety, walkSafetyBack));
     addProperties(new OSMSpecifier(spec), properties, mixin);
   }
 
@@ -388,16 +435,22 @@ public class WayPropertySet {
   }
 
   private void applyMixins(WayProperties result, List<WayProperties> mixins, boolean right) {
-    P2<Double> safetyFeatures = result.getSafetyFeatures();
-    double first = safetyFeatures.first;
-    double second = safetyFeatures.second;
+    P2<Double> bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
+    double firstBicycle = bicycleSafetyFeatures.first;
+    double secondBicycle = bicycleSafetyFeatures.second;
+    P2<Double> walkSafetyFeatures = result.getWalkSafetyFeatures();
+    double firstWalk = bicycleSafetyFeatures.first;
+    double secondWalk = bicycleSafetyFeatures.second;
     for (WayProperties properties : mixins) {
       if (right) {
-        second *= properties.getSafetyFeatures().second;
+        secondBicycle *= properties.getBicycleSafetyFeatures().second;
+        secondWalk *= properties.getWalkSafetyFeatures().second;
       } else {
-        first *= properties.getSafetyFeatures().first;
+        firstBicycle *= properties.getBicycleSafetyFeatures().first;
+        firstWalk *= properties.getWalkSafetyFeatures().first;
       }
     }
-    result.setSafetyFeatures(new P2<>(first, second));
+    result.setBicycleSafetyFeatures(new P2<>(firstBicycle, secondBicycle));
+    result.setWalkSafetyFeatures(new P2<>(firstWalk, secondWalk));
   }
 }
