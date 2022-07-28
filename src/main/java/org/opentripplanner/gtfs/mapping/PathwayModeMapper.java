@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.PathwayMode;
+import org.opentripplanner.transit.model.site.PathwayMode;
 
 public class PathwayModeMapper {
 
