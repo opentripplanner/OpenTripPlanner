@@ -14,7 +14,6 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -44,6 +43,7 @@ import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
