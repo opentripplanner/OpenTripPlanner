@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.routing.trippattern.OccupancyStatus;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.StopRealTimeState;

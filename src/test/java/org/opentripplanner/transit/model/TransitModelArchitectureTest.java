@@ -26,7 +26,7 @@ public class TransitModelArchitectureTest {
 
   @Test
   void enforcePackageDependencies() {
-    FRAMEWORK.dependsOn(UTILS).verify();
+    FRAMEWORK.dependsOn(GUAVA, UTILS).verify();
     BASIC.dependsOn(UTILS, JTS_GEOM, FRAMEWORK).verify();
     ORGANIZATION.dependsOn(UTILS, FRAMEWORK, BASIC).verify();
     SITE
@@ -46,7 +46,7 @@ public class TransitModelArchitectureTest {
         LEGACY_MODEL
       )
       .verify();
-    TIMETABLE.dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL).verify();
+    TIMETABLE.dependsOn(GUAVA, UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL).verify();
   }
 
   @Test
