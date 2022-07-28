@@ -190,6 +190,7 @@ public class GeometryUtils {
     return r;
   }
 
+  // TODO OTP2 move this method to a separate mapper class
   /**
    * Convert a org.geojson.Xxxx geometry to a JTS geometry. Only support Point, Polygon and
    * MultiPolygon for now.
