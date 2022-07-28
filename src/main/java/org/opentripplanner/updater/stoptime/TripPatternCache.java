@@ -61,6 +61,7 @@ public class TripPatternCache {
       tripPatternBuilder.withServiceCodes(serviceCodes);
 
       tripPatternBuilder.withCreatedByRealtimeUpdater(true);
+      tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
 
       tripPattern = tripPatternBuilder.build();
 

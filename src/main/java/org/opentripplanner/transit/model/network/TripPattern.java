@@ -103,6 +103,7 @@ public final class TripPattern
     this.scheduledTimetable.setServiceCodes(builder.getServiceCodes());
 
     this.services = builder.getServices();
+    this.originalTripPattern = builder.getOriginalTripPattern();
 
     if (builder.getServiceCodes() != null) {
       setServiceCodes(builder.getServiceCodes());
@@ -554,10 +555,6 @@ public final class TripPattern
     scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
   }
 
-  public void setOriginalTripPattern(TripPattern originalTripPattern) {
-    this.originalTripPattern = originalTripPattern;
-  }
-
   /**
    * Checks that this is TripPattern is based of the provided TripPattern and contains same stops
    * (but not necessarily with same pickup and dropoff values).
@@ -650,6 +647,10 @@ public final class TripPattern
    */
   public BitSet getServices() {
     return services;
+  }
+
+  public TripPattern getOriginalTripPattern() {
+    return originalTripPattern;
   }
 
   public String getTripHeadsign() {

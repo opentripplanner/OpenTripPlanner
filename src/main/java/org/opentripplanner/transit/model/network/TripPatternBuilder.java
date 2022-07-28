@@ -19,6 +19,8 @@ public final class TripPatternBuilder
 
   private boolean createdByRealtimeUpdate;
 
+  private TripPattern originalTripPattern;
+
   public TripPatternBuilder(FeedScopedId id) {
     super(id);
   }
@@ -31,6 +33,7 @@ public final class TripPatternBuilder
     this.scheduledTimetable = original.getScheduledTimetable();
     this.createdByRealtimeUpdate = original.isCreatedByRealtimeUpdater();
     this.services = original.getServices();
+    this.originalTripPattern = original.getOriginalTripPattern();
   }
 
   public TripPatternBuilder withName(String name) {
@@ -55,6 +58,11 @@ public final class TripPatternBuilder
 
   public TripPatternBuilder withCreatedByRealtimeUpdater(boolean createdByRealtimeUpdate) {
     this.createdByRealtimeUpdate = createdByRealtimeUpdate;
+    return this;
+  }
+
+  public TripPatternBuilder withOriginalTripPattern(TripPattern originalTripPattern) {
+    this.originalTripPattern = originalTripPattern;
     return this;
   }
 
@@ -85,6 +93,10 @@ public final class TripPatternBuilder
 
   public BitSet getServices() {
     return services;
+  }
+
+  public TripPattern getOriginalTripPattern() {
+    return originalTripPattern;
   }
 
   public boolean isCreatedByRealtimeUpdate() {

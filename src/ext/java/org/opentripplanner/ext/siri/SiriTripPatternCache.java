@@ -83,6 +83,7 @@ public class SiriTripPatternCache {
         .get(trip);
 
       tripPatternBuilder.withCreatedByRealtimeUpdater(true);
+      tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
 
       tripPattern = tripPatternBuilder.build();
       // Copy information from the TripPattern this is replacing
