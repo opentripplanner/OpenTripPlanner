@@ -15,7 +15,7 @@ public class NoticeBuilder extends AbstractEntityBuilder<Notice, NoticeBuilder> 
   public NoticeBuilder(Notice original) {
     super(original);
     this.publicCode = original.publicCode();
-    this.text = original.publicCode();
+    this.text = original.text();
   }
 
   public String publicCode() {

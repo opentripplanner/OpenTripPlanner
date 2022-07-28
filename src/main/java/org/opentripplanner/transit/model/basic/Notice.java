@@ -13,7 +13,6 @@ import org.opentripplanner.transit.model.framework.TransitEntity2;
 public class Notice extends TransitEntity2<Notice, NoticeBuilder> {
 
   private final String text;
-
   private final String publicCode;
 
   Notice(NoticeBuilder builder) {
