@@ -87,7 +87,7 @@ public class NetexBundleSmokeTest {
   }
 
   private static StopTimeKey stId(String id, int stopSequenceNr) {
-    return new StopTimeKey(fId(id), stopSequenceNr);
+    return StopTimeKey.of(fId(id), stopSequenceNr).build();
   }
 
   private static FeedScopedId fId(String id) {

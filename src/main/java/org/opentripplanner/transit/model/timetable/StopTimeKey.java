@@ -1,7 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * This class is used as a reference to a StopTime wrapping the {@link Trip#getId()} and
@@ -9,9 +10,26 @@ import org.opentripplanner.transit.model.framework.TransitEntity;
  * represented by the {@link TripTimes}, but we use this class to map other entities
  * (NoticeAssignment) to StopTimes to be able to decorate itineraries with such data.
  */
-public class StopTimeKey extends TransitEntity {
+public class StopTimeKey extends TransitEntity2<StopTimeKey, StopTimeKeyBuilder> {
 
-  public StopTimeKey(FeedScopedId tripId, int stopSequenceNumber) {
-    super(new FeedScopedId(tripId.getFeedId(), tripId.getId() + "_#" + stopSequenceNumber));
+  StopTimeKey(StopTimeKeyBuilder builder) {
+    super(builder.getId());
+  }
+
+  public static StopTimeKeyBuilder of(@Nonnull FeedScopedId tripId, int stopSequenceNumber) {
+    return new StopTimeKeyBuilder(
+      new FeedScopedId(tripId.getFeedId(), tripId.getId() + "_#" + stopSequenceNumber)
+    );
+  }
+
+  @Override
+  public boolean sameAs(@Nonnull StopTimeKey other) {
+    return getId().equals(other.getId());
+  }
+
+  @Nonnull
+  @Override
+  public StopTimeKeyBuilder copy() {
+    return new StopTimeKeyBuilder(this);
   }
 }

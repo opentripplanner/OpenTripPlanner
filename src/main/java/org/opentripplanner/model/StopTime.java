@@ -93,7 +93,7 @@ public final class StopTime implements Comparable<StopTime> {
    * is ok.
    */
   public StopTimeKey getId() {
-    return new StopTimeKey(trip.getId(), stopSequence);
+    return StopTimeKey.of(trip.getId(), stopSequence).build();
   }
 
   public Trip getTrip() {
