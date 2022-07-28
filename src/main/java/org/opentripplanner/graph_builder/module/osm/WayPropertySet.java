@@ -439,8 +439,8 @@ public class WayPropertySet {
     double firstBicycle = bicycleSafetyFeatures.first;
     double secondBicycle = bicycleSafetyFeatures.second;
     P2<Double> walkSafetyFeatures = result.getWalkSafetyFeatures();
-    double firstWalk = bicycleSafetyFeatures.first;
-    double secondWalk = bicycleSafetyFeatures.second;
+    double firstWalk = walkSafetyFeatures.first;
+    double secondWalk = walkSafetyFeatures.second;
     for (WayProperties properties : mixins) {
       if (right) {
         secondBicycle *= properties.getBicycleSafetyFeatures().second;
