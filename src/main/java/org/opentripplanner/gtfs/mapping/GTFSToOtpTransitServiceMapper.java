@@ -9,6 +9,7 @@ import static org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP;
 import java.util.Collection;
 import java.util.function.Function;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -71,6 +72,8 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
+  private final FareRulesData fareRulesBuilder = new FareRulesData();
+
   private final TranslationHelper translationHelper;
   private final boolean discardMinTransferTimes;
 
@@ -118,14 +121,16 @@ public class GTFSToOtpTransitServiceMapper {
     return builder;
   }
 
-  public void mapStopTripAndRouteDatantoBuilder() {
+  public FareRulesData getFareRulesService() {
+    return fareRulesBuilder;
+  }
+
+  public void mapStopTripAndRouteDataIntoBuilder() {
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
     builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
     builder.getCalendars().addAll(serviceCalendarMapper.map(data.getAllCalendars()));
-    builder.getFareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
-    builder.getFareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
     builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
     builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
     builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
@@ -140,6 +145,9 @@ public class GTFSToOtpTransitServiceMapper {
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
     builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
     builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
+
+    fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
+    fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
 
     mapAndAddTransfersToBuilder();
   }

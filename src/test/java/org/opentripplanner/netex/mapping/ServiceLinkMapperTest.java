@@ -14,14 +14,14 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -119,11 +119,11 @@ public class ServiceLinkMapperTest {
       stopsById.add(stop);
     }
 
-    TripPattern tripPattern = new TripPattern(
-      ID_FACTORY.createId("RUT:JourneyPattern:1"),
-      null,
-      stopPatternBuilder.build()
-    );
+    TripPattern tripPattern = TripPattern
+      .of(ID_FACTORY.createId("RUT:JourneyPattern:1"))
+      .withRoute(null)
+      .withStopPattern(stopPatternBuilder.build())
+      .build();
 
     ServiceLinkMapper serviceLinkMapper = new ServiceLinkMapper(
       ID_FACTORY,

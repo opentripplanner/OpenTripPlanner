@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.vehicle_parking;
 
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class VehicleParkingTestUtil {
 
