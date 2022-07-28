@@ -1,16 +1,13 @@
 package org.opentripplanner.transit.model.site;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopCollection;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * The next level grouping of stops above Station. Equivalent to NeTEx multimodal StopPlace. As a
@@ -18,51 +15,58 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * Stations together using a MultiModalStation in order to support several modes. This entity is not
  * part of GTFS.
  */
-public class MultiModalStation extends TransitEntity implements StopCollection {
-
-  private static final long serialVersionUID = 1L;
+public class MultiModalStation
+  extends TransitEntity2<MultiModalStation, MultiModalStationBuilder>
+  implements StopCollection {
 
   private final Collection<Station> childStations;
 
-  private I18NString name;
+  private final I18NString name;
 
-  private WgsCoordinate coordinate;
+  private final WgsCoordinate coordinate;
 
-  private String code;
+  private final String code;
 
-  private String description;
+  private final String description;
 
-  private I18NString url;
+  private final I18NString url;
 
   /**
    * Create a new multi modal station with the given list of child stations.
    */
-  public MultiModalStation(FeedScopedId id, Collection<Station> children) {
-    super(id);
-    this.childStations = Collections.unmodifiableCollection(new ArrayList<>(children));
+  MultiModalStation(MultiModalStationBuilder builder) {
+    super(builder.getId());
+    // Required fields
+    this.childStations = Objects.requireNonNull(builder.childStations());
+    this.name = I18NString.assertHasValue(builder.name());
+
+    // Optional fields
+    // TODO Make required
+    this.coordinate = builder.coordinate();
+    this.code = builder.code();
+    this.description = builder.description();
+    this.url = builder.url();
+  }
+
+  public static MultiModalStationBuilder of(FeedScopedId id) {
+    return new MultiModalStationBuilder(id);
   }
 
   public I18NString getName() {
     return name;
   }
 
-  public void setName(I18NString name) {
-    this.name = name;
+  public Collection<Station> getChildStations() {
+    return this.childStations;
   }
 
   public Collection<StopLocation> getChildStops() {
-    return this.childStations.stream()
-      .flatMap(s -> s.getChildStops().stream())
-      .collect(Collectors.toUnmodifiableList());
+    return this.childStations.stream().flatMap(s -> s.getChildStops().stream()).toList();
   }
 
   @Override
   public WgsCoordinate getCoordinate() {
     return coordinate;
-  }
-
-  public void setCoordinate(WgsCoordinate coordinate) {
-    this.coordinate = coordinate;
   }
 
   /**
@@ -72,19 +76,11 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
     return code;
   }
 
-  public void setCode(String code) {
-    this.code = code;
-  }
-
   /**
    * Additional information about the station (if needed)
    */
   public String getDescription() {
     return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   /**
@@ -94,11 +90,22 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
     return url;
   }
 
-  public void setUrl(I18NString url) {
-    this.url = url;
+  @Override
+  public boolean sameAs(@Nonnull MultiModalStation other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(childStations, other.getChildStations()) &&
+      Objects.equals(name, other.getName()) &&
+      Objects.equals(coordinate, other.getCoordinate()) &&
+      Objects.equals(code, other.getCode()) &&
+      Objects.equals(description, other.getDescription()) &&
+      Objects.equals(url, other.getUrl())
+    );
   }
 
-  public Collection<Station> getChildStations() {
-    return this.childStations;
+  @Nonnull
+  @Override
+  public MultiModalStationBuilder copy() {
+    return new MultiModalStationBuilder(this);
   }
 }
