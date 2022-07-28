@@ -68,12 +68,14 @@ public class PathwayMapperTest {
   public void testMapWithNulls() throws Exception {
     Pathway input = new Pathway();
     input.setId(AGENCY_AND_ID);
+    input.setFromStop(FROM_STOP);
+    input.setToStop(TO_STOP);
 
     org.opentripplanner.transit.model.site.Pathway result = subject.map(input);
 
     assertNotNull(result.getId());
-    assertNull(result.getFromStop());
-    assertNull(result.getToStop());
+    assertNotNull(result.getFromStop());
+    assertNotNull(result.getToStop());
     assertEquals(PathwayMode.UNKNOWN, result.getPathwayMode());
     assertEquals(0, result.getTraversalTime());
   }
