@@ -20,7 +20,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -34,6 +33,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
