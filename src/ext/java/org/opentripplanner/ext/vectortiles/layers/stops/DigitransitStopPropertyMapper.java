@@ -13,26 +13,24 @@ import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVertex> {
 
-  private final TransitModel transitModel;
+  private final TransitService transitService;
 
-  private DigitransitStopPropertyMapper(TransitModel transitModel) {
-    this.transitModel = transitModel;
+  private DigitransitStopPropertyMapper(TransitService transitService) {
+    this.transitService = transitService;
   }
 
-  public static DigitransitStopPropertyMapper create(TransitModel transitModel) {
-    return new DigitransitStopPropertyMapper(transitModel);
+  public static DigitransitStopPropertyMapper create(TransitService transitService) {
+    return new DigitransitStopPropertyMapper(transitService);
   }
 
   @Override
   public Collection<T2<String, Object>> map(TransitStopVertex input) {
     Stop stop = input.getStop();
-    Collection<TripPattern> patternsForStop = transitModel
-      .getTransitModelIndex()
-      .getPatternsForStop(stop);
+    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
 
     String type = patternsForStop
       .stream()

@@ -15,11 +15,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,6 +156,13 @@ public class TimetableSnapshot {
   public TripPattern getLastAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return lastAddedTripPattern.get(tripIdAndServiceDate);
+  }
+
+  /**
+   * @return if any trip patterns were added.
+   */
+  public boolean hasLastAddedTripPatterns() {
+    return !lastAddedTripPattern.isEmpty();
   }
 
   /**

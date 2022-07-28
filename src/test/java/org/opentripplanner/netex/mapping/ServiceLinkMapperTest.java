@@ -119,11 +119,11 @@ public class ServiceLinkMapperTest {
       stopsById.add(stop);
     }
 
-    TripPattern tripPattern = new TripPattern(
-      ID_FACTORY.createId("RUT:JourneyPattern:1"),
-      null,
-      stopPatternBuilder.build()
-    );
+    TripPattern tripPattern = TripPattern
+      .of(ID_FACTORY.createId("RUT:JourneyPattern:1"))
+      .withRoute(null)
+      .withStopPattern(stopPatternBuilder.build())
+      .build();
 
     ServiceLinkMapper serviceLinkMapper = new ServiceLinkMapper(
       ID_FACTORY,

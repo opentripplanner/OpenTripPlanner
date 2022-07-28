@@ -8,6 +8,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
@@ -25,6 +26,7 @@ import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +67,8 @@ public class OTPAppConstruction {
 
   private DefaultServerContext context;
 
+  private GraphVisualizer graphVisualizer;
+
   /**
    * Create a new OTP configuration instance for a given directory.
    */
@@ -87,6 +91,7 @@ public class OTPAppConstruction {
     this.transitModel = transitModel;
     this.raptorTuningParameters =
       new RaptorConfig<>(factory.configModel().routerConfig().raptorTuningParameters());
+
     this.context =
       DefaultServerContext.create(
         factory.configModel().routerConfig(),
@@ -94,7 +99,7 @@ public class OTPAppConstruction {
         graph,
         transitModel,
         Metrics.globalRegistry,
-        cli.visualize
+        traverseVisitor()
       );
   }
 
@@ -154,6 +159,19 @@ public class OTPAppConstruction {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
     return new OTPWebApplication(() -> context.createHttpRequestScopedCopy());
+  }
+
+  public GraphVisualizer graphVisualizer() {
+    if (cli.visualize && graphVisualizer == null) {
+      graphVisualizer =
+        new GraphVisualizer(graph, factory.configModel().routerConfig().streetRoutingTimeout());
+    }
+    return graphVisualizer;
+  }
+
+  public TraverseVisitor traverseVisitor() {
+    var gv = graphVisualizer();
+    return gv == null ? null : gv.traverseVisitor;
   }
 
   private void setupTransitRoutingServer() {

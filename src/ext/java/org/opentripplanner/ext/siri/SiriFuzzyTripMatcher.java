@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -17,6 +16,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -195,15 +195,15 @@ public class SiriFuzzyTripMatcher {
       return trip.getId();
     } else {
       //Attempt to find trip using datedServiceJourneys
-      TripOnServiceDate tripOnServiceDate = transitService
-        .getTripOnServiceDateById()
-        .get(new FeedScopedId(feedId, vehicleJourney));
+      TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
+        new FeedScopedId(feedId, vehicleJourney)
+      );
       if (tripOnServiceDate != null) {
         return tripOnServiceDate.getTrip().getId();
       }
     }
     //Fallback to handle extrajourneys
-    trip = transitService.getTripForId().get(new FeedScopedId(feedId, vehicleJourney));
+    trip = transitService.getTripForId(new FeedScopedId(feedId, vehicleJourney));
     if (trip != null) {
       vehicleJourneyTripCache.put(vehicleJourney, trip);
       return trip.getId();
@@ -212,9 +212,9 @@ public class SiriFuzzyTripMatcher {
   }
 
   public int getTripDepartureTime(FeedScopedId tripId) {
-    Trip trip = transitService.getTripForId().get(tripId);
+    Trip trip = transitService.getTripForId(tripId);
     {
-      TripPattern tripPattern = transitService.getPatternForTrip().get(trip);
+      TripPattern tripPattern = transitService.getPatternForTrip(trip);
 
       if (tripPattern != null) {
         TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
@@ -227,15 +227,13 @@ public class SiriFuzzyTripMatcher {
   }
 
   public int getTripArrivalTime(FeedScopedId tripId) {
-    Trip trip = transitService.getTripForId().get(tripId);
-    {
-      TripPattern tripPattern = transitService.getPatternForTrip().get(trip);
+    Trip trip = transitService.getTripForId(tripId);
+    TripPattern tripPattern = transitService.getPatternForTrip(trip);
 
-      if (tripPattern != null) {
-        TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
-        if (tripTimes != null) {
-          return tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
-        }
+    if (tripPattern != null) {
+      TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
+      if (tripTimes != null) {
+        return tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
       }
     }
     return -1;
@@ -258,7 +256,7 @@ public class SiriFuzzyTripMatcher {
 
     List<FeedScopedId> matches = new ArrayList<>();
     for (Trip trip : cachedTripsBySiriId) {
-      final TripPattern tripPattern = transitService.getPatternForTrip().get(trip);
+      final TripPattern tripPattern = transitService.getPatternForTrip(trip);
       if (tripPattern.matchesModeOrSubMode(mode, transportSubmode)) {
         Set<LocalDate> serviceDates = transitService
           .getCalendarService()
@@ -279,14 +277,14 @@ public class SiriFuzzyTripMatcher {
   Trip findTripByDatedVehicleJourneyRef(EstimatedVehicleJourney journey, String feedId) {
     String serviceJourneyId = resolveDatedVehicleJourneyRef(journey);
     if (serviceJourneyId != null) {
-      Trip trip = transitService.getTripForId().get(new FeedScopedId(feedId, serviceJourneyId));
+      Trip trip = transitService.getTripForId(new FeedScopedId(feedId, serviceJourneyId));
       if (trip != null) {
         return trip;
       } else {
         //Attempt to find trip using datedServiceJourneyId
-        TripOnServiceDate tripOnServiceDate = transitService
-          .getTripOnServiceDateById()
-          .get(new FeedScopedId(feedId, serviceJourneyId));
+        TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
+          new FeedScopedId(feedId, serviceJourneyId)
+        );
         if (tripOnServiceDate != null) {
           return tripOnServiceDate.getTrip();
         }
@@ -297,9 +295,8 @@ public class SiriFuzzyTripMatcher {
 
   private static void initCache(TransitService index) {
     if (mappedTripsCache.isEmpty()) {
-      Set<Trip> trips = index.getPatternForTrip().keySet();
-      for (Trip trip : trips) {
-        TripPattern tripPattern = index.getPatternForTrip().get(trip);
+      for (Trip trip : index.getAllTrips()) {
+        TripPattern tripPattern = index.getPatternForTrip(trip);
 
         String currentTripId = getUnpaddedTripId(trip.getId().getId());
 
@@ -342,8 +339,7 @@ public class SiriFuzzyTripMatcher {
           }
         }
       }
-      Set<Route> routes = index.getPatternsForRoute().keySet();
-      for (Route route : routes) {
+      for (Route route : index.getAllRoutes()) {
         String currentRouteId = getUnpaddedTripId(route.getId().getId());
         if (mappedRoutesCache.containsKey(currentRouteId)) {
           mappedRoutesCache.get(currentRouteId).add(route);
@@ -361,10 +357,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (vehicleJourneyTripCache.isEmpty()) {
-      index
-        .getTripForId()
-        .values()
-        .forEach(trip -> vehicleJourneyTripCache.put(trip.getId().getId(), trip));
+      index.getAllTrips().forEach(trip -> vehicleJourneyTripCache.put(trip.getId().getId(), trip));
     }
   }
 

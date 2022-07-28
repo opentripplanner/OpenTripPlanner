@@ -70,7 +70,7 @@ public class SpeedTestTimer {
     var measurementEnv = Optional
       .ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT"))
       .orElse("local");
-    var location = Optional.ofNullable(System.getenv("SPEEDTEST_LOCATION")).orElse("norway");
+    var location = Optional.ofNullable(System.getenv("SPEEDTEST_LOCATION")).orElse("unknown");
     registry
       .config()
       .commonTags(

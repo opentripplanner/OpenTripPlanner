@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
@@ -33,7 +32,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
@@ -54,6 +52,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -62,6 +61,7 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public abstract class GraphRoutingTest {
 

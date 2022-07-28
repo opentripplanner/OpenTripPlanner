@@ -4,14 +4,13 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 
 /**
@@ -55,13 +54,6 @@ public interface OtpServerContext {
 
   Graph graph();
 
-  /**
-   * @deprecated Use {@link #transitService()} instead. The model should not be used in the APIs
-   * - all APIs are read-only; Hence should be able to use the transit service.
-   */
-  @Deprecated
-  TransitModel transitModel();
-
   @HttpRequestScoped
   TransitService transitService();
 
@@ -86,7 +78,8 @@ public interface OtpServerContext {
   TileRendererManager tileRendererManager();
 
   /**
-   * A graphical window that is used for visualizing search progress (debugging).
+   * Callback witch is injected into the {@code DirectStreetRouter}, used to visualize the
+   * search.
    */
-  GraphVisualizer graphVisualizer();
+  TraverseVisitor traverseVisitor();
 }

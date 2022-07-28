@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.transit.model.framework;
 
 import com.google.common.collect.Maps;
 import java.io.Serializable;

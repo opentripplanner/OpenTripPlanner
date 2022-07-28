@@ -111,6 +111,17 @@ public final class StopPattern implements Serializable {
     }
   }
 
+  /**
+   * Checks that stops equal without taking into account if pickup or dropoff is allowed.
+   */
+  public boolean stopsEqual(Object other) {
+    if (other instanceof StopPattern that) {
+      return Arrays.equals(this.stops, that.stops);
+    } else {
+      return false;
+    }
+  }
+
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("StopPattern: ");

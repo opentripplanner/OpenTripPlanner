@@ -12,7 +12,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 

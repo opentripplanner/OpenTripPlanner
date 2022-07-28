@@ -171,7 +171,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
           }
           if (entitySelector instanceof EntitySelector.Trip) {
             FeedScopedId id = ((EntitySelector.Trip) entitySelector).tripId;
-            Trip trip = getTransitService(environment).getTripForId().get(id);
+            Trip trip = getTransitService(environment).getTripForId(id);
             return List.of(getAlertEntityOrUnknown(trip, id.toString(), "trip"));
           }
           if (entitySelector instanceof EntitySelector.StopAndRoute) {
@@ -200,7 +200,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
             FeedScopedId stopId = stopAndTripKey.stop;
             FeedScopedId tripId = stopAndTripKey.routeOrTrip;
             StopLocation stop = getTransitService(environment).getStopForId(stopId);
-            Trip trip = getTransitService(environment).getTripForId().get(tripId);
+            Trip trip = getTransitService(environment).getTripForId(tripId);
             return List.of(
               stop != null && trip != null
                 ? new LegacyGraphQLStopOnTripModel(stop, trip)
@@ -242,8 +242,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
             Route route = getTransitService(environment).getRouteForId(routeId);
             return route != null
               ? getTransitService(environment)
-                .getPatternsForRoute()
-                .get(route)
+                .getPatternsForRoute(route)
                 .stream()
                 .filter(pattern -> pattern.getDirection() == direction)
                 .collect(Collectors.toList())
@@ -321,9 +320,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
         .findAny()
         .map(EntitySelector.Trip.class::cast)
-        .map(entitySelector ->
-          getTransitService(environment).getTripForId().get(entitySelector.tripId)
-        )
+        .map(entitySelector -> getTransitService(environment).getTripForId(entitySelector.tripId))
         .orElse(null);
   }
 

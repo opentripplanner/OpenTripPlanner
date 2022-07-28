@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public abstract class FlexAccessEgressTemplate {
 
@@ -84,17 +84,17 @@ public abstract class FlexAccessEgressTemplate {
    */
   public Stream<FlexAccessEgress> createFlexAccessEgressStream(
     Graph graph,
-    TransitModel transitModel
+    TransitService transitService
   ) {
     if (transferStop instanceof Stop stop) {
-      TransitStopVertex flexVertex = transitModel.getStopModel().getStopVertexForStop(stop);
+      TransitStopVertex flexVertex = transitService.getStopVertexForStop(stop);
       return Stream
         .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
         .filter(Objects::nonNull);
     }
     // transferStop is Location Area/Line
     else {
-      return getTransfersFromTransferStop(transitModel)
+      return getTransfersFromTransferStop(transitService)
         .stream()
         .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= flexParams.maxTransferMeters)
         .filter(transfer -> getFinalStop(transfer) != null)
@@ -138,7 +138,7 @@ public abstract class FlexAccessEgressTemplate {
    * flex ride for the access/egress.
    */
   protected abstract Collection<PathTransfer> getTransfersFromTransferStop(
-    TransitModel transitModel
+    TransitService transitService
   );
 
   /**

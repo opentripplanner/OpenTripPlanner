@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.util.geometry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +18,7 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opentripplanner.common.geometry.UnsupportedGeometryException;
 import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

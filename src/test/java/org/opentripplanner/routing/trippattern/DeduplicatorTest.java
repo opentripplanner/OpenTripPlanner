@@ -10,9 +10,9 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 @SuppressWarnings("StringOperationCanBeSimplified")
 public class DeduplicatorTest {

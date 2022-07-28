@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.network;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
@@ -12,30 +14,33 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.CompactLineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.util.geometry.CompactLineStringUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO OTP2 instances of this class are still mutable after construction with a builder, this will be refactored in a subsequent step
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
  * sequence of stops. For each stop, there is a list of departure times, running times, arrival
@@ -50,7 +55,9 @@ import org.slf4j.LoggerFactory;
  * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For NeTEx the
  * JourneyPattern id is used.
  */
-public final class TripPattern extends TransitEntity implements Cloneable, Serializable {
+public final class TripPattern
+  extends TransitEntity2<TripPattern, TripPatternBuilder>
+  implements Cloneable, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -62,12 +69,12 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
    * delegation, like the {@link #numberOfStops()} and {@link #canBoard(int)} methods.
    */
   private final StopPattern stopPattern;
-  private final Timetable scheduledTimetable = new Timetable(this);
+  private final Timetable scheduledTimetable;
   private String name;
   /**
    * Geometries of each inter-stop segment of the tripPattern.
    */
-  private byte[][] hopGeometries = null;
+  private byte[][] hopGeometries;
 
   /**
    * The original TripPattern this replaces at least for one modified trip.
@@ -77,15 +84,34 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
   /**
    * Has the TripPattern been created by a real-time update.
    */
-  private boolean createdByRealtimeUpdater = false;
+  private final boolean createdByRealtimeUpdater;
 
   // TODO MOVE codes INTO Timetable or TripTimes
   private BitSet services;
 
-  public TripPattern(FeedScopedId id, Route route, StopPattern stopPattern) {
-    super(id);
-    this.route = route;
-    this.stopPattern = stopPattern;
+  public TripPattern(TripPatternBuilder builder) {
+    super(builder.getId());
+    this.name = builder.getName();
+    this.route = builder.getRoute();
+    this.stopPattern = requireNonNull(builder.getStopPattern());
+    this.createdByRealtimeUpdater = builder.isCreatedByRealtimeUpdate();
+
+    this.scheduledTimetable =
+      builder.getScheduledTimetable() != null
+        ? builder.getScheduledTimetable()
+        : new Timetable(this);
+    this.scheduledTimetable.setServiceCodes(builder.getServiceCodes());
+
+    this.services = builder.getServices();
+    this.originalTripPattern = builder.getOriginalTripPattern();
+
+    if (builder.getServiceCodes() != null) {
+      setServiceCodes(builder.getServiceCodes());
+    }
+  }
+
+  public static TripPatternBuilder of(@Nonnull FeedScopedId id) {
+    return new TripPatternBuilder(id);
   }
 
   /**
@@ -260,7 +286,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
   public LineString getHopGeometry(int stopPosInPattern) {
     if (hopGeometries != null) {
-      return CompactLineString.uncompactLineString(hopGeometries[stopPosInPattern], false);
+      return CompactLineStringUtils.uncompactLineString(hopGeometries[stopPosInPattern], false);
     } else {
       return GeometryUtils
         .getGeometryFactory()
@@ -277,6 +303,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return stopPattern;
   }
 
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   public void setHopGeometries(LineString[] hopGeometries) {
     this.hopGeometries = new byte[hopGeometries.length][];
 
@@ -285,10 +312,12 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
   }
 
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   public void setHopGeometry(int i, LineString hopGeometry) {
-    this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry, false);
+    this.hopGeometries[i] = CompactLineStringUtils.compactLineString(hopGeometry, false);
   }
 
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   /**
    * This will copy the geometry from another TripPattern to this one. It checks if each hop is
    * between the same stops before copying that hop geometry. If the stops are different but lie
@@ -476,6 +505,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return scheduledTimetable.getTripTimes(tripIndex).getTrip();
   }
 
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   /**
    * Add the given tripTimes to this pattern's scheduled timetable, recording the corresponding trip
    * as one of the scheduled trips on this pattern.
@@ -497,6 +527,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
   }
 
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   /**
    * Add the given FrequencyEntry to this pattern's scheduled timetable, recording the corresponding
    * trip as one of the scheduled trips on this pattern.
@@ -514,6 +545,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
   }
 
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   /**
    * Remove all trips matching the given predicate.
    *
@@ -523,8 +555,16 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
   }
 
-  public void setOriginalTripPattern(TripPattern originalTripPattern) {
-    this.originalTripPattern = originalTripPattern;
+  /**
+   * Checks that this is TripPattern is based of the provided TripPattern and contains same stops
+   * (but not necessarily with same pickup and dropoff values).
+   */
+  public boolean isModifiedFromTripPatternWithEqualStops(TripPattern other) {
+    return (
+      originalTripPattern != null &&
+      originalTripPattern.equals(other) &&
+      getStopPattern().stopsEqual(other.getStopPattern())
+    );
   }
 
   /**
@@ -565,17 +605,14 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return createdByRealtimeUpdater;
   }
 
-  public void setCreatedByRealtimeUpdater() {
-    createdByRealtimeUpdater = true;
-  }
-
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   /**
    * A bit of a strange place to set service codes all at once when TripTimes are already added, but
    * we need a reference to the Graph or at least the codes map. This could also be placed in the
    * hop factory itself.
    */
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
-    setServices(new BitSet());
+    this.services = new BitSet();
     scheduledTripsAsStream()
       .forEach(trip -> {
         FeedScopedId serviceId = trip.getServiceId();
@@ -588,6 +625,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     scheduledTimetable.setServiceCodes(serviceCodes);
   }
 
+  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   /**
    * Sets service code for pattern if it's not already set
    *
@@ -597,7 +635,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     if (!getServices().get(serviceCode)) {
       final BitSet services = (BitSet) getServices().clone();
       services.set(serviceCode);
-      setServices(services);
+      this.services = services;
     }
   }
 
@@ -611,11 +649,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     return services;
   }
 
-  /**
-   * @param services bitset of service codes
-   */
-  public void setServices(BitSet services) {
-    this.services = services;
+  public TripPattern getOriginalTripPattern() {
+    return originalTripPattern;
   }
 
   public String getTripHeadsign() {
@@ -737,5 +772,21 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
       .orElse(getStop(index + 1).equals(other.getStop(index + 1)));
 
     return sameOrigin && sameDestination;
+  }
+
+  @Override
+  public boolean sameAs(@Nonnull TripPattern other) {
+    return (
+      getId().equals(other.getId()) &&
+      Objects.equals(this.route, other.route) &&
+      Objects.equals(this.name, other.name) &&
+      Objects.equals(this.stopPattern, other.stopPattern) &&
+      Objects.equals(this.scheduledTimetable, other.scheduledTimetable)
+    );
+  }
+
+  @Override
+  public TripPatternBuilder copy() {
+    return new TripPatternBuilder(this);
   }
 }

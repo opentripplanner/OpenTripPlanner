@@ -7,10 +7,10 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,7 +20,6 @@ import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +35,7 @@ public class DefaultServerContext implements OtpServerContext {
   private final RaptorConfig<TripSchedule> raptorConfig;
   public final Logger requestLogger;
   private final TileRendererManager tileRendererManager;
-  public final GraphVisualizer graphVisualizer;
+  public final TraverseVisitor traverseVisitor;
 
   /**
    * Copy constructor - used to make an HTTP Request scoped copy of the context. All mutable
@@ -50,7 +49,7 @@ public class DefaultServerContext implements OtpServerContext {
     RaptorConfig<TripSchedule> raptorConfig,
     Logger requestLogger,
     TileRendererManager tileRendererManager,
-    Function<OtpServerContext, GraphVisualizer> graphVisualizerProvider
+    TraverseVisitor traverseVisitor
   ) {
     this.graph = graph;
     this.transitModel = transitModel;
@@ -59,7 +58,7 @@ public class DefaultServerContext implements OtpServerContext {
     this.raptorConfig = raptorConfig;
     this.requestLogger = requestLogger;
     this.tileRendererManager = tileRendererManager;
-    this.graphVisualizer = graphVisualizerProvider.apply(this);
+    this.traverseVisitor = traverseVisitor;
   }
 
   /**
@@ -72,7 +71,7 @@ public class DefaultServerContext implements OtpServerContext {
     Graph graph,
     TransitModel transitModel,
     MeterRegistry meterRegistry,
-    boolean initGraphVisualizer
+    @Nullable TraverseVisitor traverseVisitor
   ) {
     var defaultRoutingRequest = routerConfig.routingRequestDefaults();
 
@@ -84,7 +83,7 @@ public class DefaultServerContext implements OtpServerContext {
       raptorConfig,
       createLogger(routerConfig.requestLogFile()),
       new TileRendererManager(graph, defaultRoutingRequest),
-      initGraphVisualizer ? GraphVisualizer::new : ctx -> null
+      traverseVisitor
     );
   }
 
@@ -121,11 +120,6 @@ public class DefaultServerContext implements OtpServerContext {
   }
 
   @Override
-  public TransitModel transitModel() {
-    return transitModel;
-  }
-
-  @Override
   public TransitService transitService() {
     if (transitService == null) {
       this.transitService = new DefaultTransitService(transitModel);
@@ -135,7 +129,7 @@ public class DefaultServerContext implements OtpServerContext {
 
   @Override
   public RoutingService routingService() {
-    return new RoutingService(graph(), transitModel());
+    return new RoutingService(this);
   }
 
   @Override
@@ -154,8 +148,8 @@ public class DefaultServerContext implements OtpServerContext {
   }
 
   @Override
-  public GraphVisualizer graphVisualizer() {
-    return graphVisualizer;
+  public TraverseVisitor traverseVisitor() {
+    return traverseVisitor;
   }
 
   public OtpServerContext createHttpRequestScopedCopy() {
@@ -167,7 +161,7 @@ public class DefaultServerContext implements OtpServerContext {
       raptorConfig,
       requestLogger,
       tileRendererManager,
-      ctx -> graphVisualizer
+      traverseVisitor
     );
   }
 

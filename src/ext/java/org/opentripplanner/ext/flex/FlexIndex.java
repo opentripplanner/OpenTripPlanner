@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -16,13 +17,13 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public class FlexIndex {
 
-  public Multimap<StopLocation, PathTransfer> transfersToStop = ArrayListMultimap.create();
+  private final Multimap<StopLocation, PathTransfer> transfersToStop = ArrayListMultimap.create();
 
-  public Multimap<StopLocation, FlexTrip> flexTripsByStop = HashMultimap.create();
+  private final Multimap<StopLocation, FlexTrip> flexTripsByStop = HashMultimap.create();
 
-  public Map<FeedScopedId, Route> routeById = new HashMap<>();
+  private final Map<FeedScopedId, Route> routeById = new HashMap<>();
 
-  public Map<FeedScopedId, FlexTrip> tripById = new HashMap<>();
+  private final Map<FeedScopedId, FlexTrip> tripById = new HashMap<>();
 
   public FlexIndex(TransitModel transitModel) {
     for (PathTransfer transfer : transitModel.getAllPathTransfers()) {
@@ -43,7 +44,27 @@ public class FlexIndex {
     }
   }
 
-  Stream<FlexTrip> getFlexTripsByStop(StopLocation stopLocation) {
-    return flexTripsByStop.get(stopLocation).stream();
+  public Collection<PathTransfer> getTransfersToStop(StopLocation stopLocation) {
+    return transfersToStop.get(stopLocation);
+  }
+
+  public Collection<FlexTrip> getFlexTripsByStop(StopLocation stopLocation) {
+    return flexTripsByStop.get(stopLocation);
+  }
+
+  public Route getRouteById(FeedScopedId id) {
+    return routeById.get(id);
+  }
+
+  public Collection<Route> getAllFlexRoutes() {
+    return routeById.values();
+  }
+
+  public FlexTrip getTripById(FeedScopedId id) {
+    return tripById.get(id);
+  }
+
+  public Collection<FlexTrip> getAllFlexTrips() {
+    return tripById.values();
   }
 }

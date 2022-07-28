@@ -25,8 +25,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -35,7 +33,9 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -682,7 +682,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
 
-    TripPattern pattern = new TripPattern(id, tripBuilder.getRoute(), stopPattern);
+    TripPattern pattern = TripPattern
+      .of(id)
+      .withRoute(tripBuilder.getRoute())
+      .withStopPattern(stopPattern)
+      .build();
 
     TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, transitModel.getDeduplicator());
 
@@ -850,9 +854,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       /*
               Found exact match
              */
-      TripPattern exactPattern = transitService
-        .getPatternForTrip()
-        .get(tripMatchedByServiceJourneyId);
+      TripPattern exactPattern = transitService.getPatternForTrip(tripMatchedByServiceJourneyId);
 
       if (exactPattern != null) {
         Timetable currentTimetable = getCurrentTimetable(exactPattern, serviceDate);
@@ -1141,7 +1143,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean cancelScheduledTrip(Trip trip, final LocalDate serviceDate) {
     boolean success = false;
 
-    final TripPattern pattern = transitService.getPatternForTrip().get(trip);
+    final TripPattern pattern = transitService.getPatternForTrip(trip);
 
     if (pattern != null) {
       // Cancel scheduled trip times for this trip in this pattern
@@ -1216,7 +1218,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     Set<TripPattern> patterns = new HashSet<>();
     for (Trip currentTrip : matches) {
-      TripPattern tripPattern = transitService.getPatternForTrip().get(currentTrip);
+      TripPattern tripPattern = transitService.getPatternForTrip(currentTrip);
       Set<LocalDate> serviceDates = transitService
         .getCalendarService()
         .getServiceDatesForServiceId(currentTrip.getServiceId());
@@ -1329,7 +1331,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     if (lastAddedTripPattern != null) {
       tripPattern = lastAddedTripPattern;
     } else {
-      tripPattern = transitService.getPatternForTrip().get(trip);
+      tripPattern = transitService.getPatternForTrip(trip);
     }
 
     var firstStop = tripPattern.firstStop();
@@ -1463,7 +1465,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         .getCalendarService()
         .getServiceDatesForServiceId(trip.getServiceId());
       if (serviceDatesForServiceId.contains(serviceDate)) {
-        TripPattern pattern = transitService.getPatternForTrip().get(trip);
+        TripPattern pattern = transitService.getPatternForTrip(trip);
 
         if (stopNumber < pattern.numberOfStops()) {
           boolean firstReportedStopIsFound = false;

@@ -4,6 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -21,6 +21,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -38,6 +39,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
@@ -244,12 +246,24 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             return null;
           }
 
+          TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
+          long startTime = args.getLegacyGraphQLStartTime();
+          if (timetableSnapshot != null && timetableSnapshot.hasLastAddedTripPatterns()) {
+            return getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
+              pattern,
+              stop,
+              timetableSnapshot,
+              transitService,
+              args
+            );
+          }
+
           // TODO: use args.getLegacyGraphQLOmitCanceled()
 
           return transitService.stopTimesForPatternAtStop(
             stop,
             pattern,
-            args.getLegacyGraphQLStartTime(),
+            startTime,
             args.getLegacyGraphQLTimeRange(),
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
@@ -513,6 +527,67 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
+  }
+
+  /**
+   * TODO this functionality should be supported by {@link org.opentripplanner.routing.stoptimes.StopTimesHelper#stopTimesForPatternAtStop}
+   */
+  private List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
+    TripPattern originalPattern,
+    StopLocation stop,
+    TimetableSnapshot timetableSnapshot,
+    TransitService transitService,
+    LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args
+  ) {
+    long startTime = args.getLegacyGraphQLStartTime();
+    LocalDate date =
+      (startTime == 0 ? Instant.now() : Instant.ofEpochSecond(startTime)).atZone(
+          transitService.getTimeZone()
+        )
+        .toLocalDate();
+    return Stream
+      .concat(
+        getRealtimeAddedPatternsAsStream(originalPattern, timetableSnapshot, date),
+        Stream.of(originalPattern)
+      )
+      .flatMap(tripPattern ->
+        transitService
+          .stopTimesForPatternAtStop(
+            stop,
+            tripPattern,
+            startTime,
+            args.getLegacyGraphQLTimeRange(),
+            args.getLegacyGraphQLNumberOfDepartures(),
+            args.getLegacyGraphQLOmitNonPickups()
+              ? ArrivalDeparture.DEPARTURES
+              : ArrivalDeparture.BOTH
+          )
+          .stream()
+      )
+      .sorted(
+        Comparator.comparing((TripTimeOnDate tts) ->
+          tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
+        )
+      )
+      .limit(args.getLegacyGraphQLNumberOfDepartures())
+      .toList();
+  }
+
+  /**
+   * Get a stream of {@link TripPattern} that were created realtime based of the provided pattern.
+   * Only patterns that don't have removed (stops can still be skipped) or added stops are included.
+   */
+  private Stream<TripPattern> getRealtimeAddedPatternsAsStream(
+    TripPattern originalPattern,
+    TimetableSnapshot timetableSnapshot,
+    LocalDate date
+  ) {
+    return originalPattern
+      .scheduledTripsAsStream()
+      .map(trip -> timetableSnapshot.getLastAddedTripPattern(trip.getId(), date))
+      .filter(tripPattern ->
+        tripPattern != null && tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
+      );
   }
 
   private <T> T getValue(

@@ -18,13 +18,12 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
@@ -35,6 +34,7 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class RoutingRequestTransitDataProviderFilterTest {
 
@@ -73,11 +73,11 @@ public class RoutingRequestTransitDataProviderFilterTest {
     stopTimeEnd.setStop(lastStop);
 
     var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
-    var pattern = new TripPattern(
-      TransitModelForTest.id("P1"),
-      TransitModelForTest.route("1").build(),
-      stopPattern
-    );
+    var pattern = TripPattern
+      .of(TransitModelForTest.id("P1"))
+      .withRoute(TransitModelForTest.route("1").build())
+      .withStopPattern(stopPattern)
+      .build();
 
     var tripPattern = new TripPatternWithRaptorStopIndexes(pattern, new int[2]);
 
@@ -517,7 +517,11 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    TripPattern pattern = new TripPattern(TransitModelForTest.id("P1"), route, stopPattern);
+    TripPattern pattern = TripPattern
+      .of(TransitModelForTest.id("P1"))
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
 
     TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
       pattern,

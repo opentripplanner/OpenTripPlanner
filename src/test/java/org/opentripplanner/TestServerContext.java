@@ -18,15 +18,16 @@ public class TestServerContext {
   /** Create a context for unit testing, using the default RoutingRequest. */
   public static OtpServerContext createServerContext(Graph graph, TransitModel transitModel) {
     transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
+    final RouterConfig routerConfig = RouterConfig.DEFAULT;
     DefaultServerContext context = DefaultServerContext.create(
-      RouterConfig.DEFAULT,
-      new RaptorConfig<>(RouterConfig.DEFAULT.raptorTuningParameters()),
+      routerConfig,
+      new RaptorConfig<>(routerConfig.raptorTuningParameters()),
       graph,
       transitModel,
       Metrics.globalRegistry,
-      false
+      null
     );
-    creatTransitLayerForRaptor(context.transitModel(), context.routerConfig());
+    creatTransitLayerForRaptor(transitModel, routerConfig);
     return context;
   }
 }

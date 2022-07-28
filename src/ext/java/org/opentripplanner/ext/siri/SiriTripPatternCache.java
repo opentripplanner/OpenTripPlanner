@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -62,10 +63,13 @@ public class SiriTripPatternCache {
     // Create TripPattern if it doesn't exist yet
     if (tripPattern == null) {
       var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
-      tripPattern = new TripPattern(id, trip.getRoute(), stopPattern);
+      TripPatternBuilder tripPatternBuilder = TripPattern
+        .of(id)
+        .withRoute(trip.getRoute())
+        .withStopPattern(stopPattern);
 
       // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-      tripPattern.setServiceCodes(transitModel.getServiceCodes());
+      tripPatternBuilder.withServiceCodes(transitModel.getServiceCodes());
 
       // Create vertices and edges for new TripPattern
       // TODO: purge these vertices and edges once in a while?
@@ -78,16 +82,17 @@ public class SiriTripPatternCache {
         .getPatternForTrip()
         .get(trip);
 
-      tripPattern.setCreatedByRealtimeUpdater();
+      tripPatternBuilder.withCreatedByRealtimeUpdater(true);
+      tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
 
+      tripPattern = tripPatternBuilder.build();
       // Copy information from the TripPattern this is replacing
       if (originalTripPattern != null) {
-        tripPattern.setOriginalTripPattern(originalTripPattern);
         tripPattern.setHopGeometriesFromPattern(originalTripPattern);
       }
 
       // Add pattern to cache
-      cache.put(key, tripPattern);
+      cache.put(key, tripPatternBuilder.build());
     }
 
     /**
