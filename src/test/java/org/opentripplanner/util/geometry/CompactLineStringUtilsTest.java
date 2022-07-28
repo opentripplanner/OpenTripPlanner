@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.util.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.geometry.DlugoszVarLenIntPacker;
 import org.opentripplanner.util.geometry.CompactLineStringUtils;
 
 public class CompactLineStringUtilsTest {
