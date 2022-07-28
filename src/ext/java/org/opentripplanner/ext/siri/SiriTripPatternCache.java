@@ -92,7 +92,7 @@ public class SiriTripPatternCache {
       }
 
       // Add pattern to cache
-      cache.put(key, tripPatternBuilder.build());
+      cache.put(key, tripPattern);
     }
 
     /**
