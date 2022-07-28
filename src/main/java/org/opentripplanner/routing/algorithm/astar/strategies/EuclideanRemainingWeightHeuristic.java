@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import com.google.common.collect.Iterables;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -32,7 +31,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     arriveBy = rctx.opt.arriveBy;
 
     if (target.getDegreeIn() == 1) {
-      Edge edge = Iterables.getOnlyElement(target.getIncoming());
+      Edge edge = target.getIncoming().iterator().next();
       if (edge instanceof FreeEdge) {
         target = edge.getFromVertex();
       }
