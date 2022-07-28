@@ -550,6 +550,18 @@ public final class TripPattern
   }
 
   /**
+   * Checks that this is TripPattern is based of the provided TripPattern and contains same stops
+   * (but not necessarily with same pickup and dropoff values).
+   */
+  public boolean isModifiedFromTripPatternWithEqualStops(TripPattern other) {
+    return (
+      originalTripPattern != null &&
+      originalTripPattern.equals(other) &&
+      getStopPattern().stopsEqual(other.getStopPattern())
+    );
+  }
+
+  /**
    * The direction for all the trips in this pattern.
    */
   public Direction getDirection() {

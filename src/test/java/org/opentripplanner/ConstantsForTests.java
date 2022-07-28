@@ -141,6 +141,7 @@ public class ConstantsForTests {
         osmModule.staticBikeParkAndRide = true;
         osmModule.staticParkAndRide = true;
         osmModule.skipVisibility = true;
+        new DefaultWayPropertySetSource().populateProperties(osmModule.wayPropertySet);
         osmModule.buildGraph(graph, transitModel, new HashMap<>());
       }
       // Add transit data from GTFS
