@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.transit.model.timetable;
 
 /**
  * The real-time state of a trip

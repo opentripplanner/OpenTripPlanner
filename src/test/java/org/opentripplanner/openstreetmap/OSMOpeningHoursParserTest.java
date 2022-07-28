@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OSMOpeningHoursParserTest {
 

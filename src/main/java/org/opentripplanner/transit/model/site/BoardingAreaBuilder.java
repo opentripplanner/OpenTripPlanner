@@ -8,11 +8,11 @@ public final class BoardingAreaBuilder
 
   private Stop parentStop;
 
-  public BoardingAreaBuilder(FeedScopedId id) {
+  BoardingAreaBuilder(FeedScopedId id) {
     super(id);
   }
 
-  public BoardingAreaBuilder(BoardingArea original) {
+  BoardingAreaBuilder(BoardingArea original) {
     super(original);
     this.parentStop = original.getParentStop();
   }

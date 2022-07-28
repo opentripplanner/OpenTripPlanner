@@ -1,7 +1,8 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.util.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.geometry.DlugoszVarLenIntPacker;
 
 /**
  * Compact line string. To optimize storage, we use the following tricks:
@@ -21,7 +22,7 @@ import org.locationtech.jts.geom.LineString;
  *
  * @author laurent
  */
-public final class CompactLineString {
+public final class CompactLineStringUtils {
 
   /**
    * Multiplier for fixed-float representation. For lat/lon CRS, 1e6 leads to a precision of 0.11
@@ -82,7 +83,7 @@ public final class CompactLineString {
       Math.abs(x1 - c[c.length - 1].x) > EPS ||
       Math.abs(y1 - c[c.length - 1].y) > EPS
     ) throw new IllegalArgumentException(
-      "CompactLineString geometry must stick to given end points. If you need to relax this, please read source code."
+      "CompactLineStringUtils geometry must stick to given end points. If you need to relax this, please read source code."
     );
     int oix = (int) Math.round(x0 * FIXED_FLOAT_MULT);
     int oiy = (int) Math.round(y0 * FIXED_FLOAT_MULT);

@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.FareRule;
+import org.opentripplanner.ext.fares.model.FareRule;
 import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS FareRule into the OTP model. */
