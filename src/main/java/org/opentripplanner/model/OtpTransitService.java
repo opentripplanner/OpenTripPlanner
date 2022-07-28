@@ -17,6 +17,7 @@ import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;

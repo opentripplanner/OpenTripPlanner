@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.PathwayMode;
+import org.opentripplanner.transit.model.site.PathwayMode;
 
 public class PathwayMapperTest {
 
@@ -55,7 +55,7 @@ public class PathwayMapperTest {
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.Pathway result = subject.map(PATHWAY);
+    org.opentripplanner.transit.model.site.Pathway result = subject.map(PATHWAY);
 
     assertEquals("A:1", result.getId().toString());
     assertNotNull(result.getFromStop());
@@ -69,7 +69,7 @@ public class PathwayMapperTest {
     Pathway input = new Pathway();
     input.setId(AGENCY_AND_ID);
 
-    org.opentripplanner.model.Pathway result = subject.map(input);
+    org.opentripplanner.transit.model.site.Pathway result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getFromStop());
@@ -81,8 +81,8 @@ public class PathwayMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() throws Exception {
-    org.opentripplanner.model.Pathway result1 = subject.map(PATHWAY);
-    org.opentripplanner.model.Pathway result2 = subject.map(PATHWAY);
+    org.opentripplanner.transit.model.site.Pathway result1 = subject.map(PATHWAY);
+    org.opentripplanner.transit.model.site.Pathway result2 = subject.map(PATHWAY);
 
     assertSame(result1, result2);
   }

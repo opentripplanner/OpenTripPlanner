@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -19,6 +18,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.site.PathwayMode;
 
 class PathwayEdgeTest {
 
