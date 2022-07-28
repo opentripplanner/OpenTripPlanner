@@ -1,4 +1,4 @@
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.util.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

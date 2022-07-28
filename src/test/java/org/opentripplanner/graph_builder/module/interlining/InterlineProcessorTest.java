@@ -8,14 +8,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.transfer.DefaultTransferService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class InterlineProcessorTest implements PlanTestConstants {
 
@@ -75,7 +75,11 @@ class InterlineProcessorTest implements PlanTestConstants {
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
     var stopPattern = new StopPattern(stopTimes);
 
-    var tp = new TripPattern(TransitModelForTest.id(tripId), trip.getRoute(), stopPattern);
+    var tp = TripPattern
+      .of(TransitModelForTest.id(tripId))
+      .withRoute(trip.getRoute())
+      .withStopPattern(stopPattern)
+      .build();
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     tp.add(tripTimes);
     return tp;

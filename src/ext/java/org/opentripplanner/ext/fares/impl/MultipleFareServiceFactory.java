@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.fares.FaresConfiguration;
+import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -28,8 +29,11 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
   }
 
   @Override
-  public void processGtfs(OtpTransitService transitService) {
-    for (FareServiceFactory subFactory : subFactories) subFactory.processGtfs(transitService);
+  public void processGtfs(FareRulesData fareRuleService, OtpTransitService transitService) {
+    for (FareServiceFactory subFactory : subFactories) subFactory.processGtfs(
+      fareRuleService,
+      transitService
+    );
   }
 
   /**

@@ -5,8 +5,8 @@ import dagger.Provides;
 import javax.inject.Singleton;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphModel;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 
 @Module

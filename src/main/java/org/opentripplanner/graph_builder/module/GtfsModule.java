@@ -126,9 +126,10 @@ public class GtfsModule implements GraphBuilderModule {
           discardMinTransferTimes,
           gtfsDao
         );
-        mapper.mapStopTripAndRouteDatantoBuilder();
+        mapper.mapStopTripAndRouteDataIntoBuilder();
 
         OtpTransitServiceBuilder builder = mapper.getBuilder();
+        var fareRulesService = mapper.getFareRulesService();
 
         builder.limitServiceDays(transitPeriodLimit);
 
@@ -173,7 +174,7 @@ public class GtfsModule implements GraphBuilderModule {
             .run(transitModel.getAllTripPatterns());
         }
 
-        fareServiceFactory.processGtfs(otpTransitService);
+        fareServiceFactory.processGtfs(fareRulesService, otpTransitService);
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
       }
     } catch (IOException e) {

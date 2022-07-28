@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.transit.model.timetable;
 
 /**
  * OccupancyStatus to be exposed in the API. The values are based on GTFS-RT
