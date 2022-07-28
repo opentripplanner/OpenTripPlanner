@@ -311,7 +311,13 @@ class TripPatternMapper {
       .filter(Objects::nonNull)
       .toList();
 
-    return new TripOnServiceDate(id, trip, serviceDate, alteration, replacementFor);
+    return TripOnServiceDate
+      .of(id)
+      .withTrip(trip)
+      .withServiceDate(serviceDate)
+      .withTripAlteration(alteration)
+      .withReplacementFor(replacementFor)
+      .build();
   }
 
   private org.opentripplanner.transit.model.network.Route lookupRoute(

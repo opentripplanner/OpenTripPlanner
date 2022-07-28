@@ -1112,13 +1112,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (dsjId.isPresent()) {
       FeedScopedId datedServiceJourneyId = new FeedScopedId(feedId, dsjId.get());
-      var tripOnServiceDate = new TripOnServiceDate(
-        datedServiceJourneyId,
-        trip,
-        serviceDate,
-        null,
-        List.of() // TODO: Is there a reference to the old DSJ?
-      );
+      var tripOnServiceDate = TripOnServiceDate
+        .of(datedServiceJourneyId)
+        .withTrip(trip)
+        .withServiceDate(serviceDate)
+        .build();
 
       buffer.addLastAddedTripOnServiceDate(
         trip,
