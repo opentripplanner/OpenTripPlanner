@@ -25,7 +25,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;

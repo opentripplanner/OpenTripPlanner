@@ -12,7 +12,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;

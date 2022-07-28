@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.GenericLocation;

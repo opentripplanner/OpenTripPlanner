@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;

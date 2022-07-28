@@ -25,7 +25,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;

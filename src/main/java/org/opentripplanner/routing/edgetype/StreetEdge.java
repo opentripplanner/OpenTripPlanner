@@ -13,9 +13,9 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.CompactLineString;
+import org.opentripplanner.util.geometry.CompactLineStringUtils;
 import org.opentripplanner.common.geometry.DirectionUtils;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
@@ -426,7 +426,7 @@ public class StreetEdge
   }
 
   public LineString getGeometry() {
-    return CompactLineString.uncompactLineString(
+    return CompactLineStringUtils.uncompactLineString(
       fromv.getLon(),
       fromv.getLat(),
       tov.getLon(),
@@ -450,7 +450,7 @@ public class StreetEdge
 
   private void setGeometry(LineString geometry) {
     this.compactGeometry =
-      CompactLineString.compactLineString(
+      CompactLineStringUtils.compactLineString(
         fromv.getLon(),
         fromv.getLat(),
         tov.getLon(),

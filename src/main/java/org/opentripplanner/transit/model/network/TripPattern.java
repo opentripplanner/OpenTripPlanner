@@ -22,8 +22,8 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.CompactLineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.CompactLineStringUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -280,7 +280,7 @@ public final class TripPattern
 
   public LineString getHopGeometry(int stopPosInPattern) {
     if (hopGeometries != null) {
-      return CompactLineString.uncompactLineString(hopGeometries[stopPosInPattern], false);
+      return CompactLineStringUtils.uncompactLineString(hopGeometries[stopPosInPattern], false);
     } else {
       return GeometryUtils
         .getGeometryFactory()
@@ -308,7 +308,7 @@ public final class TripPattern
 
   // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   public void setHopGeometry(int i, LineString hopGeometry) {
-    this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry, false);
+    this.hopGeometries[i] = CompactLineStringUtils.compactLineString(hopGeometry, false);
   }
 
   // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step

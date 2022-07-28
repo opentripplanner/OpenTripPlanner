@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;

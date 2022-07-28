@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.List;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 

@@ -28,7 +28,8 @@ public interface OtpArchitectureModules {
     UTIL.subPackage("lang"),
     UTIL.subPackage("logging"),
     UTIL.subPackage("resources"),
-    UTIL.subPackage("time")
+    UTIL.subPackage("time"),
+    UTIL.subPackage("geometry")
   );
 
   Package TRANSIT = OTP_ROOT.subPackage("transit");

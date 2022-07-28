@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;

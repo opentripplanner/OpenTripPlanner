@@ -46,7 +46,7 @@ public class TransitModelArchitectureTest {
         LEGACY_MODEL
       )
       .verify();
-    TIMETABLE.dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE).verify();
+    TIMETABLE.dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL).verify();
   }
 
   @Test

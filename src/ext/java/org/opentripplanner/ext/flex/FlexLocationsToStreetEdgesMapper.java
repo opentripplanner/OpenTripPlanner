@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
