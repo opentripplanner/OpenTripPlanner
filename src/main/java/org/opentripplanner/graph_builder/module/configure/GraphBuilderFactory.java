@@ -1,9 +1,15 @@
 package org.opentripplanner.graph_builder.module.configure;
 
+import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.GTFS;
+import static org.opentripplanner.datastore.api.FileType.NETEX;
+import static org.opentripplanner.datastore.api.FileType.OSM;
+
 import com.google.common.collect.Lists;
 import java.io.File;
 import java.time.Duration;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -14,6 +20,7 @@ import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.DataImportIssuesToHTML;
 import org.opentripplanner.graph_builder.GraphBuilder;
+import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
@@ -43,6 +50,7 @@ public class GraphBuilderFactory {
   private final BuildConfig config;
   private final Graph graph;
   private final TransitModel transitModel;
+  private final GraphBuilderDataSources dataSources;
   private final DataImportIssueStore issueStore;
 
   /**
@@ -55,6 +63,7 @@ public class GraphBuilderFactory {
     this.config = builder.config();
     this.graph = builder.graph();
     this.transitModel = builder.transitModel();
+    this.dataSources = builder.dataSources();
     this.issueStore = builder.issueStore();
   }
 
@@ -62,13 +71,17 @@ public class GraphBuilderFactory {
     return new GraphBuilderFactoryBuilder();
   }
 
+  public TransitModel transitModel() {
+    return transitModel;
+  }
+
   public GraphBuilder createGraphBuilder() {
     return new GraphBuilder(graph, transitModel, issueStore);
   }
 
-  public GraphBuilderModule createOpenStreetMapModule(Iterable<DataSource> osmFiles) {
+  public GraphBuilderModule createOpenStreetMapModule() {
     List<OpenStreetMapProvider> providers = Lists.newArrayList();
-    for (DataSource osmFile : osmFiles) {
+    for (DataSource osmFile : dataSources.get(OSM)) {
       providers.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
     }
 
@@ -94,9 +107,9 @@ public class GraphBuilderFactory {
     return osmModule;
   }
 
-  public GraphBuilderModule createGtfsModule(Iterable<DataSource> gtfsFeeds) {
+  public GraphBuilderModule createGtfsModule() {
     List<GtfsBundle> gtfsBundles = Lists.newArrayList();
-    for (DataSource gtfsData : gtfsFeeds) {
+    for (DataSource gtfsData : dataSources.get(GTFS)) {
       GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource) gtfsData);
 
       if (config.parentStopLinking) {
@@ -120,8 +133,9 @@ public class GraphBuilderFactory {
     );
   }
 
-  public GraphBuilderModule createNetexModule(Iterable<DataSource> netexSources) {
-    return new NetexConfig(config).createNetexModule(netexSources, transitModel, graph, issueStore);
+  public GraphBuilderModule createNetexModule() {
+    return new NetexConfig(config)
+      .createNetexModule(dataSources.get(NETEX), transitModel, graph, issueStore);
   }
 
   public GraphBuilderModule createTimeZoneAdjusterModule() {
@@ -154,46 +168,21 @@ public class GraphBuilderFactory {
     return pruneNoThruIslands;
   }
 
-  public ElevationGridCoverageFactory createNedElevationFactory(File cacheDirectory) {
-    var nedCacheDirectory = new File(cacheDirectory, "ned");
-
-    // Download the elevation tiles from an Amazon S3 bucket
-    DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
-    awsTileSource.awsAccessKey = config.elevationBucket.accessKey;
-    awsTileSource.awsSecretKey = config.elevationBucket.secretKey;
-    awsTileSource.awsBucketName = config.elevationBucket.bucketName;
-
-    return new NEDGridCoverageFactoryImpl(nedCacheDirectory, awsTileSource);
-  }
-
-  public GraphBuilderModule createElevationModule(
-    ElevationGridCoverageFactory it,
-    File cacheDirectory
-  ) {
-    var cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
-
-    return new ElevationModule(
-      it,
-      graph,
-      issueStore,
-      cachedElevationsFile,
-      elevationData.read(),
-      config.readCachedElevations,
-      config.writeCachedElevations,
-      config.elevationUnitMultiplier,
-      config.distanceBetweenElevationSamples,
-      config.maxElevationPropagationMeters,
-      config.includeEllipsoidToGeoidDifference,
-      config.multiThreadElevationCalculations
-    );
-  }
-
-  public GraphBuilderModule createDataImportIssuesToHTML(CompositeDataSource reportDir) {
-    return new DataImportIssuesToHTML(issueStore, reportDir, config.maxDataImportIssuesPerFile);
-  }
-
-  public ElevationGridCoverageFactory createGeotiffGridCoverageFactoryImpl(DataSource demSource) {
-    return new GeotiffGridCoverageFactoryImpl(demSource);
+  public List<GraphBuilderModule> createElevationModules() {
+    List<GraphBuilderModule> result = new ArrayList<>();
+    List<ElevationGridCoverageFactory> gridCoverageFactories = new ArrayList<>();
+    if (config.elevationBucket != null) {
+      gridCoverageFactories.add(createNedElevationFactory());
+    } else if (dataSources.has(DEM)) {
+      gridCoverageFactories.addAll(createDemGeotiffGridCoverageFactories());
+    }
+    // Refactoring this class, it was made clear that this allows for adding multiple elevation
+    // modules to the same graph builder. We do not actually know if this is supported by the
+    // ElevationModule class.
+    for (ElevationGridCoverageFactory it : gridCoverageFactories) {
+      result.add(createElevationModule(it, dataSources.getCacheDirectory()));
+    }
+    return result;
   }
 
   public GraphBuilderModule createFlexLocationsToStreetEdgesMapper() {
@@ -228,8 +217,64 @@ public class GraphBuilderFactory {
     return DataOverlayFactory.create(graph, config.dataOverlay);
   }
 
+  public GraphBuilderModule createDataImportIssuesToHTML() {
+    return new DataImportIssuesToHTML(
+      issueStore,
+      dataSources.getBuildReportDir(),
+      config.maxDataImportIssuesPerFile
+    );
+  }
+
+  /* private methods */
+
   private ZoneId zoneId() {
     // TODO OTP2: This is probably wrong, fetch it from config instead?
     return transitModel.getTimeZone();
+  }
+
+  private ElevationGridCoverageFactory createNedElevationFactory() {
+    var nedCacheDirectory = new File(dataSources.getCacheDirectory(), "ned");
+
+    // Download the elevation tiles from an Amazon S3 bucket
+    DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
+    awsTileSource.awsAccessKey = config.elevationBucket.accessKey;
+    awsTileSource.awsSecretKey = config.elevationBucket.secretKey;
+    awsTileSource.awsBucketName = config.elevationBucket.bucketName;
+
+    return new NEDGridCoverageFactoryImpl(nedCacheDirectory, awsTileSource);
+  }
+
+  private List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories() {
+    List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
+    for (DataSource demSource : dataSources.get(DEM)) {
+      elevationGridCoverageFactories.add(createGeotiffGridCoverageFactoryImpl(demSource));
+    }
+    return elevationGridCoverageFactories;
+  }
+
+  private GraphBuilderModule createElevationModule(
+    ElevationGridCoverageFactory it,
+    File cacheDirectory
+  ) {
+    var cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
+
+    return new ElevationModule(
+      it,
+      graph,
+      issueStore,
+      cachedElevationsFile,
+      elevationData.read(),
+      config.readCachedElevations,
+      config.writeCachedElevations,
+      config.elevationUnitMultiplier,
+      config.distanceBetweenElevationSamples,
+      config.maxElevationPropagationMeters,
+      config.includeEllipsoidToGeoidDifference,
+      config.multiThreadElevationCalculations
+    );
+  }
+
+  private ElevationGridCoverageFactory createGeotiffGridCoverageFactoryImpl(DataSource demSource) {
+    return new GeotiffGridCoverageFactoryImpl(demSource);
   }
 }

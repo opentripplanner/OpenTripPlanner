@@ -6,7 +6,6 @@ import com.csvreader.CsvReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +20,6 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
@@ -261,13 +259,13 @@ public class ConstantsForTests {
       }
       // Add transit data from Netex
       {
-        GraphBuilderFactory
-          .of()
-          .withGraph(graph)
-          .withTransitModel(transitModel)
-          .withConfig(createNetexBuilderParameters())
-          .build()
-          .createNetexModule(Collections.singletonList(NETEX_MINIMAL_DATA_SOURCE))
+        new NetexConfig(createNetexBuilderParameters())
+          .createNetexModule(
+            List.of(NETEX_MINIMAL_DATA_SOURCE),
+            transitModel,
+            graph,
+            noopIssueStore()
+          )
           .buildGraph();
       }
       // Link transit stops to streets

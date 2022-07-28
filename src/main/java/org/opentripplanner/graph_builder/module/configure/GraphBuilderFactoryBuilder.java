@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.configure;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -10,6 +11,8 @@ public class GraphBuilderFactoryBuilder {
   private BuildConfig config;
   private Graph graph;
   private TransitModel transitModel;
+
+  private GraphBuilderDataSources dataSources;
   private DataImportIssueStore issueStore;
 
   BuildConfig config() {
@@ -37,6 +40,15 @@ public class GraphBuilderFactoryBuilder {
   public GraphBuilderFactoryBuilder withTransitModel(TransitModel transitModel) {
     this.transitModel = transitModel;
     return this;
+  }
+
+  public GraphBuilderFactoryBuilder withDataSources(GraphBuilderDataSources dataSources) {
+    this.dataSources = dataSources;
+    return this;
+  }
+
+  public GraphBuilderDataSources dataSources() {
+    return dataSources;
   }
 
   /**

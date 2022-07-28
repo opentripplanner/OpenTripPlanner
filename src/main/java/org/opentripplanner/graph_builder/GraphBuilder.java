@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder;
 
-import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
@@ -9,10 +8,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
-import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -70,6 +67,7 @@ public class GraphBuilder implements Runnable {
       .withConfig(config)
       .withGraph(graph)
       .withTransitModel(transitModel)
+      .withDataSources(dataSources)
       .withIssueStore()
       .build();
 
@@ -79,15 +77,15 @@ public class GraphBuilder implements Runnable {
     transitModel.initTimeZone(config.timeZone);
 
     if (hasOsm) {
-      graphBuilder.addModule(factory.createOpenStreetMapModule(dataSources.get(OSM)));
+      graphBuilder.addModule(factory.createOpenStreetMapModule());
     }
 
     if (hasGtfs) {
-      graphBuilder.addModule(factory.createGtfsModule(dataSources.get(GTFS)));
+      graphBuilder.addModule(factory.createGtfsModule());
     }
 
     if (hasNetex) {
-      graphBuilder.addModule(factory.createNetexModule(dataSources.get(NETEX)));
+      graphBuilder.addModule(factory.createNetexModule());
     }
 
     if (hasTransitData && transitModel.getAgencyTimeZones().size() > 1) {
@@ -114,22 +112,8 @@ public class GraphBuilder implements Runnable {
 
     // Load elevation data and apply it to the streets.
     // We want to do run this module after loading the OSM street network but before finding transfers.
-    List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
-    if (config.elevationBucket != null) {
-      elevationGridCoverageFactories.add(
-        factory.createNedElevationFactory(dataSources.getCacheDirectory())
-      );
-    } else if (dataSources.has(DEM)) {
-      // Load the elevation from a file in the graph inputs directory
-      for (DataSource demSource : dataSources.get(DEM)) {
-        elevationGridCoverageFactories.add(factory.createGeotiffGridCoverageFactoryImpl(demSource));
-      }
-    }
-    // Refactoring this class, it was made clear that this allows for adding multiple elevation
-    // modules to the same graph builder. We do not actually know if this is supported by the
-    // ElevationModule class.
-    for (ElevationGridCoverageFactory it : elevationGridCoverageFactories) {
-      graphBuilder.addModule(factory.createElevationModule(it, dataSources.getCacheDirectory()));
+    for (GraphBuilderModule it : factory.createElevationModules()) {
+      graphBuilder.addModule(it);
     }
 
     if (hasTransitData) {
@@ -152,7 +136,7 @@ public class GraphBuilder implements Runnable {
     }
 
     if (config.dataImportReport) {
-      graphBuilder.addModule(factory.createDataImportIssuesToHTML(dataSources.getBuildReportDir()));
+      graphBuilder.addModule(factory.createDataImportIssuesToHTML());
     }
 
     if (OTPFeature.DataOverlay.isOn()) {
