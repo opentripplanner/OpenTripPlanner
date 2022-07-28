@@ -12,7 +12,7 @@ public class NoticeBuilder extends AbstractEntityBuilder<Notice, NoticeBuilder> 
     super(id);
   }
 
-  public NoticeBuilder(Notice original) {
+  NoticeBuilder(Notice original) {
     super(original);
     this.publicCode = original.publicCode();
     this.text = original.text();
