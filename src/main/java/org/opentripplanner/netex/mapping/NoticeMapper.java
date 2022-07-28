@@ -28,7 +28,8 @@ class NoticeMapper {
 
     if (otpNotice == null) {
       otpNotice =
-        Notice.of(id)
+        Notice
+          .of(id)
           .withPublicCode(netexNotice.getPublicCode())
           .withText(netexNotice.getText().getValue())
           .build();
