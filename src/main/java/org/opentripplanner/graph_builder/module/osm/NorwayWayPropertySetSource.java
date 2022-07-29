@@ -783,7 +783,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
 
     //relation properties are copied over to ways
-    props.setProperties("lcn=yes|rcn=yes|ncn=yes", ALL, 0.8, 0.8, true);
+    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", ALL, 0.8, 0.8);
 
     props.setProperties("highway=busway", PEDESTRIAN_AND_BICYCLE, low_traffic, low_traffic);
     props.setProperties("highway=track", PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
@@ -795,8 +795,8 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=platform", PEDESTRIAN);
     props.setProperties("public_transport=platform", PEDESTRIAN);
 
-    props.setProperties("smoothness=intermediate", ALL, 1.5, 1.5, true);
-    props.setProperties("smoothness=bad", ALL, 2, 2, true);
+    props.setMixinProperties("smoothness=intermediate", ALL, 1.5, 1.5);
+    props.setMixinProperties("smoothness=bad", ALL, 2, 2);
     props.setProperties("highway=*;smoothness=very_bad", PEDESTRIAN);
     props.setProperties("highway=*;smoothness=horrible", NONE);
     props.setProperties("highway=*;smoothness=very_horrible", NONE);
@@ -832,27 +832,27 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=path;sac_scale=difficult_alpine_hiking", NONE);
 
     // paved but unfavorable
-    props.setProperties("surface=grass_paver", ALL, 1.2, 1.2, true);
-    props.setProperties("surface=sett", ALL, 1.2, 1.2, true);
-    props.setProperties("surface=cobblestone", ALL, 1.2, 1.2, true);
-    props.setProperties("surface=unhewn_cobblestone", ALL, 1.5, 1.5, true);
+    props.setMixinProperties("surface=grass_paver", ALL, 1.2, 1.2);
+    props.setMixinProperties("surface=sett", ALL, 1.2, 1.2);
+    props.setMixinProperties("surface=cobblestone", ALL, 1.2, 1.2);
+    props.setMixinProperties("surface=unhewn_cobblestone", ALL, 1.5, 1.5);
     // Can be slick if wet, but otherwise not unfavorable to bikes
-    props.setProperties("surface=metal_grid", ALL, 1.2, 1.2, true);
-    props.setProperties("surface=metal", ALL, 1.2, 1.2, true);
+    props.setMixinProperties("surface=metal_grid", ALL, 1.2, 1.2);
+    props.setMixinProperties("surface=metal", ALL, 1.2, 1.2);
 
     // unpaved
-    props.setProperties("surface=unpaved", ALL, 1.2, 1.2, true);
-    props.setProperties("surface=compacted", ALL, 1.2, 1.2, true);
-    props.setProperties("surface=fine_gravel", ALL, 1.3, 1.3, true);
-    props.setProperties("surface=pebblestone", ALL, 1.3, 1.3, true);
-    props.setProperties("surface=gravel", ALL, 1.3, 1.3, true);
-    props.setProperties("surface=woodchip", ALL, 1.5, 1.5, true);
-    props.setProperties("surface=ground", ALL, 1.5, 1.5, true);
-    props.setProperties("surface=dirt", ALL, 1.5, 1.5, true);
-    props.setProperties("surface=earth", ALL, 1.5, 1.5, true);
-    props.setProperties("surface=grass", ALL, 1.5, 1.5, true);
-    props.setProperties("surface=mud", ALL, 2, 2, true);
-    props.setProperties("surface=sand", ALL, 2, 2, true);
+    props.setMixinProperties("surface=unpaved", ALL, 1.2, 1.2);
+    props.setMixinProperties("surface=compacted", ALL, 1.2, 1.2);
+    props.setMixinProperties("surface=fine_gravel", ALL, 1.3, 1.3);
+    props.setMixinProperties("surface=pebblestone", ALL, 1.3, 1.3);
+    props.setMixinProperties("surface=gravel", ALL, 1.3, 1.3);
+    props.setMixinProperties("surface=woodchip", ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=ground", ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=dirt", ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=earth", ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=grass", ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=mud", ALL, 2, 2);
+    props.setMixinProperties("surface=sand", ALL, 2, 2);
 
     /*
      * Automobile speeds in Norway. General speed limit is 80kph unless signs says otherwise

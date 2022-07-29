@@ -798,7 +798,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
     // this uses a OR since you don't want to apply the safety multiplier more than once.
-    props.setProperties("lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7, true);
+    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", StreetTraversalPermission.ALL, 0.7, 0.7);
 
     /*
      * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California
@@ -857,33 +857,32 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
      * running tracks are usually made of)
      */
 
-    props.setProperties("surface=unpaved", StreetTraversalPermission.ALL, 1.18, 1.18, true);
-    props.setProperties("surface=compacted", StreetTraversalPermission.ALL, 1.18, 1.18, true);
-    props.setProperties("surface=wood", StreetTraversalPermission.ALL, 1.18, 1.18, true);
+    props.setMixinProperties("surface=unpaved", StreetTraversalPermission.ALL, 1.18, 1.18);
+    props.setMixinProperties("surface=compacted", StreetTraversalPermission.ALL, 1.18, 1.18);
+    props.setMixinProperties("surface=wood", StreetTraversalPermission.ALL, 1.18, 1.18);
 
-    props.setProperties("surface=cobblestone", StreetTraversalPermission.ALL, 1.3, 1.3, true);
-    props.setProperties(
+    props.setMixinProperties("surface=cobblestone", StreetTraversalPermission.ALL, 1.3, 1.3);
+    props.setMixinProperties(
       "surface=cobblestone:flattened",
       StreetTraversalPermission.ALL,
       1.3,
-      1.3,
-      true
+      1.3
     );
-    props.setProperties("surface=grass_paver", StreetTraversalPermission.ALL, 1.3, 1.3, true);
-    props.setProperties("surface=pebblestone", StreetTraversalPermission.ALL, 1.3, 1.3, true);
+    props.setMixinProperties("surface=grass_paver", StreetTraversalPermission.ALL, 1.3, 1.3);
+    props.setMixinProperties("surface=pebblestone", StreetTraversalPermission.ALL, 1.3, 1.3);
     // Can be slick if wet, but otherwise not unfavorable to bikes
-    props.setProperties("surface=metal", StreetTraversalPermission.ALL, 1.3, 1.3, true);
-    props.setProperties("surface=ground", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=dirt", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=earth", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=grass", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=woodchip", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=gravel", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("surface=artifical_turf", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setMixinProperties("surface=metal", StreetTraversalPermission.ALL, 1.3, 1.3);
+    props.setMixinProperties("surface=ground", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=dirt", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=earth", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=grass", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=woodchip", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=gravel", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("surface=artifical_turf", StreetTraversalPermission.ALL, 1.5, 1.5);
 
     /* sand is deadly for bikes */
-    props.setProperties("surface=sand", StreetTraversalPermission.ALL, 100.0, 100.0, true);
+    props.setMixinProperties("surface=sand", StreetTraversalPermission.ALL, 100.0, 100.0);
 
     /* Portland-local mixins */
 
@@ -896,50 +895,44 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     /*
      * props.setProperties("RLIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
      */
-    props.setProperties(
+    props.setMixinProperties(
       "RLIS:bicycle=caution_area",
       StreetTraversalPermission.ALL,
       1.45,
-      1.45,
-      true
+      1.45
     );
-    props.setProperties(
+    props.setMixinProperties(
       "RLIS:bicycle:right=caution_area",
       StreetTraversalPermission.ALL,
       1.45,
-      1.0,
-      true
+      1.0
     );
-    props.setProperties(
+    props.setMixinProperties(
       "RLIS:bicycle:left=caution_area",
       StreetTraversalPermission.ALL,
       1.0,
-      1.45,
-      true
+      1.45
     );
     /*
      * props.setProperties("CCGIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
      */
-    props.setProperties(
+    props.setMixinProperties(
       "CCGIS:bicycle=caution_area",
       StreetTraversalPermission.ALL,
       1.45,
-      1.45,
-      true
+      1.45
     );
-    props.setProperties(
+    props.setMixinProperties(
       "CCGIS:bicycle:right=caution_area",
       StreetTraversalPermission.ALL,
       1.45,
-      1.0,
-      true
+      1.0
     );
-    props.setProperties(
+    props.setMixinProperties(
       "CCGIS:bicycle:left=caution_area",
       StreetTraversalPermission.ALL,
       1.0,
-      1.45,
-      true
+      1.45
     );
 
     props.defaultProperties.setPermission(StreetTraversalPermission.ALL);

@@ -77,28 +77,28 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
       1.2
     );
 
-    props.setProperties("highway=tertiary", StreetTraversalPermission.ALL, 1.2, 1.2, true);
-    props.setProperties("maxspeed=70", StreetTraversalPermission.ALL, 1.5, 1.5, true);
-    props.setProperties("maxspeed=80", StreetTraversalPermission.ALL, 2.0, 2.0, true);
-    props.setProperties("maxspeed=90", StreetTraversalPermission.ALL, 3.0, 3.0, true);
-    props.setProperties("maxspeed=100", StreetTraversalPermission.ALL, 5.0, 5.0, true);
+    props.setMixinProperties("highway=tertiary", StreetTraversalPermission.ALL, 1.2, 1.2);
+    props.setMixinProperties("maxspeed=70", StreetTraversalPermission.ALL, 1.5, 1.5);
+    props.setMixinProperties("maxspeed=80", StreetTraversalPermission.ALL, 2.0, 2.0);
+    props.setMixinProperties("maxspeed=90", StreetTraversalPermission.ALL, 3.0, 3.0);
+    props.setMixinProperties("maxspeed=100", StreetTraversalPermission.ALL, 5.0, 5.0);
 
     // tracktypes
 
     // solid
-    props.setProperties("tracktype=grade1", StreetTraversalPermission.ALL, 1.0, 1.0, true);
+    props.setMixinProperties("tracktype=grade1", StreetTraversalPermission.ALL, 1.0, 1.0);
     // solid but unpaved
-    props.setProperties("tracktype=grade2", StreetTraversalPermission.ALL, 1.1, 1.1, true);
+    props.setMixinProperties("tracktype=grade2", StreetTraversalPermission.ALL, 1.1, 1.1);
     // mostly solid.
-    props.setProperties("tracktype=grade3", StreetTraversalPermission.ALL, 1.15, 1.15, true);
+    props.setMixinProperties("tracktype=grade3", StreetTraversalPermission.ALL, 1.15, 1.15);
     // mostly soft
-    props.setProperties("tracktype=grade4", StreetTraversalPermission.ALL, 1.3, 1.3, true);
+    props.setMixinProperties("tracktype=grade4", StreetTraversalPermission.ALL, 1.3, 1.3);
     // soft
-    props.setProperties("tracktype=grade5", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+    props.setMixinProperties("tracktype=grade5", StreetTraversalPermission.ALL, 1.5, 1.5);
 
     // lit=yes currently is tagged very rarely, so we just want to discount where lit=no explicitly
     // not lit decreases safety
-    props.setProperties("lit=no", StreetTraversalPermission.ALL, 1.05, 1.05, true);
+    props.setMixinProperties("lit=no", StreetTraversalPermission.ALL, 1.05, 1.05);
 
     props.setProperties(
       "highway=unclassified;cycleway=lane",

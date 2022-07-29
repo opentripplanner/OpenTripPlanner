@@ -343,20 +343,19 @@ public class WayPropertySet {
     double safety,
     double safetyBack
   ) {
-    setProperties(spec, permission, safety, safetyBack, false);
+    setMixinProperties(spec, permission, safety, safetyBack);
   }
 
-  public void setProperties(
+  public void setMixinProperties(
     String spec,
     StreetTraversalPermission permission,
     double safety,
-    double safetyBack,
-    boolean mixin
+    double safetyBack
   ) {
     WayProperties properties = new WayProperties();
     properties.setPermission(permission);
     properties.setSafetyFeatures(new P2<>(safety, safetyBack));
-    addProperties(new OSMSpecifier(spec), properties, mixin);
+    addProperties(new OSMSpecifier(spec), properties, true);
   }
 
   public void setCarSpeed(String spec, float speed) {
