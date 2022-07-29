@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.site;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -51,7 +50,7 @@ public class GroupOfStationsBuilder
   }
 
   public Set<StopCollection> childStations() {
-    return Collections.unmodifiableSet(this.childStations);
+    return Set.copyOf(this.childStations);
   }
 
   public GroupOfStationsBuilder withCoordinate(WgsCoordinate coordinate) {
