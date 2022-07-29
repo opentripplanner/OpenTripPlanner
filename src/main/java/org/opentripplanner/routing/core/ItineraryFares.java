@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.fares.model.LegProducts;
@@ -28,26 +29,21 @@ public class ItineraryFares {
    * serializing a trip planning response, and List is an interface. See
    * https://stackoverflow.com/a/1119241/778449
    */
-  private final HashMap<FareType, List<FareComponent>> details;
+  private final HashMap<FareType, List<FareComponent>> details = new HashMap<>();
   private final List<FareProduct> productsCoveringItinerary = new ArrayList<>();
   private final Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
   /**
    * A mapping from {@link FareType} to {@link Money}.
    */
-  private HashMap<FareType, Money> fare;
+  private HashMap<FareType, Money> fare = new HashMap<>();
 
   public ItineraryFares(ItineraryFares aFare) {
     if (aFare != null) {
-      details = new HashMap<>(aFare.details);
-    } else {
-      details = new HashMap<>();
+      fare.putAll(aFare.fare);
     }
   }
 
-  public ItineraryFares() {
-    fare = new HashMap<>();
-    details = new HashMap<>();
-  }
+  public ItineraryFares() {}
 
   public static ItineraryFares empty() {
     return new ItineraryFares();

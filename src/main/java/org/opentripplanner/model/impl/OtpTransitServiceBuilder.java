@@ -10,9 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
-import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareLegRule;
-import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.GroupOfStations;
@@ -292,10 +290,6 @@ public class OtpTransitServiceBuilder {
     }
     removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
-  }
-
-  public Collection<FareLegRule> getFareLegRules() {
-    return fareLegRules;
   }
 
   /**
