@@ -12,7 +12,6 @@ import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripStopTimes;
@@ -40,6 +39,7 @@ import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
@@ -106,7 +106,7 @@ public class OtpTransitServiceBuilder {
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-  private final EntityById<FlexTrip> flexTripsById = new EntityById<>();
+  private final EntityById<FlexTrip<?, ?>> flexTripsById = new EntityById<>();
 
   private final EntityById<Branding> brandingsById = new EntityById<>();
 
@@ -224,7 +224,7 @@ public class OtpTransitServiceBuilder {
     return tripPatterns;
   }
 
-  public EntityById<FlexTrip> getFlexTripsById() {
+  public EntityById<FlexTrip<?, ?>> getFlexTripsById() {
     return flexTripsById;
   }
 

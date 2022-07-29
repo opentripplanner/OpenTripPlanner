@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.site;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -80,7 +79,7 @@ public class FlexLocationGroupBuilder
   }
 
   public Set<StopLocation> stopLocations() {
-    return Collections.unmodifiableSet(stopLocations);
+    return Set.copyOf(stopLocations);
   }
 
   public GeometryCollection geometry() {

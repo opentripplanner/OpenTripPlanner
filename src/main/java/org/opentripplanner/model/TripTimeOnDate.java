@@ -9,6 +9,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -223,7 +224,7 @@ public class TripTimeOnDate {
   }
 
   public StopTimeKey getStopTimeKey() {
-    return new StopTimeKey(tripTimes.getTrip().getId(), stopIndex);
+    return StopTimeKey.of(tripTimes.getTrip().getId(), stopIndex).build();
   }
 
   public BookingInfo getPickupBookingInfo() {
