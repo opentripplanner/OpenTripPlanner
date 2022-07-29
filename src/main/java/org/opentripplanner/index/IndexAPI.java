@@ -51,19 +51,17 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.PolylineEncoder;
+import org.opentripplanner.util.SemanticHash;
 import org.opentripplanner.util.model.EncodedPolyline;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
@@ -432,7 +430,7 @@ public class IndexAPI {
   @Path("/trips/{tripId}/semanticHash")
   public String getSemanticHashForTrip(@PathParam("tripId") String tripId) {
     var trip = trip(tripId);
-    return tripPattern(trip).semanticHashString(trip);
+    return SemanticHash.forTripPattern(tripPattern(trip), trip);
   }
 
   @GET
@@ -498,7 +496,7 @@ public class IndexAPI {
   @Path("/patterns/{patternId}/semanticHash")
   public String getSemanticHashForPattern(@PathParam("patternId") String patternId) {
     var tripPattern = tripPattern(patternId);
-    return tripPattern.semanticHashString(null);
+    return SemanticHash.forTripPattern(tripPattern, null);
   }
 
   /** Return geometry for the pattern as a packed coordinate sequence */

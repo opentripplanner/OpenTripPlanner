@@ -35,6 +35,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.SemanticHash;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
@@ -285,7 +286,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
       if (tripPattern == null) {
         return null;
       }
-      return tripPattern.semanticHashString(getSource(environment));
+      return SemanticHash.forTripPattern(tripPattern, getSource(environment));
     };
   }
 

@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.SemanticHash;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPattern {
@@ -185,7 +186,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
   @Override
   public DataFetcher<String> semanticHash() {
-    return environment -> getSource(environment).semanticHashString(null);
+    return environment -> SemanticHash.forTripPattern(getSource(environment), null);
   }
 
   @Override
