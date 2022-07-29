@@ -50,6 +50,8 @@ public class GermanyWayPropertySetSourceTest {
     way.addTag("width", "6.5");
     way.addTag("zone:traffic", "DE:urban");
     assertEquals(0.9, wps.getDataForWay(way).getBicycleSafetyFeatures().first, epsilon);
+    // walk safety should be default
+    assertEquals(1, wps.getDataForWay(way).getWalkSafetyFeatures().first, epsilon);
 
     // way332589799 (Radschnellweg BW1)
     way = new OSMWithTags();
