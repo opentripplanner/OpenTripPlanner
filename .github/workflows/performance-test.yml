@@ -7,7 +7,7 @@ on:
 
 jobs:
   perf-test:
-    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,"Bump serialization version id for")
+    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for')
     runs-on: performance-test
     strategy:
       max-parallel: 1
