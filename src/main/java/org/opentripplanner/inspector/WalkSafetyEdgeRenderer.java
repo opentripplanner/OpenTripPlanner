@@ -21,8 +21,7 @@ public class WalkSafetyEdgeRenderer implements EdgeVertexRenderer {
 
   @Override
   public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-    if (e instanceof StreetEdge) {
-      StreetEdge pse = (StreetEdge) e;
+    if (e instanceof StreetEdge pse) {
       if (pse.getPermission().allows(TraverseMode.WALK)) {
         double walkSafety = pse.getWalkSafetyFactor();
         attrs.color = palette.getColor(walkSafety);
