@@ -30,7 +30,6 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
@@ -93,7 +92,10 @@ public class TransitRouter {
       ? serverContext.transitService().getTransitLayer()
       : serverContext.transitService().getRealtimeTransitLayer();
 
-    var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
+    var requestTransitDataProvider = createRequestTransitDataProvider(
+      transitLayer,
+      serverContext.transitService()
+    );
 
     debugTimingAggregator.finishedPatternFiltering();
 
@@ -243,7 +245,8 @@ public class TransitRouter {
   }
 
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
-    TransitLayer transitLayer
+    TransitLayer transitLayer,
+    TransitService transitService
   ) {
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
@@ -254,7 +257,7 @@ public class TransitRouter {
       additionalSearchDays.additionalSearchDaysInFuture(),
       createRequestTransitDataProviderFilter(serverContext.transitService()),
       new RoutingContext(transferRoutingRequest, serverContext.graph(), (Vertex) null, null),
-      transitModel.getTransitModelIndex().getRoutesForAgency()::get
+      transitService::getRoutesForAgency
     );
   }
 
