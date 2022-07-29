@@ -370,8 +370,8 @@ public abstract class RoutingResource {
   protected Integer bikeBoardCost;
 
   /**
-   * Factor for how much the walk safety is considered in routing. If value is set to be 0, it is
-   * ignored. Default is 1.0.
+   * Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
+   * If the value is set to be 0, safety is ignored. Default is 1.0.
    */
   @QueryParam("walkSafetyFactor")
   protected Double walkSafetyFactor;

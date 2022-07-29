@@ -425,8 +425,8 @@ public class RoutingRequest implements Cloneable, Serializable {
    */
   public int bikeBoardCost = 60 * 10;
   /**
-   * Factor for how much the walk safety is considered in routing. If value is set to be 0, it is
-   * ignored.
+   * Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
+   * If the value is set to be 0, safety is ignored.
    */
   public double walkSafetyFactor = 1.0;
   /**
@@ -772,6 +772,8 @@ public class RoutingRequest implements Cloneable, Serializable {
   public void setWalkSafetyFactor(double walkSafetyFactor) {
     if (walkSafetyFactor < 0) {
       this.walkSafetyFactor = 0;
+    } else if (walkSafetyFactor > 1) {
+      this.walkSafetyFactor = 1;
     } else {
       this.walkSafetyFactor = walkSafetyFactor;
     }
