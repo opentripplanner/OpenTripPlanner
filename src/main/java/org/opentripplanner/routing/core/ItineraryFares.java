@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +65,7 @@ public class ItineraryFares {
     details.put(fareType, newDetails);
   }
 
-  public void addProductsCoveringItinerary(List<FareProduct> products) {
+  public void addProductsCoveringItinerary(Collection<FareProduct> products) {
     productsCoveringItinerary.addAll(products);
   }
 
@@ -98,7 +99,7 @@ public class ItineraryFares {
     return fare.keySet();
   }
 
-  public void addLegProducts(List<LegProducts> legProducts) {
+  public void addLegProducts(Collection<LegProducts> legProducts) {
     legProducts.forEach(lp -> this.legProducts.putAll(lp.leg(), lp.products()));
   }
 

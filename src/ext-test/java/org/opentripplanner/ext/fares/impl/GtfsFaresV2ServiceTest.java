@@ -123,7 +123,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(dayPass, single), result.productsCoveringItinerary());
+    assertEquals(Set.of(dayPass, single), result.productsCoveringItinerary());
   }
 
   @Test
@@ -131,7 +131,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(dayPass), result.productsCoveringItinerary());
+    assertEquals(Set.of(dayPass), result.productsCoveringItinerary());
   }
 
   @Test
@@ -139,7 +139,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(expressPass), result.productsCoveringItinerary());
+    assertEquals(Set.of(expressPass), result.productsCoveringItinerary());
   }
 
   @Test
@@ -150,7 +150,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(innerToOuterZoneSingle), result.productsCoveringItinerary());
+    assertEquals(Set.of(innerToOuterZoneSingle), result.productsCoveringItinerary());
   }
 
   @Test
@@ -161,7 +161,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(singleToOuter), result.productsCoveringItinerary());
+    assertEquals(Set.of(singleToOuter), result.productsCoveringItinerary());
   }
 
   @Test
@@ -172,7 +172,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .build();
 
     var result = service.getProducts(i1);
-    assertEquals(List.of(singleFromOuter), result.productsCoveringItinerary());
+    assertEquals(Set.of(singleFromOuter), result.productsCoveringItinerary());
   }
 
   /**

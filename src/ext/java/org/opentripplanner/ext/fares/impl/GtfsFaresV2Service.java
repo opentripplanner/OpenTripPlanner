@@ -42,16 +42,16 @@ public final class GtfsFaresV2Service implements Serializable {
       .stream()
       .map(this::getLegProduct)
       .filter(lp -> !lp.products().isEmpty())
-      .toList();
+      .collect(Collectors.toSet());
 
     var coveringItinerary = productsCoveringItinerary(itinerary, legProducts);
 
     return new ProductResult(coveringItinerary, legProducts);
   }
 
-  private List<FareProduct> productsCoveringItinerary(
+  private Set<FareProduct> productsCoveringItinerary(
     Itinerary itinerary,
-    List<LegProducts> legProducts
+    Collection<LegProducts> legProducts
   ) {
     var distinctProductSets = legProducts
       .stream()
@@ -62,9 +62,9 @@ public final class GtfsFaresV2Service implements Serializable {
       return distinctProductSets
         .stream()
         .flatMap(p -> p.stream().filter(ps -> ps.coversItinerary(itinerary)))
-        .toList();
+        .collect(Collectors.toSet());
     } else {
-      return List.of();
+      return Set.of();
     }
   }
 
@@ -119,7 +119,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 }
 
-record ProductResult(List<FareProduct> productsCoveringItinerary, List<LegProducts> legProducts) {
+record ProductResult(Set<FareProduct> productsCoveringItinerary, Set<LegProducts> legProducts) {
   public Set<FareProduct> getProducts(Leg leg) {
     return legProducts
       .stream()
