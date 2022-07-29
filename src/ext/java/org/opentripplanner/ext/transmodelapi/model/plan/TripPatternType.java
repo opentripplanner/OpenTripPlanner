@@ -98,7 +98,7 @@ public class TripPatternType {
           .name("duration")
           .description("Duration of the trip, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getDuration())
+          .dataFetcher(env -> itinerary(env).getDuration().toSeconds())
           .build()
       )
       .field(
@@ -107,7 +107,7 @@ public class TripPatternType {
           .name("directDuration")
           .description("NOT IMPLEMENTED.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getDuration())
+          .dataFetcher(env -> itinerary(env).getDuration().toSeconds())
           .build()
       )
       .field(
@@ -116,7 +116,7 @@ public class TripPatternType {
           .name("waitingTime")
           .description("How much time is spent waiting for transit to arrive, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getWaitingTime())
+          .dataFetcher(env -> itinerary(env).getWaitingTime().toSeconds())
           .build()
       )
       .field(

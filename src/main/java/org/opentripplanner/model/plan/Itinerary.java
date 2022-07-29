@@ -23,7 +23,7 @@ public class Itinerary {
   private final Duration duration;
   private final Duration transitTime;
   private final int numberOfTransfers;
-  private final Duration waitingTimeSeconds;
+  private final Duration waitingTime;
   private final double nonTransitDistanceMeters;
   private final boolean walkOnly;
   private final boolean streetOnly;
@@ -54,12 +54,12 @@ public class Itinerary {
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
-    this.duration = totals.totalDurationSeconds;
+    this.duration = totals.totalDuration;
     this.numberOfTransfers = totals.transfers();
-    this.transitTime = totals.transitTimeSeconds;
-    this.nonTransitTime = totals.nonTransitTimeSeconds;
+    this.transitTime = totals.transitTime;
+    this.nonTransitTime = totals.nonTransitTime;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.waitingTimeSeconds = totals.waitingTimeSeconds;
+    this.waitingTime = totals.waitingTime;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
@@ -216,7 +216,7 @@ public class Itinerary {
       .addNum("generalizedCost", generalizedCost)
       .addDuration("nonTransitTime", nonTransitTime)
       .addDuration("transitTime", transitTime)
-      .addDuration("waitingTime", waitingTimeSeconds)
+      .addDuration("waitingTime", waitingTime)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
       .addNum("elevationLost", elevationLost, 0.0)
@@ -291,7 +291,7 @@ public class Itinerary {
    * How much time is spent waiting for transit to arrive, in seconds.
    */
   public Duration getWaitingTime() {
-    return waitingTimeSeconds;
+    return waitingTime;
   }
 
   /**
