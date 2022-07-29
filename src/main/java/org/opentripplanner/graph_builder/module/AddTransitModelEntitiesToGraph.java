@@ -421,7 +421,7 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   private void addFlexTripsToGraph(TransitModel transitModel) {
-    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) {
+    for (FlexTrip<?, ?> flexTrip : otpTransitService.getAllFlexTrips()) {
       transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }
