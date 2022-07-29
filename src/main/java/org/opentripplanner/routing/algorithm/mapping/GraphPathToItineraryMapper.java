@@ -178,20 +178,21 @@ public class GraphPathToItineraryMapper {
         forwardState.backEdge instanceof FlexTripEdge || backState.backEdge instanceof FlexTripEdge;
       var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
       var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
+      var carPickupChange = backState.getCarPickupState() != forwardState.getCarPickupState();
 
-      if (parkingChange || flexChange || rentalChange) {
+      if (parkingChange || flexChange || rentalChange || carPickupChange) {
         int nextBreak = i;
 
-        /* Remove the state for actually parking (traversing VehicleParkingEdge) from the
+        if (nextBreak > previousBreak) {
+          legsStates.add(states.subList(previousBreak, nextBreak + 1));
+        }
+
+        /* Remove the state for actually parking (traversing a VehicleParkingEdge) from the
          * states so that the leg from/to edges correspond to the actual entrances.
          * The actual time for parking is added to the walking leg in generateLeg().
          */
         if (parkingChange) {
           nextBreak++;
-        }
-
-        if (nextBreak > previousBreak) {
-          legsStates.add(states.subList(previousBreak, nextBreak + 1));
         }
 
         previousBreak = nextBreak;
@@ -253,25 +254,32 @@ public class GraphPathToItineraryMapper {
    * @param states The states that go with the leg
    */
   private static TraverseMode resolveMode(List<State> states) {
-    for (State state : states) {
-      TraverseMode mode = state.getNonTransitMode();
+    return states
+      .stream()
+      // The first state is part of the previous leg
+      .skip(1)
+      .map(state -> {
+        var mode = state.getNonTransitMode();
 
-      if (mode != null) {
-        // Resolve correct mode if renting vehicle
-        if (state.isRentingVehicle()) {
-          return switch (state.stateData.rentalVehicleFormFactor) {
-            case BICYCLE, OTHER -> TraverseMode.BICYCLE;
-            case SCOOTER, MOPED -> TraverseMode.SCOOTER;
-            case CAR -> TraverseMode.CAR;
-          };
-        } else {
-          return mode;
+        if (mode != null) {
+          // Resolve correct mode if renting vehicle
+          if (state.isRentingVehicle()) {
+            return switch (state.stateData.rentalVehicleFormFactor) {
+              case BICYCLE, OTHER -> TraverseMode.BICYCLE;
+              case SCOOTER, MOPED -> TraverseMode.SCOOTER;
+              case CAR -> TraverseMode.CAR;
+            };
+          } else {
+            return mode;
+          }
         }
-      }
-    }
 
-    // Fallback to walking
-    return TraverseMode.WALK;
+        return null;
+      })
+      .filter(Objects::nonNull)
+      .findFirst()
+      // Fallback to walking
+      .orElse(TraverseMode.WALK);
   }
 
   private static List<P2<Double>> encodeElevationProfileWithNaN(

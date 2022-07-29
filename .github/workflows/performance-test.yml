@@ -7,22 +7,22 @@ on:
 
 jobs:
   perf-test:
-    if: github.repository_owner == 'opentripplanner'
+    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for')
     runs-on: performance-test
     strategy:
       max-parallel: 1
       matrix:
         include:
 
-          - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
-            osm-url: https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf
-            transit-url: https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip
-            transit-filename: baden-wuerttemberg.gtfs.zip
-
           - location: norway
             osm-url: https://download.geofabrik.de/europe/norway-210101.osm.pbf
             transit-url: https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip
             transit-filename: rb_norway-aggregated-netex.zip
+
+          - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
+            osm-url: https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf
+            transit-url: https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip
+            transit-filename: baden-wuerttemberg.gtfs.zip
 
     steps:
       - uses: actions/checkout@v2.3.2
@@ -85,4 +85,3 @@ jobs:
           name: ${{ matrix.location }}-travelSearch-results.csv
           path: |
             test/performance/${{ matrix.location }}/travelSearch-results.csv
-
