@@ -2,9 +2,9 @@ package org.opentripplanner.gtfs.mapping;
 
 import java.time.Duration;
 import java.util.Currency;
-import org.opentripplanner.model.FareContainer;
-import org.opentripplanner.model.FareProduct;
-import org.opentripplanner.model.RiderCategory;
+import org.opentripplanner.ext.fares.model.FareContainer;
+import org.opentripplanner.ext.fares.model.FareProduct;
+import org.opentripplanner.ext.fares.model.RiderCategory;
 import org.opentripplanner.routing.core.Money;
 
 public class FareProductMapper {

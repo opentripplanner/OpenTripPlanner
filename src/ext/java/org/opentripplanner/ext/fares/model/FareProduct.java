@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.ext.fares.model;
 
 import java.time.Duration;
 import java.util.Objects;

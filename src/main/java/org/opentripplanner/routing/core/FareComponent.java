@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.core;
 
 import java.util.List;
-import org.opentripplanner.model.FareContainer;
-import org.opentripplanner.model.RiderCategory;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**

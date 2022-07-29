@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.LegProducts;
-import org.opentripplanner.model.FareProduct;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.util.lang.ToStringBuilder;
 

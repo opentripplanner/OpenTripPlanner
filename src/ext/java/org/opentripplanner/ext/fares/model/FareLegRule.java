@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.ext.fares.model;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
