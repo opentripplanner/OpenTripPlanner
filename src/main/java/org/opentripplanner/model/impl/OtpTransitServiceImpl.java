@@ -88,7 +88,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<Trip> trips;
 
-  private final Collection<FlexTrip> flexTrips;
+  private final Collection<FlexTrip<?, ?>> flexTrips;
 
   /**
    * Create a read only version of the {@link OtpTransitService}.
@@ -236,7 +236,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public Collection<FlexTrip> getAllFlexTrips() {
+  public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
     return flexTrips;
   }
 

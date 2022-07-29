@@ -100,7 +100,7 @@ public class TransitModel implements Serializable {
   private final Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
 
-  private final Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 
   private transient TransitLayer transitLayer;
   private transient TransitLayerUpdater transitLayerUpdater;
@@ -445,7 +445,7 @@ public class TransitModel implements Serializable {
     return transfersByStop.values();
   }
 
-  public Collection<FlexTrip> getAllFlexTrips() {
+  public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
     return flexTripsById.values();
   }
 
@@ -465,7 +465,7 @@ public class TransitModel implements Serializable {
     }
   }
 
-  public void addFlexTrip(FeedScopedId id, FlexTrip flexTrip) {
+  public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
     flexTripsById.put(id, flexTrip);
   }
 
