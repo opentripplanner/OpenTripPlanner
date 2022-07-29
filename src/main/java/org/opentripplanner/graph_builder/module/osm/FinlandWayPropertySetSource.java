@@ -1,10 +1,14 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
  * OSM way properties for Finnish roads. FinlandWayPropertySetSource is derived from
@@ -26,98 +30,89 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
   public void populateProperties(WayPropertySet props) {
     props.setProperties(
       "highway=living_street",
-      StreetTraversalPermission.ALL,
-      0.90,
-      0.90,
-      0.90,
-      0.90
+      new WayPropertiesBuilder(ALL).bicycleSafety(0.9).walkSafety(0.9).build()
     );
-    props.setProperties("highway=unclassified", StreetTraversalPermission.ALL, 1, 1);
-    props.setProperties("highway=road", StreetTraversalPermission.ALL, 1, 1);
-    props.setProperties("highway=byway", StreetTraversalPermission.ALL, 1.3, 1.3, 1.3, 1.3);
-    props.setProperties("highway=track", StreetTraversalPermission.ALL, 1.3, 1.3, 1.3, 1.3);
-    props.setProperties("highway=service", StreetTraversalPermission.ALL, 1.1, 1.1, 1.1, 1.1);
+    props.setProperties("highway=unclassified", new WayPropertiesBuilder(ALL).build());
+    props.setProperties("highway=road", new WayPropertiesBuilder(ALL).build());
+    props.setProperties(
+      "highway=byway",
+      new WayPropertiesBuilder(ALL).bicycleSafety(1.3).walkSafety(1.3).build()
+    );
+    props.setProperties(
+      "highway=track",
+      new WayPropertiesBuilder(ALL).bicycleSafety(1.3).walkSafety(1.3).build()
+    );
+    props.setProperties(
+      "highway=service",
+      new WayPropertiesBuilder(ALL).bicycleSafety(1.1).walkSafety(1.1).build()
+    );
     props.setProperties(
       "highway=residential",
-      StreetTraversalPermission.ALL,
-      0.98,
-      0.98,
-      0.98,
-      0.98
+      new WayPropertiesBuilder(ALL).bicycleSafety(0.98).walkSafety(0.98).build()
     );
     props.setProperties(
       "highway=residential_link",
-      StreetTraversalPermission.ALL,
-      0.98,
-      0.98,
-      0.98,
-      0.98
+      new WayPropertiesBuilder(ALL).bicycleSafety(0.98).walkSafety(0.98).build()
     );
-    props.setProperties("highway=tertiary", StreetTraversalPermission.ALL, 1, 1);
-    props.setProperties("highway=tertiary_link", StreetTraversalPermission.ALL, 1, 1);
-    props.setProperties("highway=secondary", StreetTraversalPermission.ALL, 1.5, 1.5, 1.5, 1.5);
+    props.setProperties("highway=tertiary", new WayPropertiesBuilder(ALL).build());
+    props.setProperties("highway=tertiary_link", new WayPropertiesBuilder(ALL).build());
+    props.setProperties(
+      "highway=secondary",
+      new WayPropertiesBuilder(ALL).bicycleSafety(1.5).walkSafety(1.5).build()
+    );
     props.setProperties(
       "highway=secondary_link",
-      StreetTraversalPermission.ALL,
-      1.5,
-      1.5,
-      1.5,
-      1.5
+      new WayPropertiesBuilder(ALL).bicycleSafety(1.5).walkSafety(1.5).build()
     );
-    props.setProperties("highway=primary", StreetTraversalPermission.ALL, 2.06, 2.06, 2.06, 2.06);
+    props.setProperties(
+      "highway=primary",
+      new WayPropertiesBuilder(ALL).bicycleSafety(2.06).walkSafety(2.06).build()
+    );
     props.setProperties(
       "highway=primary_link",
-      StreetTraversalPermission.ALL,
-      2.06,
-      2.06,
-      2.06,
-      2.06
+      new WayPropertiesBuilder(ALL).bicycleSafety(2.06).walkSafety(2.06).build()
     );
     // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
     props.setProperties(
       "highway=trunk_link",
-      StreetTraversalPermission.ALL,
-      2.06,
-      2.06,
-      2.06,
-      2.06
+      new WayPropertiesBuilder(ALL).bicycleSafety(2.06).walkSafety(2.06).build()
     );
-    props.setProperties("highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47, 7.47, 7.47);
+    props.setProperties(
+      "highway=trunk",
+      new WayPropertiesBuilder(ALL).bicycleSafety(7.47).walkSafety(7.47).build()
+    );
 
     // Don't recommend walking in trunk road tunnels
-    props.setProperties("highway=trunk;tunnel=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
+    props.setProperties(
+      "highway=trunk;tunnel=yes",
+      new WayPropertiesBuilder(CAR).bicycleSafety(7.47).build()
+    );
 
     // Do not walk on "moottoriliikennetie"
-    props.setProperties("motorroad=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
+    props.setProperties("motorroad=yes", new WayPropertiesBuilder(CAR).bicycleSafety(7.47).build());
 
     // Remove informal and private roads
-    props.setProperties("highway=*;informal=yes", StreetTraversalPermission.NONE);
-    props.setProperties("highway=service;access=private", StreetTraversalPermission.NONE);
-    props.setProperties("highway=trail", StreetTraversalPermission.NONE);
+    props.setProperties("highway=*;informal=yes", new WayPropertiesBuilder(NONE).build());
+    props.setProperties("highway=service;access=private", new WayPropertiesBuilder(NONE).build());
+    props.setProperties("highway=trail", new WayPropertiesBuilder(NONE).build());
 
     // No biking on designated footways/sidewalks
-    props.setProperties("highway=footway", StreetTraversalPermission.PEDESTRIAN);
+    props.setProperties("highway=footway", new WayPropertiesBuilder(PEDESTRIAN).build());
 
     // Prefer designated cycleways
     props.setProperties(
       "highway=cycleway;bicycle=designated",
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      0.6,
-      0.6
+      new WayPropertiesBuilder(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6).build()
     );
 
     // Remove Helsinki city center service tunnel network from graph
     props.setProperties(
       "highway=service;tunnel=yes;access=destination",
-      StreetTraversalPermission.NONE
+      new WayPropertiesBuilder(NONE).build()
     );
     props.setProperties(
       "highway=service;access=destination",
-      StreetTraversalPermission.ALL,
-      1.1,
-      1.1,
-      1.1,
-      1.1
+      new WayPropertiesBuilder(ALL).bicycleSafety(1.1).walkSafety(1.1).build()
     );
 
     /*

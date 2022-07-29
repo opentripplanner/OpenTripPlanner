@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -187,16 +189,14 @@ public class OpenStreetMapModuleTest {
     // add two equal matches: lane only...
     OSMSpecifier lane_only = new OSMSpecifier("cycleway=lane");
 
-    WayProperties lane_is_safer = new WayProperties();
-    lane_is_safer.setBicycleSafetyFeatures(new P2<>(1.5, 1.5));
+    WayProperties lane_is_safer = new WayPropertiesBuilder(ALL).bicycleSafety(1.5).build();
 
     wayPropertySet.addProperties(lane_only, lane_is_safer);
 
     // and footway only
     OSMSpecifier footway_only = new OSMSpecifier("highway=footway");
 
-    WayProperties footways_allow_peds = new WayProperties();
-    footways_allow_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    WayProperties footways_allow_peds = new WayPropertiesBuilder(PEDESTRIAN).build();
 
     wayPropertySet.addProperties(footway_only, footways_allow_peds);
 
@@ -207,9 +207,7 @@ public class OpenStreetMapModuleTest {
     // add a better match
     OSMSpecifier lane_and_footway = new OSMSpecifier("cycleway=lane;highway=footway");
 
-    WayProperties safer_and_peds = new WayProperties();
-    safer_and_peds.setBicycleSafetyFeatures(new P2<>(0.75, 0.75));
-    safer_and_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    WayProperties safer_and_peds = new WayPropertiesBuilder(PEDESTRIAN).bicycleSafety(0.75).build();
 
     wayPropertySet.addProperties(lane_and_footway, safer_and_peds);
     dataForWay = wayPropertySet.getDataForWay(way);
@@ -217,8 +215,7 @@ public class OpenStreetMapModuleTest {
 
     // add a mixin
     OSMSpecifier gravel = new OSMSpecifier("surface=gravel");
-    WayProperties gravel_is_dangerous = new WayProperties();
-    gravel_is_dangerous.setBicycleSafetyFeatures(new P2<>(2.0, 2.0));
+    WayProperties gravel_is_dangerous = new WayPropertiesBuilder(ALL).bicycleSafety(2).build();
     wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
 
     dataForWay = wayPropertySet.getDataForWay(way);
@@ -231,8 +228,7 @@ public class OpenStreetMapModuleTest {
     way.addTag("cycleway:right", "track");
 
     OSMSpecifier track_only = new OSMSpecifier("highway=footway;cycleway=track");
-    WayProperties track_is_safest = new WayProperties();
-    track_is_safest.setBicycleSafetyFeatures(new P2<>(0.25, 0.25));
+    WayProperties track_is_safest = new WayPropertiesBuilder(ALL).bicycleSafety(0.25).build();
 
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
