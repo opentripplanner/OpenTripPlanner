@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +24,7 @@ class Result {
    */
   final String testCaseId;
   final Integer nTransfers;
-  final Integer duration;
+  final Duration duration;
   final Integer cost;
   final Integer walkDistance;
   final Integer startTime;
@@ -46,7 +47,7 @@ class Result {
   Result(
     String testCaseId,
     Integer nTransfers,
-    Integer duration,
+    Duration duration,
     Integer cost,
     Integer walkDistance,
     Integer startTime,
