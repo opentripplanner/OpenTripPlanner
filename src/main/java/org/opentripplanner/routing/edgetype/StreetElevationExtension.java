@@ -189,10 +189,7 @@ public class StreetElevationExtension implements Serializable {
     }
 
     float effectiveWalkSafetyFactor = (float) (
-      streetEdge.getWalkSafetyFactor() *
-      costs.lengthMultiplier +
-      costs.slopeSafetyCost /
-      streetEdge.getDistanceMeters()
+      streetEdge.getWalkSafetyFactor() * effectiveWalkDistanceFactor
     );
 
     if (Double.isInfinite(effectiveWalkSafetyFactor) || Double.isNaN(effectiveWalkSafetyFactor)) {
