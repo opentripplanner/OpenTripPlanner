@@ -16,13 +16,10 @@ public class FareAttributeBuilder
 
   private Integer transferDuration;
 
-  /** youthPrice is an extension to the GTFS spec to support Seattle fare types. */
   private float youthPrice;
 
-  /** seniorPrice is an extension to the GTFS spec to support Seattle fare types. */
   private float seniorPrice;
 
-  /** This is a proposed extension to the GTFS spec */
   private Integer journeyDuration;
 
   FareAttributeBuilder(FeedScopedId id) {
