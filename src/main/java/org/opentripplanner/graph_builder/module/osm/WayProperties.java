@@ -28,10 +28,6 @@ public class WayProperties {
     walkSafetyFeatures = wayPropertiesBuilder.getWalkSafetyFeatures();
   }
 
-  public WayPropertiesBuilder wayProperties(StreetTraversalPermission permission) {
-    return new WayPropertiesBuilder(permission);
-  }
-
   public P2<Double> getBicycleSafetyFeatures() {
     return bicycleSafetyFeatures;
   }
