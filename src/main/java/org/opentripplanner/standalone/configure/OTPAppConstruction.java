@@ -61,9 +61,7 @@ public class OTPAppConstruction {
   public OTPAppConstruction(CommandLineParameters commandLineParameters) {
     this.cli = commandLineParameters;
     this.factory =
-      DaggerOTPApplicationFactory.builder()
-        .baseDirectory(this.cli.getBaseDirectory())
-        .build();
+      DaggerOTPApplicationFactory.builder().baseDirectory(this.cli.getBaseDirectory()).build();
   }
 
   public OTPApplicationFactory getFactory() {

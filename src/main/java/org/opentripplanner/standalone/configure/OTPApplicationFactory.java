@@ -35,15 +35,12 @@ import org.opentripplanner.transit.service.TransitModel;
   }
 )
 public interface OTPApplicationFactory {
-
   RaptorConfig<TripSchedule> raptorConfig();
   OtpDataStore datastore();
   ConfigModel configModel();
   Deduplicator deduplicator();
   AtomicReference<Graph> graph();
   AtomicReference<TransitModel> transitModel();
-
-
 
   @Component.Builder
   interface Builder {

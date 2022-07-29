@@ -240,7 +240,6 @@ public class GraphBuilderModules {
     );
   }
 
-
   /* private methods */
 
   private static ElevationGridCoverageFactory createNedElevationFactory(

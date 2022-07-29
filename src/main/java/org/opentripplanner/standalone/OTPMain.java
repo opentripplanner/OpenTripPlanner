@@ -187,10 +187,7 @@ public class OTPMain {
     if (params.doServe()) {
       GrizzlyServer grizzlyServer = app.createGrizzlyServer();
 
-      registerShutdownHookToGracefullyShutDownServer(
-        app.transitModel(),
-        app.raptorConfig()
-      );
+      registerShutdownHookToGracefullyShutDownServer(app.transitModel(), app.raptorConfig());
 
       // Loop to restart server on uncaught fatal exceptions.
       while (true) {

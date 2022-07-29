@@ -9,6 +9,7 @@ import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 
 @Module
 class AppModule {
+
   @Provides
   @Singleton
   static RaptorConfig<TripSchedule> providesRaptorConfig(RouterConfig routerConfig) {
