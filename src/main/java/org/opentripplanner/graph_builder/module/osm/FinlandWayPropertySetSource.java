@@ -24,9 +24,65 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
+    props.setProperties(
+      "highway=living_street",
+      StreetTraversalPermission.ALL,
+      0.90,
+      0.90,
+      0.90,
+      0.90
+    );
+    props.setProperties("highway=unclassified", StreetTraversalPermission.ALL, 1, 1);
+    props.setProperties("highway=road", StreetTraversalPermission.ALL, 1, 1);
+    props.setProperties("highway=byway", StreetTraversalPermission.ALL, 1.3, 1.3, 1.3, 1.3);
+    props.setProperties("highway=track", StreetTraversalPermission.ALL, 1.3, 1.3, 1.3, 1.3);
+    props.setProperties("highway=service", StreetTraversalPermission.ALL, 1.1, 1.1, 1.1, 1.1);
+    props.setProperties(
+      "highway=residential",
+      StreetTraversalPermission.ALL,
+      0.98,
+      0.98,
+      0.98,
+      0.98
+    );
+    props.setProperties(
+      "highway=residential_link",
+      StreetTraversalPermission.ALL,
+      0.98,
+      0.98,
+      0.98,
+      0.98
+    );
+    props.setProperties("highway=tertiary", StreetTraversalPermission.ALL, 1, 1);
+    props.setProperties("highway=tertiary_link", StreetTraversalPermission.ALL, 1, 1);
+    props.setProperties("highway=secondary", StreetTraversalPermission.ALL, 1.5, 1.5, 1.5, 1.5);
+    props.setProperties(
+      "highway=secondary_link",
+      StreetTraversalPermission.ALL,
+      1.5,
+      1.5,
+      1.5,
+      1.5
+    );
+    props.setProperties("highway=primary", StreetTraversalPermission.ALL, 2.06, 2.06, 2.06, 2.06);
+    props.setProperties(
+      "highway=primary_link",
+      StreetTraversalPermission.ALL,
+      2.06,
+      2.06,
+      2.06,
+      2.06
+    );
     // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
-    props.setProperties("highway=trunk_link", StreetTraversalPermission.ALL, 2.06, 2.06);
-    props.setProperties("highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47);
+    props.setProperties(
+      "highway=trunk_link",
+      StreetTraversalPermission.ALL,
+      2.06,
+      2.06,
+      2.06,
+      2.06
+    );
+    props.setProperties("highway=trunk", StreetTraversalPermission.ALL, 7.47, 7.47, 7.47, 7.47);
 
     // Don't recommend walking in trunk road tunnels
     props.setProperties("highway=trunk;tunnel=yes", StreetTraversalPermission.CAR, 7.47, 7.47);
@@ -58,6 +114,8 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
     props.setProperties(
       "highway=service;access=destination",
       StreetTraversalPermission.ALL,
+      1.1,
+      1.1,
       1.1,
       1.1
     );
