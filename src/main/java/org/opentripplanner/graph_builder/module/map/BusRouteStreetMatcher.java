@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -31,6 +32,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
   private final Graph graph;
   private final TransitModel transitModel;
 
+  @Inject
   public BusRouteStreetMatcher(Graph graph, TransitModel transitModel) {
     this.graph = graph;
     this.transitModel = transitModel;

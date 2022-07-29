@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import java.util.HashSet;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -21,6 +22,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
   private final Graph graph;
   private final TransitModel transitModel;
 
+  @Inject
   public FlexLocationsToStreetEdgesMapper(Graph graph, TransitModel transitModel) {
     this.graph = graph;
     this.transitModel = transitModel;

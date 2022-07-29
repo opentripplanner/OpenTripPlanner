@@ -8,8 +8,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
+import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -34,6 +35,7 @@ public class GraphBuilder implements Runnable {
 
   private boolean hasTransitData = false;
 
+  @Inject
   public GraphBuilder(
     @Nonnull Graph baseGraph,
     @Nonnull TransitModel transitModel,
@@ -62,85 +64,86 @@ public class GraphBuilder implements Runnable {
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
 
-    var factory = GraphBuilderFactory
-      .of()
-      .withConfig(config)
-      .withGraph(graph)
-      .withTransitModel(transitModel)
-      .withDataSources(dataSources)
-      .withIssueStore()
-      .build();
-
-    var graphBuilder = factory.createGraphBuilder();
-
-    graphBuilder.hasTransitData = hasTransitData;
     transitModel.initTimeZone(config.timeZone);
 
+    var factory = DaggerGraphBuilderFactory
+      .builder()
+      .config(config)
+      .graph(graph)
+      .transitModel(transitModel)
+      .dataSources(dataSources)
+      .timeZoneId(transitModel.getTimeZone())
+      .build();
+
+    var graphBuilder = factory.graphBuilder();
+
+    graphBuilder.hasTransitData = hasTransitData;
+
     if (hasOsm) {
-      graphBuilder.addModule(factory.createOpenStreetMapModule());
+      graphBuilder.addModule(factory.openStreetMapModule());
     }
 
     if (hasGtfs) {
-      graphBuilder.addModule(factory.createGtfsModule());
+      graphBuilder.addModule(factory.gtfsModule());
     }
 
     if (hasNetex) {
-      graphBuilder.addModule(factory.createNetexModule());
+      graphBuilder.addModule(factory.netexModule());
     }
 
     if (hasTransitData && transitModel.getAgencyTimeZones().size() > 1) {
-      graphBuilder.addModule(factory.createTimeZoneAdjusterModule());
+      graphBuilder.addModule(factory.timeZoneAdjusterModule());
     }
 
     if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
       if (config.matchBusRoutesToStreets) {
-        graphBuilder.addModule(factory.createBusRouteStreetMatcher());
+        graphBuilder.addModule(factory.busRouteStreetMatcher());
       }
-      graphBuilder.addModule(factory.createOsmBoardingLocationsModule());
+      graphBuilder.addModule(factory.osmBoardingLocationsModule());
     }
 
     // This module is outside the hasGTFS conditional block because it also links things like bike rental
     // which need to be handled even when there's no transit.
-    graphBuilder.addModule(factory.createStreetLinkerModule());
+    graphBuilder.addModule(factory.streetLinkerModule());
 
     // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should
     // not be removed quite as easily
     if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
-      graphBuilder.addModule(factory.createPruneNoThruIslands());
+      graphBuilder.addModule(factory.pruneNoThruIslands());
     }
 
     // Load elevation data and apply it to the streets.
     // We want to do run this module after loading the OSM street network but before finding transfers.
-    for (GraphBuilderModule it : factory.createElevationModules()) {
+    for (GraphBuilderModule it : factory.elevationModules()) {
       graphBuilder.addModule(it);
     }
 
     if (hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
       if (OTPFeature.FlexRouting.isOn()) {
-        graphBuilder.addModule(factory.createFlexLocationsToStreetEdgesMapper());
+        graphBuilder.addModule(factory.flexLocationsToStreetEdgesMapper());
       }
 
       // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-      graphBuilder.addModule(factory.createDirectTransferGenerator());
+      graphBuilder.addModule(factory.directTransferGenerator());
 
       // Analyze routing between stops to generate report
       if (OTPFeature.TransferAnalyzer.isOn()) {
-        graphBuilder.addModule(factory.createDirectTransferAnalyzer());
+        graphBuilder.addModule(factory.directTransferAnalyzer());
       }
     }
 
     if (loadStreetGraph || hasOsm) {
-      graphBuilder.addModule(factory.createGraphCoherencyCheckerModule());
+      graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
     if (config.dataImportReport) {
-      graphBuilder.addModule(factory.createDataImportIssuesToHTML());
+      graphBuilder.addModule(factory.dataImportIssuesToHTML());
     }
 
     if (OTPFeature.DataOverlay.isOn()) {
-      graphBuilder.addModuleOptional(factory.createDataOverlayFactory());
+      graphBuilder.addModuleOptional(factory.dataOverlayFactory());
     }
 
     return graphBuilder;

@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.service.TransitModel;
@@ -16,6 +17,7 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
   private final TransitModel transitModel;
 
+  @Inject
   public TimeZoneAdjusterModule(TransitModel transitModel) {
     this.transitModel = transitModel;
   }

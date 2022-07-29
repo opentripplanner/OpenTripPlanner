@@ -2,15 +2,20 @@ package org.opentripplanner.transit.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import org.opentripplanner.routing.graph.GraphModel;
+import java.util.concurrent.atomic.AtomicReference;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 @Module
 public abstract class TransitModule {
 
+  /** We wrap the graph to be able to set it after loading the serialized state. */
   @Provides
-  public static TransitModel provideTransitModel(GraphModel graphModel, Deduplicator deduplicator) {
-    return new TransitModel(graphModel.graph().getStopModel(), deduplicator);
+  public static AtomicReference<TransitModel> provideTransitModel(
+    StopModel stopModel,
+    Deduplicator deduplicator
+  ) {
+    return new AtomicReference<>(new TransitModel(stopModel, deduplicator));
   }
 }

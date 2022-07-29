@@ -71,6 +71,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
@@ -89,7 +90,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
 
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
-  private final Map<Vertex, Double> elevationData;
+  private final Map<Vertex, Double> elevationData = new HashMap<>();
 
   // Private members that are only read or written internally.
   /**
@@ -148,10 +149,29 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
-    this.elevationData = new HashMap<>();
     this.graph = graph;
     this.timeZoneId = timeZoneId;
     this.issueStore = issueStore;
+  }
+
+  public OpenStreetMapModule(
+    BuildConfig config,
+    Collection<OpenStreetMapProvider> providers,
+    Set<String> boardingAreaRefTags,
+    Graph graph,
+    ZoneId timeZoneId,
+    DataImportIssueStore issueStore
+  ) {
+    this(List.copyOf(providers), boardingAreaRefTags, graph, timeZoneId, issueStore);
+    this.customNamer = config.customNamer;
+    this.setDefaultWayPropertySetSource(config.osmWayPropertySet);
+    this.skipVisibility = !config.areaVisibility;
+    this.platformEntriesLinking = config.platformEntriesLinking;
+    this.staticBikeParkAndRide = config.staticBikeParkAndRide;
+    this.staticParkAndRide = config.staticParkAndRide;
+    this.banDiscouragedWalking = config.banDiscouragedWalking;
+    this.banDiscouragedBiking = config.banDiscouragedBiking;
+    this.maxAreaNodes = config.maxAreaNodes;
   }
 
   public OpenStreetMapModule(

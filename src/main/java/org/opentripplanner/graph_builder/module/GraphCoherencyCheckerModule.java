@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
+import javax.inject.Inject;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
@@ -19,6 +20,7 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
   private final Graph graph;
   private final DataImportIssueStore issueStore;
 
+  @Inject
   public GraphCoherencyCheckerModule(Graph graph, DataImportIssueStore issueStore) {
     this.graph = graph;
     this.issueStore = issueStore;

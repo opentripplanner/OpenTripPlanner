@@ -51,18 +51,8 @@ public class OTPAppConstruction {
 
   private final CommandLineParameters cli;
   private final OTPApplicationFactory factory;
-
-  private RaptorConfig<TripSchedule> raptorTuningParameters;
   private GraphBuilderDataSources graphBuilderDataSources = null;
-
-  /**
-   * The transit model should be created by the factory not cashed here, this is an intermediate
-   * step.
-   */
-  private TransitModel transitModel;
-
   private DefaultServerContext context;
-
   private GraphVisualizer graphVisualizer;
 
   /**
@@ -71,7 +61,9 @@ public class OTPAppConstruction {
   public OTPAppConstruction(CommandLineParameters commandLineParameters) {
     this.cli = commandLineParameters;
     this.factory =
-      DaggerOTPApplicationFactory.builder().baseDirectory(this.cli.getBaseDirectory()).build();
+      DaggerOTPApplicationFactory.builder()
+        .baseDirectory(this.cli.getBaseDirectory())
+        .build();
   }
 
   public OTPApplicationFactory getFactory() {
@@ -83,17 +75,15 @@ public class OTPAppConstruction {
    * so it can be used during construction of the web server.
    */
   public void updateModel(Graph graph, TransitModel transitModel) {
-    getFactory().graphModel().setGraph(graph);
-    this.transitModel = transitModel;
-    this.raptorTuningParameters =
-      new RaptorConfig<>(factory.configModel().routerConfig().raptorTuningParameters());
+    getFactory().graph().set(graph);
+    getFactory().transitModel().set(transitModel);
 
     this.context =
       DefaultServerContext.create(
         factory.configModel().routerConfig(),
-        raptorTuningParameters,
-        factory.graphModel().graph(),
-        transitModel,
+        factory.raptorConfig(),
+        factory.graph().get(),
+        factory.transitModel().get(),
         Metrics.globalRegistry,
         traverseVisitor()
       );
@@ -160,7 +150,7 @@ public class OTPAppConstruction {
     if (cli.visualize && graphVisualizer == null) {
       graphVisualizer =
         new GraphVisualizer(
-          factory.graphModel().graph(),
+          factory.graph().get(),
           factory.configModel().routerConfig().streetRoutingTimeout()
         );
     }
@@ -173,9 +163,9 @@ public class OTPAppConstruction {
   }
 
   private void setupTransitRoutingServer() {
-    new MetricsLogging(transitModel(), raptorTuningParameters);
+    new MetricsLogging(transitModel(), raptorConfig());
 
-    creatTransitLayerForRaptor(transitModel, routerConfig());
+    creatTransitLayerForRaptor(transitModel(), routerConfig());
 
     /* Create Graph updater modules from JSON config. */
     GraphUpdaterConfigurator.setupGraph(graph(), transitModel(), routerConfig().updaterConfig());
@@ -221,16 +211,16 @@ public class OTPAppConstruction {
     );
   }
 
-  public RaptorConfig<TripSchedule> raptorTuningParameters() {
-    return raptorTuningParameters;
+  public RaptorConfig<TripSchedule> raptorConfig() {
+    return factory.raptorConfig();
   }
 
   public TransitModel transitModel() {
-    return transitModel;
+    return getFactory().transitModel().get();
   }
 
   public Graph graph() {
-    return getFactory().graphModel().graph();
+    return getFactory().graph().get();
   }
 
   public Deduplicator deduplicator() {

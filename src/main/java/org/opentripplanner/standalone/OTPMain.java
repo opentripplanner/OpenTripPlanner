@@ -124,7 +124,6 @@ public class OTPMain {
         : datastore.getStreetGraph();
       SerializedGraphObject obj = SerializedGraphObject.load(graphFile);
       app.updateModel(obj.graph, obj.transitModel);
-
       configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
       graphAvailable = true;
     }
@@ -190,7 +189,7 @@ public class OTPMain {
 
       registerShutdownHookToGracefullyShutDownServer(
         app.transitModel(),
-        app.raptorTuningParameters()
+        app.raptorConfig()
       );
 
       // Loop to restart server on uncaught fatal exceptions.

@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
@@ -46,6 +47,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private final Graph graph;
 
+  @Inject
   public OsmBoardingLocationsModule(Graph graph) {
     this.graph = graph;
   }
