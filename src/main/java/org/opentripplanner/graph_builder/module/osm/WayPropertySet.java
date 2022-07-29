@@ -343,7 +343,7 @@ public class WayPropertySet {
     double safety,
     double safetyBack
   ) {
-    setMixinProperties(spec, permission, safety, safetyBack);
+    setProperties(spec, permission, safety, safetyBack, false);
   }
 
   public void setMixinProperties(
@@ -352,10 +352,7 @@ public class WayPropertySet {
     double safety,
     double safetyBack
   ) {
-    WayProperties properties = new WayProperties();
-    properties.setPermission(permission);
-    properties.setSafetyFeatures(new P2<>(safety, safetyBack));
-    addProperties(new OSMSpecifier(spec), properties, true);
+    setProperties(spec, permission, safety, safetyBack, true);
   }
 
   public void setCarSpeed(String spec, float speed) {
@@ -367,6 +364,19 @@ public class WayPropertySet {
 
   public List<WayPropertyPicker> getWayProperties() {
     return Collections.unmodifiableList(wayProperties);
+  }
+
+  private void setProperties(
+    String spec,
+    StreetTraversalPermission permission,
+    double safety,
+    double safetyBack,
+    boolean mixin
+  ) {
+    WayProperties properties = new WayProperties();
+    properties.setPermission(permission);
+    properties.setSafetyFeatures(new P2<>(safety, safetyBack));
+    addProperties(new OSMSpecifier(spec), properties, mixin);
   }
 
   private String dumpTags(OSMWithTags way) {
