@@ -27,7 +27,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRoute;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -425,15 +424,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
             .filter(transfer -> transfer.to instanceof Stop)
             .map(transfer ->
-              new NearbyStop(
-                transfer.to,
-                transfer.getDistanceMeters(),
-                transfer.getEdges(),
-                GeometryUtils.concatenateLineStrings(
-                  transfer.getEdges().stream().map(Edge::getGeometry).collect(Collectors.toList())
-                ),
-                null
-              )
+              new NearbyStop(transfer.to, transfer.getDistanceMeters(), transfer.getEdges(), null)
             )
             .collect(Collectors.toList());
         },

@@ -94,7 +94,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
   }
 
   @Override
-  @Nullable
+  @Nonnull
   public Geometry getGeometry() {
     return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
   }

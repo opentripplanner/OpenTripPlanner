@@ -82,7 +82,7 @@ public class UnscheduledTripTest extends FlexTest {
   private static NearbyStop getNearbyStop(FlexTrip trip) {
     assertEquals(1, trip.getStops().size());
     var stopLocation = trip.getStops().iterator().next();
-    return new NearbyStop(stopLocation, 0, List.of(), null, null);
+    return new NearbyStop(stopLocation, 0, List.of(), null);
   }
 
   private static FlexTrip getFlexTrip() {
