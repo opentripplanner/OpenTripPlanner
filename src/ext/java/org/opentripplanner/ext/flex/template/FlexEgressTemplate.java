@@ -41,7 +41,7 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   }
 
   protected Collection<PathTransfer> getTransfersFromTransferStop(TransitService transitService) {
-    return transitService.getFlexIndex().transfersToStop.get(transferStop);
+    return transitService.getFlexIndex().getTransfersToStop(transferStop);
   }
 
   protected Vertex getFlexVertex(Edge edge) {

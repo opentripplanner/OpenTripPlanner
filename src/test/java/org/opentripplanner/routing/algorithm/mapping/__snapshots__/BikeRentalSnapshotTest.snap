@@ -44,7 +44,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
-      "generalizedCost": 2087,
+      "generalizedCost": 2209,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -108,7 +108,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -145,7 +145,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 288,
+          "generalizedCost": 409,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 7,
@@ -168,7 +168,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             },
             {
@@ -607,7 +607,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.700835,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 113897002 from 7",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -1275,7 +1275,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
-      "generalizedCost": 2087,
+      "generalizedCost": 2209,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -1339,7 +1339,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -1376,7 +1376,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 288,
+          "generalizedCost": 409,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 7,
@@ -1399,7 +1399,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             },
             {
@@ -1748,7 +1748,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           }
         }
       },
-      "generalizedCost": 2087,
+      "generalizedCost": 2209,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -1812,7 +1812,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -1849,7 +1849,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 288,
+          "generalizedCost": 409,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 7,
@@ -1872,7 +1872,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             },
             {
@@ -2520,7 +2520,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 915,
+      "generalizedCost": 1036,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -2584,7 +2584,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -2621,7 +2621,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 288,
+          "generalizedCost": 409,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 7,
@@ -2644,7 +2644,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             },
             {
@@ -2783,7 +2783,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 652,
+      "generalizedCost": 830,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -2847,7 +2847,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -2884,7 +2884,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 363,
+          "generalizedCost": 541,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 11,
@@ -2907,7 +2907,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             },
             {
@@ -2986,7 +2986,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 652,
+      "generalizedCost": 829,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -3050,7 +3050,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -3087,7 +3087,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 363,
+          "generalizedCost": 540,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 10,
@@ -3110,7 +3110,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             },
             {
@@ -3223,7 +3223,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
-      "generalizedCost": 1998,
+      "generalizedCost": 2119,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -3558,7 +3558,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 277,
+          "generalizedCost": 399,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 7,
@@ -3594,7 +3594,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003923,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             }
           ],
@@ -3654,7 +3654,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             },
             {
@@ -4230,7 +4230,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.6764917,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 156261070 from 2",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -4532,7 +4532,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           }
         }
       },
-      "generalizedCost": 1998,
+      "generalizedCost": 2119,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -4867,7 +4867,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             ],
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 277,
+          "generalizedCost": 399,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
             "length": 7,
@@ -4903,7 +4903,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003923,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": true
             }
           ],
@@ -4963,7 +4963,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003879,
               "relativeDirection": "HARD_RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0",
+              "streetName": "path",
               "walkingBike": false
             },
             {
@@ -5539,7 +5539,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.6764917,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 156261070 from 2",
+              "streetName": "path",
               "walkingBike": false
             }
           ],

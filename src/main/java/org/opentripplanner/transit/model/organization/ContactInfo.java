@@ -16,7 +16,7 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
   private final String bookingUrl;
   private final String additionalDetails;
 
-  public ContactInfo(ContactInfoBuilder builder) {
+  ContactInfo(ContactInfoBuilder builder) {
     // Required fields - none
     // Optional fields
     this.contactPerson = builder.getContactPerson();

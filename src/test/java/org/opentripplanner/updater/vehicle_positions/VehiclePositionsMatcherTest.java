@@ -17,16 +17,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class VehiclePositionsMatcherTest {
 
@@ -57,7 +55,10 @@ public class VehiclePositionsMatcherTest {
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
     var stopPattern = new StopPattern(stopTimes);
 
-    var pattern = new TripPattern(TransitModelForTest.id(tripId), null, stopPattern);
+    var pattern = TripPattern
+      .of(TransitModelForTest.id(tripId))
+      .withStopPattern(stopPattern)
+      .build();
     pattern
       .getScheduledTimetable()
       .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
@@ -114,8 +115,14 @@ public class VehiclePositionsMatcherTest {
       List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2))
     );
 
-    var pattern1 = new TripPattern(TransitModelForTest.id(tripId1), null, stopPattern1);
-    var pattern2 = new TripPattern(TransitModelForTest.id(tripId2), null, stopPattern2);
+    var pattern1 = TripPattern
+      .of(TransitModelForTest.id(tripId1))
+      .withStopPattern(stopPattern1)
+      .build();
+    var pattern2 = TripPattern
+      .of(TransitModelForTest.id(tripId2))
+      .withStopPattern(stopPattern2)
+      .build();
 
     var tripForId = Map.of(scopedTripId1, trip1, scopedTripId2, trip2);
 

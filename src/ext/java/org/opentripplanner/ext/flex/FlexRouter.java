@@ -213,6 +213,7 @@ public class FlexRouter {
       .flatMap(accessEgress ->
         flexIndex
           .getFlexTripsByStop(accessEgress.stop)
+          .stream()
           .filter(flexTrip ->
             pickup
               ? flexTrip.isBoardingPossible(accessEgress)

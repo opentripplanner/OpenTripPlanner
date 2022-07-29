@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.FareService;
@@ -44,12 +45,8 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
    * This step ensures that the fares in the source GTFS data are accounted for correctly.
    */
   @Override
-  public void processGtfs(OtpTransitService transitService) {
-    fillFareRules(
-      transitService.getAllFareAttributes(),
-      transitService.getAllFareRules(),
-      regularFareRules
-    );
+  public void processGtfs(FareRulesData fareRuleService, OtpTransitService transitService) {
+    fillFareRules(fareRuleService.fareAttributes(), fareRuleService.fareRules(), regularFareRules);
   }
 
   @Override

@@ -19,11 +19,11 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -49,7 +49,6 @@ public class TransitModelIndex {
   private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
 
   private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
-  private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
 
@@ -74,7 +73,6 @@ public class TransitModelIndex {
     }
 
     for (TripPattern pattern : transitModel.getAllTripPatterns()) {
-      patternsForFeedId.put(pattern.getFeedId(), pattern);
       patternsForRoute.put(pattern.getRoute(), pattern);
       pattern
         .scheduledTripsAsStream()
@@ -111,10 +109,10 @@ public class TransitModelIndex {
 
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(transitModel);
-      for (Route route : flexIndex.routeById.values()) {
+      for (Route route : flexIndex.getAllFlexRoutes()) {
         routeForId.put(route.getId(), route);
       }
-      for (FlexTrip flexTrip : flexIndex.tripById.values()) {
+      for (FlexTrip flexTrip : flexIndex.getAllFlexTrips()) {
         tripForId.put(flexTrip.getId(), flexTrip.getTrip());
       }
     }
@@ -205,10 +203,6 @@ public class TransitModelIndex {
 
   public Map<Trip, TripPattern> getPatternForTrip() {
     return patternForTrip;
-  }
-
-  public Multimap<String, TripPattern> getPatternsForFeedId() {
-    return patternsForFeedId;
   }
 
   public Multimap<Route, TripPattern> getPatternsForRoute() {

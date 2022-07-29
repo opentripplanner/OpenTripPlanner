@@ -61,7 +61,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6594795,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 261187797 from 2",
+              "streetName": "parking aisle",
               "walkingBike": false
             },
             {
@@ -113,7 +113,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6658345,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "way 131623794 from 0",
+              "streetName": "path",
               "walkingBike": false
             },
             {
@@ -152,7 +152,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6738909,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 144373674 from 1",
+              "streetName": "path",
               "walkingBike": false
             },
             {
@@ -3054,7 +3054,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536338,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 162042138 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -3527,7 +3527,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536338,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 162042138 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -4000,7 +4000,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536338,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 162042138 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -4974,7 +4974,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536338,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 162042138 from 0",
+              "streetName": "path",
               "walkingBike": false
             }
           ],
@@ -5469,39 +5469,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": true,
-              "distance": 7.08,
+              "distance": 131.76,
               "elevation": "",
               "lat": 45.5193421,
               "lon": -122.6537305,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 226431264 from 0",
-              "walkingBike": false
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "area": false,
-              "bogusName": true,
-              "distance": 55.96,
-              "elevation": "",
-              "lat": 45.5194058,
-              "lon": -122.6537325,
-              "relativeDirection": "LEFT",
-              "stayOn": true,
-              "streetName": "way 226431263 from 21",
-              "walkingBike": false
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "area": false,
-              "bogusName": true,
-              "distance": 68.72,
-              "elevation": "",
-              "lat": 45.5196271,
-              "lon": -122.6543172,
-              "relativeDirection": "RIGHT",
-              "stayOn": true,
-              "streetName": "way 226431263 from 23",
+              "streetName": "path",
               "walkingBike": false
             },
             {
@@ -5527,7 +5501,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6612814,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 257064467 from 1",
+              "streetName": "parking aisle",
               "walkingBike": false
             },
             {
@@ -5949,7 +5923,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6682216,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 125785939 from 4",
+              "streetName": "path",
               "walkingBike": false
             },
             {
@@ -5975,7 +5949,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6719792,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 117315127 from 2",
+              "streetName": "steps",
               "walkingBike": false
             },
             {
@@ -5988,7 +5962,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.672028,
               "relativeDirection": "RIGHT",
               "stayOn": true,
-              "streetName": "way 117315115 from 0",
+              "streetName": "footbridge",
               "walkingBike": false
             },
             {

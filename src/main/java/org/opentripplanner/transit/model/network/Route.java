@@ -40,7 +40,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   // the GTFS Fares V2 network property
   private final String networkId;
 
-  public Route(RouteBuilder builder) {
+  Route(RouteBuilder builder) {
     super(builder.getId());
     // Required fields
     this.agency = requireNonNull(builder.getAgency());

@@ -7,11 +7,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public final class EntranceBuilder extends StationElementBuilder<Entrance, EntranceBuilder> {
 
-  public EntranceBuilder(FeedScopedId id) {
+  EntranceBuilder(FeedScopedId id) {
     super(id);
   }
 
-  public EntranceBuilder(Entrance original) {
+  EntranceBuilder(Entrance original) {
     super(original);
   }
 

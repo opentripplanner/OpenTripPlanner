@@ -1,15 +1,12 @@
 package org.opentripplanner.transit.service;
 
-import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
@@ -17,14 +14,12 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
@@ -32,11 +27,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
@@ -59,8 +56,6 @@ public interface TransitService {
 
   Collection<Operator> getOperators();
 
-  Multimap<TransitEntity, Notice> getNoticesByElement();
-
   Collection<Notice> getNoticesByEntity(TransitEntity entity);
 
   TripPattern getTripPatternForId(FeedScopedId id);
@@ -75,7 +70,7 @@ public interface TransitService {
 
   Collection<Station> getStations();
 
-  Map<FeedScopedId, Integer> getServiceCodes();
+  Integer getServiceCodeForId(FeedScopedId id);
 
   TIntSet getServiceCodesRunningForDate(LocalDate date);
 
@@ -96,11 +91,13 @@ public interface TransitService {
     TimetableSnapshot timetableSnapshot
   );
 
+  Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates);
+
   Collection<Trip> getTripsForStop(StopLocation stop);
 
   Collection<Operator> getAllOperators();
 
-  Map<FeedScopedId, Operator> getOperatorForId();
+  Operator getOperatorForId(FeedScopedId id);
 
   Collection<StopLocation> getAllStops();
 
@@ -110,15 +107,15 @@ public interface TransitService {
 
   StopCollection getStopCollectionById(FeedScopedId id);
 
-  Map<FeedScopedId, Trip> getTripForId();
+  Trip getTripForId(FeedScopedId id);
+
+  Collection<Trip> getAllTrips();
 
   Collection<Route> getAllRoutes();
 
-  Map<Trip, TripPattern> getPatternForTrip();
+  TripPattern getPatternForTrip(Trip trip);
 
-  Multimap<String, TripPattern> getPatternsForFeedId();
-
-  Multimap<Route, TripPattern> getPatternsForRoute();
+  Collection<TripPattern> getPatternsForRoute(Route route);
 
   MultiModalStation getMultiModalStationForStation(Station station);
 
@@ -146,8 +143,6 @@ public interface TransitService {
     ArrivalDeparture arrivalDeparture
   );
 
-  Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates);
-
   Collection<GroupOfRoutes> getGroupsOfRoutes();
 
   Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes);
@@ -156,15 +151,13 @@ public interface TransitService {
 
   Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 
-  TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, LocalDate serviceDate);
+  TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
 
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);
 
-  Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay();
+  Collection<TripOnServiceDate> getAllTripOnServiceDates();
 
-  Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById();
-
-  HashSet<TransitMode> getTransitModes();
+  Set<TransitMode> getTransitModes();
 
   Collection<PathTransfer> getTransfersByStop(StopLocation stop);
 

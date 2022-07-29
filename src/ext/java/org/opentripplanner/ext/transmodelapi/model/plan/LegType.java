@@ -21,6 +21,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
@@ -307,12 +308,11 @@ public class LegType {
             if (trip == null) {
               return null;
             }
-            var tripId = leg(env).getTrip().getId();
-            var serviceDate = leg(env).getServiceDate();
-
             return GqlUtil
               .getTransitService(env)
-              .getTripOnServiceDateForTripAndDay(tripId, serviceDate);
+              .getTripOnServiceDateForTripAndDay(
+                new TripIdAndServiceDate(leg(env).getTrip().getId(), leg(env).getServiceDate())
+              );
           })
           .build()
       )

@@ -7,10 +7,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TripPatternTest {
 
@@ -87,7 +89,11 @@ public class TripPatternTest {
     var stopPattern = builder.build();
     var route = TransitModelForTest.route("R1").build();
 
-    return new TripPattern(new FeedScopedId("Test", "T1"), route, stopPattern);
+    return TripPattern
+      .of(new FeedScopedId("Test", "T1"))
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
   }
 
   /**

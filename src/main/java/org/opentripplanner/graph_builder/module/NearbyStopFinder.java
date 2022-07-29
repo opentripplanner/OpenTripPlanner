@@ -15,7 +15,6 @@ import org.opentripplanner.common.MinMap;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
@@ -36,6 +35,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -130,7 +130,7 @@ public class NearbyStopFinder {
         }
       }
       if (OTPFeature.FlexRouting.isOn()) {
-        for (FlexTrip trip : transitService.getFlexIndex().flexTripsByStop.get(ts1)) {
+        for (FlexTrip trip : transitService.getFlexIndex().getFlexTripsByStop(ts1)) {
           closestStopForFlexTrip.putMin(trip, nearbyStop);
         }
       }

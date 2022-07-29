@@ -22,9 +22,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.TripTimesShortHelper;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.PolylineEncoder;
@@ -173,7 +173,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("journeyPattern")
           .type(journeyPatternType)
-          .dataFetcher(env -> GqlUtil.getTransitService(env).getPatternForTrip().get(trip(env)))
+          .dataFetcher(env -> GqlUtil.getTransitService(env).getPatternForTrip(trip(env)))
           .build()
       )
       .field(
@@ -204,8 +204,7 @@ public class ServiceJourneyType {
 
             List<StopLocation> stops = GqlUtil
               .getTransitService(environment)
-              .getPatternForTrip()
-              .get(trip(environment))
+              .getPatternForTrip(trip(environment))
               .getStops();
 
             if (first != null && last != null) {
@@ -237,7 +236,7 @@ public class ServiceJourneyType {
           .dataFetcher(env -> {
             Trip trip = trip(env);
             return TripTimeOnDate.fromTripTimes(
-              GqlUtil.getTransitService(env).getPatternForTrip().get(trip).getScheduledTimetable(),
+              GqlUtil.getTransitService(env).getPatternForTrip(trip).getScheduledTimetable(),
               trip
             );
           })
@@ -286,8 +285,7 @@ public class ServiceJourneyType {
           .dataFetcher(environment -> {
             TripPattern tripPattern = GqlUtil
               .getTransitService(environment)
-              .getPatternForTrip()
-              .get(trip(environment));
+              .getPatternForTrip(trip(environment));
             if (tripPattern == null) {
               return null;
             }

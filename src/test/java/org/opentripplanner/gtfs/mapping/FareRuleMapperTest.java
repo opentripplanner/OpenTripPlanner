@@ -59,7 +59,7 @@ public class FareRuleMapperTest {
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.FareRule result = subject.map(FARE_RULE);
+    org.opentripplanner.ext.fares.model.FareRule result = subject.map(FARE_RULE);
 
     assertEquals(CONTAINS_ID, result.getContainsId());
     assertEquals(DESTINATION_ID, result.getDestinationId());
@@ -70,7 +70,7 @@ public class FareRuleMapperTest {
 
   @Test
   public void testMapWithNulls() throws Exception {
-    org.opentripplanner.model.FareRule result = subject.map(new FareRule());
+    org.opentripplanner.ext.fares.model.FareRule result = subject.map(new FareRule());
 
     assertNull(result.getContainsId());
     assertNull(result.getDestinationId());
@@ -82,8 +82,8 @@ public class FareRuleMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() throws Exception {
-    org.opentripplanner.model.FareRule result1 = subject.map(FARE_RULE);
-    org.opentripplanner.model.FareRule result2 = subject.map(FARE_RULE);
+    org.opentripplanner.ext.fares.model.FareRule result1 = subject.map(FARE_RULE);
+    org.opentripplanner.ext.fares.model.FareRule result2 = subject.map(FARE_RULE);
 
     assertSame(result1, result2);
   }
