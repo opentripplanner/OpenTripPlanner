@@ -18,8 +18,8 @@ import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
 
@@ -148,12 +148,9 @@ public class LineType {
           .newFieldDefinition()
           .name("journeyPatterns")
           .type(new GraphQLList(journeyPatternType))
-          .dataFetcher(environment -> {
-            return GqlUtil
-              .getTransitService(environment)
-              .getPatternsForRoute()
-              .get(environment.getSource());
-          })
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment).getPatternsForRoute(environment.getSource())
+          )
           .build()
       )
       .field(
@@ -161,17 +158,16 @@ public class LineType {
           .newFieldDefinition()
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
-          .dataFetcher(environment -> {
-            return GqlUtil
+          .dataFetcher(environment ->
+            GqlUtil
               .getTransitService(environment)
-              .getPatternsForRoute()
-              .get(environment.getSource())
+              .getPatternsForRoute(environment.getSource())
               .stream()
               .map(TripPattern::getStops)
               .flatMap(Collection::stream)
               .distinct()
-              .collect(Collectors.toList());
-          })
+              .collect(Collectors.toList())
+          )
           .build()
       )
       .field(
@@ -182,8 +178,7 @@ public class LineType {
           .dataFetcher(environment -> {
             List<Trip> result = GqlUtil
               .getTransitService(environment)
-              .getPatternsForRoute()
-              .get(environment.getSource())
+              .getPatternsForRoute(environment.getSource())
               .stream()
               .flatMap(TripPattern::scheduledTripsAsStream)
               .distinct()
@@ -195,7 +190,7 @@ public class LineType {
                 GqlUtil
                   .getTransitService(environment)
                   .getFlexIndex()
-                  .tripById.values()
+                  .getAllFlexTrips()
                   .stream()
                   .map(FlexTrip::getTrip)
                   .filter(t -> t.getRoute().equals((Route) environment.getSource()))

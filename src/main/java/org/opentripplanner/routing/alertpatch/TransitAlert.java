@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 public class TransitAlert implements Serializable {
@@ -99,6 +100,7 @@ public class TransitAlert implements Serializable {
    *
    * @return First startDate for this Alert, <code>null</code> if 0 (not set)
    */
+  @Nullable
   public Instant getEffectiveStartDate() {
     return timePeriods
       .stream()
@@ -115,6 +117,7 @@ public class TransitAlert implements Serializable {
    *
    * @return Last endDate for this Alert, <code>null</code> if open-ended
    */
+  @Nullable
   public Instant getEffectiveEndDate() {
     return timePeriods
       .stream()

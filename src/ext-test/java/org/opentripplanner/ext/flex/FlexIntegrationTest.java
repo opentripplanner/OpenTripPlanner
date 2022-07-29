@@ -51,7 +51,6 @@ public class FlexIntegrationTest {
   static TransitModel transitModel;
 
   static RoutingService service;
-  static OtpServerContext serverContext;
 
   @BeforeAll
   static void setup() {
@@ -66,8 +65,7 @@ public class FlexIntegrationTest {
     transitModel = model.transitModel();
 
     addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
-    serverContext = TestServerContext.createServerContext(graph, transitModel);
-    service = new RoutingService(graph, transitModel);
+    service = TestServerContext.createServerContext(graph, transitModel).routingService();
   }
 
   @Test
@@ -227,7 +225,7 @@ public class FlexIntegrationTest {
     }
     request.modes = modes.build();
 
-    var result = service.route(request, serverContext);
+    var result = service.route(request);
     var itineraries = result.getTripPlan().itineraries;
 
     assertFalse(itineraries.isEmpty());

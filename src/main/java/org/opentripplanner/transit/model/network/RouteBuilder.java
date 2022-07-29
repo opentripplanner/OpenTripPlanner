@@ -30,11 +30,11 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   private String textColor;
   private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
 
-  public RouteBuilder(FeedScopedId id) {
+  RouteBuilder(FeedScopedId id) {
     super(id);
   }
 
-  public RouteBuilder(Route original) {
+  RouteBuilder(Route original) {
     super(original);
     this.agency = original.getAgency();
     this.operator = original.getOperator();

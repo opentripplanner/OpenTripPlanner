@@ -8,8 +8,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
  * Report the status of the graph updaters via a web service.
@@ -35,13 +34,13 @@ public class UpdaterStatusResource {
   /** Return a list of all agencies in the graph. */
   @GET
   public Response getUpdaters() {
-    GraphUpdaterManager updaterManager = serverContext.transitModel().getUpdaterManager();
-    if (updaterManager == null) {
+    GraphUpdaterStatus updaterStatus = serverContext.transitService().getUpdaterStatus();
+    if (updaterStatus == null) {
       return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
     }
     return Response
       .status(Response.Status.OK)
-      .entity(updaterManager.getUpdaterDescriptions())
+      .entity(updaterStatus.getUpdaterDescriptions())
       .build();
   }
 
@@ -49,14 +48,14 @@ public class UpdaterStatusResource {
   @GET
   @Path("/{updaterId}")
   public Response getUpdaters(@PathParam("updaterId") int updaterId) {
-    GraphUpdaterManager updaterManager = serverContext.transitModel().getUpdaterManager();
-    if (updaterManager == null) {
+    GraphUpdaterStatus updaterStatus = serverContext.transitService().getUpdaterStatus();
+    if (updaterStatus == null) {
       return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
     }
-    GraphUpdater updater = updaterManager.getUpdater(updaterId);
+    Class<?> updater = updaterStatus.getUpdaterClass(updaterId);
     if (updater == null) {
       return Response.status(Response.Status.NOT_FOUND).entity("No updater with that ID.").build();
     }
-    return Response.status(Response.Status.OK).entity(updater.getClass()).build();
+    return Response.status(Response.Status.OK).entity(updater).build();
   }
 }

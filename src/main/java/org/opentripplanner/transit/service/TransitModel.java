@@ -21,35 +21,32 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -69,33 +66,19 @@ public class TransitModel implements Serializable {
   private final Collection<String> feedIds = new HashSet<>();
   private final Map<String, FeedInfo> feedInfoForId = new HashMap<>();
 
-  /**
-   * Allows a notice element to be attached to an object in the OTP model by its id and then
-   * retrieved by the API when navigating from that object. The map key is entity id:
-   * {@link TransitEntity#getId()}. The notice is part of the static transit data.
-   */
   private final Multimap<TransitEntity, Notice> noticesByElement = HashMultimap.create();
-  private final TransferService transferService = new TransferService();
+  private final DefaultTransferService transferService = new DefaultTransferService();
 
-  /** List of transit modes that are availible in GTFS data used in this graph **/
   private final HashSet<TransitMode> transitModes = new HashSet<>();
 
-  /**
-   * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of
-   * {@code Set<Object>}. An empty Map is created before the Graph is built to allow registering IDs
-   * from multiple feeds.
-   */
   private final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
-  /** Pre-generated transfers between all stops. */
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
   private StopModel stopModel;
-  // transit feed validity information in seconds since epoch
   private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
-  /** Data model for Raptor routing, with realtime updates applied (if any). */
   private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
 
   private final transient Deduplicator deduplicator;
@@ -107,39 +90,18 @@ public class TransitModel implements Serializable {
   private ZoneId timeZone = null;
   private boolean timeZoneExplicitlySet = false;
 
-  /**
-   * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
-   * graph updaters defined in the configuration.
-   *
-   * @see GraphUpdaterConfigurator
-   */
   private transient GraphUpdaterManager updaterManager = null;
 
-  /** True if there are active transit services loaded into this Graph. */
   private boolean hasTransit = false;
 
-  /** True if direct single-edge transfers were generated between transit stops in this Graph. */
-  private boolean hasDirectTransfers = false;
-  /**
-   * True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0).
-   */
   private boolean hasFrequencyService = false;
-  /**
-   * True if schedule-based services exist in this Graph (including GTFS frequencies with
-   * exact_times = 1).
-   */
   private boolean hasScheduledService = false;
 
-  /**
-   * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
-   * vertices/edges anymore.
-   */
   private final Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
 
   private final Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
 
-  /** Data model for Raptor routing, with realtime updates applied (if any). */
   private transient TransitLayer transitLayer;
   private transient TransitLayerUpdater transitLayerUpdater;
 
@@ -196,6 +158,7 @@ public class TransitModel implements Serializable {
     }
   }
 
+  /** Data model for Raptor routing, with realtime updates applied (if any). */
   public TransitLayer getTransitLayer() {
     return transitLayer;
   }
@@ -204,6 +167,7 @@ public class TransitModel implements Serializable {
     this.transitLayer = transitLayer;
   }
 
+  /** Data model for Raptor routing, with realtime updates applied (if any). */
   public TransitLayer getRealtimeTransitLayer() {
     return realtimeTransitLayer.get();
   }
@@ -216,7 +180,7 @@ public class TransitModel implements Serializable {
     return realtimeTransitLayer != null;
   }
 
-  public TransferService getTransferService() {
+  public DefaultTransferService getTransferService() {
     return transferService;
   }
 
@@ -235,6 +199,7 @@ public class TransitModel implements Serializable {
     transitModes.add(mode);
   }
 
+  /** List of transit modes that are availible in GTFS data used in this graph **/
   public HashSet<TransitMode> getTransitModes() {
     return transitModes;
   }
@@ -376,6 +341,7 @@ public class TransitModel implements Serializable {
     }
   }
 
+  /** transit feed validity information in seconds since epoch */
   public ZonedDateTime getTransitServiceStarts() {
     return transitServiceStarts;
   }
@@ -384,6 +350,11 @@ public class TransitModel implements Serializable {
     return transitServiceEnds;
   }
 
+  /**
+   * Allows a notice element to be attached to an object in the OTP model by its id and then
+   * retrieved by the API when navigating from that object. The map key is entity id:
+   * {@link TransitEntity#getId()}. The notice is part of the static transit data.
+   */
   public Multimap<TransitEntity, Notice> getNoticesByElement() {
     return noticesByElement;
   }
@@ -399,20 +370,12 @@ public class TransitModel implements Serializable {
     return transitAlertService;
   }
 
-  public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
-    return getNoticesByElement().get(entity);
-  }
-
   public TripPattern getTripPatternForId(FeedScopedId id) {
     return tripPatternForId.get(id);
   }
 
   public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDates() {
     return tripOnServiceDates;
-  }
-
-  public Collection<Notice> getNotices() {
-    return getNoticesByElement().values();
   }
 
   /**
@@ -422,10 +385,16 @@ public class TransitModel implements Serializable {
     return stopModel.getStopModelIndex().getStopForId(id);
   }
 
+  /**
+   * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of
+   * {@code Set<Object>}. An empty Map is created before the Graph is built to allow registering IDs
+   * from multiple feeds.
+   */
   public Map<FeedScopedId, Integer> getServiceCodes() {
     return serviceCodes;
   }
 
+  /** Pre-generated transfers between all stops. */
   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
     return transfersByStop.get(stop);
   }
@@ -446,6 +415,10 @@ public class TransitModel implements Serializable {
     tripPatternForId.put(id, tripPattern);
   }
 
+  /**
+   * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
+   * vertices/edges anymore.
+   */
   public Collection<TripPattern> getAllTripPatterns() {
     return tripPatternForId.values();
   }
@@ -454,6 +427,12 @@ public class TransitModel implements Serializable {
     return tripOnServiceDates.values();
   }
 
+  /**
+   * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
+   * graph updaters defined in the configuration.
+   *
+   * @see GraphUpdaterConfigurator
+   */
   public GraphUpdaterManager getUpdaterManager() {
     return updaterManager;
   }
@@ -474,6 +453,7 @@ public class TransitModel implements Serializable {
     return flexTripsById.values();
   }
 
+  /** True if there are active transit services loaded into this Graph. */
   public boolean hasTransit() {
     return hasTransit;
   }
@@ -497,28 +477,31 @@ public class TransitModel implements Serializable {
     this.updaterManager = updaterManager;
   }
 
-  public void setHasFrequencyService(boolean hasFrequencyService) {
-    this.hasFrequencyService = hasFrequencyService;
-  }
-
-  public void setHasDirectTransfers(boolean hasDirectTransfers) {
-    this.hasDirectTransfers = hasDirectTransfers;
-  }
-
-  public void setHasScheduledService(boolean hasScheduledService) {
-    this.hasScheduledService = hasScheduledService;
-  }
-
   public void addAllTransfersByStops(Multimap<StopLocation, PathTransfer> transfersByStop) {
     this.transfersByStop.putAll(transfersByStop);
   }
 
+  /**
+   * True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0).
+   */
   public boolean hasFrequencyService() {
     return hasFrequencyService;
   }
 
+  public void setHasFrequencyService(boolean hasFrequencyService) {
+    this.hasFrequencyService = hasFrequencyService;
+  }
+
+  /**
+   * True if schedule-based services exist in this Graph (including GTFS frequencies with
+   * exact_times = 1).
+   */
   public boolean hasScheduledService() {
     return hasScheduledService;
+  }
+
+  public void setHasScheduledService(boolean hasScheduledService) {
+    this.hasScheduledService = hasScheduledService;
   }
 
   public TransitModelIndex getTransitModelIndex() {

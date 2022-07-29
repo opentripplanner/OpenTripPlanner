@@ -29,7 +29,7 @@ import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLay
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.VectorTileConfig;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
@@ -78,7 +78,6 @@ public class VectorTilesResource {
 
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    OtpServerContext serverContext = this.serverContext;
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
     for (LayerParameters layerParameters : serverContext
@@ -94,7 +93,7 @@ public class VectorTilesResource {
         mvtBuilder.addLayers(
           VectorTilesResource.layers
             .get(LayerType.valueOf(layerParameters.type()))
-            .create(serverContext.graph(), serverContext.transitModel(), layerParameters)
+            .create(serverContext.graph(), serverContext.transitService(), layerParameters)
             .build(envelope, layerParameters)
         );
       }
@@ -117,8 +116,8 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     return new TileJson(
-      ((OtpServerContext) serverContext).graph(),
-      ((OtpServerContext) serverContext).transitModel(),
+      serverContext.graph(),
+      serverContext.transitService(),
       uri,
       headers,
       requestedLayers
@@ -197,16 +196,16 @@ public class VectorTilesResource {
 
     private TileJson(
       Graph graph,
-      TransitModel transitModel,
+      TransitService transitService,
       UriInfo uri,
       HttpHeaders headers,
       String layers
     ) {
       attribution =
-        transitModel
+        transitService
           .getFeedIds()
           .stream()
-          .map(transitModel::getFeedInfo)
+          .map(transitService::getFeedInfo)
           .filter(Predicate.not(Objects::isNull))
           .map(feedInfo ->
             "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
@@ -234,8 +233,7 @@ public class VectorTilesResource {
         };
 
       center =
-        transitModel
-          .getStopModel()
+        transitService
           .getCenter()
           .map(coordinate -> new double[] { coordinate.x, coordinate.y, 9 })
           .orElse(null);

@@ -50,14 +50,14 @@ public class OperatorType {
           .name("lines")
           .withDirective(gqlUtil.timingData)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
-          .dataFetcher(environment -> {
-            return GqlUtil
+          .dataFetcher(environment ->
+            GqlUtil
               .getTransitService(environment)
               .getAllRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getOperator(), environment.getSource()))
-              .collect(Collectors.toList());
-          })
+              .collect(Collectors.toList())
+          )
           .build()
       )
       .field(
@@ -66,15 +66,14 @@ public class OperatorType {
           .name("serviceJourney")
           .withDirective(gqlUtil.timingData)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
-          .dataFetcher(environment -> {
-            return GqlUtil
+          .dataFetcher(environment ->
+            GqlUtil
               .getTransitService(environment)
-              .getTripForId()
-              .values()
+              .getAllTrips()
               .stream()
               .filter(trip -> Objects.equals(trip.getOperator(), environment.getSource()))
-              .collect(Collectors.toList());
-          })
+              .collect(Collectors.toList())
+          )
           .build()
       )
       .build();

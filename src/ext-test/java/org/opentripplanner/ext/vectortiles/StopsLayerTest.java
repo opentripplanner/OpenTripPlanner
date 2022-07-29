@@ -8,10 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -31,8 +32,9 @@ public class StopsLayerTest {
     var graph = new Graph(stopModel, deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     transitModel.index();
+    var transitService = new DefaultTransitService(transitModel);
 
-    DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(transitModel);
+    DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(transitService);
 
     Map<String, Object> map = new HashMap<>();
     mapper

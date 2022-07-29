@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -175,7 +175,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
     return environment ->
-      getTransitService(environment).getPatternsForRoute().get(getSource(environment));
+      getTransitService(environment).getPatternsForRoute(getSource(environment));
   }
 
   @Override
@@ -210,8 +210,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   private Iterable<Object> getStops(DataFetchingEnvironment environment) {
     return getTransitService(environment)
-      .getPatternsForRoute()
-      .get(getSource(environment))
+      .getPatternsForRoute(getSource(environment))
       .stream()
       .map(TripPattern::getStops)
       .flatMap(Collection::stream)
@@ -220,8 +219,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   private Iterable<Trip> getTrips(DataFetchingEnvironment environment) {
     return getTransitService(environment)
-      .getPatternsForRoute()
-      .get(getSource(environment))
+      .getPatternsForRoute(getSource(environment))
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
       .collect(Collectors.toSet());

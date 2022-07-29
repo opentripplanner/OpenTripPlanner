@@ -46,7 +46,6 @@ import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.model.StopTimesInPattern;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -54,6 +53,7 @@ import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -354,7 +354,7 @@ public class IndexAPI {
   @GET
   @Path("/routes/{routeId}/patterns")
   public List<ApiPatternShort> getPatternsForRoute(@PathParam("routeId") String routeId) {
-    Collection<TripPattern> patterns = transitService().getPatternsForRoute().get(route(routeId));
+    Collection<TripPattern> patterns = transitService().getPatternsForRoute(route(routeId));
     return TripPatternMapper.mapToApiShort(patterns);
   }
 
@@ -365,7 +365,7 @@ public class IndexAPI {
     var route = route(routeId);
 
     Set<StopLocation> stops = new HashSet<>();
-    Collection<TripPattern> patterns = transitService().getPatternsForRoute().get(route);
+    Collection<TripPattern> patterns = transitService().getPatternsForRoute(route);
     for (TripPattern pattern : patterns) {
       stops.addAll(pattern.getStops());
     }
@@ -378,7 +378,7 @@ public class IndexAPI {
   public List<ApiTripShort> getTripsForRoute(@PathParam("routeId") String routeId) {
     var route = route(routeId);
 
-    var patterns = transitService().getPatternsForRoute().get(route);
+    var patterns = transitService().getPatternsForRoute(route);
     return patterns
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
@@ -589,7 +589,7 @@ public class IndexAPI {
   }
 
   private Trip trip(String tripId) {
-    var trip = transitService().getTripForId().get(createId("tripId", tripId));
+    var trip = transitService().getTripForId(createId("tripId", tripId));
     return validateExist("Trip", trip, "tripId", tripId);
   }
 
@@ -604,7 +604,7 @@ public class IndexAPI {
   }
 
   private TripPattern tripPattern(Trip trip) {
-    var pattern = transitService().getPatternForTrip().get(trip);
+    var pattern = transitService().getPatternForTrip(trip);
     return validateExist("TripPattern", pattern, "trip", trip.getId());
   }
 

@@ -103,6 +103,10 @@ public class NodeAdapter {
     return json.isArray() && json.size() > 0;
   }
 
+  public boolean isObject() {
+    return json.isObject() && json.size() > 0;
+  }
+
   public String getSource() {
     return source;
   }

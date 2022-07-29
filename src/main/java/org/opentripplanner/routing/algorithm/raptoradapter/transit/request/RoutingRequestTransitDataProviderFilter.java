@@ -9,13 +9,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.service.TransitService;
 
 public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
 
@@ -49,14 +49,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
     RoutingRequest request,
-    TransitModelIndex transitModelIndex
+    TransitService transitService
   ) {
     this(
       request.modes.transferMode == StreetMode.BIKE,
       request.wheelchairAccessibility,
       request.includePlannedCancellations,
       request.modes.transitModes,
-      request.getBannedRoutes(transitModelIndex.getAllRoutes()),
+      request.getBannedRoutes(transitService.getAllRoutes()),
       request.bannedTrips
     );
   }

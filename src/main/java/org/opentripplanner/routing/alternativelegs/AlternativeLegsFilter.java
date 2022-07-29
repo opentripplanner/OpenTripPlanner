@@ -2,8 +2,8 @@ package org.opentripplanner.routing.alternativelegs;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 public enum AlternativeLegsFilter {
   NO_FILTER((Leg leg) -> (TripPattern tripPattern) -> true),

@@ -61,11 +61,14 @@ public class NoticeAssignmentMapperTest {
       new HashMap<>()
     );
 
-    Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement = noticeAssignmentMapper.map(
+    Multimap<TransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
       noticeAssignment
     );
 
-    org.opentripplanner.model.Notice notice2 = noticesByElement.get(route).iterator().next();
+    org.opentripplanner.transit.model.basic.Notice notice2 = noticesByElement
+      .get(route)
+      .iterator()
+      .next();
 
     assertEquals(NOTICE_ID, notice2.getId().getId());
   }
@@ -109,17 +112,17 @@ public class NoticeAssignmentMapperTest {
       stopTimesById
     );
 
-    Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement = noticeAssignmentMapper.map(
+    Multimap<TransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
       noticeAssignment
     );
 
-    org.opentripplanner.model.Notice notice2a = noticesByElement
+    org.opentripplanner.transit.model.basic.Notice notice2a = noticesByElement
       .get(stopTime1.getId())
       .stream()
       .findFirst()
       .orElseThrow(IllegalStateException::new);
 
-    org.opentripplanner.model.Notice notice2b = noticesByElement
+    org.opentripplanner.transit.model.basic.Notice notice2b = noticesByElement
       .get(stopTime2.getId())
       .stream()
       .findFirst()

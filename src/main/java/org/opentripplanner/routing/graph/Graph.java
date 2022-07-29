@@ -27,7 +27,6 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
@@ -36,11 +35,11 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
@@ -77,8 +76,6 @@ public class Graph implements Serializable {
 
   public final Instant buildTime = Instant.now();
   private StopModel stopModel;
-
-  private GraphBundle bundle;
 
   private OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
@@ -315,14 +312,6 @@ public class Graph implements Serializable {
       env.expandToInclude(v.getCoordinate());
     }
     return env;
-  }
-
-  public GraphBundle getBundle() {
-    return bundle;
-  }
-
-  public void setBundle(GraphBundle bundle) {
-    this.bundle = bundle;
   }
 
   public int countVertices() {
