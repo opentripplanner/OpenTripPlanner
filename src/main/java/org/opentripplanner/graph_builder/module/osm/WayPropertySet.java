@@ -338,8 +338,16 @@ public class WayPropertySet {
     addNote(new OSMSpecifier(spec), properties);
   }
 
+  public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
+    setMixinProperties(spec, properties.build());
+  }
+
   public void setMixinProperties(String spec, WayProperties properties) {
     addProperties(new OSMSpecifier(spec), properties, true);
+  }
+
+  public void setProperties(String spec, WayPropertiesBuilder properties) {
+    setProperties(spec, properties.build());
   }
 
   public void setProperties(String spec, WayProperties properties) {

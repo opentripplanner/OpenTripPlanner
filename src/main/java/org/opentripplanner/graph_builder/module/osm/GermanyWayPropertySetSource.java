@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.of;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE_AND_CAR;
@@ -42,85 +43,49 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
     // Many agricultural ways are tagged as 'track' but have no access tags. We assume this to mean that cars
     // are prohibited.
     // https://www.openstreetmap.org/way/124263424
-    props.setProperties("highway=track", new WayPropertiesBuilder(PEDESTRIAN_AND_BICYCLE).build());
-    props.setProperties(
-      "highway=track;surface=*",
-      new WayPropertiesBuilder(PEDESTRIAN_AND_BICYCLE).build()
-    );
+    props.setProperties("highway=track", of(PEDESTRIAN_AND_BICYCLE));
+    props.setProperties("highway=track;surface=*", of(PEDESTRIAN_AND_BICYCLE));
 
-    props.setProperties(
-      "highway=residential;junction=roundabout",
-      new WayPropertiesBuilder(ALL).bicycleSafety(0.98).build()
-    );
-    props.setProperties(
-      "highway=*;junction=roundabout",
-      new WayPropertiesBuilder(BICYCLE_AND_CAR).build()
-    );
+    props.setProperties("highway=residential;junction=roundabout", of(ALL).bicycleSafety(0.98));
+    props.setProperties("highway=*;junction=roundabout", of(BICYCLE_AND_CAR));
 
     // Pedestrian zones in Germany are forbidden for bicycles by default
-    props.setProperties("highway=pedestrian", new WayPropertiesBuilder(PEDESTRIAN).build());
-    props.setProperties(
-      "highway=residential;maxspeed=30",
-      new WayPropertiesBuilder(ALL).bicycleSafety(0.9).build()
-    );
+    props.setProperties("highway=pedestrian", of(PEDESTRIAN));
+    props.setProperties("highway=residential;maxspeed=30", of(ALL).bicycleSafety(0.9));
     props.setProperties(
       "highway=footway;bicycle=yes",
-      new WayPropertiesBuilder(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.8).build()
+      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.8)
     );
     // Default was 2.5, we want to favor using mixed footways somewhat
     props.setProperties(
       "footway=sidewalk;highway=footway;bicycle=yes",
-      new WayPropertiesBuilder(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2).build()
+      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.2)
     );
 
-    props.setMixinProperties(
-      "highway=tertiary",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.2).build()
-    );
-    props.setMixinProperties(
-      "maxspeed=70",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.5).build()
-    );
-    props.setMixinProperties("maxspeed=80", new WayPropertiesBuilder(ALL).bicycleSafety(2).build());
-    props.setMixinProperties("maxspeed=90", new WayPropertiesBuilder(ALL).bicycleSafety(3).build());
-    props.setMixinProperties(
-      "maxspeed=100",
-      new WayPropertiesBuilder(ALL).bicycleSafety(5).build()
-    );
+    props.setMixinProperties("highway=tertiary", of(ALL).bicycleSafety(1.2));
+    props.setMixinProperties("maxspeed=70", of(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("maxspeed=80", of(ALL).bicycleSafety(2));
+    props.setMixinProperties("maxspeed=90", of(ALL).bicycleSafety(3));
+    props.setMixinProperties("maxspeed=100", of(ALL).bicycleSafety(5));
 
     // tracktypes
 
     // solid
-    props.setMixinProperties("tracktype=grade1", new WayPropertiesBuilder(ALL).build());
+    props.setMixinProperties("tracktype=grade1", of(ALL));
     // solid but unpaved
-    props.setMixinProperties(
-      "tracktype=grade2",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.1).build()
-    );
+    props.setMixinProperties("tracktype=grade2", of(ALL).bicycleSafety(1.1));
     // mostly solid.
-    props.setMixinProperties(
-      "tracktype=grade3",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.15).build()
-    );
+    props.setMixinProperties("tracktype=grade3", of(ALL).bicycleSafety(1.15));
     // mostly soft
-    props.setMixinProperties(
-      "tracktype=grade4",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.3).build()
-    );
+    props.setMixinProperties("tracktype=grade4", of(ALL).bicycleSafety(1.3));
     // soft
-    props.setMixinProperties(
-      "tracktype=grade5",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.5).build()
-    );
+    props.setMixinProperties("tracktype=grade5", of(ALL).bicycleSafety(1.5));
 
     // lit=yes currently is tagged very rarely, so we just want to discount where lit=no explicitly
     // not lit decreases safety
-    props.setMixinProperties("lit=no", new WayPropertiesBuilder(ALL).bicycleSafety(1.05).build());
+    props.setMixinProperties("lit=no", of(ALL).bicycleSafety(1.05));
 
-    props.setProperties(
-      "highway=unclassified;cycleway=lane",
-      new WayPropertiesBuilder(ALL).bicycleSafety(0.87).build()
-    );
+    props.setProperties("highway=unclassified;cycleway=lane", of(ALL).bicycleSafety(0.87));
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);

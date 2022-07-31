@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.of;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.LEFT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 
@@ -29,59 +30,26 @@ public class UKWayPropertySetSource implements WayPropertySetSource {
   @Override
   public void populateProperties(WayPropertySet props) {
     // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
-    props.setProperties(
-      "highway=trunk_link",
-      new WayPropertiesBuilder(ALL).bicycleSafety(2.06).build()
-    );
-    props.setProperties("highway=trunk", new WayPropertiesBuilder(ALL).bicycleSafety(7.47).build());
-    props.setProperties(
-      "highway=trunk;cycleway=lane",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.5).build()
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=lane",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.15).build()
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=share_busway",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.75).build()
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=share_busway",
-      new WayPropertiesBuilder(ALL).bicycleSafety(1.25).build()
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=opposite_lane",
-      new WayPropertiesBuilder(ALL).bicycleSafety(7.47, 1.5).build()
-    );
+    props.setProperties("highway=trunk_link", of(ALL).bicycleSafety(2.06));
+    props.setProperties("highway=trunk", of(ALL).bicycleSafety(7.47));
+    props.setProperties("highway=trunk;cycleway=lane", of(ALL).bicycleSafety(1.5));
+    props.setProperties("highway=trunk_link;cycleway=lane", of(ALL).bicycleSafety(1.15));
+    props.setProperties("highway=trunk;cycleway=share_busway", of(ALL).bicycleSafety(1.75));
+    props.setProperties("highway=trunk_link;cycleway=share_busway", of(ALL).bicycleSafety(1.25));
+    props.setProperties("highway=trunk;cycleway=opposite_lane", of(ALL).bicycleSafety(7.47, 1.5));
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_lane",
-      new WayPropertiesBuilder(ALL).bicycleSafety(2.06, 1.15).build()
+      of(ALL).bicycleSafety(2.06, 1.15)
     );
-    props.setProperties(
-      "highway=trunk;cycleway=track",
-      new WayPropertiesBuilder(ALL).bicycleSafety(0.95).build()
-    );
-    props.setProperties(
-      "highway=trunk_link;cycleway=track",
-      new WayPropertiesBuilder(ALL).bicycleSafety(0.85).build()
-    );
-    props.setProperties(
-      "highway=trunk;cycleway=opposite_track",
-      new WayPropertiesBuilder(ALL).bicycleSafety(7.47, 0.95).build()
-    );
+    props.setProperties("highway=trunk;cycleway=track", of(ALL).bicycleSafety(0.95));
+    props.setProperties("highway=trunk_link;cycleway=track", of(ALL).bicycleSafety(0.85));
+    props.setProperties("highway=trunk;cycleway=opposite_track", of(ALL).bicycleSafety(7.47, 0.95));
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_track",
-      new WayPropertiesBuilder(ALL).bicycleSafety(2.06, 0.85).build()
+      of(ALL).bicycleSafety(2.06, 0.85)
     );
-    props.setProperties(
-      "highway=trunk;bicycle=designated",
-      new WayPropertiesBuilder(ALL).bicycleSafety(7.25).build()
-    );
-    props.setProperties(
-      "highway=trunk_link;bicycle=designated",
-      new WayPropertiesBuilder(ALL).bicycleSafety(2).build()
-    );
+    props.setProperties("highway=trunk;bicycle=designated", of(ALL).bicycleSafety(7.25));
+    props.setProperties("highway=trunk_link;bicycle=designated", of(ALL).bicycleSafety(2));
 
     /*
      * Automobile speeds in UK. Based on recorded free flow speeds for motorways, trunk and primary and

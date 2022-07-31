@@ -79,4 +79,8 @@ public class WayPropertiesBuilder {
   public WayProperties build() {
     return new WayProperties(this);
   }
+
+  public static WayPropertiesBuilder of(StreetTraversalPermission p) {
+    return new WayPropertiesBuilder(p);
+  }
 }
