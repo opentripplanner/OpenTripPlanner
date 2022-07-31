@@ -132,31 +132,43 @@ otp.modules.planner.Itinerary = otp.Class({
         return table;
     },
 
+    formatFaresV2: function (fare, legs) {
+        const allFares = document.createElement("div");
+        if (fare.coveringItinerary && fare.coveringItinerary.length > 0) {
+            const title = document.createElement("strong");
+            title.innerText = "Covering entire itinerary";
+            allFares.appendChild(title);
+            allFares.appendChild(this.buildFaresTable(this.itinData.fare.coveringItinerary));
+        }
+
+        if (fare.legProducts) {
+            Object.keys(fare.legProducts).forEach(index => {
+                const name = `${legs[index].agencyName} ${legs[index].routeLongName}`;
+                const title = document.createElement("strong");
+                title.innerText = `Covering ${name}`;
+                allFares.appendChild(title);
+                allFares.appendChild(this.buildFaresTable(fare.legProducts[index]));
+            })
+        }
+
+        return allFares.outerHTML;
+    },
+
     getFareStr : function() {
         if(this.fareDisplayOverride) return this.fareDisplayOverride;
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
 
         const fare = this.itinData.fare;
         if(fare && (fare.coveringItinerary || fare.legProducts)) {
-
-            const allFares = document.createElement("div");
-            if(fare.coveringItinerary && fare.coveringItinerary.length > 0) {
-                const title = document.createElement("strong");
-                title.innerText = "Covering entire itinerary";
-                allFares.appendChild(title);
-                allFares.appendChild(this.buildFaresTable(this.itinData.fare.coveringItinerary));
+            return this.formatFaresV2(fare, this.itinData.legs);
+        } else if(this.itinData.fare && this.itinData.fare.fare.regular) {
+            var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
+            var fare_info = {
+                'currency': this.itinData.fare.fare.regular.currency.symbol,
+                'price': (this.itinData.fare.fare.regular.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces),
             }
-
-            if(fare.legProducts && fare.legProducts.length > 0) {
-                console.log(Object.keys(fare.legProducts))
-                Object.keys(fare.legProducts).forEach(index => {
-                    const title = document.createElement("strong");
-                    title.innerText = `Covering leg # ${index}`;
-                    allFares.appendChild(title);
-                })
-            }
-
-            return allFares.outerHTML;
+            //TRANSLATORS: Fare Currency Fare price
+            return _tr('%(currency)s %(price)s', fare_info);
         }
 
         return "N/A";
