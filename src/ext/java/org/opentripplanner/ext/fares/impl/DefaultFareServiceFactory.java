@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implements the default GTFS fare rules as described in http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b
+ * as well as Fares V2.
  *
- * @author novalis
  */
 public class DefaultFareServiceFactory implements FareServiceFactory {
 
@@ -33,9 +34,10 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
-  private List<FareLegRule> fareLegRules = new ArrayList<>();
+  private final List<FareLegRule> fareLegRules = new ArrayList<>();
+
   // mapping the stop ids to area ids. one stop can be in several areas.
-  private Multimap<FeedScopedId, String> stopAreas = Multimaps.forMap(Map.of());
+  private final Multimap<FeedScopedId, String> stopAreas = ArrayListMultimap.create();
 
   @Override
   public FareService makeFareService() {

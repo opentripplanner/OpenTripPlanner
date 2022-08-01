@@ -4,10 +4,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -30,7 +30,7 @@ public class ItineraryFares {
    * https://stackoverflow.com/a/1119241/778449
    */
   private final HashMap<FareType, List<FareComponent>> details = new HashMap<>();
-  private final List<FareProduct> productsCoveringItinerary = new ArrayList<>();
+  private final Set<FareProduct> itineraryProducts = new HashSet<>();
   private final Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
   /**
    * A mapping from {@link FareType} to {@link Money}.
@@ -49,8 +49,8 @@ public class ItineraryFares {
     return new ItineraryFares();
   }
 
-  public List<FareProduct> getProductsCoveringItinerary() {
-    return List.copyOf(productsCoveringItinerary);
+  public Set<FareProduct> getItineraryProducts() {
+    return Set.copyOf(itineraryProducts);
   }
 
   public Multimap<Leg, FareProduct> getLegProducts() {
@@ -65,8 +65,8 @@ public class ItineraryFares {
     details.put(fareType, newDetails);
   }
 
-  public void addProductsCoveringItinerary(Collection<FareProduct> products) {
-    productsCoveringItinerary.addAll(products);
+  public void addItineraryProducts(Collection<FareProduct> products) {
+    itineraryProducts.addAll(products);
   }
 
   public Money getFare(FareType type) {
@@ -79,7 +79,7 @@ public class ItineraryFares {
 
   @Override
   public int hashCode() {
-    return Objects.hash(details);
+    return Objects.hash(fare, details, itineraryProducts, legProducts);
   }
 
   @Override
@@ -87,7 +87,11 @@ public class ItineraryFares {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ItineraryFares fare1 = (ItineraryFares) o;
-    return Objects.equals(details, fare1.details);
+    return (
+      Objects.equals(details, fare1.details) &&
+      Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
+      Objects.equals(legProducts, fare1.legProducts)
+    );
   }
 
   @Override

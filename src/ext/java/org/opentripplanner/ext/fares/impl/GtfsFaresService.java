@@ -11,8 +11,8 @@ public record GtfsFaresService(DefaultFareServiceImpl faresV1, GtfsFaresV2Servic
   public ItineraryFares getCost(Itinerary itinerary) {
     var fare = Objects.requireNonNullElse(faresV1.getCost(itinerary), ItineraryFares.empty());
     var products = faresV2.getProducts(itinerary);
-    fare.addProductsCoveringItinerary(products.productsCoveringItinerary().stream().toList());
-    if (products.productsCoveringItinerary().isEmpty()) {
+    fare.addItineraryProducts(products.itineraryProducts());
+    if (products.itineraryProducts().isEmpty()) {
       fare.addLegProducts(products.legProducts());
     }
     return fare;

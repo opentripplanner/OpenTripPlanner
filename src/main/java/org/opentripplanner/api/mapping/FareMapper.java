@@ -42,7 +42,7 @@ public class FareMapper {
     return new ApiItineraryFares(
       apiFare,
       apiComponent,
-      toApiFareProducts(fares.getProductsCoveringItinerary()),
+      toApiFareProducts(fares.getItineraryProducts()),
       toApiLegProducts(itinerary, fares.getLegProducts())
     );
   }

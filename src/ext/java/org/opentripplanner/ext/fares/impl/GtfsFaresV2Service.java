@@ -119,7 +119,11 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 }
 
-record ProductResult(Set<FareProduct> productsCoveringItinerary, Set<LegProducts> legProducts) {
+/**
+ * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
+ * @param legProducts The fare products that cover only individual legs.
+ */
+record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
   public Set<FareProduct> getProducts(Leg leg) {
     return legProducts
       .stream()

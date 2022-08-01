@@ -8,6 +8,7 @@
 
 - Initial move into sandbox [#4241](https://github.com/opentripplanner/OpenTripPlanner/pull/4241)
 - Add HighestFareInFreeTransferWindowFareService [#4267](https://github.com/opentripplanner/OpenTripPlanner/pull/4267)
+- Add Fares V2 [#4338](https://github.com/opentripplanner/OpenTripPlanner/pull/4338)
 
 ## Documentation
 
@@ -34,7 +35,7 @@ To enable Fares V2 support, add the following to `otp-config.json`:
 }
 ```
 
-### Support Fares V2 fields
+### Supported Fares V2 fields
 
 A full list of the fields that OTP supports is available in the [Fares V2 Adoption Google Sheet](https://docs.google.com/spreadsheets/d/1jpKjz6MbCD2XPhmIP11EDi-P2jMh7x2k-oHS-pLf2vI).
 
