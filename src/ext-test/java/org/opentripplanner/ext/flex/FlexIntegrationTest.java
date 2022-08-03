@@ -68,6 +68,11 @@ public class FlexIntegrationTest {
   }
 
   @Test
+  public void addFlexTripsAndPatternsToGraph() {
+    assertFalse(transitModel.getAllTripPatterns().isEmpty());
+  }
+
+  @Test
   public void shouldReturnARouteTransferringFromBusToFlex() {
     var from = new GenericLocation(33.84329482265106, -84.583740234375);
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);

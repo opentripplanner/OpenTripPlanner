@@ -69,6 +69,11 @@ public class UnscheduledTripTest extends FlexTest {
     assertEquals(0, egress.toStopIndex);
   }
 
+  @Test
+  public void shouldGeneratePatternForFlexTripWithSingleStop() {
+    assertFalse(transitModel.getAllTripPatterns().isEmpty());
+  }
+
   @BeforeAll
   static void setup() {
     TestOtpModel model = FlexTest.buildFlexGraph(ASPEN_GTFS);

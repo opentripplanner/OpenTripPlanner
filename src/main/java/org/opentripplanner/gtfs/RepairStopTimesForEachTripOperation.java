@@ -71,7 +71,7 @@ public class RepairStopTimesForEachTripOperation {
       if (!removedStopSequences.isEmpty()) {
         issueStore.add(new RepeatedStops(trip, removedStopSequences));
       }
-      if (!filterStopTimes(stopTimes)) {
+      if (!FlexTrip.containsFlexStops(stopTimes) && !filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
       } else {
         interpolateStopTimes(stopTimes);
