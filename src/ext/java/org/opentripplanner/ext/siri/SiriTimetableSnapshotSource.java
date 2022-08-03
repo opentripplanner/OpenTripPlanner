@@ -459,9 +459,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
-    TimetableSnapshot timetableSnapshot = getTimetableSnapshot();
+    TimetableSnapshot timetableSnapshot = snapshot;
     if (timetableSnapshot != null) {
-      return getTimetableSnapshot().resolve(tripPattern, serviceDate);
+      return timetableSnapshot.resolve(tripPattern, serviceDate);
     }
     return tripPattern.getScheduledTimetable();
   }
@@ -1305,9 +1305,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     TripPattern realtimeAddedTripPattern = null;
-    if (getTimetableSnapshot() != null) {
-      realtimeAddedTripPattern =
-        getTimetableSnapshot().getRealtimeAddedTripPattern(trip.getId(), journeyDate);
+    TimetableSnapshot timetableSnapshot = snapshot;
+    if (timetableSnapshot != null) {
+      realtimeAddedTripPattern = timetableSnapshot.getRealtimeAddedTripPattern(trip.getId(), journeyDate);
     }
 
     TripPattern tripPattern;
