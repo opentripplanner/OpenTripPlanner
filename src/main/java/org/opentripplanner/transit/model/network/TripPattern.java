@@ -77,7 +77,7 @@ public final class TripPattern
   /**
    * The original TripPattern this replaces at least for one modified trip.
    */
-  private TripPattern originalTripPattern = null;
+  private final TripPattern originalTripPattern;
 
   /**
    * Has the TripPattern been created by a real-time update.
