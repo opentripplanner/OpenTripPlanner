@@ -32,7 +32,6 @@ public class TripPatternCache {
    *
    * @param stopPattern         stop pattern to retrieve/create trip pattern
    * @param trip                the trip the new trip pattern will be created for
-   * @param serviceCodes        graph's service codes
    * @param originalTripPattern the trip pattern the new pattern is based. If the pattern is
    *                            completely new, this will be null
    * @return cached or newly created trip pattern
@@ -40,7 +39,6 @@ public class TripPatternCache {
   public synchronized TripPattern getOrCreateTripPattern(
     @Nonnull final StopPattern stopPattern,
     @Nonnull final Trip trip,
-    @Nonnull final Map<FeedScopedId, Integer> serviceCodes,
     final TripPattern originalTripPattern
   ) {
     Route route = trip.getRoute();
@@ -56,9 +54,6 @@ public class TripPatternCache {
         .of(id)
         .withRoute(route)
         .withStopPattern(stopPattern);
-
-      // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-      tripPatternBuilder.withServiceCodes(serviceCodes);
 
       tripPatternBuilder.withCreatedByRealtimeUpdater(true);
       tripPatternBuilder.withOriginalTripPattern(originalTripPattern);

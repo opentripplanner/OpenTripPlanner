@@ -13,7 +13,6 @@ public final class TripPatternBuilder
   private StopPattern stopPattern;
   private Timetable scheduledTimetable;
   private String name;
-  private Map<FeedScopedId, Integer> serviceCodes;
 
   private boolean createdByRealtimeUpdate;
 
@@ -48,11 +47,6 @@ public final class TripPatternBuilder
     return this;
   }
 
-  public TripPatternBuilder withServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
-    this.serviceCodes = serviceCodes;
-    return this;
-  }
-
   public TripPatternBuilder withCreatedByRealtimeUpdater(boolean createdByRealtimeUpdate) {
     this.createdByRealtimeUpdate = createdByRealtimeUpdate;
     return this;
@@ -82,10 +76,6 @@ public final class TripPatternBuilder
 
   public String getName() {
     return name;
-  }
-
-  public Map<FeedScopedId, Integer> getServiceCodes() {
-    return serviceCodes;
   }
 
   public TripPattern getOriginalTripPattern() {

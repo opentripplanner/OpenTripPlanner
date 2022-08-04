@@ -95,7 +95,6 @@ public final class TripPattern
       builder.getScheduledTimetable() != null
         ? builder.getScheduledTimetable()
         : new Timetable(this);
-    this.scheduledTimetable.setServiceCodes(builder.getServiceCodes());
 
     this.originalTripPattern = builder.getOriginalTripPattern();
   }

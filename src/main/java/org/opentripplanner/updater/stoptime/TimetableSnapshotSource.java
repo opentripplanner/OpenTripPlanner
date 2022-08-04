@@ -390,7 +390,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
         trip,
-        serviceCodes,
         pattern
       );
 
@@ -728,7 +727,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
       trip,
-      serviceCodes,
       originalTripPattern
     );
 
