@@ -240,7 +240,6 @@ public class StopModel implements Serializable {
     // we need this check because there could be only FlexStopLocations (which don't have vertices)
     // in the graph
     if (!vertices.isEmpty()) {
-      this.center = vertices.iterator().next().getCoordinate();
       var medianCalculator = new MedianCalcForDoubles(vertices.size());
 
       vertices.forEach(v -> medianCalculator.add(v.getLon()));
