@@ -100,7 +100,7 @@ public class ToStringBuilderTest {
     );
     assertEquals(
       "ToStringBuilderTest{}",
-      subject().addObjOp("tripId", null, TransitEntity::getId).toString()
+      subject().addObjOp("tripId", (TransitEntity<?, ?>) null, TransitEntity::getId).toString()
     );
   }
 

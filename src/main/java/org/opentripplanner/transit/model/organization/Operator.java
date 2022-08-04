@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * A company which is responsible for operating public transport services. The operator will often
@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity2;
  *
  * @see Agency
  */
-public class Operator extends TransitEntity2<Operator, OperatorBuilder> implements LogInfo {
+public class Operator extends TransitEntity<Operator, OperatorBuilder> implements LogInfo {
 
   private final String name;
   private final String url;

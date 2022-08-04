@@ -5,20 +5,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 
 public class EntityByIdTest {
 
   private static final FeedScopedId ID = TransitModelForTest.id("99");
-  private static final EntityByIdTest.E E = new E(ID);
+  private static final TestEntity E = TestEntity.of(ID).build();
   private static final String E_TO_STRING = E.toString();
   private static final String LIST_OF_E_TO_STRING = String.format("[%s]", E_TO_STRING);
   private static final String MAP_OF_E_TO_STRING = String.format("{%s=%s}", ID, E_TO_STRING);
   private static final FeedScopedId FAKE_ID = TransitModelForTest.id("77");
-  private final EntityById<E> subject = new EntityById<>();
+  private final EntityById<TestEntity> subject = new EntityById<>();
 
   @Test
   public void add() {
@@ -60,10 +63,42 @@ public class EntityByIdTest {
     assertFalse(subject.containsKey(FAKE_ID));
   }
 
-  static class E extends TransitEntity {
+  private static class TestEntity extends TransitEntity<TestEntity, TestEntityBuilder> {
 
-    E(FeedScopedId id) {
+    TestEntity(FeedScopedId id) {
       super(id);
+    }
+
+    public static TestEntityBuilder of(FeedScopedId id) {
+      return new TestEntityBuilder(id);
+    }
+
+    @Override
+    public boolean sameAs(@Nonnull TestEntity other) {
+      return getId().equals(other.getId());
+    }
+
+    @Nonnull
+    @Override
+    public TransitBuilder<TestEntity, TestEntityBuilder> copy() {
+      return new TestEntityBuilder(this);
+    }
+  }
+
+  private static class TestEntityBuilder
+    extends AbstractEntityBuilder<TestEntity, TestEntityBuilder> {
+
+    TestEntityBuilder(TestEntity testEntity) {
+      super(testEntity);
+    }
+
+    TestEntityBuilder(FeedScopedId id) {
+      super(id);
+    }
+
+    @Override
+    protected TestEntity buildFromValues() {
+      return new TestEntity(this.getId());
     }
   }
 }
