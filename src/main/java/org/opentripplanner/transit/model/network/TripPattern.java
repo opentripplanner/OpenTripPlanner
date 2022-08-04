@@ -9,11 +9,9 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -86,9 +84,6 @@ public final class TripPattern
    */
   private final boolean createdByRealtimeUpdater;
 
-  // TODO MOVE codes INTO Timetable or TripTimes
-  private BitSet services;
-
   public TripPattern(TripPatternBuilder builder) {
     super(builder.getId());
     this.name = builder.getName();
@@ -102,12 +97,7 @@ public final class TripPattern
         : new Timetable(this);
     this.scheduledTimetable.setServiceCodes(builder.getServiceCodes());
 
-    this.services = builder.getServices();
     this.originalTripPattern = builder.getOriginalTripPattern();
-
-    if (builder.getServiceCodes() != null) {
-      setServiceCodes(builder.getServiceCodes());
-    }
   }
 
   public static TripPatternBuilder of(@Nonnull FeedScopedId id) {
@@ -603,50 +593,6 @@ public final class TripPattern
    */
   public boolean isCreatedByRealtimeUpdater() {
     return createdByRealtimeUpdater;
-  }
-
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  /**
-   * A bit of a strange place to set service codes all at once when TripTimes are already added, but
-   * we need a reference to the Graph or at least the codes map. This could also be placed in the
-   * hop factory itself.
-   */
-  public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
-    this.services = new BitSet();
-    scheduledTripsAsStream()
-      .forEach(trip -> {
-        FeedScopedId serviceId = trip.getServiceId();
-        if (serviceCodes.containsKey(serviceId)) {
-          services.set(serviceCodes.get(serviceId));
-        } else {
-          LOG.warn("Service " + serviceId + " not found in service codes not found.");
-        }
-      });
-    scheduledTimetable.setServiceCodes(serviceCodes);
-  }
-
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  /**
-   * Sets service code for pattern if it's not already set
-   *
-   * @param serviceCode service code that needs to be set
-   */
-  public void setServiceCode(int serviceCode) {
-    if (!getServices().get(serviceCode)) {
-      final BitSet services = (BitSet) getServices().clone();
-      services.set(serviceCode);
-      this.services = services;
-    }
-  }
-
-  /**
-   * A set of serviceIds with at least one trip in this pattern. Trips in a pattern are no longer
-   * necessarily running on the same service ID.
-   *
-   * @return bitset of service codes
-   */
-  public BitSet getServices() {
-    return services;
   }
 
   public TripPattern getOriginalTripPattern() {

@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.network;
 
-import java.util.BitSet;
 import java.util.Map;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
@@ -10,7 +9,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public final class TripPatternBuilder
   extends AbstractEntityBuilder<TripPattern, TripPatternBuilder> {
 
-  private BitSet services;
   private Route route;
   private StopPattern stopPattern;
   private Timetable scheduledTimetable;
@@ -32,7 +30,6 @@ public final class TripPatternBuilder
     this.stopPattern = original.getStopPattern();
     this.scheduledTimetable = original.getScheduledTimetable();
     this.createdByRealtimeUpdate = original.isCreatedByRealtimeUpdater();
-    this.services = original.getServices();
     this.originalTripPattern = original.getOriginalTripPattern();
   }
 
@@ -89,10 +86,6 @@ public final class TripPatternBuilder
 
   public Map<FeedScopedId, Integer> getServiceCodes() {
     return serviceCodes;
-  }
-
-  public BitSet getServices() {
-    return services;
   }
 
   public TripPattern getOriginalTripPattern() {

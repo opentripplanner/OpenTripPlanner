@@ -413,7 +413,8 @@ public class AddTransitModelEntitiesToGraph {
 
     /* Loop over all new TripPatterns setting the service codes. */
     for (TripPattern tripPattern : tripPatterns) {
-      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
+      // TODO this could be more elegant
+      tripPattern.getScheduledTimetable().setServiceCodes(transitModel.getServiceCodes());
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
       transitModel.addTripPattern(tripPattern.getId(), tripPattern);

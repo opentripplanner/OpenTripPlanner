@@ -394,10 +394,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         pattern
       );
 
-      // Add service code to bitset of pattern if needed (using copy on write)
-      final int serviceCode = serviceCodes.get(trip.getServiceId());
-      newPattern.setServiceCode(serviceCode);
-
       cancelScheduledTrip(tripId, serviceDate);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
     } else {
@@ -736,10 +732,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       originalTripPattern
     );
 
-    // Add service code to bitset of pattern if needed (using copy on write)
-    final int serviceCode = serviceCodes.get(trip.getServiceId());
-    pattern.setServiceCode(serviceCode);
-
     // Create new trip times
     final TripTimes newTripTimes = new TripTimes(trip, stopTimes, deduplicator);
 
@@ -754,6 +746,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     // Set service code of new trip times
+    final int serviceCode = serviceCodes.get(trip.getServiceId());
     newTripTimes.setServiceCode(serviceCode);
 
     // Make sure that updated trip times have the correct real time state
