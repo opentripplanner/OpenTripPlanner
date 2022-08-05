@@ -26,7 +26,7 @@ public class RouteMapper {
     api.id = FeedScopedIdMapper.mapToApi(domain.getId());
     api.agency = AgencyMapper.mapToApi(domain.getAgency());
     api.shortName = domain.getShortName();
-    api.longName = domain.getLongName();
+    api.longName = domain.getLongName().toString();
     api.mode = TraverseModeMapper.mapToApi(domain.getMode());
     api.type =
       domain.getGtfsType() != null
@@ -62,7 +62,7 @@ public class RouteMapper {
     ApiRouteShort api = new ApiRouteShort();
     api.id = FeedScopedIdMapper.mapToApi(domain.getId());
     api.shortName = domain.getShortName();
-    api.longName = domain.getLongName();
+    api.longName = domain.getLongName().toString();
     api.mode = TraverseModeMapper.mapToApi(domain.getMode());
     api.color = domain.getColor();
     api.agencyName = domain.getAgency().getName();

@@ -91,6 +91,7 @@ public class GTFSToOtpTransitServiceMapper {
     this.data = data;
     this.discardMinTransferTimes = discardMinTransferTimes;
     translationHelper = new TranslationHelper();
+    translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
     feedInfoMapper = new FeedInfoMapper(feedId);
     agencyMapper = new AgencyMapper(feedId);
     stationMapper = new StationMapper(translationHelper);
@@ -101,7 +102,7 @@ public class GTFSToOtpTransitServiceMapper {
     locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
-    routeMapper = new RouteMapper(agencyMapper, issueStore);
+    routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);
     directionMapper = new DirectionMapper(issueStore);
     tripMapper = new TripMapper(routeMapper, directionMapper);
     bookingRuleMapper = new BookingRuleMapper();

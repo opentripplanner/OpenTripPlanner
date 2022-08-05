@@ -98,12 +98,12 @@ public class LegMapper {
       api.agencyBrandingUrl = agency.getBrandingUrl();
 
       var route = domain.getRoute();
-      api.route = route.getLongName();
+      api.route = route.getLongName().toString();
       api.routeColor = route.getColor();
       api.routeType = domain.getRouteType();
       api.routeId = FeedScopedIdMapper.mapToApi(route.getId());
       api.routeShortName = route.getShortName();
-      api.routeLongName = route.getLongName();
+      api.routeLongName = route.getLongName().toString();
       api.routeTextColor = route.getTextColor();
 
       var trip = domain.getTrip();

@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.network;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -18,7 +19,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   private Branding branding;
   private List<GroupOfRoutes> groupsOfRoutes;
   private String shortName;
-  private String longName;
+  private I18NString longName;
   private TransitMode mode;
   private Integer gtfsType;
   private Integer gtfsSortOrder;
@@ -82,7 +83,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   }
 
   public String getName() {
-    return Objects.requireNonNullElse(shortName, longName);
+    return Objects.requireNonNullElse(shortName, longName.toString());
   }
 
   public String getShortName() {
@@ -94,11 +95,11 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
     return this;
   }
 
-  public String getLongName() {
+  public I18NString getLongName() {
     return longName;
   }
 
-  public RouteBuilder withLongName(String longName) {
+  public RouteBuilder withLongName(I18NString longName) {
     this.longName = longName;
     return this;
   }

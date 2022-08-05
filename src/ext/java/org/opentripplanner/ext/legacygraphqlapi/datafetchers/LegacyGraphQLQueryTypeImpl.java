@@ -913,7 +913,7 @@ public class LegacyGraphQLQueryTypeImpl
             Stream
               .of(route.getShortName(), route.getLongName())
               .filter(Objects::nonNull)
-              .map(s -> s.toLowerCase(environment.getLocale()))
+              .map(s -> s.toString().toLowerCase(environment.getLocale()))
               .anyMatch(s -> s.startsWith(name))
           );
       }
