@@ -69,6 +69,8 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final FareLegRuleMapper fareLegRuleMapper;
 
+  private final FareTransferRuleMapper fareTransferRuleMapper;
+
   private final DirectionMapper directionMapper;
 
   private final DataImportIssueStore issueStore;
@@ -122,6 +124,7 @@ public class GTFSToOtpTransitServiceMapper {
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
     fareProductMapper = new FareProductMapper();
     fareLegRuleMapper = new FareLegRuleMapper(fareProductMapper, issueStore);
+    fareTransferRuleMapper = new FareTransferRuleMapper()
   }
 
   public OtpTransitServiceBuilder getBuilder() {
