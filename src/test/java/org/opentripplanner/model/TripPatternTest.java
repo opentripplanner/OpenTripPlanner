@@ -47,13 +47,16 @@ public class TripPatternTest {
       .build();
     var coordinate = new Coordinate(0.5, 0.5);
 
-    var originalTripPattern = setupTripPattern(stopOrigin, stopDestination, null);
-
     // Add coordinate between stops on original trip pattern
-    originalTripPattern.setHopGeometries(getLineStrings(stopOrigin, stopDestination, coordinate));
+    var originalTripPattern = setupTripPattern(
+      stopOrigin,
+      stopDestination,
+      null,
+      getLineStrings(stopOrigin, stopDestination, coordinate)
+    );
 
     // Test without setting original trip pattern
-    var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, null);
+    var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, null, null);
 
     var originalCoordinates = originalTripPattern.getHopGeometry(0).getCoordinates().length;
     var coordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
@@ -66,7 +69,7 @@ public class TripPatternTest {
     assertEquals(2, coordinates, "The coordinates for tripPattern on first hop should be 2");
 
     // Test with setting original trip pattern
-    newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, originalTripPattern);
+    newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, originalTripPattern, null);
 
     var finalCoordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
 
@@ -87,7 +90,8 @@ public class TripPatternTest {
   public TripPattern setupTripPattern(
     Stop origin,
     Stop destination,
-    TripPattern originalTripPattern
+    TripPattern originalTripPattern,
+    List<LineString> geometry
   ) {
     var builder = StopPattern.create(2);
     builder.stops[0] = origin;
@@ -101,6 +105,7 @@ public class TripPatternTest {
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withOriginalTripPattern(originalTripPattern)
+      .withHopGeometries(geometry)
       .build();
   }
 
@@ -111,7 +116,7 @@ public class TripPatternTest {
    * @param coordinate Coordinate to inject between stops
    * @return LineString with all coordinates
    */
-  private LineString[] getLineStrings(Stop origin, Stop destination, Coordinate coordinate) {
+  private List<LineString> getLineStrings(Stop origin, Stop destination, Coordinate coordinate) {
     var coordinates = new ArrayList<Coordinate>();
     // Add start and stop first and last
     coordinates.add(new Coordinate(origin.getLon(), origin.getLat()));
@@ -122,6 +127,6 @@ public class TripPatternTest {
       .getGeometryFactory()
       .createLineString(coordinates.toArray(Coordinate[]::new));
 
-    return List.of(l1).toArray(LineString[]::new);
+    return List.of(l1);
   }
 }

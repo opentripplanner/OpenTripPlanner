@@ -59,7 +59,6 @@ public final class TripPattern
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
-  private static final long serialVersionUID = 1;
   private final Route route;
   /**
    * The stop-pattern help us reuse the same stops in several trip-patterns; Hence saving memory.
@@ -72,7 +71,7 @@ public final class TripPattern
   /**
    * Geometries of each inter-stop segment of the tripPattern.
    */
-  private byte[][] hopGeometries;
+  private final byte[][] hopGeometries;
 
   /**
    * The original TripPattern this replaces at least for one modified trip.
@@ -292,15 +291,6 @@ public final class TripPattern
 
   public StopPattern getStopPattern() {
     return stopPattern;
-  }
-
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  public void setHopGeometries(LineString[] hopGeometries) {
-    this.hopGeometries = new byte[hopGeometries.length][];
-
-    for (int i = 0; i < hopGeometries.length; i++) {
-      setHopGeometry(i, hopGeometries[i]);
-    }
   }
 
   // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
