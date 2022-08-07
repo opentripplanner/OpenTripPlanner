@@ -133,7 +133,7 @@ public final class StopPattern implements Serializable {
     return sb.toString();
   }
 
-  int getSize() {
+  public int getSize() {
     return stops.length;
   }
 
@@ -193,7 +193,7 @@ public final class StopPattern implements Serializable {
     return List.of(stops);
   }
 
-  StopLocation getStop(int stopPosInPattern) {
+  public StopLocation getStop(int stopPosInPattern) {
     return stops[stopPosInPattern];
   }
 

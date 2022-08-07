@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.network;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Timetable;
@@ -22,6 +23,7 @@ public final class TripPatternBuilder
   private boolean createdByRealtimeUpdate;
 
   private TripPattern originalTripPattern;
+  private List<LineString> hopGeometries;
 
   TripPatternBuilder(FeedScopedId id) {
     super(id);
@@ -35,6 +37,10 @@ public final class TripPatternBuilder
     this.scheduledTimetable = original.getScheduledTimetable();
     this.createdByRealtimeUpdate = original.isCreatedByRealtimeUpdater();
     this.originalTripPattern = original.getOriginalTripPattern();
+    this.hopGeometries =
+      original.getGeometry() == null
+        ? null
+        : IntStream.range(0, original.numberOfStops()).mapToObj(original::getHopGeometry).toList();
   }
 
   public TripPatternBuilder withName(String name) {
@@ -59,6 +65,11 @@ public final class TripPatternBuilder
 
   public TripPatternBuilder withOriginalTripPattern(TripPattern originalTripPattern) {
     this.originalTripPattern = originalTripPattern;
+    return this;
+  }
+
+  public TripPatternBuilder withHopGeometries(List<LineString> hopGeometries) {
+    this.hopGeometries = hopGeometries;
     return this;
   }
 
@@ -92,13 +103,15 @@ public final class TripPatternBuilder
   }
 
   public byte[][] hopGeometries() {
-    List<LineString> geometries = null;
-    if (this.originalTripPattern != null) {
+    List<LineString> geometries;
+    if (this.hopGeometries != null) {
+      geometries = this.hopGeometries;
+    } else if (this.originalTripPattern != null) {
       geometries = generateHopGeometriesFromOriginalTripPattern();
-    }
-    if (geometries == null) {
+    } else {
       return null;
     }
+
     return geometries
       .stream()
       .map(hopGeometry -> CompactLineStringUtils.compactLineString(hopGeometry, false))
