@@ -79,10 +79,6 @@ public class SiriTripPatternCache {
       tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
 
       tripPattern = tripPatternBuilder.build();
-      // Copy information from the TripPattern this is replacing
-      if (originalTripPattern != null) {
-        tripPattern.setHopGeometriesFromPattern(originalTripPattern);
-      }
 
       // Add pattern to cache
       cache.put(key, tripPattern);

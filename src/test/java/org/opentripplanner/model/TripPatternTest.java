@@ -47,11 +47,13 @@ public class TripPatternTest {
       .build();
     var coordinate = new Coordinate(0.5, 0.5);
 
-    var originalTripPattern = setupTripPattern(stopOrigin, stopDestination);
-    var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination);
+    var originalTripPattern = setupTripPattern(stopOrigin, stopDestination, null);
 
     // Add coordinate between stops on original trip pattern
     originalTripPattern.setHopGeometries(getLineStrings(stopOrigin, stopDestination, coordinate));
+
+    // Test without setting original trip pattern
+    var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, null);
 
     var originalCoordinates = originalTripPattern.getHopGeometry(0).getCoordinates().length;
     var coordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
@@ -63,8 +65,8 @@ public class TripPatternTest {
     );
     assertEquals(2, coordinates, "The coordinates for tripPattern on first hop should be 2");
 
-    // Add geometry from planned data
-    newTripPattern.setHopGeometriesFromPattern(originalTripPattern);
+    // Test with setting original trip pattern
+    newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, originalTripPattern);
 
     var finalCoordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
 
@@ -77,11 +79,16 @@ public class TripPatternTest {
 
   /**
    * Create TripPattern between to stops
-   * @param origin Start stop
+   *
+   * @param origin      Start stop
    * @param destination End stop
    * @return TripPattern with stopPattern
    */
-  public TripPattern setupTripPattern(Stop origin, Stop destination) {
+  public TripPattern setupTripPattern(
+    Stop origin,
+    Stop destination,
+    TripPattern originalTripPattern
+  ) {
     var builder = StopPattern.create(2);
     builder.stops[0] = origin;
     builder.stops[1] = destination;
@@ -93,6 +100,7 @@ public class TripPatternTest {
       .of(new FeedScopedId("Test", "T1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
+      .withOriginalTripPattern(originalTripPattern)
       .build();
   }
 

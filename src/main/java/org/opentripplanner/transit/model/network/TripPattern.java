@@ -97,6 +97,8 @@ public final class TripPattern
         : new Timetable(this);
 
     this.originalTripPattern = builder.getOriginalTripPattern();
+
+    this.hopGeometries = builder.hopGeometries();
   }
 
   public static TripPatternBuilder of(@Nonnull FeedScopedId id) {
@@ -304,64 +306,6 @@ public final class TripPattern
   // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   public void setHopGeometry(int i, LineString hopGeometry) {
     this.hopGeometries[i] = CompactLineStringUtils.compactLineString(hopGeometry, false);
-  }
-
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  /**
-   * This will copy the geometry from another TripPattern to this one. It checks if each hop is
-   * between the same stops before copying that hop geometry. If the stops are different but lie
-   * within same station, old geometry will be used with overwrite on first and last point (to match
-   * new stop places). Otherwise, it will default to straight lines between hops.
-   *
-   * @param other TripPattern to copy geometry from
-   */
-  public void setHopGeometriesFromPattern(TripPattern other) {
-    this.hopGeometries = new byte[numberOfStops() - 1][];
-
-    // This accounts for the new TripPattern provided by a real-time update and the one that is
-    // being replaced having a different number of stops. In that case the geometry will be
-    // preserved up until the first mismatching stop, and a straight line will be used for
-    // all segments after that.
-    int sizeOfShortestPattern = Math.min(numberOfStops(), other.numberOfStops());
-
-    for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
-      LineString hopGeometry = other.getHopGeometry(i);
-
-      if (hopGeometry != null && sameStops(other, i)) {
-        // Copy hop geometry from previous pattern
-        this.setHopGeometry(i, other.getHopGeometry(i));
-      } else if (hopGeometry != null && sameStations(other, i)) {
-        // Use old geometry but patch first and last point with new stops
-        var newStart = new Coordinate(
-          this.getStop(i).getCoordinate().longitude(),
-          this.getStop(i).getCoordinate().latitude()
-        );
-
-        var newEnd = new Coordinate(
-          this.getStop(i + 1).getCoordinate().longitude(),
-          this.getStop(i + 1).getCoordinate().latitude()
-        );
-
-        Coordinate[] coordinates = other.getHopGeometry(i).getCoordinates().clone();
-        coordinates[0].setCoordinate(newStart);
-        coordinates[coordinates.length - 1].setCoordinate(newEnd);
-
-        this.setHopGeometry(i, GeometryUtils.getGeometryFactory().createLineString(coordinates));
-      } else {
-        // Create new straight-line geometry for hop
-        this.setHopGeometry(
-            i,
-            GeometryUtils
-              .getGeometryFactory()
-              .createLineString(
-                new Coordinate[] {
-                  coordinate(stopPattern.getStop(i)),
-                  coordinate(stopPattern.getStop(i + 1)),
-                }
-              )
-          );
-      }
-    }
   }
 
   public LineString getGeometry() {
@@ -674,49 +618,6 @@ public final class TripPattern
 
   private static Coordinate coordinate(StopLocation s) {
     return new Coordinate(s.getLon(), s.getLat());
-  }
-
-  /**
-   * Check if given stop and next stop on this trip pattern and other are equal.
-   *
-   * @param other Other instance of trip pattern with list of stops. May not be null.
-   * @param index Given index for stop
-   * @return true if stop and next stop are equal on bouth trip patterns, else false
-   */
-  private boolean sameStops(TripPattern other, int index) {
-    var otherOrigin = other.getStop(index);
-    var otherDestination = other.getStop(index + 1);
-    var origin = getStop(index);
-    var destination = getStop(index + 1);
-
-    return origin.equals(otherOrigin) && destination.equals(otherDestination);
-  }
-
-  /**
-   * Check if Station is equal on given stop and next stop for this trip pattern and other.
-   *
-   * @param other Other instance of trip pattern with list of stops. May not be null.
-   * @param index Given index for stop
-   * @return true if the stops have the same stations, else false. If any station is null then
-   * false.
-   */
-  private boolean sameStations(TripPattern other, int index) {
-    var otherOrigin = other.getStop(index).getParentStation();
-    var otherDestination = other.getStop(index + 1).getParentStation();
-    var origin = getStop(index).getParentStation();
-    var destionation = getStop(index + 1).getParentStation();
-
-    var sameOrigin = Optional
-      .ofNullable(origin)
-      .map(o -> o.equals(otherOrigin))
-      .orElse(getStop(index).equals(other.getStop(index)));
-
-    var sameDestination = Optional
-      .ofNullable(destionation)
-      .map(o -> o.equals(otherDestination))
-      .orElse(getStop(index + 1).equals(other.getStop(index + 1)));
-
-    return sameOrigin && sameDestination;
   }
 
   @Override

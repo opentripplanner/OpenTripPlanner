@@ -8,7 +8,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
+import javax.annotation.Nonnull;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
@@ -254,6 +256,49 @@ public final class StopPattern implements Serializable {
       }
     }
     return -1;
+  }
+
+  /**
+   * Check if given stop and next stop on this stop pattern and other are equal.
+   *
+   * @param other Other instance of stop pattern with list of stops.
+   * @param index Given index for stop
+   * @return true if stop and next stop are equal on both stop patterns, else false
+   */
+  boolean sameStops(@Nonnull StopPattern other, int index) {
+    var otherOrigin = other.getStop(index);
+    var otherDestination = other.getStop(index + 1);
+    var origin = getStop(index);
+    var destination = getStop(index + 1);
+
+    return origin.equals(otherOrigin) && destination.equals(otherDestination);
+  }
+
+  /**
+   * Check if Station is equal on given stop and next stop for this trip pattern and other.
+   *
+   * @param other Other instance of stop pattern with list of stops.
+   * @param index Given index for stop
+   * @return true if the stops have the same stations, else false. If any station is null then
+   * false.
+   */
+  boolean sameStations(@Nonnull StopPattern other, int index) {
+    var otherOrigin = other.getStop(index).getParentStation();
+    var otherDestination = other.getStop(index + 1).getParentStation();
+    var origin = getStop(index).getParentStation();
+    var destionation = getStop(index + 1).getParentStation();
+
+    var sameOrigin = Optional
+      .ofNullable(origin)
+      .map(o -> o.equals(otherOrigin))
+      .orElse(getStop(index).equals(other.getStop(index)));
+
+    var sameDestination = Optional
+      .ofNullable(destionation)
+      .map(o -> o.equals(otherDestination))
+      .orElse(getStop(index + 1).equals(other.getStop(index + 1)));
+
+    return sameOrigin && sameDestination;
   }
 
   public static class StopPatternBuilder {
