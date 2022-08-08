@@ -127,14 +127,8 @@ public class GbfsFeedLoader {
         return null;
       }
       return objectMapper.readValue(is, clazz);
-    } catch (IllegalArgumentException e) {
-      LOG.warn("Error parsing vehicle rental feed from {}", uri, e);
-      return null;
-    } catch (JsonProcessingException e) {
-      LOG.warn("Error parsing vehicle rental feed from (bad JSON of some sort) {}", uri, e);
-      return null;
-    } catch (IOException e) {
-      LOG.warn("Error reading vehicle rental feed from {} (connection error)", uri, e);
+    } catch (IllegalArgumentException | IOException e) {
+      LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);
       return null;
     }
   }
