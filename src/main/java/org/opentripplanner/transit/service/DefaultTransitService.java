@@ -202,15 +202,6 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternsForStop(stop);
   }
 
-  /** {@link TransitModelIndex#getPatternsForStop(StopLocation, TimetableSnapshot)} */
-  @Override
-  public Collection<TripPattern> getPatternsForStop(
-    StopLocation stop,
-    TimetableSnapshot timetableSnapshot
-  ) {
-    return this.transitModelIndex.getPatternsForStop(stop, timetableSnapshot);
-  }
-
   @Override
   public Collection<Trip> getTripsForStop(StopLocation stop) {
     return this.transitModelIndex.getTripsForStop(stop);

@@ -17,7 +17,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -86,11 +85,6 @@ public interface TransitService {
   Set<Route> getRoutesForStop(StopLocation stop);
 
   Collection<TripPattern> getPatternsForStop(StopLocation stop);
-
-  Collection<TripPattern> getPatternsForStop(
-    StopLocation stop,
-    TimetableSnapshot timetableSnapshot
-  );
 
   Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates);
 
