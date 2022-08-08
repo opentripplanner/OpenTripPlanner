@@ -26,6 +26,7 @@
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "boardingLocationTags": [],
+  "timeZone": "Europe/Oslo",
   "netex": {
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
