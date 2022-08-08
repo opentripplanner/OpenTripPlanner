@@ -383,7 +383,7 @@ public class ItineraryListFilterChainBuilder {
         new GroupByFilter<>(
           GroupBySameRoutesAndStops::new,
           List.of(
-            new SortingFilter(generalizedCostComparator()),
+            new SortingFilter(SortOrderComparator.comparator(sortOrder)),
             new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
           )
         )
