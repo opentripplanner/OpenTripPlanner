@@ -14,6 +14,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +33,6 @@ import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -327,16 +328,15 @@ public class StopPlaceType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            int timeRage = environment.getArgument("timeRange");
+            Duration timeRage = Duration.ofSeconds(environment.getArgument("timeRange"));
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
-            Long startTimeMs = environment.getArgument("startTime") == null
-              ? 0L
-              : environment.getArgument("startTime");
-            Long startTimeSeconds = startTimeMs / 1000;
+            Instant startTime = environment.containsArgument("startTime")
+              ? Instant.ofEpochMilli(environment.getArgument("startTime"))
+              : Instant.now();
 
             return monoOrMultiModalStation
               .getChildStops()
@@ -344,7 +344,7 @@ public class StopPlaceType {
               .flatMap(singleStop ->
                 getTripTimesForStop(
                   singleStop,
-                  startTimeSeconds,
+                  startTime,
                   timeRage,
                   arrivalDeparture,
                   includeCancelledTrips,
@@ -368,8 +368,8 @@ public class StopPlaceType {
 
   public static Stream<TripTimeOnDate> getTripTimesForStop(
     StopLocation stop,
-    Long startTimeSeconds,
-    int timeRage,
+    Instant startTimeSeconds,
+    Duration timeRage,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
     int numberOfDepartures,

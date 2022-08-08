@@ -31,8 +31,6 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
   private static final Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
-  private Graph graph;
-
   private File cacheDirectory;
 
   public String awsAccessKey;
@@ -45,7 +43,6 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
   @Override
   public void fetchData(Graph graph, File cacheDirectory) {
-    this.graph = graph;
     this.cacheDirectory = cacheDirectory;
 
     HashSet<P2<Integer>> tiles = new HashSet<>();

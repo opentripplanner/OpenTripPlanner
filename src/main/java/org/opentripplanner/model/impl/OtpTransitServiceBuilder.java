@@ -13,7 +13,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -44,6 +43,7 @@ import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public class OtpTransitServiceBuilder {
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-  private final EntityById<FlexTrip> flexTripsById = new EntityById<>();
+  private final EntityById<FlexTrip<?, ?>> flexTripsById = new EntityById<>();
 
   private final EntityById<Branding> brandingsById = new EntityById<>();
 
@@ -224,7 +224,7 @@ public class OtpTransitServiceBuilder {
     return tripPatterns;
   }
 
-  public EntityById<FlexTrip> getFlexTripsById() {
+  public EntityById<FlexTrip<?, ?>> getFlexTripsById() {
     return flexTripsById;
   }
 

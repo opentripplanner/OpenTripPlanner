@@ -3,13 +3,11 @@ package org.opentripplanner.graph_builder.module;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.graph.Graph;
+import javax.inject.Inject;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -21,14 +19,15 @@ import org.slf4j.LoggerFactory;
 public class TripPatternNamer implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPatternNamer.class);
+  private final TransitModel transitModel;
+
+  @Inject
+  public TripPatternNamer(TransitModel transitModel) {
+    this.transitModel = transitModel;
+  }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     /* Generate unique human-readable names for all the TableTripPatterns. */
     generateUniqueNames(transitModel.getAllTripPatterns());
   }

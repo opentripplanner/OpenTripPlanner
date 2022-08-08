@@ -301,7 +301,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
     //
     //   TS1 <-> A <-> B <-> C <-> D <-> E <-> F <-> E1 <-> S2
 
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new Builder() {
         @Override
         public void build() {

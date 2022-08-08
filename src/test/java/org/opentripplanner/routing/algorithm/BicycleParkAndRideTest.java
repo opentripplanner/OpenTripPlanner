@@ -18,7 +18,7 @@ public class BicycleParkAndRideTest extends ParkAndRideTest {
 
   @BeforeEach
   public void setUp() throws Exception {
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new Builder() {
         @Override
         public void build() {

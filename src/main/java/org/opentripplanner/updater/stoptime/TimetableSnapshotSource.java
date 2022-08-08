@@ -820,7 +820,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   ) {
     boolean success = false;
 
-    final TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
     if (pattern != null) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = buffer.resolve(pattern, serviceDate);

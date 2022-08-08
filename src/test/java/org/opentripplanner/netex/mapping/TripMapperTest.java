@@ -32,7 +32,7 @@ public class TripMapperTest {
   private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
   private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
   private static final FeedScopedId SERVICE_ID = TransitModelForTest.id("S001");
-  private static final DataImportIssueStore issueStore = new DataImportIssueStore(false);
+  private static final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
 
   private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(
     ROUTE_ID,

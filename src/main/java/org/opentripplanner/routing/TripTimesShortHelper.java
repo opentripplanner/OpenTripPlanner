@@ -20,25 +20,18 @@ public class TripTimesShortHelper {
     Trip trip,
     LocalDate serviceDate
   ) {
-    Timetable timetable = null;
-    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
-    if (timetableSnapshot != null) {
-      // Check if realtime-data is available for trip
-
-      TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
-      if (pattern == null) {
-        pattern = transitService.getPatternForTrip(trip);
-      }
-      timetable = timetableSnapshot.resolve(pattern, serviceDate);
-
-      // If realtime moved pattern back to original trip, fetch it instead
-      if (timetable.getTripIndex(trip.getId()) == -1) {
-        pattern = transitService.getPatternForTrip(trip);
-        timetable = timetableSnapshot.resolve(pattern, serviceDate);
-      }
+    // Check if realtime-data changed pattern for trip, otherwise use original
+    TripPattern pattern = transitService.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
+    if (pattern == null) {
+      pattern = transitService.getPatternForTrip(trip);
     }
-    if (timetable == null) {
-      timetable = transitService.getPatternForTrip(trip).getScheduledTimetable();
+
+    Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
+
+    // If realtime moved pattern back to original trip, fetch it instead
+    if (timetable.getTripIndex(trip.getId()) == -1) {
+      pattern = transitService.getPatternForTrip(trip);
+      timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
     }
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes

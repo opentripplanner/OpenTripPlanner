@@ -22,7 +22,7 @@ public class OpenStreetMapParserTest {
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), StandardCharsets.UTF_8)
     );
     OpenStreetMapProvider pr = new OpenStreetMapProvider(osmFile, true);
-    OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false), Set.of());
+    OSMDatabase osmdb = new OSMDatabase(DataImportIssueStore.noopIssueStore(), Set.of());
 
     pr.readOSM(osmdb);
 

@@ -203,12 +203,12 @@ public class FlexRouter {
         .collect(Collectors.toList());
   }
 
-  private Stream<T2<NearbyStop, FlexTrip>> getClosestFlexTrips(
+  private Stream<T2<NearbyStop, FlexTrip<?, ?>>> getClosestFlexTrips(
     Collection<NearbyStop> nearbyStops,
     boolean pickup
   ) {
     // Find all trips reachable from the nearbyStops
-    Stream<T2<NearbyStop, FlexTrip>> flexTripsReachableFromNearbyStops = nearbyStops
+    Stream<T2<NearbyStop, FlexTrip<?, ?>>> flexTripsReachableFromNearbyStops = nearbyStops
       .stream()
       .flatMap(accessEgress ->
         flexIndex
@@ -223,7 +223,7 @@ public class FlexRouter {
       );
 
     // Group all (NearbyStop, FlexTrip) tuples by flexTrip
-    Collection<List<T2<NearbyStop, FlexTrip>>> groupedReachableFlexTrips = flexTripsReachableFromNearbyStops
+    Collection<List<T2<NearbyStop, FlexTrip<?, ?>>>> groupedReachableFlexTrips = flexTripsReachableFromNearbyStops
       .collect(Collectors.groupingBy(t2 -> t2.second))
       .values();
 

@@ -6,7 +6,6 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -19,17 +18,17 @@ public class FlexIndex {
 
   private final Multimap<StopLocation, PathTransfer> transfersToStop = ArrayListMultimap.create();
 
-  private final Multimap<StopLocation, FlexTrip> flexTripsByStop = HashMultimap.create();
+  private final Multimap<StopLocation, FlexTrip<?, ?>> flexTripsByStop = HashMultimap.create();
 
   private final Map<FeedScopedId, Route> routeById = new HashMap<>();
 
-  private final Map<FeedScopedId, FlexTrip> tripById = new HashMap<>();
+  private final Map<FeedScopedId, FlexTrip<?, ?>> tripById = new HashMap<>();
 
   public FlexIndex(TransitModel transitModel) {
     for (PathTransfer transfer : transitModel.getAllPathTransfers()) {
       transfersToStop.put(transfer.to, transfer);
     }
-    for (FlexTrip flexTrip : transitModel.getAllFlexTrips()) {
+    for (FlexTrip<?, ?> flexTrip : transitModel.getAllFlexTrips()) {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {
@@ -48,7 +47,7 @@ public class FlexIndex {
     return transfersToStop.get(stopLocation);
   }
 
-  public Collection<FlexTrip> getFlexTripsByStop(StopLocation stopLocation) {
+  public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
     return flexTripsByStop.get(stopLocation);
   }
 
@@ -60,11 +59,11 @@ public class FlexIndex {
     return routeById.values();
   }
 
-  public FlexTrip getTripById(FeedScopedId id) {
+  public FlexTrip<?, ?> getTripById(FeedScopedId id) {
     return tripById.get(id);
   }
 
-  public Collection<FlexTrip> getAllFlexTrips() {
+  public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
     return tripById.values();
   }
 }

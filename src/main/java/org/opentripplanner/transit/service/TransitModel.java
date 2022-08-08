@@ -26,7 +26,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
@@ -45,6 +44,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -97,7 +97,7 @@ public class TransitModel implements Serializable {
   private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = new HashMap<>();
 
-  private final Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 
   private transient TransitLayer transitLayer;
   private transient TransitLayerUpdater transitLayerUpdater;
@@ -442,7 +442,7 @@ public class TransitModel implements Serializable {
     return transfersByStop.values();
   }
 
-  public Collection<FlexTrip> getAllFlexTrips() {
+  public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
     return flexTripsById.values();
   }
 
@@ -462,7 +462,7 @@ public class TransitModel implements Serializable {
     }
   }
 
-  public void addFlexTrip(FeedScopedId id, FlexTrip flexTrip) {
+  public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
     flexTripsById.put(id, flexTrip);
   }
 

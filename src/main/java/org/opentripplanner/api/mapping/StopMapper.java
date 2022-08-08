@@ -3,10 +3,8 @@ package org.opentripplanner.api.mapping;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class StopMapper {
