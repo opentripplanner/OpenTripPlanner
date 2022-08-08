@@ -12,8 +12,6 @@ import org.opentripplanner.util.MapUtils;
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */
 class FareAttributeMapper {
 
-  private static final int MISSING_VALUE = -999;
-
   private final Map<org.onebusaway.gtfs.model.FareAttribute, FareAttribute> mappedStops = new HashMap<>();
 
   Collection<FareAttribute> map(Collection<org.onebusaway.gtfs.model.FareAttribute> allStops) {
@@ -34,13 +32,13 @@ class FareAttributeMapper {
       .setYouthPrice(rhs.getYouthPrice())
       .setSeniorPrice(rhs.getSeniorPrice());
 
-    if (rhs.getTransfers() != MISSING_VALUE) {
+    if (rhs.isTransfersSet()) {
       builder.setTransfers(rhs.getTransfers());
     }
-    if (rhs.getTransferDuration() != MISSING_VALUE) {
+    if (rhs.isTransferDurationSet()) {
       builder.setTransferDuration(rhs.getTransferDuration());
     }
-    if (rhs.getJourneyDuration() != MISSING_VALUE) {
+    if (rhs.isJourneyDurationSet()) {
       builder.setJourneyDuration(rhs.getJourneyDuration());
     }
 
