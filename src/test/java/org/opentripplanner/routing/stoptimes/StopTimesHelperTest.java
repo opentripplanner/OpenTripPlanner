@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.Month;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -17,7 +18,9 @@ class StopTimesHelperTest {
 
   static String feedId;
   private static DefaultTransitService transitService;
-  private static final LocalDate serviceDate = LocalDate.of(2021, 07, 26);
+  private static final LocalDate serviceDate = LocalDate.of(2021, Month.JULY, 26);
+  private static FeedScopedId stopId;
+  private static TripPattern pattern;
 
   @BeforeAll
   public static void setUp() throws Exception {
@@ -25,12 +28,18 @@ class StopTimesHelperTest {
     TransitModel transitModel = model.transitModel();
     transitService = new DefaultTransitService(transitModel);
     feedId = transitModel.getFeedIds().iterator().next();
+    stopId = new FeedScopedId(feedId, "J");
+    pattern =
+      transitService.getPatternForTrip(
+        transitService.getTripForId(new FeedScopedId(feedId, "5.1"))
+      );
   }
 
+  /**
+   * Case 1, should find first departure for each pattern when numberOfDepartures is one
+   */
   @Test
-  void stopTimesForStop() {
-    FeedScopedId stopId = new FeedScopedId(feedId, "J");
-
+  void stopTimesForStop_oneDeparture() {
     // Case 1, should find first departure for each pattern
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
@@ -60,59 +69,73 @@ class StopTimesHelperTest {
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
     assertEquals(serviceDate, stopTime.getServiceDay());
+  }
 
-    // Case 2, should find all departures for the day
-    result =
-      StopTimesHelper.stopTimesForStop(
-        transitService,
-        transitService.getStopForId(stopId),
-        serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
-        Duration.ofHours(24),
-        10,
-        ArrivalDeparture.BOTH,
-        true
-      );
+  /**
+   * Case 2, should find all departures for the day, when numberOfDepartures is 10
+   */
+  @Test
+  void stopTimesForStop_allDepartures() {
+    var result = StopTimesHelper.stopTimesForStop(
+      transitService,
+      transitService.getStopForId(stopId),
+      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      Duration.ofHours(24),
+      10,
+      ArrivalDeparture.BOTH,
+      true
+    );
 
     assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
+  }
 
-    // Case 3, short search window, no results found
-    result =
-      StopTimesHelper.stopTimesForStop(
-        transitService,
-        transitService.getStopForId(stopId),
-        serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
-        Duration.ofHours(6),
-        2,
-        ArrivalDeparture.BOTH,
-        true
-      );
+  /**
+   * Case 3, short search window, no results found
+   */
+  @Test
+  void stopTimesForStop_noDepartures() {
+    var result = StopTimesHelper.stopTimesForStop(
+      transitService,
+      transitService.getStopForId(stopId),
+      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      Duration.ofHours(6),
+      2,
+      ArrivalDeparture.BOTH,
+      true
+    );
 
     assertEquals(0, result.stream().mapToLong(s -> s.times.size()).sum());
+  }
 
-    // Case 4, long search window, results found on the next day
-    result =
-      StopTimesHelper.stopTimesForStop(
-        transitService,
-        transitService.getStopForId(stopId),
-        serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
-        Duration.ofHours(36),
-        10,
-        ArrivalDeparture.BOTH,
-        true
-      );
+  /**
+   * Case 4, long search window, results found on the next day
+   */
+  @Test
+  void stopTimesForStop_nextDay() {
+    var result = StopTimesHelper.stopTimesForStop(
+      transitService,
+      transitService.getStopForId(stopId),
+      serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
+      Duration.ofHours(36),
+      10,
+      ArrivalDeparture.BOTH,
+      true
+    );
 
     assertEquals(9, result.stream().mapToLong(s -> s.times.size()).sum());
 
-    stopTimesForPattern =
-      result.stream().filter(s -> s.pattern.getRoute().getId().getId().equals("5")).toList();
+    var stopTimesForPattern = result
+      .stream()
+      .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
+      .toList();
 
     assertEquals(1, stopTimesForPattern.size());
 
-    stopTimes = stopTimesForPattern.get(0).times;
+    var stopTimes = stopTimesForPattern.get(0).times;
 
     assertEquals(1, stopTimes.size());
 
-    stopTime = stopTimes.get(0);
+    var stopTime = stopTimes.get(0);
 
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
@@ -120,14 +143,11 @@ class StopTimesHelperTest {
     assertEquals(serviceDate.plusDays(1), stopTime.getServiceDay());
   }
 
+  /**
+   * Case 1, midnight, time range one day, should only find one trip, which is on the same day
+   */
   @Test
-  void stopTimesForPatternAtStop() {
-    FeedScopedId stopId = new FeedScopedId(feedId, "J");
-    TripPattern pattern = transitService.getPatternForTrip(
-      transitService.getTripForId(new FeedScopedId(feedId, "5.1"))
-    );
-
-    // Case 1, midnight, time range one day, should only find one trip, which is on the same day
+  void stopTimesForPatternAtStop_oneDayFromMidnight() {
     var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
       transitService,
       transitService.getStopForId(stopId),
@@ -146,44 +166,52 @@ class StopTimesHelperTest {
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
     assertEquals(serviceDate, stopTime.getServiceDay());
+  }
 
-    // Case 2, midday, time range one day, should only find one trip, which is on the next day
-    stopTimes =
-      StopTimesHelper.stopTimesForPatternAtStop(
-        transitService,
-        transitService.getStopForId(stopId),
-        pattern,
-        serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
-        Duration.ofHours(24),
-        2,
-        ArrivalDeparture.BOTH
-      );
+  /**
+   * Case 2, midday, time range one day, should only find one trip, which is on the next day
+   */
+  @Test
+  void stopTimesForPatternAtStop_oneDayFromMidday() {
+    var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
+      transitService,
+      transitService.getStopForId(stopId),
+      pattern,
+      serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
+      Duration.ofHours(24),
+      2,
+      ArrivalDeparture.BOTH
+    );
 
     assertEquals(1, stopTimes.size());
 
-    stopTime = stopTimes.get(0);
+    var stopTime = stopTimes.get(0);
 
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledDeparture());
 
     assertEquals(serviceDate.plusDays(1), stopTime.getServiceDay());
+  }
 
-    // Case 3, midnight, time range two days, should only find two trips, on both days
-    stopTimes =
-      StopTimesHelper.stopTimesForPatternAtStop(
-        transitService,
-        transitService.getStopForId(stopId),
-        pattern,
-        serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
-        Duration.ofHours(48),
-        2,
-        ArrivalDeparture.BOTH
-      );
+  /**
+   * Case 3, midnight, time range two days, should only find two trips, on both days
+   */
+  @Test
+  void stopTimesForPatternAtStop_twoDaysFromMidnight() {
+    var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
+      transitService,
+      transitService.getStopForId(stopId),
+      pattern,
+      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      Duration.ofHours(48),
+      2,
+      ArrivalDeparture.BOTH
+    );
 
     assertEquals(2, stopTimes.size());
 
-    stopTime = stopTimes.get(0);
+    var stopTime = stopTimes.get(0);
 
     assertEquals(stopId, stopTime.getStop().getId());
     assertEquals((8 * 60 + 10) * 60, stopTime.getScheduledArrival());
@@ -198,11 +226,11 @@ class StopTimesHelperTest {
     assertEquals(serviceDate.plusDays(1), stopTime.getServiceDay());
   }
 
+  /**
+   * Case 1, should find all five departures on this day
+   */
   @Test
   void stopTimesForStopServiceDate() {
-    FeedScopedId stopId = new FeedScopedId(feedId, "J");
-
-    // Case 1, should find all five departures on this day
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
       transitService.getStopForId(stopId),
