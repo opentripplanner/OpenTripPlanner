@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
  * A GraphQL query for retrieving data on DatedServiceJourneys
