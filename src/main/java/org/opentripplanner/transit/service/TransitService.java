@@ -166,8 +166,6 @@ public interface TransitService {
 
   Collection<PathTransfer> getTransfersByStop(StopLocation stop);
 
-  TimetableSnapshot getTimetableSnapshot();
-
   TransitLayer getTransitLayer();
 
   TransitLayer getRealtimeTransitLayer();

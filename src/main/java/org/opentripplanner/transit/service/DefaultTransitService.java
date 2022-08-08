@@ -26,7 +26,6 @@ import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -448,7 +447,16 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
-    return DatedServiceJourneyHelper.getTripOnServiceDate(this, datedServiceJourneyId);
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate = timetableSnapshot
+        .getRealtimeAddedTripOnServiceDate()
+        .get(datedServiceJourneyId);
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate;
+      }
+    }
+    return transitModelIndex.getTripOnServiceDateById().get(datedServiceJourneyId);
   }
 
   @Override
@@ -460,6 +468,15 @@ public class DefaultTransitService implements TransitEditorService {
   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate = timetableSnapshot
+        .getRealtimeAddedTripOnServiceDateByTripIdAndServiceDate()
+        .get(tripIdAndServiceDate);
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate;
+      }
+    }
     return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
   }
 
@@ -479,12 +496,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
     return this.transitModel.getTransfersByStop(stop);
-  }
-
-  /** {@link TransitModel#getTimetableSnapshot()} */
-  @Override
-  public TimetableSnapshot getTimetableSnapshot() {
-    return this.transitModel.getTimetableSnapshot();
   }
 
   /** {@link TransitModel#getOrSetupTimetableSnapshotProvider(Function)} */

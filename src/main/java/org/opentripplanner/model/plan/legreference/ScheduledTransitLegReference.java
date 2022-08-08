@@ -3,7 +3,6 @@ package org.opentripplanner.model.plan.legreference;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -31,13 +30,8 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    TripPattern tripPattern = null;
-    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
-
     // Check if pattern is changed by real-time updater
-    if (timetableSnapshot != null) {
-      tripPattern = timetableSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
-    }
+    TripPattern tripPattern = transitService.getRealtimeAddedTripPattern(tripId, serviceDate);
 
     // Otherwise use scheduled pattern
     if (tripPattern == null) {
