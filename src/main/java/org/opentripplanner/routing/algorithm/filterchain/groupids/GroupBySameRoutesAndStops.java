@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
-import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByUtils.getStopOrStationId;
-
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
@@ -28,9 +26,9 @@ public class GroupBySameRoutesAndStops implements GroupId<GroupBySameRoutesAndSt
         .filter(Leg::isTransitLeg)
         .flatMap(leg ->
           Stream.of(
-            getStopOrStationId(leg.getFrom().stop),
+            leg.getFrom().stop.getStationOrStopId(),
             leg.getRoute().getId(),
-            getStopOrStationId(leg.getTo().stop)
+            leg.getTo().stop.getStationOrStopId()
           )
         )
         .toList();
