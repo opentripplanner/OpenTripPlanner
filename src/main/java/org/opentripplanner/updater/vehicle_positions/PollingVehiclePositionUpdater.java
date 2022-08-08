@@ -100,7 +100,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   ) {
     return Optional
       .ofNullable(transitModel.getTimetableSnapshot())
-      .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
+      .map(snapshot -> snapshot.getRealtimeAddedTripPattern(trip.getId(), sd))
       .orElseGet(() -> transitModel.getTransitModelIndex().getPatternForTrip().get(trip));
   }
 }

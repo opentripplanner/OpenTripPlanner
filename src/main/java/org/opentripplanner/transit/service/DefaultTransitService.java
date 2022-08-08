@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -24,7 +25,6 @@ import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.DatedServiceJourneyHelper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -202,15 +202,6 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternsForStop(stop);
   }
 
-  /** {@link TransitModelIndex#getPatternsForStop(StopLocation, TimetableSnapshot)} */
-  @Override
-  public Collection<TripPattern> getPatternsForStop(
-    StopLocation stop,
-    TimetableSnapshot timetableSnapshot
-  ) {
-    return this.transitModelIndex.getPatternsForStop(stop, timetableSnapshot);
-  }
-
   @Override
   public Collection<Trip> getTripsForStop(StopLocation stop) {
     return this.transitModelIndex.getTripsForStop(stop);
@@ -296,8 +287,8 @@ public class DefaultTransitService implements TransitEditorService {
    * TODO: Add frequency based trips
    *
    * @param stop                  Stop object to perform the search for
-   * @param startTime             Start time for the search. Seconds from UNIX epoch
-   * @param timeRange             Searches forward for timeRange seconds from startTime
+   * @param startTime             Start time for the search.
+   * @param timeRange             Searches forward for timeRange from startTime
    * @param numberOfDepartures    Number of departures to fetch per pattern
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result.
@@ -305,15 +296,14 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
   ) {
     return StopTimesHelper.stopTimesForStop(
       this,
-      lazyGetTimeTableSnapShot(),
       stop,
       startTime,
       timeRange,
@@ -349,8 +339,8 @@ public class DefaultTransitService implements TransitEditorService {
    *
    * @param stop               Stop object to perform the search for
    * @param pattern            Pattern object to perform the search for
-   * @param startTime          Start time for the search. Seconds from UNIX epoch
-   * @param timeRange          Searches forward for timeRange seconds from startTime
+   * @param startTime          Start time for the search.
+   * @param timeRange          Searches forward for timeRange from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param arrivalDeparture   Filter by arrivals, departures, or both
    */
@@ -358,14 +348,13 @@ public class DefaultTransitService implements TransitEditorService {
   public List<TripTimeOnDate> stopTimesForPatternAtStop(
     StopLocation stop,
     TripPattern pattern,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
     return StopTimesHelper.stopTimesForPatternAtStop(
       this,
-      lazyGetTimeTableSnapShot(),
       stop,
       pattern,
       startTime,
@@ -417,6 +406,24 @@ public class DefaultTransitService implements TransitEditorService {
       : tripPattern.getScheduledTimetable();
   }
 
+  @Override
+  public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return null;
+    }
+    return timetableSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
+  }
+
+  @Override
+  public boolean hasRealtimeAddedTripPatterns() {
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return false;
+    }
+    return timetableSnapshot.hasRealtimeAddedTripPatterns();
+  }
+
   /**
    * Lazy-initialization of TimetableSnapshot
    *
@@ -431,7 +438,16 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
-    return DatedServiceJourneyHelper.getTripOnServiceDate(this, datedServiceJourneyId);
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate = timetableSnapshot
+        .getRealtimeAddedTripOnServiceDate()
+        .get(datedServiceJourneyId);
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate;
+      }
+    }
+    return transitModelIndex.getTripOnServiceDateById().get(datedServiceJourneyId);
   }
 
   @Override
@@ -443,6 +459,15 @@ public class DefaultTransitService implements TransitEditorService {
   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate = timetableSnapshot
+        .getRealtimeAddedTripOnServiceDateByTripIdAndServiceDate()
+        .get(tripIdAndServiceDate);
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate;
+      }
+    }
     return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
   }
 
@@ -462,12 +487,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
     return this.transitModel.getTransfersByStop(stop);
-  }
-
-  /** {@link TransitModel#getTimetableSnapshot()} */
-  @Override
-  public TimetableSnapshot getTimetableSnapshot() {
-    return this.transitModel.getTimetableSnapshot();
   }
 
   /** {@link TransitModel#getOrSetupTimetableSnapshotProvider(Function)} */
