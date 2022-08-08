@@ -188,7 +188,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
   public String getName() {
-    return Objects.requireNonNullElse(shortName, longName.toString());
+    return shortName == null ? longName.toString() : shortName;
   }
 
   @Override
