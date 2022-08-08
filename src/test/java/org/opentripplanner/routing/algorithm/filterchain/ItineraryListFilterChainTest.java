@@ -211,7 +211,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(true)
       .build();
-    assertEquals(toStr(List.of(i4, i2)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
+    assertEquals(toStr(List.of(i4, i1)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
   }
 
   private ItineraryListFilterChainBuilder createBuilder(
