@@ -86,7 +86,7 @@ public class TripPatternNamer implements GraphBuilderModule {
 
       /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
       if (routeTripPatterns.size() == 1) {
-        routeTripPatterns.iterator().next().setName(routeName);
+        routeTripPatterns.iterator().next().initName(routeName);
         continue;
       }
 
@@ -113,7 +113,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         StringBuilder sb = new StringBuilder(routeName);
         String headsign = pattern.getTripHeadsign();
         if (headsign != null && signs.get(headsign).size() == 1) {
-          pattern.setName(sb.append(" ").append(headsign).toString());
+          pattern.initName(sb.append(" ").append(headsign).toString());
           continue;
         }
 
@@ -121,7 +121,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         var end = pattern.lastStop();
         sb.append(" to ").append(stopNameAndId(end));
         if (ends.get(end).size() == 1) {
-          pattern.setName(sb.toString());
+          pattern.initName(sb.toString());
           continue; // only pattern with this last stop
         }
 
@@ -129,7 +129,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         var start = pattern.firstStop();
         sb.append(" from ").append(stopNameAndId(start));
         if (starts.get(start).size() == 1) {
-          pattern.setName((sb.toString()));
+          pattern.initName((sb.toString()));
           continue; // only pattern with this first stop
         }
 
@@ -138,7 +138,7 @@ public class TripPatternNamer implements GraphBuilderModule {
         Set<TripPattern> remainingPatterns = new HashSet<>(tripPatterns);
         remainingPatterns.retainAll(ends.get(end)); // set intersection
         if (remainingPatterns.size() == 1) {
-          pattern.setName((sb.toString()));
+          pattern.initName((sb.toString()));
           continue;
         }
 
@@ -149,7 +149,7 @@ public class TripPatternNamer implements GraphBuilderModule {
           intersection.retainAll(vias.get(via));
           if (intersection.size() == 1) {
             sb.append(" via ").append(stopNameAndId(via));
-            pattern.setName((sb.toString()));
+            pattern.initName((sb.toString()));
             continue PATTERN;
           }
         }
@@ -167,7 +167,7 @@ public class TripPatternNamer implements GraphBuilderModule {
             .map(TripTimes::getTrip)
             .ifPresent(value -> sb.append(" like trip ").append(value.getId()));
         }
-        pattern.setName((sb.toString()));
+        pattern.initName((sb.toString()));
       } // END foreach PATTERN
     } // END foreach ROUTE
 

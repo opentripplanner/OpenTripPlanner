@@ -188,7 +188,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
       .withStopPattern(STOP_PATTERN)
       .build();
 
-    p.setName("Pattern");
+    p.initName("Pattern");
     for (Trip trip : trips) {
       p.add(new TripTimes(trip, STOP_TIMES, DEDUPLICATOR));
     }
