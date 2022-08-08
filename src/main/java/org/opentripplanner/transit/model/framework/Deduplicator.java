@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.framework;
 
-import com.google.common.collect.Maps;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -22,11 +21,11 @@ public class Deduplicator implements Serializable {
 
   private static final long serialVersionUID = 20140524L;
 
-  private final Map<BitSet, BitSet> canonicalBitSets = Maps.newHashMap();
-  private final Map<IntArray, IntArray> canonicalIntArrays = Maps.newHashMap();
-  private final Map<String, String> canonicalStrings = Maps.newHashMap();
-  private final Map<StringArray, StringArray> canonicalStringArrays = Maps.newHashMap();
-  private final Map<String2DArray, String2DArray> canonicalString2DArrays = Maps.newHashMap();
+  private final Map<BitSet, BitSet> canonicalBitSets = new HashMap<>();
+  private final Map<IntArray, IntArray> canonicalIntArrays = new HashMap<>();
+  private final Map<String, String> canonicalStrings = new HashMap<>();
+  private final Map<StringArray, StringArray> canonicalStringArrays = new HashMap<>();
+  private final Map<String2DArray, String2DArray> canonicalString2DArrays = new HashMap<>();
   private final Map<Class<?>, Map<?, ?>> canonicalObjects = new HashMap<>();
   private final Map<Class<?>, Map<List<?>, List<?>>> canonicalLists = new HashMap<>();
 

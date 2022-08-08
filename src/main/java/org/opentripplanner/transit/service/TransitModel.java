@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.IOException;
@@ -69,7 +68,7 @@ public class TransitModel implements Serializable {
 
   private final HashSet<TransitMode> transitModes = new HashSet<>();
 
-  private final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
+  private final Map<FeedScopedId, Integer> serviceCodes = new HashMap<>();
 
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
@@ -95,8 +94,8 @@ public class TransitModel implements Serializable {
   private boolean hasFrequencyService = false;
   private boolean hasScheduledService = false;
 
-  private final Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
-  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
+  private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
+  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = new HashMap<>();
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 

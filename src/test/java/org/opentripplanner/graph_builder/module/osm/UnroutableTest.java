@@ -35,14 +35,13 @@ import org.opentripplanner.transit.service.TransitModel;
 public class UnroutableTest {
 
   private Graph graph;
-  private TransitModel transitModel;
 
   @BeforeEach
   public void setUp() throws Exception {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    TransitModel transitModel = new TransitModel(stopModel, deduplicator);
 
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));

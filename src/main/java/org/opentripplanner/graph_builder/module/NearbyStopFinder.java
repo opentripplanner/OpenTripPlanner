@@ -1,13 +1,13 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
@@ -137,7 +137,7 @@ public class NearbyStopFinder {
     }
 
     /* Make a transfer from the origin stop to each destination stop that was the closest stop on any pattern. */
-    Set<NearbyStop> uniqueStops = Sets.newHashSet();
+    Set<NearbyStop> uniqueStops = new HashSet<>();
     uniqueStops.addAll(closestStopForFlexTrip.values());
     uniqueStops.addAll(closestStopForPattern.values());
     return uniqueStops;
@@ -177,7 +177,7 @@ public class NearbyStopFinder {
     boolean reverseDirection,
     RoutingRequest routingRequest
   ) {
-    List<NearbyStop> stopsFound = Lists.newArrayList();
+    List<NearbyStop> stopsFound = new ArrayList<>();
 
     routingRequest.setArriveBy(reverseDirection);
 

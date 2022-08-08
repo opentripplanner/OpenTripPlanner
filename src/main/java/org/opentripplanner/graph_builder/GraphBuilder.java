@@ -91,6 +91,10 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.netexModule());
     }
 
+    if (hasTransitData) {
+      graphBuilder.addModule(factory.tripPatternNamer());
+    }
+
     if (hasTransitData && transitModel.getAgencyTimeZones().size() > 1) {
       graphBuilder.addModule(factory.timeZoneAdjusterModule());
     }

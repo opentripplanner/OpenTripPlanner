@@ -1,6 +1,5 @@
 package org.opentripplanner.model;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
@@ -11,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -172,8 +172,8 @@ public class TimetableSnapshot {
    */
   public boolean update(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
     // Preconditions
-    Preconditions.checkNotNull(pattern);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(pattern);
+    Objects.requireNonNull(serviceDate);
 
     if (readOnly) {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");

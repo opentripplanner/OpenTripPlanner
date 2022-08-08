@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import org.opentripplanner.model.StopTime;
@@ -420,8 +421,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(tripUpdate);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(tripUpdate);
+    Objects.requireNonNull(serviceDate);
 
     //
     // Validate added trip
@@ -570,7 +571,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -664,7 +665,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final RealTimeState realTimeState
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -857,8 +858,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(tripUpdate);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(tripUpdate);
+    Objects.requireNonNull(serviceDate);
 
     //
     // Validate modified trip
@@ -925,7 +926,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"

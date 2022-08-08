@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
+import org.opentripplanner.graph_builder.module.TripPatternNamer;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
@@ -35,6 +36,7 @@ public interface GraphBuilderFactory {
   GtfsModule gtfsModule();
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
+  TripPatternNamer tripPatternNamer();
   BusRouteStreetMatcher busRouteStreetMatcher();
   OsmBoardingLocationsModule osmBoardingLocationsModule();
   StreetLinkerModule streetLinkerModule();

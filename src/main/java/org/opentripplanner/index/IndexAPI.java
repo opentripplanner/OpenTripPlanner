@@ -49,6 +49,7 @@ import org.opentripplanner.api.model.ApiTransfer;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
+import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
@@ -435,7 +436,7 @@ public class IndexAPI {
   @Path("/trips/{tripId}/semanticHash")
   public String getSemanticHashForTrip(@PathParam("tripId") String tripId) {
     var trip = trip(tripId);
-    return tripPattern(trip).semanticHashString(trip);
+    return SemanticHash.forTripPattern(tripPattern(trip), trip);
   }
 
   @GET
@@ -501,7 +502,7 @@ public class IndexAPI {
   @Path("/patterns/{patternId}/semanticHash")
   public String getSemanticHashForPattern(@PathParam("patternId") String patternId) {
     var tripPattern = tripPattern(patternId);
-    return tripPattern.semanticHashString(null);
+    return SemanticHash.forTripPattern(tripPattern, null);
   }
 
   /** Return geometry for the pattern as a packed coordinate sequence */
