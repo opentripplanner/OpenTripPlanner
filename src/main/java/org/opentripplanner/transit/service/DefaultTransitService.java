@@ -156,7 +156,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TIntSet getServicesRunningForDate(LocalDate serviceDate) {
+  public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
     return transitModelIndex
       .getServiceCodesRunningForDate()
       .getOrDefault(serviceDate, new TIntHashSet());

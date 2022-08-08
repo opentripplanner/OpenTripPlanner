@@ -105,7 +105,7 @@ public class FlexRouter {
         new FlexServiceDate(
           date,
           ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
-          transitService.getServicesRunningForDate(date)
+          transitService.getServiceCodesRunningForDate(date)
         );
     }
   }

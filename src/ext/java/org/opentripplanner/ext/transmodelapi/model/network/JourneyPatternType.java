@@ -86,7 +86,7 @@ public class JourneyPatternType {
           .dataFetcher(environment -> {
             TIntSet services = GqlUtil
               .getTransitService(environment)
-              .getServicesRunningForDate(
+              .getServiceCodesRunningForDate(
                 Optional
                   .ofNullable((LocalDate) environment.getArgument("date"))
                   .orElse(LocalDate.now())

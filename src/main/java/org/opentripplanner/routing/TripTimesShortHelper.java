@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -36,7 +35,9 @@ public class TripTimesShortHelper {
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
-    if (!transitService.getServicesRunningForDate(serviceDate).contains(times.getServiceCode())) {
+    if (
+      !transitService.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
+    ) {
       return new ArrayList<>();
     } else {
       Instant midnight = ServiceDateUtils

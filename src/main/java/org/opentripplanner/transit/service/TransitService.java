@@ -72,7 +72,7 @@ public interface TransitService {
 
   Integer getServiceCodeForId(FeedScopedId id);
 
-  TIntSet getServicesRunningForDate(LocalDate date);
+  TIntSet getServiceCodesRunningForDate(LocalDate date);
 
   FlexStopLocation getLocationById(FeedScopedId id);
 

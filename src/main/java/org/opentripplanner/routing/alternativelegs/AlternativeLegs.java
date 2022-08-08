@@ -128,7 +128,7 @@ public class AlternativeLegs {
         departureTime
       );
 
-      var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
+      var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
       for (TripTimes tripTimes : timetable.getTripTimes()) {
         if (!servicesRunning.contains(tripTimes.getServiceCode())) {
