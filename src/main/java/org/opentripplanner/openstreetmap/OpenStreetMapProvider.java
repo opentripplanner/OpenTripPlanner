@@ -1,6 +1,5 @@
 package org.opentripplanner.openstreetmap;
 
-import com.google.common.base.MoreObjects;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +9,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +55,10 @@ public class OpenStreetMapProvider {
 
   @Override
   public String toString() {
-    return MoreObjects
-      .toStringHelper(this)
-      .add("source", source)
-      .add("cacheDataInMem", cacheDataInMem)
+    return ToStringBuilder
+      .of(OpenStreetMapProvider.class)
+      .addObj("source", source)
+      .addBool("cacheDataInMem", cacheDataInMem)
       .toString();
   }
 

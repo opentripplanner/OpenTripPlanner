@@ -110,7 +110,7 @@ public class CarPickupTest extends GraphRoutingTest {
     //   A <-> B <-> C <-> D <-> E
     //   TS1 <-^           ^-> TE1
 
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new Builder() {
         @Override
         public void build() {

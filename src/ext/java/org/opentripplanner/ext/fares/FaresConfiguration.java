@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class FaresConfiguration {
 
-  public static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
 
   /**
    * Build a specific FareServiceFactory given the config node, or fallback to the default if none

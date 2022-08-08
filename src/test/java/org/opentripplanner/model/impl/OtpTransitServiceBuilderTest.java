@@ -104,10 +104,6 @@ public class OtpTransitServiceBuilderTest {
     return first(builder.getAgenciesById().values());
   }
 
-  private static FareAttribute createFareAttribute() {
-    return new FareAttribute(TransitModelForTest.id("FA"));
-  }
-
   private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {
     return new ServiceCalendarDate(serviceId, LocalDate.of(2017, 8, 31), 2);
   }

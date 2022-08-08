@@ -96,7 +96,7 @@ public class ServiceLinkMapperTest {
 
     EntityById<Stop> stopsById = new EntityById<>();
 
-    DataImportIssueStore issueStore = new DataImportIssueStore(false);
+    DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
     StopMapper stopMapper = new StopMapper(ID_FACTORY, issueStore);
     StopPattern.StopPatternBuilder stopPatternBuilder = StopPattern.create(3);
 

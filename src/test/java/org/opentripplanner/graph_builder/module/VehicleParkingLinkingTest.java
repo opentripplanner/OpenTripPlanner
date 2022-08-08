@@ -4,10 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
@@ -46,13 +44,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(
-      graph,
-      transitModel,
-      new HashMap<>(),
-      new DataImportIssueStore(false)
-    );
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     assertEquals(1, parkingVertex.getOutgoing().size());
     parkingVertex.getOutgoing().forEach(e -> assertEquals(e.getToVertex(), A));
@@ -71,13 +63,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(
-      graph,
-      transitModel,
-      new HashMap<>(),
-      new DataImportIssueStore(false)
-    );
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(2, streetLinks.size());
@@ -103,13 +89,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(
-      graph,
-      transitModel,
-      new HashMap<>(),
-      new DataImportIssueStore(false)
-    );
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(4, streetLinks.size());
@@ -133,13 +113,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(
-      graph,
-      transitModel,
-      new HashMap<>(),
-      new DataImportIssueStore(false)
-    );
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     assertEquals(1, vehicleParking.getEntrances().size());
 
@@ -164,13 +138,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(
-      graph,
-      transitModel,
-      new HashMap<>(),
-      new DataImportIssueStore(false)
-    );
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 

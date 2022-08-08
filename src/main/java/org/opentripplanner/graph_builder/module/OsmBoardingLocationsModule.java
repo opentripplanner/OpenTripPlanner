@@ -1,13 +1,12 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -23,7 +22,6 @@ import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +45,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(OsmBoardingLocationsModule.class);
   private final double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(250);
 
+  private final Graph graph;
+
+  @Inject
+  public OsmBoardingLocationsModule(Graph graph) {
+    this.graph = graph;
+  }
+
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     var streetIndex = graph.getStreetIndex();
     LOG.info("Improving boarding locations by checking OSM entities...");
     int successes = 0;

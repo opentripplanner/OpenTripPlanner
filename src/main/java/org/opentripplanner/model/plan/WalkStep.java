@@ -1,6 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,7 +49,7 @@ public class WalkStep {
   private List<P2<Double>> elevation;
   private Boolean stayOn = false;
 
-  private List<Edge> edges = Lists.newArrayList();
+  private List<Edge> edges = new ArrayList<>();
 
   private VehicleRentalStationInfo vehicleRentalOnStation;
 

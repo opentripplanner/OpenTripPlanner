@@ -2,6 +2,8 @@ package org.opentripplanner.api.common;
 
 import java.util.Locale;
 import org.opentripplanner.util.resources.ResourceBundleAdaptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The purpose of Messages is to read supply Message.properties to underlying calling code... The
@@ -30,6 +32,8 @@ public enum Message {
   TRIANGLE_OPTIMIZE_TYPE_NOT_SET(372),
   TRIANGLE_VALUES_NOT_SET(373);
 
+  private static final Logger LOG = LoggerFactory.getLogger(Message.class);
+
   private final ResourceBundleAdaptor config = new ResourceBundleAdaptor(Message.class);
   private final int m_id;
 
@@ -46,9 +50,7 @@ public enum Message {
     try {
       return config.get(name(), l);
     } catch (Exception e) {
-      ResourceBundleAdaptor.LOG.warn(
-        "No entry in Message.properties file could be found for string " + name()
-      );
+      LOG.warn("No entry in Message.properties file could be found for string " + name());
       return "";
     }
   }

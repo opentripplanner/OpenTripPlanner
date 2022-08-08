@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,12 +30,12 @@ public class StopModelIndex {
 
   // TODO: consistently key on model object or id string
 
-  private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
+  private final Map<Stop, TransitStopVertex> stopVertexForStop = new HashMap<>();
   private final HashGridSpatialIndex<Stop> stopSpatialIndex = new HashGridSpatialIndex<>();
-  private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
+  private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
   private final Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
   private final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
-  private final Map<FeedScopedId, StopLocation> stopForId = Maps.newHashMap();
+  private final Map<FeedScopedId, StopLocation> stopForId = new HashMap<>();
   private final List<StopLocation> stopsByIndex;
   private final Map<StopLocation, Integer> indexByStop = new HashMap<>();
 

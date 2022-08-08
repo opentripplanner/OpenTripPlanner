@@ -199,7 +199,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
   }
 
   private Graph graph() {
-    TestOtpModel model = graphOf(
+    TestOtpModel model = modelOf(
       new Builder() {
         @Override
         public void build() {
