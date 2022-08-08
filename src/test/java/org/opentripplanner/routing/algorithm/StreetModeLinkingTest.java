@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -111,7 +110,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new GraphRoutingTest.Builder() {
         @Override
         public void build() {
@@ -159,7 +158,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
     graph.hasStreets = true;
     transitModel = otpModel.transitModel();
-    new StreetLinkerModule().buildGraph(graph, transitModel, null, new DataImportIssueStore(false));
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
   }
 
   private void assertLinkedFromTo(

@@ -7,10 +7,13 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Responsible for dependency injection and creating main NeTEx module objects. This decouple the
@@ -27,15 +30,8 @@ public class NetexConfig {
 
   private final BuildConfig buildParams;
 
-  private NetexConfig(BuildConfig builderParams) {
+  public NetexConfig(BuildConfig builderParams) {
     this.buildParams = builderParams;
-  }
-
-  public static NetexModule netexModule(
-    BuildConfig buildParams,
-    Iterable<DataSource> netexSources
-  ) {
-    return new NetexConfig(buildParams).netexModule(netexSources);
   }
 
   public static NetexBundle netexBundleForTest(BuildConfig builderParams, File netexZipFile) {
@@ -43,7 +39,12 @@ public class NetexConfig {
       .netexBundle(new ZipFileDataSource(netexZipFile, FileType.NETEX));
   }
 
-  private NetexModule netexModule(Iterable<DataSource> netexSources) {
+  public NetexModule createNetexModule(
+    Iterable<DataSource> netexSources,
+    TransitModel transitModel,
+    Graph graph,
+    DataImportIssueStore issueStore
+  ) {
     List<NetexBundle> netexBundles = new ArrayList<>();
 
     for (DataSource it : netexSources) {
@@ -53,6 +54,9 @@ public class NetexConfig {
 
     return new NetexModule(
       buildParams.netex.netexFeedId,
+      graph,
+      transitModel,
+      issueStore,
       buildParams.getSubwayAccessTimeSeconds(),
       buildParams.getTransitServicePeriod(),
       netexBundles

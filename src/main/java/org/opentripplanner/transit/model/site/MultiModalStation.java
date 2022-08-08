@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
