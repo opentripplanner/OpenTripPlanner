@@ -47,6 +47,7 @@ import org.opentripplanner.api.model.ApiTransfer;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
+import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
@@ -61,7 +62,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.SemanticHash;
 import org.opentripplanner.util.model.EncodedPolyline;
 import org.opentripplanner.util.time.ServiceDateUtils;
 

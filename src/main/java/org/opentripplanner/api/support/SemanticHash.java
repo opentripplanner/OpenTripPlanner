@@ -1,4 +1,4 @@
-package org.opentripplanner.util;
+package org.opentripplanner.api.support;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
