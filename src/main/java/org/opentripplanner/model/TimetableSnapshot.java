@@ -156,7 +156,7 @@ public class TimetableSnapshot {
   /**
    * @return if any trip patterns were added.
    */
-  public boolean hasLastAddedTripPatterns() {
+  public boolean hasRealtimeAddedTripPatterns() {
     return !realtimeAddedTripPattern.isEmpty();
   }
 

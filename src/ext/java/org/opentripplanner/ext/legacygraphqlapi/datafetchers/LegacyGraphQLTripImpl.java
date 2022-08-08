@@ -21,7 +21,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -337,11 +336,10 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
           ? ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate())
           : LocalDate.now(timeZone);
 
-        TripPattern tripPattern = null;
-        TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
-        if (timetableSnapshot != null) {
-          tripPattern = timetableSnapshot.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
-        }
+        TripPattern tripPattern = transitService.getRealtimeAddedTripPattern(
+          trip.getId(),
+          serviceDate
+        );
         // timetableSnapshot is null or no realtime added pattern found
         if (tripPattern == null) {
           tripPattern = getTripPattern(environment);

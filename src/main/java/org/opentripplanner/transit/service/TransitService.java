@@ -154,6 +154,8 @@ public interface TransitService {
 
   TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate);
 
+  boolean hasRealtimeAddedTripPatterns();
+
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
 
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);

@@ -425,6 +425,15 @@ public class DefaultTransitService implements TransitEditorService {
     return timetableSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
   }
 
+  @Override
+  public boolean hasRealtimeAddedTripPatterns() {
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return false;
+    }
+    return timetableSnapshot.hasRealtimeAddedTripPatterns();
+  }
+
   /**
    * Lazy-initialization of TimetableSnapshot
    *
