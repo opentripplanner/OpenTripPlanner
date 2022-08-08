@@ -23,12 +23,12 @@ public class DatedServiceJourneyHelper {
       if (
         transitService
           .getTimetableSnapshot()
-          .getLastAddedTripOnServiceDateByTripIdAndServiceDate()
+          .getRealtimeAddedTripOnServiceDateByTripIdAndServiceDate()
           .containsKey(tuple)
       ) {
         return transitService
           .getTimetableSnapshot()
-          .getLastAddedTripOnServiceDateByTripIdAndServiceDate()
+          .getRealtimeAddedTripOnServiceDateByTripIdAndServiceDate()
           .get(tuple);
       }
     }
@@ -46,9 +46,9 @@ public class DatedServiceJourneyHelper {
     TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
     if (
       timetableSnapshot != null &&
-      timetableSnapshot.getLastAddedTripOnServiceDate().containsKey(datedServiceJourneyId)
+      timetableSnapshot.getRealtimeAddedTripOnServiceDate().containsKey(datedServiceJourneyId)
     ) {
-      return timetableSnapshot.getLastAddedTripOnServiceDate().get(datedServiceJourneyId);
+      return timetableSnapshot.getRealtimeAddedTripOnServiceDate().get(datedServiceJourneyId);
     }
 
     return transitService.getTripOnServiceDateById(datedServiceJourneyId);

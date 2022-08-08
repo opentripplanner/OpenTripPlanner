@@ -39,7 +39,6 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
@@ -586,7 +585,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   ) {
     return originalPattern
       .scheduledTripsAsStream()
-      .map(trip -> timetableSnapshot.getLastAddedTripPattern(trip.getId(), date))
+      .map(trip -> timetableSnapshot.getRealtimeAddedTripPattern(trip.getId(), date))
       .filter(tripPattern ->
         tripPattern != null && tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
       );

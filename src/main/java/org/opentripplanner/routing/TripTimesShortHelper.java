@@ -25,7 +25,10 @@ public class TripTimesShortHelper {
     if (timetableSnapshot != null) {
       // Check if realtime-data is available for trip
 
-      TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
+      TripPattern pattern = timetableSnapshot.getRealtimeAddedTripPattern(
+        trip.getId(),
+        serviceDate
+      );
       if (pattern == null) {
         pattern = transitService.getPatternForTrip(trip);
       }

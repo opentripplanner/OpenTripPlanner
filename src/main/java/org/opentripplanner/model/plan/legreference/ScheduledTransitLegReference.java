@@ -36,7 +36,7 @@ public record ScheduledTransitLegReference(
 
     // Check if pattern is changed by real-time updater
     if (timetableSnapshot != null) {
-      tripPattern = timetableSnapshot.getLastAddedTripPattern(tripId, serviceDate);
+      tripPattern = timetableSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
     }
 
     // Otherwise use scheduled pattern

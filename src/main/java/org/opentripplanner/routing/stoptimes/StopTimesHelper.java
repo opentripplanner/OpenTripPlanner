@@ -301,7 +301,7 @@ public class StopTimesHelper {
     if (snapshot == null) {
       return false;
     }
-    final TripPattern replacement = snapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
+    final TripPattern replacement = snapshot.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
     return replacement != null && !replacement.equals(pattern);
   }
 

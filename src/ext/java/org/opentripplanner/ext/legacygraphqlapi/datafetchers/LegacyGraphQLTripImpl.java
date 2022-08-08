@@ -340,7 +340,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         TripPattern tripPattern = null;
         TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
         if (timetableSnapshot != null) {
-          tripPattern = timetableSnapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
+          tripPattern = timetableSnapshot.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
         }
         // timetableSnapshot is null or no realtime added pattern found
         if (tripPattern == null) {
