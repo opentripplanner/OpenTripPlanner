@@ -18,9 +18,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -32,8 +30,10 @@ import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -87,7 +87,7 @@ public class NetexBundleSmokeTest {
   }
 
   private static StopTimeKey stId(String id, int stopSequenceNr) {
-    return new StopTimeKey(fId(id), stopSequenceNr);
+    return StopTimeKey.of(fId(id), stopSequenceNr).build();
   }
 
   private static FeedScopedId fId(String id) {

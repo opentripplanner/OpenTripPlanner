@@ -185,19 +185,4 @@ public class RoutingService {
         transitService
       );
   }
-
-  /** {@link Graph#getStopsByBoundingBox(double, double, double, double)} */
-  public Collection<StopLocation> getStopsByBoundingBox(
-    double minLat,
-    double minLon,
-    double maxLat,
-    double maxLon
-  ) {
-    return this.graph.getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
-  }
-
-  /** {@link Graph#getStopsInRadius(WgsCoordinate, double)} */
-  public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
-    return this.graph.getStopsInRadius(center, radius);
-  }
 }

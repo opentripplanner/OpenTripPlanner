@@ -37,8 +37,8 @@ class DirectGraphFinderTest extends GraphRoutingTest {
 
   @Test
   void findClosestStops() {
-    var ns1 = new NearbyStop(S1.getStop(), 0, null, null, null);
-    var ns2 = new NearbyStop(S2.getStop(), 1112, null, null, null);
+    var ns1 = new NearbyStop(S1.getStop(), 0, null, null);
+    var ns2 = new NearbyStop(S2.getStop(), 1112, null, null);
 
     var testee = new DirectGraphFinder(graph);
     assertEquals(List.of(ns1), testee.findClosestStops(47.500, 19.000, 100));

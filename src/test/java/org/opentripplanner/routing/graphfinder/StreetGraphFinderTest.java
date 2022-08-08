@@ -121,8 +121,8 @@ class StreetGraphFinderTest extends GraphRoutingTest {
 
   @Test
   void findClosestStops() {
-    var ns1 = new NearbyStop(S1.getStop(), 0, null, null, null);
-    var ns2 = new NearbyStop(S2.getStop(), 100, null, null, null);
+    var ns1 = new NearbyStop(S1.getStop(), 0, null, null);
+    var ns2 = new NearbyStop(S2.getStop(), 100, null, null);
 
     assertEquals(List.of(ns1), simplify(graphFinder.findClosestStops(47.500, 19.000, 10)));
 
@@ -433,7 +433,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
   private List<NearbyStop> simplify(List<NearbyStop> closestStops) {
     return closestStops
       .stream()
-      .map(ns -> new NearbyStop(ns.stop, ns.distance, null, null, null))
+      .map(ns -> new NearbyStop(ns.stop, ns.distance, null, null))
       .collect(Collectors.toList());
   }
 }

@@ -77,7 +77,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .stream()
       .filter(s -> s.getId().getId().equals("cujv"))
       .findFirst()
-      .get();
+      .orElseThrow();
     assertEquals(33.85465, stop.getLat(), delta);
     assertEquals(-84.60039, stop.getLon(), delta);
 
@@ -86,7 +86,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .stream()
       .filter(s -> s.getId().getId().equals("zone_3"))
       .findFirst()
-      .get();
+      .orElseThrow();
     assertEquals(33.825846635310214, flexZone.getLat(), delta);
     assertEquals(-84.63430143459385, flexZone.getLon(), delta);
   }
@@ -253,11 +253,11 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     return result.getItineraries();
   }
 
-  private static NearbyStop getNearbyStop(FlexTrip trip) {
+  private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip) {
     return getNearbyStop(trip, "nearby-stop");
   }
 
-  private static NearbyStop getNearbyStop(FlexTrip trip, String id) {
+  private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip, String id) {
     // getStops() returns a set of stops and the order doesn't correspond to the stop times
     // of the trip
     var stopLocation = trip
@@ -265,7 +265,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .stream()
       .filter(s -> s instanceof FlexStopLocation)
       .findFirst()
-      .get();
+      .orElseThrow();
     var r = new RoutingRequest();
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, r)) {
       RoutingContext routingContext = new RoutingContext(r, graph, temporaryVertices);
@@ -274,13 +274,12 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         stopLocation,
         0,
         List.of(),
-        null,
         new State(new StreetLocation(id, new Coordinate(0, 0), id), r, routingContext)
       );
     }
   }
 
-  private static FlexTrip getFlexTrip() {
+  private static FlexTrip<?, ?> getFlexTrip() {
     var feedId = transitModel.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
     return transitModel.getFlexTrip(tripId);

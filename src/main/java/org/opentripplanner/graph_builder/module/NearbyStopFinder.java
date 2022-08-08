@@ -190,10 +190,10 @@ public class NearbyStopFinder {
 
     /* Add the origin vertices if they are stops */
     for (Vertex vertex : originVertices) {
-      if (vertex instanceof TransitStopVertex) {
+      if (vertex instanceof TransitStopVertex tsv) {
         stopsFound.add(
           new NearbyStop(
-            (TransitStopVertex) vertex,
+            tsv.getStop(),
             0,
             Collections.emptyList(),
             new State(vertex, routingRequest, routingContext)

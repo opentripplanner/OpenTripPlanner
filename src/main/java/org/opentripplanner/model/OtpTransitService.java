@@ -15,6 +15,9 @@ import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
@@ -86,7 +89,7 @@ public interface OtpTransitService {
 
   Collection<Trip> getAllTrips();
 
-  Collection<FlexTrip> getAllFlexTrips();
+  Collection<FlexTrip<?, ?>> getAllFlexTrips();
 
   /**
    * @return if transit service has any active services. The graph build might filter out all

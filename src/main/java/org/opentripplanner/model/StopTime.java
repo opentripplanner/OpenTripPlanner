@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 
 import java.util.List;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -92,7 +93,7 @@ public final class StopTime implements Comparable<StopTime> {
    * is ok.
    */
   public StopTimeKey getId() {
-    return new StopTimeKey(trip.getId(), stopSequence);
+    return StopTimeKey.of(trip.getId(), stopSequence).build();
   }
 
   public Trip getTrip() {

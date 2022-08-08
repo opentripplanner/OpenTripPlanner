@@ -10,11 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -40,6 +36,10 @@ import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.Pathway;
+import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationElement;
@@ -59,7 +59,7 @@ public class AddTransitModelEntitiesToGraph {
   private final OtpTransitService otpTransitService;
 
   // Map of all station elements and their vertices in the graph
-  private final Map<StationElement, Vertex> stationElementNodes = new HashMap<>();
+  private final Map<StationElement<?, ?>, Vertex> stationElementNodes = new HashMap<>();
 
   private final int subwayAccessTime;
 
@@ -421,7 +421,7 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   private void addFlexTripsToGraph(TransitModel transitModel) {
-    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) {
+    for (FlexTrip<?, ?> flexTrip : otpTransitService.getAllFlexTrips()) {
       transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }

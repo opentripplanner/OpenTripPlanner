@@ -11,7 +11,6 @@ import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
@@ -35,6 +34,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSame
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 
 /**

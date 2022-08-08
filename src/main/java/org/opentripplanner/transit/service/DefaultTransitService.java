@@ -16,7 +16,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
@@ -43,6 +42,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopCollection;
@@ -543,7 +543,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<TransitStopVertex> queryStopSpatialIndex(Envelope envelope) {
+  public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
     return transitModel.getStopModel().getStopModelIndex().queryStopSpatialIndex(envelope);
   }
 

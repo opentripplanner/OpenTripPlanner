@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.TransitService;
 
-public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVertex> {
+public class DigitransitStopPropertyMapper extends PropertyMapper<Stop> {
 
   private final TransitService transitService;
 
@@ -28,8 +28,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
   }
 
   @Override
-  public Collection<T2<String, Object>> map(TransitStopVertex input) {
-    Stop stop = input.getStop();
+  public Collection<T2<String, Object>> map(Stop stop) {
     Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
 
     String type = patternsForStop
