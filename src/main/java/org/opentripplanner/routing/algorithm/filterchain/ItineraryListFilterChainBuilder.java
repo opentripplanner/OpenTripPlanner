@@ -273,17 +273,7 @@ public class ItineraryListFilterChainBuilder {
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
-    if (removeItinerariesWithSameRoutesAndStops) {
-      filters.add(
-        new GroupByFilter<>(
-          GroupBySameRoutesAndStops::new,
-          List.of(
-            new SortingFilter(generalizedCostComparator()),
-            new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
-          )
-        )
-      );
-    }
+    filters.addAll(buildGroupBySameRoutesAndStopsFilter());
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
@@ -380,6 +370,27 @@ public class ItineraryListFilterChainBuilder {
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
     return new ItineraryListFilterChain(filters, debug);
+  }
+
+  /**
+   * If enabled, this adds the filter to remove itineraries which have the same stops and routes.
+   * These are sometimes called "time-shifted duplicates" but since those terms have so many meanings
+   * we chose to use a long, but descriptive name instead.
+   */
+  private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
+    if (removeItinerariesWithSameRoutesAndStops) {
+      return List.of(
+        new GroupByFilter<>(
+          GroupBySameRoutesAndStops::new,
+          List.of(
+            new SortingFilter(generalizedCostComparator()),
+            new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
+          )
+        )
+      );
+    } else {
+      return List.of();
+    }
   }
 
   public ItineraryListFilterChainBuilder withTransitAlerts(
