@@ -13,12 +13,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -47,7 +45,6 @@ public class StopTimesHelper {
    */
   public static List<StopTimesInPattern> stopTimesForStop(
     TransitService transitService,
-    TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     Instant startTime,
     Duration timeRange,
@@ -58,12 +55,11 @@ public class StopTimesHelper {
     List<StopTimesInPattern> result = new ArrayList<>();
 
     // Fetch all patterns, including those from realtime sources
-    Collection<TripPattern> patterns = transitService.getPatternsForStop(stop, timetableSnapshot);
+    Collection<TripPattern> patterns = transitService.getPatternsForStop(stop, true);
 
     for (TripPattern pattern : patterns) {
       Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
         transitService,
-        timetableSnapshot,
         stop,
         pattern,
         startTime,
@@ -102,10 +98,7 @@ public class StopTimesHelper {
 
     for (TripPattern pattern : transitService.getPatternsForStop(stop, true)) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-      Timetable tt = Optional
-        .ofNullable(transitService.getTimetableSnapshot())
-        .map(timetableSnapshot -> timetableSnapshot.resolve(pattern, serviceDate))
-        .orElse(pattern.getScheduledTimetable());
+      Timetable tt = transitService.getTimetableForTripPattern(pattern, serviceDate);
       List<StopLocation> stops = pattern.getStops();
       for (int i = 0; i < stops.size(); i++) {
         StopLocation currStop = stops.get(i);
@@ -142,7 +135,6 @@ public class StopTimesHelper {
    */
   public static List<TripTimeOnDate> stopTimesForPatternAtStop(
     TransitService transitService,
-    TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -152,7 +144,6 @@ public class StopTimesHelper {
   ) {
     Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
       transitService,
-      timetableSnapshot,
       stop,
       pattern,
       startTime,
@@ -183,7 +174,6 @@ public class StopTimesHelper {
 
   private static Queue<TripTimeOnDate> listTripTimeShortsForPatternAtStop(
     TransitService transitService,
-    TimetableSnapshot timetableSnapshot,
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -223,11 +213,7 @@ public class StopTimesHelper {
 
     // Loop through all possible days
     for (LocalDate serviceDate : serviceDates) {
-      Timetable timetable = Optional
-        .ofNullable(timetableSnapshot)
-        .map(timetableSnapshot1 -> timetableSnapshot1.resolve(pattern, serviceDate))
-        .orElse(pattern.getScheduledTimetable());
-
+      Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
       ZonedDateTime midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
       int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
         midnight,
@@ -255,12 +241,7 @@ public class StopTimesHelper {
             }
             if (
               !includeReplaced &&
-              isReplacedByAnotherPattern(
-                tripTimes.getTrip(),
-                serviceDate,
-                pattern,
-                timetableSnapshot
-              )
+              isReplacedByAnotherPattern(tripTimes.getTrip(), serviceDate, pattern, transitService)
             ) {
               continue;
             }
@@ -296,12 +277,12 @@ public class StopTimesHelper {
     Trip trip,
     LocalDate serviceDate,
     TripPattern pattern,
-    TimetableSnapshot snapshot
+    TransitService transitService
   ) {
-    if (snapshot == null) {
-      return false;
-    }
-    final TripPattern replacement = snapshot.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
+    final TripPattern replacement = transitService.getRealtimeAddedTripPattern(
+      trip.getId(),
+      serviceDate
+    );
     return replacement != null && !replacement.equals(pattern);
   }
 

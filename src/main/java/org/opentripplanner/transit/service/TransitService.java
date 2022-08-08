@@ -152,6 +152,8 @@ public interface TransitService {
 
   Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 
+  TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate);
+
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
 
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);

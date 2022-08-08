@@ -314,7 +314,6 @@ public class DefaultTransitService implements TransitEditorService {
   ) {
     return StopTimesHelper.stopTimesForStop(
       this,
-      lazyGetTimeTableSnapShot(),
       stop,
       startTime,
       timeRange,
@@ -366,7 +365,6 @@ public class DefaultTransitService implements TransitEditorService {
   ) {
     return StopTimesHelper.stopTimesForPatternAtStop(
       this,
-      lazyGetTimeTableSnapShot(),
       stop,
       pattern,
       startTime,
@@ -416,6 +414,15 @@ public class DefaultTransitService implements TransitEditorService {
     return timetableSnapshot != null
       ? timetableSnapshot.resolve(tripPattern, serviceDate)
       : tripPattern.getScheduledTimetable();
+  }
+
+  @Override
+  public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return null;
+    }
+    return timetableSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
   }
 
   /**

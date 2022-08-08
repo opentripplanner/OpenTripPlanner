@@ -34,7 +34,6 @@ class StopTimesHelperTest {
     // Case 1, should find first departure for each pattern
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
-      null,
       transitService.getStopForId(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
@@ -66,7 +65,6 @@ class StopTimesHelperTest {
     result =
       StopTimesHelper.stopTimesForStop(
         transitService,
-        null,
         transitService.getStopForId(stopId),
         serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
         Duration.ofHours(24),
@@ -81,7 +79,6 @@ class StopTimesHelperTest {
     result =
       StopTimesHelper.stopTimesForStop(
         transitService,
-        null,
         transitService.getStopForId(stopId),
         serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
         Duration.ofHours(6),
@@ -96,7 +93,6 @@ class StopTimesHelperTest {
     result =
       StopTimesHelper.stopTimesForStop(
         transitService,
-        null,
         transitService.getStopForId(stopId),
         serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
         Duration.ofHours(36),
@@ -134,7 +130,6 @@ class StopTimesHelperTest {
     // Case 1, midnight, time range one day, should only find one trip, which is on the same day
     var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
       transitService,
-      null,
       transitService.getStopForId(stopId),
       pattern,
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
@@ -156,7 +151,6 @@ class StopTimesHelperTest {
     stopTimes =
       StopTimesHelper.stopTimesForPatternAtStop(
         transitService,
-        null,
         transitService.getStopForId(stopId),
         pattern,
         serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
@@ -179,7 +173,6 @@ class StopTimesHelperTest {
     stopTimes =
       StopTimesHelper.stopTimesForPatternAtStop(
         transitService,
-        null,
         transitService.getStopForId(stopId),
         pattern,
         serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
