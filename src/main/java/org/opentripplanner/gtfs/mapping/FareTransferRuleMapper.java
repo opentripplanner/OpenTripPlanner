@@ -17,11 +17,14 @@ public class FareTransferRuleMapper {
 
   public final int MISSING_VALUE = -999;
 
-  private final Map<FeedScopedId, FareProduct> fareProductsById;
   private final DataImportIssueStore issueStore;
+  private final FareProductMapper fareProductMapper;
 
-  public FareTransferRuleMapper(List<FareProduct> fareProducts, DataImportIssueStore issueStore) {
-    this.fareProductsById = Maps.uniqueIndex(fareProducts, FareProduct::id);
+  public FareTransferRuleMapper(
+    FareProductMapper fareProductMapper,
+    DataImportIssueStore issueStore
+  ) {
+    this.fareProductMapper = fareProductMapper;
     this.issueStore = issueStore;
   }
 
@@ -32,28 +35,32 @@ public class FareTransferRuleMapper {
   }
 
   private FareTransferRule doMap(org.onebusaway.gtfs.model.FareTransferRule rhs) {
-    Duration duration = null;
-    if (rhs.getDurationLimit() != MISSING_VALUE) {
-      duration = Duration.ofSeconds(rhs.getDurationLimit());
-    }
     var fareProductId = mapAgencyAndId(rhs.getFareProductId());
-    var fareProduct = fareProductsById.get(fareProductId);
-    if (fareProduct == null) {
-      issueStore.add(
-        "UnknownFareProductId",
-        "Fare product with id %s of fare transfer rule with %s not found.".formatted(
-            fareProductId,
-            rhs.getId()
-          )
-      );
-      return null;
-    }
-    return new FareTransferRule(
-      mapAgencyAndId(rhs.getFromLegGroupId()),
-      mapAgencyAndId(rhs.getToLegGroupId()),
-      rhs.getTransferCount(),
-      duration,
-      fareProduct
-    );
+
+    return fareProductMapper
+      .getByFareProductId(fareProductId)
+      .map(p -> {
+        Duration duration = null;
+        if (rhs.getDurationLimit() != MISSING_VALUE) {
+          duration = Duration.ofSeconds(rhs.getDurationLimit());
+        }
+        return new FareTransferRule(
+          mapAgencyAndId(rhs.getFromLegGroupId()),
+          mapAgencyAndId(rhs.getToLegGroupId()),
+          rhs.getTransferCount(),
+          duration,
+          p
+        );
+      })
+      .orElseGet(() -> {
+        issueStore.add(
+          "UnknownFareProductId",
+          "Fare product with id %s referenced by fare transfer rule with id %s not found.".formatted(
+              fareProductId,
+              rhs.getId()
+            )
+        );
+        return null;
+      });
   }
 }

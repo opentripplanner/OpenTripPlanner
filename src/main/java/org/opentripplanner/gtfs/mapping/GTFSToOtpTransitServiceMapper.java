@@ -20,7 +20,7 @@ import org.opentripplanner.util.OTPFeature;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
- * General mapping code or reusable bussiness logic should be moved into the Builder; hence reusable
+ * General mapping code or reusable business logic should be moved into the Builder; hence reusable
  * for other import modules.
  */
 public class GTFSToOtpTransitServiceMapper {
@@ -124,7 +124,7 @@ public class GTFSToOtpTransitServiceMapper {
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
     fareProductMapper = new FareProductMapper();
     fareLegRuleMapper = new FareLegRuleMapper(fareProductMapper, issueStore);
-    fareTransferRuleMapper = new FareTransferRuleMapper()
+    fareTransferRuleMapper = new FareTransferRuleMapper(fareProductMapper, issueStore);
   }
 
   public OtpTransitServiceBuilder getBuilder() {
