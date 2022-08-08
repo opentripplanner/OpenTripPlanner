@@ -46,7 +46,7 @@ public class MaxLimitFilter implements ItineraryDeletionFlagger {
   }
 
   @Override
-  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     if (itineraries.size() <= maxLimit) {
       return List.of();
     }
