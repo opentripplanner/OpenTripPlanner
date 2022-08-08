@@ -138,10 +138,6 @@ public class CalendarServiceDataFactoryImplTest {
     return ctxBuilder.build();
   }
 
-  private static FareAttribute createFareAttribute() {
-    return new FareAttribute(id("FA"));
-  }
-
   private static ServiceCalendarDate removeMondayFromAlldays() {
     return new ServiceCalendarDate(
       SERVICE_ALLDAYS_ID,
