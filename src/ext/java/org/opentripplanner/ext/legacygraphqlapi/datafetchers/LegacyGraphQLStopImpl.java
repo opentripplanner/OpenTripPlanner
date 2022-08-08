@@ -244,10 +244,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             return null;
           }
 
-          Instant startTime = args.getLegacyGraphQLStartTime() != 0
-            ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
-            : Instant.now();
-
           if (transitService.hasRealtimeAddedTripPatterns()) {
             return getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
               pattern,
@@ -262,7 +258,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           return transitService.stopTimesForPatternAtStop(
             stop,
             pattern,
-            startTime,
+            LegacyGraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
             Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
@@ -294,14 +290,10 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Instant startTime = args.getLegacyGraphQLStartTime() != 0
-        ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
-        : Instant.now();
-
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
         transitService.stopTimesForStop(
           stop,
-          startTime,
+          LegacyGraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
           Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
           args.getLegacyGraphQLNumberOfDepartures(),
           args.getLegacyGraphQLOmitNonPickups()
@@ -373,14 +365,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Instant startTime = args.getLegacyGraphQLStartTime() != 0
-        ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
-        : Instant.now();
       Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
         transitService
           .stopTimesForStop(
             stop,
-            startTime,
+            LegacyGraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
             Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
@@ -536,11 +525,9 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     TransitService transitService,
     LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args
   ) {
-    Instant startTime = args.getLegacyGraphQLStartTime() != 0
-      ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
-      : Instant.now();
-
+    Instant startTime = LegacyGraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime());
     LocalDate date = startTime.atZone(transitService.getTimeZone()).toLocalDate();
+
     return Stream
       .concat(
         getRealtimeAddedPatternsAsStream(originalPattern, transitService, date),

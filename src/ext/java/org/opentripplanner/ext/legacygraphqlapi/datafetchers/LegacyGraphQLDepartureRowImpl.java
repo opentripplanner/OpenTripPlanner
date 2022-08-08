@@ -6,6 +6,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -49,14 +50,10 @@ public class LegacyGraphQLDepartureRowImpl
         environment.getArguments()
       );
 
-      Instant startTime = args.getLegacyGraphQLStartTime() != 0
-        ? Instant.ofEpochSecond(args.getLegacyGraphQLStartTime())
-        : Instant.now();
-
       return getSource(environment)
         .getStoptimes(
           getTransitService(environment),
-          startTime,
+          LegacyGraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
           Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
           args.getLegacyGraphQLNumberOfDepartures(),
           args.getLegacyGraphQLOmitNonPickups()
